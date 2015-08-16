@@ -12,7 +12,7 @@ What it does:
 Quickstart
 ----------
 
-Install `voc`, then run the sample script.
+Install `voc`, then run the sample script::
 
     $ pip install voc
     $ python tests/sample.py
@@ -20,7 +20,7 @@ Install `voc`, then run the sample script.
     Writing sample.class...
     Done.
 
-This will produce a `sample.class` that you can run on any Java 1.7+ VM.
+This will produce a `sample.class` that you can run on any Java 1.7+ VM::
 
     $ java sample
     Hello, World
