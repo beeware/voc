@@ -42,7 +42,7 @@ major trading port at Batavia - now Jakarta, on the island of Java (now part
 of Indonesia). As a result of their monopoly, the VOC became an incredibly
 valuable company, issuing an 18% annual dividend for almost 200 years.
 
-VOC was... the worlds first Enterprise using Java. (rimshot!)
+VOC was... the world's first Enterprise using Java. (rimshot!)
 
 .. _Vereenigde Oostindische Compagnie (VOC): https://en.wikipedia.org/wiki/Dutch_East_India_Company
 
