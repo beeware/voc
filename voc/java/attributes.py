@@ -319,8 +319,6 @@ class Code(Attribute):
 
     def __len__(self):
         return (
-            2 +  # attribute_name_index
-            4 +  # attribute_length
             2 +  # max_stack
             2 +  # max_locals
             4 +  # code_length
@@ -328,7 +326,7 @@ class Code(Attribute):
             2 +  # exception_table_length
             sum(len(e) for e in self.exception_table) +  # exception table
             2 +  # attributes_count
-            sum(len(a) for a in self.attributes)  # attributes
+            sum(6 + len(a) for a in self.attributes)  # attributes
         )
 
     def __repr__(self):

@@ -1,4 +1,4 @@
-from voc.classfile import Class, Method, SourceFile, Code, LineNumberTable, opcodes
+from voc.java import Class, Method, SourceFile, Code, LineNumberTable, opcodes
 
 
 print("Creating class 'sample'...")
@@ -32,6 +32,29 @@ classfile.methods.append(
     Method(
         'main',
         '([Ljava/lang/String;)V',
+        static=True,
+        attributes=[
+            Code(
+                max_stack=0,
+                max_locals=1,
+                code=[
+                    opcodes.RETURN(),
+                ],
+                attributes=[
+                    LineNumberTable({
+                        0: 8,
+                    })
+                ]
+            )
+        ]
+    )
+)
+
+classfile.methods.append(
+    Method(
+        '<clinit>',
+        '()V',
+        public=False,
         static=True,
         attributes=[
             Code(

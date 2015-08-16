@@ -4,7 +4,9 @@ from .constants import Classref, ConstantPool
 
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 
+##########################################################################
 # Chapter 4: The class File Format
+##########################################################################
 
 # This chapter describes the Java Virtual Machine class file format. Each class
 # file contains the definition of a single class or interface. Although a class
