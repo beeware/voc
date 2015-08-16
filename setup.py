@@ -25,6 +25,11 @@ setup(
     author_email='russell@keith-magee.com',
     url='http://pybee.org/voc',
     packages=find_packages(exclude=['docs', 'tests']),
+    entry_points={
+        'console_scripts': [
+            'voc = voc.__main__:main',
+        ]
+    },
     license='New BSD',
     classifiers=[
         'Development Status :: 4 - Beta',
