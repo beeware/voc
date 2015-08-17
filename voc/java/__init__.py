@@ -1,5 +1,5 @@
 from .attributes import Code, SourceFile, LineNumberTable
-from .classfile import Class
+from .klass import Class
 from .constants import (
     Classref,
     Fieldref,
