@@ -91,10 +91,11 @@ class ANEWARRAY(Opcode):
 # pool
 
 class ARETURN(Opcode):
+    # Stack: objectref → [empty]
+    # Return a reference from a method
     def __init__(self):
         super(ARETURN, self).__init__(0xb0)
-# objectref → [empty]
-# Return a reference from a method
+
 
 class ARRAYLENGTH(Opcode):
     def __init__(self):
@@ -1097,8 +1098,8 @@ class LDC(Opcode):
             self.const = String(const)
         elif isinstance(const, int):
             self.const = Integer(const)
-        elif isinstance(const, long):
-            self.const = Long(const)
+        # elif isinstance(const, long):
+        #     self.const = Long(const)
         else:
             raise TypeError('Invalid type for LDC: %s' % type(const))
 
@@ -1299,17 +1300,20 @@ class NOP(Opcode):
 # [No change]
 # Perform no operation
 
+
 class POP(Opcode):
+    # Stack: value →
+    # Discard the top value on the stack
     def __init__(self):
         super(POP, self).__init__(0x57)
-# value →
-# Discard the top value on the stack
+
 
 class POP2(Opcode):
     def __init__(self):
         super(POP2, self).__init__(0x58)
 # {value2, value1} →
 # Discard the top two values on the stack (or one value, if it is a double or long)
+
 
 class PUTFIELD(Opcode):
     def __init__(self):

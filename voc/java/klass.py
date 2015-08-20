@@ -226,6 +226,9 @@ class BaseClass:
         # be a CONSTANT_Class_info structure representing the class Object.
         self.super_class = Classref(supername if supername else 'java/lang/Object')
 
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__.__name__, self.this_class.name)
+
     def write(self, out):
         """Output the classfile to the output stream provided"""
         # First, create a writer.
