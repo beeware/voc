@@ -26,7 +26,15 @@ class POP_TOP(Opcode):
         code = []
         for argument in arguments:
             code.extend(argument.operation.convert(argument.arguments))
-        code.append(JavaOpcodes.POP())
+
+        # If the most recent command is stored as None, then this is
+        # return value of a void function. We can avoid a POP operation
+        # in this case.
+        if code[-1] is None:
+            code.pop()
+        else:
+            code.append(JavaOpcodes.POP())
+
         return code
 
 
@@ -218,6 +226,7 @@ class RETURN_VALUE(Opcode):
     def convert(self, arguments):
         code = []
         if arguments[0].operation.opname == 'LOAD_CONST' and arguments[0].operation.const is None:
+            # Simple case - no return value.
             code.append(JavaOpcodes.RETURN())
         else:
             code.extend(arguments[0].operation.convert(arguments[0].arguments))
@@ -240,6 +249,7 @@ class POP_BLOCK(Opcode):
 
 # class END_FINALLY(Opcode):
 # class POP_EXCEPT(Opcode):
+
 class STORE_NAME(Opcode):
     def __init__(self, namei):
         self.namei = namei
@@ -254,6 +264,20 @@ class STORE_NAME(Opcode):
     @property
     def product_count(self):
         return 0
+
+    def convert(self, arguments):
+        code = []
+
+        # If the most recent command is stored as None, then this is
+        # return value of a void function. We can avoid a POP operation
+        # in this case.
+        if code[-1] is None:
+            code.pop()
+        else:
+            # FIXME - use namei
+            code.append(JavaOpcodes.ASTORE_0())
+
+        return code
 
 # class DELETE_NAME(Opcode):
 # class UNPACK_SEQUENCE(Opcode):
@@ -558,10 +582,18 @@ class CALL_FUNCTION(Opcode):
 
             code.extend([
                 JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/String;)V'),
-                JavaOpcodes.ACONST_NULL()
+                None
             ])
+            # The None value in the code list is a special case;
+            # Python explicitly returns None and then pops the empty
+            # result; Java can just return. We put a marker here that
+            # the POP/STORE_* result can use to identify the case.
         else:
             # FIXME
+            # get method name from arguments[0].operation.namei
+            for argument in arguments[1:]:
+                code.extend(argument.operation.convert(argument.arguments))
+
             code.extend([
                 # JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/String;)V'),
             ])

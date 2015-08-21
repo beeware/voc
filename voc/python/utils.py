@@ -89,12 +89,9 @@ def extract(namespace, sourcefile, code):
         if main_end is not None:
             # Marker for the end of the main block:
             #   JUMP_FORWARD <target>
-            if len(command.arguments) == 0 and cmd.operation.opname == 'JUMP_FORWARD' and cmd.operation.delta == main_end:
-
+            if len(cmd.arguments) == 0 and cmd.operation.opname == 'JUMP_FORWARD' and cmd.operation.delta == main_end:
                 main_end = None
                 main = transpile_block(main_commands)
-                print ("END OF MAIN METHOD")
-                print (main)
             else:
                 main_commands.append(cmd)
         else:
@@ -115,8 +112,9 @@ def extract(namespace, sourcefile, code):
                 #       MAKE_FUNCTION <n_defaults>
                 #   STORE_NAME <name>
                 elif cmd.arguments[0].operation.opname == 'MAKE_FUNCTION':
-                    print ("Found method", cmd.operation.namei)
-                    parts = extract(namespace, sourcefile, cmd.arguments[0].arguments[-2].operation.const)
+                    # print ("Found method", cmd.operation.namei)
+                    code = cmd.arguments[0].arguments[-2].operation.const
+                    parts = extract(namespace, sourcefile, code)
                     method = transpile_method(cmd.operation.namei, parts)
                     if cmd.operation.namei == '__init__':
                         # print (" - adding as special case: __init__")
@@ -138,7 +136,8 @@ def extract(namespace, sourcefile, code):
                     #   STORE_NAME <Name>
                     if cmd.arguments[0].arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
                         # print ("Found class", cmd.operation.namei)
-                        parts = extract(namespace, sourcefile, cmd.arguments[0].arguments[1].arguments[0].operation.const)
+                        code = cmd.arguments[0].arguments[1].arguments[0].operation.const
+                        parts = extract(namespace, sourcefile, code)
                         classes.append(transpile_class(namespace, sourcefile, cmd.operation.namei, parts))
 
                     # Equivalent of "name = method_name(...)"
@@ -164,7 +163,10 @@ def extract(namespace, sourcefile, code):
                     and cmd.arguments[0].operation.opname == 'COMPARE_OP' and cmd.arguments[0].operation.comparison == '=='
                     and cmd.arguments[0].arguments[0].operation.opname == 'LOAD_NAME' and cmd.arguments[0].arguments[0].operation.namei == '__name__'
                     and cmd.arguments[0].arguments[1].operation.opname == 'LOAD_CONST' and cmd.arguments[0].arguments[1].operation.const == '__main__'):
-                print("Found main block")
+                # print("Found main block")
+                if main is not None:
+                    print("Found duplicate main block... replacing previous main")
+
                 main_end = cmd.operation.target
 
             # All other module-level cmds goes into the static block
