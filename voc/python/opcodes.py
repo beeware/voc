@@ -48,6 +48,7 @@ class ROT_TWO(Opcode):
         return 2
 
     def convert(self, arguments):
+        code = []
         code.append(JavaOpcodes.SWAP())
         return code
 
@@ -64,6 +65,7 @@ class DUP_TOP(Opcode):
         return 2
 
     def convert(self, arguments):
+        code = []
         code.append(JavaOpcodes.DUP())
         return code
 
@@ -78,6 +80,7 @@ class DUP_TOP_TWO(Opcode):
         return 4
 
     def convert(self, arguments):
+        code = []
         code.append(JavaOpcodes.DUP2())
         return code
 
@@ -92,13 +95,16 @@ class NOP(Opcode):
         return 0
 
     def convert(self, arguments):
+        code = []
         code.append(JavaOpcodes.NOP())
         return code
+
 
 # class UNARY_POSITIVE(Opcode):
 # class UNARY_NEGATIVE(Opcode):
 # class UNARY_NOT(Opcode):
 # class UNARY_INVERT(Opcode):
+
 
 class BINARY_POWER(Opcode):
     @property
@@ -139,7 +145,9 @@ class BINARY_ADD(Opcode):
     def product_count(self):
         return 1
 
+
 # class BINARY_SUBTRACT(Opcode):
+
 
 class BINARY_SUBSCR(Opcode):
     @property
@@ -149,6 +157,7 @@ class BINARY_SUBSCR(Opcode):
     @property
     def product_count(self):
         return 1
+
 
 # class BINARY_FLOOR_DIVIDE(Opcode):
 # class BINARY_TRUE_DIVIDE(Opcode):
@@ -172,6 +181,7 @@ class BINARY_SUBSCR(Opcode):
 # class BINARY_XOR(Opcode):
 # class BINARY_OR(Opcode):
 # class INPLACE_POWER(Opcode):
+
 
 class GET_ITER(Opcode):
     @property
@@ -201,6 +211,7 @@ class LOAD_BUILD_CLASS(Opcode):
     @property
     def product_count(self):
         return 1
+
 
 # class YIELD_FROM(Opcode):
 
@@ -247,8 +258,10 @@ class POP_BLOCK(Opcode):
     def product_count(self):
         return 0
 
+
 # class END_FINALLY(Opcode):
 # class POP_EXCEPT(Opcode):
+
 
 class STORE_NAME(Opcode):
     def __init__(self, namei):
@@ -279,6 +292,7 @@ class STORE_NAME(Opcode):
 
         return code
 
+
 # class DELETE_NAME(Opcode):
 # class UNPACK_SEQUENCE(Opcode):
 
@@ -298,7 +312,9 @@ class FOR_ITER(Opcode):
     def product_count(self):
         return 2
 
+
 # class UNPACK_EX(Opcode):
+
 
 class STORE_ATTR(Opcode):
     def __init__(self, namei):
@@ -328,10 +344,12 @@ class STORE_ATTR(Opcode):
         ])
         return code
 
+
 # class DELETE_ATTR(Opcode):
 
 # class STORE_GLOBAL(Opcode):
 # class DELETE_GLOBAL(Opcode):
+
 
 class LOAD_CONST(Opcode):
     def __init__(self, const):
@@ -374,6 +392,7 @@ class LOAD_NAME(Opcode):
 # class BUILD_LIST(Opcode):
 # class BUILD_SET(Opcode):
 # class BUILD_MAP(Opcode):
+
 
 class LOAD_ATTR(Opcode):
     def __init__(self, namei):
@@ -422,7 +441,9 @@ class IMPORT_NAME(Opcode):
     def product_count(self):
         return 1
 
+
 # class IMPORT_FROM(Opcode):
+
 
 class JUMP_FORWARD(Opcode):
     def __init__(self, delta):
@@ -439,8 +460,11 @@ class JUMP_FORWARD(Opcode):
     def product_count(self):
         return 0
 
+
 # class JUMP_IF_FALSE_OR_POP(Opcode):
 # class JUMP_IF_TRUE_OR_POP(Opcode):
+
+
 class JUMP_ABSOLUTE(Opcode):
     def __init__(self, target):
         self.target = target
@@ -456,6 +480,7 @@ class JUMP_ABSOLUTE(Opcode):
     def product_count(self):
         return 0
 
+
 class POP_JUMP_IF_FALSE(Opcode):
     def __init__(self, target):
         self.target = target
@@ -470,6 +495,7 @@ class POP_JUMP_IF_FALSE(Opcode):
     @property
     def product_count(self):
         return 0
+
 
 class POP_JUMP_IF_TRUE(Opcode):
     def __init__(self, target):
@@ -502,6 +528,7 @@ class LOAD_GLOBAL(Opcode):
 
 # class CONTINUE_LOOP(Opcode):
 
+
 class SETUP_LOOP(Opcode):
     def __init__(self, delta):
         self.delta = delta
@@ -514,8 +541,10 @@ class SETUP_LOOP(Opcode):
     def product_count(self):
         return 0
 
+
 # class SETUP_EXCEPT(Opcode):
 # class SETUP_FINALLY(Opcode):
+
 
 class LOAD_FAST(Opcode):
     def __init__(self, varnum):
@@ -544,6 +573,7 @@ class STORE_FAST(Opcode):
     @property
     def product_count(self):
         return 0
+
 
 # class DELETE_FAST(Opcode):
 
@@ -621,6 +651,7 @@ class MAKE_FUNCTION(Opcode):
     @property
     def product_count(self):
         return 1
+
 
 # class BUILD_SLICE(Opcode):
 
