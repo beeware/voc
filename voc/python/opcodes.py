@@ -1,9 +1,26 @@
 from ..java import opcodes as JavaOpcodes
 
 
+##########################################################################
+# Local variables are stored in a dictionary, keyed by name,
+# and with the value of the local variable register they are stored in.
+#
+# When a variable is deleted, a value of None is put in as the
+# value.
+##########################################################################
+
+def get_local(localvars, name):
+    i = localvars[name]
+    if i is None:
+        raise KeyError(name)
+    return i
+
+
 def create_local(localvars, name):
     try:
         i = localvars[name]
+        if i is None:
+            localvars[name] = i
     except KeyError:
         i = len(localvars)
         localvars[name] = i
@@ -262,13 +279,8 @@ class RETURN_VALUE(Opcode):
         return 0
 
     def convert(self, localvars, arguments):
-        code = []
-        if arguments[0].operation.opname == 'LOAD_CONST' and arguments[0].operation.const is None:
-            # Simple case - no return value.
-            code.append(JavaOpcodes.RETURN())
-        else:
-            code.extend(arguments[0].operation.convert(localvars, arguments[0].arguments))
-            code.append(JavaOpcodes.ARETURN())
+        code = arguments[0].operation.convert(localvars, arguments[0].arguments)
+        code.append(JavaOpcodes.ARETURN())
         return code
 
 
@@ -416,9 +428,15 @@ class LOAD_CONST(Opcode):
         return 1
 
     def convert(self, localvars, arguments):
+        # A None value has it's own opcode.
         # If the constant is a byte or a short, we can
         # cut a value out of the constant pool.
-        if isinstance(self.const, int) and self.const < 128:
+        # Otherwise, use LDC.
+        if self.const is None:
+            return [
+                JavaOpcodes.ACONST_NULL()
+            ]
+        elif isinstance(self.const, int) and self.const < 128:
             prototype = '(I)V'
             load_op = JavaOpcodes.BIPUSH(self.const)
         elif isinstance(self.const, int) and self.const < 32768:
@@ -456,7 +474,7 @@ class LOAD_NAME(Opcode):
 
     def convert(self, localvars, arguments):
         code = []
-        i = localvars[self.name]
+        i = get_local(localvars, self.name)
         if i == 0:
             code.append(JavaOpcodes.ALOAD_0())
         elif i == 1:
@@ -662,7 +680,7 @@ class LOAD_FAST(Opcode):
     def convert(self, localvars, arguments):
         code = []
 
-        i = localvars[self.name]
+        i = get_local(localvars, self.name)
 
         if i == 0:
             code.append(JavaOpcodes.ALOAD_0())
@@ -673,16 +691,7 @@ class LOAD_FAST(Opcode):
         elif i == 3:
             code.append(JavaOpcodes.ALOAD_3())
         else:
-            if i < 128:
-                load_op = JavaOpcodes.BIPUSH(i)
-            elif i < 32768:
-                load_op = JavaOpcodes.SIPUSH(i)
-            else:
-                load_op = JavaOpcodes.LDC(i)
-            code.extend([
-                load_op,
-                JavaOpcodes.ALOAD()
-            ])
+            code.append(JavaOpcodes.ALOAD(i))
 
         return code
 
@@ -716,16 +725,8 @@ class STORE_FAST(Opcode):
         elif i == 3:
             code.append(JavaOpcodes.ASTORE_3())
         else:
-            if i < 128:
-                load_op = JavaOpcodes.BIPUSH(i)
-            elif i < 32768:
-                load_op = JavaOpcodes.SIPUSH(i)
-            else:
-                load_op = JavaOpcodes.LDC(i)
-            code.extend([
-                load_op,
-                JavaOpcodes.ASTORE()
-            ])
+            code.append(JavaOpcodes.ASTORE(i))
+
         return code
 
 # class DELETE_FAST(Opcode):
@@ -785,23 +786,24 @@ class CALL_FUNCTION(Opcode):
                         JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/Object;)Ljava/lang/StringBuilder;'),
                     ])
 
+            # The None value in the code list is a special case;
+            # Python explicitly returns None and then pops the empty
+            # result; Java can just return. We put a marker here that
+            # the POP/STORE_* result can use to identify the special case.
             code.extend([
                 JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/Object;)V'),
                 None
             ])
 
-            # The None value in the code list is a special case;
-            # Python explicitly returns None and then pops the empty
-            # result; Java can just return. We put a marker here that
-            # the POP/STORE_* result can use to identify the case.
         else:
-            # get method name from arguments[0].operation.name
+            method_name = arguments[0].operation.name
+            descriptor = '(%s)Lorg/python/PyObject;' % ('Lorg/python/PyObject;' * (len(arguments) - 1))
 
             for argument in arguments[1:]:
                 code.extend(argument.operation.convert(localvars, argument.arguments))
 
             code.extend([
-                JavaOpcodes.INVOKESTATIC('org/pybee/example', arguments[0].operation.name, '()V'),
+                JavaOpcodes.INVOKESTATIC('org/pybee/example', method_name, descriptor),
                 None
             ])
         return code
@@ -809,21 +811,23 @@ class CALL_FUNCTION(Opcode):
 
 class MAKE_FUNCTION(Opcode):
     def __init__(self, argc):
-        self.args = argc & 0xff
-        self.kwargs = ((argc >> 8) & 0xFF)
+        self.default_args = argc & 0xff
+        self.default_kwargs = ((argc >> 8) & 0xFF)
         self.annotations = (argc >> 16) & 0x7FFF
-        self.annotation_names = 1 if self.annotations else 0
 
     def __arg_repr__(self):
-        return '%s args, %s kwargs, %s annotations' % (
-            self.args,
-            self.kwargs,
+        return '%s default args, %s default kwargs, %s annotations' % (
+            self.default_args,
+            self.default_kwargs,
             self.annotations,
         )
 
     @property
     def consume_count(self):
-        return self.args + 2 * self.kwargs + self.annotations + self.annotation_names + 2
+        if self.annotations:
+            return 2 + self.annotations
+        else:
+            return 2 + self.default_args + (2 * self.default_kwargs)
 
     @property
     def product_count(self):
@@ -850,4 +854,3 @@ class MAKE_FUNCTION(Opcode):
 # class MAP_ADD(Opcode):
 
 # class LOAD_CLASSDEREF(Opcode):
-# class EXTENDED_ARG(Opcode):

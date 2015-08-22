@@ -40,11 +40,12 @@ class AASTORE(Opcode):
 # arrayref, index, value →
 # Store into a reference in an array
 
+
 class ACONST_NULL(Opcode):
+    # Push a null reference onto the stack
+    # Stack: → null
     def __init__(self):
         super(ACONST_NULL, self).__init__(0x01)
-# → null
-# Push a null reference onto the stack
 
 
 class ALOAD(Opcode):
@@ -53,6 +54,7 @@ class ALOAD(Opcode):
     # Stack: → objectref
     def __init__(self, var):
         super(ALOAD, self).__init__(0x19)
+        self.var = var
 
     def __len__(self):
         return 2
@@ -98,9 +100,10 @@ class ANEWARRAY(Opcode):
 # by the class reference index (indexbyte1 << 8 + indexbyte2) in the constant
 # pool
 
+
 class ARETURN(Opcode):
-    # Stack: objectref → [empty]
     # Return a reference from a method
+    # Stack: objectref → [empty]
     def __init__(self):
         super(ARETURN, self).__init__(0xb0)
 
@@ -111,36 +114,49 @@ class ARRAYLENGTH(Opcode):
 # arrayref → length
 # Get the length of an array
 
+
 class ASTORE(Opcode):
-    def __init__(self):
+    # Store a reference into a local variable #index
+    # Args(1): index
+    # Stack: objectref →
+    def __init__(self, var):
         super(ASTORE, self).__init__(0x3a)
-# 1: index
-# objectref →
-# Store a reference into a local variable #index
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
 
 class ASTORE_0(Opcode):
+    # Store a reference into local variable 0
+    # Stack: objectref →
     def __init__(self):
         super(ASTORE_0, self).__init__(0x4b)
-# objectref →
-# Store a reference into local variable 0
+
 
 class ASTORE_1(Opcode):
+    # Store a reference into local variable 1
+    # Stack: objectref →
     def __init__(self):
         super(ASTORE_1, self).__init__(0x4c)
-# objectref →
-# Store a reference into local variable 1
+
 
 class ASTORE_2(Opcode):
+    # Store a reference into local variable 2
+    # Stack: objectref →
     def __init__(self):
         super(ASTORE_2, self).__init__(0x4d)
-# objectref →
-# Store a reference into local variable 2
+
 
 class ASTORE_3(Opcode):
+    # Store a reference into local variable 3
+    # Stack: objectref →
     def __init__(self):
         super(ASTORE_3, self).__init__(0x4e)
-# objectref →
-# Store a reference into local variable 3
+
 
 class ATHROW(Opcode):
     def __init__(self):

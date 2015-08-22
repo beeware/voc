@@ -4,7 +4,7 @@ import dis
 from . import opcodes
 
 from .klass import transpile as transpile_class
-from .method import transpile as transpile_method
+from .method import transpile as transpile_method, signature as method_signature
 from .block import transpile as transpile_block
 
 
@@ -46,7 +46,7 @@ class Command:
         print ('    ' * depth, self.operation)
 
 
-def extract(namespace, sourcefile, code, static=False):
+def extract(namespace, sourcefile, code, localvars=None, static=False, void_return=False):
     """Break a code object into the parts it defines.
 
     Returns a Parts object describing the components of
@@ -91,7 +91,7 @@ def extract(namespace, sourcefile, code, static=False):
             #   JUMP_FORWARD <target>
             if len(cmd.arguments) == 0 and cmd.operation.opname == 'JUMP_FORWARD' and cmd.operation.delta == main_end:
                 main_end = None
-                main = transpile_block(main_commands, ignore_empty=True)
+                main = transpile_block(main_commands, localvars=localvars, ignore_empty=True, void_return=True)
             else:
                 main_commands.append(cmd)
         else:
@@ -114,8 +114,18 @@ def extract(namespace, sourcefile, code, static=False):
                 elif cmd.arguments[0].operation.opname == 'MAKE_FUNCTION':
                     # print ("Found method", cmd.operation.name)
                     code = cmd.arguments[0].arguments[-2].operation.const
-                    parts = extract(namespace, sourcefile, code)
-                    method = transpile_method(cmd.operation.name, parts, static=static)
+                    print ("MAKE FUNCTION", cmd.operation.name)
+                    sig = method_signature(code)
+                    parts = extract(namespace, sourcefile, code, localvars=dict((p['name'], i) for i, p in enumerate(sig)), void_return=False)
+                    if parts.classes:
+                        print("Ignoring inner class definition.")
+                    if parts.methods:
+                        print("Ignoring inner method definition.")
+                    if parts.main:
+                        print("Ignoring inner __main__ definition.")
+                    if parts.init:
+                        print("Ignoring inner __init__ definition.")
+                    method = transpile_method(cmd.operation.name, sig, parts, static=static)
                     if cmd.operation.name == '__init__':
                         # print (" - adding as special case: __init__")
                         if init is not None:
@@ -137,7 +147,11 @@ def extract(namespace, sourcefile, code, static=False):
                     if cmd.arguments[0].arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
                         # print ("Found class", cmd.operation.name)
                         code = cmd.arguments[0].arguments[1].arguments[0].operation.const
-                        parts = extract(namespace, sourcefile, code)
+                        parts = extract(namespace, sourcefile, code, void_return=True)
+                        if parts.classes:
+                            print("Ignoring inner class definition.")
+                        if parts.main:
+                            print("Ignoring inner __main__ definition.")
                         classes.append(transpile_class(namespace, sourcefile, cmd.operation.name, parts))
 
                     # Equivalent of "name = method_name(...)"
@@ -155,7 +169,6 @@ def extract(namespace, sourcefile, code, static=False):
                 else:
                     # print ("Static block invocation of", cmd.arguments[-1].arguments[0].operation.name)
                     block_commands.append(cmd)
-
 
             # This is looking for a very specific pattern:
             #   if __name__ == '__main__':
@@ -181,7 +194,7 @@ def extract(namespace, sourcefile, code, static=False):
             else:
                 block_commands.append(cmd)
 
-    block = transpile_block(block_commands, ignore_empty=True)
+    block = transpile_block(block_commands, localvars=localvars, ignore_empty=True, void_return=void_return)
 
     return Parts(classes=classes, methods=methods, block=block, main=main, init=init)
 
@@ -189,12 +202,23 @@ def extract(namespace, sourcefile, code, static=False):
 def extract_command(instructions, i, depth):
     i = i - 1
     instruction = instructions[i]
-    # print ('    ' * depth, "Extract; i=", i, instruction)
+    argval = instruction.argval
+
     OpType = getattr(opcodes, instruction.opname)
+    # print ('    ' * depth, "Extract; i=", i, instruction)
+    # If this instruction is preceded by EXTENDED_ARG, then
+    # there is more arugment information to come. Integrate it
+    # into the instruction argument we've already read.
+    if i > 0 and instructions[i - 1].opname == 'EXTENDED_ARG':
+        i = i - 1
+        extended = instructions[i]
+
+        argval = argval | extended.argval
+
     if instruction.arg is None:
         opcode = OpType()
     else:
-        opcode = OpType(instruction.argval)
+        opcode = OpType(argval)
 
     cmd = Command(opcode)
 
@@ -205,7 +229,7 @@ def extract_command(instructions, i, depth):
         cmd.arguments.append(arg)
         # print('    ' * depth, '+', arg.consume_count, arg.product_count)
         stack = stack + arg.consume_count - arg.product_count
-        # print('    ' * depth, 'stack is now',stack)
+        # print('    ' * depth, 'stack is now', stack)
 
     # print('    ' * depth, 'cmd complete')
     cmd.arguments.reverse()
