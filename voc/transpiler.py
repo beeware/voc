@@ -68,7 +68,9 @@ class Transpiler:
         # Extract the parts out of the code, which we will use to create
         # the java representation.
         # This process is recursive, working down the entire code tree.
-        parts = extract(self.namespace, sourcefile, code)
+        # This top level module isn't designed to be instantiated, so methods
+        # defined in this context are all static.
+        parts = extract(self.namespace, sourcefile, code, static=True)
 
         # Transpile the module code, adding any classfiles generated
         # to the list to be exported.

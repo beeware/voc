@@ -33,22 +33,22 @@ public class PyObject {
     }
 
     public PyObject(byte v) {
-        type = Integer.class;
+        type = Long.class;
         value = (long)v;
     }
 
     public PyObject(short v) {
-        type = Integer.class;
+        type = Long.class;
         value = (long)v;
     }
 
     public PyObject(int v) {
-        type = Integer.class;
+        type = Long.class;
         value = (long)v;
     }
 
     public PyObject(long v) {
-        type = Integer.class;
+        type = Long.class;
         value = v;
     }
 
@@ -122,11 +122,17 @@ public class PyObject {
     }
 
     public String __repr__() {
-        return "<PyObject>";
+        return "<PyObject: " + this.type + ">";
     }
 
     public String __str__() {
-        return __repr__();
+        if (type == String.class) {
+            return (String) value;
+        }
+        else if (type == Long.class) {
+            return ((Long) value).toString();
+        }
+        return this.__repr__();
     }
 
     public boolean __equals__(PyObject other) {
@@ -153,100 +159,125 @@ public class PyObject {
         return false;
     }
 
-    public PyObject add(PyObject other) {
+    public PyObject __add__(PyObject other) {
+        if (this.type == String.class) {
+            if (other.type == String.class) {
+                return new PyObject(((String) this.value) + ((String) other.value));
+            } else if (other.type == Long.class) {
+            } else if (other.type == Float.class) {
+            } else if (other.type == Map.class) {
+            } else if (other.type == Set.class) {
+            } else if (other.type == Object.class) {
+            } else if (other.type == ArrayList.class) {
+            }
+        } else if (this.type == Long.class) {
+        } else if (this.type == Float.class) {
+        } else if (this.type == Map.class) {
+        } else if (this.type == Set.class) {
+        } else if (this.type == Object.class) {
+        } else if (this.type == ArrayList.class) {
+        }
         return null;
     }
 
-    public PyObject subtract(PyObject other) {
+    public PyObject __sub__(PyObject other) {
         return null;
     }
 
-    public PyObject multiply(PyObject other) {
+    public PyObject __mul__(PyObject other) {
+        return new PyObject(((Long) this.value) * ((Long) other.value));
+    }
+
+    public PyObject __floordiv__(PyObject other) {
         return null;
     }
 
-    public PyObject floordivide(PyObject other) {
+    public PyObject __truediv__(PyObject other) {
         return null;
     }
 
-    public PyObject truedivide(PyObject other) {
+    public PyObject __div__(PyObject other) {
         return null;
     }
 
-    public PyObject modulo(PyObject other) {
+    public PyObject __mod__(PyObject other) {
         return null;
     }
 
-    public PyObject power(PyObject other) {
+    public PyObject __pow__(PyObject other) {
         return null;
     }
 
-    public PyObject lshift(PyObject other) {
+    public PyObject __lshift__(PyObject other) {
         return null;
     }
 
-    public PyObject rshift(PyObject other) {
+    public PyObject __rshift__(PyObject other) {
         return null;
     }
 
-    public PyObject and(PyObject other) {
+    public PyObject __and__(PyObject other) {
         return null;
     }
 
-    public PyObject xor(PyObject other) {
+    public PyObject __xor__(PyObject other) {
         return null;
     }
 
-    public PyObject or(PyObject other) {
+    public PyObject __or__(PyObject other) {
         return null;
     }
 
-    public void inplace_add(PyObject other) {
-        this.value = this.add(other).value;
+    public void __iadd__(PyObject other) {
+        this.value = this.__add__(other).value;
     }
 
-    public void inplace_subtract(PyObject other) {
-        this.value = this.subtract(other).value;
+    public void __isubtract__(PyObject other) {
+        this.value = this.__sub__(other).value;
     }
 
-    public void inplace_multiply(PyObject other) {
-        this.value = this.multiply(other).value;
+    public void __imultiply__(PyObject other) {
+        this.value = this.__mul__(other).value;
     }
 
-    public void inplace_floordivide(PyObject other) {
-        this.value = this.floordivide(other).value;
+    public void __ifloordiv__(PyObject other) {
+        this.value = this.__floordiv__(other).value;
     }
 
-    public void inplace_truedivide(PyObject other) {
-        this.value = this.truedivide(other).value;
+    public void __itruediv__(PyObject other) {
+        this.value = this.__truediv__(other).value;
     }
 
-    public void inplace_modulo(PyObject other) {
-        this.value = this.modulo(other).value;
+    public void __idiv__(PyObject other) {
+        this.value = this.__div__(other).value;
     }
 
-    public void inplace_power(PyObject other) {
-        this.value = this.power(other).value;
+    public void __imod__(PyObject other) {
+        this.value = this.__mod__(other).value;
     }
 
-    public void inplace_lshift(PyObject other) {
-        this.value = this.lshift(other).value;
+    public void __ipow__(PyObject other) {
+        this.value = this.__pow__(other).value;
     }
 
-    public void inplace_rshift(PyObject other) {
-        this.value = this.rshift(other).value;
+    public void __ilshift__(PyObject other) {
+        this.value = this.__lshift__(other).value;
     }
 
-    public void inplace_and(PyObject other) {
-        this.value = this.and(other).value;
+    public void __irshift__(PyObject other) {
+        this.value = this.__rshift__(other).value;
     }
 
-    public void inplace_xor(PyObject other) {
-        this.value = this.xor(other).value;
+    public void __iand__(PyObject other) {
+        this.value = this.__and__(other).value;
     }
 
-    public void inplace_or(PyObject other) {
-        this.value = this.or(other).value;
+    public void __ixor__(PyObject other) {
+        this.value = this.__xor__(other).value;
+    }
+
+    public void __ior__(PyObject other) {
+        this.value = this.__or__(other).value;
     }
 
     public void __setitem__(PyObject k, PyObject v) {

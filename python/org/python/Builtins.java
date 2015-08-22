@@ -249,7 +249,7 @@ public class Builtins {
     }
 
     public static void py_print() {
-        throw new NotImplementedError("Builtin function 'input' not implemented");
+
     }
 
     public static void py_property() {

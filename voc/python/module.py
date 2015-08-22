@@ -29,7 +29,7 @@ def transpile(namespace, sourcefile, moduleparts):
 
     main_method = JavaMethod('main', '([Ljava/lang/String;)V', public=True, static=True)
     if moduleparts.main is None:
-        print("Adding default main method...")
+        print("Adding default main method...");
         main_code = JavaCode(max_stack=0, max_locals=1, code=[JavaOpcodes.RETURN()])
     else:
         main_code = moduleparts.main

@@ -396,7 +396,7 @@ class Integer(Constant):
         return multihash(self, 'tag', 'value')
 
     def write_info(self, writer):
-        writer.write_u4(writer.constant_pool[self.value])
+        writer.write_u4(self.value)
 
 
 # CONSTANT_Float_info {
@@ -463,7 +463,7 @@ class Long(Constant):
         return multihash(self, 'tag', 'value')
 
     def write_info(self, writer):
-        writer.write_u8(writer.constant_pool[self.value])
+        writer.write_u8(writer.constant_pool[self])
 
 
 # CONSTANT_Double_info {

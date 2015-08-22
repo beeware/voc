@@ -1,4 +1,4 @@
-from .constants import Fieldref, Methodref, String, Integer, Long
+from .constants import Classref, Fieldref, Methodref, String, Integer, Long
 
 # From: https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 # Reference" http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.2
@@ -10,6 +10,9 @@ from .constants import Fieldref, Methodref, String, Integer, Long
 class Opcode:
     def __init__(self, code):
         self.code = code
+
+    def __repr__(self):
+        return '<%s>' % self.__class__.__name__
 
     def __len__(self):
         return 1
@@ -51,6 +54,9 @@ class ALOAD(Opcode):
     def __init__(self, var):
         super(ALOAD, self).__init__(0x19)
 
+    def __len__(self):
+        return 2
+
     def write_extra(self, writer):
         writer.write_u1(self.var)
 
@@ -58,28 +64,30 @@ class ALOAD(Opcode):
 class ALOAD_0(Opcode):
     # Load a reference onto the stack from local variable 0
     # Stack: → objectref
-
     def __init__(self):
         super(ALOAD_0, self).__init__(0x2a)
 
 
 class ALOAD_1(Opcode):
+    # Load a reference onto the stack from local variable 1
+    # Stack: → objectref
     def __init__(self):
         super(ALOAD_1, self).__init__(0x2b)
-# → objectref
-# Load a reference onto the stack from local variable 1
+
 
 class ALOAD_2(Opcode):
+    # Load a reference onto the stack from local variable 2
+    # Stack: → objectref
     def __init__(self):
         super(ALOAD_2, self).__init__(0x2c)
-# → objectref
-# Load a reference onto the stack from local variable 2
+
 
 class ALOAD_3(Opcode):
+    # Load a reference onto the stack from local variable 3
+    # Stack: → objectref
     def __init__(self):
         super(ALOAD_3, self).__init__(0x2d)
-# → objectref
-# Load a reference onto the stack from local variable 3
+
 
 class ANEWARRAY(Opcode):
     def __init__(self):
@@ -154,10 +162,18 @@ class BASTORE(Opcode):
 # Store a byte or Boolean value into an array
 
 class BIPUSH(Opcode):
-    def __init__(self):
+    # Args(1) byte → value
+    # Push a byte onto the stack as an integer value
+    def __init__(self, const):
         super(BIPUSH, self).__init__(0x10)
-# 1: byte → value
-# Push a byte onto the stack as an integer value
+        self.const = const
+
+    def __len__(self):
+        return 2
+
+    def write_extra(self, writer):
+        writer.write_u1(self.const)
+
 
 class BREAKPOINT(Opcode):
     def __init__(self):
@@ -337,10 +353,12 @@ class DSUB(Opcode):
         super(DSUB, self).__init__(0x67)
 # value1, value2 → result subtract a double from another
 
+
 class DUP(Opcode):
+    # value → value, value    duplicate the value on top of the stack
     def __init__(self):
         super(DUP, self).__init__(0x59)
-# value → value, value    duplicate the value on top of the stack
+
 
 class DUP_X1(Opcode):
     def __init__(self):
@@ -860,6 +878,7 @@ class INEG(Opcode):
 # value → result
 # Negate int
 
+
 class INSTANCEOF(Opcode):
     def __init__(self):
         super(INSTANCEOF, self).__init__(0xc1)
@@ -867,6 +886,7 @@ class INSTANCEOF(Opcode):
 # objectref → result
 # Determines if an object objectref is of a given type, identified by class
 # reference index in constant pool (indexbyte1 << 8 + indexbyte2)
+
 
 class INVOKEDYNAMIC(Opcode):
     def __init__(self):
@@ -876,6 +896,7 @@ class INVOKEDYNAMIC(Opcode):
 # Invokes a dynamic method and puts the result on the stack (might be void); the
 # method is identified by method reference index in constant pool (indexbyte1 <<
 # 8 + indexbyte2)
+
 
 class INVOKEINTERFACE(Opcode):
     def __init__(self):
@@ -888,11 +909,11 @@ class INVOKEINTERFACE(Opcode):
 
 
 class INVOKESPECIAL(Opcode):
-    # Args (2): indexbyte1, indexbyte2
-    # Stack: objectref, [arg1, arg2, ...] → result
     # Invoke instance method on object objectref and puts the result on the stack
     # (might be void); the method is identified by method reference index in
     # constant pool (indexbyte1 << 8 + indexbyte2)
+    # Args (2): indexbyte1, indexbyte2
+    # Stack: objectref, [arg1, arg2, ...] → result
     def __init__(self, classname, methodname, descriptor):
         super(INVOKESPECIAL, self).__init__(0xb7)
         self.method = Methodref(classname, methodname, descriptor)
@@ -908,21 +929,31 @@ class INVOKESPECIAL(Opcode):
 
 
 class INVOKESTATIC(Opcode):
-    def __init__(self):
+    # Invoke a static method and puts the result on the stack (might be void); the
+    # method is identified by method reference index in constant pool (indexbyte1 <<
+    # 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: [arg1, arg2, ...] → result
+    def __init__(self, classname, methodname, descriptor):
         super(INVOKESTATIC, self).__init__(0xb8)
-# 2: indexbyte1, indexbyte2
-# [arg1, arg2, ...] → result
-# Invoke a static method and puts the result on the stack (might be void); the
-# method is identified by method reference index in constant pool (indexbyte1 <<
-# 8 + indexbyte2)
+        self.method = Methodref(classname, methodname, descriptor)
+
+    def __len__(self):
+        return 3
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool[self.method])
+
+    def resolve(self, constant_pool):
+        self.method.resolve(constant_pool)
 
 
 class INVOKEVIRTUAL(Opcode):
-    # Args(2): indexbyte1, indexbyte2
-    # Stack: objectref, [arg1, arg2, ...] → result
     # Invoke virtual method on object objectref and puts the result on the stack
     # (might be void); the method is identified by method reference index in
     # constant pool (indexbyte1 << 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: objectref, [arg1, arg2, ...] → result
     def __init__(self, classname, methodname, descriptor):
         super(INVOKEVIRTUAL, self).__init__(0xb6)
         self.method = Methodref(classname, methodname, descriptor)
@@ -1280,12 +1311,24 @@ class MULTIANEWARRAY(Opcode):
 # by class reference in constant pool index (indexbyte1 << 8 + indexbyte2); the
 # sizes of each dimension is identified by count1, [count2, etc.]
 
+
 class NEW(Opcode):
-    def __init__(self):
+    # args(2): indexbyte1, indexbyte2   → objectref
+    # Create new object of type identified by class reference in constant pool index
+    # (indexbyte1 << 8 + indexbyte2)
+    def __init__(self, classname):
         super(NEW, self).__init__(0xbb)
-# 2: indexbyte1, indexbyte2   → objectref
-# Create new object of type identified by class reference in constant pool index
-# (indexbyte1 << 8 + indexbyte2)
+        self.classref = Classref(classname)
+
+    def __len__(self):
+        return 3
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool[self.classref])
+
+    def resolve(self, constant_pool):
+        self.classref.resolve(constant_pool)
+
 
 class NEWARRAY(Opcode):
     def __init__(self):
@@ -1360,10 +1403,18 @@ class SASTORE(Opcode):
 # Store short to array
 
 class SIPUSH(Opcode):
-    def __init__(self):
+    # args(2): byte1, byte2
+    # → value push a short onto the stack
+    def __init__(self, const):
         super(SIPUSH, self).__init__(0x11)
-# 2: byte1, byte2
-# → value push a short onto the stack
+        self.const = const
+
+    def __len__(self):
+        return 3
+
+    def write_extra(self, writer):
+        writer.write_u2(self.const)
+
 
 class SWAP(Opcode):
     def __init__(self):

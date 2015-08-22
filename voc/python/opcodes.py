@@ -1,6 +1,15 @@
 from ..java import opcodes as JavaOpcodes
 
 
+def create_local(localvars, name):
+    try:
+        i = localvars[name]
+    except KeyError:
+        i = len(localvars)
+        localvars[name] = i
+    return i
+
+
 class Opcode:
     @property
     def opname(self):
@@ -22,11 +31,14 @@ class POP_TOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
+        print ('-----')
         code = []
         for argument in arguments:
-            code.extend(argument.operation.convert(argument.arguments))
+            print (argument)
+            code.extend(argument.operation.convert(localvars, argument.arguments))
 
+        print ('-----')
         # If the most recent command is stored as None, then this is
         # return value of a void function. We can avoid a POP operation
         # in this case.
@@ -47,7 +59,7 @@ class ROT_TWO(Opcode):
     def product_count(self):
         return 2
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
         code = []
         code.append(JavaOpcodes.SWAP())
         return code
@@ -64,7 +76,7 @@ class DUP_TOP(Opcode):
     def product_count(self):
         return 2
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
         code = []
         code.append(JavaOpcodes.DUP())
         return code
@@ -79,7 +91,7 @@ class DUP_TOP_TWO(Opcode):
     def product_count(self):
         return 4
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
         code = []
         code.append(JavaOpcodes.DUP2())
         return code
@@ -94,7 +106,7 @@ class NOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
         code = []
         code.append(JavaOpcodes.NOP())
         return code
@@ -124,6 +136,21 @@ class BINARY_MULTIPLY(Opcode):
     @property
     def product_count(self):
         return 1
+
+    def convert(self, localvars, arguments):
+        code = []
+
+        for argument in arguments:
+            code.extend(argument.operation.convert(localvars, argument.arguments))
+
+        code.append(
+            JavaOpcodes.INVOKEVIRTUAL(
+                'org/python/PyObject',
+                '__mul__',
+                '(Lorg/python/PyObject;)Lorg/python/PyObject;'
+            )
+        )
+        return code
 
 
 class BINARY_MODULO(Opcode):
@@ -234,13 +261,13 @@ class RETURN_VALUE(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
         code = []
         if arguments[0].operation.opname == 'LOAD_CONST' and arguments[0].operation.const is None:
             # Simple case - no return value.
             code.append(JavaOpcodes.RETURN())
         else:
-            code.extend(arguments[0].operation.convert(arguments[0].arguments))
+            code.extend(arguments[0].operation.convert(localvars, arguments[0].arguments))
             code.append(JavaOpcodes.ARETURN())
         return code
 
@@ -264,11 +291,11 @@ class POP_BLOCK(Opcode):
 
 
 class STORE_NAME(Opcode):
-    def __init__(self, namei):
-        self.namei = namei
+    def __init__(self, name):
+        self.name = name
 
     def __arg_repr__(self):
-        return str(self.namei)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -278,8 +305,11 @@ class STORE_NAME(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
         code = []
+
+        for argument in arguments:
+            code.extend(argument.operation.convert(localvars, argument.arguments))
 
         # If the most recent command is stored as None, then this is
         # return value of a void function. We can avoid a POP operation
@@ -287,8 +317,27 @@ class STORE_NAME(Opcode):
         if code[-1] is None:
             code.pop()
         else:
-            # FIXME - use namei
-            code.append(JavaOpcodes.ASTORE_0())
+            i = create_local(localvars, self.name)
+
+            if i == 0:
+                code.append(JavaOpcodes.ASTORE_0())
+            elif i == 1:
+                code.append(JavaOpcodes.ASTORE_1())
+            elif i == 2:
+                code.append(JavaOpcodes.ASTORE_2())
+            elif i == 3:
+                code.append(JavaOpcodes.ASTORE_3())
+            else:
+                if i < 128:
+                    load_op = JavaOpcodes.BIPUSH(i)
+                elif i < 32768:
+                    load_op = JavaOpcodes.SIPUSH(i)
+                else:
+                    load_op = JavaOpcodes.LDC(i)
+                code.extend([
+                    load_op,
+                    JavaOpcodes.ASTORE()
+                ])
 
         return code
 
@@ -317,11 +366,11 @@ class FOR_ITER(Opcode):
 
 
 class STORE_ATTR(Opcode):
-    def __init__(self, namei):
-        self.namei = namei
+    def __init__(self, name):
+        self.name = name
 
     def __arg_repr__(self):
-        return str(self.namei)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -331,15 +380,15 @@ class STORE_ATTR(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
         # FIXME
         code = []
-        code.extend(arguments[0].operation.convert(arguments[0].arguments))
-        code.append(JavaOpcodes.LDC(self.namei))
-        code.extend(arguments[1].operation.convert(arguments[1].arguments))
+        code.extend(arguments[0].operation.convert(localvars, arguments[0].arguments))
+        code.append(JavaOpcodes.LDC(self.name))
+        code.extend(arguments[1].operation.convert(localvars, arguments[1].arguments))
 
         code.extend([
-            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '__setattr__', '(java/lang/String;org/python/PyObject)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '__setattr__', '(Ljava/lang/String;Lorg/python/PyObject;)V'),
             JavaOpcodes.POP(),
         ])
         return code
@@ -366,18 +415,36 @@ class LOAD_CONST(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
+        # If the constant is a byte or a short, we can
+        # cut a value out of the constant pool.
+        if isinstance(self.const, int) and self.const < 128:
+            prototype = '(I)V'
+            load_op = JavaOpcodes.BIPUSH(self.const)
+        elif isinstance(self.const, int) and self.const < 32768:
+            prototype = '(I)V'
+            load_op = JavaOpcodes.SIPUSH(self.const)
+        else:
+            prototype = {
+                int: '(I)V',
+                str: '(Ljava/lang/String;)V',
+            }[type(self.const)]
+            load_op = JavaOpcodes.LDC(self.const)
+
         return [
-            JavaOpcodes.LDC(self.const)
+            JavaOpcodes.NEW('org/python/PyObject'),
+            JavaOpcodes.DUP(),
+            load_op,
+            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '<init>', prototype),
         ]
 
 
 class LOAD_NAME(Opcode):
-    def __init__(self, namei):
-        self.namei = namei
+    def __init__(self, name):
+        self.name = name
 
     def __arg_repr__(self):
-        return str(self.namei)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -387,6 +454,25 @@ class LOAD_NAME(Opcode):
     def product_count(self):
         return 1
 
+    def convert(self, localvars, arguments):
+        code = []
+        i = localvars[self.name]
+        if i == 0:
+            code.append(JavaOpcodes.ALOAD_0())
+        elif i == 1:
+            code.append(JavaOpcodes.ALOAD_1())
+        elif i == 2:
+            code.append(JavaOpcodes.ALOAD_2())
+        elif i == 3:
+            code.append(JavaOpcodes.ALOAD_3())
+        else:
+            code.extend([
+                JavaOpcodes.LDC(i),
+                JavaOpcodes.ALOAD()
+            ])
+
+        return code
+
 
 # class BUILD_TUPLE(Opcode):
 # class BUILD_LIST(Opcode):
@@ -395,11 +481,11 @@ class LOAD_NAME(Opcode):
 
 
 class LOAD_ATTR(Opcode):
-    def __init__(self, namei):
-        self.namei = namei
+    def __init__(self, name):
+        self.name = name
 
     def __arg_repr__(self):
-        return str(self.namei)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -408,6 +494,16 @@ class LOAD_ATTR(Opcode):
     @property
     def product_count(self):
         return 1
+
+    def convert(self, localvars, arguments):
+        code = []
+        code.extend(arguments[0].operation.convert(localvars, arguments[0].arguments))
+        code.append(JavaOpcodes.LDC(self.name))
+
+        code.extend([
+            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '__getattr__', '(java/lang/String;org/python/PyObject)V'),
+        ])
+        return code
 
 
 class COMPARE_OP(Opcode):
@@ -441,6 +537,8 @@ class IMPORT_NAME(Opcode):
     def product_count(self):
         return 1
 
+    def convert(self, localvars, arguments):
+        return [None]
 
 # class IMPORT_FROM(Opcode):
 
@@ -511,11 +609,11 @@ class POP_JUMP_IF_TRUE(Opcode):
 
 
 class LOAD_GLOBAL(Opcode):
-    def __init__(self, namei):
-        self.namei = namei
+    def __init__(self, name):
+        self.name = name
 
     def __arg_repr__(self):
-        return str(self.namei)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -547,11 +645,11 @@ class SETUP_LOOP(Opcode):
 
 
 class LOAD_FAST(Opcode):
-    def __init__(self, varnum):
-        self.varnum = varnum
+    def __init__(self, name):
+        self.name = name
 
     def __arg_repr__(self):
-        return str(self.varnum)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -560,11 +658,38 @@ class LOAD_FAST(Opcode):
     @property
     def product_count(self):
         return 1
+
+    def convert(self, localvars, arguments):
+        code = []
+
+        i = localvars[self.name]
+
+        if i == 0:
+            code.append(JavaOpcodes.ALOAD_0())
+        elif i == 1:
+            code.append(JavaOpcodes.ALOAD_1())
+        elif i == 2:
+            code.append(JavaOpcodes.ALOAD_2())
+        elif i == 3:
+            code.append(JavaOpcodes.ALOAD_3())
+        else:
+            if i < 128:
+                load_op = JavaOpcodes.BIPUSH(i)
+            elif i < 32768:
+                load_op = JavaOpcodes.SIPUSH(i)
+            else:
+                load_op = JavaOpcodes.LDC(i)
+            code.extend([
+                load_op,
+                JavaOpcodes.ALOAD()
+            ])
+
+        return code
 
 
 class STORE_FAST(Opcode):
-    def __init__(self, varnum):
-        self.varnum = varnum
+    def __init__(self, name):
+        self.name = name
 
     @property
     def consume_count(self):
@@ -574,6 +699,34 @@ class STORE_FAST(Opcode):
     def product_count(self):
         return 0
 
+    def convert(self, localvars, arguments):
+        code = []
+
+        for argument in arguments:
+            code.extend(argument.operation.convert(localvars, argument.arguments))
+
+        i = create_local(localvars, self.name)
+
+        if i == 0:
+            code.append(JavaOpcodes.ASTORE_0())
+        elif i == 1:
+            code.append(JavaOpcodes.ASTORE_1())
+        elif i == 2:
+            code.append(JavaOpcodes.ASTORE_2())
+        elif i == 3:
+            code.append(JavaOpcodes.ASTORE_3())
+        else:
+            if i < 128:
+                load_op = JavaOpcodes.BIPUSH(i)
+            elif i < 32768:
+                load_op = JavaOpcodes.SIPUSH(i)
+            else:
+                load_op = JavaOpcodes.LDC(i)
+            code.extend([
+                load_op,
+                JavaOpcodes.ASTORE()
+            ])
+        return code
 
 # class DELETE_FAST(Opcode):
 
@@ -599,33 +752,57 @@ class CALL_FUNCTION(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, arguments):
+    def convert(self, localvars, arguments):
         code = []
 
-        if arguments[0].operation.namei == 'print':
-            code.append(
-                JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'),
-            )
+        if arguments[0].operation.name == 'print':
+            if len(arguments) == 2:
+                # Just the one argument - no need to use a StringBuilder.
+                code.append(JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'))
+                code.extend(arguments[1].operation.convert(localvars, arguments[1].arguments))
+            else:
+                # Multiple arguments; use a StringBuilder to concatenate, and put a space
+                # between each argument.
+                code.extend([
+                    JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'),
+                    JavaOpcodes.NEW('java/lang/StringBuilder'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKESPECIAL('java/lang/StringBuilder', '<init>', '()V'),
+                ])
 
-            for argument in arguments[1:]:
-                code.extend(argument.operation.convert(argument.arguments))
+                code.extend(arguments[1].operation.convert(localvars, arguments[1].arguments))
+                code.extend([
+                    JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/Object;)Ljava/lang/StringBuilder;'),
+                ])
+
+                for argument in arguments[2:]:
+                    code.extend([
+                        JavaOpcodes.LDC(" "),
+                        JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/String;)Ljava/lang/StringBuilder;')
+                    ])
+                    code.extend(argument.operation.convert(localvars, argument.arguments))
+                    code.extend([
+                        JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/Object;)Ljava/lang/StringBuilder;'),
+                    ])
 
             code.extend([
-                JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/String;)V'),
+                JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/Object;)V'),
                 None
             ])
+
             # The None value in the code list is a special case;
             # Python explicitly returns None and then pops the empty
             # result; Java can just return. We put a marker here that
             # the POP/STORE_* result can use to identify the case.
         else:
-            # FIXME
-            # get method name from arguments[0].operation.namei
+            # get method name from arguments[0].operation.name
+
             for argument in arguments[1:]:
-                code.extend(argument.operation.convert(argument.arguments))
+                code.extend(argument.operation.convert(localvars, argument.arguments))
 
             code.extend([
-                # JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/String;)V'),
+                JavaOpcodes.INVOKESTATIC('org/pybee/example', arguments[0].operation.name, '()V'),
+                None
             ])
         return code
 
