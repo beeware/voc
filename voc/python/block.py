@@ -14,7 +14,7 @@ def stack_depth(code):
 def transpile(context, commands):
     code = []
     for cmd in commands:
-        code.extend(cmd.operation.convert(context.localvars, cmd.arguments))
+        code.extend(cmd.operation.convert(context, cmd.arguments))
 
     # Make sure there is a return at the end.
     if not isinstance(code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):

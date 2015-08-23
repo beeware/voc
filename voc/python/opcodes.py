@@ -52,11 +52,11 @@ class UnaryOpcode(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(localvars, argument.arguments))
+            code.extend(argument.operation.convert(context, argument.arguments))
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
@@ -77,11 +77,11 @@ class BinaryOpcode(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(localvars, argument.arguments))
+            code.extend(argument.operation.convert(context, argument.arguments))
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
@@ -102,11 +102,11 @@ class InplaceOpcode(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(localvars, argument.arguments))
+            code.extend(argument.operation.convert(context, argument.arguments))
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
@@ -131,12 +131,12 @@ class POP_TOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         print ('-----')
         code = []
         for argument in arguments:
             print (argument)
-            code.extend(argument.operation.convert(localvars, argument.arguments))
+            code.extend(argument.operation.convert(context, argument.arguments))
 
         print ('-----')
         # If the most recent command is stored as None, then this is
@@ -159,7 +159,7 @@ class ROT_TWO(Opcode):
     def product_count(self):
         return 2
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
         code.append(JavaOpcodes.SWAP())
         return code
@@ -176,7 +176,7 @@ class DUP_TOP(Opcode):
     def product_count(self):
         return 2
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
         code.append(JavaOpcodes.DUP())
         return code
@@ -191,7 +191,7 @@ class DUP_TOP_TWO(Opcode):
     def product_count(self):
         return 4
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
         code.append(JavaOpcodes.DUP2())
         return code
@@ -206,7 +206,7 @@ class NOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
         code.append(JavaOpcodes.NOP())
         return code
@@ -381,8 +381,8 @@ class RETURN_VALUE(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, localvars, arguments):
-        code = arguments[0].operation.convert(localvars, arguments[0].arguments)
+    def convert(self, context, arguments):
+        code = arguments[0].operation.convert(context, arguments[0].arguments)
         code.append(JavaOpcodes.ARETURN())
         return code
 
@@ -420,11 +420,11 @@ class STORE_NAME(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(localvars, argument.arguments))
+            code.extend(argument.operation.convert(context, argument.arguments))
 
         # If the most recent command is stored as None, then this is
         # return value of a void function. We can avoid a POP operation
@@ -432,7 +432,7 @@ class STORE_NAME(Opcode):
         if code[-1] is None:
             code.pop()
         else:
-            i = create_local(localvars, self.name)
+            i = create_local(context.localvars, self.name)
 
             if i == 0:
                 code.append(JavaOpcodes.ASTORE_0())
@@ -486,12 +486,12 @@ class STORE_ATTR(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         # FIXME
         code = []
-        code.extend(arguments[0].operation.convert(localvars, arguments[0].arguments))
+        code.extend(arguments[0].operation.convert(context, arguments[0].arguments))
         code.append(JavaOpcodes.LDC(self.name))
-        code.extend(arguments[1].operation.convert(localvars, arguments[1].arguments))
+        code.extend(arguments[1].operation.convert(context, arguments[1].arguments))
 
         code.extend([
             JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '__setattr__', '(Ljava/lang/String;Lorg/python/PyObject;)V'),
@@ -521,7 +521,7 @@ class LOAD_CONST(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         # A None value has it's own opcode.
         # If the constant is a byte or a short, we can
         # cut a value out of the constant pool.
@@ -566,10 +566,10 @@ class LOAD_NAME(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
         try:
-            i = get_local(localvars, self.name)
+            i = get_local(context.localvars, self.name)
             if i == 0:
                 code.append(JavaOpcodes.ALOAD_0())
             elif i == 1:
@@ -609,9 +609,9 @@ class LOAD_ATTR(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
-        code.extend(arguments[0].operation.convert(localvars, arguments[0].arguments))
+        code.extend(arguments[0].operation.convert(context, arguments[0].arguments))
         code.append(JavaOpcodes.LDC(self.name))
 
         code.extend([
@@ -651,7 +651,7 @@ class IMPORT_NAME(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         return [None]
 
 # class IMPORT_FROM(Opcode):
@@ -773,10 +773,10 @@ class LOAD_FAST(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
 
-        i = get_local(localvars, self.name)
+        i = get_local(context.localvars, self.name)
 
         if i == 0:
             code.append(JavaOpcodes.ALOAD_0())
@@ -804,13 +804,13 @@ class STORE_FAST(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(localvars, argument.arguments))
+            code.extend(argument.operation.convert(context, argument.arguments))
 
-        i = create_local(localvars, self.name)
+        i = create_local(context.localvars, self.name)
 
         if i == 0:
             code.append(JavaOpcodes.ASTORE_0())
@@ -849,14 +849,14 @@ class CALL_FUNCTION(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, localvars, arguments):
+    def convert(self, context, arguments):
         code = []
 
         if arguments[0].operation.name == 'print':
             if len(arguments) == 2:
                 # Just the one argument - no need to use a StringBuilder.
                 code.append(JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'))
-                code.extend(arguments[1].operation.convert(localvars, arguments[1].arguments))
+                code.extend(arguments[1].operation.convert(context, arguments[1].arguments))
             else:
                 # Multiple arguments; use a StringBuilder to concatenate, and put a space
                 # between each argument.
@@ -867,7 +867,7 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.INVOKESPECIAL('java/lang/StringBuilder', '<init>', '()V'),
                 ])
 
-                code.extend(arguments[1].operation.convert(localvars, arguments[1].arguments))
+                code.extend(arguments[1].operation.convert(context, arguments[1].arguments))
                 code.extend([
                     JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/Object;)Ljava/lang/StringBuilder;'),
                 ])
@@ -877,7 +877,7 @@ class CALL_FUNCTION(Opcode):
                         JavaOpcodes.LDC(" "),
                         JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/String;)Ljava/lang/StringBuilder;')
                     ])
-                    code.extend(argument.operation.convert(localvars, argument.arguments))
+                    code.extend(argument.operation.convert(context, argument.arguments))
                     code.extend([
                         JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/Object;)Ljava/lang/StringBuilder;'),
                     ])
@@ -896,7 +896,7 @@ class CALL_FUNCTION(Opcode):
             descriptor = '(%s)Lorg/python/PyObject;' % ('Lorg/python/PyObject;' * (len(arguments) - 1))
 
             for argument in arguments[1:]:
-                code.extend(argument.operation.convert(localvars, argument.arguments))
+                code.extend(argument.operation.convert(context, argument.arguments))
 
             code.extend([
                 JavaOpcodes.INVOKESTATIC('org/pybee/example', method_name, descriptor),
