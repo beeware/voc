@@ -88,7 +88,7 @@ def transpile(context, parts):
     method = JavaMethod(
         context.name,
         context.descriptor,
-        static=context.is_static,
+        static=context.static,
         attributes=[
             parts.block
         ]

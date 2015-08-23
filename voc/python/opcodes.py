@@ -581,10 +581,10 @@ class LOAD_NAME(Opcode):
             else:
                 code.append(JavaOpcodes.ALOAD(i))
         except KeyError:
-            # TODO:
             # Look for global name (static variable in current class)
             # Then look for builtin.
-            raise
+            code.append(JavaOpcodes.GETSTATIC(context.class_descriptor, self.name, 'Lorg/python/PyObject'))
+
         return code
 
 

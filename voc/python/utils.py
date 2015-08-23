@@ -58,8 +58,9 @@ class Context:
             If no localvars are provided, the method signature will be used
             to construct one, reflecting the state of the stack at entry to
             a new context.
-     * is_class - boolean, indicating if the current context is a class
-     * is_static - boolean, indicating if the current context is static
+     * classname - string providing the name of the current Python class.
+            If the code is in a module's context, classname is None
+     * static - boolean, indicating if the current context is static
      * signature - A list of dictionaries, each dictionary providing details
             about an argument to the method.
      * return_signature - A single dictionary, providing details about the
@@ -71,7 +72,7 @@ class Context:
     def __init__(
             self, sourcefile, namespace, name,
             localvars=None,
-            is_class=False, is_static=False,
+            classname=None, static=False,
             signature=None, return_signature=None,
             ignore_empty=False):
         self.sourcefile = sourcefile
@@ -83,8 +84,16 @@ class Context:
         else:
             self.signature = signature
 
+        self.classname = classname
+        self.static = static
+        self.ignore_empty = ignore_empty
+
         if localvars is None:
-            self.localvars = dict((p['name'], i) for i, p in enumerate(self.signature))
+            if self.classname:
+                self.localvars = dict((p['name'], i + 1) for i, p in enumerate(self.signature[1:]))
+                self.localvars['self'] = 0
+            else:
+                self.localvars = dict((p['name'], i) for i, p in enumerate(self.signature))
         else:
             self.localvars = localvars
 
@@ -93,18 +102,14 @@ class Context:
         else:
             self.return_signature = return_signature
 
-        self.is_class = is_class
-        self.is_static = is_static
-        self.ignore_empty = ignore_empty
-
     @property
     def modulename(self):
         return os.path.splitext(os.path.basename(self.sourcefile))[0]
 
     @property
     def class_descriptor(self):
-        if self.is_class:
-            return '/'.join(self.namespace.split('.') + [self.modulename, self.name])
+        if self.classname:
+            return '/'.join(self.namespace.split('.') + [self.modulename, self.classname])
         else:
             return '/'.join(self.namespace.split('.') + [self.modulename])
 
@@ -119,6 +124,8 @@ class Context:
         # Special case for the main method; otherwise, every argument is a PyObject.
         if self.signature == [{'annotation': 'argv'}]:
             param_descriptor = '[Ljava/lang/String;'
+        elif self.classname:
+            param_descriptor = 'Lorg/python/PyObject;' * (len(self.signature) - 1)
         else:
             param_descriptor = 'Lorg/python/PyObject;' * len(self.signature)
 
@@ -174,7 +181,7 @@ def extract(context, code):
                     name='__main__',
                     namespace=context.namespace,
                     sourcefile=context.sourcefile,
-                    is_static=True,
+                    static=True,
                     signature=[{'name': 'args', 'annotation': 'argv'}],
                     ignore_empty=True,
                 )
@@ -206,7 +213,8 @@ def extract(context, code):
                         sourcefile=context.sourcefile,
                         namespace=context.namespace,
                         name=cmd.operation.name,
-                        is_static=context.is_static,
+                        classname=context.classname,
+                        static=context.static,
                         signature=method_signature(code),
                         return_signature={'annotation': object}
                     )
@@ -244,8 +252,8 @@ def extract(context, code):
                         class_context = Context(
                             sourcefile=context.sourcefile,
                             namespace=context.namespace,
-                            name=context.name,
-                            is_class=True,
+                            name=cmd.operation.name,
+                            classname=cmd.operation.name,
                             ignore_empty=True,
                         )
                         parts = extract(class_context, code)

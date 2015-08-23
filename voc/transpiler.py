@@ -75,7 +75,7 @@ class Transpiler:
             sourcefile=sourcefile,
             namespace=self.namespace,
             name='<clinit>',
-            is_static=True,
+            static=True,
             return_signature={'return': None},
             ignore_empty=True,
         )

@@ -45,4 +45,4 @@ def transpile(context, parts):
     for method in parts.methods:
         classfile.methods.append(method)
 
-    return context.classname, classfile
+    return context.name, classfile
