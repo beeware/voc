@@ -58,7 +58,8 @@ class Context:
             If no localvars are provided, the method signature will be used
             to construct one, reflecting the state of the stack at entry to
             a new context.
-     * static - boolean, indicating if the current context is static
+     * is_class - boolean, indicating if the current context is a class
+     * is_static - boolean, indicating if the current context is static
      * signature - A list of dictionaries, each dictionary providing details
             about an argument to the method.
      * return_signature - A single dictionary, providing details about the
@@ -70,11 +71,12 @@ class Context:
     def __init__(
             self, sourcefile, namespace, name,
             localvars=None,
-            static=False, signature=None, return_signature=None,
+            is_class=False, is_static=False,
+            signature=None, return_signature=None,
             ignore_empty=False):
-        self.name = name
-        self.namespace = namespace
         self.sourcefile = sourcefile
+        self.namespace = namespace
+        self.name = name
 
         if signature is None:
             self.signature = []
@@ -82,25 +84,29 @@ class Context:
             self.signature = signature
 
         if localvars is None:
-            print ("NO LOCALVARS")
             self.localvars = dict((p['name'], i) for i, p in enumerate(self.signature))
         else:
-            print ("WITH LOCALVARS")
             self.localvars = localvars
-
-        print ('C>>>>', self.name, self.signature, self.localvars)
 
         if return_signature is None:
             self.return_signature = {}
         else:
             self.return_signature = return_signature
 
-        self.static = static
+        self.is_class = is_class
+        self.is_static = is_static
         self.ignore_empty = ignore_empty
 
     @property
     def modulename(self):
         return os.path.splitext(os.path.basename(self.sourcefile))[0]
+
+    @property
+    def class_descriptor(self):
+        if self.is_class:
+            return '/'.join(self.namespace.split('.') + [self.modulename, self.name])
+        else:
+            return '/'.join(self.namespace.split('.') + [self.modulename])
 
     @property
     def void_return(self):
@@ -168,7 +174,7 @@ def extract(context, code):
                     name='__main__',
                     namespace=context.namespace,
                     sourcefile=context.sourcefile,
-                    static=True,
+                    is_static=True,
                     signature=[{'name': 'args', 'annotation': 'argv'}],
                     ignore_empty=True,
                 )
@@ -197,10 +203,10 @@ def extract(context, code):
                     code = cmd.arguments[0].arguments[-2].operation.const
                     print ("MAKE FUNCTION", cmd.operation.name)
                     method_context = Context(
-                        name=cmd.operation.name,
-                        namespace=context.namespace,
                         sourcefile=context.sourcefile,
-                        static=context.static,
+                        namespace=context.namespace,
+                        name=cmd.operation.name,
+                        is_static=context.is_static,
                         signature=method_signature(code),
                         return_signature={'annotation': object}
                     )
@@ -236,9 +242,10 @@ def extract(context, code):
                         # print ("Found class", cmd.operation.name)
                         code = cmd.arguments[0].arguments[1].arguments[0].operation.const
                         class_context = Context(
-                            name=cmd.operation.name,
-                            namespace=context.namespace,
                             sourcefile=context.sourcefile,
+                            namespace=context.namespace,
+                            name=context.name,
+                            is_class=True,
                             ignore_empty=True,
                         )
                         parts = extract(class_context, code)

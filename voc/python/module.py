@@ -16,7 +16,7 @@ def transpile(context, moduleparts):
     # If there is any static content, generate a classfile
     # for this module
 
-    classfile = JavaClass('/'.join(context.namespace.split('.') + [context.modulename]))
+    classfile = JavaClass(context.class_descriptor)
     classfile.attributes.append(SourceFile(os.path.basename(context.sourcefile)))
 
     if moduleparts.block:

@@ -11,7 +11,7 @@ from ..java import (
 
 
 def transpile(context, parts):
-    classfile = JavaClass('/'.join(context.namespace.split('.') + [context.modulename, context.name]))
+    classfile = JavaClass(context.class_descriptor)
     classfile.attributes.append(SourceFile(os.path.basename(context.sourcefile)))
 
     if parts.block:

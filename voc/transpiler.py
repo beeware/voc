@@ -72,10 +72,10 @@ class Transpiler:
         # defined in this context are all static.
 
         context = Context(
+            sourcefile=sourcefile,
             namespace=self.namespace,
             name='<clinit>',
-            sourcefile=sourcefile,
-            static=True,
+            is_static=True,
             return_signature={'return': None},
             ignore_empty=True,
         )
