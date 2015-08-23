@@ -1,5 +1,6 @@
 from collections import namedtuple
 import dis
+import os
 
 from . import opcodes
 
@@ -46,7 +47,75 @@ class Command:
         print ('    ' * depth, self.operation)
 
 
-def extract(namespace, sourcefile, code, localvars=None, static=False, void_return=False):
+class Context:
+    """An object describing the context in which a given code block will execute.
+
+    Constructor takes the following arguments:
+     * sourcefile - The source file providing the code definition
+     * namespace - The namespace for the object being constructed.
+     * name - The object currently being constructed.
+     * localvars - The local context dictionary in which the method operates.
+            If no localvars are provided, the method signature will be used
+            to construct one, reflecting the state of the stack at entry to
+            a new context.
+     * static - boolean, indicating if the current context is static
+     * signature - A list of dictionaries, each dictionary providing details
+            about an argument to the method.
+     * return_signature - A single dictionary, providing details about the
+            return type of the object.
+     * ignore_empty - If True, a block that contains only a "return" statement
+            will be flagged, and not turned into a full method. This is to
+            avoid defining do-nothing <init> and <clinit> methods on classes.
+    """
+    def __init__(
+            self, sourcefile, namespace, name,
+            localvars=None,
+            static=False, signature=None, return_signature=None,
+            ignore_empty=False):
+        self.name = name
+        self.namespace = namespace
+        self.sourcefile = sourcefile
+
+        if signature is None:
+            self.signature = []
+        else:
+            self.signature = signature
+
+        if localvars is None:
+            self.localvars = dict((p['name'], i) for i, p in enumerate(self.signature))
+        else:
+            self.localvars = localvars
+
+        if return_signature is None:
+            self.return_signature = {}
+        else:
+            self.return_signature = return_signature
+
+        self.static = static
+        self.ignore_empty = ignore_empty
+
+    @property
+    def modulename(self):
+        return os.path.splitext(os.path.basename(self.sourcefile))[0]
+
+    @property
+    def void_return(self):
+        return self.return_signature.get('annotation') is None
+
+    @property
+    def descriptor(self):
+        return_descriptor = 'V' if self.return_signature.get('annotation') is None else 'Lorg/python/PyObject;'
+
+        # Special case for the main method; otherwise, every argument is a PyObject.
+        if self.signature == [{'annotation': 'argv'}]:
+            param_descriptor = '[Ljava/lang/String;'
+        else:
+            param_descriptor = 'Lorg/python/PyObject;' * len(self.signature)
+
+        return '(%s)%s' % (param_descriptor, return_descriptor)
+
+
+def extract(context, code):
     """Break a code object into the parts it defines.
 
     Returns a Parts object describing the components of
@@ -91,7 +160,16 @@ def extract(namespace, sourcefile, code, localvars=None, static=False, void_retu
             #   JUMP_FORWARD <main_end>
             if len(cmd.arguments) == 0 and cmd.operation.opname == 'JUMP_FORWARD' and cmd.operation.delta == main_end:
                 main_end = None
-                main = transpile_block(main_commands, localvars=localvars, ignore_empty=True, void_return=True)
+                main_context = Context(
+                    name='__main__',
+                    namespace=context.namespace,
+                    sourcefile=context.sourcefile,
+                    localvars=context.localvars,
+                    static=True,
+                    signature=[{'annotation': 'argv'}],
+                    ignore_empty=True,
+                )
+                main = transpile_block(main_context, main_commands)
             else:
                 main_commands.append(cmd)
         else:
@@ -115,8 +193,15 @@ def extract(namespace, sourcefile, code, localvars=None, static=False, void_retu
                     # print ("Found method", cmd.operation.name)
                     code = cmd.arguments[0].arguments[-2].operation.const
                     print ("MAKE FUNCTION", cmd.operation.name)
-                    sig = method_signature(code)
-                    parts = extract(namespace, sourcefile, code, localvars=dict((p['name'], i) for i, p in enumerate(sig)), void_return=False)
+                    method_context = Context(
+                        name=cmd.operation.name,
+                        namespace=context.namespace,
+                        sourcefile=context.sourcefile,
+                        static=context.static,
+                        signature=method_signature(code),
+                        return_signature={'annotation': object}
+                    )
+                    parts = extract(method_context, code)
                     if parts.classes:
                         print("Ignoring inner class definition.")
                     if parts.methods:
@@ -125,7 +210,7 @@ def extract(namespace, sourcefile, code, localvars=None, static=False, void_retu
                         print("Ignoring inner __main__ definition.")
                     if parts.init:
                         print("Ignoring inner __init__ definition.")
-                    method = transpile_method(cmd.operation.name, sig, parts, static=static)
+                    method = transpile_method(method_context, parts)
                     if cmd.operation.name == '__init__':
                         # print (" - adding as special case: __init__")
                         if init is not None:
@@ -147,12 +232,18 @@ def extract(namespace, sourcefile, code, localvars=None, static=False, void_retu
                     if cmd.arguments[0].arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
                         # print ("Found class", cmd.operation.name)
                         code = cmd.arguments[0].arguments[1].arguments[0].operation.const
-                        parts = extract(namespace, sourcefile, code, void_return=True)
+                        class_context = Context(
+                            name=cmd.operation.name,
+                            namespace=context.namespace,
+                            sourcefile=context.sourcefile,
+                            ignore_empty=True,
+                        )
+                        parts = extract(class_context, code)
                         if parts.classes:
                             print("Ignoring inner class definition.")
                         if parts.main:
                             print("Ignoring inner __main__ definition.")
-                        classes.append(transpile_class(namespace, sourcefile, cmd.operation.name, parts))
+                        classes.append(transpile_class(class_context, parts))
 
                     # Equivalent of "name = method_name(...)"
                     #           LOAD_NAME <method_name>
@@ -193,7 +284,7 @@ def extract(namespace, sourcefile, code, localvars=None, static=False, void_retu
             else:
                 block_commands.append(cmd)
 
-    block = transpile_block(block_commands, localvars=localvars, ignore_empty=True, void_return=void_return)
+    block = transpile_block(context, block_commands)
 
     return Parts(classes=classes, methods=methods, block=block, main=main, init=init)
 

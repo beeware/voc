@@ -443,16 +443,7 @@ class STORE_NAME(Opcode):
             elif i == 3:
                 code.append(JavaOpcodes.ASTORE_3())
             else:
-                if i < 128:
-                    load_op = JavaOpcodes.BIPUSH(i)
-                elif i < 32768:
-                    load_op = JavaOpcodes.SIPUSH(i)
-                else:
-                    load_op = JavaOpcodes.LDC(i)
-                code.extend([
-                    load_op,
-                    JavaOpcodes.ASTORE()
-                ])
+                code.append(JavaOpcodes.ASTORE(i))
 
         return code
 
@@ -593,7 +584,7 @@ class LOAD_NAME(Opcode):
             # TODO:
             # Look for global name (static variable in current class)
             # Then look for builtin.
-            pass
+            raise
         return code
 
 

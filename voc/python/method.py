@@ -84,11 +84,11 @@ def signature(code):
     return parameters
 
 
-def transpile(methodname, signature, parts, static=False):
+def transpile(context, parts):
     method = JavaMethod(
-        methodname,
-        '(%s)Lorg/python/PyObject;' % ('Lorg/python/PyObject;' * len(signature)),
-        static=static,
+        context.name,
+        context.descriptor,
+        static=context.static,
         attributes=[
             parts.block
         ]

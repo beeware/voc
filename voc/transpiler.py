@@ -4,7 +4,7 @@ import os
 import py_compile
 
 from .python.module import transpile as transpile_module
-from .python.utils import extract
+from .python.utils import Context, extract
 
 
 def transpile(sourcefile, namespace, outdir=None):
@@ -70,8 +70,18 @@ class Transpiler:
         # This process is recursive, working down the entire code tree.
         # This top level module isn't designed to be instantiated, so methods
         # defined in this context are all static.
-        parts = extract(self.namespace, sourcefile, code, static=True)
+
+        context = Context(
+            namespace=self.namespace,
+            name='<clinit>',
+            sourcefile=sourcefile,
+            static=True,
+            return_signature={'return': None},
+            ignore_empty=True,
+        )
+
+        parts = extract(context, code)
 
         # Transpile the module code, adding any classfiles generated
         # to the list to be exported.
-        self.classfiles.extend(transpile_module(self.namespace, sourcefile, parts))
+        self.classfiles.extend(transpile_module(context, parts))

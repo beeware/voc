@@ -10,10 +10,9 @@ from ..java import (
 )
 
 
-def transpile(namespace, sourcefile, classname, parts):
-    modulename = os.path.splitext(os.path.basename(sourcefile))[0]
-    classfile = JavaClass('/'.join(namespace.split('.') + [modulename, classname]))
-    classfile.attributes.append(SourceFile(os.path.basename(sourcefile)))
+def transpile(context, parts):
+    classfile = JavaClass('/'.join(context.namespace.split('.') + [context.modulename, context.name]))
+    classfile.attributes.append(SourceFile(os.path.basename(context.sourcefile)))
 
     if parts.block:
         # If we have block content, add a static block to the class
@@ -46,4 +45,4 @@ def transpile(namespace, sourcefile, classname, parts):
     for method in parts.methods:
         classfile.methods.append(method)
 
-    return classname, classfile
+    return context.classname, classfile

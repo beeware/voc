@@ -10,15 +10,14 @@ from ..java import (
 )
 
 
-def transpile(namespace, sourcefile, moduleparts):
+def transpile(context, moduleparts):
     classfiles = []
-    modulename = os.path.splitext(os.path.basename(sourcefile))[0]
 
     # If there is any static content, generate a classfile
     # for this module
 
-    classfile = JavaClass('/'.join(namespace.split('.') + [modulename]))
-    classfile.attributes.append(SourceFile(os.path.basename(sourcefile)))
+    classfile = JavaClass('/'.join(context.namespace.split('.') + [context.modulename]))
+    classfile.attributes.append(SourceFile(os.path.basename(context.sourcefile)))
 
     if moduleparts.block:
         static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
@@ -43,10 +42,10 @@ def transpile(namespace, sourcefile, moduleparts):
     if moduleparts.init:
         print("Unexpected __init__ method in static context... ignoring")
 
-    classfiles.append((modulename, None, classfile))
+    classfiles.append((context.modulename, None, classfile))
 
     # Also output any subclasses.
     for classname, classfile in moduleparts.classes:
-        classfiles.append((classname, modulename, classfile))
+        classfiles.append((classname, context.modulename, classfile))
 
     return classfiles
