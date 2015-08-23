@@ -82,9 +82,13 @@ class Context:
             self.signature = signature
 
         if localvars is None:
+            print ("NO LOCALVARS")
             self.localvars = dict((p['name'], i) for i, p in enumerate(self.signature))
         else:
+            print ("WITH LOCALVARS")
             self.localvars = localvars
+
+        print ('C>>>>', self.name, self.signature, self.localvars)
 
         if return_signature is None:
             self.return_signature = {}
@@ -164,9 +168,8 @@ def extract(context, code):
                     name='__main__',
                     namespace=context.namespace,
                     sourcefile=context.sourcefile,
-                    localvars=context.localvars,
                     static=True,
-                    signature=[{'annotation': 'argv'}],
+                    signature=[{'name': 'args', 'annotation': 'argv'}],
                     ignore_empty=True,
                 )
                 main = transpile_block(main_context, main_commands)

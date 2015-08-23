@@ -1,3 +1,4 @@
+from .signatures import method_descriptor
 
 ##########################################################################
 # Some utility methods to help compare and hash constants
@@ -265,6 +266,9 @@ class Methodref(Constant):
         # <init>, representing an instance initialization method (§2.9). The
         # return type of such a method must be void.
         self.name_and_type = NameAndType(name, descriptor)
+
+        # For convenience, store a parsed version of the descriptor.
+        self.descriptor = method_descriptor(descriptor)
 
     def __repr__(self):
         return '<Methodref class:%s name_and_type:%s>' % (self.klass, self.name_and_type)

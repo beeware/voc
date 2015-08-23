@@ -1,5 +1,4 @@
 from .constants import Classref, Fieldref, Methodref, String, Integer, Long
-
 # From: https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 # Reference" http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.2
 
@@ -47,6 +46,10 @@ class ACONST_NULL(Opcode):
     def __init__(self):
         super(ACONST_NULL, self).__init__(0x01)
 
+    @property
+    def stack_effect(self):
+        return 1
+
 
 class ALOAD(Opcode):
     # Load a reference onto the stack from a local variable #index
@@ -62,12 +65,20 @@ class ALOAD(Opcode):
     def write_extra(self, writer):
         writer.write_u1(self.var)
 
+    @property
+    def stack_effect(self):
+        return 1
+
 
 class ALOAD_0(Opcode):
     # Load a reference onto the stack from local variable 0
     # Stack: → objectref
     def __init__(self):
         super(ALOAD_0, self).__init__(0x2a)
+
+    @property
+    def stack_effect(self):
+        return 1
 
 
 class ALOAD_1(Opcode):
@@ -76,6 +87,10 @@ class ALOAD_1(Opcode):
     def __init__(self):
         super(ALOAD_1, self).__init__(0x2b)
 
+    @property
+    def stack_effect(self):
+        return 1
+
 
 class ALOAD_2(Opcode):
     # Load a reference onto the stack from local variable 2
@@ -83,12 +98,20 @@ class ALOAD_2(Opcode):
     def __init__(self):
         super(ALOAD_2, self).__init__(0x2c)
 
+    @property
+    def stack_effect(self):
+        return 1
+
 
 class ALOAD_3(Opcode):
     # Load a reference onto the stack from local variable 3
     # Stack: → objectref
     def __init__(self):
         super(ALOAD_3, self).__init__(0x2d)
+
+    @property
+    def stack_effect(self):
+        return 1
 
 
 class ANEWARRAY(Opcode):
@@ -106,6 +129,10 @@ class ARETURN(Opcode):
     # Stack: objectref → [empty]
     def __init__(self):
         super(ARETURN, self).__init__(0xb0)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class ARRAYLENGTH(Opcode):
@@ -129,12 +156,20 @@ class ASTORE(Opcode):
     def write_extra(self, writer):
         writer.write_u1(self.var)
 
+    @property
+    def stack_effect(self):
+        return -1
+
 
 class ASTORE_0(Opcode):
     # Store a reference into local variable 0
     # Stack: objectref →
     def __init__(self):
         super(ASTORE_0, self).__init__(0x4b)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class ASTORE_1(Opcode):
@@ -143,6 +178,10 @@ class ASTORE_1(Opcode):
     def __init__(self):
         super(ASTORE_1, self).__init__(0x4c)
 
+    @property
+    def stack_effect(self):
+        return -1
+
 
 class ASTORE_2(Opcode):
     # Store a reference into local variable 2
@@ -150,12 +189,20 @@ class ASTORE_2(Opcode):
     def __init__(self):
         super(ASTORE_2, self).__init__(0x4d)
 
+    @property
+    def stack_effect(self):
+        return -1
+
 
 class ASTORE_3(Opcode):
     # Store a reference into local variable 3
     # Stack: objectref →
     def __init__(self):
         super(ASTORE_3, self).__init__(0x4e)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class ATHROW(Opcode):
@@ -189,6 +236,10 @@ class BIPUSH(Opcode):
 
     def write_extra(self, writer):
         writer.write_u1(self.const)
+
+    @property
+    def stack_effect(self):
+        return 1
 
 
 class BREAKPOINT(Opcode):
@@ -374,6 +425,10 @@ class DUP(Opcode):
     # value → value, value    duplicate the value on top of the stack
     def __init__(self):
         super(DUP, self).__init__(0x59)
+
+    @property
+    def stack_effect(self):
+        return 1
 
 
 class DUP_X1(Opcode):
@@ -592,6 +647,10 @@ class GETSTATIC(Opcode):
 
     def resolve(self, constant_pool):
         self.field.resolve(constant_pool)
+
+    @property
+    def stack_effect(self):
+        return 1
 
 
 class GOTO(Opcode):
@@ -943,6 +1002,10 @@ class INVOKESPECIAL(Opcode):
     def resolve(self, constant_pool):
         self.method.resolve(constant_pool)
 
+    @property
+    def stack_effect(self):
+        return -len(self.method.descriptor.parameters)
+
 
 class INVOKESTATIC(Opcode):
     # Invoke a static method and puts the result on the stack (might be void); the
@@ -963,6 +1026,10 @@ class INVOKESTATIC(Opcode):
     def resolve(self, constant_pool):
         self.method.resolve(constant_pool)
 
+    @property
+    def stack_effect(self):
+        return -len(self.method.descriptor.parameters)
+
 
 class INVOKEVIRTUAL(Opcode):
     # Invoke virtual method on object objectref and puts the result on the stack
@@ -982,6 +1049,10 @@ class INVOKEVIRTUAL(Opcode):
 
     def resolve(self, constant_pool):
         self.method.resolve(constant_pool)
+
+    @property
+    def stack_effect(self):
+        return -len(self.method.descriptor.parameters)
 
 
 class IOR(Opcode):
@@ -1158,6 +1229,10 @@ class LDC(Opcode):
 
     def resolve(self, constant_pool):
         self.const.resolve(constant_pool)
+
+    @property
+    def stack_effect(self):
+        return 1
 
 
 class LDC_W(Opcode):
@@ -1345,6 +1420,10 @@ class NEW(Opcode):
     def resolve(self, constant_pool):
         self.classref.resolve(constant_pool)
 
+    @property
+    def stack_effect(self):
+        return 1
+
 
 class NEWARRAY(Opcode):
     def __init__(self):
@@ -1365,6 +1444,10 @@ class POP(Opcode):
     # Discard the top value on the stack
     def __init__(self):
         super(POP, self).__init__(0x57)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class POP2(Opcode):
@@ -1405,6 +1488,10 @@ class RETURN(Opcode):
     def __init__(self):
         super(RETURN, self).__init__(0xb1)
 
+    @property
+    def stack_effect(self):
+        return -1
+
 
 class SALOAD(Opcode):
     def __init__(self):
@@ -1430,6 +1517,10 @@ class SIPUSH(Opcode):
 
     def write_extra(self, writer):
         writer.write_u2(self.const)
+
+    @property
+    def stack_effect(self):
+        return 1
 
 
 class SWAP(Opcode):

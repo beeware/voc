@@ -1,6 +1,16 @@
 from ..java import Code as JavaCode, opcodes as JavaOpcodes
 
 
+def stack_depth(code):
+    depth = 0
+    max_depth = 0
+    for opcode in code:
+        depth = depth + opcode.stack_effect
+        if depth > max_depth:
+            max_depth = depth
+    return max_depth
+
+
 def transpile(context, commands):
     code = []
     for cmd in commands:
@@ -24,7 +34,7 @@ def transpile(context, commands):
             code = code[:-2] + [JavaOpcodes.RETURN()]
 
     return JavaCode(
-        max_stack=20,
-        max_locals=len(context.localvars) + 1,
+        max_stack=stack_depth(code),
+        max_locals=len(context.localvars),
         code=code
     )
