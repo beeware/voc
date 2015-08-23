@@ -27,6 +27,10 @@ def create_local(localvars, name):
     return i
 
 
+##########################################################################
+# Base classes for defining opcodes.
+##########################################################################
+
 class Opcode:
     @property
     def opname(self):
@@ -38,6 +42,85 @@ class Opcode:
     def __arg_repr__(self):
         return ''
 
+
+class UnaryOpcode(Opcode):
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert(self, localvars, arguments):
+        code = []
+
+        for argument in arguments:
+            code.extend(argument.operation.convert(localvars, argument.arguments))
+
+        code.append(
+            JavaOpcodes.INVOKEVIRTUAL(
+                'org/python/PyObject',
+                self.__method__,
+                '()Lorg/python/PyObject;'
+            )
+        )
+        return code
+
+
+class BinaryOpcode(Opcode):
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert(self, localvars, arguments):
+        code = []
+
+        for argument in arguments:
+            code.extend(argument.operation.convert(localvars, argument.arguments))
+
+        code.append(
+            JavaOpcodes.INVOKEVIRTUAL(
+                'org/python/PyObject',
+                self.__method__,
+                '(Lorg/python/PyObject;)Lorg/python/PyObject;'
+            )
+        )
+        return code
+
+
+class InplaceOpcode(Opcode):
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert(self, localvars, arguments):
+        code = []
+
+        for argument in arguments:
+            code.extend(argument.operation.convert(localvars, argument.arguments))
+
+        code.append(
+            JavaOpcodes.INVOKEVIRTUAL(
+                'org/python/PyObject',
+                self.__method__,
+                '(Lorg/python/PyObject;)V'
+            )
+        )
+        return code
+
+
+##########################################################################
+# The actual Python opcodes
+##########################################################################
 
 class POP_TOP(Opcode):
     @property
@@ -128,103 +211,109 @@ class NOP(Opcode):
         code.append(JavaOpcodes.NOP())
         return code
 
-
-# class UNARY_POSITIVE(Opcode):
-# class UNARY_NEGATIVE(Opcode):
-# class UNARY_NOT(Opcode):
-# class UNARY_INVERT(Opcode):
+class UNARY_POSITIVE(Opcode):
+    __method__ = '__pos__'
 
 
-class BINARY_POWER(Opcode):
-    @property
-    def consume_count(self):
-        return 2
-
-    @property
-    def product_count(self):
-        return 1
+class UNARY_NEGATIVE(Opcode):
+    __method__ = '__neg__'
 
 
-class BINARY_MULTIPLY(Opcode):
-    @property
-    def consume_count(self):
-        return 2
-
-    @property
-    def product_count(self):
-        return 1
-
-    def convert(self, localvars, arguments):
-        code = []
-
-        for argument in arguments:
-            code.extend(argument.operation.convert(localvars, argument.arguments))
-
-        code.append(
-            JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/PyObject',
-                '__mul__',
-                '(Lorg/python/PyObject;)Lorg/python/PyObject;'
-            )
-        )
-        return code
+# FIXME - there shouldn't be a __not__...
+class UNARY_NOT(Opcode):
+    __method__ = '__not__'
 
 
-class BINARY_MODULO(Opcode):
-    @property
-    def consume_count(self):
-        return 2
-
-    @property
-    def product_count(self):
-        return 1
+class UNARY_INVERT(Opcode):
+    __method__ = '__invert__'
 
 
-class BINARY_ADD(Opcode):
-    @property
-    def consume_count(self):
-        return 2
-
-    @property
-    def product_count(self):
-        return 1
+class BINARY_POWER(BinaryOpcode):
+    __method__ = '__pow__'
 
 
-# class BINARY_SUBTRACT(Opcode):
+class BINARY_MULTIPLY(BinaryOpcode):
+    __method__ = '__mul__'
 
 
-class BINARY_SUBSCR(Opcode):
-    @property
-    def consume_count(self):
-        return 2
-
-    @property
-    def product_count(self):
-        return 1
+class BINARY_MODULO(BinaryOpcode):
+    __method__ = '__mod__'
 
 
-# class BINARY_FLOOR_DIVIDE(Opcode):
-# class BINARY_TRUE_DIVIDE(Opcode):
+class BINARY_ADD(BinaryOpcode):
+    __method__ = '__add__'
 
-# class INPLACE_FLOOR_DIVIDE(Opcode):
-# class INPLACE_TRUE_DIVIDE(Opcode):
+
+class BINARY_SUBTRACT(BinaryOpcode):
+    __method__ = '__sub__'
+
+
+class BINARY_SUBSCR(BinaryOpcode):
+    __method__ = '__subscr__'
+
+
+class BINARY_FLOOR_DIVIDE(BinaryOpcode):
+    __method__ = '__floordiv__'
+
+
+class BINARY_TRUE_DIVIDE(BinaryOpcode):
+    __method__ = '__truediv__'
+
+
+
+class INPLACE_FLOOR_DIVIDE(InplaceOpcode):
+    __method__ = '__ifloordiv__'
+
+
+class INPLACE_TRUE_DIVIDE(InplaceOpcode):
+    __method__ = '__itruediv__'
+
 
 # class STORE_MAP(Opcode):
 
-# class INPLACE_ADD(Opcode):
-# class INPLACE_SUBTRACT(Opcode):
-# class INPLACE_MULTIPLY(Opcode):
-# class INPLACE_MODULO(Opcode):
+class INPLACE_ADD(InplaceOpcode):
+    __method__ = '__iadd__'
+
+
+class INPLACE_SUBTRACT(InplaceOpcode):
+    __method__ = '__isub__'
+
+
+class INPLACE_MULTIPLY(InplaceOpcode):
+    __method__ = '__imul__'
+
+
+class INPLACE_MODULO(InplaceOpcode):
+    __method__ = '__imod__'
+
 
 # class STORE_SUBSCR(Opcode):
 # class DELETE_SUBSCR(Opcode):
 
-# class BINARY_LSHIFT(Opcode):
-# class BINARY_RSHIFT(Opcode):
-# class BINARY_AND(Opcode):
-# class BINARY_XOR(Opcode):
-# class BINARY_OR(Opcode):
-# class INPLACE_POWER(Opcode):
+
+class BINARY_LSHIFT(BinaryOpcode):
+    __method__ = '__lshift__'
+
+
+class BINARY_RSHIFT(BinaryOpcode):
+    __method__ = '__rshift__'
+
+
+class BINARY_AND(BinaryOpcode):
+    __method__ = '__and__'
+
+
+class BINARY_XOR(BinaryOpcode):
+    __method__ = '__xor__'
+
+
+class BINARY_OR(BinaryOpcode):
+    __method__ = '__or__'
+
+
+class INPLACE_POWER(InplaceOpcode):
+    __method__ = '__ipow__'
+
 
 
 class GET_ITER(Opcode):
@@ -259,11 +348,25 @@ class LOAD_BUILD_CLASS(Opcode):
 
 # class YIELD_FROM(Opcode):
 
-# class INPLACE_LSHIFT(Opcode):
-# class INPLACE_RSHIFT(Opcode):
-# class INPLACE_AND(Opcode):
-# class INPLACE_XOR(Opcode):
-# class INPLACE_OR(Opcode):
+class INPLACE_LSHIFT(InplaceOpcode):
+    __method__ = '__ilshift__'
+
+
+class INPLACE_RSHIFT(InplaceOpcode):
+    __method__ = '__irshift__'
+
+
+class INPLACE_AND(InplaceOpcode):
+    __method__ = '__iand__'
+
+
+class INPLACE_XOR(InplaceOpcode):
+    __method__ = '__ixor__'
+
+
+class INPLACE_OR(InplaceOpcode):
+    __method__ = '__ior__'
+
 
 # class BREAK_LOOP(Opcode):
 # class WITH_CLEANUP(Opcode):
@@ -474,21 +577,23 @@ class LOAD_NAME(Opcode):
 
     def convert(self, localvars, arguments):
         code = []
-        i = get_local(localvars, self.name)
-        if i == 0:
-            code.append(JavaOpcodes.ALOAD_0())
-        elif i == 1:
-            code.append(JavaOpcodes.ALOAD_1())
-        elif i == 2:
-            code.append(JavaOpcodes.ALOAD_2())
-        elif i == 3:
-            code.append(JavaOpcodes.ALOAD_3())
-        else:
-            code.extend([
-                JavaOpcodes.LDC(i),
-                JavaOpcodes.ALOAD()
-            ])
-
+        try:
+            i = get_local(localvars, self.name)
+            if i == 0:
+                code.append(JavaOpcodes.ALOAD_0())
+            elif i == 1:
+                code.append(JavaOpcodes.ALOAD_1())
+            elif i == 2:
+                code.append(JavaOpcodes.ALOAD_2())
+            elif i == 3:
+                code.append(JavaOpcodes.ALOAD_3())
+            else:
+                code.append(JavaOpcodes.ALOAD(i))
+        except KeyError:
+            # TODO:
+            # Look for global name (static variable in current class)
+            # Then look for builtin.
+            pass
         return code
 
 

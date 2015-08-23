@@ -23,7 +23,7 @@ def transpile(commands, localvars=None, ignore_empty=False, void_return=False):
 
     # If we require a void return, convert any "return None" into a straight return.
     if void_return:
-        if len(code) > 2 and isinstance(code[-1], JavaOpcodes.ARETURN) and isinstance(code[-2], JavaOpcodes.ASTORE_NULL):
+        if len(code) > 2 and isinstance(code[-1], JavaOpcodes.ARETURN) and isinstance(code[-2], JavaOpcodes.ACONST_NULL):
             code = code[:-2] + [JavaOpcodes.RETURN()]
 
     return JavaCode(

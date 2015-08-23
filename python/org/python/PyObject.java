@@ -7,16 +7,21 @@ import java.util.Map;
 import java.util.ArrayList;
 
 public class PyObject {
-    public static Hashtable<String, PyObject> globals;
-
-    // public static Hashtable<String, PyObject> locals;
+    static public String __name__;
+    static public String __module__;
+    static public String __qualname__;
 
     public Type type;
     public Object value;
 
     static {
-        globals = new Hashtable<String, PyObject>();
-        // locals = new Hashtable<String, PyObject>();
+        // Field[] declaredFields = String.class.getDeclaredFields();
+        // List<Field> staticFields = new ArrayList<Field>();
+        // for (Field field : declaredFields) {
+        //     if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+        //         staticFields.add(field);
+        //     }
+        // }
     }
 
     /**

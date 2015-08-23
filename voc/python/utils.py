@@ -88,7 +88,7 @@ def extract(namespace, sourcefile, code, localvars=None, static=False, void_retu
     for cmd in commands:
         if main_end is not None:
             # Marker for the end of the main block:
-            #   JUMP_FORWARD <target>
+            #   JUMP_FORWARD <main_end>
             if len(cmd.arguments) == 0 and cmd.operation.opname == 'JUMP_FORWARD' and cmd.operation.delta == main_end:
                 main_end = None
                 main = transpile_block(main_commands, localvars=localvars, ignore_empty=True, void_return=True)
@@ -167,7 +167,6 @@ def extract(namespace, sourcefile, code, localvars=None, static=False, void_retu
                 #       ... load arg ...
                 #   STORE_NAME <name>
                 else:
-                    # print ("Static block invocation of", cmd.arguments[-1].arguments[0].operation.name)
                     block_commands.append(cmd)
 
             # This is looking for a very specific pattern:
