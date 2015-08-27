@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class UnboundLocalError extends PythonException {
+public class UnboundLocalError extends PyException {
     public UnboundLocalError() {
         super();
     }

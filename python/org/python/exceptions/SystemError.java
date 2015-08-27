@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class SystemError extends PythonException {
+public class SystemError extends PyException {
     public SystemError() {
         super();
     }

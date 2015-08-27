@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class TabError extends PythonException {
+public class TabError extends PyException {
     public TabError() {
         super();
     }

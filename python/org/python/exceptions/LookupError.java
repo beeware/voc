@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class LookupError extends PythonException {
+public class LookupError extends PyException {
     public LookupError() {
         super();
     }

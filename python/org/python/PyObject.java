@@ -165,6 +165,7 @@ public class PyObject {
     }
 
     public PyObject __add__(PyObject other) {
+        // System.out.println("ADD " + this.type + " TO " + other.type);
         if (this.type == String.class) {
             if (other.type == String.class) {
                 return new PyObject(((String) this.value) + ((String) other.value));
@@ -176,6 +177,15 @@ public class PyObject {
             } else if (other.type == ArrayList.class) {
             }
         } else if (this.type == Long.class) {
+            if (other.type == String.class) {
+            } else if (other.type == Long.class) {
+                return new PyObject(((Long) this.value) + ((Long) other.value));
+            } else if (other.type == Float.class) {
+            } else if (other.type == Map.class) {
+            } else if (other.type == Set.class) {
+            } else if (other.type == Object.class) {
+            } else if (other.type == ArrayList.class) {
+            }
         } else if (this.type == Float.class) {
         } else if (this.type == Map.class) {
         } else if (this.type == Set.class) {
@@ -190,7 +200,26 @@ public class PyObject {
     }
 
     public PyObject __mul__(PyObject other) {
-        return new PyObject(((Long) this.value) * ((Long) other.value));
+        // System.out.println("MUL " + this.type + " TO " + other.type);
+        if (this.type == String.class) {
+        } else if (this.type == Long.class) {
+            if (other.type == String.class) {
+            } else if (other.type == Long.class) {
+                return new PyObject(((Long) this.value) * ((Long) other.value));
+            } else if (other.type == Float.class) {
+            } else if (other.type == Map.class) {
+            } else if (other.type == Set.class) {
+            } else if (other.type == Object.class) {
+            } else if (other.type == ArrayList.class) {
+            }
+        } else if (this.type == Float.class) {
+        } else if (this.type == Map.class) {
+        } else if (this.type == Set.class) {
+        } else if (this.type == Object.class) {
+        } else if (this.type == ArrayList.class) {
+        }
+        return null;
+
     }
 
     public PyObject __floordiv__(PyObject other) {
@@ -210,6 +239,24 @@ public class PyObject {
     }
 
     public PyObject __pow__(PyObject other) {
+        // System.out.println("POW " + this.type + " TO " + other.type);
+        if (this.type == String.class) {
+        } else if (this.type == Long.class) {
+            if (other.type == String.class) {
+            } else if (other.type == Long.class) {
+                return new PyObject((long)Math.pow((Long) this.value, (Long) other.value));
+            } else if (other.type == Float.class) {
+            } else if (other.type == Map.class) {
+            } else if (other.type == Set.class) {
+            } else if (other.type == Object.class) {
+            } else if (other.type == ArrayList.class) {
+            }
+        } else if (this.type == Float.class) {
+        } else if (this.type == Map.class) {
+        } else if (this.type == Set.class) {
+        } else if (this.type == Object.class) {
+        } else if (this.type == ArrayList.class) {
+        }
         return null;
     }
 

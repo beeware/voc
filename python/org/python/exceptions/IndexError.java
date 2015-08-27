@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class IndexError extends PythonException {
+public class IndexError extends PyException {
     public IndexError() {
         super();
     }

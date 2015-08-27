@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class NotImplementedError extends PythonException {
+public class NotImplementedError extends PyException {
     public NotImplementedError() {
         super();
     }

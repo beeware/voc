@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class AssertionError extends PythonException {
+public class AssertionError extends PyException {
     public AssertionError() {
         super();
     }

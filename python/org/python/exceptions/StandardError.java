@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class StandardError extends PythonException {
+public class StandardError extends PyException {
     public StandardError() {
         super();
     }

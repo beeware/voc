@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class NameError extends PythonException {
+public class NameError extends PyException {
     public NameError() {
         super();
     }

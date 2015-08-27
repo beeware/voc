@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class ValueError extends PythonException {
+public class ValueError extends PyException {
     public ValueError() {
         super();
     }

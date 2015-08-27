@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class BufferError extends PythonException {
+public class BufferError extends PyException {
     public BufferError() {
         super();
     }

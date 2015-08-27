@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class ArithmeticError extends PythonException {
+public class ArithmeticError extends PyException {
     public ArithmeticError() {
         super();
     }

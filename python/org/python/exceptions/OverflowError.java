@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class OverflowError extends PythonException {
+public class OverflowError extends PyException {
     public OverflowError() {
         super();
     }

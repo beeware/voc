@@ -1,346 +1,314 @@
-package org.python;
+package org;
 
+import java.util.Hashtable;
+
+import org.python.PyObject;
 import org.python.exceptions.NotImplementedError;
 
 
-public class Builtins {
-    public static void py___import__() {
+public class Python {
+    public static Hashtable<String, PyObject> globals;
+
+    static {
+        globals = new Hashtable<String, PyObject>();
+    }
+
+    public static void __import__() {
         throw new NotImplementedError("Builtin function 'abs' not implemented");
     }
 
-    public static void py_abs() {
+    public static void abs() {
         throw new NotImplementedError("Builtin function 'abs' not implemented");
     }
 
-    public static void py_all() {
+    public static void all() {
         throw new NotImplementedError("Builtin function 'all' not implemented");
     }
 
-    public static void py_any() {
+    public static void any() {
         throw new NotImplementedError("Builtin function 'any' not implemented");
     }
 
-    public static void py_apply() {
-        throw new NotImplementedError("Builtin function 'apply' not implemented");
+    public static void ascii() {
+        throw new NotImplementedError("Builtin function 'ascii' not implemented");
     }
 
-    public static void py_basestring() {
-        throw new NotImplementedError("Builtin function 'basestring' not implemented");
-    }
-
-    public static void py_bin() {
+    public static void bin() {
         throw new NotImplementedError("Builtin function 'bin' not implemented");
     }
 
-    public static void py_bool() {
+    public static void bool() {
         throw new NotImplementedError("Builtin function 'bool' not implemented");
     }
 
-    public static void py_buffer() {
-        throw new NotImplementedError("Builtin function 'buffer' not implemented");
-    }
-
-    public static void py_bytearray() {
+    public static void bytearray() {
         throw new NotImplementedError("Builtin function 'bytearray' not implemented");
     }
 
-    public static void py_bytes() {
+    public static void bytes() {
         throw new NotImplementedError("Builtin function 'bytes' not implemented");
     }
 
-    public static void py_callable() {
+    public static void callable() {
         throw new NotImplementedError("Builtin function 'callable' not implemented");
     }
 
-    public static void py_chr() {
+    public static void chr() {
         throw new NotImplementedError("Builtin function 'callable' not implemented");
     }
 
-    public static void py_classmethod() {
+    public static void classmethod() {
         throw new NotImplementedError("Builtin function 'classmethod' not implemented");
     }
 
-    public static void py_cmp() {
-        throw new NotImplementedError("Builtin function 'cmp' not implemented");
-    }
-
-    public static void py_coerce() {
-        throw new NotImplementedError("Builtin function 'coerce' not implemented");
-    }
-
-    public static void py_compile() {
+    public static void compile() {
         throw new NotImplementedError("Builtin function 'compile' not implemented");
     }
 
-    public static void py_complex() {
+    public static void complex() {
         throw new NotImplementedError("Builtin function 'complex' not implemented");
     }
 
-    public static void py_copyright() {
+    public static void copyright() {
         throw new NotImplementedError("Builtin function 'copyright' not implemented");
     }
 
-    public static void py_credits() {
+    public static void credits() {
         throw new NotImplementedError("Builtin function 'credits' not implemented");
     }
 
-    public static void py_delattr() {
+    public static void delattr() {
         throw new NotImplementedError("Builtin function 'delattr' not implemented");
     }
 
-    public static void py_dict() {
+    public static void dict() {
         throw new NotImplementedError("Builtin function 'dict' not implemented");
     }
 
-    public static void py_dir() {
+    public static void dir() {
         throw new NotImplementedError("Builtin function 'dir' not implemented");
     }
 
-    public static void py_divmod() {
+    public static void divmod() {
         throw new NotImplementedError("Builtin function 'divmod' not implemented");
     }
 
-    public static void py_enumerate() {
+    public static void dreload() {
+        throw new NotImplementedError("Builtin function 'dreload' not implemented");
+    }
+
+    public static void enumerate() {
         throw new NotImplementedError("Builtin function 'enumerate' not implemented");
     }
 
-    public static void py_eval() {
+    public static void eval() {
         throw new NotImplementedError("Builtin function 'eval' not implemented");
     }
 
-    public static void py_execfile() {
-        throw new NotImplementedError("Builtin function 'execfile' not implemented");
+    public static void exec() {
+        throw new NotImplementedError("Builtin function 'exec' not implemented");
     }
 
-    public static void py_exit() {
-        throw new NotImplementedError("Builtin function 'exit' not implemented");
-    }
-
-    public static void py_file() {
-        throw new NotImplementedError("Builtin function 'file' not implemented");
-    }
-
-    public static void py_filter() {
+    public static void filter() {
         throw new NotImplementedError("Builtin function 'filter' not implemented");
     }
 
-    public static void py_float() {
-        throw new NotImplementedError("Builtin function 'float' not implemented");
+    public static PyObject float_cast(PyObject obj) {
+        return new PyObject((float) obj.value);
     }
 
-    public static void py_format() {
+    public static void format() {
         throw new NotImplementedError("Builtin function 'format' not implemented");
     }
 
-    public static void py_frozenset() {
+    public static void frozenset() {
         throw new NotImplementedError("Builtin function 'frozenset' not implemented");
     }
 
-    public static void py_getattr() {
+    public static void getattr() {
         throw new NotImplementedError("Builtin function 'getattr' not implemented");
     }
 
-    public static void py_globals() {
-        throw new NotImplementedError("Builtin function 'globals' not implemented");
+    public static PyObject globals() {
+        return new PyObject(Python.globals);
     }
 
-    public static void py_hasattr() {
+    public static void hasattr() {
         throw new NotImplementedError("Builtin function 'hasattr' not implemented");
     }
 
-    public static void py_hash() {
+    public static void hash() {
         throw new NotImplementedError("Builtin function 'hash' not implemented");
     }
 
-    public static void py_help() {
+    public static void help() {
         throw new NotImplementedError("Builtin function 'help' not implemented");
     }
 
-    public static void py_hex() {
+    public static void hex() {
         throw new NotImplementedError("Builtin function 'hex' not implemented");
     }
 
-    public static void py_id() {
+    public static void id() {
         throw new NotImplementedError("Builtin function 'id' not implemented");
     }
 
-    public static void py_input() {
+    public static void input() {
         throw new NotImplementedError("Builtin function 'input' not implemented");
     }
 
-    public static void py_int() {
-        throw new NotImplementedError("Builtin function 'input' not implemented");
+    public static PyObject int_cast(PyObject obj) {
+        return new PyObject((int) obj.value);
     }
 
-    public static void py_intern() {
+    public static void intern() {
         throw new NotImplementedError("Builtin function 'intern' not implemented");
     }
 
-    public static void py_isinstance() {
+    public static void isinstance() {
         throw new NotImplementedError("Builtin function 'isinstance' not implemented");
     }
 
-    public static void py_issubclass() {
+    public static void issubclass() {
         throw new NotImplementedError("Builtin function 'issubclass' not implemented");
     }
 
-    public static void py_iter() {
+    public static void iter() {
         throw new NotImplementedError("Builtin function 'iter' not implemented");
     }
 
-    public static void py_len() {
+    public static void len() {
         throw new NotImplementedError("Builtin function 'input' not implemented");
     }
 
-    public static void py_license() {
+    public static void license() {
         throw new NotImplementedError("Builtin function 'license' not implemented");
     }
 
-    public static void py_list() {
+    public static void list() {
         throw new NotImplementedError("Builtin function 'list' not implemented");
     }
 
-    public static void py_locals() {
+    public static void locals() {
         throw new NotImplementedError("Builtin function 'locals' not implemented");
     }
 
-    public static void py_long() {
-        throw new NotImplementedError("Builtin function 'long' not implemented");
-    }
-
-    public static void py_map() {
+    public static void map() {
         throw new NotImplementedError("Builtin function 'input' not implemented");
     }
 
-    public static void py_max() {
+    public static void max() {
         throw new NotImplementedError("Builtin function 'max' not implemented");
     }
 
-    public static void py_memoryview() {
+    public static void memoryview() {
         throw new NotImplementedError("Builtin function 'memoryview' not implemented");
     }
 
-    public static void py_min() {
+    public static void min() {
         throw new NotImplementedError("Builtin function 'min' not implemented");
     }
 
-    public static void py_next() {
+    public static void next() {
         throw new NotImplementedError("Builtin function 'next' not implemented");
     }
 
-    public static void py_object() {
+    public static void object() {
         throw new NotImplementedError("Builtin function 'object' not implemented");
     }
 
-    public static void py_oct() {
+    public static void oct() {
         throw new NotImplementedError("Builtin function 'oct' not implemented");
     }
 
-    public static void py_open() {
+    public static void open() {
         throw new NotImplementedError("Builtin function 'open' not implemented");
     }
 
-    public static void py_ord() {
+    public static void ord() {
         throw new NotImplementedError("Builtin function 'input' not implemented");
     }
 
-    public static void py_pow() {
+    public static void pow() {
         throw new NotImplementedError("Builtin function 'pow' not implemented");
     }
 
-    public static void py_print() {
-
+    public static void print(PyObject... args) {
+        StringBuilder buffer = new StringBuilder();
+        for (int i = 0; i < args.length; i++) {
+            buffer.append(args[i]);
+            if (i != args.length - 1) {
+                buffer.append(" ");
+            }
+        }
+        System.out.println(buffer.toString());
     }
 
-    public static void py_property() {
+    public static void property() {
         throw new NotImplementedError("Builtin function 'property' not implemented");
     }
 
-    public static void py_quit() {
-        throw new NotImplementedError("Builtin function 'quit' not implemented");
+    public static void range() {
+        throw new NotImplementedError("Builtin function 'range' not implemented");
     }
 
-    public static void py_range() {
-        throw new NotImplementedError("Builtin function 'input' not implemented");
-    }
-
-    public static void py_reduce() {
-        throw new NotImplementedError("Builtin function 'reduce' not implemented");
-    }
-
-    public static void py_reload() {
-        throw new NotImplementedError("Builtin function 'reload' not implemented");
-    }
-
-    public static void py_repr() {
+    public static void repr() {
         throw new NotImplementedError("Builtin function 'repr' not implemented");
     }
 
-    public static void py_reversed() {
+    public static void reversed() {
         throw new NotImplementedError("Builtin function 'reversed' not implemented");
     }
 
-    public static void py_round() {
+    public static void round() {
         throw new NotImplementedError("Builtin function 'round' not implemented");
     }
 
-    public static void py_set() {
+    public static void set() {
         throw new NotImplementedError("Builtin function 'set' not implemented");
     }
 
-    public static void py_setattr() {
+    public static void setattr() {
         throw new NotImplementedError("Builtin function 'setattr' not implemented");
     }
 
-    public static void py_slice() {
+    public static void slice() {
         throw new NotImplementedError("Builtin function 'input' not implemented");
     }
 
-    public static void py_sorted() {
+    public static void sorted() {
         throw new NotImplementedError("Builtin function 'sorted' not implemented");
     }
 
-    public static void py_staticmethod() {
+    public static void staticmethod() {
         throw new NotImplementedError("Builtin function 'staticmethod' not implemented");
     }
 
-    public static void py_str() {
-        throw new NotImplementedError("Builtin function 'input' not implemented");
+    public static PyObject str(PyObject obj) {
+        return new PyObject((String) obj.value);
     }
 
-    public static void py_sum() {
+    public static void sum() {
         throw new NotImplementedError("Builtin function 'sum' not implemented");
     }
 
-    public static void py_super() {
+    public static void super_call() {
         throw new NotImplementedError("Builtin function 'super' not implemented");
     }
 
-    public static void py_tuple() {
+    public static void tuple() {
         throw new NotImplementedError("Builtin function 'tuple' not implemented");
     }
 
-    public static void py_type() {
+    public static void type() {
         throw new NotImplementedError("Builtin function 'type' not implemented");
     }
 
-    public static void py_unichr() {
-        throw new NotImplementedError("Builtin function 'unichr' not implemented");
-    }
-
-    public static void py_unicode() {
-        throw new NotImplementedError("Builtin function 'unicode' not implemented");
-    }
-
-    public static void py_vars() {
+    public static void vars() {
         throw new NotImplementedError("Builtin function 'vars' not implemented");
     }
 
-    public static void py_xrange() {
-        throw new NotImplementedError("Builtin function 'xrange' not implemented");
-    }
-
-    public static void py_zip() {
+    public static void zip() {
         throw new NotImplementedError("Builtin function 'zip' not implemented");
     }
 }

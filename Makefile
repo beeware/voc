@@ -1,7 +1,11 @@
 
 ALL_FILES=\
-	python/org/python/Builtins.class \
+	python/org/Python.class \
 	python/org/python/PyObject.class \
+	python/org/python/Function.class \
+	python/org/python/InstanceMethod.class \
+	python/org/python/StaticMethod.class \
+	python/org/python/PyConstructor.class \
 	python/org/python/exceptions/ArithmeticError.class \
 	python/org/python/exceptions/AssertionError.class \
 	python/org/python/exceptions/AttributeError.class \
@@ -21,7 +25,7 @@ ALL_FILES=\
 	python/org/python/exceptions/NotImplementedError.class \
 	python/org/python/exceptions/OSError.class \
 	python/org/python/exceptions/OverflowError.class \
-	python/org/python/exceptions/PythonException.class \
+	python/org/python/exceptions/PyException.class \
 	python/org/python/exceptions/ReferenceError.class \
 	python/org/python/exceptions/RuntimeError.class \
 	python/org/python/exceptions/StandardError.class \
@@ -47,7 +51,7 @@ clean:
 	find python -name "*.class" -exec rm {} \;
 
 python.jar: $(ALL_FILES)
-	cd python && jar -cf ../$@ $(subst python/org/python,org/python,$(ALL_FILES))
+	cd python && jar -cf ../$@ $(subst python/org,org,$(ALL_FILES))
 
 %.class: %.java
 	javac -classpath python $<

@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class IndentationError extends PythonException {
+public class IndentationError extends PyException {
     public IndentationError() {
         super();
     }

@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class IOError extends PythonException {
+public class IOError extends PyException {
     public IOError() {
         super();
     }

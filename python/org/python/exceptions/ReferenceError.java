@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class ReferenceError extends PythonException {
+public class ReferenceError extends PyException {
     public ReferenceError() {
         super();
     }

@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class KeyError extends PythonException {
+public class KeyError extends PyException {
     public KeyError() {
         super();
     }

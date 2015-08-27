@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class EnvironmentError extends PythonException {
+public class EnvironmentError extends PyException {
     public EnvironmentError() {
         super();
     }

@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class TypeError extends PythonException {
+public class TypeError extends PyException {
     public TypeError() {
         super();
     }
