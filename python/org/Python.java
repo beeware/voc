@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import org.python.PyObject;
 import org.python.exceptions.NotImplementedError;
+import org.python.exceptions.TypeError;
 
 
 public class Python {
@@ -14,7 +15,7 @@ public class Python {
     }
 
     public static void __import__() {
-        throw new NotImplementedError("Builtin function 'abs' not implemented");
+        throw new NotImplementedError("Builtin function '__import__' not implemented");
     }
 
     public static void abs() {
@@ -137,16 +138,16 @@ public class Python {
         throw new NotImplementedError("Builtin function 'hasattr' not implemented");
     }
 
-    public static void hash() {
-        throw new NotImplementedError("Builtin function 'hash' not implemented");
+    public static PyObject hash(PyObject obj) {
+        return new PyObject(obj.hashCode());
     }
 
     public static void help() {
         throw new NotImplementedError("Builtin function 'help' not implemented");
     }
 
-    public static void hex() {
-        throw new NotImplementedError("Builtin function 'hex' not implemented");
+    public static PyObject hex(PyObject obj) {
+        return new PyObject(String.format("0x%x", obj.value));
     }
 
     public static void id() {
@@ -217,20 +218,29 @@ public class Python {
         throw new NotImplementedError("Builtin function 'object' not implemented");
     }
 
-    public static void oct() {
-        throw new NotImplementedError("Builtin function 'oct' not implemented");
+    public static PyObject oct(PyObject obj) {
+        return new PyObject(String.format("0o%o", obj.value));
     }
 
     public static void open() {
         throw new NotImplementedError("Builtin function 'open' not implemented");
     }
 
-    public static void ord() {
-        throw new NotImplementedError("Builtin function 'input' not implemented");
+    public static PyObject ord(PyObject obj) {
+        if (obj.type == String.class) {
+            int length = ((String) obj.value).length();
+            if (length != 1) {
+                return new PyObject((int) ((String) obj.value).charAt(0));
+            } else {
+                throw new TypeError("ord() expected string of length 1, but string of length " + length + " found");
+            }
+        } else {
+            throw new TypeError("ord() expected string of length 1, but " + obj.type + " found");
+        }
     }
 
-    public static void pow() {
-        throw new NotImplementedError("Builtin function 'pow' not implemented");
+    public static PyObject pow(PyObject x, PyObject y) {
+        return x.__pow__(y);
     }
 
     public static void print(PyObject... args) {
@@ -288,8 +298,16 @@ public class Python {
         return new PyObject((String) obj.value);
     }
 
-    public static void sum() {
+    public static PyObject sum(PyObject iterable, int start) {
         throw new NotImplementedError("Builtin function 'sum' not implemented");
+    }
+
+    public static PyObject sum(PyObject iterable, PyObject start) {
+        return sum(iterable, (int) start.value);
+    }
+
+    public static PyObject sum(PyObject iterable) {
+        return sum(iterable, 0);
     }
 
     public static void super_call() {
