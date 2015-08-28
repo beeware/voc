@@ -1,4 +1,6 @@
 from .constants import Utf8
+from .opcodes import Opcode
+
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 
 ##########################################################################
@@ -20,8 +22,17 @@ class Attribute:
     def __repr__(self):
         return '<%s>' % self.__class__.__name__
 
+    @staticmethod
+    def read(reader, dump=None):
+        name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+        size = reader.read_u4()
+        if dump is not None:
+            print("    " * dump, '%s (%s bytes)' % (name, size))
+
+        return globals()[name].read_info(reader, dump + 1 if dump is not None else dump)
+
     def write(self, writer):
-        writer.write_u2(writer.constant_pool[self.name])
+        writer.write_u2(writer.constant_pool.index(self.name))
         writer.write_u4(len(self))
         self.write_info(writer)
 
@@ -235,6 +246,20 @@ class ExceptionInfo:
         # called for all exceptions. This is used to implement finally (§3.13).
         self.catch_type = catch_type
 
+    @staticmethod
+    def read(reader, dump=None):
+        start_pc = reader.read_u2()
+        end_pc = reader.read_u2()
+        handler_pc = reader.read_u2()
+        catch_type = reader.read_u2()
+
+        if dump is not None:
+            print("    " * dump, '%s-%s (%s): %s' % (
+                start_pc, end_pc, handler_pc, catch_type
+            ))
+
+        return ExceptionInfo(start_pc, end_pc, handler_pc, catch_type)
+
     def write(self, writer):
         writer.write_u2(self.start_pc)
         writer.write_u2(self.end_pc)
@@ -331,6 +356,44 @@ class Code(Attribute):
 
     def __repr__(self):
         return '<Code (%d opcodes)>' % len(self.code)
+
+    @staticmethod
+    def read_info(reader, dump=None):
+        max_stack = reader.read_u2()
+        max_locals = reader.read_u2()
+
+        if dump is not None:
+            print("    " * dump, 'Max stack: %s' % max_stack)
+            print("    " * dump, 'Max locals: %s' % max_locals)
+
+        code_length = reader.read_u4()
+        if dump is not None:
+            print("    " * dump, 'Bytecode: (%d bytes)' % code_length)
+
+        code = []
+        i = 0
+        while i < code_length:
+            opcode = Opcode.read(reader, dump=dump + 1 if dump is not None else dump)
+            code.append(opcode)
+            i += len(opcode)
+
+        exception_table_length = reader.read_u2()
+        if dump is not None:
+            print("    " * dump, 'Exceptions: (%d exceptions):' % exception_table_length)
+
+        exceptions = []
+        for i in range(0, exception_table_length):
+            exceptions.append(ExceptionInfo.read(reader, dump=dump + 1 if dump is not None else dump))
+
+        attributes_count = reader.read_u2()
+        if dump is not None:
+            print("    " * dump, 'Attributes: (%s)' % attributes_count)
+
+        attributes = []
+        for i in range(0, attributes_count):
+            attributes.append(Attribute.read(reader, dump=dump + 1 if dump is not None else dump))
+
+        return Code(max_stack, max_locals, code, exceptions=exceptions, attributes=attributes)
 
     def write_info(self, writer):
         writer.write_u2(self.max_stack)
@@ -813,25 +876,53 @@ class Code(Attribute):
 # 4.7.9. The Signature Attribute
 # ------------------------------------------------------------------------
 
-# The Signature attribute is an optional fixed-length attribute in the attributes table of a ClassFile, field_info, or method_info structure (§4.1, §4.5, §4.6). The Signature attribute records generic signature information for any class, interface, constructor or member whose generic signature in the Java programming language would include references to type variables or parameterized types.
+# The Signature attribute is an optional fixed-length attribute in the
+# attributes table of a ClassFile, field_info, or method_info structure (§4.1,
+# §4.5, §4.6). The Signature attribute records generic signature information for
+# any class, interface, constructor or member whose generic signature in the
+# Java programming language would include references to type variables or
+# parameterized types.
 
 # The Signature attribute has the following format:
 
-# Signature_attribute {
-#     u2 attribute_name_index;
-#     u4 attribute_length;
-#     u2 signature_index;
-# }
-# The items of the Signature_attribute structure are as follows:
 
-# attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "Signature".
+class Signature(Attribute):
+    # u2 attribute_name_index;
+    # u4 attribute_length;
+    # u2 signature_index;
 
-# attribute_length
-# The value of the attribute_length item of a Signature_attribute structure must be 2.
+    def __init__(self, signature):
+        super(Signature, self).__init__()
 
-# signature_index
-# The value of the signature_index item must be a valid index into the constant_pool table. The constant pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing a class signature (§4.3.4) if this Signature attribute is an attribute of a ClassFile structure; a method signature if this Signature attribute is an attribute of a method_info structure; or a field type signature otherwise.
+        # The value of the signature_index item must be a valid index into the
+        # constant_pool table. The constant pool entry at that index must be a
+        # CONSTANT_Utf8_info (§4.4.7) structure representing a class signature
+        # (§4.3.4) if this Signature attribute is an attribute of a ClassFile
+        # structure; a method signature if this Signature attribute is an
+        # attribute of a method_info structure; or a field type signature
+        # otherwise.
+        self.signature = Utf8(signature)
+
+    def __repr__(self):
+        return '<SourceFile: %s>' % self.signature
+
+    def __len__(self):
+        return 2
+
+    @staticmethod
+    def read_info(reader, dump=None):
+        signature = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+
+        if dump is not None:
+            print("    " * dump, 'Signature: %s' % signature)
+
+        return Signature(signature)
+
+    def write_info(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.signature))
+
+    def resolve_info(self, constant_pool):
+        constant_pool.add(self.signature)
 
 # ------------------------------------------------------------------------
 # 4.7.10. The SourceFile Attribute
@@ -870,8 +961,17 @@ class SourceFile(Attribute):
     def __len__(self):
         return 2
 
+    @staticmethod
+    def read_info(reader, dump=None):
+        sourcefile_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+
+        if dump is not None:
+            print("    " * dump, 'Source file: %s' % sourcefile_name)
+
+        return SourceFile(sourcefile_name)
+
     def write_info(self, writer):
-        writer.write_u2(writer.constant_pool[self.sourcefile_name])
+        writer.write_u2(writer.constant_pool.index(self.sourcefile_name))
 
     def resolve_info(self, constant_pool):
         constant_pool.add(self.sourcefile_name)
@@ -952,6 +1052,23 @@ class LineNumberTable(Attribute):
         entries in the line_number_table array.
         """
         return len(self.line_number_table)
+
+    @staticmethod
+    def read_info(reader, dump=None):
+        line_number_table_length = reader.read_u2()
+
+        if dump is not None:
+            print("    " * dump, 'Line numbers (%s total):' % line_number_table_length)
+
+        line_numbers = {}
+        for i in range(0, line_number_table_length):
+            start_pc = reader.read_u2()
+            line_number = reader.read_u2()
+            if dump is not None:
+                print("    " * (dump + 1), '%s: %s' % (start_pc, line_number))
+            line_numbers[start_pc] = line_number
+
+        return LineNumberTable(line_numbers)
 
     def write_info(self, writer):
         writer.write_u2(self.line_number_table_length)

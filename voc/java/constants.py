@@ -22,6 +22,46 @@ def multihash(obj, *attrs):
     return result
 
 
+##########################################################################
+# Some utility methods to help reconstruct a constant pool.
+# These allow us to read the entire constant pool, and then resolve it.
+##########################################################################
+
+def resolve(entry, pool):
+    klass, args = entry
+
+    resolved_args = []
+    for arg in args:
+        if hasattr(arg, '__call__'):
+            resolved_args.append(arg(pool))
+        else:
+            resolved_args.append(arg)
+    return klass(*resolved_args)
+
+
+def read_ref_attr(index, attr):
+    def resolver(pool):
+        entry = pool[index - 1]
+        if isinstance(entry, tuple):
+            value = resolve(entry, pool)
+            pool[index - 1] = value
+        else:
+            value = entry
+        return getattr(value, attr).bytes.decode('utf8')
+    return resolver
+
+
+def read_utf8(index):
+    def resolver(pool):
+        entry = pool[index - 1]
+        if isinstance(entry, tuple):
+            value = resolve(entry, pool)
+            pool[index - 1] = value
+        else:
+            value = entry
+        return value.bytes.decode('utf8')
+    return resolver
+
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 
 ##########################################################################
@@ -61,8 +101,30 @@ class ConstantPool:
     def __len__(self):
         return len(self._constant_pool)
 
-    def __getitem__(self, obj):
+    def __getitem__(self, i):
+        return self._constant_pool[i - 1]
+
+    def index(self, obj):
         return self._constants[obj]
+
+    def read(self, reader, dump=None):
+        count = reader.read_u2()
+        if dump is not None:
+            print("    " * dump, 'Constant pool: (%s constants)' % (count - 1))
+
+        raw_pool = []
+        for i in range(1, count):
+            raw_pool.append(Constant.read(reader))
+
+        for i in range(0, count-1):
+            entry = raw_pool[i]
+            if isinstance(entry, tuple):
+                const = resolve(entry, raw_pool)
+            else:
+                const = entry
+            self.add(const)
+            if dump is not None:
+                print("    " * (dump + 1), '%s: %s' % ((i + 1), repr(const)))
 
     def write(self, writer):
         writer.write_u2(self.count)
@@ -81,7 +143,6 @@ class Constant:
     # of tag. The valid tags and their values are listed in Table 4.3. Each tag byte
     # must be followed by two or more bytes giving information about the specific
     # constant. The format of the additional information varies with the tag value.
-
 
     # Table 4.3. Constant pool tags
 
@@ -102,6 +163,27 @@ class Constant:
 
     def __init__(self, tag):
         self.tag = tag
+
+    @staticmethod
+    def read(reader):
+        tag = reader.read_u1()
+        klass = {
+            Constant.CONSTANT_Class: Classref,
+            Constant.CONSTANT_Fieldref: Fieldref,
+            Constant.CONSTANT_Methodref: Methodref,
+            Constant.CONSTANT_InterfaceMethodref: InterfaceMethodref,
+            Constant.CONSTANT_String: String,
+            Constant.CONSTANT_Integer: Integer,
+            # Constant.CONSTANT_Float: Float,
+            Constant.CONSTANT_Long: Long,
+            # Constant.CONSTANT_Double: Double,
+            Constant.CONSTANT_NameAndType: NameAndType,
+            Constant.CONSTANT_Utf8: Utf8,
+            # Constant.CONSTANT_MethodHandle: MethodHandle
+            # Constant.CONSTANT_MethodType: MethodType
+            # Constant.CONSTANT_InvokeDynamic: InvokeDynamic
+        }[tag]
+        return klass.read_info(reader)
 
     def write(self, writer):
         writer.write_u1(self.tag)
@@ -126,7 +208,6 @@ class Classref(Constant):
     # u2 name_index;
 
     def __init__(self, name):
-
         # The tag item has the value CONSTANT_Class (7).
         super(Classref, self).__init__(Constant.CONSTANT_Class)
 
@@ -161,7 +242,7 @@ class Classref(Constant):
         self.name = Utf8(name)
 
     def __repr__(self):
-        return '<Class name:%s>' % self.name
+        return '<Class %s>' % self.name
 
     def __eq__(self, other):
         return multieq(self, other, 'tag', 'name')
@@ -169,8 +250,13 @@ class Classref(Constant):
     def __hash__(self):
         return multihash(self, 'tag', 'name')
 
+    @staticmethod
+    def read_info(reader):
+        name = reader.read_u2()
+        return Classref, (read_utf8(name),)
+
     def write_info(self, writer):
-        writer.write_u2(writer.constant_pool[self.name])
+        writer.write_u2(writer.constant_pool.index(self.name))
 
     def resolve_info(self, constant_pool):
         self.name.resolve(constant_pool)
@@ -211,7 +297,7 @@ class Fieldref(Constant):
         self.name_and_type = NameAndType(name, descriptor)
 
     def __repr__(self):
-        return '<Fieldref class:%s name_and_type:%s>' % (self.klass, self.name_and_type)
+        return '<Fieldref %s.%s (%s)>' % (self.klass.name, self.name_and_type.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
         return multieq(self, other, 'tag', 'klass', 'name_and_type')
@@ -225,9 +311,19 @@ class Fieldref(Constant):
     def __info_hash__(self):
         return 31 * hash(self.klass) + 31
 
+    @staticmethod
+    def read_info(reader):
+        klass = reader.read_u2()
+        name_and_type = reader.read_u2()
+        return Fieldref, (
+            read_ref_attr(klass, 'name'),
+            read_ref_attr(name_and_type, 'name'),
+            read_ref_attr(name_and_type, 'descriptor'),
+        )
+
     def write_info(self, writer):
-        writer.write_u2(writer.constant_pool[self.klass])
-        writer.write_u2(writer.constant_pool[self.name_and_type])
+        writer.write_u2(writer.constant_pool.index(self.klass))
+        writer.write_u2(writer.constant_pool.index(self.name_and_type))
 
     def resolve_info(self, constant_pool):
         self.klass.resolve(constant_pool)
@@ -271,7 +367,7 @@ class Methodref(Constant):
         self.descriptor = method_descriptor(descriptor)
 
     def __repr__(self):
-        return '<Methodref class:%s name_and_type:%s>' % (self.klass, self.name_and_type)
+        return '<Methodref %s.%s %s>' % (self.klass.name, self.name_and_type.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
         return multieq(self, other, 'tag', 'klass', 'name_and_type')
@@ -279,9 +375,19 @@ class Methodref(Constant):
     def __hash__(self):
         return multihash(self, 'tag', 'klass', 'name_and_type')
 
+    @staticmethod
+    def read_info(reader):
+        klass = reader.read_u2()
+        name_and_type = reader.read_u2()
+        return Methodref, (
+            read_ref_attr(klass, 'name'),
+            read_ref_attr(name_and_type, 'name'),
+            read_ref_attr(name_and_type, 'descriptor'),
+        )
+
     def write_info(self, writer):
-        writer.write_u2(writer.constant_pool[self.klass])
-        writer.write_u2(writer.constant_pool[self.name_and_type])
+        writer.write_u2(writer.constant_pool.index(self.klass))
+        writer.write_u2(writer.constant_pool.index(self.name_and_type))
 
     def resolve_info(self, constant_pool):
         self.klass.resolve(constant_pool)
@@ -317,7 +423,7 @@ class InterfaceMethodref(Constant):
         self.name_and_type = NameAndType(name, descriptor)
 
     def __repr__(self):
-        return '<InterfaceMethodref class:%s name_and_type:%s>' % (self.klass, self.name_and_type)
+        return '<InterfaceMethodref %s.%s %s>' % (self.klass.name, self.name_and_type.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
         return multieq(self, other, 'tag', 'klass', 'name_and_type')
@@ -325,9 +431,19 @@ class InterfaceMethodref(Constant):
     def __hash__(self):
         return multihash(self, 'tag', 'klass', 'name_and_type')
 
+    @staticmethod
+    def read_info(reader):
+        klass = reader.read_u2()
+        name_and_type = reader.read_u2()
+        return InterfaceMethodref, (
+            read_ref_attr(klass, 'name'),
+            read_ref_attr(name_and_type, 'name'),
+            read_ref_attr(name_and_type, 'descriptor'),
+        )
+
     def write_info(self, writer):
-        writer.write_u2(writer.constant_pool[self.klass])
-        writer.write_u2(writer.constant_pool[self.name_and_type])
+        writer.write_u2(writer.constant_pool.index(self.klass))
+        writer.write_u2(writer.constant_pool.index(self.name_and_type))
 
     def resolve_info(self, constant_pool):
         self.klass.resolve(constant_pool)
@@ -357,7 +473,7 @@ class String(Constant):
         self.string = Utf8(string)
 
     def __repr__(self):
-        return '<String %s>' % self.string
+        return "<String '%s'>" % self.string
 
     def __eq__(self, other):
         return multieq(self, other, 'tag', 'string')
@@ -365,8 +481,15 @@ class String(Constant):
     def __hash__(self):
         return multihash(self, 'tag', 'string')
 
+    @staticmethod
+    def read_info(reader):
+        string = reader.read_u2()
+        return String, (
+            read_utf8(string),
+        )
+
     def write_info(self, writer):
-        writer.write_u2(writer.constant_pool[self.string])
+        writer.write_u2(writer.constant_pool.index(self.string))
 
     def resolve_info(self, constant_pool):
         self.string.resolve(constant_pool)
@@ -398,6 +521,11 @@ class Integer(Constant):
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
+
+    @staticmethod
+    def read_info(reader):
+        value = reader.read_u4()
+        return Integer, (value,)
 
     def write_info(self, writer):
         writer.write_u4(self.value)
@@ -466,8 +594,13 @@ class Long(Constant):
     def __hash__(self):
         return multihash(self, 'tag', 'value')
 
+    @staticmethod
+    def read_info(reader):
+        value = reader.read_u8()
+        return Long, (value,)
+
     def write_info(self, writer):
-        writer.write_u8(writer.constant_pool[self])
+        writer.write_u8(self.value)
 
 
 # CONSTANT_Double_info {
@@ -560,9 +693,18 @@ class NameAndType(Constant):
     def __hash__(self):
         return multihash(self, 'tag', 'name', 'descriptor')
 
+    @staticmethod
+    def read_info(reader):
+        name = reader.read_u2()
+        descriptor = reader.read_u2()
+        return NameAndType, (
+            read_utf8(name),
+            read_utf8(descriptor)
+        )
+
     def write_info(self, writer):
-        writer.write_u2(writer.constant_pool[self.name])
-        writer.write_u2(writer.constant_pool[self.descriptor])
+        writer.write_u2(writer.constant_pool.index(self.name))
+        writer.write_u2(writer.constant_pool.index(self.descriptor))
 
     def resolve_info(self, constant_pool):
         self.name.resolve(constant_pool)
@@ -711,6 +853,15 @@ class Utf8(Constant):
 
     def __repr__(self):
         return "b'%s'" % self._bytes.decode('utf8')
+
+    def __str__(self):
+        return self._bytes.decode('utf8')
+
+    @staticmethod
+    def read_info(reader):
+        length = reader.read_u2()
+        string = reader.read_bytes(length).decode('utf8')
+        return Utf8, (string,)
 
     def write_info(self, writer):
         writer.write_u2(self.length)

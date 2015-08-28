@@ -11,5 +11,6 @@ from .constants import (
     Long,
     Utf8,
 )
+from .fields import Field
 from .methods import Method
 from .opcodes import *

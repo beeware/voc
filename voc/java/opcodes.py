@@ -1,4 +1,5 @@
-from .constants import Classref, Fieldref, Methodref, String, Integer, Long
+from .constants import Classref, Fieldref, Methodref, String, Integer
+
 # From: https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 # Reference" http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.2
 
@@ -6,15 +7,40 @@ from .constants import Classref, Fieldref, Methodref, String, Integer, Long
 # 6.2. Opcodes
 ##########################################################################
 
+
 class Opcode:
-    def __init__(self, code):
-        self.code = code
+    opcodes = None
 
     def __repr__(self):
-        return '<%s>' % self.__class__.__name__
+        return '<%s%s>' % (self.__class__.__name__, self.__arg_repr__())
+
+    def __arg_repr__(self):
+        return ''
 
     def __len__(self):
         return 1
+
+    @classmethod
+    def read(cls, reader, dump=None):
+        code = reader.read_u1()
+        # Create an index of all known opcodes.
+        if Opcode.opcodes is None:
+            Opcode.opcodes = {}
+            for name in globals():
+                klass = globals()[name]
+                try:
+                    if name != 'Opcode' and issubclass(klass, Opcode):
+                        Opcode.opcodes[klass.code] = klass
+                except TypeError:
+                    pass
+        return Opcode.opcodes[code].read_extra(reader, dump)
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        instance = cls()
+        if dump:
+            print("    " * dump, instance)
+        return instance
 
     def write(self, writer):
         writer.write_u1(self.code)
@@ -28,14 +54,19 @@ class Opcode:
 
 
 class AALOAD(Opcode):
+    code = 0x32
+
     def __init__(self):
-        super(AALOAD, self).__init__(0x32)
+        super(AALOAD, self).__init__()
 # arrayref, index → value
 # Load onto the stack a reference from an array
 
+
 class AASTORE(Opcode):
+    code = 0x53
+
     def __init__(self):
-        super(AASTORE, self).__init__(0x53)
+        super(AASTORE, self).__init__()
 # arrayref, index, value →
 # Store into a reference in an array
 
@@ -43,8 +74,10 @@ class AASTORE(Opcode):
 class ACONST_NULL(Opcode):
     # Push a null reference onto the stack
     # Stack: → null
+    code = 0x01
+
     def __init__(self):
-        super(ACONST_NULL, self).__init__(0x01)
+        super(ACONST_NULL, self).__init__()
 
     @property
     def stack_effect(self):
@@ -55,12 +88,22 @@ class ALOAD(Opcode):
     # Load a reference onto the stack from a local variable #index
     # Args(1): index
     # Stack: → objectref
+    code = 0x19
+
     def __init__(self, var):
-        super(ALOAD, self).__init__(0x19)
+        super(ALOAD, self).__init__()
         self.var = var
 
     def __len__(self):
         return 2
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        instance = cls(var)
+        if dump:
+            print("    " * dump, instance)
+        return instance
 
     def write_extra(self, writer):
         writer.write_u1(self.var)
@@ -73,8 +116,10 @@ class ALOAD(Opcode):
 class ALOAD_0(Opcode):
     # Load a reference onto the stack from local variable 0
     # Stack: → objectref
+    code = 0x2a
+
     def __init__(self):
-        super(ALOAD_0, self).__init__(0x2a)
+        super(ALOAD_0, self).__init__()
 
     @property
     def stack_effect(self):
@@ -84,8 +129,10 @@ class ALOAD_0(Opcode):
 class ALOAD_1(Opcode):
     # Load a reference onto the stack from local variable 1
     # Stack: → objectref
+    code = 0x2b
+
     def __init__(self):
-        super(ALOAD_1, self).__init__(0x2b)
+        super(ALOAD_1, self).__init__()
 
     @property
     def stack_effect(self):
@@ -95,8 +142,10 @@ class ALOAD_1(Opcode):
 class ALOAD_2(Opcode):
     # Load a reference onto the stack from local variable 2
     # Stack: → objectref
+    code = 0x2c
+
     def __init__(self):
-        super(ALOAD_2, self).__init__(0x2c)
+        super(ALOAD_2, self).__init__()
 
     @property
     def stack_effect(self):
@@ -106,8 +155,10 @@ class ALOAD_2(Opcode):
 class ALOAD_3(Opcode):
     # Load a reference onto the stack from local variable 3
     # Stack: → objectref
+    code = 0x2d
+
     def __init__(self):
-        super(ALOAD_3, self).__init__(0x2d)
+        super(ALOAD_3, self).__init__()
 
     @property
     def stack_effect(self):
@@ -115,8 +166,10 @@ class ALOAD_3(Opcode):
 
 
 class ANEWARRAY(Opcode):
+    code = 0xbd
+
     def __init__(self):
-        super(ANEWARRAY, self).__init__(0xbd)
+        super(ANEWARRAY, self).__init__()
 # 2: indexbyte1, indexbyte2
 # count → arrayref
 # Create a new array of references of length count and component type identified
@@ -127,8 +180,10 @@ class ANEWARRAY(Opcode):
 class ARETURN(Opcode):
     # Return a reference from a method
     # Stack: objectref → [empty]
+    code = 0xb0
+
     def __init__(self):
-        super(ARETURN, self).__init__(0xb0)
+        super(ARETURN, self).__init__()
 
     @property
     def stack_effect(self):
@@ -136,8 +191,10 @@ class ARETURN(Opcode):
 
 
 class ARRAYLENGTH(Opcode):
+    code = 0xbe
+
     def __init__(self):
-        super(ARRAYLENGTH, self).__init__(0xbe)
+        super(ARRAYLENGTH, self).__init__()
 # arrayref → length
 # Get the length of an array
 
@@ -146,12 +203,22 @@ class ASTORE(Opcode):
     # Store a reference into a local variable #index
     # Args(1): index
     # Stack: objectref →
+    code = 0x3a
+
     def __init__(self, var):
-        super(ASTORE, self).__init__(0x3a)
+        super(ASTORE, self).__init__()
         self.var = var
 
     def __len__(self):
         return 2
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        instance = cls(var)
+        if dump:
+            print("    " * dump, instance)
+        return instance
 
     def write_extra(self, writer):
         writer.write_u1(self.var)
@@ -164,8 +231,10 @@ class ASTORE(Opcode):
 class ASTORE_0(Opcode):
     # Store a reference into local variable 0
     # Stack: objectref →
+    code = 0x4b
+
     def __init__(self):
-        super(ASTORE_0, self).__init__(0x4b)
+        super(ASTORE_0, self).__init__()
 
     @property
     def stack_effect(self):
@@ -175,8 +244,10 @@ class ASTORE_0(Opcode):
 class ASTORE_1(Opcode):
     # Store a reference into local variable 1
     # Stack: objectref →
+    code = 0x4c
+
     def __init__(self):
-        super(ASTORE_1, self).__init__(0x4c)
+        super(ASTORE_1, self).__init__()
 
     @property
     def stack_effect(self):
@@ -186,8 +257,10 @@ class ASTORE_1(Opcode):
 class ASTORE_2(Opcode):
     # Store a reference into local variable 2
     # Stack: objectref →
+    code = 0x4d
+
     def __init__(self):
-        super(ASTORE_2, self).__init__(0x4d)
+        super(ASTORE_2, self).__init__()
 
     @property
     def stack_effect(self):
@@ -197,8 +270,10 @@ class ASTORE_2(Opcode):
 class ASTORE_3(Opcode):
     # Store a reference into local variable 3
     # Stack: objectref →
+    code = 0x4e
+
     def __init__(self):
-        super(ASTORE_3, self).__init__(0x4e)
+        super(ASTORE_3, self).__init__()
 
     @property
     def stack_effect(self):
@@ -206,33 +281,52 @@ class ASTORE_3(Opcode):
 
 
 class ATHROW(Opcode):
+    code = 0xbf
+
     def __init__(self):
-        super(ATHROW, self).__init__(0xbf)
+        super(ATHROW, self).__init__()
 # objectref → [empty], objectref
 # Throws an error or exception (notice that the rest of the stack is cleared,
 # leaving only a reference to the Throwable)
 
+
 class BALOAD(Opcode):
+    code = 0x33
+
     def __init__(self):
-        super(BALOAD, self).__init__(0x33)
+        super(BALOAD, self).__init__()
 # arrayref, index → value
 # Load a byte or Boolean value from an array
 
+
 class BASTORE(Opcode):
+    code = 0x54
+
     def __init__(self):
-        super(BASTORE, self).__init__(0x54)
+        super(BASTORE, self).__init__()
 # arrayref, index, value →
 # Store a byte or Boolean value into an array
+
 
 class BIPUSH(Opcode):
     # Args(1) byte → value
     # Push a byte onto the stack as an integer value
+    code = 0x10
+
     def __init__(self, const):
-        super(BIPUSH, self).__init__(0x10)
+        super(BIPUSH, self).__init__()
         self.const = const
 
     def __len__(self):
         return 2
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        const = reader.read_u1()
+        instance = cls(const)
+        if dump:
+            print("    " * dump, instance)
+        return instance
 
     def write_extra(self, writer):
         writer.write_u1(self.const)
@@ -243,188 +337,279 @@ class BIPUSH(Opcode):
 
 
 class BREAKPOINT(Opcode):
+    code = 0xca
+
     def __init__(self):
-        super(BREAKPOINT, self).__init__(0xca)
+        super(BREAKPOINT, self).__init__()
 # Reserved for breakpoints in Java debuggers; should not appear in any class file
 
+
 class CALOAD(Opcode):
+    code = 0x34
+
     def __init__(self):
-        super(CALOAD, self).__init__(0x34)
+        super(CALOAD, self).__init__()
 # arrayref, index → value
 # Load a char from an array
 
+
 class CASTORE(Opcode):
+    code = 0x55
+
     def __init__(self):
-        super(CASTORE, self).__init__(0x55)
+        super(CASTORE, self).__init__()
 # arrayref, index, value →
 # Store a char into an array
 
+
 class CHECKCAST(Opcode):
+    code = 0xc0
+
     def __init__(self):
-        super(CHECKCAST, self).__init__(0xc0)
+        super(CHECKCAST, self).__init__()
 # 2: indexbyte1, indexbyte2
 # objectref → objectref
 # Checks whether an objectref is of a certain type, the class reference of which
 # is in the constant pool at index (indexbyte1 << 8 + indexbyte2)
 
+
 class D2F(Opcode):
+    code = 0x90
+
     def __init__(self):
-        super(D2F, self).__init__(0x90)
+        super(D2F, self).__init__()
 # value → result
 # Convert a double to a float
 
+
 class D2I(Opcode):
+    code = 0x8e
+
     def __init__(self):
-        super(D2I, self).__init__(0x8e)
+        super(D2I, self).__init__()
 # value → result
 # Convert a double to an int
 
+
 class D2L(Opcode):
+    code = 0x8f
+
     def __init__(self):
-        super(D2L, self).__init__(0x8f)
+        super(D2L, self).__init__()
 # value → result
 # Convert a double to a long
 
+
 class DADD(Opcode):
+    code = 0x63
+
     def __init__(self):
-        super(DADD, self).__init__(0x63)
+        super(DADD, self).__init__()
 # value1, value2 → result
 # Add two doubles
 
+
 class DALOAD(Opcode):
+    code = 0x31
+
     def __init__(self):
-        super(DALOAD, self).__init__(0x31)
+        super(DALOAD, self).__init__()
 # arrayref, index → value
 # Load a double from an array
 
+
 class DASTORE(Opcode):
+    code = 0x52
+
     def __init__(self):
-        super(DASTORE, self).__init__(0x52)
+        super(DASTORE, self).__init__()
 # arrayref, index, value →
 # Store a double into an array
 
+
 class DCMPG(Opcode):
+    code = 0x98
+
     def __init__(self):
-        super(DCMPG, self).__init__(0x98)
+        super(DCMPG, self).__init__()
 # value1, value2 → result
 # Compare two doubles
+
 
 class DCMPL(Opcode):
+    code = 0x97
+
     def __init__(self):
-        super(DCMPL, self).__init__(0x97)
+        super(DCMPL, self).__init__()
 # value1, value2 → result
 # Compare two doubles
 
+
 class DCONST_0(Opcode):
+    code = 0x0e
+
     def __init__(self):
-        super(DCONST_0, self).__init__(0x0e)
+        super(DCONST_0, self).__init__()
 # → 0.0
 # Push the constant 0.0 onto the stack
 
+
 class DCONST_1(Opcode):
+    code = 0x0f
+
     def __init__(self):
-        super(DCONST_1, self).__init__(0x0f)
+        super(DCONST_1, self).__init__()
 # → 1.0
 # Push the constant 1.0 onto the stack
 
+
 class DDIV(Opcode):
+    code = 0x6f
+
     def __init__(self):
-        super(DDIV, self).__init__(0x6f)
+        super(DDIV, self).__init__()
 # value1, value2 → result
 # Divide two doubles
 
+
 class DLOAD(Opcode):
+    code = 0x18
+
     def __init__(self):
-        super(DLOAD, self).__init__(0x18)
+        super(DLOAD, self).__init__()
 # 1: index
 # → value
 # Load a double value from a local variable #index
 
+
 class DLOAD_0(Opcode):
+    code = 0x26
+
     def __init__(self):
-        super(DLOAD_0, self).__init__(0x26)
+        super(DLOAD_0, self).__init__()
 # → value
 # Load a double from local variable 0
 
+
 class DLOAD_1(Opcode):
+    code = 0x27
+
     def __init__(self):
-        super(DLOAD_1, self).__init__(0x27)
+        super(DLOAD_1, self).__init__()
 # → value
 # Load a double from local variable 1
 
+
 class DLOAD_2(Opcode):
+    code = 0x28
+
     def __init__(self):
-        super(DLOAD_2, self).__init__(0x28)
+        super(DLOAD_2, self).__init__()
 # → value
 # Load a double from local variable 2
 
+
 class DLOAD_3(Opcode):
+    code = 0x29
+
     def __init__(self):
-        super(DLOAD_3, self).__init__(0x29)
+        super(DLOAD_3, self).__init__()
 # → value
 # Load a double from local variable 3
 
+
 class DMUL(Opcode):
+    code = 0x6b
+
     def __init__(self):
-        super(DMUL, self).__init__(0x6b)
+        super(DMUL, self).__init__()
 # value1, value2 → result multiply two doubles
 
+
 class DNEG(Opcode):
+    code = 0x77
+
     def __init__(self):
-        super(DNEG, self).__init__(0x77)
+        super(DNEG, self).__init__()
 # value → result  negate a double
 
+
 class DREM(Opcode):
+    code = 0x73
+
     def __init__(self):
-        super(DREM, self).__init__(0x73)
+        super(DREM, self).__init__()
 # value1, value2 → result get the remainder from a division between two doubles
 
+
 class DRETURN(Opcode):
+    code = 0xaf
+
     def __init__(self):
-        super(DRETURN, self).__init__(0xaf)
+        super(DRETURN, self).__init__()
 # value → [empty] return a double from a method
 
+
 class DSTORE(Opcode):
+    code = 0x39
+
     def __init__(self):
-        super(DSTORE, self).__init__(0x39)
+        super(DSTORE, self).__init__()
 # 1: index
 # value →
 # Store a double value into a local variable #index
 
+
 class DSTORE_0(Opcode):
+    code = 0x47
+
     def __init__(self):
-        super(DSTORE_0, self).__init__(0x47)
+        super(DSTORE_0, self).__init__()
 # value →
 # Store a double into local variable 0
 
+
 class DSTORE_1(Opcode):
+    code = 0x48
+
     def __init__(self):
-        super(DSTORE_1, self).__init__(0x48)
+        super(DSTORE_1, self).__init__()
 # value →
 # Store a double into local variable 1
 
+
 class DSTORE_2(Opcode):
+    code = 0x49
+
     def __init__(self):
-        super(DSTORE_2, self).__init__(0x49)
+        super(DSTORE_2, self).__init__()
 # value →
 # Store a double into local variable 2
 
+
 class DSTORE_3(Opcode):
+    code = 0x4a
+
     def __init__(self):
-        super(DSTORE_3, self).__init__(0x4a)
+        super(DSTORE_3, self).__init__()
 # value →
 # Store a double into local variable 3
 
+
 class DSUB(Opcode):
+    code = 0x67
+
     def __init__(self):
-        super(DSUB, self).__init__(0x67)
+        super(DSUB, self).__init__()
 # value1, value2 → result subtract a double from another
 
 
 class DUP(Opcode):
     # value → value, value    duplicate the value on top of the stack
+    code = 0x59
+
     def __init__(self):
-        super(DUP, self).__init__(0x59)
+        super(DUP, self).__init__()
 
     @property
     def stack_effect(self):
@@ -432,200 +617,299 @@ class DUP(Opcode):
 
 
 class DUP_X1(Opcode):
+    code = 0x5a
+
     def __init__(self):
-        super(DUP_X1, self).__init__(0x5a)
+        super(DUP_X1, self).__init__()
 # value2, value1 → value1, value2, value1
 # Insert a copy of the top value into the stack two values from the top. value1
 # and value2 must not be of the type double or long.
 
+
 class DUP_X2(Opcode):
+    code = 0x5b
+
     def __init__(self):
-        super(DUP_X2, self).__init__(0x5b)
+        super(DUP_X2, self).__init__()
 # value3, value2, value1 → value1, value3, value2, value1
 # Insert a copy of the top value into the stack two (if value2 is double or long
 # it takes up the entry of value3, too) or three values (if value2 is neither
 # double nor long) from the top
 
+
 class DUP2(Opcode):
+    code = 0x5c
+
     def __init__(self):
-        super(DUP2, self).__init__(0x5c)
+        super(DUP2, self).__init__()
 # {value2, value1} → {value2, value1}, {value2, value1}
 # Duplicate top two stack words (two values, if value1 is not double nor long; a
 # single value, if value1 is double or long)
 
+
 class DUP2_X1(Opcode):
+    code = 0x5d
+
     def __init__(self):
-        super(DUP2_X1, self).__init__(0x5d)
+        super(DUP2_X1, self).__init__()
 # value3, {value2, value1} → {value2, value1}, value3, {value2, value1}
 # Duplicate two words and insert beneath third word (see explanation above)
 
+
 class DUP2_X2(Opcode):
+    code = 0x5e
+
     def __init__(self):
-        super(DUP2_X2, self).__init__(0x5e)
+        super(DUP2_X2, self).__init__()
 # {value4, value3}, {value2, value1} → {value2, value1}, {value4, value3}, {value2, value1}
 # Duplicate two words and insert beneath fourth word
 
+
 class F2D(Opcode):
+    code = 0x8d
+
     def __init__(self):
-        super(F2D, self).__init__(0x8d)
+        super(F2D, self).__init__()
 # value → result
 # Convert a float to a double
 
+
 class F2I(Opcode):
+    code = 0x8b
+
     def __init__(self):
-        super(F2I, self).__init__(0x8b)
+        super(F2I, self).__init__()
 # value → result
 # Convert a float to an int
 
+
 class F2L(Opcode):
+    code = 0x8c
+
     def __init__(self):
-        super(F2L, self).__init__(0x8c)
+        super(F2L, self).__init__()
 # value → result
 # Convert a float to a long
 
+
 class FADD(Opcode):
+    code = 0x62
+
     def __init__(self):
-        super(FADD, self).__init__(0x62)
+
+        super(FADD, self).__init__()
 # value1, value2 → result add two floats
 
+
 class FALOAD(Opcode):
+    code = 0x30
+
     def __init__(self):
-        super(FALOAD, self).__init__(0x30)
+        super(FALOAD, self).__init__()
 # arrayref, index → value
 # Load a float from an array
 
+
 class FASTORE(Opcode):
+    code = 0x51
+
     def __init__(self):
-        super(FASTORE, self).__init__(0x51)
+        super(FASTORE, self).__init__()
 # arrayref, index, value →
 # Store a float in an array
 
+
 class FCMPG(Opcode):
+    code = 0x96
+
     def __init__(self):
-        super(FCMPG, self).__init__(0x96)
+        super(FCMPG, self).__init__()
 # value1, value2 → result
 # Compare two floats
+
 
 class FCMPL(Opcode):
+    code = 0x95
+
     def __init__(self):
-        super(FCMPL, self).__init__(0x95)
+        super(FCMPL, self).__init__()
 # value1, value2 → result
 # Compare two floats
 
+
 class FCONST_0(Opcode):
+    code = 0x0b
+
     def __init__(self):
-        super(FCONST_0, self).__init__(0x0b)
+        super(FCONST_0, self).__init__()
 # → 0.0f
 # Push 0.0f on the stack
 
+
 class FCONST_1(Opcode):
+    code = 0x0c
+
     def __init__(self):
-        super(FCONST_1, self).__init__(0x0c)
+        super(FCONST_1, self).__init__()
 # → 1.0f
 # Push 1.0f on the stack
 
+
 class FCONST_2(Opcode):
+    code = 0x0d
+
     def __init__(self):
-        super(FCONST_2, self).__init__(0x0d)
+        super(FCONST_2, self).__init__()
 # → 2.0f
 # Push 2.0f on the stack
 
+
 class FDIV(Opcode):
+    code = 0x6e
+
     def __init__(self):
-        super(FDIV, self).__init__(0x6e)
+        super(FDIV, self).__init__()
 # value1, value2 → result
 # Divide two floats
 
+
 class FLOAD(Opcode):
+    code = 0x17
+
     def __init__(self):
-        super(FLOAD, self).__init__(0x17)
+        super(FLOAD, self).__init__()
 # 1: index
 # → value
 # Load a float value from a local variable #index
 
+
 class FLOAD_0(Opcode):
+    code = 0x22
+
     def __init__(self):
-        super(FLOAD_0, self).__init__(0x22)
+        super(FLOAD_0, self).__init__()
 # → value
 # Load a float value from local variable 0
 
+
 class FLOAD_1(Opcode):
+    code = 0x23
+
     def __init__(self):
-        super(FLOAD_1, self).__init__(0x23)
+        super(FLOAD_1, self).__init__()
 # → value
 # Load a float value from local variable 1
 
+
 class FLOAD_2(Opcode):
+    code = 0x24
+
     def __init__(self):
-        super(FLOAD_2, self).__init__(0x24)
+        super(FLOAD_2, self).__init__()
 # → value
 # Load a float value from local variable 2
 
+
 class FLOAD_3(Opcode):
+    code = 0x25
+
     def __init__(self):
-        super(FLOAD_3, self).__init__(0x25)
+        super(FLOAD_3, self).__init__()
 # → value
 # Load a float value from local variable 3
 
+
 class FMUL(Opcode):
+    code = 0x6a
+
     def __init__(self):
-        super(FMUL, self).__init__(0x6a)
+        super(FMUL, self).__init__()
 # value1, value2 → result multiply two floats
 
+
 class FNEG(Opcode):
+    code = 0x76
+
     def __init__(self):
-        super(FNEG, self).__init__(0x76)
+        super(FNEG, self).__init__()
 # value → result  negate a float
 
+
 class FREM(Opcode):
+    code = 0x72
+
     def __init__(self):
-        super(FREM, self).__init__(0x72)
+        super(FREM, self).__init__()
 # value1, value2 → result get the remainder from a division between two floats
 
+
 class FRETURN(Opcode):
+    code = 0xae
+
     def __init__(self):
-        super(FRETURN, self).__init__(0xae)
+        super(FRETURN, self).__init__()
 # value → [empty] return a float
 
+
 class FSTORE(Opcode):
+    code = 0x38
+
     def __init__(self):
-        super(FSTORE, self).__init__(0x38)
+        super(FSTORE, self).__init__()
 # 1: index
 # value →
 # Store a float value into a local variable #index
 
+
 class FSTORE_0(Opcode):
+    code = 0x43
+
     def __init__(self):
-        super(FSTORE_0, self).__init__(0x43)
+        super(FSTORE_0, self).__init__()
 # value →
 # Store a float value into local variable 0
 
+
 class FSTORE_1(Opcode):
+    code = 0x44
+
     def __init__(self):
-        super(FSTORE_1, self).__init__(0x44)
+        super(FSTORE_1, self).__init__()
 # value →
 # Store a float value into local variable 1
 
+
 class FSTORE_2(Opcode):
+    code = 0x45
+
     def __init__(self):
-        super(FSTORE_2, self).__init__(0x45)
+        super(FSTORE_2, self).__init__()
 # value →
 # Store a float value into local variable 2
 
+
 class FSTORE_3(Opcode):
+    code = 0x46
+
     def __init__(self):
-        super(FSTORE_3, self).__init__(0x46)
+        super(FSTORE_3, self).__init__()
 # value →
 # Store a float value into local variable 3
 
+
 class FSUB(Opcode):
+    code = 0x66
+
     def __init__(self):
-        super(FSUB, self).__init__(0x66)
+        super(FSUB, self).__init__()
 # value1, value2 → result subtract two floats
 
+
 class GETFIELD(Opcode):
+    code = 0xb4
+
     def __init__(self):
-        super(GETFIELD, self).__init__(0xb4)
+        super(GETFIELD, self).__init__()
 # 2: index1, index2   objectref → value
 # Get a field value of an object objectref, where the field is identified by
 # field reference in the constant pool index (index1 << 8 + index2)
@@ -634,16 +918,33 @@ class GETFIELD(Opcode):
 class GETSTATIC(Opcode):
     # Args(2): index1, index2   → value
     # Get a static field value of a class, where the field is identified by field
-    # reference in the constant pool index (index1 << 8 + index2)
+    # reference in the constant pool index (index 1 << 8 + index2)
+    code = 0xb2
+
     def __init__(self, classname, fieldname, descriptor):
-        super(GETSTATIC, self).__init__(0xb2)
+        super(GETSTATIC, self).__init__()
         self.field = Fieldref(classname, fieldname, descriptor)
 
     def __len__(self):
         return 3
 
+    def __arg_repr__(self):
+        return ' %s' % self.field
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        field = reader.constant_pool[reader.read_u2()]
+        instance = cls(
+            field.klass.name.bytes.decode('utf8'),
+            field.name_and_type.name.bytes.decode('utf8'),
+            field.name_and_type.descriptor.bytes.decode('utf8')
+        )
+        if dump:
+            print("    " * dump, instance)
+        return instance
+
     def write_extra(self, writer):
-        writer.write_u2(writer.constant_pool[self.field])
+        writer.write_u2(writer.constant_pool.index(self.field))
 
     def resolve(self, constant_pool):
         self.field.resolve(constant_pool)
@@ -654,309 +955,448 @@ class GETSTATIC(Opcode):
 
 
 class GOTO(Opcode):
+    code = 0xa7
+
     def __init__(self):
-        super(GOTO, self).__init__(0xa7)
+        super(GOTO, self).__init__()
 # 2: branchbyte1, branchbyte2
 # [no change]
 # Goes to another instruction at branchoffset (signed short constructed from
 # unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class GOTO_W(Opcode):
+    code = 0xc8
+
     def __init__(self):
-        super(GOTO_W, self).__init__(0xc8)
+        super(GOTO_W, self).__init__()
 # 4: branchbyte1, branchbyte2, branchbyte3, branchbyte4
 # [no change]
 # Goes to another instruction at branchoffset (signed int constructed from
 # unsigned bytes branchbyte1 << 24 + branchbyte2 << 16 + branchbyte3 << 8 +
 # branchbyte4)
 
+
 class I2B(Opcode):
+    code = 0x91
+
     def __init__(self):
-        super(I2B, self).__init__(0x91)
+        super(I2B, self).__init__()
 # value → result
 # Convert an int into a byte
 
+
 class I2C(Opcode):
+    code = 0x92
+
     def __init__(self):
-        super(I2C, self).__init__(0x92)
+        super(I2C, self).__init__()
 # value → result
 # Convert an int into a character
 
+
 class I2D(Opcode):
+    code = 0x87
+
     def __init__(self):
-        super(I2D, self).__init__(0x87)
+        super(I2D, self).__init__()
 # value → result
 # Convert an int into a double
 
+
 class I2F(Opcode):
+    code = 0x86
+
     def __init__(self):
-        super(I2F, self).__init__(0x86)
+        super(I2F, self).__init__()
 # value → result
 # Convert an int into a float
 
+
 class I2L(Opcode):
+    code = 0x85
+
     def __init__(self):
-        super(I2L, self).__init__(0x85)
+        super(I2L, self).__init__()
 # value → result
 # Convert an int into a long
 
+
 class I2S(Opcode):
+    code = 0x93
+
     def __init__(self):
-        super(I2S, self).__init__(0x93)
+        super(I2S, self).__init__()
 # value → result
 # Convert an int into a short
 
+
 class IADD(Opcode):
+    code = 0x60
+
     def __init__(self):
-        super(IADD, self).__init__(0x60)
+        super(IADD, self).__init__()
 # value1, value2 → result add two ints
 
+
 class IALOAD(Opcode):
+    code = 0x2e
+
     def __init__(self):
-        super(IALOAD, self).__init__(0x2e)
+        super(IALOAD, self).__init__()
 # arrayref, index → value
 # Load an int from an array
 
+
 class IAND(Opcode):
+    code = 0x7e
+
     def __init__(self):
-        super(IAND, self).__init__(0x7e)
+        super(IAND, self).__init__()
 # value1, value2 → result
 # Perform a bitwise and on two integers
 
+
 class IASTORE(Opcode):
+    code = 0x4f
+
     def __init__(self):
-        super(IASTORE, self).__init__(0x4f)
+        super(IASTORE, self).__init__()
 # arrayref, index, value →
 # Store an int into an array
 
+
 class ICONST_M1(Opcode):
+    code = 0x02
+
     def __init__(self):
-        super(ICONST_M1, self).__init__(0x02)
+        super(ICONST_M1, self).__init__()
 # → -1
 # Load the int value -1 onto the stack
 
+
 class ICONST_0(Opcode):
+    code = 0x03
+
     def __init__(self):
-        super(ICONST_0, self).__init__(0x03)
+        super(ICONST_0, self).__init__()
 # → 0
 # Load the int value 0 onto the stack
 
+
 class ICONST_1(Opcode):
+    code = 0x04
+
     def __init__(self):
-        super(ICONST_1, self).__init__(0x04)
+        super(ICONST_1, self).__init__()
 # → 1
 # Load the int value 1 onto the stack
 
+
 class ICONST_2(Opcode):
+    code = 0x05
+
     def __init__(self):
-        super(ICONST_2, self).__init__(0x05)
+        super(ICONST_2, self).__init__()
 # → 2
 # Load the int value 2 onto the stack
 
+
 class ICONST_3(Opcode):
+    code = 0x06
+
     def __init__(self):
-        super(ICONST_3, self).__init__(0x06)
+        super(ICONST_3, self).__init__()
 # → 3
 # Load the int value 3 onto the stack
 
+
 class ICONST_4(Opcode):
+    code = 0x07
+
     def __init__(self):
-        super(ICONST_4, self).__init__(0x07)
+        super(ICONST_4, self).__init__()
 # → 4
 # Load the int value 4 onto the stack
 
+
 class ICONST_5(Opcode):
+    code = 0x08
+
     def __init__(self):
-        super(ICONST_5, self).__init__(0x08)
+        super(ICONST_5, self).__init__()
 # → 5
 # Load the int value 5 onto the stack
 
+
 class IDIV(Opcode):
+    code = 0x6c
+
     def __init__(self):
-        super(IDIV, self).__init__(0x6c)
+        super(IDIV, self).__init__()
 # value1, value2 → result
 # Divide two integers
 
+
 class IF_ACMPEQ(Opcode):
+    code = 0xa5
+
     def __init__(self):
-        super(IF_ACMPEQ, self).__init__(0xa5)
+        super(IF_ACMPEQ, self).__init__()
 # 2: branchbyte1, branchbyte2 value1, value2 →
 # If references are equal, branch to instruction at branchoffset (signed short
 # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IF_ACMPNE(Opcode):
+    code = 0xa6
+
     def __init__(self):
-        super(IF_ACMPNE, self).__init__(0xa6)
+        super(IF_ACMPNE, self).__init__()
 # 2: branchbyte1, branchbyte2 value1, value2 →
 # If references are not equal, branch to instruction at branchoffset (signed
 # short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IF_ICMPEQ(Opcode):
+    code = 0x9f
+
     def __init__(self):
-        super(IF_ICMPEQ, self).__init__(0x9f)
+        super(IF_ICMPEQ, self).__init__()
 # 2: branchbyte1, branchbyte2 value1, value2 →
 # If ints are equal, branch to instruction at branchoffset (signed short
 # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IF_ICMPGE(Opcode):
+    code = 0xa2
+
     def __init__(self):
-        super(IF_ICMPGE, self).__init__(0xa2)
+        super(IF_ICMPGE, self).__init__()
 # 2: branchbyte1, branchbyte2 value1, value2 →
 # If value1 is greater than or equal to value2, branch to instruction at
 # Iranchoffset (signed short constructed from unsigned bytes branchbyte1 << 8 +
 # branchbyte2)
 
+
 class IF_ICMPGT(Opcode):
+    code = 0xa3
+
     def __init__(self):
-        super(IF_ICMPGT, self).__init__(0xa3)
+        super(IF_ICMPGT, self).__init__()
 # 2: branchbyte1, branchbyte2 value1, value2 →
 # If value1 is greater than value2, branch to instruction at branchoffset
 # (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IF_ICMPLE(Opcode):
+    code = 0xa4
+
     def __init__(self):
-        super(IF_ICMPLE, self).__init__(0xa4)
+        super(IF_ICMPLE, self).__init__()
 # 2: branchbyte1, branchbyte2 value1, value2 →
 # If value1 is less than or equal to value2, branch to instruction at
 # Iranchoffset (signed short constructed from unsigned bytes branchbyte1 << 8 +
 # branchbyte2)
 
+
 class IF_ICMPLT(Opcode):
+    code = 0xa1
+
     def __init__(self):
-        super(IF_ICMPLT, self).__init__(0xa1)
+        super(IF_ICMPLT, self).__init__()
 # 2: branchbyte1, branchbyte2 value1, value2 →
 # If value1 is less than value2, branch to instruction at branchoffset (signed
 # short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IF_ICMPNE(Opcode):
+    code = 0xa0
+
     def __init__(self):
-        super(IF_ICMPNE, self).__init__(0xa0)
+        super(IF_ICMPNE, self).__init__()
 # 2: branchbyte1, branchbyte2 value1, value2 →
 # If ints are not equal, branch to instruction at branchoffset (signed short
 # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IFEQ(Opcode):
+    code = 0x99
+
     def __init__(self):
-        super(IFEQ, self).__init__(0x99)
+        super(IFEQ, self).__init__()
 # 2: branchbyte1, branchbyte2 value →
 # If value is 0, branch to instruction at branchoffset (signed short constructed
 # from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IFGE(Opcode):
+    code = 0x9c
+
     def __init__(self):
-        super(IFGE, self).__init__(0x9c)
+        super(IFGE, self).__init__()
 # 2: branchbyte1, branchbyte2 value →
 # If value is greater than or equal to 0, branch to instruction at branchoffset
 # (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IFGT(Opcode):
+    code = 0x9d
+
     def __init__(self):
-        super(IFGT, self).__init__(0x9d)
+        super(IFGT, self).__init__()
 # 2: branchbyte1, branchbyte2 value →
 # If value is greater than 0, branch to instruction at branchoffset (signed
 # short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IFLE(Opcode):
+    code = 0x9e
+
     def __init__(self):
-        super(IFLE, self).__init__(0x9e)
+        super(IFLE, self).__init__()
 # 2: branchbyte1, branchbyte2 value →
 # If value is less than or equal to 0, branch to instruction at branchoffset
 # (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IFLT(Opcode):
+    code = 0x9b
+
     def __init__(self):
-        super(IFLT, self).__init__(0x9b)
+        super(IFLT, self).__init__()
 # 2: branchbyte1, branchbyte2 value →
 # If value is less than 0, branch to instruction at branchoffset (signed short
 # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IFNE(Opcode):
+    code = 0x9a
+
     def __init__(self):
-        super(IFNE, self).__init__(0x9a)
+        super(IFNE, self).__init__()
 # 2: branchbyte1, branchbyte2 value →
 # If value is not 0, branch to instruction at branchoffset (signed short
 # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IFNONNULL(Opcode):
+    code = 0xc7
+
     def __init__(self):
-        super(IFNONNULL, self).__init__(0xc7)
+        super(IFNONNULL, self).__init__()
 # 2: branchbyte1, branchbyte2 value →
 # If value is not null, branch to instruction at branchoffset (signed short
 # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IFNULL(Opcode):
+    code = 0xc6
+
     def __init__(self):
-        super(IFNULL, self).__init__(0xc6)
+        super(IFNULL, self).__init__()
 # 2: branchbyte1, branchbyte2 value →
 # If value is null, branch to instruction at branchoffset (signed short
 # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
 
+
 class IINC(Opcode):
+    code = 0x84
+
     def __init__(self):
-        super(IINC, self).__init__(0x84)
+        super(IINC, self).__init__()
 # 2: index, const
 # [No change]
 # Increment local variable #index by signed byte const
 
+
 class ILOAD(Opcode):
+    code = 0x15
+
     def __init__(self):
-        super(ILOAD, self).__init__(0x15)
+        super(ILOAD, self).__init__()
 # 1: index
 # → value
 # Load an int value from a local variable #index
 
+
 class ILOAD_0(Opcode):
+    code = 0x1a
+
     def __init__(self):
-        super(ILOAD_0, self).__init__(0x1a)
+        super(ILOAD_0, self).__init__()
 # → value
 # Load an int value from local variable 0
 
+
 class ILOAD_1(Opcode):
+    code = 0x1b
+
     def __init__(self):
-        super(ILOAD_1, self).__init__(0x1b)
+        super(ILOAD_1, self).__init__()
 # → value
 # Load an int value from local variable 1
 
+
 class ILOAD_2(Opcode):
+    code = 0x1c
+
     def __init__(self):
-        super(ILOAD_2, self).__init__(0x1c)
+        super(ILOAD_2, self).__init__()
 # → value
 # Load an int value from local variable 2
 
+
 class ILOAD_3(Opcode):
+    code = 0x1d
+
     def __init__(self):
-        super(ILOAD_3, self).__init__(0x1d)
+        super(ILOAD_3, self).__init__()
 # → value
 # Load an int value from local variable 3
 
+
 class IMPDEP1(Opcode):
+    code = 0xfe
+
     def __init__(self):
-        super(IMPDEP1, self).__init__(0xfe)
+        super(IMPDEP1, self).__init__()
 # Reserved for implementation-dependent operations within debuggers; should not
 # appear in any class file
+
 
 class IMPDEP2(Opcode):
+    code = 0xff
+
     def __init__(self):
-        super(IMPDEP2, self).__init__(0xff)
+        super(IMPDEP2, self).__init__()
 # Reserved for implementation-dependent operations within debuggers; should not
 # appear in any class file
 
+
 class IMUL(Opcode):
+    code = 0x68
+
     def __init__(self):
-        super(IMUL, self).__init__(0x68)
+        super(IMUL, self).__init__()
 # value1, value2 → result
 # Multiply two integers
 
+
 class INEG(Opcode):
+    code = 0x74
+
     def __init__(self):
-        super(INEG, self).__init__(0x74)
+        super(INEG, self).__init__()
 # value → result
 # Negate int
 
 
 class INSTANCEOF(Opcode):
+    code = 0xc1
+
     def __init__(self):
-        super(INSTANCEOF, self).__init__(0xc1)
+        super(INSTANCEOF, self).__init__()
 # 2: indexbyte1, indexbyte2
 # objectref → result
 # Determines if an object objectref is of a given type, identified by class
@@ -964,8 +1404,10 @@ class INSTANCEOF(Opcode):
 
 
 class INVOKEDYNAMIC(Opcode):
+    code = 0xba
+
     def __init__(self):
-        super(INVOKEDYNAMIC, self).__init__(0xba)
+        super(INVOKEDYNAMIC, self).__init__()
 # 4: indexbyte1, indexbyte2, 0, 0
 # [arg1, [arg2 ...]] → result
 # Invokes a dynamic method and puts the result on the stack (might be void); the
@@ -974,8 +1416,10 @@ class INVOKEDYNAMIC(Opcode):
 
 
 class INVOKEINTERFACE(Opcode):
+    code = 0xb9
+
     def __init__(self):
-        super(INVOKEINTERFACE, self).__init__(0xb9)
+        super(INVOKEINTERFACE, self).__init__()
 # 4: indexbyte1, indexbyte2, count, 0 objectref,
 # [arg1, arg2, ...] → result
 # Invokes an interface method on object objectref and puts the result on the
@@ -989,15 +1433,35 @@ class INVOKESPECIAL(Opcode):
     # constant pool (indexbyte1 << 8 + indexbyte2)
     # Args (2): indexbyte1, indexbyte2
     # Stack: objectref, [arg1, arg2, ...] → result
+    code = 0xb7
+
     def __init__(self, classname, methodname, descriptor):
-        super(INVOKESPECIAL, self).__init__(0xb7)
+        super(INVOKESPECIAL, self).__init__()
+        self.classname = classname
+        self.methodname = methodname
+        self.descriptor = descriptor
         self.method = Methodref(classname, methodname, descriptor)
+
+    def __arg_repr__(self):
+        return ' %s' % self.method
 
     def __len__(self):
         return 3
 
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        method = reader.constant_pool[reader.read_u2()]
+        instance = cls(
+            method.klass.name.bytes.decode('utf8'),
+            method.name_and_type.name.bytes.decode('utf8'),
+            method.name_and_type.descriptor.bytes.decode('utf8')
+        )
+        if dump:
+            print("    " * dump, instance)
+        return instance
+
     def write_extra(self, writer):
-        writer.write_u2(writer.constant_pool[self.method])
+        writer.write_u2(writer.constant_pool.index(self.method))
 
     def resolve(self, constant_pool):
         self.method.resolve(constant_pool)
@@ -1013,15 +1477,35 @@ class INVOKESTATIC(Opcode):
     # 8 + indexbyte2)
     # Args(2): indexbyte1, indexbyte2
     # Stack: [arg1, arg2, ...] → result
+    code = 0xb8
+
     def __init__(self, classname, methodname, descriptor):
-        super(INVOKESTATIC, self).__init__(0xb8)
+        super(INVOKESTATIC, self).__init__()
+        self.classname = classname
+        self.methodname = methodname
+        self.descriptor = descriptor
         self.method = Methodref(classname, methodname, descriptor)
+
+    def __arg_repr__(self):
+        return ' %s' % self.method
 
     def __len__(self):
         return 3
 
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        method = reader.constant_pool[reader.read_u2()]
+        instance = cls(
+            method.klass.name.bytes.decode('utf8'),
+            method.name_and_type.name.bytes.decode('utf8'),
+            method.name_and_type.descriptor.bytes.decode('utf8')
+        )
+        if dump:
+            print("    " * dump, instance)
+        return instance
+
     def write_extra(self, writer):
-        writer.write_u2(writer.constant_pool[self.method])
+        writer.write_u2(writer.constant_pool.index(self.method))
 
     def resolve(self, constant_pool):
         self.method.resolve(constant_pool)
@@ -1037,15 +1521,35 @@ class INVOKEVIRTUAL(Opcode):
     # constant pool (indexbyte1 << 8 + indexbyte2)
     # Args(2): indexbyte1, indexbyte2
     # Stack: objectref, [arg1, arg2, ...] → result
+    code = 0xb6
+
     def __init__(self, classname, methodname, descriptor):
-        super(INVOKEVIRTUAL, self).__init__(0xb6)
+        super(INVOKEVIRTUAL, self).__init__()
+        self.classname = classname
+        self.methodname = methodname
+        self.descriptor = descriptor
         self.method = Methodref(classname, methodname, descriptor)
+
+    def __arg_repr__(self):
+        return ' %s' % self.method
 
     def __len__(self):
         return 3
 
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        method = reader.constant_pool[reader.read_u2()]
+        instance = cls(
+            method.klass.name.bytes.decode('utf8'),
+            method.name_and_type.name.bytes.decode('utf8'),
+            method.name_and_type.descriptor.bytes.decode('utf8')
+        )
+        if dump:
+            print("    " * dump, instance)
+        return instance
+
     def write_extra(self, writer):
-        writer.write_u2(writer.constant_pool[self.method])
+        writer.write_u2(writer.constant_pool.index(self.method))
 
     def resolve(self, constant_pool):
         self.method.resolve(constant_pool)
@@ -1056,152 +1560,226 @@ class INVOKEVIRTUAL(Opcode):
 
 
 class IOR(Opcode):
+    code = 0x80
+
     def __init__(self):
-        super(IOR, self).__init__(0x80)
+        super(IOR, self).__init__()
 # value1, value2 → result
 # Bitwise int or
 
+
 class IREM(Opcode):
+    code = 0x70
+
     def __init__(self):
-        super(IREM, self).__init__(0x70)
+        super(IREM, self).__init__()
 # value1, value2 → result
 # Logical int remainder
 
+
 class IRETURN(Opcode):
+    code = 0xac
+
     def __init__(self):
-        super(IRETURN, self).__init__(0xac)
+        super(IRETURN, self).__init__()
 # value → [empty]
 # Return an integer from a method
 
+
 class ISHL(Opcode):
+    code = 0x78
+
     def __init__(self):
-        super(ISHL, self).__init__(0x78)
+        super(ISHL, self).__init__()
 # value1, value2 → result
 # int shift left
 
+
 class ISHR(Opcode):
+    code = 0x7a
+
     def __init__(self):
-        super(ISHR, self).__init__(0x7a)
+        super(ISHR, self).__init__()
 # value1, value2 → result
 # int arithmetic shift right
 
+
 class ISTORE(Opcode):
+    code = 0x36
+
     def __init__(self):
-        super(ISTORE, self).__init__(0x36)
+        super(ISTORE, self).__init__()
 # 1: index
 # value →
 # Store int value into variable #index
 
+
 class ISTORE_0(Opcode):
+    code = 0x3b
+
     def __init__(self):
-        super(ISTORE_0, self).__init__(0x3b)
+        super(ISTORE_0, self).__init__()
 # value →
 # Store int value into variable 0
 
+
 class ISTORE_1(Opcode):
+    code = 0x3c
+
     def __init__(self):
-        super(ISTORE_1, self).__init__(0x3c)
+        super(ISTORE_1, self).__init__()
 # value →
 # Store int value into variable 1
 
+
 class ISTORE_2(Opcode):
+    code = 0x3d
+
     def __init__(self):
-        super(ISTORE_2, self).__init__(0x3d)
+        super(ISTORE_2, self).__init__()
 # value →
 # Store int value into variable 2
 
+
 class ISTORE_3(Opcode):
+    code = 0x3e
+
     def __init__(self):
-        super(ISTORE_3, self).__init__(0x3e)
+        super(ISTORE_3, self).__init__()
 # value →
 # Store int value into variable 3
 
+
 class ISUB(Opcode):
+    code = 0x64
+
     def __init__(self):
-        super(ISUB, self).__init__(0x64)
+        super(ISUB, self).__init__()
 # value1, value2 → result int subtract
 
+
 class IUSHR(Opcode):
+    code = 0x7c
+
     def __init__(self):
-        super(IUSHR, self).__init__(0x7c)
+        super(IUSHR, self).__init__()
 # value1, value2 → result int logical shift right
 
+
 class IXOR(Opcode):
+    code = 0x82
+
     def __init__(self):
-        super(IXOR, self).__init__(0x82)
+        super(IXOR, self).__init__()
 # value1, value2 → result int xor
 
+
 class JSR(Opcode):
+    code = 0xa8
+
     def __init__(self):
-        super(JSR, self).__init__(0xa8)
+        super(JSR, self).__init__()
 # 2: branchbyte1, branchbyte2 → address
 # Jump to subroutine at branchoffset (signed short constructed from unsigned
 # bytes branchbyte1 << 8 + branchbyte2) and place the return address on the
 # stack
 
+
 class JSR_W(Opcode):
+    code = 0xc9
+
     def __init__(self):
-        super(JSR_W, self).__init__(0xc9)
+        super(JSR_W, self).__init__()
 # 4: branchbyte1, branchbyte2, branchbyte3, branchbyte4   → address
 # Jump to subroutine at branchoffset (signed int constructed from unsigned bytes
 # branchbyte1 << 24 + branchbyte2 << 16 + branchbyte3 << 8 + branchbyte4) and
 # place the return address on the stack
 
+
 class L2D(Opcode):
+    code = 0x8a
+
     def __init__(self):
-        super(L2D, self).__init__(0x8a)
+        super(L2D, self).__init__()
 # value → result
 # Convert a long to a double
 
+
 class L2F(Opcode):
+    code = 0x89
+
     def __init__(self):
-        super(L2F, self).__init__(0x89)
+        super(L2F, self).__init__()
 # value → result
 # Convert a long to a float
 
+
 class L2I(Opcode):
+    code = 0x88
+
     def __init__(self):
-        super(L2I, self).__init__(0x88)
+        super(L2I, self).__init__()
 # value → result
 # Convert a long to a int
 
+
 class LADD(Opcode):
+    code = 0x61
+
     def __init__(self):
-        super(LADD, self).__init__(0x61)
+        super(LADD, self).__init__()
 # value1, value2 → result add two longs
 
+
 class LALOAD(Opcode):
+    code = 0x2f
+
     def __init__(self):
-        super(LALOAD, self).__init__(0x2f)
+        super(LALOAD, self).__init__()
 # arrayref, index → value
 # Load a long from an array
 
+
 class LAND(Opcode):
+    code = 0x7f
+
     def __init__(self):
-        super(LAND, self).__init__(0x7f)
+        super(LAND, self).__init__()
 # value1, value2 → result bitwise and of two longs
 
+
 class LASTORE(Opcode):
+    code = 0x50
+
     def __init__(self):
-        super(LASTORE, self).__init__(0x50)
+        super(LASTORE, self).__init__()
 # arrayref, index, value →
 # Store a long to an array
 
+
 class LCMP(Opcode):
+    code = 0x94
+
     def __init__(self):
-        super(LCMP, self).__init__(0x94)
+        super(LCMP, self).__init__()
 # value1, value2 → result
 # Compare two longs values
 
+
 class LCONST_0(Opcode):
+    code = 0x09
+
     def __init__(self):
-        super(LCONST_0, self).__init__(0x09)
+        super(LCONST_0, self).__init__()
 # → 0L
 # Push the long 0 onto the stack
 
+
 class LCONST_1(Opcode):
+    code = 0x0a
+
     def __init__(self):
-        super(LCONST_1, self).__init__(0x0a)
+        super(LCONST_1, self).__init__()
 # → 1L
 # Push the long 1 onto the stack
 
@@ -1210,8 +1788,10 @@ class LDC(Opcode):
     # Args(1): index → value
     # Push a constant #index from a constant pool (String, int or float) onto the
     # stack
+    code = 0x12
+
     def __init__(self, const):
-        super(LDC, self).__init__(0x12)
+        super(LDC, self).__init__()
         if isinstance(const, str):
             self.const = String(const)
         elif isinstance(const, int):
@@ -1221,11 +1801,22 @@ class LDC(Opcode):
         else:
             raise TypeError('Invalid type for LDC: %s' % type(const))
 
+    def __arg_repr__(self):
+        return ' %s' % self.const
+
     def __len__(self):
         return 2
 
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        const = reader.read_u1()
+        instance = cls(const)
+        if dump:
+            print("    " * dump, instance)
+        return instance
+
     def write_extra(self, writer):
-        writer.write_u1(writer.constant_pool[self.const])
+        writer.write_u1(writer.constant_pool.index(self.const))
 
     def resolve(self, constant_pool):
         self.const.resolve(constant_pool)
@@ -1236,166 +1827,247 @@ class LDC(Opcode):
 
 
 class LDC_W(Opcode):
+    code = 0x13
+
     def __init__(self):
-        super(LDC_W, self).__init__(0x13)
+        super(LDC_W, self).__init__()
 # 2: indexbyte1, indexbyte2   → value
 # push a constant #index from a constant pool (String, int or float) onto the
 # stack (wide index is constructed as indexbyte1 << 8 + indexbyte2)
 
+
 class LDC2_W(Opcode):
+    code = 0x14
+
     def __init__(self):
-        super(LDC2_W, self).__init__(0x14)
+        super(LDC2_W, self).__init__()
 # 2: indexbyte1, indexbyte2   → value
 # push a constant #index from a constant pool (double or long) onto the stack
 # (wide index is constructed as indexbyte1 << 8 + indexbyte2)
 
+
 class LDIV(Opcode):
+    code = 0x6d
+
     def __init__(self):
-        super(LDIV, self).__init__(0x6d)
+        super(LDIV, self).__init__()
 # value1, value2 → result
 # Divide two longs
 
+
 class LLOAD(Opcode):
+    code = 0x16
+
     def __init__(self):
-        super(LLOAD, self).__init__(0x16)
+        super(LLOAD, self).__init__()
 # 1: index
 # → value
 # Load a long value from a local variable #index
 
+
 class LLOAD_0(Opcode):
+    code = 0x1e
+
     def __init__(self):
-        super(LLOAD_0, self).__init__(0x1e)
+        super(LLOAD_0, self).__init__()
 # → value
 # Load a long value from a local variable 0
 
+
 class LLOAD_1(Opcode):
+    code = 0x1f
+
     def __init__(self):
-        super(LLOAD_1, self).__init__(0x1f)
+        super(LLOAD_1, self).__init__()
 # → value
 # Load a long value from a local variable 1
 
+
 class LLOAD_2(Opcode):
+    code = 0x20
+
     def __init__(self):
-        super(LLOAD_2, self).__init__(0x20)
+        super(LLOAD_2, self).__init__()
 # → value
 # Load a long value from a local variable 2
 
+
 class LLOAD_3(Opcode):
+    code = 0x21
+
     def __init__(self):
-        super(LLOAD_3, self).__init__(0x21)
+        super(LLOAD_3, self).__init__()
 # → value
 # Load a long value from a local variable 3
 
+
 class LMUL(Opcode):
+    code = 0x69
+
     def __init__(self):
-        super(LMUL, self).__init__(0x69)
+        super(LMUL, self).__init__()
 # value1, value2 → result multiply two longs
 
+
 class LNEG(Opcode):
+    code = 0x75
+
     def __init__(self):
-        super(LNEG, self).__init__(0x75)
+        super(LNEG, self).__init__()
 # value → result  negate a long
 
+
 class LOOKUPSWITCH(Opcode):
+    code = 0xab
+
     def __init__(self):
-        super(LOOKUPSWITCH, self).__init__(0xab)
+        super(LOOKUPSWITCH, self).__init__()
 # 4+: <0-3 bytes padding>, defaultbyte1, defaultbyte2, defaultbyte3, defaultbyte4, npairs1, npairs2, npairs3, npairs4, match-offset pairs...
 # key →
 # A target address is looked up from a table using a key and execution continues
 # from the instruction at that address
 
+
 class LOR(Opcode):
+    code = 0x81
+
     def __init__(self):
-        super(LOR, self).__init__(0x81)
+        super(LOR, self).__init__()
 # value1, value2 → result
 # Bitwise or of two longs
 
+
 class LREM(Opcode):
+    code = 0x71
+
     def __init__(self):
-        super(LREM, self).__init__(0x71)
+        super(LREM, self).__init__()
 # value1, value2 → result
 # Remainder of division of two longs
 
+
 class LRETURN(Opcode):
+    code = 0xad
+
     def __init__(self):
-        super(LRETURN, self).__init__(0xad)
+        super(LRETURN, self).__init__()
 # value → [empty] return a long value
 
+
 class LSHL(Opcode):
+    code = 0x79
+
     def __init__(self):
-        super(LSHL, self).__init__(0x79)
+        super(LSHL, self).__init__()
 # value1, value2 → result
 # Bitwise shift left of a long value1 by int value2 positions
 
+
 class LSHR(Opcode):
+    code = 0x7b
+
     def __init__(self):
-        super(LSHR, self).__init__(0x7b)
+
+        super(LSHR, self).__init__()
 # value1, value2 → result
 # Bitwise shift right of a long value1 by int value2 positions
 
+
 class LSTORE(Opcode):
+    code = 0x37
+
     def __init__(self):
-        super(LSTORE, self).__init__(0x37)
+        super(LSTORE, self).__init__()
 # 1: index
 # value →
 # Store a long value in a local variable #index
 
+
 class LSTORE_0(Opcode):
+    code = 0x3f
+
     def __init__(self):
-        super(LSTORE_0, self).__init__(0x3f)
+        super(LSTORE_0, self).__init__()
 # value →
 # Store a long value in a local variable 0
 
+
 class LSTORE_1(Opcode):
+    code = 0x40
+
     def __init__(self):
-        super(LSTORE_1, self).__init__(0x40)
+        super(LSTORE_1, self).__init__()
 # value →
 # Store a long value in a local variable 1
 
+
 class LSTORE_2(Opcode):
+    code = 0x41
+
     def __init__(self):
-        super(LSTORE_2, self).__init__(0x41)
+        super(LSTORE_2, self).__init__()
 # value →
 # Store a long value in a local variable 2
 
+
 class LSTORE_3(Opcode):
+    code = 0x42
+
     def __init__(self):
-        super(LSTORE_3, self).__init__(0x42)
+        super(LSTORE_3, self).__init__()
 # value →
 # Store a long value in a local variable 3
 
+
 class LSUB(Opcode):
+    code = 0x65
+
     def __init__(self):
-        super(LSUB, self).__init__(0x65)
+        super(LSUB, self).__init__()
 # value1, value2 → result subtract two longs
 
+
 class LUSHR(Opcode):
+    code = 0x7d
+
     def __init__(self):
-        super(LUSHR, self).__init__(0x7d)
+        super(LUSHR, self).__init__()
 # value1, value2 → result
 # Bitwise shift right of a long value1 by int value2 positions, unsigned
 
+
 class LXOR(Opcode):
+    code = 0x83
+
     def __init__(self):
-        super(LXOR, self).__init__(0x83)
+        super(LXOR, self).__init__()
 # value1, value2 → result
 # Bitwise exclusive or of two longs
 
+
 class MONITORENTER(Opcode):
+    code = 0xc2
+
     def __init__(self):
-        super(MONITORENTER, self).__init__(0xc2)
+        super(MONITORENTER, self).__init__()
 # objectref →
 # Enter monitor for object ("grab the lock" - start of synchronized() section)
 
+
 class MONITOREXIT(Opcode):
+    code = 0xc3
+
     def __init__(self):
-        super(MONITOREXIT, self).__init__(0xc3)
+        super(MONITOREXIT, self).__init__()
 # objectref →
 # Exit monitor for object ("release the lock" - end of synchronized() section)
 
+
 class MULTIANEWARRAY(Opcode):
+    code = 0xc5
+
     def __init__(self):
-        super(MULTIANEWARRAY, self).__init__(0xc5)
+        super(MULTIANEWARRAY, self).__init__()
 # 3: indexbyte1, indexbyte2, dimensions
 # count1, [count2,...] → arrayref
 # Create a new array of dimensions dimensions with elements of type identified
@@ -1407,15 +2079,27 @@ class NEW(Opcode):
     # args(2): indexbyte1, indexbyte2   → objectref
     # Create new object of type identified by class reference in constant pool index
     # (indexbyte1 << 8 + indexbyte2)
+    code = 0xbb
+
     def __init__(self, classname):
-        super(NEW, self).__init__(0xbb)
+        super(NEW, self).__init__()
         self.classref = Classref(classname)
 
     def __len__(self):
         return 3
 
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        classref = reader.constant_pool[reader.read_u2()]
+        instance = cls(
+            classref.name.bytes.decode('utf8'),
+        )
+        if dump:
+            print("    " * dump, instance)
+        return instance
+
     def write_extra(self, writer):
-        writer.write_u2(writer.constant_pool[self.classref])
+        writer.write_u2(writer.constant_pool.index(self.classref))
 
     def resolve(self, constant_pool):
         self.classref.resolve(constant_pool)
@@ -1426,15 +2110,20 @@ class NEW(Opcode):
 
 
 class NEWARRAY(Opcode):
+    code = 0xbc
+
     def __init__(self):
-        super(NEWARRAY, self).__init__(0xbc)
+        super(NEWARRAY, self).__init__()
 # 1: atype
 # count → arrayref
 # Create new array with count elements of primitive type identified by atype
 
+
 class NOP(Opcode):
+    code = 0x00
+
     def __init__(self):
-        super(NOP, self).__init__(0x00)
+        super(NOP, self).__init__()
 # [No change]
 # Perform no operation
 
@@ -1442,8 +2131,10 @@ class NOP(Opcode):
 class POP(Opcode):
     # Stack: value →
     # Discard the top value on the stack
+    code = 0x57
+
     def __init__(self):
-        super(POP, self).__init__(0x57)
+        super(POP, self).__init__()
 
     @property
     def stack_effect(self):
@@ -1451,31 +2142,70 @@ class POP(Opcode):
 
 
 class POP2(Opcode):
+    code = 0x58
+
     def __init__(self):
-        super(POP2, self).__init__(0x58)
+        super(POP2, self).__init__()
 # {value2, value1} →
 # Discard the top two values on the stack (or one value, if it is a double or long)
 
 
 class PUTFIELD(Opcode):
+    code = 0xb5
+
     def __init__(self):
-        super(PUTFIELD, self).__init__(0xb5)
+        super(PUTFIELD, self).__init__()
 # 2: indexbyte1, indexbyte2
 # objectref, value →
 # Set field to value in an object objectref, where the field is identified by a
 # field reference index in constant pool (indexbyte1 << 8 + indexbyte2)
 
+
 class PUTSTATIC(Opcode):
-    def __init__(self):
-        super(PUTSTATIC, self).__init__(0xb3)
-# 2: indexbyte1, indexbyte2
-# value →
-# Set static field to value in a class, where the field is identified by a field
-# reference index in constant pool (indexbyte1 << 8 + indexbyte2)
+    # Set static field to value in a class, where the field is identified by a field
+    # reference index in constant pool (indexbyte1 << 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: value →
+    code = 0xb3
+
+    def __init__(self, classname, fieldname, descriptor):
+        super(PUTSTATIC, self).__init__()
+        self.field = Fieldref(classname, fieldname, descriptor)
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.field
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        field = reader.constant_pool[reader.read_u2()]
+        instance = cls(
+            field.klass.name.bytes.decode('utf8'),
+            field.name_and_type.name.bytes.decode('utf8'),
+            field.name_and_type.descriptor.bytes.decode('utf8')
+        )
+        if dump:
+            print("    " * dump, instance)
+        return instance
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.field))
+
+    def resolve(self, constant_pool):
+        self.field.resolve(constant_pool)
+
+    @property
+    def stack_effect(self):
+        return -1
+
 
 class RET(Opcode):
+    code = 0xa9
+
     def __init__(self):
-        super(RET, self).__init__(0xa9)
+        super(RET, self).__init__()
 # 1: index
 # [No change]
 # Continue execution from address taken from a local variable #index (the
@@ -1485,8 +2215,10 @@ class RET(Opcode):
 class RETURN(Opcode):
     # Return void from method
     # Stack:→ [empty]
+    code = 0xb1
+
     def __init__(self):
-        super(RETURN, self).__init__(0xb1)
+        super(RETURN, self).__init__()
 
     @property
     def stack_effect(self):
@@ -1494,26 +2226,42 @@ class RETURN(Opcode):
 
 
 class SALOAD(Opcode):
+    code = 0x35
+
     def __init__(self):
-        super(SALOAD, self).__init__(0x35)
+        super(SALOAD, self).__init__()
 # arrayref, index → value
 # Load short from array
 
+
 class SASTORE(Opcode):
+    code = 0x56
+
     def __init__(self):
-        super(SASTORE, self).__init__(0x56)
+        super(SASTORE, self).__init__()
 # arrayref, index, value →
 # Store short to array
+
 
 class SIPUSH(Opcode):
     # args(2): byte1, byte2
     # → value push a short onto the stack
+    code = 0x11
+
     def __init__(self, const):
-        super(SIPUSH, self).__init__(0x11)
+        super(SIPUSH, self).__init__()
         self.const = const
 
     def __len__(self):
         return 3
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        const = reader.read_u2()
+        instance = cls(const)
+        if dump:
+            print("    " * dump, instance)
+        return instance
 
     def write_extra(self, writer):
         writer.write_u2(self.const)
@@ -1524,22 +2272,30 @@ class SIPUSH(Opcode):
 
 
 class SWAP(Opcode):
+    # Swaps two top words on the stack (note that value1 and value2 must not be
+    # double or long)
+    # Stack: value2, value1 → value1, value2
+    code = 0x5f
+
     def __init__(self):
-        super(SWAP, self).__init__(0x5f)
-# value2, value1 → value1, value2
-# Swaps two top words on the stack (note that value1 and value2 must not be
-# double or long)
+        super(SWAP, self).__init__()
+
 
 class TABLESWITCH(Opcode):
+    code = 0xaa
+
     def __init__(self):
-        super(TABLESWITCH, self).__init__(0xaa)
+        super(TABLESWITCH, self).__init__()
 # 4+: [0-3 bytes padding], defaultbyte1, defaultbyte2, defaultbyte3, defaultbyte4, lowbyte1, lowbyte2, lowbyte3, lowbyte4, highbyte1, highbyte2, highbyte3, highbyte4, jump offsets...
 # index →
 # continue execution from an address in the table at offset index
 
+
 class WIDE(Opcode):
+    code = 0xc4
+
     def __init__(self):
-        super(WIDE, self).__init__(0xc4)
+        super(WIDE, self).__init__()
 # 3/5: Opcode, indexbyte1, indexbyte2
 # or
 # iinc, indexbyte1, indexbyte2, countbyte1, countbyte2

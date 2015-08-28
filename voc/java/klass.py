@@ -1,6 +1,9 @@
 import struct
 
+from .attributes import Attribute
 from .constants import Classref, ConstantPool
+from .fields import Field
+from .methods import Method
 
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 
@@ -49,24 +52,45 @@ from .constants import Classref, ConstantPool
 
 
 class ClassFileWriter:
-    def __init__(self, out, constant_pool):
-        self._out = out
+    def __init__(self, outfile, constant_pool):
+        self._outfile = outfile
         self.constant_pool = constant_pool
 
     def write_bytes(self, b):
-        self._out.write(b)
+        self._outfile.write(b)
 
     def write_u1(self, u1):
-        self._out.write(struct.pack('B', u1))
+        self._outfile.write(struct.pack('B', u1))
 
     def write_u2(self, u2):
-        self._out.write(struct.pack('>H', u2))
+        self._outfile.write(struct.pack('>H', u2))
 
     def write_u4(self, u4):
-        self._out.write(struct.pack('>I', u4))
+        self._outfile.write(struct.pack('>I', u4))
 
     def write_u8(self, u8):
-        self._out.write(struct.pack('>L', u8))
+        self._outfile.write(struct.pack('>L', u8))
+
+
+class ClassFileReader:
+    def __init__(self, infile, constant_pool):
+        self._infile = infile
+        self.constant_pool = constant_pool
+
+    def read_bytes(self, count):
+        return self._infile.read(count)
+
+    def read_u1(self):
+        return struct.unpack('B', self._infile.read(1))[0]
+
+    def read_u2(self):
+        return struct.unpack('>H', self._infile.read(2))[0]
+
+    def read_u4(self):
+        return struct.unpack('>I', self._infile.read(4))[0]
+
+    def read_u8(self):
+        return struct.unpack('>L', self._infile.read(8))[0]
 
 
 # ------------------------------------------------------------------------
@@ -229,11 +253,90 @@ class BaseClass:
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.this_class.name)
 
-    def write(self, out):
+    @staticmethod
+    def read(infile, dump=True):
+        constant_pool = ConstantPool()
+        reader = ClassFileReader(infile, constant_pool)
+
+        magic = reader.read_u4()
+        minor_version = reader.read_u2()
+        major_version = reader.read_u2()
+
+        if dump is not None:
+            print("    " * dump, 'Magic: %x' % (magic))
+            print("    " * dump, 'Version: %s.%s' % (major_version, minor_version))
+
+        reader.constant_pool.read(reader, dump)
+
+        access_flags = reader.read_u2()
+        this_class = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
+        super_class = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
+
+        if dump is not None:
+            print("    " * dump, 'Class %s' % this_class)
+            print("    " * dump, '    Extends %s' % super_class)
+
+            access_description = ', '.join(f for f in [
+                    flag if access_flags & mask else None
+                    for flag, mask in [
+                        ('public', Class.ACC_PUBLIC),
+                        ('final', Class.ACC_FINAL),
+                        ('super', Class.ACC_SUPER),
+                        ('interface', Class.ACC_INTERFACE),
+                        ('abstract', Class.ACC_ABSTRACT),
+                        ('synthetic', Class.ACC_SYNTHETIC),
+                        ('annotation', Class.ACC_ANNOTATION),
+                        ('enum', Class.ACC_ENUM),
+                    ]
+                ] if f)
+            print("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
+
+        interfaces_count = reader.read_u2()
+        if dump is not None:
+            print("    " * (dump + 1), 'Interfaces: (%s)' % interfaces_count)
+        for i in range(0, interfaces_count):
+            Interface.read(reader, dump=dump + 2 if dump is not None else dump)
+
+        fields_count = reader.read_u2()
+        if dump is not None:
+            print("    " * (dump + 1), 'Fields: (%s)' % fields_count)
+        for i in range(0, fields_count):
+            Field.read(reader, dump=dump + 2 if dump is not None else dump)
+
+        methods_count = reader.read_u2()
+        if dump is not None:
+            print("    " * (dump + 1), 'Methods: (%s)' % methods_count)
+        for i in range(0, methods_count):
+            Method.read(reader, dump=dump + 2 if dump is not None else dump)
+
+        attributes_count = reader.read_u2()
+        if dump is not None:
+            print("    " * (dump + 1), 'Attributes: (%s)' % attributes_count)
+        for i in range(0, attributes_count):
+            Attribute.read(reader, dump=dump + 2 if dump is not None else dump)
+
+        if access_flags & BaseClass.ACC_ENUM:
+            klass = Enum
+        elif access_flags & BaseClass.ACC_INTERFACE:
+            klass = Interface
+        else:
+            klass = Class
+
+        return klass(
+            this_class,
+            supername=super_class,
+            public=bool(access_flags & BaseClass.ACC_PUBLIC),
+            final=bool(access_flags & BaseClass.ACC_FINAL),
+            abstract=bool(access_flags & BaseClass.ACC_ABSTRACT),
+            # synthetic=bool(access_flags & self.ACC_SYNTHETIC),
+            # annotation=bool(access_flags & self.ACC_ANNOTATION),
+        )
+
+    def write(self, outfile):
         """Output the classfile to the output stream provided"""
         # First, create a writer.
         constant_pool = ConstantPool()
-        writer = ClassFileWriter(out, constant_pool)
+        writer = ClassFileWriter(outfile, constant_pool)
 
         self.this_class.resolve(constant_pool)
         self.super_class.resolve(constant_pool)
@@ -262,8 +365,8 @@ class BaseClass:
         constant_pool.write(writer)
 
         writer.write_u2(self.access_flags)
-        writer.write_u2(writer.constant_pool[self.this_class])
-        writer.write_u2(writer.constant_pool[self.super_class])
+        writer.write_u2(writer.constant_pool.index(self.this_class))
+        writer.write_u2(writer.constant_pool.index(self.super_class))
 
         writer.write_u2(self.interfaces_count)
         for interface in self.interfaces:
@@ -347,7 +450,7 @@ class BaseClass:
         both class variables and instance variables, declared by this class or
         interface type.
         """
-        return len(self.interfaces)
+        return len(self.fields)
 
     @property
     def methods_count(self):
@@ -376,4 +479,4 @@ class Interface(BaseClass):
 
 class Enum(BaseClass):
     def __init__(self, name, supername=None, public=True, final=False):
-        super(Enum, self).__init__(name, supername, public=public, final=final)
+        super(Enum, self).__init__(name, supername, public=public, final=final, enum=True)
