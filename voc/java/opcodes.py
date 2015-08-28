@@ -33,14 +33,14 @@ class Opcode:
                         Opcode.opcodes[klass.code] = klass
                 except TypeError:
                     pass
-        return Opcode.opcodes[code].read_extra(reader, dump)
+        instance = Opcode.opcodes[code].read_extra(reader, dump)
+        if dump:
+            print("    " * dump, '%s: %s' % (reader.offset, instance))
+        return instance
 
     @classmethod
     def read_extra(cls, reader, dump=None):
-        instance = cls()
-        if dump:
-            print("    " * dump, instance)
-        return instance
+        return cls()
 
     def write(self, writer):
         writer.write_u1(self.code)
@@ -100,10 +100,7 @@ class ALOAD(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         var = reader.read_u1()
-        instance = cls(var)
-        if dump:
-            print("    " * dump, instance)
-        return instance
+        return cls(var)
 
     def write_extra(self, writer):
         writer.write_u1(self.var)
@@ -215,10 +212,7 @@ class ASTORE(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         var = reader.read_u1()
-        instance = cls(var)
-        if dump:
-            print("    " * dump, instance)
-        return instance
+        return cls(var)
 
     def write_extra(self, writer):
         writer.write_u1(self.var)
@@ -320,13 +314,13 @@ class BIPUSH(Opcode):
     def __len__(self):
         return 2
 
+    def __arg_repr__(self):
+        return ' ' + repr(self.const)
+
     @classmethod
     def read_extra(cls, reader, dump=None):
         const = reader.read_u1()
-        instance = cls(const)
-        if dump:
-            print("    " * dump, instance)
-        return instance
+        return cls(const)
 
     def write_extra(self, writer):
         writer.write_u1(self.const)
@@ -934,14 +928,11 @@ class GETSTATIC(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         field = reader.constant_pool[reader.read_u2()]
-        instance = cls(
+        return cls(
             field.klass.name.bytes.decode('utf8'),
             field.name_and_type.name.bytes.decode('utf8'),
             field.name_and_type.descriptor.bytes.decode('utf8')
         )
-        if dump:
-            print("    " * dump, instance)
-        return instance
 
     def write_extra(self, writer):
         writer.write_u2(writer.constant_pool.index(self.field))
@@ -955,14 +946,29 @@ class GETSTATIC(Opcode):
 
 
 class GOTO(Opcode):
+    # Goes to another instruction at branchoffset (signed short constructed from
+    # unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: [no change]
     code = 0xa7
 
-    def __init__(self):
+    def __init__(self, offset):
         super(GOTO, self).__init__()
-# 2: branchbyte1, branchbyte2
-# [no change]
-# Goes to another instruction at branchoffset (signed short constructed from
-# unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
 
 
 class GOTO_W(Opcode):
@@ -1067,66 +1073,66 @@ class IASTORE(Opcode):
 
 
 class ICONST_M1(Opcode):
+    # Load the int value -1 onto the stack
+    # Stack: → -1
     code = 0x02
 
     def __init__(self):
         super(ICONST_M1, self).__init__()
-# → -1
-# Load the int value -1 onto the stack
 
 
 class ICONST_0(Opcode):
+    # Load the int value 0 onto the stack
+    # Stack: → 0
     code = 0x03
 
     def __init__(self):
         super(ICONST_0, self).__init__()
-# → 0
-# Load the int value 0 onto the stack
 
 
 class ICONST_1(Opcode):
+    # Load the int value 1 onto the stack
+    # Stack: → 1
     code = 0x04
 
     def __init__(self):
         super(ICONST_1, self).__init__()
-# → 1
-# Load the int value 1 onto the stack
 
 
 class ICONST_2(Opcode):
+    # Load the int value 2 onto the stack
+    # Stack: → 2
     code = 0x05
 
     def __init__(self):
         super(ICONST_2, self).__init__()
-# → 2
-# Load the int value 2 onto the stack
 
 
 class ICONST_3(Opcode):
+    # Load the int value 3 onto the stack
+    # Stack: → 3
     code = 0x06
 
     def __init__(self):
         super(ICONST_3, self).__init__()
-# → 3
-# Load the int value 3 onto the stack
 
 
 class ICONST_4(Opcode):
+    # Load the int value 4 onto the stack
+    # Stack: → 4
     code = 0x07
 
     def __init__(self):
         super(ICONST_4, self).__init__()
-# → 4
-# Load the int value 4 onto the stack
 
 
 class ICONST_5(Opcode):
+    # Load the int value 5 onto the stack
+    # Stack: → 5
     code = 0x08
 
     def __init__(self):
         super(ICONST_5, self).__init__()
-# → 5
-# Load the int value 5 onto the stack
 
 
 class IDIV(Opcode):
@@ -1139,175 +1145,510 @@ class IDIV(Opcode):
 
 
 class IF_ACMPEQ(Opcode):
+    # If references are equal, branch to instruction at branchoffset (signed short
+    # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value1, value2 →
     code = 0xa5
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IF_ACMPEQ, self).__init__()
-# 2: branchbyte1, branchbyte2 value1, value2 →
-# If references are equal, branch to instruction at branchoffset (signed short
-# constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -2
 
 
 class IF_ACMPNE(Opcode):
+    # If references are not equal, branch to instruction at branchoffset (signed
+    # short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value1, value2 →
     code = 0xa6
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IF_ACMPNE, self).__init__()
-# 2: branchbyte1, branchbyte2 value1, value2 →
-# If references are not equal, branch to instruction at branchoffset (signed
-# short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -2
 
 
 class IF_ICMPEQ(Opcode):
+    # If ints are equal, branch to instruction at branchoffset (signed short
+    # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value1, value2 →
     code = 0x9f
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IF_ICMPEQ, self).__init__()
-# 2: branchbyte1, branchbyte2 value1, value2 →
-# If ints are equal, branch to instruction at branchoffset (signed short
-# constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -2
 
 
 class IF_ICMPGE(Opcode):
+    # If value1 is greater than or equal to value2, branch to instruction at
+    # Iranchoffset (signed short constructed from unsigned bytes branchbyte1 << 8 +
+    # branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value1, value2 →
     code = 0xa2
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IF_ICMPGE, self).__init__()
-# 2: branchbyte1, branchbyte2 value1, value2 →
-# If value1 is greater than or equal to value2, branch to instruction at
-# Iranchoffset (signed short constructed from unsigned bytes branchbyte1 << 8 +
-# branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -2
 
 
 class IF_ICMPGT(Opcode):
+    # If value1 is greater than value2, branch to instruction at branchoffset
+    # (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value1, value2 →
     code = 0xa3
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IF_ICMPGT, self).__init__()
-# 2: branchbyte1, branchbyte2 value1, value2 →
-# If value1 is greater than value2, branch to instruction at branchoffset
-# (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -2
 
 
 class IF_ICMPLE(Opcode):
+    # If value1 is less than or equal to value2, branch to instruction at
+    # Iranchoffset (signed short constructed from unsigned bytes branchbyte1 << 8 +
+    # branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value1, value2 →
     code = 0xa4
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IF_ICMPLE, self).__init__()
-# 2: branchbyte1, branchbyte2 value1, value2 →
-# If value1 is less than or equal to value2, branch to instruction at
-# Iranchoffset (signed short constructed from unsigned bytes branchbyte1 << 8 +
-# branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -2
 
 
 class IF_ICMPLT(Opcode):
+    # If value1 is less than value2, branch to instruction at branchoffset (signed
+    # short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value1, value2 →
     code = 0xa1
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IF_ICMPLT, self).__init__()
-# 2: branchbyte1, branchbyte2 value1, value2 →
-# If value1 is less than value2, branch to instruction at branchoffset (signed
-# short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -2
 
 
 class IF_ICMPNE(Opcode):
+    # If ints are not equal, branch to instruction at branchoffset (signed short
+    # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value1, value2 →
     code = 0xa0
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IF_ICMPNE, self).__init__()
-# 2: branchbyte1, branchbyte2 value1, value2 →
-# If ints are not equal, branch to instruction at branchoffset (signed short
-# constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -2
 
 
 class IFEQ(Opcode):
+    # If value is 0, branch to instruction at branchoffset (signed short constructed
+    # from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value →
     code = 0x99
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IFEQ, self).__init__()
-# 2: branchbyte1, branchbyte2 value →
-# If value is 0, branch to instruction at branchoffset (signed short constructed
-# from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class IFGE(Opcode):
+    # If value is greater than or equal to 0, branch to instruction at branchoffset
+    # (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value →
     code = 0x9c
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IFGE, self).__init__()
-# 2: branchbyte1, branchbyte2 value →
-# If value is greater than or equal to 0, branch to instruction at branchoffset
-# (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class IFGT(Opcode):
+    # If value is greater than 0, branch to instruction at branchoffset (signed
+    # short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value →
     code = 0x9d
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IFGT, self).__init__()
-# 2: branchbyte1, branchbyte2 value →
-# If value is greater than 0, branch to instruction at branchoffset (signed
-# short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class IFLE(Opcode):
+    # If value is less than or equal to 0, branch to instruction at branchoffset
+    # (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value →
     code = 0x9e
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IFLE, self).__init__()
-# 2: branchbyte1, branchbyte2 value →
-# If value is less than or equal to 0, branch to instruction at branchoffset
-# (signed short constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class IFLT(Opcode):
+    # If value is less than 0, branch to instruction at branchoffset (signed short
+    # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value →
     code = 0x9b
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IFLT, self).__init__()
-# 2: branchbyte1, branchbyte2 value →
-# If value is less than 0, branch to instruction at branchoffset (signed short
-# constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class IFNE(Opcode):
+    # If value is not 0, branch to instruction at branchoffset (signed short
+    # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value →
     code = 0x9a
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IFNE, self).__init__()
-# 2: branchbyte1, branchbyte2 value →
-# If value is not 0, branch to instruction at branchoffset (signed short
-# constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class IFNONNULL(Opcode):
+    # If value is not null, branch to instruction at branchoffset (signed short
+    # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value →
     code = 0xc7
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IFNONNULL, self).__init__()
-# 2: branchbyte1, branchbyte2 value →
-# If value is not null, branch to instruction at branchoffset (signed short
-# constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class IFNULL(Opcode):
+    # If value is null, branch to instruction at branchoffset (signed short
+    # constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+    # Args(2): branchbyte1, branchbyte2
+    # Stack: value →
     code = 0xc6
 
-    def __init__(self):
+    def __init__(self, offset):
         super(IFNULL, self).__init__()
-# 2: branchbyte1, branchbyte2 value →
-# If value is null, branch to instruction at branchoffset (signed short
-# constructed from unsigned bytes branchbyte1 << 8 + branchbyte2)
+        self.offset = offset
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s2()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s2(self.offset)
+
+    @property
+    def stack_effect(self):
+        return -1
 
 
 class IINC(Opcode):
+    # Increment local variable #index by signed byte const
+    # Args(2): index, const
+    # Stack: [No change]
     code = 0x84
 
-    def __init__(self):
+    def __init__(self, index, const):
         super(IINC, self).__init__()
-# 2: index, const
-# [No change]
-# Increment local variable #index by signed byte const
+        self.index = index
+        self.const = const
+
+    def __len__(self):
+        return 3
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        index = reader.read_u1()
+        const = reader.read_u1()
+        return cls(index, const)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.index)
+        writer.write_u1(self.value)
 
 
 class ILOAD(Opcode):
@@ -1451,14 +1792,11 @@ class INVOKESPECIAL(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         method = reader.constant_pool[reader.read_u2()]
-        instance = cls(
+        return cls(
             method.klass.name.bytes.decode('utf8'),
             method.name_and_type.name.bytes.decode('utf8'),
             method.name_and_type.descriptor.bytes.decode('utf8')
         )
-        if dump:
-            print("    " * dump, instance)
-        return instance
 
     def write_extra(self, writer):
         writer.write_u2(writer.constant_pool.index(self.method))
@@ -1495,14 +1833,11 @@ class INVOKESTATIC(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         method = reader.constant_pool[reader.read_u2()]
-        instance = cls(
+        return cls(
             method.klass.name.bytes.decode('utf8'),
             method.name_and_type.name.bytes.decode('utf8'),
             method.name_and_type.descriptor.bytes.decode('utf8')
         )
-        if dump:
-            print("    " * dump, instance)
-        return instance
 
     def write_extra(self, writer):
         writer.write_u2(writer.constant_pool.index(self.method))
@@ -1539,14 +1874,11 @@ class INVOKEVIRTUAL(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         method = reader.constant_pool[reader.read_u2()]
-        instance = cls(
+        return cls(
             method.klass.name.bytes.decode('utf8'),
             method.name_and_type.name.bytes.decode('utf8'),
             method.name_and_type.descriptor.bytes.decode('utf8')
         )
-        if dump:
-            print("    " * dump, instance)
-        return instance
 
     def write_extra(self, writer):
         writer.write_u2(writer.constant_pool.index(self.method))
@@ -1802,7 +2134,7 @@ class LDC(Opcode):
             raise TypeError('Invalid type for LDC: %s' % type(const))
 
     def __arg_repr__(self):
-        return ' %s' % self.const
+        return ' %s' % self.const.value
 
     def __len__(self):
         return 2
@@ -1810,10 +2142,7 @@ class LDC(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         const = reader.read_u1()
-        instance = cls(const)
-        if dump:
-            print("    " * dump, instance)
-        return instance
+        return cls(const)
 
     def write_extra(self, writer):
         writer.write_u1(writer.constant_pool.index(self.const))
@@ -2091,12 +2420,9 @@ class NEW(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         classref = reader.constant_pool[reader.read_u2()]
-        instance = cls(
+        return cls(
             classref.name.bytes.decode('utf8'),
         )
-        if dump:
-            print("    " * dump, instance)
-        return instance
 
     def write_extra(self, writer):
         writer.write_u2(writer.constant_pool.index(self.classref))
@@ -2181,14 +2507,11 @@ class PUTSTATIC(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         field = reader.constant_pool[reader.read_u2()]
-        instance = cls(
+        return cls(
             field.klass.name.bytes.decode('utf8'),
             field.name_and_type.name.bytes.decode('utf8'),
             field.name_and_type.descriptor.bytes.decode('utf8')
         )
-        if dump:
-            print("    " * dump, instance)
-        return instance
 
     def write_extra(self, writer):
         writer.write_u2(writer.constant_pool.index(self.field))
@@ -2258,10 +2581,7 @@ class SIPUSH(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         const = reader.read_u2()
-        instance = cls(const)
-        if dump:
-            print("    " * dump, instance)
-        return instance
+        return cls(const)
 
     def write_extra(self, writer):
         writer.write_u2(self.const)

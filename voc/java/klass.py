@@ -62,6 +62,9 @@ class ClassFileWriter:
     def write_u1(self, u1):
         self._outfile.write(struct.pack('B', u1))
 
+    def write_s2(self, u2):
+        self._outfile.write(struct.pack('>h', u2))
+
     def write_u2(self, u2):
         self._outfile.write(struct.pack('>H', u2))
 
@@ -82,6 +85,9 @@ class ClassFileReader:
 
     def read_u1(self):
         return struct.unpack('B', self._infile.read(1))[0]
+
+    def read_s2(self):
+        return struct.unpack('>h', self._infile.read(2))[0]
 
     def read_u2(self):
         return struct.unpack('>H', self._infile.read(2))[0]

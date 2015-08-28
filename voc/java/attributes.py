@@ -29,7 +29,14 @@ class Attribute:
         if dump is not None:
             print("    " * dump, '%s (%s bytes)' % (name, size))
 
-        return globals()[name].read_info(reader, dump + 1 if dump is not None else dump)
+        try:
+            return globals()[name].read_info(reader, dump + 1 if dump is not None else dump)
+        except KeyError:
+            # Unknown attribute - just read the bytes and ignore them.
+            if dump is not None:
+                print("    " * (dump + 1), 'Reading and ignoring %s bytes' % size)
+
+            reader.read_bytes(size)
 
     def write(self, writer):
         writer.write_u2(writer.constant_pool.index(self.name))
@@ -373,6 +380,7 @@ class Code(Attribute):
         code = []
         i = 0
         while i < code_length:
+            reader.offset = i
             opcode = Opcode.read(reader, dump=dump + 1 if dump is not None else dump)
             code.append(opcode)
             i += len(opcode)
@@ -444,270 +452,608 @@ class Code(Attribute):
 # 4.7.4. The StackMapTable Attribute
 # ------------------------------------------------------------------------
 
-# The StackMapTable attribute is a variable-length attribute in the attributes table of a Code (§4.7.3) attribute. This attribute is used during the process of verification by type checking (§4.10.1). A method's Code attribute may have at most one StackMapTable attribute.
+# The StackMapTable attribute is a variable-length attribute in the attributes
+# table of a Code (§4.7.3) attribute. This attribute is used during the process
+# of verification by type checking (§4.10.1). A method's Code attribute may have
+# at most one StackMapTable attribute.
 
-# A StackMapTable attribute consists of zero or more stack map frames. Each stack map frame specifies (either explicitly or implicitly) a bytecode offset, the verification types (§4.10.1.2) for the local variables, and the verification types for the operand stack.
+# A StackMapTable attribute consists of zero or more stack map frames. Each
+# stack map frame specifies (either explicitly or implicitly) a bytecode offset,
+# the verification types (§4.10.1.2) for the local variables, and the
+# verification types for the operand stack.
 
-# The type checker deals with and manipulates the expected types of a method's local variables and operand stack. Throughout this section, a location refers to either a single local variable or to a single operand stack entry.
+# The type checker deals with and manipulates the expected types of a method's
+# local variables and operand stack. Throughout this section, a location refers
+# to either a single local variable or to a single operand stack entry.
 
-# We will use the terms stack map frame and type state interchangeably to describe a mapping from locations in the operand stack and local variables of a method to verification types. We will usually use the term stack map frame when such a mapping is provided in the class file, and the term type state when the mapping is used by the type checker.
+# We will use the terms stack map frame and type state interchangeably to
+# describe a mapping from locations in the operand stack and local variables of
+# a method to verification types. We will usually use the term stack map frame
+# when such a mapping is provided in the class file, and the term type state
+# when the mapping is used by the type checker.
 
-# In a class file whose version number is greater than or equal to 50.0, if a method's Code attribute does not have a StackMapTable attribute, it has an implicit stack map attribute. This implicit stack map attribute is equivalent to a StackMapTable attribute with number_of_entries equal to zero.
+# In a class file whose version number is greater than or equal to 50.0, if a
+# method's Code attribute does not have a StackMapTable attribute, it has an
+# implicit stack map attribute. This implicit stack map attribute is equivalent
+# to a StackMapTable attribute with number_of_entries equal to zero.
 
-# The StackMapTable attribute has the following format:
 
-# StackMapTable_attribute {
-#     u2              attribute_name_index;
-#     u4              attribute_length;
-#     u2              number_of_entries;
-#     stack_map_frame entries[number_of_entries];
-# }
-# The items of the StackMapTable_attribute structure are as follows:
+class StackMapTable(Attribute):
+    # The StackMapTable attribute has the following format:
 
-# attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "StackMapTable".
+    # u2 attribute_name_index;
+    # u4 attribute_length;
+    # u2 number_of_entries;
+    # stack_map_frame entries[number_of_entries];
 
-# attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+    def __init__(self, entries=None):
+        super(StackMapTable, self).__init__()
 
-# number_of_entries
-# The value of the number_of_entries item gives the number of stack_map_frame entries in the entries table.
+        # The entries array gives the method's stack_map_frame structures.
 
-# entries
-# The entries array gives the method's stack_map_frame structures.
+        # Each stack_map_frame structure specifies the type state at a
+        # particular bytecode offset. Each frame type specifies (explicitly or
+        # implicitly) a value, offset_delta, that is used to calculate the
+        # actual bytecode offset at which a frame applies. The bytecode offset
+        # at which a frame applies is calculated by adding offset_delta + 1 to
+        # the bytecode offset of the previous frame, unless the previous frame
+        # is the initial frame of the method, in which case the bytecode offset
+        # is offset_delta.
 
-# Each stack_map_frame structure specifies the type state at a particular bytecode offset. Each frame type specifies (explicitly or implicitly) a value, offset_delta, that is used to calculate the actual bytecode offset at which a frame applies. The bytecode offset at which a frame applies is calculated by adding offset_delta + 1 to the bytecode offset of the previous frame, unless the previous frame is the initial frame of the method, in which case the bytecode offset is offset_delta.
+        # By using an offset delta rather than the actual bytecode offset we
+        # ensure, by definition, that stack map frames are in the correctly
+        # sorted order. Furthermore, by consistently using the formula
+        # offset_delta + 1 for all explicit frames, we guarantee the absence of
+        # duplicates.
 
-# By using an offset delta rather than the actual bytecode offset we ensure, by definition, that stack map frames are in the correctly sorted order. Furthermore, by consistently using the formula offset_delta + 1 for all explicit frames, we guarantee the absence of duplicates.
+        # We say that an instruction in the bytecode has a corresponding stack
+        # map frame if the instruction starts at offset i in the code array of a
+        # Code attribute, and the Code attribute has a StackMapTable attribute
+        # whose entries array has a stack_map_frame structure that applies at
+        # bytecode offset i.
 
-# We say that an instruction in the bytecode has a corresponding stack map frame if the instruction starts at offset i in the code array of a Code attribute, and the Code attribute has a StackMapTable attribute whose entries array has a stack_map_frame structure that applies at bytecode offset i.
+        # The stack_map_frame structure consists of a one-byte tag followed by
+        # zero or more bytes, giving more information, depending upon the tag.
+        self.entries = entries if entries is not None else []
 
-# The stack_map_frame structure consists of a one-byte tag followed by zero or more bytes, giving more information, depending upon the tag.
+    def __repr__(self):
+        return '<StackMapTable (%d entries)>' % self.number_of_entries
+
+    @property
+    def number_of_entries(self):
+        """The value of the number_of_entries item gives the number of
+        # stack_map_frame entries in the entries table.
+        """
+        return len(self.entries)
+
+    @staticmethod
+    def read_info(reader, dump=None):
+        number_of_entries = reader.read_u2()
+        if dump is not None:
+            print("    " * dump, 'Entries: (%d entries)' % number_of_entries)
+
+        entries = []
+        for i in range(0, number_of_entries):
+            entries.append(StackMapFrame.read(reader, dump=dump + 1 if dump is not None else dump))
+
+        return StackMapTable(entries)
+
+    def write_info(self, writer):
+        writer.write_u2(self.number_of_entries)
+        for entry in self.entries:
+            entry.write(writer)
+
+    def resolve_info(self, constant_pool):
+        for entry in self.entries:
+            entry.resolve(constant_pool)
+
 
 # A stack map frame may belong to one of several frame types:
 
-# union stack_map_frame {
-#     same_frame;
-#     same_locals_1_stack_item_frame;
-#     same_locals_1_stack_item_frame_extended;
-#     chop_frame;
-#     same_frame_extended;
-#     append_frame;
-#     full_frame;
-# }
-# All frame types, even full_frame, rely on the previous frame for some of their semantics. This raises the question of what is the very first frame? The initial frame is implicit, and computed from the method descriptor. (See the Prolog predicate methodInitialStackFrame (§4.10.1.6).)
+class StackMapFrame:
+    def __init__(self, frame_type):
+        self.frame_type = frame_type
 
-# The frame type same_frame is represented by tags in the range [0-63]. If the frame type is same_frame, it means the frame has exactly the same locals as the previous stack map frame and that the number of stack items is zero. The offset_delta value for the frame is the value of the tag item, frame_type.
+    @staticmethod
+    def read(reader, dump=None):
+        frame_type = reader.read_u1()
+        if 0 <= frame_type <= 63:
+            frameClass = SameFrame
+        elif 64 <= frame_type <= 127:
+            frameClass = SameLocals1StackItemFrame
+        elif frame_type == 247:
+            frameClass = SameLocals1StackItemFrameExtended
+        elif 248 <= frame_type <= 250:
+            frameClass = ChopFrame
+        elif frame_type == 251:
+            frameClass = SameFrameExtended
+        elif 252 <= frame_type <= 254:
+            frameClass = AppendFrame
+        elif frame_type == 254:
+            frameClass = FullFrame
 
-# same_frame {
-#     u1 frame_type = SAME; /* 0-63 */
-# }
+        stack_map_frame = frameClass.read_info(reader, frame_type)
 
-# The frame type same_locals_1_stack_item_frame is represented by tags in the range [64, 127]. If the frame_type is same_locals_1_stack_item_frame, it means the frame has exactly the same locals as the previous stack map frame and that the number of stack items is 1. The offset_delta value for the frame is the value (frame_type - 64). There is a verification_type_info following the frame_type for the one stack item.
+        if dump is not None:
+            print("    " * dump, stack_map_frame)
 
-# same_locals_1_stack_item_frame {
-#     u1 frame_type = SAME_LOCALS_1_STACK_ITEM; /* 64-127 */
-#     verification_type_info stack[1];
-# }
+        return stack_map_frame
+
+    def write(self, writer):
+        writer.write_u1(self.frame_type)
+        self.write_info(writer)
+
+    def write_info(self, writer):
+        pass
+
+
+# All frame types, even full_frame, rely on the previous frame for some of
+# their semantics. This raises the question of what is the very first frame?
+# The initial frame is implicit, and computed from the method descriptor. (See
+# the Prolog predicate methodInitialStackFrame (§4.10.1.6).)
+
+
+class SameFrame(StackMapFrame):
+    # The frame type same_frame is represented by tags in the range [0-63]. If
+    # the frame type is same_frame, it means the frame has exactly the same
+    # locals as the previous stack map frame and that the number of stack
+    # items is zero. The offset_delta value for the frame is the value of the
+    # tag item, frame_type.
+
+    # u1 frame_type = SAME; /* 0-63 */
+
+    def __init__(self, offset_delta):
+        super().__init__(offset_delta)
+
+    def __repr__(self):
+        return '<SameFrame %s>' % self.frame_type
+
+    @property
+    def offset_delta(self):
+        return self.frame_type
+
+    @staticmethod
+    def read_info(reader, frame_type):
+        return SameFrame(frame_type)
+
+
+class SameLocals1StackItemFrame(StackMapFrame):
+    # The frame type same_locals_1_stack_item_frame is represented by tags in
+    # the range [64, 127]. If the frame_type is
+    # same_locals_1_stack_item_frame, it means the frame has exactly the same
+    # locals as the previous stack map frame and that the number of stack
+    # items is 1. The offset_delta value for the frame is the value
+    # (frame_type - 64). There is a verification_type_info following the
+    # frame_type for the one stack item.
+
+    # u1 frame_type = SAME_LOCALS_1_STACK_ITEM; /* 64-127 */
+    # verification_type_info stack[1];
+
+    def __init__(self, offset_delta, verification_type_info):
+        super().__init__(offset_delta + 64)
+        self.verification_type_info = verification_type_info
+
+    def __repr__(self):
+        return '<SameLocals1StackItemFrame %s>' % self.offset_delta
+
+    @property
+    def offset_delta(self):
+        return self.frame_type - 64
+
+    @staticmethod
+    def read_info(reader, frame_type):
+        verification_type_info = VerificationTypeInfo.read(reader)
+        return SameLocals1StackItemFrame(frame_type - 64, verification_type_info)
+
+    def write_info(self, writer):
+        self.verification_type_info.write(writer)
+
+
 # Tags in the range [128-246] are reserved for future use.
 
-# The frame type same_locals_1_stack_item_frame_extended is represented by the tag 247. The frame type same_locals_1_stack_item_frame_extended indicates that the frame has exactly the same locals as the previous stack map frame and that the number of stack items is 1. The offset_delta value for the frame is given explicitly. There is a verification_type_info following the frame_type for the one stack item.
 
-# same_locals_1_stack_item_frame_extended {
-#     u1 frame_type = SAME_LOCALS_1_STACK_ITEM_EXTENDED; /* 247 */
-#     u2 offset_delta;
-#     verification_type_info stack[1];
-# }
+class SameLocals1StackItemFrameExtended(StackMapFrame):
+    # The frame type same_locals_1_stack_item_frame_extended is represented by
+    # the tag 247. The frame type same_locals_1_stack_item_frame_extended
+    # indicates that the frame has exactly the same locals as the previous
+    # stack map frame and that the number of stack items is 1. The
+    # offset_delta value for the frame is given explicitly. There is a
+    # verification_type_info following the frame_type for the one stack item.
+
+    # u1 frame_type = SAME_LOCALS_1_STACK_ITEM_EXTENDED; /* 247 */
+    # u2 offset_delta;
+    # verification_type_info stack[1];
+
+    def __init__(self, offset_delta, verification_type_info):
+        super().__init__(247)
+        self.offset_delta = offset_delta
+        self.verification_type_info = verification_type_info
+
+    def __repr__(self):
+        return '<SameLocals1StackItemFrameExtended %s>' % self.offset_delta
+
+    @staticmethod
+    def read_info(reader, frame_type):
+        offset_delta = reader.read_u2()
+        verification_type_info = VerificationTypeInfo.read(reader)
+        return SameLocals1StackItemFrameExtended(offset_delta, verification_type_info)
+
+    def write_info(self, writer):
+        writer.write_u2(self.offset_delta)
+        self.verification_type_info.write(writer)
+
+
+class ChopFrame(StackMapFrame):
+    # The frame type chop_frame is represented by tags in the range [248-250].
+    # If the frame_type is chop_frame, it means that the operand stack is
+    # empty and the current locals are the same as the locals in the previous
+    # frame, except that the k last locals are absent. The value of k is given
+    # by the formula 251 - frame_type.
+
+    # u1 frame_type = CHOP; /* 248-250 */
+    # u2 offset_delta;
+
+    def __init__(self, k, offset_delta):
+        super().__init__(251-k)
+        self.offset_delta = offset_delta
+
+    def __repr__(self):
+        return '<ChopFrame %s, k=%s>' % (self.offset_delta, self.k)
+
+    @property
+    def k(self):
+        return 251 - self.frame_type
+
+    @staticmethod
+    def read_info(reader, frame_type):
+        offset_delta = reader.read_u2()
+        return ChopFrame(251 - frame_type, offset_delta)
+
+    def write_info(self, writer):
+        writer.write_u2(self.offset_delta)
+
+
+class SameFrameExtended(StackMapFrame):
+    # The frame type same_frame_extended is represented by the tag value 251.
+    # If the frame type is same_frame_extended, it means the frame has exactly
+    # the same locals as the previous stack map frame and that the number of
+    # stack items is zero.
+
+    # u1 frame_type = SAME_FRAME_EXTENDED; /* 251 */
+    # u2 offset_delta;
+
+    def __init__(self, k, offset_delta):
+        super().__init__(251)
+        self.offset_delta = offset_delta
+
+    def __repr__(self):
+        return '<SameFrameExtended %s>' % self.offset_delta
+
+    @property
+    def k(self):
+        return 251 - self.frame_type
+
+    @staticmethod
+    def read_info(reader, frame_type):
+        offset_delta = reader.read_u2()
+        return SameFrameExtended(offset_delta)
+
+    def write_info(self, writer):
+        writer.write_u2(self.offset_delta)
+
+
+class AppendFrame(StackMapFrame):
+    # The frame type append_frame is represented by tags in the range
+    # [252-254]. If the frame_type is append_frame, it means that the operand
+    # stack is empty and the current locals are the same as the locals in the
+    # previous frame, except that k additional locals are defined. The value
+    # of k is given by the formula frame_type - 251.
+
+    # u1 frame_type = APPEND; /* 252-254 */
+    # u2 offset_delta;
+    # verification_type_info locals[frame_type - 251];
+
+    # The 0th entry in locals represents the type of the first additional local
+    # variable. If locals[M] represents local variable N, then locals[M+1]
+    # represents local variable N+1 if locals[M] is one of:
+    #
+    # * Top_variable_info
+    # * Integer_variable_info
+    # * Float_variable_info
+    # * Null_variable_info
+    # * UninitializedThis_variable_info
+    # * Object_variable_info
+    # * Uninitialized_variable_info
+    #
+    # Otherwise locals[M+1] represents local variable N+2.
+    #
+    # It is an error if, for any index i, locals[i] represents a local
+    # variable whose index is greater than the maximum number of local
+    # variables for the method.
+
+    def __init__(self, k, offset_delta, locals):
+        super().__init__(k + 251)
+        self.offset_delta = offset_delta
+        self.locals = locals
+
+    def __repr__(self):
+        return '<AppendFrame %s, k=%s, locals=%s>' % (self.offset_delta, self.k, self.locals)
+
+    @property
+    def k(self):
+        return self.frame_type - 251
+
+    @staticmethod
+    def read_info(reader, frame_type):
+        offset_delta = reader.read_u2()
+        locals = []
+        for i in range(0, frame_type - 251):
+            locals.append(VerificationTypeInfo.read(reader))
+        return AppendFrame(frame_type - 251, offset_delta, locals)
+
+    def write_info(self, writer):
+        writer.write_u2(self.offset_delta)
+        for local in self.locals:
+            local.write(writer)
+
+
+class FullFrame(StackMapFrame):
+    # The frame type full_frame is represented by the tag value 255.
+
+    # u1 frame_type = FULL_FRAME; /* 255 */
+    # u2 offset_delta;
+    # u2 number_of_locals;
+    # verification_type_info locals[number_of_locals];
+    # u2 number_of_stack_items;
+    # verification_type_info stack[number_of_stack_items];
+
+    # The 0th entry in locals represents the type of local variable 0. If
+    # locals[M] represents local variable N, then locals[M+1] represents local
+    # variable N+1 if locals[M] is one of:
+    #
+    # * Top_variable_info
+    # * Integer_variable_info
+    # * Float_variable_info
+    # * Null_variable_info
+    # * UninitializedThis_variable_info
+    # * Object_variable_info
+    # * Uninitialized_variable_info
+    #
+    # Otherwise locals[M+1] represents local variable N+2.
+    #
+    # It is an error if, for any index i, locals[i] represents a local
+    # variable whose index is greater than the maximum number of local
+    # variables for the method.
+    #
+    # The 0th entry in stack represents the type of the bottom of the stack,
+    # and subsequent entries represent types of stack elements closer to the
+    # top of the operand stack. We shall refer to the bottom element of the
+    # stack as stack element 0, and to subsequent elements as stack element 1,
+    # 2 etc. If stack[M] represents stack element N, then stack[M+1]
+    # represents stack element N+1 if stack[M] is one of:
+    #
+    # * Top_variable_info
+    # * Integer_variable_info
+    # * Float_variable_info
+    # * Null_variable_info
+    # * UninitializedThis_variable_info
+    # * Object_variable_info
+    # * Uninitialized_variable_info
+    #
+    # Otherwise, stack[M+1] represents stack element N+2.
+    #
+    # It is an error if, for any index i, stack[i] represents a stack entry
+    # whose index is greater than the maximum operand stack size for the
+    # method.
+    pass
+
+# The verification_type_info structure consists of a one-byte tag followed by
+# zero or more bytes, giving more information about the tag. Each
+# verification_type_info structure specifies the verification type of one or
+# two locations.
+
+
+class VerificationTypeInfo:
+    ITEM_Top = 0
+    ITEM_Integer = 1
+    ITEM_Float = 2
+    ITEM_Long = 4
+    ITEM_Double = 3
+    ITEM_Null = 5
+    ITEM_UninitializedThis = 6
+    ITEM_Object = 7
+    ITEM_Uninitialized = 8
+
+    def __init__(self, tag):
+        self.tag = tag
+
+    @staticmethod
+    def read(reader):
+        tag = reader.read_u1()
+        return VerificationTypeInfo.read_info(reader, tag)
+
+    @staticmethod
+    def read_info(reader, tag):
+        if tag == VerificationTypeInfo.ITEM_Top:
+            klass = TopVariableInfo
+        if tag == VerificationTypeInfo.ITEM_Integer:
+            klass = IntegerVariableInfo
+        if tag == VerificationTypeInfo.ITEM_Float:
+            klass = FloatVariableInfo
+        if tag == VerificationTypeInfo.ITEM_Long:
+            klass = LongVariableInfo
+        if tag == VerificationTypeInfo.ITEM_Double:
+            klass = DoubleVariableInfo
+        if tag == VerificationTypeInfo.ITEM_Null:
+            klass = NullVariableInfo
+        if tag == VerificationTypeInfo.ITEM_UninitializedThis:
+            klass = UninitializedThisVariableInfo
+
+        return klass()
+
+
+class TopVariableInfo(VerificationTypeInfo):
+    # The Top_variable_info type indicates that the local variable has the
+    # verification type top.
+
+    # u1 tag = ITEM_Top; /* 0 */
+    def __init__(self):
+        super().__init__(0)
+
+    def __repr__(self):
+        return "top"
+
+
+class IntegerVariableInfo(VerificationTypeInfo):
+    # The Integer_variable_info type indicates that the location contains the
+    # verification type int.
+
+    # u1 tag = ITEM_Integer; /* 1 */
+    def __init__(self):
+        super().__init__(1)
+
+    def __repr__(self):
+        return "Integer"
+
+
+class FloatVariableInfo(VerificationTypeInfo):
+    # The Float_variable_info type indicates that the location contains the
+    # verification type float.
+
+    # u1 tag = ITEM_Float; /* 2 */
+    def __init__(self):
+        super().__init__(2)
+
+    def __repr__(self):
+        return "Float"
+
+
+class LongVariableInfo(VerificationTypeInfo):
+    # The Long_variable_info type indicates that the location contains the
+    # verification type long.
+
+    # u1 tag = ITEM_Long; /* 4 */
+
+    # This structure gives the contents of two locations in the operand stack
+    # or in the local variable array.
+    #
+    # If the location is a local variable, then:
+    # * It must not be the local variable with the highest index.
+    # * The next higher numbered local variable contains the verification type
+    #   top.
+    #
+    # If the location is an operand stack entry, then:
+    # * The current location must not be the topmost location of the operand
+    #   stack.
+    # * The next location closer to the top of the operand stack contains the
+    #   verification type top.
+    def __init__(self):
+        super().__init__(4)
+
+    def __repr__(self):
+        return "Long"
+
+
+class DoubleVariableInfo(VerificationTypeInfo):
+    # The Double_variable_info type indicates that the location contains the
+    # verification type double.
+
+    # u1 tag = ITEM_Double; /* 3 */
+
+    # This structure gives the contents of two locations in the operand stack
+    # or in the local variable array.
+    #
+    # If the location is a local variable, then:
+    #
+    # * It must not be the local variable with the highest index.
+    # * The next higher numbered local variable contains the verification type
+    #   top.
+    #
+    # If the location is an operand stack entry, then:
+    #
+    # * The current location must not be the topmost location of the operand
+    #   stack.
+    #
+    # * The next location closer to the top of the operand stack contains the
+    #   verification type top.
+    def __init__(self):
+        super().__init__(3)
+
+    def __repr__(self):
+        return "Double"
+
+
+class NullVariableInfo(VerificationTypeInfo):
+    # The Null_variable_info type indicates that location contains the verification type null.
+
+    # u1 tag = ITEM_Null; /* 5 */
+    def __init__(self):
+        super().__init__(5)
+
+    def __repr__(self):
+        return "Null"
+
+
+class UninitializedThisVariableInfo(VerificationTypeInfo):
+    # The UninitializedThis_variable_info type indicates that the location
+    # contains the verification type uninitializedThis.
+
+    # u1 tag = ITEM_UninitializedThis; /* 6 */
+    def __init__(self):
+        super().__init__(6)
+
+    def __repr__(self):
+        return "Unitialized this"
+
+
+class ObjectVariableInfo(VerificationTypeInfo):
+    # The Object_variable_info type indicates that the location contains an
+    # instance of the class represented by the CONSTANT_Class_info (§4.4.1)
+    # structure found in the constant_pool table at the index given by
+    # cpool_index.
+
+    # u1 tag = ITEM_Object; /* 7 */
+    # u2 cpool_index;
+    def __init__(self, cpool_index):
+        super().__init__(VerificationTypeInfo.ITEM_Object)
+        self.cpool_index = cpool_index
+
+    def __repr__(self):
+        return "Object"
+
+    @staticmethod
+    def read_info(reader, tag):
+        cpool_index = reader.read
+        return ObjectVariableInfo(cpool_index)
+
+    def write_info(self, writer):
+        writer.write_u2(self.cpool_index)
+
+
+class UninitializedVariableInfo(VerificationTypeInfo):
+    # The Uninitialized_variable_info type indicates that the location
+    # contains the verification type uninitialized(offset). The offset item
+    # indicates the offset, in the code array of the Code attribute (§4.7.3)
+    # that contains this StackMapTable attribute, of the new instruction
+    # (§new) that created the object being stored in the location.
+
+    # u1 tag = ITEM_Uninitialized /* 8 */
+    # u2 offset;
+    def __init__(self, offset):
+        super().__init__(VerificationTypeInfo.ITEM_Uninitialized)
+        self.offset = offset
+
+    def __repr__(self):
+        return "Unitialized"
+
+    @staticmethod
+    def read_info(reader, tag):
+        offset = reader.read
+        return ObjectVariableInfo(offset)
+
+    def write_info(self, writer):
+        writer.write_u2(self.offset)
 
-# The frame type chop_frame is represented by tags in the range [248-250]. If the frame_type is chop_frame, it means that the operand stack is empty and the current locals are the same as the locals in the previous frame, except that the k last locals are absent. The value of k is given by the formula 251 - frame_type.
-
-# chop_frame {
-#     u1 frame_type = CHOP; /* 248-250 */
-#     u2 offset_delta;
-# }
-
-# The frame type same_frame_extended is represented by the tag value 251. If the frame type is same_frame_extended, it means the frame has exactly the same locals as the previous stack map frame and that the number of stack items is zero.
-
-# same_frame_extended {
-#     u1 frame_type = SAME_FRAME_EXTENDED; /* 251 */
-#     u2 offset_delta;
-# }
-
-# The frame type append_frame is represented by tags in the range [252-254]. If the frame_type is append_frame, it means that the operand stack is empty and the current locals are the same as the locals in the previous frame, except that k additional locals are defined. The value of k is given by the formula frame_type - 251.
-
-# append_frame {
-#     u1 frame_type = APPEND; /* 252-254 */
-#     u2 offset_delta;
-#     verification_type_info locals[frame_type - 251];
-# }
-
-# The 0th entry in locals represents the type of the first additional local variable. If locals[M] represents local variable N, then locals[M+1] represents local variable N+1 if locals[M] is one of:
-
-# Top_variable_info
-
-# Integer_variable_info
-
-# Float_variable_info
-
-# Null_variable_info
-
-# UninitializedThis_variable_info
-
-# Object_variable_info
-
-# Uninitialized_variable_info
-
-# Otherwise locals[M+1] represents local variable N+2.
-
-# It is an error if, for any index i, locals[i] represents a local variable whose index is greater than the maximum number of local variables for the method.
-
-# The frame type full_frame is represented by the tag value 255.
-
-# full_frame {
-#     u1 frame_type = FULL_FRAME; /* 255 */
-#     u2 offset_delta;
-#     u2 number_of_locals;
-#     verification_type_info locals[number_of_locals];
-#     u2 number_of_stack_items;
-#     verification_type_info stack[number_of_stack_items];
-# }
-
-# The 0th entry in locals represents the type of local variable 0. If locals[M] represents local variable N, then locals[M+1] represents local variable N+1 if locals[M] is one of:
-
-# Top_variable_info
-
-# Integer_variable_info
-
-# Float_variable_info
-
-# Null_variable_info
-
-# UninitializedThis_variable_info
-
-# Object_variable_info
-
-# Uninitialized_variable_info
-
-# Otherwise locals[M+1] represents local variable N+2.
-
-# It is an error if, for any index i, locals[i] represents a local variable whose index is greater than the maximum number of local variables for the method.
-
-# The 0th entry in stack represents the type of the bottom of the stack, and subsequent entries represent types of stack elements closer to the top of the operand stack. We shall refer to the bottom element of the stack as stack element 0, and to subsequent elements as stack element 1, 2 etc. If stack[M] represents stack element N, then stack[M+1] represents stack element N+1 if stack[M] is one of:
-
-# Top_variable_info
-
-# Integer_variable_info
-
-# Float_variable_info
-
-# Null_variable_info
-
-# UninitializedThis_variable_info
-
-# Object_variable_info
-
-# Uninitialized_variable_info
-
-# Otherwise, stack[M+1] represents stack element N+2.
-
-# It is an error if, for any index i, stack[i] represents a stack entry whose index is greater than the maximum operand stack size for the method.
-
-# The verification_type_info structure consists of a one-byte tag followed by zero or more bytes, giving more information about the tag. Each verification_type_info structure specifies the verification type of one or two locations.
-
-# union verification_type_info {
-#     Top_variable_info;
-#     Integer_variable_info;
-#     Float_variable_info;
-#     Long_variable_info;
-#     Double_variable_info;
-#     Null_variable_info;
-#     UninitializedThis_variable_info;
-#     Object_variable_info;
-#     Uninitialized_variable_info;
-# }
-# The Top_variable_info type indicates that the local variable has the verification type top.
-
-# Top_variable_info {
-#     u1 tag = ITEM_Top; /* 0 */
-# }
-
-# The Integer_variable_info type indicates that the location contains the verification type int.
-
-# Integer_variable_info {
-#     u1 tag = ITEM_Integer; /* 1 */
-# }
-
-# The Float_variable_info type indicates that the location contains the verification type float.
-
-# Float_variable_info {
-#     u1 tag = ITEM_Float; /* 2 */
-# }
-
-# The Long_variable_info type indicates that the location contains the verification type long.
-
-# Long_variable_info {
-#     u1 tag = ITEM_Long; /* 4 */
-# }
-
-# This structure gives the contents of two locations in the operand stack or in the local variable array.
-
-# If the location is a local variable, then:
-
-# It must not be the local variable with the highest index.
-
-# The next higher numbered local variable contains the verification type top.
-
-# If the location is an operand stack entry, then:
-
-# The current location must not be the topmost location of the operand stack.
-
-# The next location closer to the top of the operand stack contains the verification type top.
-
-# The Double_variable_info type indicates that the location contains the verification type double.
-
-# Double_variable_info {
-#     u1 tag = ITEM_Double; /* 3 */
-# }
-
-# This structure gives the contents of two locations in the operand stack or in the local variable array.
-
-# If the location is a local variable, then:
-
-# It must not be the local variable with the highest index.
-
-# The next higher numbered local variable contains the verification type top.
-
-# If the location is an operand stack entry, then:
-
-# The current location must not be the topmost location of the operand stack.
-
-# The next location closer to the top of the operand stack contains the verification type top.
-
-# The Null_variable_info type indicates that location contains the verification type null.
-
-# Null_variable_info {
-#     u1 tag = ITEM_Null; /* 5 */
-# }
-
-# The UninitializedThis_variable_info type indicates that the location contains the verification type uninitializedThis.
-
-# UninitializedThis_variable_info {
-#     u1 tag = ITEM_UninitializedThis; /* 6 */
-# }
-
-# The Object_variable_info type indicates that the location contains an instance of the class represented by the CONSTANT_Class_info (§4.4.1) structure found in the constant_pool table at the index given by cpool_index.
-
-# Object_variable_info {
-#     u1 tag = ITEM_Object; /* 7 */
-#     u2 cpool_index;
-# }
-
-# The Uninitialized_variable_info type indicates that the location contains the verification type uninitialized(offset). The offset item indicates the offset, in the code array of the Code attribute (§4.7.3) that contains this StackMapTable attribute, of the new instruction (§new) that created the object being stored in the location.
-
-# Uninitialized_variable_info {
-#     u1 tag = ITEM_Uninitialized /* 8 */
-#     u2 offset;
-# }
 
 # ------------------------------------------------------------------------
 # 4.7.5. The Exceptions Attribute

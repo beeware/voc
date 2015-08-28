@@ -461,7 +461,7 @@ class String(Constant):
     # u1 tag;
     # u2 string_index;
 
-    def __init__(self, string):
+    def __init__(self, value):
         # The tag item of the CONSTANT_String_info structure has the value
         # CONSTANT_String (8).
         super(String, self).__init__(Constant.CONSTANT_String)
@@ -470,29 +470,29 @@ class String(Constant):
         # constant_pool table. The constant_pool entry at that index must be a
         # CONSTANT_Utf8_info (§4.4.7) structure representing the sequence of
         # Unicode code points to which the String object is to be initialized.
-        self.string = Utf8(string)
+        self.value = Utf8(value)
 
     def __repr__(self):
-        return "<String '%s'>" % self.string
+        return "<String '%s'>" % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'string')
+        return multieq(self, other, 'tag', 'value')
 
     def __hash__(self):
-        return multihash(self, 'tag', 'string')
+        return multihash(self, 'tag', 'value')
 
     @staticmethod
     def read_info(reader):
-        string = reader.read_u2()
+        value = reader.read_u2()
         return String, (
-            read_utf8(string),
+            read_utf8(value),
         )
 
     def write_info(self, writer):
-        writer.write_u2(writer.constant_pool.index(self.string))
+        writer.write_u2(writer.constant_pool.index(self.value))
 
     def resolve_info(self, constant_pool):
-        self.string.resolve(constant_pool)
+        self.value.resolve(constant_pool)
 
 
 # ------------------------------------------------------------------------
