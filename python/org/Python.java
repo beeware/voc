@@ -467,7 +467,7 @@ public class Python {
      * Return the dictionary containing the current scope's global variables.
      */
     public static PyObject globals() {
-        return new PyObject(Python.globals);
+        throw new NotImplementedError("Builtin function 'globals' not implemented");
     }
 
     /**

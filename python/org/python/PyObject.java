@@ -474,22 +474,24 @@ public class PyObject {
         this.value = this.__or__(other).value;
     }
 
-
-
-    public PyObject __neg__(PyObject other) {
+    public PyObject __neg__() {
         throw new NotImplementedError("Object method __neg__ not implemented");
     }
 
-    public PyObject __pos__(PyObject other) {
+    public PyObject __pos__() {
         throw new NotImplementedError("Object method __pos__ not implemented");
     }
 
-    public PyObject __abs__(PyObject other) {
+    public PyObject __abs__() {
         throw new NotImplementedError("Object method __abs__ not implemented");
     }
 
-    public PyObject __invert__(PyObject other) {
+    public PyObject __invert__() {
         throw new NotImplementedError("Object method __invert__ not implemented");
+    }
+
+    public PyObject __not__() {
+        return new PyObject(!((boolean)(__bool__().value)));
     }
 
     public PyObject __complex__(PyObject other) {
@@ -507,7 +509,6 @@ public class PyObject {
     public PyObject __round__() {
         throw new NotImplementedError("Object method __round__ not implemented");
     }
-
 
     /**
      * Section 3.3.8 - With statement context
