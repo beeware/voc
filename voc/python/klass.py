@@ -9,8 +9,8 @@ from ..java import (
     # LineNumberTable
 )
 
-from .block import Block
-from .method import InitMethod, Method, extract_parameters
+from .blocks import Block
+from .methods import InitMethod, Method, extract_parameters
 from .opcodes import ASTORE_name, ALOAD_name
 
 

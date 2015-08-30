@@ -1,6 +1,6 @@
 from ..java import Method as JavaMethod, opcodes as JavaOpcodes
 
-from .block import Block
+from .blocks import Block
 
 
 POSITIONAL_OR_KEYWORD = 1

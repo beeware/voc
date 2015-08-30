@@ -3,7 +3,7 @@ import marshal
 import os
 import py_compile
 
-from .python.module import Module
+from .python.modules import Module
 
 
 def transpile(sourcefile, namespace, outdir=None):
