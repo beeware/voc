@@ -93,8 +93,8 @@ class ConstantPool:
         """
         return len(self._constant_pool) + 1
 
-    def add(self, obj):
-        if obj not in self._constants:
+    def add(self, obj, allow_duplicates=False):
+        if allow_duplicates or obj not in self._constants:
             self._constant_pool.append(obj)
             self._constants[obj] = len(self)
 
@@ -122,7 +122,7 @@ class ConstantPool:
                 const = resolve(entry, raw_pool)
             else:
                 const = entry
-            self.add(const)
+            self.add(const, allow_duplicates=True)
             if dump is not None:
                 print("    " * (dump + 1), '%s: %s' % ((i + 1), repr(const)))
 
