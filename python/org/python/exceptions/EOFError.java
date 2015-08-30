@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class EOFError extends PyException {
+public class EOFError extends org.python.exceptions.Exception {
     public EOFError() {
         super();
     }

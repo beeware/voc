@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class StopIteration extends PyException {
+public class StopIteration extends org.python.exceptions.Exception {
     public StopIteration() {
         super();
     }

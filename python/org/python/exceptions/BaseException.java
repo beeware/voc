@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class BaseException extends PyException {
+public class BaseException extends java.lang.RuntimeException {
     public BaseException() {
         super();
     }

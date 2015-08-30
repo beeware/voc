@@ -7,15 +7,15 @@ import org.python.exceptions.RuntimeError;
 
 
 public class InstanceMethod implements Callable {
-    public Method method;
+    public java.lang.reflect.Method method;
 
-    public InstanceMethod(Method method) {
+    public InstanceMethod(java.lang.reflect.Method method) {
         this.method = method;
     }
 
-    public PyObject invoke(PyObject... args) {
+    public org.python.Object invoke(org.python.Object... args) {
         try {
-            return (PyObject) this.method.invoke(args);
+            return (org.python.Object) this.method.invoke(args);
         } catch (IllegalAccessException e) {
             throw new RuntimeError("Illegal access to Java instance method " + this.method);
         } catch (InvocationTargetException e) {

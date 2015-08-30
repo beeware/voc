@@ -2,5 +2,5 @@ package org.python;
 
 
 public interface Callable {
-    public PyObject invoke(PyObject... args);
+    public org.python.Object invoke(org.python.Object... args);
 }

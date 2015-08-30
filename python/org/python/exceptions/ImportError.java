@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class ImportError extends PyException {
+public class ImportError extends org.python.exceptions.Exception {
     public ImportError() {
         super();
     }

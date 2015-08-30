@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class AttributeError extends PyException {
+public class AttributeError extends org.python.exceptions.Exception {
     public AttributeError() {
         super();
     }

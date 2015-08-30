@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class ZeroDivisionError extends PyException {
+public class ZeroDivisionError extends org.python.exceptions.ArithmeticError {
     public ZeroDivisionError() {
         super();
     }

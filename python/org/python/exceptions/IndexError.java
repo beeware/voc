@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class IndexError extends PyException {
+public class IndexError extends org.python.exceptions.LookupError {
     public IndexError() {
         super();
     }

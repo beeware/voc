@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class MemoryError extends PyException {
+public class MemoryError extends org.python.exceptions.Exception {
     public MemoryError() {
         super();
     }

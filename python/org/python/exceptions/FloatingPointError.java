@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class FloatingPointError extends PyException {
+public class FloatingPointError extends org.python.exceptions.ArithmeticError {
     public FloatingPointError() {
         super();
     }

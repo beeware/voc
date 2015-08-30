@@ -36,8 +36,8 @@ class Method(Block):
 
     @property
     def signature(self):
-        return_descriptor = 'V' if self.returns.get('annotation') is None else 'Lorg/python/PyObject;'
-        param_descriptor = 'Lorg/python/PyObject;' * len(self.parameters)
+        return_descriptor = 'V' if self.returns.get('annotation') is None else 'Lorg/python/Object;'
+        param_descriptor = 'Lorg/python/Object;' * len(self.parameters)
         return '(%s)%s' % (param_descriptor, return_descriptor)
 
     @property
@@ -84,7 +84,7 @@ class InitMethod(Method):
 
         if not super_found:
             # FIXME - get the actual superclass
-            superclass = 'org/python/PyObject'
+            superclass = 'org/python/Object'
             code = [
                 JavaOpcodes.ALOAD_0(),
                 JavaOpcodes.INVOKESPECIAL(superclass, '<init>', '()V'),

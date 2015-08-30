@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class SyntaxError extends PyException {
+public class SyntaxError extends org.python.exceptions.Exception {
     public SyntaxError() {
         super();
     }

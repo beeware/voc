@@ -6,14 +6,14 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.HashSet;
 
-import org.python.PyObject;
-import org.python.exceptions.IOError;
+import org.python.Object;
+import org.python.exceptions.OSError;
 import org.python.exceptions.NotImplementedError;
 import org.python.exceptions.TypeError;
 
 
 public class Python {
-    public static Hashtable<String, PyObject> globals;
+    public static Hashtable<String, org.python.Object> globals;
 
     /**
      * __import__(name, globals=None, locals=None, fromlist=(), level=0) -> module
@@ -32,7 +32,7 @@ public class Python {
      * absolute or relative imports. 0 is absolute while a positive number
      * is the number of parent directories to search relative to the current module.
      */
-    public static PyObject __import__(PyObject name, PyObject globals, PyObject locals, PyObject fromlist, PyObject level) {
+    public static org.python.Object __import__(org.python.Object name, org.python.Object globals, org.python.Object locals, org.python.Object fromlist, org.python.Object level) {
         throw new NotImplementedError("Builtin function '__import__' not implemented");
     }
 
@@ -41,7 +41,7 @@ public class Python {
      *
      * Return the absolute value of the argument.
      */
-    public static PyObject abs(PyObject number) {
+    public static org.python.Object abs(org.python.Object number) {
         throw new NotImplementedError("Builtin function 'abs' not implemented");
     }
 
@@ -51,7 +51,7 @@ public class Python {
      * Return True if bool(x) is True for all values x in the iterable.
      * If the iterable is empty, return True.
      */
-    public static PyObject all(PyObject iterable) {
+    public static org.python.Object all(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'all' not implemented");
     }
 
@@ -61,7 +61,7 @@ public class Python {
      * Return True if bool(x) is True for any x in the iterable.
      * If the iterable is empty, return False.
      */
-    public static PyObject any(PyObject iterable) {
+    public static org.python.Object any(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'any' not implemented");
     }
 
@@ -73,7 +73,7 @@ public class Python {
      * repr() using \\x, \\u or \\U escapes.  This generates a string similar
      * to that returned by repr() in Python 2.
      */
-    public static PyObject ascii(PyObject obj) {
+    public static org.python.Object ascii(org.python.Object obj) {
         throw new NotImplementedError("Builtin function 'ascii' not implemented");
     }
 
@@ -85,8 +85,8 @@ public class Python {
      *   >>> bin(2796202)
      *   '0b1010101010101010101010'
      */
-    public static PyObject bin(PyObject obj) {
-        return new PyObject(String.format("0b%b", obj.value));
+    public static org.python.Object bin(org.python.Object obj) {
+        return new org.python.Object(String.format("0b%b", obj.value));
     }
 
     /**
@@ -96,7 +96,7 @@ public class Python {
      * The builtins True and False are the only two instances of the class bool.
      * The class bool is a subclass of the class int, and cannot be subclassed.
      */
-    public static PyObject bool(PyObject obj) {
+    public static org.python.Object bool(org.python.Object obj) {
         // bytearray(iterable_of_ints) -> bytearray
         // bytearray(bytes_or_buffer) -> mutable copy of bytes_or_buffer
         // bytearray(int) -> bytes array of size given by the parameter initialized with null bytes
@@ -117,24 +117,24 @@ public class Python {
      *  - any object implementing the buffer API.
      *  - an integer
      */
-    public static PyObject bytearray(PyObject obj) {
+    public static org.python.Object bytearray(org.python.Object obj) {
         // bytearray(iterable_of_ints) -> bytearray
         // bytearray(bytes_or_buffer) -> mutable copy of bytes_or_buffer
         // bytearray(int) -> bytes array of size given by the parameter initialized with null bytes
         throw new NotImplementedError("Builtin function 'bytearray' not implemented");
     }
 
-    public static PyObject bytearray(PyObject string, PyObject encoding, PyObject errors) {
+    public static org.python.Object bytearray(org.python.Object string, org.python.Object encoding, org.python.Object errors) {
         // bytearray(string, encoding[, errors]) -> bytearray
         throw new NotImplementedError("Builtin function 'bytearray' not implemented");
     }
 
-    public static PyObject bytearray(PyObject string, PyObject encoding) {
+    public static org.python.Object bytearray(org.python.Object string, org.python.Object encoding) {
         // bytearray(string, encoding) -> bytearray
         return bytearray(string, encoding, null);
     }
 
-    public static PyObject bytearray() {
+    public static org.python.Object bytearray() {
         // bytearray() -> empty bytes array
         throw new NotImplementedError("Builtin function 'bytearray' not implemented");
     }
@@ -152,24 +152,24 @@ public class Python {
      *  - any object implementing the buffer API.
      *  - an integer
      */
-    public static PyObject bytes(PyObject obj) {
+    public static org.python.Object bytes(org.python.Object obj) {
         // bytes(iterable_of_ints) -> bytes
         // bytes(bytes_or_buffer) -> immutable copy of bytes_or_buffer
         // bytes(int) -> bytes object of size given by the parameter initialized with null bytes
         throw new NotImplementedError("Builtin function 'bytes' not implemented");
     }
 
-    public static PyObject bytes(PyObject string, PyObject encoding, PyObject errors) {
+    public static org.python.Object bytes(org.python.Object string, org.python.Object encoding, org.python.Object errors) {
         // bytes(string, encoding[, errors]) -> bytes
         throw new NotImplementedError("Builtin function 'bytes' not implemented");
     }
 
-    public static PyObject bytes(PyObject string, PyObject encoding) {
+    public static org.python.Object bytes(org.python.Object string, org.python.Object encoding) {
         // bytes(string, encoding) -> bytes
         return bytes(string, encoding, null);
     }
 
-    public static PyObject bytes() {
+    public static org.python.Object bytes() {
         // bytes() -> empty bytes object
         throw new NotImplementedError("Builtin function 'bytes' not implemented");
     }
@@ -181,7 +181,7 @@ public class Python {
      * Note that classes are callable, as are instances of classes with a
      * __call__() method.
      */
-    public static PyObject callable(PyObject obj) {
+    public static org.python.Object callable(org.python.Object obj) {
         throw new NotImplementedError("Builtin function 'callable' not implemented");
     }
 
@@ -190,7 +190,7 @@ public class Python {
      *
      * Return a Unicode string of one character with ordinal i; 0 <= i <= 0x10ffff.
      */
-    public static PyObject chr(PyObject i) {
+    public static org.python.Object chr(org.python.Object i) {
         throw new NotImplementedError("Builtin function 'callable' not implemented");
     }
 
@@ -215,7 +215,7 @@ public class Python {
      * Class methods are different than C++ or Java static methods.
      * If you want those, see the staticmethod builtin.
      */
-    public static PyObject classmethod(PyObject function) {
+    public static org.python.Object classmethod(org.python.Object function) {
         throw new NotImplementedError("Builtin function 'classmethod' not implemented");
     }
 
@@ -234,15 +234,15 @@ public class Python {
      * compile; if absent or zero these statements do influence the compilation,
      * in addition to any features explicitly specified.
      */
-    public static PyObject compile(PyObject source, PyObject filename, PyObject mode, PyObject flags, PyObject dont_inherit) {
+    public static org.python.Object compile(org.python.Object source, org.python.Object filename, org.python.Object mode, org.python.Object flags, org.python.Object dont_inherit) {
         throw new NotImplementedError("Builtin function 'compile' not implemented");
     }
 
-    public static PyObject compile(PyObject source, PyObject filename, PyObject mode, PyObject flags) {
+    public static org.python.Object compile(org.python.Object source, org.python.Object filename, org.python.Object mode, org.python.Object flags) {
         return compile(source, filename, mode, flags, null);
     }
 
-    public static PyObject compile(PyObject source, PyObject filename, PyObject mode) {
+    public static org.python.Object compile(org.python.Object source, org.python.Object filename, org.python.Object mode) {
         return compile(source, filename, mode, null, null);
     }
 
@@ -252,19 +252,19 @@ public class Python {
      * Create a complex number from a real part and an optional imaginary part.
      * This is equivalent to (real + imag*1j) where imag defaults to 0.
      */
-    public static PyObject complex(PyObject real, PyObject imag) {
+    public static org.python.Object complex(org.python.Object real, org.python.Object imag) {
         throw new NotImplementedError("Builtin function 'complex' not implemented");
     }
 
-    public static PyObject complex(PyObject real) {
-        return complex(real, new PyObject(0));
+    public static org.python.Object complex(org.python.Object real) {
+        return complex(real, new org.python.Object(0));
     }
 
     /**
      * interactive prompt objects for printing the license text, a list of
      * contributors and the copyright notice.
      */
-    public static PyObject copyright() {
+    public static org.python.Object copyright() {
         throw new NotImplementedError("Builtin function 'copyright' not implemented");
     }
 
@@ -272,7 +272,7 @@ public class Python {
      * interactive prompt objects for printing the license text, a list of
      * contributors and the copyright notice.
      */
-    public static PyObject credits() {
+    public static org.python.Object credits() {
         throw new NotImplementedError("Builtin function 'credits' not implemented");
     }
 
@@ -282,7 +282,7 @@ public class Python {
      * Delete a named attribute on an object; delattr(x, 'y') is equivalent to
      * ``del x.y''.
     */
-    public static PyObject delattr(PyObject object, PyObject name) {
+    public static org.python.Object delattr(org.python.Object object, org.python.Object name) {
         throw new NotImplementedError("Builtin function 'delattr' not implemented");
     }
 
@@ -297,15 +297,15 @@ public class Python {
      * dict(**kwargs) -> new dictionary initialized with the name=value pairs
      *     in the keyword argument list.  For example:  dict(one=1, two=2)
      */
-    public static PyObject dict(PyObject obj) {
+    public static org.python.Object dict(org.python.Object obj) {
         throw new NotImplementedError("Builtin function 'dict' not implemented");
     }
 
-    public static PyObject dict() {
+    public static org.python.Object dict() {
         throw new NotImplementedError("Builtin function 'dict' not implemented");
     }
 
-    // public static PyObject dict(**kwargs) {
+    // public static org.python.Object dict(**kwargs) {
     //     throw new NotImplementedError("Builtin function 'dict' not implemented");
     // }
 
@@ -323,11 +323,11 @@ public class Python {
      *     for any other object: its attributes, its class's attributes, and
      *     recursively the attributes of its class's base classes.
      */
-    public static PyObject dir(PyObject obj) {
+    public static org.python.Object dir(org.python.Object obj) {
         throw new NotImplementedError("Builtin function 'dir' not implemented");
     }
 
-    public static PyObject dir() {
+    public static org.python.Object dir() {
         throw new NotImplementedError("Builtin function 'dir' not implemented");
     }
 
@@ -336,7 +336,7 @@ public class Python {
      *
      * Return the tuple ((x-x%y)/y, x%y).  Invariant: div*y + mod == x.
      */
-    public static PyObject divmod(PyObject x, PyObject y) {
+    public static org.python.Object divmod(org.python.Object x, org.python.Object y) {
         throw new NotImplementedError("Builtin function 'divmod' not implemented");
     }
 
@@ -349,12 +349,12 @@ public class Python {
      * enumerate is useful for obtaining an indexed list:
      *        (0, seq[0]), (1, seq[1]), (2, seq[2]), ...
      */
-    public static PyObject enumerate(PyObject iterable, PyObject start) {
+    public static org.python.Object enumerate(org.python.Object iterable, org.python.Object start) {
         throw new NotImplementedError("Builtin function 'enumerate' not implemented");
     }
 
-    public static PyObject enumerate(PyObject iterable) {
-        return enumerate(iterable, new PyObject(0));
+    public static org.python.Object enumerate(org.python.Object iterable) {
+        return enumerate(iterable, new org.python.Object(0));
     }
 
     /**
@@ -367,15 +367,15 @@ public class Python {
      * defaulting to the current globals and locals.
      * If only globals is given, locals defaults to it.
      */
-    public static PyObject eval(PyObject source, PyObject globals, PyObject locals) {
+    public static org.python.Object eval(org.python.Object source, org.python.Object globals, org.python.Object locals) {
         throw new NotImplementedError("Builtin function 'eval' not implemented");
     }
 
-    public static PyObject eval(PyObject source, PyObject globals) {
+    public static org.python.Object eval(org.python.Object source, org.python.Object globals) {
         return eval(source, globals, null);
     }
 
-    public static PyObject eval(PyObject source) {
+    public static org.python.Object eval(org.python.Object source) {
         return eval(source, null, null);
     }
 
@@ -387,15 +387,15 @@ public class Python {
      * The globals and locals are dictionaries, defaulting to the current
      * globals and locals.  If only globals is given, locals defaults to it.
     */
-    public static PyObject exec(PyObject obj, PyObject globals, PyObject locals) {
+    public static org.python.Object exec(org.python.Object obj, org.python.Object globals, org.python.Object locals) {
         throw new NotImplementedError("Builtin function 'exec' not implemented");
     }
 
-    public static PyObject exec(PyObject obj, PyObject globals) {
+    public static org.python.Object exec(org.python.Object obj, org.python.Object globals) {
         return exec(obj, globals, null);
     }
 
-    public static PyObject exec(PyObject obj) {
+    public static org.python.Object exec(org.python.Object obj) {
         return exec(obj, null, null);
     }
 
@@ -405,7 +405,7 @@ public class Python {
      * Return an iterator yielding those items of iterable for which function(item)
      * is true. If function is None, return the items that are true.
      */
-    public static PyObject filter(PyObject function, PyObject iterable) {
+    public static org.python.Object filter(org.python.Object function, org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'filter' not implemented");
     }
 
@@ -414,7 +414,7 @@ public class Python {
      *
      * Convert a string or number to a floating point number, if possible.
      */
-    public static PyObject float_cast(PyObject obj) {
+    public static org.python.Object float_cast(org.python.Object obj) {
         return obj.__float__();
     }
 
@@ -424,12 +424,12 @@ public class Python {
      * Returns value.__format__(format_spec)
      * format_spec defaults to ""
     */
-    public static PyObject format(PyObject value, PyObject format_spec) {
+    public static org.python.Object format(org.python.Object value, org.python.Object format_spec) {
         throw new NotImplementedError("Builtin function 'format' not implemented");
     }
 
-    public static PyObject format(PyObject value) {
-        return format(value, new PyObject(""));
+    public static org.python.Object format(org.python.Object value) {
+        return format(value, new org.python.Object(""));
     }
 
     /**
@@ -438,11 +438,11 @@ public class Python {
      *
      * Build an immutable unordered collection of unique elements.
      */
-    public static PyObject frozenset(PyObject iterable) {
+    public static org.python.Object frozenset(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'frozenset' not implemented");
     }
 
-    public static PyObject frozenset() {
+    public static org.python.Object frozenset() {
         throw new NotImplementedError("Builtin function 'frozenset' not implemented");
     }
 
@@ -453,11 +453,11 @@ public class Python {
      * When a default argument is given, it is returned when the attribute doesn't
      * exist; without it, an exception is raised in that case.
      */
-    public static PyObject getattr(PyObject obj, PyObject name, PyObject def) {
+    public static org.python.Object getattr(org.python.Object obj, org.python.Object name, org.python.Object def) {
         throw new NotImplementedError("Builtin function 'getattr' not implemented");
     }
 
-    public static PyObject getattr(PyObject obj, PyObject name) {
+    public static org.python.Object getattr(org.python.Object obj, org.python.Object name) {
         return getattr(obj, name, null);
     }
 
@@ -466,7 +466,7 @@ public class Python {
      *
      * Return the dictionary containing the current scope's global variables.
      */
-    public static PyObject globals() {
+    public static org.python.Object globals() {
         throw new NotImplementedError("Builtin function 'globals' not implemented");
     }
 
@@ -476,7 +476,7 @@ public class Python {
      * Return whether the object has an attribute with the given name.
      * (This is done by calling getattr(object, name) and catching AttributeError.)
      */
-    public static PyObject hasattr(PyObject object, PyObject name) {
+    public static org.python.Object hasattr(org.python.Object object, org.python.Object name) {
         throw new NotImplementedError("Builtin function 'hasattr' not implemented");
     }
 
@@ -486,7 +486,7 @@ public class Python {
      * Return a hash value for the object.  Two objects with the same value have
      * the same hash value.  The reverse is not necessarily true, but likely.
      */
-    public static PyObject hash(PyObject obj) {
+    public static org.python.Object hash(org.python.Object obj) {
         return obj.__hash__();
     }
 
@@ -494,7 +494,7 @@ public class Python {
      * Define the built-in 'help'.
      * This is a wrapper around pydoc.help (with a twist).
      */
-    public static PyObject help(PyObject obj) {
+    public static org.python.Object help(org.python.Object obj) {
         throw new NotImplementedError("Builtin function 'help' not implemented");
     }
 
@@ -506,8 +506,8 @@ public class Python {
      *   >>> hex(3735928559)
      *   '0xdeadbeef'
      */
-    public static PyObject hex(PyObject obj) {
-        return new PyObject(String.format("0x%x", obj.value));
+    public static org.python.Object hex(org.python.Object obj) {
+        return new org.python.Object(String.format("0x%x", obj.value));
     }
 
     /**
@@ -516,8 +516,8 @@ public class Python {
      * Return the identity of an object.  This is guaranteed to be unique among
      * simultaneously existing objects.
      */
-    public static PyObject id(PyObject obj) {
-        return new PyObject(System.identityHashCode(obj));
+    public static org.python.Object id(org.python.Object obj) {
+        return new org.python.Object(System.identityHashCode(obj));
     }
 
     /**
@@ -528,7 +528,7 @@ public class Python {
      * The prompt string, if given,
      * is printed without a trailing newline before reading.
      */
-    public static PyObject input(PyObject prompt) {
+    public static org.python.Object input(org.python.Object prompt) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         if (prompt != null) {
@@ -537,13 +537,13 @@ public class Python {
         }
 
         try {
-            return new PyObject(reader.readLine());
+            return new org.python.Object(reader.readLine());
         } catch (IOException e) {
-            throw new IOError();
+            throw new OSError();
         }
     }
 
-    public static PyObject input() {
+    public static org.python.Object input() {
         return input(null);
     }
 
@@ -564,16 +564,16 @@ public class Python {
      *   >>> int('0b100', base=0)
      *   4
      */
-    public static PyObject int_cast(PyObject obj, PyObject base) {
+    public static org.python.Object int_cast(org.python.Object obj, org.python.Object base) {
         throw new NotImplementedError("Builtin function 'int_cast' with base not implemented");
     }
 
-    public static PyObject int_cast(PyObject obj) {
+    public static org.python.Object int_cast(org.python.Object obj) {
         return obj.__int__();
     }
 
-    public static PyObject int_cast() {
-        return new PyObject(0);
+    public static org.python.Object int_cast() {
+        return new org.python.Object(0);
     }
 
     /**
@@ -584,7 +584,7 @@ public class Python {
      * The form using a tuple, isinstance(x, (A, B, ...)), is a shortcut for
      * isinstance(x, A) or isinstance(x, B) or ... (etc.).
      */
-    public static PyObject isinstance(PyObject obj, PyObject class_or_type_or_tuple) {
+    public static org.python.Object isinstance(org.python.Object obj, org.python.Object class_or_type_or_tuple) {
         throw new NotImplementedError("Builtin function 'isinstance' not implemented");
     }
 
@@ -595,7 +595,7 @@ public class Python {
      * When using a tuple as the second argument issubclass(X, (A, B, ...)),
      * is a shortcut for issubclass(X, A) or issubclass(X, B) or ... (etc.).
      */
-    public static PyObject issubclass(PyObject C, PyObject B) {
+    public static org.python.Object issubclass(org.python.Object C, org.python.Object B) {
         throw new NotImplementedError("Builtin function 'issubclass' not implemented");
     }
 
@@ -607,11 +607,11 @@ public class Python {
      * supply its own iterator, or be a sequence.
      * In the second form, the callable is called until it returns the sentinel.
      */
-    public static PyObject iter(PyObject iterable) {
+    public static org.python.Object iter(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'iter' not implemented");
     }
 
-    public static PyObject iter(PyObject callable, PyObject sentinel) {
+    public static org.python.Object iter(org.python.Object callable, org.python.Object sentinel) {
         throw new NotImplementedError("Builtin function 'iter' not implemented");
     }
 
@@ -620,7 +620,7 @@ public class Python {
      *
      * Return the number of items of a sequence or collection.
      */
-    public static PyObject len(PyObject obj) {
+    public static org.python.Object len(org.python.Object obj) {
         return obj.__len__();
     }
 
@@ -628,7 +628,7 @@ public class Python {
      * interactive prompt objects for printing the license text, a list of
      * contributors and the copyright notice.
      */
-    public static PyObject license() {
+    public static org.python.Object license() {
         throw new NotImplementedError("Builtin function 'license' not implemented");
     }
 
@@ -636,11 +636,11 @@ public class Python {
      * list() -> new empty list
      * list(iterable) -> new list initialized from iterable's items
      */
-    public static PyObject list(PyObject iterable) {
+    public static org.python.Object list(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'list' not implemented");
     }
 
-    public static PyObject list() {
+    public static org.python.Object list() {
         throw new NotImplementedError("Builtin function 'list' not implemented");
     }
 
@@ -649,7 +649,7 @@ public class Python {
      *
      * Update and return a dictionary containing the current scope's local variables.
      */
-    public static PyObject locals() {
+    public static org.python.Object locals() {
         throw new NotImplementedError("Builtin function 'locals' not implemented");
     }
 
@@ -659,7 +659,7 @@ public class Python {
      * Make an iterator that computes the function using arguments from
      * each of the iterables.  Stops when the shortest iterable is exhausted.
      */
-    public static PyObject map(PyObject func, PyObject iterables) {
+    public static org.python.Object map(org.python.Object func, org.python.Object iterables) {
         throw new NotImplementedError("Builtin function 'input' not implemented");
     }
 
@@ -672,11 +672,11 @@ public class Python {
      * the provided iterable is empty.
      * With two or more arguments, return the largest argument.
      */
-    public static PyObject max(PyObject iterable) {
+    public static org.python.Object max(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'max' not implemented");
     }
 
-    public static PyObject max(PyObject arg1, PyObject arg2) {
+    public static org.python.Object max(org.python.Object arg1, org.python.Object arg2) {
         throw new NotImplementedError("Builtin function 'max' not implemented");
     }
 
@@ -685,7 +685,7 @@ public class Python {
      *
      * Create a new memoryview object which references the given object.
      */
-    public static PyObject memoryview(PyObject obj) {
+    public static org.python.Object memoryview(org.python.Object obj) {
         throw new NotImplementedError("Builtin function 'memoryview' not implemented");
     }
 
@@ -698,11 +698,11 @@ public class Python {
      * the provided iterable is empty.
      * With two or more arguments, return the smallest argument.
      */
-    public static PyObject min(PyObject iterable) {
+    public static org.python.Object min(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'min' not implemented");
     }
 
-    public static PyObject min(PyObject arg1, PyObject arg2) {
+    public static org.python.Object min(org.python.Object arg1, org.python.Object arg2) {
         throw new NotImplementedError("Builtin function 'min' not implemented");
     }
 
@@ -712,18 +712,18 @@ public class Python {
      * Return the next item from the iterator. If default is given and the iterator
      * is exhausted, it is returned instead of raising StopIteration.
      */
-    public static PyObject next(PyObject iterator, PyObject def) {
+    public static org.python.Object next(org.python.Object iterator, org.python.Object def) {
         throw new NotImplementedError("Builtin function 'next' not implemented");
     }
 
-    public static PyObject next(PyObject iterator) {
+    public static org.python.Object next(org.python.Object iterator) {
         throw new NotImplementedError("Builtin function 'next' not implemented");
     }
 
     /**
      * The most base type
      */
-    public static PyObject object() {
+    public static org.python.Object object() {
         throw new NotImplementedError("Builtin function 'object' not implemented");
     }
 
@@ -735,8 +735,8 @@ public class Python {
      *    >>> oct(342391)
      *   '0o1234567'
      */
-    public static PyObject oct(PyObject obj) {
-        return new PyObject(String.format("0o%o", obj.value));
+    public static org.python.Object oct(org.python.Object obj) {
+        return new org.python.Object(String.format("0o%o", obj.value));
     }
 
     /**
@@ -862,12 +862,12 @@ public class Python {
      * opened in a text mode, and for bytes a BytesIO can be used like a file
      * opened in a binary mode.
      */
-    public static PyObject open(PyObject file, PyObject mode, PyObject buffering, PyObject encoding, PyObject errors, PyObject newline, PyObject closefd, PyObject opener) {
+    public static org.python.Object open(org.python.Object file, org.python.Object mode, org.python.Object buffering, org.python.Object encoding, org.python.Object errors, org.python.Object newline, org.python.Object closefd, org.python.Object opener) {
         throw new NotImplementedError("Builtin function 'open' not implemented");
     }
 
-    public static PyObject open(PyObject file) {
-        return open(file, new PyObject('r'), new PyObject(-1), null, null, null, null, null);
+    public static org.python.Object open(org.python.Object file) {
+        return open(file, new org.python.Object('r'), new org.python.Object(-1), null, null, null, null, null);
     }
 
     /**
@@ -875,11 +875,11 @@ public class Python {
      *
      * Return the integer ordinal of a one-character string.
      */
-    public static PyObject ord(PyObject obj) {
+    public static org.python.Object ord(org.python.Object obj) {
         if (obj.type == String.class) {
             int length = ((String) obj.value).length();
             if (length != 1) {
-                return new PyObject((int) ((String) obj.value).charAt(0));
+                return new org.python.Object((int) ((String) obj.value).charAt(0));
             } else {
                 throw new TypeError("ord() expected string of length 1, but string of length " + length + " found");
             }
@@ -894,11 +894,11 @@ public class Python {
      * With two arguments, equivalent to x**y.  With three arguments,
      * equivalent to (x**y) % z, but may be more efficient (e.g. for ints).
      */
-    public static PyObject pow(PyObject x, PyObject y) {
+    public static org.python.Object pow(org.python.Object x, org.python.Object y) {
         return x.__pow__(y);
     }
 
-    public static PyObject pow(PyObject x, PyObject y, PyObject z) {
+    public static org.python.Object pow(org.python.Object x, org.python.Object y, org.python.Object z) {
         return x.__pow__(y).__mod__(z);
     }
 
@@ -912,7 +912,7 @@ public class Python {
      * end:   string appended after the last value, default a newline.
      * flush: whether to forcibly flush the stream.
      */
-    public static void print(PyObject... args) {
+    public static void print(org.python.Object... args) {
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             buffer.append(args[i]);
@@ -950,7 +950,7 @@ public class Python {
      *     def x(self):
      *         del self._x
      */
-    public static PyObject property(PyObject fget, PyObject fset, PyObject fdel, PyObject doc) {
+    public static org.python.Object property(org.python.Object fget, org.python.Object fset, org.python.Object fdel, org.python.Object doc) {
         throw new NotImplementedError("Builtin function 'property' not implemented");
     }
 
@@ -960,17 +960,17 @@ public class Python {
      *
      * Return a virtual sequence of numbers from start to stop by step.
      */
-    public static PyObject range(PyObject stop) {
+    public static org.python.Object range(org.python.Object stop) {
         throw new NotImplementedError("Builtin function 'range' not implemented");
     }
 
-    public static PyObject range(PyObject start, PyObject stop, PyObject step) {
+    public static org.python.Object range(org.python.Object start, org.python.Object stop, org.python.Object step) {
         throw new NotImplementedError("Builtin function 'range' not implemented");
     }
 
 
-    public static PyObject range(PyObject start, PyObject stop) {
-        return range(start, stop, new PyObject(1));
+    public static org.python.Object range(org.python.Object start, org.python.Object stop) {
+        return range(start, stop, new org.python.Object(1));
     }
 
     /**
@@ -979,7 +979,7 @@ public class Python {
      * Return the canonical string representation of the object.
      * For most object types, eval(repr(object)) == object.
      */
-    public static PyObject repr(PyObject obj) {
+    public static org.python.Object repr(org.python.Object obj) {
         return obj.__repr__();
     }
 
@@ -988,7 +988,7 @@ public class Python {
      *
      * Return a reverse iterator
      */
-    public static PyObject reversed(PyObject sequence) {
+    public static org.python.Object reversed(org.python.Object sequence) {
         throw new NotImplementedError("Builtin function 'reversed' not implemented");
     }
 
@@ -999,7 +999,7 @@ public class Python {
      * This returns an int when called with one argument, otherwise the
      * same type as the number. ndigits may be negative.
      */
-    public static PyObject round(PyObject number, PyObject ndigits) {
+    public static org.python.Object round(org.python.Object number, org.python.Object ndigits) {
         throw new NotImplementedError("Builtin function 'round' not implemented");
     }
 
@@ -1010,8 +1010,8 @@ public class Python {
      * This returns an int when called with one argument, otherwise the
      * same type as the number. ndigits may be negative.
      */
-    public static PyObject round(PyObject number) {
-        return round(number, new PyObject(0));
+    public static org.python.Object round(org.python.Object number) {
+        return round(number, new org.python.Object(0));
     }
 
     /**
@@ -1020,12 +1020,12 @@ public class Python {
      *
      * Build an unordered collection of unique elements.
      */
-    public static PyObject set(PyObject iterable) {
+    public static org.python.Object set(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'set' not implemented");
     }
 
-    public static PyObject set() {
-        return new PyObject(new HashSet());
+    public static org.python.Object set() {
+        return new org.python.Object(new HashSet());
     }
 
     /**
@@ -1034,7 +1034,7 @@ public class Python {
      * Set a named attribute on an object; setattr(x, 'y', v) is equivalent to
      * ``x.y = v''.
      */
-    public static PyObject setattr(PyObject obj, PyObject name, PyObject value) {
+    public static org.python.Object setattr(org.python.Object obj, org.python.Object name, org.python.Object value) {
         throw new NotImplementedError("Builtin function 'setattr' not implemented");
     }
 
@@ -1044,26 +1044,26 @@ public class Python {
      *
      * Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).
      */
-    public static PyObject slice(PyObject stop) {
+    public static org.python.Object slice(org.python.Object stop) {
         throw new NotImplementedError("Builtin function 'input' not implemented");
     }
 
-    public static PyObject slice(PyObject start, PyObject stop, PyObject step) {
+    public static org.python.Object slice(org.python.Object start, org.python.Object stop, org.python.Object step) {
         throw new NotImplementedError("Builtin function 'input' not implemented");
     }
 
-    public static PyObject slice(PyObject start, PyObject stop) {
-        return slice(start, stop, new PyObject(1));
+    public static org.python.Object slice(org.python.Object start, org.python.Object stop) {
+        return slice(start, stop, new org.python.Object(1));
     }
 
     /**
      * sorted(iterable, key=None, reverse=False) --> new sorted list
      */
-    public static PyObject sorted(PyObject iterable) {
+    public static org.python.Object sorted(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'sorted' not implemented");
     }
 
-    public static PyObject sorted(PyObject iterable, PyObject key, PyObject reverse) {
+    public static org.python.Object sorted(org.python.Object iterable, org.python.Object key, org.python.Object reverse) {
         throw new NotImplementedError("Builtin function 'sorted' not implemented");
     }
 
@@ -1085,7 +1085,7 @@ public class Python {
      * Static methods in Python are similar to those found in Java or C++.
      * For a more advanced concept, see the classmethod builtin.
      */
-    public static PyObject staticmethod(PyObject function) {
+    public static org.python.Object staticmethod(org.python.Object function) {
         throw new NotImplementedError("Builtin function 'staticmethod' not implemented");
     }
 
@@ -1101,19 +1101,19 @@ public class Python {
      * encoding defaults to sys.getdefaultencoding().
      * errors defaults to 'strict'.
      */
-    public static PyObject str(PyObject obj) {
-        return new PyObject((String) obj.value);
+    public static org.python.Object str(org.python.Object obj) {
+        return new org.python.Object((String) obj.value);
     }
 
-    public static PyObject str() {
-        return new PyObject("");
+    public static org.python.Object str() {
+        return new org.python.Object("");
     }
 
-    public static PyObject str(PyObject bytes_or_buffer, PyObject encoding, PyObject errors) {
-        return new PyObject((String) bytes_or_buffer.value);
+    public static org.python.Object str(org.python.Object bytes_or_buffer, org.python.Object encoding, org.python.Object errors) {
+        return new org.python.Object((String) bytes_or_buffer.value);
     }
 
-    public static PyObject str(PyObject bytes_or_buffer, PyObject encoding) {
+    public static org.python.Object str(org.python.Object bytes_or_buffer, org.python.Object encoding) {
         return str(bytes_or_buffer, encoding, null);
     }
 
@@ -1124,12 +1124,12 @@ public class Python {
      * of parameter 'start' (which defaults to 0).  When the iterable is
      * empty, return start.
      */
-    public static PyObject sum(PyObject iterable, PyObject start) {
+    public static org.python.Object sum(org.python.Object iterable, org.python.Object start) {
         throw new NotImplementedError("Builtin function 'sum' not implemented");
     }
 
-    public static PyObject sum(PyObject iterable) {
-        return sum(iterable, new PyObject(0));
+    public static org.python.Object sum(org.python.Object iterable) {
+        return sum(iterable, new org.python.Object(0));
     }
 
     /**
@@ -1148,15 +1148,15 @@ public class Python {
      *    super().cmeth(arg)
      */
 
-    public static PyObject super_call() {
+    public static org.python.Object super_call() {
         throw new NotImplementedError("Builtin function 'super' not implemented");
     }
 
-    public static PyObject super_call(PyObject type) {
+    public static org.python.Object super_call(org.python.Object type) {
         throw new NotImplementedError("Builtin function 'super' not implemented");
     }
 
-    public static PyObject super_call(PyObject type, PyObject obj) {
+    public static org.python.Object super_call(org.python.Object type, org.python.Object obj) {
         throw new NotImplementedError("Builtin function 'super' not implemented");
     }
 
@@ -1166,11 +1166,11 @@ public class Python {
      *
      * If the argument is a tuple, the return value is the same object.
      */
-    public static PyObject tuple(PyObject iterable) {
+    public static org.python.Object tuple(org.python.Object iterable) {
         throw new NotImplementedError("Builtin function 'tuple' not implemented");
     }
 
-    public static PyObject tuple() {
+    public static org.python.Object tuple() {
         throw new NotImplementedError("Builtin function 'tuple' not implemented");
     }
 
@@ -1179,11 +1179,11 @@ public class Python {
      * type(object) -> the object's type
      * type(name, bases, dict) -> a new type
      */
-    public static PyObject type(PyObject object_or_name, PyObject bases, PyObject dict) {
+    public static org.python.Object type(org.python.Object object_or_name, org.python.Object bases, org.python.Object dict) {
         throw new NotImplementedError("Builtin function 'type' not implemented");
     }
 
-    public static PyObject type(PyObject object) {
+    public static org.python.Object type(org.python.Object object) {
         throw new NotImplementedError("Builtin function 'type' not implemented");
     }
 
@@ -1193,11 +1193,11 @@ public class Python {
      * Without arguments, equivalent to locals().
      * With an argument, equivalent to object.__dict__.
      */
-    public static PyObject vars(PyObject obj) {
+    public static org.python.Object vars(org.python.Object obj) {
         throw new NotImplementedError("Builtin function 'vars' not implemented");
     }
 
-    public static PyObject vars() {
+    public static org.python.Object vars() {
         throw new NotImplementedError("Builtin function 'vars' not implemented");
     }
 
@@ -1209,7 +1209,7 @@ public class Python {
      * method continues until the shortest iterable in the argument sequence
      * is exhausted and then it raises StopIteration.
      */
-    public static PyObject zip(PyObject... iter) {
+    public static org.python.Object zip(org.python.Object... iter) {
         throw new NotImplementedError("Builtin function 'zip' not implemented");
     }
 }

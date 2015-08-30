@@ -1,21 +1,20 @@
 package org.python;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.python.exceptions.RuntimeError;
 
 
-public class PyConstructor implements Callable {
-    public Constructor constructor;
+public class Constructor implements Callable {
+    public java.lang.reflect.Constructor constructor;
 
-    public PyConstructor(Constructor constructor) {
+    public Constructor(java.lang.reflect.Constructor constructor) {
         this.constructor = constructor;
     }
 
-    public PyObject invoke(PyObject... args) {
+    public org.python.Object invoke(org.python.Object... args) {
         try {
-            return (PyObject) this.constructor.newInstance();
+            return (org.python.Object) this.constructor.newInstance();
         } catch (IllegalAccessException e) {
             throw new RuntimeError("Illegal access to Java constructor " + this.constructor);
         } catch (InvocationTargetException e) {

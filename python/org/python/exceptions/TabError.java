@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class TabError extends PyException {
+public class TabError extends org.python.exceptions.IndentationError {
     public TabError() {
         super();
     }

@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class UnicodeEncodeError extends PyException {
+public class UnicodeEncodeError extends org.python.exceptions.UnicodeError {
     public UnicodeEncodeError() {
         super();
     }

@@ -219,9 +219,9 @@ class UnaryOpcode(Opcode):
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/PyObject',
+                'org/python/Object',
                 self.__method__,
-                '()Lorg/python/PyObject;'
+                '()Lorg/python/Object;'
             )
         )
         return code
@@ -244,9 +244,9 @@ class BinaryOpcode(Opcode):
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/PyObject',
+                'org/python/Object',
                 self.__method__,
-                '(Lorg/python/PyObject;)Lorg/python/PyObject;'
+                '(Lorg/python/Object;)Lorg/python/Object;'
             )
         )
         return code
@@ -269,9 +269,9 @@ class InplaceOpcode(Opcode):
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/PyObject',
+                'org/python/Object',
                 self.__method__,
-                '(Lorg/python/PyObject;)V'
+                '(Lorg/python/Object;)V'
             )
         )
         return code
@@ -664,7 +664,7 @@ class STORE_ATTR(Opcode):
         code.extend(arguments[1].operation.convert(context, arguments[1].arguments))
 
         code.extend([
-            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '__setattr__', '(Ljava/lang/String;Lorg/python/PyObject;)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
             JavaOpcodes.POP(),
         ])
         return code
@@ -714,10 +714,10 @@ class LOAD_CONST(Opcode):
             load_op = JavaOpcodes.LDC(self.const)
 
         return [
-            JavaOpcodes.NEW('org/python/PyObject'),
+            JavaOpcodes.NEW('org/python/Object'),
             JavaOpcodes.DUP(),
             load_op,
-            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '<init>', prototype),
+            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', prototype),
         ]
 
 
@@ -743,7 +743,7 @@ class LOAD_NAME(Opcode):
         except KeyError:
             # Look for global name (static variable in current class)
             # Then look for builtin.
-            code.append(JavaOpcodes.GETSTATIC(context.class_descriptor, self.name, 'Lorg/python/PyObject;'))
+            code.append(JavaOpcodes.GETSTATIC(context.class_descriptor, self.name, 'Lorg/python/Object;'))
 
         return code
 
@@ -849,7 +849,7 @@ class LOAD_ATTR(Opcode):
         code.append(JavaOpcodes.LDC(self.name))
 
         code.extend([
-            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '__getattr__', '(Ljava/lang/String;)Lorg/python/PyObject;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/Object', '__getattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
         ])
         return code
 
@@ -1123,7 +1123,7 @@ class CALL_FUNCTION(Opcode):
 
                 # Create an array to pass in arguments to invoke()
                 ICONST_val(len(arguments) - 1),
-                JavaOpcodes.ANEWARRAY('org/python/PyObject'),
+                JavaOpcodes.ANEWARRAY('org/python/Object'),
             ]
 
             for i, argument in enumerate(arguments[1:]):
@@ -1135,7 +1135,7 @@ class CALL_FUNCTION(Opcode):
                 code.append(JavaOpcodes.AASTORE())
 
             code.extend([
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/PyObject;)Lorg/python/PyObject;', 2),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;)Lorg/python/Object;', 2),
             ])
         return code
 
@@ -1195,7 +1195,7 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.ANEWARRAY('java/lang/Class'),
                 JavaOpcodes.DUP(),
                 JavaOpcodes.ICONST_0(),
-                JavaOpcodes.LDC(Classref('org/python/PyObject')),
+                JavaOpcodes.LDC(Classref('org/python/Object')),
                 JavaOpcodes.AASTORE(),
                 JavaOpcodes.INVOKEVIRTUAL(
                     'java/lang/Class',

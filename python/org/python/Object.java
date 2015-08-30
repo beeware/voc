@@ -8,13 +8,13 @@ import java.util.ArrayList;
 
 import org.python.exceptions.NotImplementedError;
 
-public class PyObject {
+public class Object {
     static public String __name__;
     static public String __module__;
     static public String __qualname__;
 
     public Type type;
-    public Object value;
+    public java.lang.Object value;
 
     static {
         // Field[] declaredFields = String.class.getDeclaredFields();
@@ -29,72 +29,72 @@ public class PyObject {
     /**
      * Copy Constructor
      */
-    public PyObject(Object v, Type t) {
+    public Object(org.python.Object v, Type t) {
         value = v;
         type = t;
     }
 
-    public PyObject() {
-        type = Object.class;
-        value = new Hashtable<String, PyObject>();
+    public Object() {
+        type = java.lang.Object.class;
+        value = new Hashtable<String, org.python.Object>();
     }
 
-    public PyObject(boolean v) {
+    public Object(boolean v) {
         type = Boolean.class;
         value = v;
     }
 
-    public PyObject(byte v) {
+    public Object(byte v) {
         type = Long.class;
         value = (long)v;
     }
 
-    public PyObject(short v) {
+    public Object(short v) {
         type = Long.class;
         value = (long)v;
     }
 
-    public PyObject(int v) {
+    public Object(int v) {
         type = Long.class;
         value = (long)v;
     }
 
-    public PyObject(long v) {
+    public Object(long v) {
         type = Long.class;
         value = v;
     }
 
-    public PyObject(float v) {
+    public Object(float v) {
         type = Float.class;
         value = (double)v;
     }
 
-    public PyObject(double v) {
+    public Object(double v) {
         type = Float.class;
         value = v;
     }
 
-    public PyObject(char v) {
+    public Object(char v) {
         type = String.class;
         value = Character.toString(v);
     }
 
-    public PyObject(String v) {
+    public Object(String v) {
         type = String.class;
         value = v;
     }
 
-    public PyObject(Map v) {
+    public Object(Map v) {
         type = Map.class;
         value = v;
     }
 
-    public PyObject(Set v) {
+    public Object(Set v) {
         type = Set.class;
         value = v;
     }
 
-    public PyObject(ArrayList v) {
+    public Object(ArrayList v) {
         type = ArrayList.class;
         value = v;
     }
@@ -103,11 +103,11 @@ public class PyObject {
      * Proxy Java object methods onto their Python counterparts.
      */
 
-    public boolean equals(PyObject other) {
+    public boolean equals(org.python.Object other) {
         return (boolean) __eq__(other).value;
     }
 
-    public int compareTo(PyObject other) {
+    public int compareTo(org.python.Object other) {
         if ((boolean) __lt__(other).value) {
             return -1;
         } else if ((boolean) __gt__(other).value) {
@@ -141,75 +141,75 @@ public class PyObject {
     public void __del__() {
     }
 
-    public PyObject __repr__() {
-        return new PyObject("<PyObject: " + this.type + ">");
+    public org.python.Object __repr__() {
+        return new org.python.Object("<org.python.Object: " + this.type + ">");
     }
 
-    public PyObject __str__() {
+    public org.python.Object __str__() {
         if (type == String.class) {
-            return new PyObject((String) value);
+            return new org.python.Object((String) value);
         }
         else if (type == Long.class) {
-            return new PyObject(((Long) value).toString());
+            return new org.python.Object(((Long) value).toString());
         }
         return this.__repr__();
     }
 
-    public PyObject __bytes__() {
+    public org.python.Object __bytes__() {
         throw new NotImplementedError("Object method __bytes__ not implemented");
     }
 
-    public PyObject __format__() {
+    public org.python.Object __format__() {
         throw new NotImplementedError("Object method __format__ not implemented");
     }
 
-    public PyObject __lt__(PyObject other) {
+    public org.python.Object __lt__(org.python.Object other) {
         throw new NotImplementedError("Object method __lt__ not implemented");
     }
 
-    public PyObject __le__(PyObject other) {
+    public org.python.Object __le__(org.python.Object other) {
         throw new NotImplementedError("Object method __le__ not implemented");
     }
 
-    public PyObject __eq__(PyObject other) {
+    public org.python.Object __eq__(org.python.Object other) {
         throw new NotImplementedError("Object method __eq__ not implemented");
     }
 
-    public PyObject __ne__(PyObject other) {
+    public org.python.Object __ne__(org.python.Object other) {
         throw new NotImplementedError("Object method __ne__ not implemented");
     }
 
-    public PyObject __gt__(PyObject other) {
+    public org.python.Object __gt__(org.python.Object other) {
         throw new NotImplementedError("Object method __gt__ not implemented");
     }
 
-    public PyObject __ge__(PyObject other) {
+    public org.python.Object __ge__(org.python.Object other) {
         throw new NotImplementedError("Object method __ge__ not implemented");
     }
 
-    public PyObject __hash__() {
-        return new PyObject(this.hashCode());
+    public org.python.Object __hash__() {
+        return new org.python.Object(this.hashCode());
     }
 
-    public PyObject __bool__() {
+    public org.python.Object __bool__() {
         throw new NotImplementedError("Object method __bool__ not implemented");
     }
 
     /**
      * Section 3.3.4 - Customizing instance and subclass checks
      */
-    public PyObject __instancecheck__(PyObject instance) {
+    public org.python.Object __instancecheck__(org.python.Object instance) {
         throw new NotImplementedError("Object method __instancecheck__ not implemented");
     }
 
-    public PyObject __subclasscheck__(PyObject subclass) {
+    public org.python.Object __subclasscheck__(org.python.Object subclass) {
         throw new NotImplementedError("Object method __subclasscheck__ not implemented");
     }
 
     /**
      * Section 3.3.5 - Emulating callable objects
      */
-    public void __call__(PyObject... args) {
+    public void __call__(org.python.Object... args) {
         throw new NotImplementedError("Object method __call__ not implemented");
     }
 
@@ -217,39 +217,39 @@ public class PyObject {
      * Section 3.3.6 - Emulating container types
      */
 
-    public PyObject __len__() {
+    public org.python.Object __len__() {
         throw new NotImplementedError("Object method __len__ not implemented");
     }
 
-    public PyObject __length_hint__() {
+    public org.python.Object __length_hint__() {
         throw new NotImplementedError("Object method __length__ not implemented");
     }
 
-    public PyObject __getitem__(PyObject key) {
+    public org.python.Object __getitem__(org.python.Object key) {
         throw new NotImplementedError("Object method __getitem__ not implemented");
     }
 
-    public PyObject __missing__(PyObject key) {
+    public org.python.Object __missing__(org.python.Object key) {
         throw new NotImplementedError("Object method __setitem__ not implemented");
     }
 
-    public void __setitem__(PyObject key, PyObject value) {
+    public void __setitem__(org.python.Object key, org.python.Object value) {
         throw new NotImplementedError("Object method __setitem__ not implemented");
     }
 
-    public void __delattr__(PyObject attr) {
+    public void __delattr__(org.python.Object attr) {
         throw new NotImplementedError("Object method __delattr__ not implemented");
     }
 
-    public PyObject __iter__() {
+    public org.python.Object __iter__() {
         throw new NotImplementedError("Object method __iter__ not implemented");
     }
 
-    public PyObject __reversed__() {
+    public org.python.Object __reversed__() {
         throw new NotImplementedError("Object method __reversed__ not implemented");
     }
 
-    public PyObject __contains__(PyObject item) {
+    public org.python.Object __contains__(org.python.Object item) {
         throw new NotImplementedError("Object method __reversed__ not implemented");
     }
 
@@ -257,11 +257,11 @@ public class PyObject {
      * Section 3.3.7 - Emulating numeric types
      */
 
-    public PyObject __add__(PyObject other) {
+    public org.python.Object __add__(org.python.Object other) {
         // System.out.println("ADD " + this.type + " TO " + other.type);
         if (this.type == String.class) {
             if (other.type == String.class) {
-                return new PyObject(((String) this.value) + ((String) other.value));
+                return new org.python.Object(((String) this.value) + ((String) other.value));
             } else if (other.type == Long.class) {
             } else if (other.type == Float.class) {
             } else if (other.type == Map.class) {
@@ -272,7 +272,7 @@ public class PyObject {
         } else if (this.type == Long.class) {
             if (other.type == String.class) {
             } else if (other.type == Long.class) {
-                return new PyObject(((Long) this.value) + ((Long) other.value));
+                return new org.python.Object(((Long) this.value) + ((Long) other.value));
             } else if (other.type == Float.class) {
             } else if (other.type == Map.class) {
             } else if (other.type == Set.class) {
@@ -288,17 +288,17 @@ public class PyObject {
         return null;
     }
 
-    public PyObject __sub__(PyObject other) {
+    public org.python.Object __sub__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __mul__(PyObject other) {
+    public org.python.Object __mul__(org.python.Object other) {
         // System.out.println("MUL " + this.type + " TO " + other.type);
         if (this.type == String.class) {
         } else if (this.type == Long.class) {
             if (other.type == String.class) {
             } else if (other.type == Long.class) {
-                return new PyObject(((Long) this.value) * ((Long) other.value));
+                return new org.python.Object(((Long) this.value) * ((Long) other.value));
             } else if (other.type == Float.class) {
             } else if (other.type == Map.class) {
             } else if (other.type == Set.class) {
@@ -315,29 +315,29 @@ public class PyObject {
 
     }
 
-    public PyObject __truediv__(PyObject other) {
+    public org.python.Object __truediv__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __floordiv__(PyObject other) {
+    public org.python.Object __floordiv__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __mod__(PyObject other) {
+    public org.python.Object __mod__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __divmod__(PyObject other) {
+    public org.python.Object __divmod__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __pow__(PyObject other) {
+    public org.python.Object __pow__(org.python.Object other) {
         // System.out.println("POW " + this.type + " TO " + other.type);
         if (this.type == String.class) {
         } else if (this.type == Long.class) {
             if (other.type == String.class) {
             } else if (other.type == Long.class) {
-                return new PyObject((long)Math.pow((Long) this.value, (Long) other.value));
+                return new org.python.Object((long)Math.pow((Long) this.value, (Long) other.value));
             } else if (other.type == Float.class) {
             } else if (other.type == Map.class) {
             } else if (other.type == Set.class) {
@@ -353,171 +353,171 @@ public class PyObject {
         return null;
     }
 
-    public PyObject __lshift__(PyObject other) {
+    public org.python.Object __lshift__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __rshift__(PyObject other) {
+    public org.python.Object __rshift__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __and__(PyObject other) {
+    public org.python.Object __and__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __xor__(PyObject other) {
+    public org.python.Object __xor__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __or__(PyObject other) {
+    public org.python.Object __or__(org.python.Object other) {
         return null;
     }
 
-    public PyObject __radd__(PyObject other) {
+    public org.python.Object __radd__(org.python.Object other) {
         return other.__add__(this);
     }
 
-    public PyObject __rsub__(PyObject other) {
+    public org.python.Object __rsub__(org.python.Object other) {
         return other.__sub__(this);
     }
 
-    public PyObject __rmul__(PyObject other) {
+    public org.python.Object __rmul__(org.python.Object other) {
         return other.__mul__(this);
     }
 
-    public PyObject __rtruediv__(PyObject other) {
+    public org.python.Object __rtruediv__(org.python.Object other) {
         return other.__truediv__(this);
     }
 
-    public PyObject __rfloordiv__(PyObject other) {
+    public org.python.Object __rfloordiv__(org.python.Object other) {
         return other.__floordiv__(this);
     }
 
-    public PyObject __rmod__(PyObject other) {
+    public org.python.Object __rmod__(org.python.Object other) {
         return other.__mod__(this);
     }
 
-    public PyObject __rdivmod__(PyObject other) {
+    public org.python.Object __rdivmod__(org.python.Object other) {
         return other.__divmod__(this);
     }
 
-    public PyObject __rpow__(PyObject other) {
+    public org.python.Object __rpow__(org.python.Object other) {
         return other.__pow__(this);
     }
 
-    public PyObject __rlshift__(PyObject other) {
+    public org.python.Object __rlshift__(org.python.Object other) {
         return other.__lshift__(this);
     }
 
-    public PyObject __rrshift__(PyObject other) {
+    public org.python.Object __rrshift__(org.python.Object other) {
         return other.__rshift__(this);
     }
 
-    public PyObject __rand__(PyObject other) {
+    public org.python.Object __rand__(org.python.Object other) {
         return other.__and__(this);
     }
 
-    public PyObject __rxor__(PyObject other) {
+    public org.python.Object __rxor__(org.python.Object other) {
         return other.__xor__(this);
     }
 
-    public PyObject __ror__(PyObject other) {
+    public org.python.Object __ror__(org.python.Object other) {
         return other.__or__(this);
     }
 
 
-    public void __iadd__(PyObject other) {
+    public void __iadd__(org.python.Object other) {
         this.value = this.__add__(other).value;
     }
 
-    public void __isub__(PyObject other) {
+    public void __isub__(org.python.Object other) {
         this.value = this.__sub__(other).value;
     }
 
-    public void __imul__(PyObject other) {
+    public void __imul__(org.python.Object other) {
         this.value = this.__mul__(other).value;
     }
 
-    public void __itruediv__(PyObject other) {
+    public void __itruediv__(org.python.Object other) {
         this.value = this.__truediv__(other).value;
     }
 
-    public void __ifloordiv__(PyObject other) {
+    public void __ifloordiv__(org.python.Object other) {
         this.value = this.__floordiv__(other).value;
     }
 
-    public void __imod__(PyObject other) {
+    public void __imod__(org.python.Object other) {
         this.value = this.__mod__(other).value;
     }
 
-    public void __ipow__(PyObject other) {
+    public void __ipow__(org.python.Object other) {
         this.value = this.__pow__(other).value;
     }
 
-    public void __ilshift__(PyObject other) {
+    public void __ilshift__(org.python.Object other) {
         this.value = this.__lshift__(other).value;
     }
 
-    public void __irshift__(PyObject other) {
+    public void __irshift__(org.python.Object other) {
         this.value = this.__rshift__(other).value;
     }
 
-    public void __iand__(PyObject other) {
+    public void __iand__(org.python.Object other) {
         this.value = this.__and__(other).value;
     }
 
-    public void __ixor__(PyObject other) {
+    public void __ixor__(org.python.Object other) {
         this.value = this.__xor__(other).value;
     }
 
-    public void __ior__(PyObject other) {
+    public void __ior__(org.python.Object other) {
         this.value = this.__or__(other).value;
     }
 
-    public PyObject __neg__() {
+    public org.python.Object __neg__() {
         throw new NotImplementedError("Object method __neg__ not implemented");
     }
 
-    public PyObject __pos__() {
+    public org.python.Object __pos__() {
         throw new NotImplementedError("Object method __pos__ not implemented");
     }
 
-    public PyObject __abs__() {
+    public org.python.Object __abs__() {
         throw new NotImplementedError("Object method __abs__ not implemented");
     }
 
-    public PyObject __invert__() {
+    public org.python.Object __invert__() {
         throw new NotImplementedError("Object method __invert__ not implemented");
     }
 
-    public PyObject __not__() {
-        return new PyObject(!((boolean)(__bool__().value)));
+    public org.python.Object __not__() {
+        return new org.python.Object(!((boolean)(__bool__().value)));
     }
 
-    public PyObject __complex__(PyObject other) {
+    public org.python.Object __complex__(org.python.Object other) {
         throw new NotImplementedError("Object method __complex__ not implemented");
     }
 
-    public PyObject __int__() {
-        return new PyObject((int) this.value);
+    public org.python.Object __int__() {
+        return new org.python.Object((int) this.value);
     }
 
-    public PyObject __float__() {
-        return new PyObject((float) this.value);
+    public org.python.Object __float__() {
+        return new org.python.Object((float) this.value);
     }
 
-    public PyObject __round__() {
+    public org.python.Object __round__() {
         throw new NotImplementedError("Object method __round__ not implemented");
     }
 
     /**
      * Section 3.3.8 - With statement context
      */
-    public PyObject __enter__() {
+    public org.python.Object __enter__() {
         throw new NotImplementedError("Object method __enter__ not implemented");
     }
 
-    public PyObject __exit__(PyObject exc_type, PyObject exc_value, PyObject traceback) {
+    public org.python.Object __exit__(org.python.Object exc_type, org.python.Object exc_value, org.python.Object traceback) {
         throw new NotImplementedError("Object method __exit__ not implemented");
     }
 

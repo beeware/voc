@@ -112,7 +112,7 @@ class Module(Block):
 
         # If there is any static content, generate a classfile
         # for this module
-        classfile = JavaClass(self.descriptor, supername='org/python/PyObject')
+        classfile = JavaClass(self.descriptor, supername='org/python/Object')
         classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
 
         # Add a globals dictionary to the module.

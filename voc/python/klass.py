@@ -30,7 +30,7 @@ class Class(Block):
     def transpile(self, code):
         extract(self, code)
 
-        classfile = JavaClass(self.descriptor, supername='org/python/PyObject')
+        classfile = JavaClass(self.descriptor, supername='org/python/Object')
         classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
 
         if self.block:
@@ -53,7 +53,7 @@ class Class(Block):
                             max_locals=1,
                             code=[
                                 JavaOpcodes.ALOAD_0(),
-                                JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '<init>', '()V'),
+                                JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '()V'),
                                 JavaOpcodes.RETURN(),
                             ],
                         )

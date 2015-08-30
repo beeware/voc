@@ -1,6 +1,6 @@
 package org.python.exceptions;
 
-public class RuntimeError extends PyException {
+public class RuntimeError extends org.python.exceptions.Exception {
     public RuntimeError() {
         super();
     }
