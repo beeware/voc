@@ -3,17 +3,34 @@ package org;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Hashtable;
 import java.util.HashSet;
 
 import org.python.Object;
+import org.python.Function;
 import org.python.exceptions.OSError;
 import org.python.exceptions.NotImplementedError;
 import org.python.exceptions.TypeError;
 
 
 public class Python {
-    public static Hashtable<String, org.python.Object> globals;
+    public static Hashtable<String, org.python.Object> builtins;
+
+    /**
+     * Load all the builtins into the dictionary as callables
+     */
+    static {
+        builtins = new Hashtable<String, org.python.Object>();
+
+        // Iterate over all methods, adding the static ones to builtins
+        for (Method method: Python.class.getMethods()) {
+            if (Modifier.isStatic(method.getModifiers())) {
+                builtins.put(method.getName(), new Function(method));
+            }
+        }
+    }
 
     /**
      * __import__(name, globals=None, locals=None, fromlist=(), level=0) -> module

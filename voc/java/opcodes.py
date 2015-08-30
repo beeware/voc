@@ -56,10 +56,10 @@ class Opcode:
     def stack_effect(self):
         return self.produce_count - self.consume_count
 
-    def process(self, code, try_catches):
-        code.append(self)
+    def process(self, parts):
+        parts.code.append(self)
 
-    def post_process(self, code, try_catches):
+    def post_process(self, parts):
         pass
 
 
@@ -212,9 +212,9 @@ class ANEWARRAY(Opcode):
     # Stack: count → arrayref
     code = 0xbd
 
-    def __init__(self, classname):
+    def __init__(self, class_name):
         super(ANEWARRAY, self).__init__()
-        self.klass = Classref(classname)
+        self.klass = Classref(class_name)
 
     def __len__(self):
         return 3
@@ -468,9 +468,9 @@ class CHECKCAST(Opcode):
     # Stack: objectref → objectref
     code = 0xc0
 
-    def __init__(self, classname):
+    def __init__(self, class_name):
         super(CHECKCAST, self).__init__()
-        self.klass = Classref(classname)
+        self.klass = Classref(class_name)
 
     def __len__(self):
         return 3
@@ -480,8 +480,8 @@ class CHECKCAST(Opcode):
 
     @classmethod
     def read_extra(cls, reader, dump=None):
-        classname = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
-        return cls(classname)
+        class_name = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
+        return cls(class_name)
 
     def write_extra(self, writer):
         writer.write_u2(writer.constant_pool.index(self.klass))
@@ -1051,9 +1051,9 @@ class GETSTATIC(Opcode):
     # Stack: → value
     code = 0xb2
 
-    def __init__(self, classname, fieldname, descriptor):
+    def __init__(self, class_name, fieldname, descriptor):
         super(GETSTATIC, self).__init__()
-        self.field = Fieldref(classname, fieldname, descriptor)
+        self.field = Fieldref(class_name, fieldname, descriptor)
 
     def __len__(self):
         return 3
@@ -2028,12 +2028,12 @@ class INVOKEDYNAMIC(Opcode):
     # Stack: [arg1, [arg2 ...]] → result
     code = 0xba
 
-    def __init__(self, classname, methodname, descriptor):
+    def __init__(self, class_name, method_name, descriptor):
         super(INVOKEDYNAMIC, self).__init__()
-        self.method = Methodref(classname, methodname, descriptor)
+        self.method = Methodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
-        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
+        return ' %s.%s %s' % (self.method.class_name, self.method.name, self.method.name_and_type.descriptor)
 
     def __len__(self):
         return 5
@@ -2072,12 +2072,12 @@ class INVOKEINTERFACE(Opcode):
     # Stack: objectref, [arg1, arg2, ...] → result
     code = 0xb9
 
-    def __init__(self, classname, methodname, descriptor, count):
+    def __init__(self, class_name, method_name, descriptor, count):
         super(INVOKEINTERFACE, self).__init__()
-        self.method = InterfaceMethodref(classname, methodname, descriptor)
+        self.method = InterfaceMethodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
-        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
+        return ' %s.%s %s' % (self.method.class_name, self.method.name, self.method.name_and_type.descriptor)
 
     def __len__(self):
         return 5
@@ -2088,8 +2088,8 @@ class INVOKEINTERFACE(Opcode):
         count = reader.read_u1()
         reader.read_u1()
         return cls(
-            method.klass.name.bytes.decode('utf8'),
-            method.name_and_type.name.bytes.decode('utf8'),
+            method.class_name,
+            method.name,
             method.name_and_type.descriptor.bytes.decode('utf8'),
             count
         )
@@ -2119,15 +2119,27 @@ class INVOKESPECIAL(Opcode):
     # Stack: objectref, [arg1, arg2, ...] → result
     code = 0xb7
 
-    def __init__(self, classname, methodname, descriptor):
+    def __init__(self, class_name, method_name, descriptor):
         super(INVOKESPECIAL, self).__init__()
-        self.method = Methodref(classname, methodname, descriptor)
+        self.method = Methodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
         return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
 
     def __len__(self):
         return 3
+
+    @property
+    def class_name(self):
+        return self.method.class_name
+
+    @property
+    def method_name(self):
+        return self.method.method_name
+
+    @property
+    def descriptor(self):
+        return self.method.descriptor
 
     @classmethod
     def read_extra(cls, reader, dump=None):
@@ -2161,9 +2173,9 @@ class INVOKESTATIC(Opcode):
     # Stack: [arg1, arg2, ...] → result
     code = 0xb8
 
-    def __init__(self, classname, methodname, descriptor):
+    def __init__(self, class_name, method_name, descriptor):
         super(INVOKESTATIC, self).__init__()
-        self.method = Methodref(classname, methodname, descriptor)
+        self.method = Methodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
         return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
@@ -2203,9 +2215,9 @@ class INVOKEVIRTUAL(Opcode):
     # Stack: objectref, [arg1, arg2, ...] → result
     code = 0xb6
 
-    def __init__(self, classname, methodname, descriptor):
+    def __init__(self, class_name, method_name, descriptor):
         super(INVOKEVIRTUAL, self).__init__()
-        self.method = Methodref(classname, methodname, descriptor)
+        self.method = Methodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
         return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
@@ -2832,9 +2844,9 @@ class NEW(Opcode):
     # Stack: → objectref
     code = 0xbb
 
-    def __init__(self, classname):
+    def __init__(self, class_name):
         super(NEW, self).__init__()
-        self.classref = Classref(classname)
+        self.classref = Classref(class_name)
 
     def __len__(self):
         return 3
@@ -2936,9 +2948,9 @@ class PUTSTATIC(Opcode):
     # Stack: value →
     code = 0xb3
 
-    def __init__(self, classname, fieldname, descriptor):
+    def __init__(self, class_name, fieldname, descriptor):
         super(PUTSTATIC, self).__init__()
-        self.field = Fieldref(classname, fieldname, descriptor)
+        self.field = Fieldref(class_name, fieldname, descriptor)
 
     def __len__(self):
         return 3

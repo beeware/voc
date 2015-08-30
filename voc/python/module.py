@@ -10,31 +10,53 @@ from ..java import (
     # LineNumberTable
 )
 from .block import Block, IgnoreBlock
-from .method import MainMethod
+from .method import MainMethod, Method, extract_parameters
+from .opcodes import ASTORE_name, ALOAD_name
 
 
 class StaticBlock(Block):
     def tweak(self, code):
-        # If the block is the module-level definition start the code by setting the
-        # globals to be the locals for this class
         code = [
+            # Set up the globals dictionary for the module
             JavaOpcodes.NEW('java/util/Hashtable'),
             JavaOpcodes.DUP(),
             JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
-            JavaOpcodes.PUTSTATIC(self.parent.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.PUTSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+
+            # Load the Python builtins into the globals.
+            JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.LDC('__builtins__'),
+            JavaOpcodes.NEW('org/python/Object'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/util/Map;)V'),
+            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.POP()
         ] + code
         return self.void_return(code)
+
+    def store_name(self, name, arguments):
+        return [
+            ASTORE_name(self.localvars, '#TEMP#'),
+            JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.LDC(name),
+            ALOAD_name(self.localvars, '#TEMP#'),
+            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+            ALOAD_name(self.localvars, '#TEMP#'),
+        ]
 
     @property
     def is_module(self):
         return True
 
     @property
-    def descriptor(self):
-        return self.parent.descriptor
+    def module(self):
+        return self.parent
 
-    def add_method(self, method):
-        self.parent.methods.append(method)
+    def add_method(self, method_name, code):
+        method = Method(self.module, method_name, extract_parameters(code), static=True)
+        method.extract(code)
+        self.module.methods.append(method.transpile())
 
 
 class Module(Block):
@@ -48,10 +70,6 @@ class Module(Block):
         self.classes = []
 
     @property
-    def is_module(self):
-        return True
-
-    @property
     def descriptor(self):
         return '/'.join(self.namespace.split('.') + [self.name])
 
@@ -59,7 +77,7 @@ class Module(Block):
         """Convert a Python code block into a list of Java Classfile definitions.
 
         Returns a list of triples:
-            (namespace, classname, javaclassfile)
+            (namespace, class_name, javaclassfile)
 
         The list contains the classfile for the module, plus and classes
         defined in the module.
@@ -150,9 +168,8 @@ class Module(Block):
         # The list of classfiles that will be returned will contain
         # at least one entry - the class for the module itself.
         classfiles = [(self.namespace, self.name, classfile)]
-
         # Also output any classes defined in this module.
-        for classname, classfile in self.classes:
-            classfiles.append(('%s.%s' % (self.namespace, self.name), classname, classfile))
+        for class_name, classfile in self.classes:
+            classfiles.append(('%s.%s' % (self.namespace, self.name), class_name, classfile))
 
         return classfiles

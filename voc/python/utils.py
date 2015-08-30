@@ -99,15 +99,3 @@ def extract_command(instructions, i):
     # arguments back in the right order.
     cmd.arguments.reverse()
     return i, cmd
-
-
-def stack_depth(code):
-    "Evaluate the maximum stack depth required by a sequence of Java opcodes"
-    depth = 0
-    max_depth = 0
-    for opcode in code:
-        # print("   ", opcode)
-        depth = depth + opcode.stack_effect
-        if depth > max_depth:
-            max_depth = depth
-    return max_depth

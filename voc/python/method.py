@@ -23,8 +23,7 @@ class Method(Block):
         else:
             self.returns = returns
 
-        # FIXME - If this is a class, add the implied self argument.
-        # self.localvars['self'] = 0
+        self.add_self()
         for p in self.parameters:
             self.localvars[p['name']] = len(self.localvars)
 
@@ -40,8 +39,11 @@ class Method(Block):
         param_descriptor = 'Lorg/python/Object;' * len(self.parameters)
         return '(%s)%s' % (param_descriptor, return_descriptor)
 
+    def add_self(self):
+        pass
+
     @property
-    def methodname(self):
+    def method_name(self):
         return self.name
 
     def tweak(self, code):
@@ -51,7 +53,7 @@ class Method(Block):
         code = super().transpile()
 
         return JavaMethod(
-            self.methodname,
+            self.method_name,
             self.signature,
             static=self.static,
             attributes=[
@@ -62,35 +64,45 @@ class Method(Block):
 
 class InitMethod(Method):
     def __init__(self, parent, parameters, commands=None):
+        print ("CREATE INIT FOR ",parent)
         super().__init__(
             parent, '__init__',
-            parameters=parameters,
+            parameters=parameters[1:],
             returns={},
-            ignore_empty=True,
             commands=commands
         )
+        print("LOCALS", self.localvars)
 
     @property
-    def methodname(self):
+    def method_name(self):
         return '<init>'
+
+    @property
+    def klass(self):
+        return self.parent
+
+    @property
+    def module(self):
+        return self.klass.module
+
+    def add_self(self):
+        self.localvars['self'] = 0
 
     def tweak(self, code):
         # If the block is an init method, make sure it invokes super().<init>
         super_found = False
         for opcode in code:
-            if isinstance(opcode, JavaOpcodes.INVOKESPECIAL) and opcode.methodname == '<init>':
+            if isinstance(opcode, JavaOpcodes.INVOKESPECIAL) and opcode.method.name == '<init>':
                 super_found = True
                 break
 
         if not super_found:
-            # FIXME - get the actual superclass
-            superclass = 'org/python/Object'
             code = [
                 JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.INVOKESPECIAL(superclass, '<init>', '()V'),
+                JavaOpcodes.INVOKESPECIAL(self.klass.superclass, '<init>', '()V'),
             ] + code
 
-        return self.void_return(code)
+        return self.ignore_empty(self.void_return(code))
 
 
 class MainMethod(Method):
@@ -104,7 +116,7 @@ class MainMethod(Method):
         )
 
     @property
-    def methodname(self):
+    def method_name(self):
         return 'main'
 
     @property

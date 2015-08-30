@@ -239,6 +239,7 @@ class Classref(Constant):
         #
         # An array type descriptor is valid only if it represents 255 or fewer
         # dimensions.
+        self.class_name = name
         self.name = Utf8(name)
 
     def __repr__(self):
@@ -273,7 +274,7 @@ class Fieldref(Constant):
     # u2 class_index;
     # u2 name_and_type_index;
 
-    def __init__(self, classname, name, descriptor):
+    def __init__(self, class_name, name, descriptor):
 
         # The tag item of a CONSTANT_Fieldref_info structure has the value
         # CONSTANT_Fieldref (9).
@@ -286,7 +287,8 @@ class Fieldref(Constant):
 
         # The class_index item of a CONSTANT_Fieldref_info structure may be
         # either a class type or an interface type.
-        self.klass = Classref(classname)
+        self.class_name = class_name
+        self.klass = Classref(class_name)
 
         # The value of the name_and_type item must be a valid index into
         # the constant_pool table. The constant_pool entry at that index must be
@@ -294,10 +296,12 @@ class Fieldref(Constant):
         # entry indicates the name and descriptor of the field or method.
 
         # The indicated descriptor must be a field descriptor (§4.3.2).
+        self.name = name
+        self.descriptor = descriptor
         self.name_and_type = NameAndType(name, descriptor)
 
     def __repr__(self):
-        return '<Fieldref %s.%s (%s)>' % (self.klass.name, self.name_and_type.name, self.name_and_type.descriptor)
+        return '<Fieldref %s.%s (%s)>' % (self.class_name, self.name, self.descriptor)
 
     def __eq__(self, other):
         return multieq(self, other, 'tag', 'klass', 'name_and_type')
@@ -335,7 +339,7 @@ class Methodref(Constant):
     # u2 class_index;
     # u2 name_and_type_index;
 
-    def __init__(self, classname, name, descriptor):
+    def __init__(self, class_name, name, descriptor):
 
         # The tag item of a CONSTANT_Methodref_info structure has the value
         # CONSTANT_Methodref (10).
@@ -348,7 +352,8 @@ class Methodref(Constant):
 
         # The class item of a CONSTANT_Methodref_info structure must be a
         # class type, not an interface type.
-        self.klass = Classref(classname)
+        self.class_name = class_name
+        self.klass = Classref(class_name)
 
         # The value of the name_and_type item must be a valid index into
         # the constant_pool table. The constant_pool entry at that index must be
@@ -364,10 +369,11 @@ class Methodref(Constant):
         self.name_and_type = NameAndType(name, descriptor)
 
         # For convenience, store a parsed version of the descriptor.
+        self.name = name
         self.descriptor = method_descriptor(descriptor)
 
     def __repr__(self):
-        return '<Methodref %s.%s %s>' % (self.klass.name, self.name_and_type.name, self.name_and_type.descriptor)
+        return '<Methodref %s.%s %s>' % (self.class_name, self.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
         return multieq(self, other, 'tag', 'klass', 'name_and_type')
@@ -399,7 +405,7 @@ class InterfaceMethodref(Constant):
     # u2 class_index;
     # u2 name_and_type_index;
 
-    def __init__(self, classname, name, descriptor):
+    def __init__(self, class_name, name, descriptor):
 
         # The tag item of a CONSTANT_InterfaceMethodref_info structure has the value
         # CONSTANT_InterfaceMethodref (11).
@@ -412,7 +418,8 @@ class InterfaceMethodref(Constant):
 
         # The class item of a CONSTANT_InterfaceMethodref_info structure
         # must be an interface type.
-        self.klass = Classref(classname)
+        self.class_name = class_name
+        self.klass = Classref(class_name)
 
         # The value of the name_and_type item must be a valid index into
         # the constant_pool table. The constant_pool entry at that index must be
@@ -423,10 +430,11 @@ class InterfaceMethodref(Constant):
         self.name_and_type = NameAndType(name, descriptor)
 
         # For convenience, store a parsed version of the descriptor.
+        self.name = name
         self.descriptor = method_descriptor(descriptor)
 
     def __repr__(self):
-        return '<InterfaceMethodref %s.%s %s>' % (self.klass.name, self.name_and_type.name, self.name_and_type.descriptor)
+        return '<InterfaceMethodref %s.%s %s>' % (self.class_name, self.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
         return multieq(self, other, 'tag', 'klass', 'name_and_type')

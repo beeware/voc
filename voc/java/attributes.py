@@ -1069,9 +1069,10 @@ class ObjectVariableInfo(VerificationTypeInfo):
 
     # u1 tag = ITEM_Object; /* 7 */
     # u2 cpool_index;
-    def __init__(self, classname):
+    def __init__(self, class_name):
         super().__init__(VerificationTypeInfo.ITEM_Object)
-        self.klass = Classref(classname)
+        self.class_name = class_name
+        self.klass = Classref(class_name)
 
     def __repr__(self):
         return "Object %s" % self.klass
@@ -1082,8 +1083,8 @@ class ObjectVariableInfo(VerificationTypeInfo):
     @staticmethod
     def read_info(reader):
         val = reader.read_u2()
-        klass = reader.constant_pool[val]
-        return ObjectVariableInfo('java/lang/NoSuchMethodException')
+        klass = reader.constant_pool[val].name.bytes.decode('utf8')
+        return ObjectVariableInfo(klass)
 
     def write_info(self, writer):
         writer.write_u2(writer.constant_pool.index(self.klass))

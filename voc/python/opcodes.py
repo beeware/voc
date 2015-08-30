@@ -6,6 +6,30 @@ from ..java import opcodes as JavaOpcodes, Classref
 # attributes of the code, especially those depened on opcode offset.
 ##########################################################################
 
+class IF:
+    def __init__(self, opcode):
+        self.opcode = opcode
+        self.if_op = None
+        self.end_op = None
+
+    def process(self, parts):
+        parts.if_blocks.append(self)
+        self.if_op = self.opcode(0)
+        parts.code.append(self.if_op)
+
+    def post_process(self, parts):
+        pass
+
+
+class ENDIF:
+    def process(self, parts):
+        for self.if_block in parts.if_blocks[::-1]:
+            if self.if_block.end_op is None:
+                break
+
+    def post_process(self, parts):
+        self.if_block.end_op = parts.code[-1]
+
 
 class TRY:
     """Mark the start of a try-catch block.
@@ -48,25 +72,11 @@ class TRY:
         self.jump_op = None
         self.handlers = []
 
-    def process(self, code, try_catches):
-        try_catches.append(self)
+    def process(self, parts):
+        parts.try_catches.append(self)
 
-    def post_process(self, code, try_catches):
-        self.start_op = code[-1]
-
-
-class END_TRY:
-    def process(self, code, try_catches):
-        # Find the most recent exception on the stack that hasn't been
-        # ended. That's the block we're ending.
-        for self.exception in try_catches[::-1]:
-            if self.exception.end_op is None:
-                break
-
-        self.exception.handlers[-1].end_op = code[-1]
-
-    def post_process(self, code, try_catches):
-        self.exception.end_op = code[-1]
+    def post_process(self, parts):
+        self.start_op = parts.code[-1]
 
 
 class CATCH:
@@ -76,12 +86,12 @@ class CATCH:
     # The CATCH needs to be able to pass as an opcode under initial
     # post processing
     def __len__(self):
-        3
+        return 3
 
-    def process(self, code, try_catches):
+    def process(self, parts):
         # Find the most recent exception on the stack that hasn't been
         # ended. That's the block that the catch applies to.
-        for self.exception in try_catches[::-1]:
+        for self.exception in parts.try_catches[::-1]:
             if self.exception.end_op is None:
                 break
 
@@ -92,13 +102,27 @@ class CATCH:
         # previous one. Record the end of the block for framing purposes.
         if len(self.exception.handlers) == 0:
             self.exception.jump_op = JavaOpcodes.GOTO(0)
-            code.append(self.exception.jump_op)
+            parts.code.append(self.exception.jump_op)
         else:
-            self.exception.handlers[-1].end_op = code[-1]
+            self.exception.handlers[-1].end_op = parts.code[-1]
 
-    def post_process(self, code, try_catches):
-        self.start_op = code[-1]
+    def post_process(self, parts):
+        self.start_op = parts.code[-1]
         self.exception.handlers.append(self)
+
+
+class END_TRY:
+    def process(self, parts):
+        # Find the most recent exception on the stack that hasn't been
+        # ended. That's the block we're ending.
+        for self.exception in parts.try_catches[::-1]:
+            if self.exception.end_op is None:
+                break
+
+        self.exception.handlers[-1].end_op = parts.code[-1]
+
+    def post_process(self, parts):
+        self.exception.end_op = parts.code[-1]
 
 
 ##########################################################################
@@ -597,19 +621,9 @@ class STORE_NAME(Opcode):
         if code[-1] is None:
             code.pop()
         else:
-            if context.is_module:
-                # If this is a module-level context, also store the name
-                # in the globals dictionary for the module.
-                code.extend([
-                    ASTORE_name(context.localvars, '#TEMP#'),
-                    JavaOpcodes.GETSTATIC(context.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                    JavaOpcodes.LDC(self.name),
-                    ALOAD_name(context.localvars, '#TEMP#'),
-                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-                    ALOAD_name(context.localvars, '#TEMP#'),
-                ])
-
-            code.append(ASTORE_name(context.localvars, self.name))
+            # Depending on context, this might mean writing to local
+            # variables, class attributes, or to the global context.
+            code.extend(context.store_name(self.name, arguments))
 
         return code
 
@@ -739,11 +753,30 @@ class LOAD_NAME(Opcode):
     def convert(self, context, arguments):
         code = []
         try:
+            # Look for a local first.
             code.append(ALOAD_name(context.localvars, self.name))
         except KeyError:
-            # Look for global name (static variable in current class)
-            # Then look for builtin.
-            code.append(JavaOpcodes.GETSTATIC(context.class_descriptor, self.name, 'Lorg/python/Object;'))
+            code.extend([
+                # If there isn't a local, look for a global
+                JavaOpcodes.GETSTATIC(context.module.descriptor, 'globals', 'Lorg/python/Object;'),
+                JavaOpcodes.NEW('org/python/Object'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC(self.name),
+                JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/lang/String;)V'),
+                ASTORE_name(context.localvars, "#ATTRNAME#"),
+                ALOAD_name(context.localvars, "#ATTRNAME#"),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+
+                # If there's nothing in the globals, then look for a builtin.
+                JavaOpcodes.DUP(),
+                IF(JavaOpcodes.IFNONNULL),
+                    JavaOpcodes.POP(),
+                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Lorg/python/Object;'),
+                    ALOAD_name(context.localvars, "#ATTRNAME#"),
+                    JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+                ENDIF()
+            ])
 
         return code
 
@@ -1073,7 +1106,51 @@ class CALL_FUNCTION(Opcode):
     def convert(self, context, arguments):
         code = []
 
-        if arguments[0].operation.name == 'print':
+        if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
+            # Construct a class.
+            from .klass import Class
+
+            code = arguments[1].arguments[0].operation.const
+            class_name = arguments[1].arguments[1].operation.const
+            if len(arguments) == 4:
+                super_name = arguments[2].operation.const
+            else:
+                super_name = None
+
+            klass = Class(context.parent, class_name, super_name=super_name)
+            klass.extract(code)
+            context.parent.classes.append(klass.transpile())
+
+            # Push a callable onto the stack so that it can be stored
+            # in globals and subsequently retrieved and run.
+            return [
+                # Get a Method representing the new function
+                TRY(),
+                    JavaOpcodes.LDC(Classref(klass.descriptor)),
+                    JavaOpcodes.ICONST_0(),
+                    JavaOpcodes.ANEWARRAY('java/lang/Class'),
+                    JavaOpcodes.INVOKEVIRTUAL(
+                        'java/lang/Class',
+                        'getConstructor',
+                        '([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;'
+                    ),
+                    ASTORE_name(context.localvars, '#CONSTRUCTOR#'),
+
+                    # Then wrap that Constructor into a Callable.
+                    JavaOpcodes.NEW('org/python/Constructor'),
+                    JavaOpcodes.DUP(),
+                    ALOAD_name(context.localvars, '#CONSTRUCTOR#'),
+                    JavaOpcodes.INVOKESPECIAL('org/python/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
+                CATCH('java/lang/NoSuchMethodError'),
+                    ASTORE_name(context.localvars, '#EXCEPTION#'),
+                    JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC('Unable to find class %s' % (klass.descriptor)),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW(),
+                END_TRY()
+            ]
+        elif arguments[0].operation.name == 'print':
             if len(arguments) == 2:
                 # Just the one argument - no need to use a StringBuilder.
                 code.append(JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'))
@@ -1111,6 +1188,7 @@ class CALL_FUNCTION(Opcode):
                 JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/Object;)V'),
                 None
             ])
+
 
         else:
             method_name = arguments[0].operation.name
@@ -1175,21 +1253,17 @@ class MAKE_FUNCTION(Opcode):
 
     def convert(self, context, arguments):
         # Add a new method definition to the context class/module
-        from .method import Method, extract_parameters
-
         code = arguments[0].operation.const
         method_name = arguments[-1].operation.const
-        method = Method(context, method_name, extract_parameters(code), static=context.is_module)
-        method.extract(code)
 
-        context.add_method(method.transpile())
+        context.add_method(method_name, code)
 
         # Push a callable onto the stack so that it can be stored
         # in globals and subsequently retrieved and run.
         return [
             # Get a Method representing the new function
             TRY(),
-                JavaOpcodes.LDC(Classref(context.descriptor)),
+                JavaOpcodes.LDC(Classref(context.module.descriptor)),
                 JavaOpcodes.LDC(method_name),
                 JavaOpcodes.ICONST_1(),
                 JavaOpcodes.ANEWARRAY('java/lang/Class'),
@@ -1213,7 +1287,7 @@ class MAKE_FUNCTION(Opcode):
                 ASTORE_name(context.localvars, '#EXCEPTION#'),
                 JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.LDC('Unable to find MAKE_FUNCTION output %s.%s' % (context.descriptor, method_name)),
+                JavaOpcodes.LDC('Unable to find MAKE_FUNCTION output %s.%s' % (context.module.descriptor, method_name)),
                 JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
                 JavaOpcodes.ATHROW(),
             END_TRY()

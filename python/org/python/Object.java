@@ -9,22 +9,8 @@ import java.util.ArrayList;
 import org.python.exceptions.NotImplementedError;
 
 public class Object {
-    static public String __name__;
-    static public String __module__;
-    static public String __qualname__;
-
     public Type type;
     public java.lang.Object value;
-
-    static {
-        // Field[] declaredFields = String.class.getDeclaredFields();
-        // List<Field> staticFields = new ArrayList<Field>();
-        // for (Field field : declaredFields) {
-        //     if (java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
-        //         staticFields.add(field);
-        //     }
-        // }
-    }
 
     /**
      * Copy Constructor

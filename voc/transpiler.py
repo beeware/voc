@@ -27,14 +27,14 @@ class Transpiler:
         else:
             basedir = []
 
-        for namespace, classname, javaclassfile in self.classfiles:
-            dirname = os.path.join(*(basedir + self.namespace.split('.')))
+        for namespace, class_name, javaclassfile in self.classfiles:
+            dirname = os.path.join(*(basedir + namespace.split('.')))
             try:
                 os.makedirs(dirname)
             except FileExistsError:
                 pass
 
-            classfilename = os.path.join(dirname, '%s.class' % classname)
+            classfilename = os.path.join(dirname, '%s.class' % class_name)
 
             print("Writing %s ..." % classfilename)
             with open(classfilename, 'wb') as out:
