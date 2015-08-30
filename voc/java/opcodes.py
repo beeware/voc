@@ -56,10 +56,10 @@ class Opcode:
     def stack_effect(self):
         return self.produce_count - self.consume_count
 
-    def process(self, code, exceptions):
+    def process(self, code, try_catches):
         code.append(self)
 
-    def post_process(self, op):
+    def post_process(self, code, try_catches):
         pass
 
 

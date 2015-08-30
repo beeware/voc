@@ -174,8 +174,8 @@ class BaseClass:
         # through 45.65535 inclusive. For k ≥ 2, JDK release 1.k supports class
         # file format versions in the range 45.0 through 44+k.0 inclusive.
 
-        # Java 7 is v51.0
-        self.major_version = 51
+        # Java 6 is v50.0
+        self.major_version = 50
         self.minor_version = 0
 
         # Each value in the interfaces array must be a valid index into the

@@ -82,10 +82,12 @@ class Block:
         prev = None
         for cmd in self.commands:
             for instruction in cmd.operation.convert(self, cmd.arguments):
-                if prev is not None:
-                    prev.post_process(instruction)
                 instruction.process(code, try_catches)
+                if prev is not None:
+                    prev.post_process(code, try_catches)
                 prev = instruction
+        if prev is not None:
+            prev.post_process(code, try_catches)
 
         # Java requires that every body of code finishes with a return.
         # Make sure there is one.
@@ -97,40 +99,25 @@ class Block:
         code = self.tweak(code)
 
         # Now that we have a complete opcode list, postprocess the list
-        # with the known offsets...
+        # with the known offsets.
         offset = 0
-        for instruction in code:
+        for index, instruction in enumerate(code):
+            instruction.code_index = index
             instruction.code_offset = offset
             offset += len(instruction)
 
-        # ... then construct the exception table and stack map table, updating
-        # any end-of-exception GOTO operations with the right opcode.
-        stack_map_table = JavaStackMapTable()
+        # Then construct the exception table, updating any
+        # end-of-exception GOTO operations with the right opcode.
+        # Record a frame range for each one.
         exceptions = []
         for try_catch in try_catches:
-            for descriptor, catch_op in try_catch.handlers:
+            for handler in try_catch.handlers:
                 exceptions.append(JavaExceptionInfo(
                     try_catch.start_op.code_offset,
                     try_catch.jump_op.code_offset,
-                    catch_op.code_offset,
-                    descriptor
+                    handler.start_op.code_offset,
+                    handler.descriptor
                 ))
-
-                # Stack map frame for the catch block.
-                stack_map_table.entries.append(
-                    SameLocals1StackItemFrame(
-                        catch_op.code_offset,
-                        ObjectVariableInfo(descriptor)
-                    )
-                )
-
-                # Stack map frame for the return to normal code.
-                stack_map_table.entries.append(
-                    SameLocals1StackItemFrame(
-                        try_catch.end_op.code_offset - catch_op.code_offset - 1,
-                        ObjectVariableInfo('org/python/Function')  # FIXME
-                    )
-                )
 
             try_catch.jump_op.offset = try_catch.end_op.code_offset - try_catch.jump_op.code_offset
 
@@ -139,7 +126,4 @@ class Block:
             max_locals=len(self.localvars),
             code=code,
             exceptions=exceptions,
-            attributes=[
-                stack_map_table,
-            ]
         )

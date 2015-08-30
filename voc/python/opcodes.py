@@ -48,23 +48,25 @@ class TRY:
         self.jump_op = None
         self.handlers = []
 
-    def process(self, code, exceptions):
-        exceptions.append(self)
+    def process(self, code, try_catches):
+        try_catches.append(self)
 
-    def post_process(self, op):
-        self.start_op = op
+    def post_process(self, code, try_catches):
+        self.start_op = code[-1]
 
 
 class END_TRY:
-    def process(self, code, exceptions):
+    def process(self, code, try_catches):
         # Find the most recent exception on the stack that hasn't been
         # ended. That's the block we're ending.
-        for self.exception in exceptions[::-1]:
+        for self.exception in try_catches[::-1]:
             if self.exception.end_op is None:
                 break
 
-    def post_process(self, op):
-        self.exception.end_op = op
+        self.exception.handlers[-1].end_op = code[-1]
+
+    def post_process(self, code, try_catches):
+        self.exception.end_op = code[-1]
 
 
 class CATCH:
@@ -76,22 +78,27 @@ class CATCH:
     def __len__(self):
         3
 
-    def process(self, code, exceptions):
+    def process(self, code, try_catches):
         # Find the most recent exception on the stack that hasn't been
         # ended. That's the block that the catch applies to.
-        for self.exception in exceptions[::-1]:
+        for self.exception in try_catches[::-1]:
             if self.exception.end_op is None:
                 break
 
         # If this is the first catch, insert a GOTO operation.
-        # The jump distance will be updated when the exception is
-        # converted.
+        # The jump distance will be updated when all the CATCH blocks
+        # have been processed and the exception is converted.
+        # If it isn't the first catch, then this catch concludes the
+        # previous one. Record the end of the block for framing purposes.
         if len(self.exception.handlers) == 0:
             self.exception.jump_op = JavaOpcodes.GOTO(0)
             code.append(self.exception.jump_op)
+        else:
+            self.exception.handlers[-1].end_op = code[-1]
 
-    def post_process(self, op):
-        self.exception.handlers.append((self.descriptor, op))
+    def post_process(self, code, try_catches):
+        self.start_op = code[-1]
+        self.exception.handlers.append(self)
 
 
 ##########################################################################
