@@ -1,4 +1,4 @@
-from .constants import Classref, Fieldref, Methodref, String, Integer
+from .constants import Classref, Fieldref, Methodref, InterfaceMethodref, String, Integer, Long, Constant
 
 # From: https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 # Reference" http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.2
@@ -35,7 +35,7 @@ class Opcode:
                     pass
         instance = Opcode.opcodes[code].read_extra(reader, dump)
         if dump:
-            print("    " * dump, '%s: %s' % (reader.offset, instance))
+            print("    " * dump, '%3d: %s' % (reader.offset, instance))
         return instance
 
     @classmethod
@@ -52,6 +52,16 @@ class Opcode:
     def resolve(self, constant_pool):
         pass
 
+    @property
+    def stack_effect(self):
+        return self.produce_count - self.consume_count
+
+    def process(self, code, exceptions):
+        code.append(self)
+
+    def post_process(self, op):
+        pass
+
 
 class AALOAD(Opcode):
     code = 0x32
@@ -63,12 +73,20 @@ class AALOAD(Opcode):
 
 
 class AASTORE(Opcode):
+    # Store into a reference in an array
+    # Stack: arrayref, index, value →
     code = 0x53
 
     def __init__(self):
         super(AASTORE, self).__init__()
-# arrayref, index, value →
-# Store into a reference in an array
+
+    @property
+    def consume_count(self):
+        return 3
+
+    @property
+    def produce_count(self):
+        return 0
 
 
 class ACONST_NULL(Opcode):
@@ -80,8 +98,12 @@ class ACONST_NULL(Opcode):
         super(ACONST_NULL, self).__init__()
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ALOAD(Opcode):
@@ -106,8 +128,12 @@ class ALOAD(Opcode):
         writer.write_u1(self.var)
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ALOAD_0(Opcode):
@@ -119,8 +145,12 @@ class ALOAD_0(Opcode):
         super(ALOAD_0, self).__init__()
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ALOAD_1(Opcode):
@@ -132,8 +162,12 @@ class ALOAD_1(Opcode):
         super(ALOAD_1, self).__init__()
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ALOAD_2(Opcode):
@@ -145,8 +179,12 @@ class ALOAD_2(Opcode):
         super(ALOAD_2, self).__init__()
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ALOAD_3(Opcode):
@@ -158,20 +196,50 @@ class ALOAD_3(Opcode):
         super(ALOAD_3, self).__init__()
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ANEWARRAY(Opcode):
+    # Create a new array of references of length count and component type identified
+    # by the class reference index (indexbyte1 << 8 + indexbyte2) in the constant
+    # pool
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: count → arrayref
     code = 0xbd
 
-    def __init__(self):
+    def __init__(self, classname):
         super(ANEWARRAY, self).__init__()
-# 2: indexbyte1, indexbyte2
-# count → arrayref
-# Create a new array of references of length count and component type identified
-# by the class reference index (indexbyte1 << 8 + indexbyte2) in the constant
-# pool
+        self.klass = Classref(classname)
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.klass.name
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        klass = reader.read_u2()
+        return cls(reader.constant_pool[klass].name.bytes.decode('utf8'))
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.klass))
+
+    def resolve(self, constant_pool):
+        self.klass.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ARETURN(Opcode):
@@ -183,8 +251,12 @@ class ARETURN(Opcode):
         super(ARETURN, self).__init__()
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ARRAYLENGTH(Opcode):
@@ -218,8 +290,12 @@ class ASTORE(Opcode):
         writer.write_u1(self.var)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ASTORE_0(Opcode):
@@ -231,8 +307,12 @@ class ASTORE_0(Opcode):
         super(ASTORE_0, self).__init__()
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ASTORE_1(Opcode):
@@ -244,8 +324,12 @@ class ASTORE_1(Opcode):
         super(ASTORE_1, self).__init__()
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ASTORE_2(Opcode):
@@ -257,8 +341,12 @@ class ASTORE_2(Opcode):
         super(ASTORE_2, self).__init__()
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ASTORE_3(Opcode):
@@ -270,18 +358,30 @@ class ASTORE_3(Opcode):
         super(ASTORE_3, self).__init__()
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ATHROW(Opcode):
+    # Throws an error or exception (notice that the rest of the stack is cleared,
+    # leaving only a reference to the Throwable)
+    # Stack: objectref → [empty], objectref
     code = 0xbf
 
     def __init__(self):
         super(ATHROW, self).__init__()
-# objectref → [empty], objectref
-# Throws an error or exception (notice that the rest of the stack is cleared,
-# leaving only a reference to the Throwable)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class BALOAD(Opcode):
@@ -303,7 +403,8 @@ class BASTORE(Opcode):
 
 
 class BIPUSH(Opcode):
-    # Args(1) byte → value
+    # Args(1) byte
+    # → value
     # Push a byte onto the stack as an integer value
     code = 0x10
 
@@ -326,8 +427,12 @@ class BIPUSH(Opcode):
         writer.write_u1(self.const)
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class BREAKPOINT(Opcode):
@@ -357,14 +462,40 @@ class CASTORE(Opcode):
 
 
 class CHECKCAST(Opcode):
+    # Checks whether an objectref is of a certain type, the class reference of which
+    # is in the constant pool at index (indexbyte1 << 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: objectref → objectref
     code = 0xc0
 
-    def __init__(self):
+    def __init__(self, classname):
         super(CHECKCAST, self).__init__()
-# 2: indexbyte1, indexbyte2
-# objectref → objectref
-# Checks whether an objectref is of a certain type, the class reference of which
-# is in the constant pool at index (indexbyte1 << 8 + indexbyte2)
+        self.klass = Classref(classname)
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s' % (self.klass)
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        classname = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
+        return cls(classname)
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.klass))
+
+    def resolve(self, constant_pool):
+        self.klass.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class D2F(Opcode):
@@ -606,8 +737,12 @@ class DUP(Opcode):
         super(DUP, self).__init__()
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DUP_X1(Opcode):
@@ -910,9 +1045,10 @@ class GETFIELD(Opcode):
 
 
 class GETSTATIC(Opcode):
-    # Args(2): index1, index2   → value
     # Get a static field value of a class, where the field is identified by field
     # reference in the constant pool index (index 1 << 8 + index2)
+    # Args(2): index1, index2
+    # Stack: → value
     code = 0xb2
 
     def __init__(self, classname, fieldname, descriptor):
@@ -923,7 +1059,7 @@ class GETSTATIC(Opcode):
         return 3
 
     def __arg_repr__(self):
-        return ' %s' % self.field
+        return ' %s.%s' % (self.field.klass.name, self.field.name_and_type.name)
 
     @classmethod
     def read_extra(cls, reader, dump=None):
@@ -941,8 +1077,12 @@ class GETSTATIC(Opcode):
         self.field.resolve(constant_pool)
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class GOTO(Opcode):
@@ -969,6 +1109,14 @@ class GOTO(Opcode):
 
     def write_extra(self, writer):
         writer.write_s2(self.offset)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class GOTO_W(Opcode):
@@ -1080,6 +1228,14 @@ class ICONST_M1(Opcode):
     def __init__(self):
         super(ICONST_M1, self).__init__()
 
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
+
 
 class ICONST_0(Opcode):
     # Load the int value 0 onto the stack
@@ -1088,6 +1244,14 @@ class ICONST_0(Opcode):
 
     def __init__(self):
         super(ICONST_0, self).__init__()
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ICONST_1(Opcode):
@@ -1098,6 +1262,14 @@ class ICONST_1(Opcode):
     def __init__(self):
         super(ICONST_1, self).__init__()
 
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
+
 
 class ICONST_2(Opcode):
     # Load the int value 2 onto the stack
@@ -1106,6 +1278,14 @@ class ICONST_2(Opcode):
 
     def __init__(self):
         super(ICONST_2, self).__init__()
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ICONST_3(Opcode):
@@ -1116,6 +1296,14 @@ class ICONST_3(Opcode):
     def __init__(self):
         super(ICONST_3, self).__init__()
 
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
+
 
 class ICONST_4(Opcode):
     # Load the int value 4 onto the stack
@@ -1125,6 +1313,14 @@ class ICONST_4(Opcode):
     def __init__(self):
         super(ICONST_4, self).__init__()
 
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
+
 
 class ICONST_5(Opcode):
     # Load the int value 5 onto the stack
@@ -1133,6 +1329,14 @@ class ICONST_5(Opcode):
 
     def __init__(self):
         super(ICONST_5, self).__init__()
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class IDIV(Opcode):
@@ -1170,8 +1374,12 @@ class IF_ACMPEQ(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -2
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IF_ACMPNE(Opcode):
@@ -1200,8 +1408,12 @@ class IF_ACMPNE(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -2
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IF_ICMPEQ(Opcode):
@@ -1230,8 +1442,12 @@ class IF_ICMPEQ(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -2
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IF_ICMPGE(Opcode):
@@ -1261,8 +1477,12 @@ class IF_ICMPGE(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -2
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IF_ICMPGT(Opcode):
@@ -1291,8 +1511,12 @@ class IF_ICMPGT(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -2
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IF_ICMPLE(Opcode):
@@ -1322,8 +1546,12 @@ class IF_ICMPLE(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -2
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IF_ICMPLT(Opcode):
@@ -1352,8 +1580,12 @@ class IF_ICMPLT(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -2
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IF_ICMPNE(Opcode):
@@ -1382,8 +1614,12 @@ class IF_ICMPNE(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -2
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IFEQ(Opcode):
@@ -1412,8 +1648,12 @@ class IFEQ(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IFGE(Opcode):
@@ -1442,8 +1682,12 @@ class IFGE(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IFGT(Opcode):
@@ -1472,8 +1716,12 @@ class IFGT(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IFLE(Opcode):
@@ -1502,8 +1750,12 @@ class IFLE(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IFLT(Opcode):
@@ -1532,8 +1784,12 @@ class IFLT(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IFNE(Opcode):
@@ -1562,8 +1818,12 @@ class IFNE(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IFNONNULL(Opcode):
@@ -1592,8 +1852,12 @@ class IFNONNULL(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IFNULL(Opcode):
@@ -1622,8 +1886,12 @@ class IFNULL(Opcode):
         writer.write_s2(self.offset)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IINC(Opcode):
@@ -1649,6 +1917,14 @@ class IINC(Opcode):
     def write_extra(self, writer):
         writer.write_u1(self.index)
         writer.write_u1(self.value)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ILOAD(Opcode):
@@ -1745,27 +2021,94 @@ class INSTANCEOF(Opcode):
 
 
 class INVOKEDYNAMIC(Opcode):
+    # Invokes a dynamic method and puts the result on the stack (might be void); the
+    # method is identified by method reference index in constant pool (indexbyte1 <<
+    # 8 + indexbyte2)
+    # Args(4): indexbyte1, indexbyte2, 0, 0
+    # Stack: [arg1, [arg2 ...]] → result
     code = 0xba
 
-    def __init__(self):
+    def __init__(self, classname, methodname, descriptor):
         super(INVOKEDYNAMIC, self).__init__()
-# 4: indexbyte1, indexbyte2, 0, 0
-# [arg1, [arg2 ...]] → result
-# Invokes a dynamic method and puts the result on the stack (might be void); the
-# method is identified by method reference index in constant pool (indexbyte1 <<
-# 8 + indexbyte2)
+        self.method = Methodref(classname, methodname, descriptor)
+
+    def __arg_repr__(self):
+        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
+
+    def __len__(self):
+        return 5
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        method = reader.constant_pool[reader.read_u2()]
+        reader.read_u2()
+        return cls(
+            method.klass.name.bytes.decode('utf8'),
+            method.name_and_type.name.bytes.decode('utf8'),
+            method.name_and_type.descriptor.bytes.decode('utf8')
+        )
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.method))
+        writer.write_u2(0)
+
+    def resolve(self, constant_pool):
+        self.method.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 0 if self.method.name_and_type.descriptor.bytes[-1] == ord('V') else 1
+
+    @property
+    def consume_count(self):
+        return 1 + len(self.method.descriptor.parameters)
 
 
 class INVOKEINTERFACE(Opcode):
+    # Invokes an interface method on object objectref and puts the result on the
+    # stack (might be void); the interface method is identified by method reference
+    # index in constant pool (indexbyte1 << 8 + indexbyte2)
+    # Args(4): indexbyte1, indexbyte2, count, 0
+    # Stack: objectref, [arg1, arg2, ...] → result
     code = 0xb9
 
-    def __init__(self):
+    def __init__(self, classname, methodname, descriptor, count):
         super(INVOKEINTERFACE, self).__init__()
-# 4: indexbyte1, indexbyte2, count, 0 objectref,
-# [arg1, arg2, ...] → result
-# Invokes an interface method on object objectref and puts the result on the
-# stack (might be void); the interface method is identified by method reference
-# index in constant pool (indexbyte1 << 8 + indexbyte2)
+        self.method = InterfaceMethodref(classname, methodname, descriptor)
+
+    def __arg_repr__(self):
+        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
+
+    def __len__(self):
+        return 5
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        method = reader.constant_pool[reader.read_u2()]
+        count = reader.read_u1()
+        reader.read_u1()
+        return cls(
+            method.klass.name.bytes.decode('utf8'),
+            method.name_and_type.name.bytes.decode('utf8'),
+            method.name_and_type.descriptor.bytes.decode('utf8'),
+            count
+        )
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.method))
+        writer.write_u1(len(self.method.descriptor.parameters) + 1)
+        writer.write_u1(0)
+
+    def resolve(self, constant_pool):
+        self.method.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 0 if self.method.name_and_type.descriptor.bytes[-1] == ord('V') else 1
+
+    @property
+    def consume_count(self):
+        return 1 + len(self.method.descriptor.parameters)
 
 
 class INVOKESPECIAL(Opcode):
@@ -1778,13 +2121,10 @@ class INVOKESPECIAL(Opcode):
 
     def __init__(self, classname, methodname, descriptor):
         super(INVOKESPECIAL, self).__init__()
-        self.classname = classname
-        self.methodname = methodname
-        self.descriptor = descriptor
         self.method = Methodref(classname, methodname, descriptor)
 
     def __arg_repr__(self):
-        return ' %s' % self.method
+        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
 
     def __len__(self):
         return 3
@@ -1805,8 +2145,12 @@ class INVOKESPECIAL(Opcode):
         self.method.resolve(constant_pool)
 
     @property
-    def stack_effect(self):
-        return -len(self.method.descriptor.parameters)
+    def produce_count(self):
+        return 0 if self.method.name_and_type.descriptor.bytes[-1] == ord('V') else 1
+
+    @property
+    def consume_count(self):
+        return 1 + len(self.method.descriptor.parameters)
 
 
 class INVOKESTATIC(Opcode):
@@ -1819,13 +2163,10 @@ class INVOKESTATIC(Opcode):
 
     def __init__(self, classname, methodname, descriptor):
         super(INVOKESTATIC, self).__init__()
-        self.classname = classname
-        self.methodname = methodname
-        self.descriptor = descriptor
         self.method = Methodref(classname, methodname, descriptor)
 
     def __arg_repr__(self):
-        return ' %s' % self.method
+        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
 
     def __len__(self):
         return 3
@@ -1846,8 +2187,12 @@ class INVOKESTATIC(Opcode):
         self.method.resolve(constant_pool)
 
     @property
-    def stack_effect(self):
-        return -len(self.method.descriptor.parameters)
+    def produce_count(self):
+        return 0 if self.method.name_and_type.descriptor.bytes[-1] == ord('V') else 1
+
+    @property
+    def consume_count(self):
+        return 1 + len(self.method.descriptor.parameters)
 
 
 class INVOKEVIRTUAL(Opcode):
@@ -1860,13 +2205,10 @@ class INVOKEVIRTUAL(Opcode):
 
     def __init__(self, classname, methodname, descriptor):
         super(INVOKEVIRTUAL, self).__init__()
-        self.classname = classname
-        self.methodname = methodname
-        self.descriptor = descriptor
         self.method = Methodref(classname, methodname, descriptor)
 
     def __arg_repr__(self):
-        return ' %s' % self.method
+        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
 
     def __len__(self):
         return 3
@@ -1887,8 +2229,12 @@ class INVOKEVIRTUAL(Opcode):
         self.method.resolve(constant_pool)
 
     @property
-    def stack_effect(self):
-        return -len(self.method.descriptor.parameters)
+    def produce_count(self):
+        return 0 if self.method.name_and_type.descriptor.bytes[-1] == ord('V') else 1
+
+    @property
+    def consume_count(self):
+        return 1 + len(self.method.descriptor.parameters)
 
 
 class IOR(Opcode):
@@ -2117,9 +2463,10 @@ class LCONST_1(Opcode):
 
 
 class LDC(Opcode):
-    # Args(1): index → value
     # Push a constant #index from a constant pool (String, int or float) onto the
     # stack
+    # Args(1): index
+    # Stack: → value
     code = 0x12
 
     def __init__(self, const):
@@ -2128,13 +2475,15 @@ class LDC(Opcode):
             self.const = String(const)
         elif isinstance(const, int):
             self.const = Integer(const)
-        # elif isinstance(const, long):
-        #     self.const = Long(const)
+        # elif isinstance(const, float):
+        #     self.const = Float(const)
+        elif isinstance(const, Constant):
+            self.const = const
         else:
             raise TypeError('Invalid type for LDC: %s' % type(const))
 
     def __arg_repr__(self):
-        return ' %s' % self.const.value
+        return ' %s' % self.const
 
     def __len__(self):
         return 2
@@ -2142,7 +2491,7 @@ class LDC(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         const = reader.read_u1()
-        return cls(const)
+        return cls(reader.constant_pool[const])
 
     def write_extra(self, writer):
         writer.write_u1(writer.constant_pool.index(self.const))
@@ -2151,28 +2500,100 @@ class LDC(Opcode):
         self.const.resolve(constant_pool)
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LDC_W(Opcode):
+    # Push a constant #index from a constant pool (String, int or float) onto the
+    # stack (wide index is constructed as indexbyte1 << 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: → value
     code = 0x13
 
-    def __init__(self):
+    def __init__(self, const):
         super(LDC_W, self).__init__()
-# 2: indexbyte1, indexbyte2   → value
-# push a constant #index from a constant pool (String, int or float) onto the
-# stack (wide index is constructed as indexbyte1 << 8 + indexbyte2)
+        if isinstance(const, str):
+            self.const = String(const)
+        elif isinstance(const, int):
+            self.const = Integer(const)
+        elif isinstance(const, float):
+            self.const = Float(const)
+        elif isinstance(const, Constant):
+            self.const = const
+        else:
+            raise TypeError('Invalid type for LDC_W: %s' % type(const))
+
+    def __arg_repr__(self):
+        return ' %s' % self.const
+
+    def __len__(self):
+        return 3
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        const = reader.read_u2()
+        return cls(reader.constant_pool[const])
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.const))
+
+    def resolve(self, constant_pool):
+        self.const.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LDC2_W(Opcode):
+    # Push a constant #index from a constant pool (double or long) onto the stack
+    # (wide index is constructed as indexbyte1 << 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: → value
     code = 0x14
 
-    def __init__(self):
+    def __init__(self, const):
         super(LDC2_W, self).__init__()
-# 2: indexbyte1, indexbyte2   → value
-# push a constant #index from a constant pool (double or long) onto the stack
-# (wide index is constructed as indexbyte1 << 8 + indexbyte2)
+        if isinstance(const, float):
+            self.const = Double(const)
+        elif isinstance(const, long):
+            self.const = Long(const)
+        else:
+            raise TypeError('Invalid type for LDC_W: %s' % type(const))
+
+    def __arg_repr__(self):
+        return ' %s' % self.const
+
+    def __len__(self):
+        return 3
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        const = reader.read_u2()
+        return cls(reader.constant_pool[const])
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.const))
+
+    def resolve(self, constant_pool):
+        self.const.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LDIV(Opcode):
@@ -2405,9 +2826,10 @@ class MULTIANEWARRAY(Opcode):
 
 
 class NEW(Opcode):
-    # args(2): indexbyte1, indexbyte2   → objectref
     # Create new object of type identified by class reference in constant pool index
     # (indexbyte1 << 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: → objectref
     code = 0xbb
 
     def __init__(self, classname):
@@ -2416,6 +2838,9 @@ class NEW(Opcode):
 
     def __len__(self):
         return 3
+
+    def __arg_repr__(self):
+        return ' %s' % self.classref.name
 
     @classmethod
     def read_extra(cls, reader, dump=None):
@@ -2431,8 +2856,12 @@ class NEW(Opcode):
         self.classref.resolve(constant_pool)
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class NEWARRAY(Opcode):
@@ -2455,25 +2884,38 @@ class NOP(Opcode):
 
 
 class POP(Opcode):
-    # Stack: value →
     # Discard the top value on the stack
+    # Stack: value →
     code = 0x57
 
     def __init__(self):
         super(POP, self).__init__()
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class POP2(Opcode):
+    # Discard the top two values on the stack (or one value, if it is a double or long)
+    # {value2, value1} →
     code = 0x58
 
     def __init__(self):
         super(POP2, self).__init__()
-# {value2, value1} →
-# Discard the top two values on the stack (or one value, if it is a double or long)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
+
 
 
 class PUTFIELD(Opcode):
@@ -2502,7 +2944,7 @@ class PUTSTATIC(Opcode):
         return 3
 
     def __arg_repr__(self):
-        return ' %s' % self.field
+        return ' %s.%s' % (self.field.klass.name, self.field.name_and_type.name)
 
     @classmethod
     def read_extra(cls, reader, dump=None):
@@ -2520,8 +2962,12 @@ class PUTSTATIC(Opcode):
         self.field.resolve(constant_pool)
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class RET(Opcode):
@@ -2544,8 +2990,12 @@ class RETURN(Opcode):
         super(RETURN, self).__init__()
 
     @property
-    def stack_effect(self):
-        return -1
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class SALOAD(Opcode):
@@ -2567,8 +3017,9 @@ class SASTORE(Opcode):
 
 
 class SIPUSH(Opcode):
-    # args(2): byte1, byte2
-    # → value push a short onto the stack
+    # push a short onto the stack
+    # Args(2): byte1, byte2
+    # Stack: → value
     code = 0x11
 
     def __init__(self, const):
@@ -2587,8 +3038,12 @@ class SIPUSH(Opcode):
         writer.write_u2(self.const)
 
     @property
-    def stack_effect(self):
+    def produce_count(self):
         return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class SWAP(Opcode):
@@ -2599,6 +3054,14 @@ class SWAP(Opcode):
 
     def __init__(self):
         super(SWAP, self).__init__()
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class TABLESWITCH(Opcode):

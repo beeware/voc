@@ -2,8 +2,10 @@
 ALL_FILES=\
 	python/org/Python.class \
 	python/org/python/PyObject.class \
+	python/org/python/Callable.class \
 	python/org/python/Function.class \
 	python/org/python/InstanceMethod.class \
+	python/org/python/Iterable.class \
 	python/org/python/StaticMethod.class \
 	python/org/python/PyConstructor.class \
 	python/org/python/exceptions/ArithmeticError.class \

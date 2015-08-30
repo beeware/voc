@@ -1,4 +1,4 @@
-from .constants import Utf8
+from .constants import Utf8, Classref
 from .opcodes import Opcode
 
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
@@ -251,18 +251,18 @@ class ExceptionInfo:
 
         # If the value of the catch_type item is zero, this exception handler is
         # called for all exceptions. This is used to implement finally (§3.13).
-        self.catch_type = catch_type
+        self.catch_type = Classref(catch_type)
 
     @staticmethod
     def read(reader, dump=None):
         start_pc = reader.read_u2()
         end_pc = reader.read_u2()
         handler_pc = reader.read_u2()
-        catch_type = reader.read_u2()
+        catch_type = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
 
         if dump is not None:
-            print("    " * dump, '%s-%s (%s): %s' % (
-                start_pc, end_pc, handler_pc, catch_type
+            print("    " * dump, '%s: %s-%s [%s]' % (
+                catch_type, start_pc, end_pc, handler_pc,
             ))
 
         return ExceptionInfo(start_pc, end_pc, handler_pc, catch_type)
@@ -271,7 +271,10 @@ class ExceptionInfo:
         writer.write_u2(self.start_pc)
         writer.write_u2(self.end_pc)
         writer.write_u2(self.handler_pc)
-        writer.write_u2(self.catch_type)
+        writer.write_u2(writer.constant_pool.index(self.catch_type))
+
+    def resolve(self, constant_pool):
+        self.catch_type.resolve(constant_pool)
 
     def __len__(self):
         return 2 + 2 + 2 + 2
@@ -379,6 +382,7 @@ class Code(Attribute):
 
         code = []
         i = 0
+        reader.depth = 0
         while i < code_length:
             reader.offset = i
             opcode = Opcode.read(reader, dump=dump + 1 if dump is not None else dump)
@@ -387,7 +391,7 @@ class Code(Attribute):
 
         exception_table_length = reader.read_u2()
         if dump is not None:
-            print("    " * dump, 'Exceptions: (%d exceptions):' % exception_table_length)
+            print("    " * dump, 'Exceptions: (%d)' % exception_table_length)
 
         exceptions = []
         for i in range(0, exception_table_length):
@@ -425,6 +429,9 @@ class Code(Attribute):
 
         for attribute in self.attributes:
             attribute.resolve(constant_pool)
+
+        for exception in self.exception_table:
+            exception.resolve(constant_pool)
 
     @property
     def code_length(self):
@@ -519,6 +526,9 @@ class StackMapTable(Attribute):
     def __repr__(self):
         return '<StackMapTable (%d entries)>' % self.number_of_entries
 
+    def __len__(self):
+        return 2 + sum(len(entry) for entry in self.entries)
+
     @property
     def number_of_entries(self):
         """The value of the number_of_entries item gives the number of
@@ -586,6 +596,9 @@ class StackMapFrame:
     def write_info(self, writer):
         pass
 
+    def resolve(self, constant_pool):
+        pass
+
 
 # All frame types, even full_frame, rely on the previous frame for some of
 # their semantics. This raises the question of what is the very first frame?
@@ -608,6 +621,9 @@ class SameFrame(StackMapFrame):
     def __repr__(self):
         return '<SameFrame %s>' % self.frame_type
 
+    def __len__(self):
+        return 1
+
     @property
     def offset_delta(self):
         return self.frame_type
@@ -629,12 +645,15 @@ class SameLocals1StackItemFrame(StackMapFrame):
     # u1 frame_type = SAME_LOCALS_1_STACK_ITEM; /* 64-127 */
     # verification_type_info stack[1];
 
-    def __init__(self, offset_delta, verification_type_info):
+    def __init__(self, offset_delta, stack):
         super().__init__(offset_delta + 64)
-        self.verification_type_info = verification_type_info
+        self.stack = stack
 
     def __repr__(self):
-        return '<SameLocals1StackItemFrame %s>' % self.offset_delta
+        return '<SameLocals1StackItemFrame %s %s>' % (self.offset_delta, self.stack)
+
+    def __len__(self):
+        return 1 + len(self.stack)
 
     @property
     def offset_delta(self):
@@ -642,11 +661,14 @@ class SameLocals1StackItemFrame(StackMapFrame):
 
     @staticmethod
     def read_info(reader, frame_type):
-        verification_type_info = VerificationTypeInfo.read(reader)
-        return SameLocals1StackItemFrame(frame_type - 64, verification_type_info)
+        stack = VerificationTypeInfo.read(reader)
+        return SameLocals1StackItemFrame(frame_type - 64, stack)
 
     def write_info(self, writer):
-        self.verification_type_info.write(writer)
+        self.stack.write(writer)
+
+    def resolve(self, constant_pool):
+        self.stack.resolve(constant_pool)
 
 
 # Tags in the range [128-246] are reserved for future use.
@@ -664,23 +686,29 @@ class SameLocals1StackItemFrameExtended(StackMapFrame):
     # u2 offset_delta;
     # verification_type_info stack[1];
 
-    def __init__(self, offset_delta, verification_type_info):
+    def __init__(self, offset_delta, stack):
         super().__init__(247)
         self.offset_delta = offset_delta
-        self.verification_type_info = verification_type_info
+        self.stack = stack
 
     def __repr__(self):
         return '<SameLocals1StackItemFrameExtended %s>' % self.offset_delta
 
+    def __len__(self):
+        return 3 + len(self.stack)
+
     @staticmethod
     def read_info(reader, frame_type):
         offset_delta = reader.read_u2()
-        verification_type_info = VerificationTypeInfo.read(reader)
-        return SameLocals1StackItemFrameExtended(offset_delta, verification_type_info)
+        stack = VerificationTypeInfo.read(reader)
+        return SameLocals1StackItemFrameExtended(offset_delta, stack)
 
     def write_info(self, writer):
         writer.write_u2(self.offset_delta)
-        self.verification_type_info.write(writer)
+        self.stack.write(writer)
+
+    def resolve(self, constant_pool):
+        self.stack.resolve(constant_pool)
 
 
 class ChopFrame(StackMapFrame):
@@ -699,6 +727,9 @@ class ChopFrame(StackMapFrame):
 
     def __repr__(self):
         return '<ChopFrame %s, k=%s>' % (self.offset_delta, self.k)
+
+    def __len__(self):
+        return 3
 
     @property
     def k(self):
@@ -728,6 +759,9 @@ class SameFrameExtended(StackMapFrame):
 
     def __repr__(self):
         return '<SameFrameExtended %s>' % self.offset_delta
+
+    def __len__(self):
+        return 3
 
     @property
     def k(self):
@@ -779,6 +813,9 @@ class AppendFrame(StackMapFrame):
     def __repr__(self):
         return '<AppendFrame %s, k=%s, locals=%s>' % (self.offset_delta, self.k, self.locals)
 
+    def __len__(self):
+        return 3 + sum(len(local) for local in locals)
+
     @property
     def k(self):
         return self.frame_type - 251
@@ -795,6 +832,10 @@ class AppendFrame(StackMapFrame):
         writer.write_u2(self.offset_delta)
         for local in self.locals:
             local.write(writer)
+
+    def resolve(self, constant_pool):
+        for local in self.locals:
+            local.resolve(constant_pool)
 
 
 class FullFrame(StackMapFrame):
@@ -867,29 +908,43 @@ class VerificationTypeInfo:
     def __init__(self, tag):
         self.tag = tag
 
+    def __len__(self):
+        return 1
+
     @staticmethod
     def read(reader):
         tag = reader.read_u1()
-        return VerificationTypeInfo.read_info(reader, tag)
 
-    @staticmethod
-    def read_info(reader, tag):
         if tag == VerificationTypeInfo.ITEM_Top:
-            klass = TopVariableInfo
-        if tag == VerificationTypeInfo.ITEM_Integer:
-            klass = IntegerVariableInfo
-        if tag == VerificationTypeInfo.ITEM_Float:
-            klass = FloatVariableInfo
-        if tag == VerificationTypeInfo.ITEM_Long:
-            klass = LongVariableInfo
-        if tag == VerificationTypeInfo.ITEM_Double:
-            klass = DoubleVariableInfo
-        if tag == VerificationTypeInfo.ITEM_Null:
-            klass = NullVariableInfo
-        if tag == VerificationTypeInfo.ITEM_UninitializedThis:
-            klass = UninitializedThisVariableInfo
+            return TopVariableInfo()
+        elif tag == VerificationTypeInfo.ITEM_Integer:
+            return IntegerVariableInfo()
+        elif tag == VerificationTypeInfo.ITEM_Float:
+            return FloatVariableInfo()
+        elif tag == VerificationTypeInfo.ITEM_Long:
+            return LongVariableInfo()
+        elif tag == VerificationTypeInfo.ITEM_Double:
+            return DoubleVariableInfo()
+        elif tag == VerificationTypeInfo.ITEM_Null:
+            return NullVariableInfo()
+        elif tag == VerificationTypeInfo.ITEM_UninitializedThis:
+            return UninitializedThisVariableInfo()
+        elif tag == VerificationTypeInfo.ITEM_Object:
+            return ObjectVariableInfo.read_info(reader)
+        elif tag == VerificationTypeInfo.ITEM_Uninitialized:
+            return UninitializedVariableInfo.read_info(reader)
+        else:
+            raise Exception("Unknow verification tag type %s" % tag)
 
-        return klass()
+    def write(self, writer):
+        writer.write_u1(self.tag)
+        self.write_info(writer)
+
+    def write_info(self, writer):
+        pass
+
+    def resolve(self, constant_pool):
+        pass
 
 
 class TopVariableInfo(VerificationTypeInfo):
@@ -1014,20 +1069,27 @@ class ObjectVariableInfo(VerificationTypeInfo):
 
     # u1 tag = ITEM_Object; /* 7 */
     # u2 cpool_index;
-    def __init__(self, cpool_index):
+    def __init__(self, classname):
         super().__init__(VerificationTypeInfo.ITEM_Object)
-        self.cpool_index = cpool_index
+        self.klass = Classref(classname)
 
     def __repr__(self):
-        return "Object"
+        return "Object %s" % self.klass
+
+    def __len__(self):
+        return 3
 
     @staticmethod
-    def read_info(reader, tag):
-        cpool_index = reader.read
-        return ObjectVariableInfo(cpool_index)
+    def read_info(reader):
+        val = reader.read_u2()
+        klass = reader.constant_pool[val]
+        return ObjectVariableInfo('java/lang/NoSuchMethodException')
 
     def write_info(self, writer):
-        writer.write_u2(self.cpool_index)
+        writer.write_u2(writer.constant_pool.index(self.klass))
+
+    def resolve(self, constant_pool):
+        self.klass.resolve(constant_pool)
 
 
 class UninitializedVariableInfo(VerificationTypeInfo):
@@ -1047,8 +1109,8 @@ class UninitializedVariableInfo(VerificationTypeInfo):
         return "Unitialized"
 
     @staticmethod
-    def read_info(reader, tag):
-        offset = reader.read
+    def read_info(reader):
+        offset = reader.read_u2()
         return ObjectVariableInfo(offset)
 
     def write_info(self, writer):

@@ -1,4 +1,97 @@
-from ..java import opcodes as JavaOpcodes
+from ..java import opcodes as JavaOpcodes, Classref
+
+
+##########################################################################
+# Pseudo instructions used to flag the offset position of other
+# attributes of the code, especially those depened on opcode offset.
+##########################################################################
+
+
+class TRY:
+    """Mark the start of a try-catch block.
+
+    This forms the first of at least three pseudo-operations:
+        TRY()
+            ...
+        CATCH('your/exception/descriptor')
+            ...
+        CATCH('your/other/exception')
+            ...
+        END_TRY()
+
+    END_TRY come *after* the last operation in the relevant block;
+    but TRY and CATCH come *before* the first instruction. A little
+    special handling is required to account for this.
+
+        1. When the TRY is created, it is empty, and has no start_op.
+           The empty pseudo-instruction is added to the exception list.
+        2. When the instruction *after* the TRY or CATCH is processed,
+           it is post-processed to fill in the operation marking the
+           start of the relevant section.
+        3. When a CATCH is found, that marks the end of the TRY; a
+           new handler is registered in the current exception.
+           If it's the first CATCH, a GOTO is added, with no offset,
+           and recorded as the jump_op. The offset will be updated
+           when the END is found.
+        4. When an END is found, that marks the end of the current
+           exception. An end_op is recorded; that means this try block
+           is no longer current.
+
+    Exception blocks can be nested, so when a CATCH or END is found,
+    it is recorded against the last exception in the exception list
+    that has no end_op recorded.
+
+    """
+    def __init__(self):
+        self.start_op = None
+        self.end_op = None
+        self.jump_op = None
+        self.handlers = []
+
+    def process(self, code, exceptions):
+        exceptions.append(self)
+
+    def post_process(self, op):
+        self.start_op = op
+
+
+class END_TRY:
+    def process(self, code, exceptions):
+        # Find the most recent exception on the stack that hasn't been
+        # ended. That's the block we're ending.
+        for self.exception in exceptions[::-1]:
+            if self.exception.end_op is None:
+                break
+
+    def post_process(self, op):
+        self.exception.end_op = op
+
+
+class CATCH:
+    def __init__(self, descriptor):
+        self.descriptor = descriptor
+
+    # The CATCH needs to be able to pass as an opcode under initial
+    # post processing
+    def __len__(self):
+        3
+
+    def process(self, code, exceptions):
+        # Find the most recent exception on the stack that hasn't been
+        # ended. That's the block that the catch applies to.
+        for self.exception in exceptions[::-1]:
+            if self.exception.end_op is None:
+                break
+
+        # If this is the first catch, insert a GOTO operation.
+        # The jump distance will be updated when the exception is
+        # converted.
+        if len(self.exception.handlers) == 0:
+            self.exception.jump_op = JavaOpcodes.GOTO(0)
+            code.append(self.exception.jump_op)
+
+    def post_process(self, op):
+        self.exception.handlers.append((self.descriptor, op))
 
 
 ##########################################################################
@@ -9,14 +102,36 @@ from ..java import opcodes as JavaOpcodes
 # value.
 ##########################################################################
 
-def get_local(localvars, name):
+def ALOAD_name(localvars, name):
+    """Generate the opcode to load a variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
     i = localvars[name]
     if i is None:
         raise KeyError(name)
-    return i
+
+    if i == 0:
+        return JavaOpcodes.ALOAD_0()
+    elif i == 1:
+        return JavaOpcodes.ALOAD_1()
+    elif i == 2:
+        return JavaOpcodes.ALOAD_2()
+    elif i == 3:
+        return JavaOpcodes.ALOAD_3()
+    else:
+        return JavaOpcodes.ALOAD(i)
 
 
-def create_local(localvars, name):
+def ASTORE_name(localvars, name):
+    """Generate the opcode to store a variable with the given name.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
     try:
         i = localvars[name]
         if i is None:
@@ -24,7 +139,41 @@ def create_local(localvars, name):
     except KeyError:
         i = len(localvars)
         localvars[name] = i
-    return i
+
+    if i == 0:
+        return JavaOpcodes.ASTORE_0()
+    elif i == 1:
+        return JavaOpcodes.ASTORE_1()
+    elif i == 2:
+        return JavaOpcodes.ASTORE_2()
+    elif i == 3:
+        return JavaOpcodes.ASTORE_3()
+    else:
+        return JavaOpcodes.ASTORE(i)
+
+
+def ICONST_val(value):
+    """Write a constant onto the stack.
+
+    There are a couple of opcodes that can be used to optimize the
+    loading of small integers; use them if possible.
+    """
+    if value == 0:
+        return JavaOpcodes.ICONST_0()
+    elif value == 1:
+        return JavaOpcodes.ICONST_1()
+    elif value == 2:
+        return JavaOpcodes.ICONST_2()
+    elif value == 3:
+        return JavaOpcodes.ICONST_3()
+    elif value == 4:
+        return JavaOpcodes.ICONST_4()
+    elif value == 5:
+        return JavaOpcodes.ICONST_5()
+    elif value == -1:
+        return JavaOpcodes.ICONST_M1()
+    else:
+        return JavaOpcodes.LDC(value)
 
 
 ##########################################################################
@@ -32,6 +181,9 @@ def create_local(localvars, name):
 ##########################################################################
 
 class Opcode:
+    start_block = False
+    end_block = False
+
     @property
     def opname(self):
         return self.__class__.__name__
@@ -211,6 +363,7 @@ class NOP(Opcode):
         code.append(JavaOpcodes.NOP())
         return code
 
+
 class UNARY_POSITIVE(Opcode):
     __method__ = '__pos__'
 
@@ -258,7 +411,6 @@ class BINARY_FLOOR_DIVIDE(BinaryOpcode):
 
 class BINARY_TRUE_DIVIDE(BinaryOpcode):
     __method__ = '__truediv__'
-
 
 
 class INPLACE_FLOOR_DIVIDE(InplaceOpcode):
@@ -392,6 +544,8 @@ class RETURN_VALUE(Opcode):
 
 
 class POP_BLOCK(Opcode):
+    end_block = True
+
     @property
     def consume_count(self):
         return 0
@@ -399,6 +553,10 @@ class POP_BLOCK(Opcode):
     @property
     def product_count(self):
         return 0
+
+    def convert(self, context, arguments):
+        code = []
+        return code
 
 
 # class END_FINALLY(Opcode):
@@ -432,18 +590,19 @@ class STORE_NAME(Opcode):
         if code[-1] is None:
             code.pop()
         else:
-            i = create_local(context.localvars, self.name)
+            if context.is_module:
+                # If this is a module-level context, also store the name
+                # in the globals dictionary for the module.
+                code.extend([
+                    ASTORE_name(context.localvars, '#TEMP#'),
+                    JavaOpcodes.GETSTATIC(context.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+                    JavaOpcodes.LDC(self.name),
+                    ALOAD_name(context.localvars, '#TEMP#'),
+                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                    ALOAD_name(context.localvars, '#TEMP#'),
+                ])
 
-            if i == 0:
-                code.append(JavaOpcodes.ASTORE_0())
-            elif i == 1:
-                code.append(JavaOpcodes.ASTORE_1())
-            elif i == 2:
-                code.append(JavaOpcodes.ASTORE_2())
-            elif i == 3:
-                code.append(JavaOpcodes.ASTORE_3())
-            else:
-                code.append(JavaOpcodes.ASTORE(i))
+            code.append(ASTORE_name(context.localvars, self.name))
 
         return code
 
@@ -466,6 +625,10 @@ class FOR_ITER(Opcode):
     @property
     def product_count(self):
         return 2
+
+    def convert(self, context, arguments):
+        code = []
+        return code
 
 
 # class UNPACK_EX(Opcode):
@@ -569,29 +732,93 @@ class LOAD_NAME(Opcode):
     def convert(self, context, arguments):
         code = []
         try:
-            i = get_local(context.localvars, self.name)
-            if i == 0:
-                code.append(JavaOpcodes.ALOAD_0())
-            elif i == 1:
-                code.append(JavaOpcodes.ALOAD_1())
-            elif i == 2:
-                code.append(JavaOpcodes.ALOAD_2())
-            elif i == 3:
-                code.append(JavaOpcodes.ALOAD_3())
-            else:
-                code.append(JavaOpcodes.ALOAD(i))
+            code.append(ALOAD_name(context.localvars, self.name))
         except KeyError:
             # Look for global name (static variable in current class)
             # Then look for builtin.
-            code.append(JavaOpcodes.GETSTATIC(context.class_descriptor, self.name, 'Lorg/python/PyObject'))
+            code.append(JavaOpcodes.GETSTATIC(context.class_descriptor, self.name, 'Lorg/python/PyObject;'))
 
         return code
 
 
-# class BUILD_TUPLE(Opcode):
-# class BUILD_LIST(Opcode):
-# class BUILD_SET(Opcode):
-# class BUILD_MAP(Opcode):
+class BUILD_TUPLE(Opcode):
+    def __init__(self, count):
+        self.count = count
+
+    def __arg_repr__(self):
+        return str(self.count)
+
+    @property
+    def consume_count(self):
+        return self.count
+
+    @property
+    def product_count(self):
+        return 1
+
+    # def convert(self, context, arguments):
+    #     code = []
+    #     return code
+
+
+class BUILD_LIST(Opcode):
+    def __init__(self, count):
+        self.count = count
+
+    def __arg_repr__(self):
+        return str(self.count)
+
+    @property
+    def consume_count(self):
+        return self.count
+
+    @property
+    def product_count(self):
+        return 1
+
+    # def convert(self, context, arguments):
+    #     code = []
+    #     return code
+
+
+class BUILD_SET(Opcode):
+    def __init__(self, count):
+        self.count = count
+
+    def __arg_repr__(self):
+        return str(self.count)
+
+    @property
+    def consume_count(self):
+        return self.count
+
+    @property
+    def product_count(self):
+        return 1
+
+    # def convert(self, context, arguments):
+    #     code = []
+    #     return code
+
+
+class BUILD_MAP(Opcode):
+    def __init__(self, count):
+        self.count = count
+
+    def __arg_repr__(self):
+        return str(self.count)
+
+    @property
+    def consume_count(self):
+        return self.count
+
+    @property
+    def product_count(self):
+        return 1
+
+    # def convert(self, context, arguments):
+    #     code = []
+    #     return code
 
 
 class LOAD_ATTR(Opcode):
@@ -615,7 +842,7 @@ class LOAD_ATTR(Opcode):
         code.append(JavaOpcodes.LDC(self.name))
 
         code.extend([
-            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '__getattr__', '(java/lang/String;org/python/PyObject)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/PyObject', '__getattr__', '(Ljava/lang/String;)Lorg/python/PyObject;'),
         ])
         return code
 
@@ -692,6 +919,10 @@ class JUMP_ABSOLUTE(Opcode):
     def product_count(self):
         return 0
 
+    def convert(self, context, arguments):
+        code = []
+        return code
+
 
 class POP_JUMP_IF_FALSE(Opcode):
     def __init__(self, target):
@@ -707,6 +938,10 @@ class POP_JUMP_IF_FALSE(Opcode):
     @property
     def product_count(self):
         return 0
+
+    def convert(self, context, arguments):
+        code = []
+        return code
 
 
 class POP_JUMP_IF_TRUE(Opcode):
@@ -742,6 +977,8 @@ class LOAD_GLOBAL(Opcode):
 
 
 class SETUP_LOOP(Opcode):
+    start_block = True
+
     def __init__(self, delta):
         self.delta = delta
 
@@ -753,6 +990,9 @@ class SETUP_LOOP(Opcode):
     def product_count(self):
         return 0
 
+    def convert(self, context, arguments):
+        code = []
+        return code
 
 # class SETUP_EXCEPT(Opcode):
 # class SETUP_FINALLY(Opcode):
@@ -774,22 +1014,7 @@ class LOAD_FAST(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        code = []
-
-        i = get_local(context.localvars, self.name)
-
-        if i == 0:
-            code.append(JavaOpcodes.ALOAD_0())
-        elif i == 1:
-            code.append(JavaOpcodes.ALOAD_1())
-        elif i == 2:
-            code.append(JavaOpcodes.ALOAD_2())
-        elif i == 3:
-            code.append(JavaOpcodes.ALOAD_3())
-        else:
-            code.append(JavaOpcodes.ALOAD(i))
-
-        return code
+        return [ALOAD_name(context.localvars, self.name)]
 
 
 class STORE_FAST(Opcode):
@@ -810,18 +1035,7 @@ class STORE_FAST(Opcode):
         for argument in arguments:
             code.extend(argument.operation.convert(context, argument.arguments))
 
-        i = create_local(context.localvars, self.name)
-
-        if i == 0:
-            code.append(JavaOpcodes.ASTORE_0())
-        elif i == 1:
-            code.append(JavaOpcodes.ASTORE_1())
-        elif i == 2:
-            code.append(JavaOpcodes.ASTORE_2())
-        elif i == 3:
-            code.append(JavaOpcodes.ASTORE_3())
-        else:
-            code.append(JavaOpcodes.ASTORE(i))
+        code.append(ASTORE_name(context.localvars, self.name))
 
         return code
 
@@ -893,16 +1107,39 @@ class CALL_FUNCTION(Opcode):
 
         else:
             method_name = arguments[0].operation.name
-            descriptor = '(%s)Lorg/python/PyObject;' % ('Lorg/python/PyObject;' * (len(arguments) - 1))
+            code = [
+                # Retrieve the callable from globals
+                JavaOpcodes.GETSTATIC(context.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.LDC(method_name),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.CHECKCAST('org/python/Callable'),
 
-            for argument in arguments[1:]:
+                # Create an array to pass in arguments to invoke()
+                ICONST_val(len(arguments) - 1),
+                JavaOpcodes.ANEWARRAY('org/python/PyObject'),
+            ]
+
+            for i, argument in enumerate(arguments[1:]):
+                code.extend([
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                ])
                 code.extend(argument.operation.convert(context, argument.arguments))
+                code.append(JavaOpcodes.AASTORE())
 
             code.extend([
-                JavaOpcodes.INVOKESTATIC('org/pybee/example', method_name, descriptor),
-                None
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/PyObject;)Lorg/python/PyObject;', 2),
             ])
         return code
+
+        # if class:
+        #     JavaOpcodes.NEW('java/lang/CLASSNAME'),
+        #     JavaOpcodes.DUP(),
+        #     JavaOpcodes.INVOKESPECIAL('java/lang/CLASSNAME', '<init>', '()V'),
+        # elif method:
+        #     JavaOpcodes.INVOKEVIRTUAL('java/lang/CLASSNAME', method_name, descriptor)
+        # elif staticmethod:
+        #     JavaOpcodes.INVOKESTATIC('java/lang/CLASSNAME', method_name, descriptor)
 
 
 class MAKE_FUNCTION(Opcode):
@@ -929,11 +1166,88 @@ class MAKE_FUNCTION(Opcode):
     def product_count(self):
         return 1
 
+    def convert(self, context, arguments):
+        # Add a new method definition to the context class/module
+        from .method import Method, extract_parameters
+
+        code = arguments[0].operation.const
+        method_name = arguments[-1].operation.const
+        method = Method(context, method_name, extract_parameters(code), static=context.is_module)
+        method.extract(code)
+
+        context.add_method(method.transpile())
+
+        # Push a callable onto the stack so that it can be stored
+        # in globals and subsequently retrieved and run.
+        return [
+            # Get a Method representing the new function
+            TRY(),
+                JavaOpcodes.LDC(Classref(context.descriptor)),
+                JavaOpcodes.LDC(method_name),
+                JavaOpcodes.ICONST_1(),
+                JavaOpcodes.ANEWARRAY('java/lang/Class'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.ICONST_0(),
+                JavaOpcodes.LDC(Classref('org/python/PyObject')),
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'java/lang/Class',
+                    'getMethod',
+                    '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'
+                ),
+                ASTORE_name(context.localvars, '#METHOD#'),
+
+                # Then wrap that Method into a Callable.
+                JavaOpcodes.NEW('org/python/Function'),
+                JavaOpcodes.DUP(),
+                ALOAD_name(context.localvars, '#METHOD#'),
+                JavaOpcodes.INVOKESPECIAL('org/python/Function', '<init>', '(Ljava/lang/reflect/Method;)V'),
+            CATCH('java/lang/NoSuchMethodError'),
+                ASTORE_name(context.localvars, '#EXCEPTION#'),
+                JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC('Unable to find MAKE_FUNCTION output %s.%s' % (context.descriptor, method_name)),
+                JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.ATHROW(),
+            END_TRY()
+        ]
+
 
 # class BUILD_SLICE(Opcode):
 
-# class MAKE_CLOSURE(Opcode):
-# class LOAD_CLOSURE(Opcode):
+class MAKE_CLOSURE(Opcode):
+    def __init__(self, argc):
+        self.argc = argc
+
+    def __arg_repr__(self):
+        return '%s' % (self.argc)
+
+    @property
+    def consume_count(self):
+        return 3 + self.argc
+
+    @property
+    def product_count(self):
+        return 1
+
+
+class LOAD_CLOSURE(Opcode):
+    def __init__(self, i):
+        self.i = i
+
+    def __arg_repr__(self):
+        return '%s' % (self.i)
+
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert(self, context, arguments):
+        return []
 
 # class LOAD_DEREF(Opcode):
 # class STORE_DEREF(Opcode):

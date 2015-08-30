@@ -422,6 +422,9 @@ class InterfaceMethodref(Constant):
         # The indicated descriptor must be a method descriptor (§4.3.3).
         self.name_and_type = NameAndType(name, descriptor)
 
+        # For convenience, store a parsed version of the descriptor.
+        self.descriptor = method_descriptor(descriptor)
+
     def __repr__(self):
         return '<InterfaceMethodref %s.%s %s>' % (self.klass.name, self.name_and_type.name, self.name_and_type.descriptor)
 

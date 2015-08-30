@@ -3,8 +3,7 @@ import marshal
 import os
 import py_compile
 
-from .python.module import transpile as transpile_module
-from .python.utils import Context, extract
+from .python.module import Module
 
 
 def transpile(sourcefile, namespace, outdir=None):
@@ -24,31 +23,22 @@ class Transpiler:
     def write(self, outdir):
         # Create directory tree to store classfile
         if outdir:
-            dirparts = [outdir]
+            basedir = [outdir]
         else:
-            dirparts = []
-        dirparts = dirparts + self.namespace.split('.')
-        dirname = os.path.join(*dirparts)
+            basedir = []
 
-        try:
-            os.makedirs(dirname)
-        except FileExistsError:
-            pass
+        for namespace, classname, javaclassfile in self.classfiles:
+            dirname = os.path.join(*(basedir + self.namespace.split('.')))
+            try:
+                os.makedirs(dirname)
+            except FileExistsError:
+                pass
 
-        for classname, module, classfile in self.classfiles:
-
-            if module:
-                classfilename = os.path.join(dirname, module, '%s.class' % classname)
-                try:
-                    os.mkdir(os.path.join(dirname, module))
-                except FileExistsError:
-                    pass
-            else:
-                classfilename = os.path.join(dirname, '%s.class' % classname)
+            classfilename = os.path.join(dirname, '%s.class' % classname)
 
             print("Writing %s ..." % classfilename)
             with open(classfilename, 'wb') as out:
-                classfile.write(out)
+                javaclassfile.write(out)
         print("Done.")
 
     def transpile(self, sourcefile):
@@ -59,29 +49,11 @@ class Transpiler:
             # Decompile the code object.
             code = marshal.load(compiled)
 
-        # Ultimately, all operations are going to end up either:
-        #  * Defining a class
-        #  * Defining a method
-        #  * Defining body code
-        # Sometimes, a method or parts of body code may play a special role
-        # (e.g., an __init__ or mainline method).
-        # Extract the parts out of the code, which we will use to create
-        # the java representation.
-        # This process is recursive, working down the entire code tree.
-        # This top level module isn't designed to be instantiated, so methods
-        # defined in this context are all static.
+        module = Module(self.namespace, sourcefile)
 
-        context = Context(
-            sourcefile=sourcefile,
-            namespace=self.namespace,
-            name='<clinit>',
-            static=True,
-            return_signature={'return': None},
-            ignore_empty=True,
-        )
-
-        parts = extract(context, code)
+        # Extract commands from the code block
+        module.extract(code)
 
         # Transpile the module code, adding any classfiles generated
         # to the list to be exported.
-        self.classfiles.extend(transpile_module(context, parts))
+        self.classfiles.extend(module.transpile())
