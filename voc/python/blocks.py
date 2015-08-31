@@ -152,7 +152,15 @@ class Block:
 
         # Lastly, update any IF-related offsets
         for if_block in parts.if_blocks:
+            # Update the jumps for the initial IF block
             if_block.if_op.offset = if_block.end_op.code_offset - if_block.if_op.code_offset
+            if if_block.jump_op:
+                if_block.jump_op.offset = if_block.end_op.code_offset - if_block.jump_op.code_offset
+
+            # Update the jumps for each ELIF/ELSE
+            for else_if in if_block.elifs:
+                else_if.if_op.offset = if_block.end_op.code_offset - else_if.if_op.code_offset
+                else_if.jump_op.offset = if_block.end_op.code_offset - else_if.jump_op.code_offset
 
         return JavaCode(
             max_stack=parts.stack_depth(),

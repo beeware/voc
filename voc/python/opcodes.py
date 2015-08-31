@@ -7,27 +7,166 @@ from ..java import opcodes as JavaOpcodes, Classref
 ##########################################################################
 
 class IF:
-    def __init__(self, opcode):
+    """Mark the start of an if-endif block.
+
+    This forms the first of at least two pseudo-operations. It might be
+    as simple as:
+        IF([], IFOPCODE)
+            ...
+        END_IF()
+
+    or as complex as
+
+        IF([
+                ... # commands to prepare stack for IF opcode
+            ],
+            IFOPCODE
+        )
+            ...
+        ELIF([
+                ... # commands to prepare stack for next IF opcode
+            ],
+            IFOPCODE
+        )
+            ...
+        ELIF([
+                ... # commands to prepare stack for next IF opcode
+            ],
+            IFOPCODE
+        )
+            ...
+        ELSE()
+            ...
+        END_IF()
+
+    END_IF comes *after* the last operation in the relevant block;
+    but IF, ELIF and ELSE come *before* the first instruction. A little
+    special handling is required to account for this.
+
+        1. When the IF is created, it is empty, and has no start_op.
+           The empty pseudo-instruction is added to the if_blocks list.
+        2. When the instruction *after* the IF, ELIF or ELSE is processed,
+           it is post-processed to fill in the operation marking the
+           start of the relevant section.
+        3. When the first ELIF/ELSE is found, that marks the end of the IF; a
+           new elif block is registered. A GOTO is added, with no offset,
+           to the end of the IF block. The offset will be updated
+           when the END_IF is found.
+        3. When the 2+ ELIF/ELSE is found, that marks the end of the previous
+           ELIF; a new elif block is registered. A GOTO is added, with no offset,
+           to the end of the previous block. The offset will be updated
+           when the END_IF is found.
+        4. When an END_IF is found, that marks the end of the current
+           exception. An end_op is recorded; that means this if block
+           is no longer current.
+
+    IF-ELSE blocks can be nested, so when an ELIF, ELSE or END_IF is found,
+    it is recorded against the last IF in the if_blocks list
+    that has no end_op recorded.
+
+    """
+    def __init__(self, commands, opcode):
+        # The commands to prepare the stack for the IF comparison
+        self.commands = commands if commands is not None else []
+
+        # The opcode class to instantiate
         self.opcode = opcode
+
+        # The instantiated opcode for the comparison
         self.if_op = None
+
+        # The list of all ELSE blocks associated with this IF
+        self.elifs = []
+
+        # The jump operation at the end of the IF, jumping to the
+        # end of the IF-ELSE block.
+        self.jump_op = None
+
+        # The last operation in the IF-ELSE block - the target for
+        # all if-exiting jumps.
         self.end_op = None
 
     def process(self, parts):
-        parts.if_blocks.append(self)
+        # Add the stack prepration commands to the code list
+        parts.code.extend(self.commands)
+
+        # Create an instance of the opcode and put it on the code list
         self.if_op = self.opcode(0)
         parts.code.append(self.if_op)
+
+        # Record this IF.
+        parts.if_blocks.append(self)
 
     def post_process(self, parts):
         pass
 
 
-class ENDIF:
+class ELIF:
+    def __init__(self, commands, opcode):
+        # The master IF block
+        self.if_block = None
+
+        # The commands to prepare the stack for the IF comparison
+        self.commands = commands if commands is not None else []
+
+        # The opcode class to instantiate
+        self.opcode = opcode
+
+        # The instantiated opcode for the comparison
+        self.elif_op = None
+
+        # The jump operation at the end of the ELIF, jumping to the
+        # end of the IF-ELSE block.
+        self.jump_op = None
+
     def process(self, parts):
+        # Find the most recent if block on the stack that hasn't been
+        # ended. That's the block that the elif applies to.
+        for self.if_block in parts.if_blocks[::-1]:
+            if self.if_block.end_op is None:
+                break
+
+        # If this is the first elif, add a GOTO and use it as the
+        # jump operation at the end of the IF block. If there are
+        # ELIFs, add the GOTO as the jump operation on the most
+        # recent ELIF.
+        jump_op = JavaOpcodes.GOTO(0)
+        parts.code.append(jump_op)
+        if len(self.if_block.elifs) == 0:
+            self.if_block.jump_op = jump_op
+        else:
+            self.if_block.handlers[-1].jump_op = jump_op
+
+        if self.opcode:
+            # Add the stack prepration commands to the code list
+            parts.code.extend(self.commands)
+
+            # Create an instance of the opcode and put it on the code list
+            self.if_op = self.opcode(0)
+            parts.code.append(self.if_op)
+
+        self.if_block.elifs.append(self)
+
+    def post_process(self, parts):
+        pass
+
+
+class ELSE(ELIF):
+    def __init__(self):
+        # ELSE if an ELIF with no preparation and no comparison opcode
+        super().__init__(None, None)
+
+
+class END_IF:
+    def process(self, parts):
+        # Find the most recent if block on the stack that hasn't been
+        # ended. That's the block that the elif applies to.
         for self.if_block in parts.if_blocks[::-1]:
             if self.if_block.end_op is None:
                 break
 
     def post_process(self, parts):
+        # Record the operation that comes directly after the END_IF.
         self.if_block.end_op = parts.code[-1]
 
 
@@ -768,14 +907,16 @@ class LOAD_NAME(Opcode):
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
 
                 # If there's nothing in the globals, then look for a builtin.
-                JavaOpcodes.DUP(),
-                IF(JavaOpcodes.IFNONNULL),
+                IF(
+                    [JavaOpcodes.DUP()],
+                    JavaOpcodes.IFNONNULL
+                ),
                     JavaOpcodes.POP(),
                     JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Lorg/python/Object;'),
                     ALOAD_name(context.localvars, "#ATTRNAME#"),
                     JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/lang/String;)V'),
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
-                ENDIF()
+                END_IF()
             ])
 
         return code
