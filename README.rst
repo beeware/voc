@@ -49,6 +49,10 @@ valuable company, issuing an 18% annual dividend for almost 200 years.
 
 VOC was... the world's first Enterprise using Java. (rimshot!)
 
+VOC is also a backronym for "Vestigial Output Compiler". Or "Vexing Obtuse
+Compiler". Or "Valuable Obscure Compiler". Or "Varigated Ocelot Calibrator".
+It's your choice.
+
 .. _Vereenigde Oostindische Compagnie (VOC): https://en.wikipedia.org/wiki/Dutch_East_India_Company
 
 Community
