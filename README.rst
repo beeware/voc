@@ -20,10 +20,15 @@ Install `voc`, then run the sample script::
     Writing sample.class...
     Done.
 
-This will produce a `sample.class` that you can run on any Java 1.7+ VM::
+This will produce a `sample.class` that you can run on any Java 1.7+ VM. You will
+need to make sure that the python.jar support file is in your classpath::
 
-    $ java sample
+    $ java -XX:-UseSplitVerifier --classpath python.jar:. sample
     Hello, World
+
+The ``-CC:-UsesplitVerifier`` argument is necessary to turn off stack map
+verification in Java 7. This could be addressed by computing stack maps
+for generated code.
 
 Documentation
 -------------

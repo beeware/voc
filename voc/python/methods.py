@@ -46,6 +46,10 @@ class Method(Block):
     def method_name(self):
         return self.name
 
+    @property
+    def module(self):
+        return self.parent
+
     def tweak(self, code):
         return self.void_return(code)
 
@@ -118,6 +122,10 @@ class MainMethod(Method):
     @property
     def method_name(self):
         return 'main'
+
+    @property
+    def module(self):
+        return self.parent
 
     @property
     def signature(self):

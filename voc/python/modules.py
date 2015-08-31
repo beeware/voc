@@ -7,10 +7,11 @@ from ..java import (
     Code as JavaCode,
     opcodes as JavaOpcodes,
     SourceFile,
+    Signature,
     # LineNumberTable
 )
-from .block import Block, IgnoreBlock
-from .method import MainMethod, Method, extract_parameters
+from .blocks import Block, IgnoreBlock
+from .methods import MainMethod, Method, extract_parameters
 from .opcodes import ASTORE_name, ALOAD_name
 
 
@@ -135,7 +136,15 @@ class Module(Block):
 
         # Add a globals dictionary to the module.
         classfile.fields.append(
-            JavaField('globals', 'Ljava/util/Hashtable;', public=True, static=True)
+            JavaField(
+                'globals',
+                'Ljava/util/Hashtable;',
+                public=True,
+                static=True,
+                attributes=[
+                    Signature('Ljava/util/Hashtable<Ljava/lang/String;Lorg/python/Object;>;')
+                ]
+            )
         )
 
         # Add a static method to the module.

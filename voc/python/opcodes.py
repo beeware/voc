@@ -1291,53 +1291,27 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.ATHROW(),
                 END_TRY()
             ]
-        elif arguments[0].operation.name == 'print':
-            if len(arguments) == 2:
-                # Just the one argument - no need to use a StringBuilder.
-                code.append(JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'))
-                code.extend(arguments[1].operation.convert(context, arguments[1].arguments))
-            else:
-                # Multiple arguments; use a StringBuilder to concatenate, and put a space
-                # between each argument.
-                code.extend([
-                    JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'),
-                    JavaOpcodes.NEW('java/lang/StringBuilder'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKESPECIAL('java/lang/StringBuilder', '<init>', '()V'),
-                ])
-
-                code.extend(arguments[1].operation.convert(context, arguments[1].arguments))
-                code.extend([
-                    JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/Object;)Ljava/lang/StringBuilder;'),
-                ])
-
-                for argument in arguments[2:]:
-                    code.extend([
-                        JavaOpcodes.LDC(" "),
-                        JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/String;)Ljava/lang/StringBuilder;')
-                    ])
-                    code.extend(argument.operation.convert(context, argument.arguments))
-                    code.extend([
-                        JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/Object;)Ljava/lang/StringBuilder;'),
-                    ])
-
-            # The None value in the code list is a special case;
-            # Python explicitly returns None and then pops the empty
-            # result; Java can just return. We put a marker here that
-            # the POP/STORE_* result can use to identify the special case.
-            code.extend([
-                JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/Object;)V'),
-                None
-            ])
-
 
         else:
             method_name = arguments[0].operation.name
+
             code = [
                 # Retrieve the callable from globals
-                JavaOpcodes.GETSTATIC(context.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.GETSTATIC(context.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC(method_name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+
+                # If there's nothing in the globals, then look for a builtin.
+                IF(
+                    [JavaOpcodes.DUP()],
+                    JavaOpcodes.IFNONNULL
+                ),
+                    JavaOpcodes.POP(),
+                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
+                    JavaOpcodes.LDC(method_name),
+                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+                END_IF(),
+
                 JavaOpcodes.CHECKCAST('org/python/Callable'),
 
                 # Create an array to pass in arguments to invoke()
@@ -1354,18 +1328,9 @@ class CALL_FUNCTION(Opcode):
                 code.append(JavaOpcodes.AASTORE())
 
             code.extend([
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;)Lorg/python/Object;', 2),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Ljava/lang/Object;)Lorg/python/Object;', 2),
             ])
         return code
-
-        # if class:
-        #     JavaOpcodes.NEW('java/lang/CLASSNAME'),
-        #     JavaOpcodes.DUP(),
-        #     JavaOpcodes.INVOKESPECIAL('java/lang/CLASSNAME', '<init>', '()V'),
-        # elif method:
-        #     JavaOpcodes.INVOKEVIRTUAL('java/lang/CLASSNAME', method_name, descriptor)
-        # elif staticmethod:
-        #     JavaOpcodes.INVOKESTATIC('java/lang/CLASSNAME', method_name, descriptor)
 
 
 class MAKE_FUNCTION(Opcode):

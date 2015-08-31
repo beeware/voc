@@ -13,7 +13,7 @@ public class InstanceMethod implements Callable {
         this.method = method;
     }
 
-    public org.python.Object invoke(org.python.Object... args) {
+    public org.python.Object invoke(java.lang.Object... args) {
         try {
             return (org.python.Object) this.method.invoke(args);
         } catch (IllegalAccessException e) {

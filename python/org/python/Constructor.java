@@ -12,7 +12,7 @@ public class Constructor implements Callable {
         this.constructor = constructor;
     }
 
-    public org.python.Object invoke(org.python.Object... args) {
+    public org.python.Object invoke(java.lang.Object... args) {
         try {
             return (org.python.Object) this.constructor.newInstance();
         } catch (IllegalAccessException e) {

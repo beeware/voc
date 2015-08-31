@@ -249,7 +249,9 @@ public class Object {
             if (other.type == String.class) {
                 return new org.python.Object(((String) this.value) + ((String) other.value));
             } else if (other.type == Long.class) {
+                return new org.python.Object(((String) this.value) + ((long) other.value));
             } else if (other.type == Float.class) {
+                return new org.python.Object(((String) this.value) + ((float) other.value));
             } else if (other.type == Map.class) {
             } else if (other.type == Set.class) {
             } else if (other.type == Object.class) {
@@ -257,15 +259,27 @@ public class Object {
             }
         } else if (this.type == Long.class) {
             if (other.type == String.class) {
+                return new org.python.Object(((Long) other.value) + ((String) this.value));
             } else if (other.type == Long.class) {
                 return new org.python.Object(((Long) this.value) + ((Long) other.value));
             } else if (other.type == Float.class) {
+                return new org.python.Object(((float) this.value) + ((float) other.value));
             } else if (other.type == Map.class) {
             } else if (other.type == Set.class) {
             } else if (other.type == Object.class) {
             } else if (other.type == ArrayList.class) {
             }
         } else if (this.type == Float.class) {
+            if (other.type == String.class) {
+                return new org.python.Object(((float) other.value) + ((String) this.value));
+            } else if (other.type == Long.class) {
+                return new org.python.Object(((float) this.value) + ((float) other.value));
+            } else if (other.type == Float.class) {
+            } else if (other.type == Map.class) {
+            } else if (other.type == Set.class) {
+            } else if (other.type == Object.class) {
+            } else if (other.type == ArrayList.class) {
+            }
         } else if (this.type == Map.class) {
         } else if (this.type == Set.class) {
         } else if (this.type == Object.class) {

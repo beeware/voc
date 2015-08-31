@@ -16,13 +16,13 @@ import org.python.exceptions.TypeError;
 
 
 public class Python {
-    public static Hashtable<String, org.python.Object> builtins;
+    public static Hashtable<java.lang.String, org.python.Object> builtins;
 
     /**
      * Load all the builtins into the dictionary as callables
      */
     static {
-        builtins = new Hashtable<String, org.python.Object>();
+        builtins = new Hashtable<java.lang.String, org.python.Object>();
 
         // Iterate over all methods, adding the static ones to builtins
         for (Method method: Python.class.getMethods()) {
@@ -929,15 +929,17 @@ public class Python {
      * end:   string appended after the last value, default a newline.
      * flush: whether to forcibly flush the stream.
      */
-    public static void print(org.python.Object... args) {
-        StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            buffer.append(args[i]);
-            if (i != args.length - 1) {
-                buffer.append(" ");
-            }
-        }
-        System.out.println(buffer.toString());
+    // public static void print(org.python.Object... args) {
+    public static void print(org.python.Object args) {
+        System.out.println(args);
+        // StringBuilder buffer = new StringBuilder();
+        // for (int i = 0; i < args.length; i++) {
+        //     buffer.append(args[i]);
+        //     if (i != args.length - 1) {
+        //         buffer.append(" ");
+        //     }
+        // }
+        // System.out.println(buffer.toString());
     }
 
     /**

@@ -1059,14 +1059,14 @@ class GETSTATIC(Opcode):
         return 3
 
     def __arg_repr__(self):
-        return ' %s.%s' % (self.field.klass.name, self.field.name_and_type.name)
+        return ' %s.%s (%s)' % (self.field.class_name, self.field.name, self.field.name_and_type.descriptor)
 
     @classmethod
     def read_extra(cls, reader, dump=None):
         field = reader.constant_pool[reader.read_u2()]
         return cls(
-            field.klass.name.bytes.decode('utf8'),
-            field.name_and_type.name.bytes.decode('utf8'),
+            field.class_name,
+            field.name,
             field.name_and_type.descriptor.bytes.decode('utf8')
         )
 
@@ -2956,14 +2956,14 @@ class PUTSTATIC(Opcode):
         return 3
 
     def __arg_repr__(self):
-        return ' %s.%s' % (self.field.klass.name, self.field.name_and_type.name)
+        return ' %s.%s (%s)' % (self.field.klass.name, self.field.name, self.field.name_and_type.descriptor)
 
     @classmethod
     def read_extra(cls, reader, dump=None):
         field = reader.constant_pool[reader.read_u2()]
         return cls(
-            field.klass.name.bytes.decode('utf8'),
-            field.name_and_type.name.bytes.decode('utf8'),
+            field.class_name,
+            field.name,
             field.name_and_type.descriptor.bytes.decode('utf8')
         )
 
