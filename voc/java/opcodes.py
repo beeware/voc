@@ -64,12 +64,20 @@ class Opcode:
 
 
 class AALOAD(Opcode):
+    # Load onto the stack a reference from an array
+    # Stack: arrayref, index → value
     code = 0x32
 
     def __init__(self):
         super(AALOAD, self).__init__()
-# arrayref, index → value
-# Load onto the stack a reference from an array
+
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def produce_count(self):
+        return 1
 
 
 class AASTORE(Opcode):
@@ -2927,7 +2935,6 @@ class POP2(Opcode):
     @property
     def consume_count(self):
         return 2
-
 
 
 class PUTFIELD(Opcode):

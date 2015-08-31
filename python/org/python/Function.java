@@ -13,10 +13,9 @@ public class Function extends org.python.Object implements Callable {
         this.method = method;
     }
 
-    public org.python.Object invoke(java.lang.Object... args) {
-        System.out.println("INVOKING " + method + ", args: " + args);
+    public org.python.Object invoke(org.python.Object[] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
         try {
-            return (org.python.Object) this.method.invoke(null, args);
+            return (org.python.Object) this.method.invoke(null, args, kwargs);
         } catch (IllegalAccessException e) {
             throw new RuntimeError("Illegal access to Java function " + this.method);
         } catch (InvocationTargetException e) {

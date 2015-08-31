@@ -1,6 +1,7 @@
 from ..java import Method as JavaMethod, opcodes as JavaOpcodes
 
 from .blocks import Block
+from .opcodes import ASTORE_name, ICONST_val
 
 
 POSITIONAL_OR_KEYWORD = 1
@@ -24,8 +25,12 @@ class Method(Block):
             self.returns = returns
 
         self.add_self()
-        for p in self.parameters:
-            self.localvars[p['name']] = len(self.localvars)
+        # Load args and kwargs, but don't expose those names into the localvars.
+        self.localvars[None] = len(self.localvars)
+        self.localvars[None] = len(self.localvars)
+        # Then reserve space for all the *actual* arguments.
+        for i, arg in enumerate(self.parameters):
+            self.localvars[arg['name']] = len(self.localvars)
 
         self.static = static
 
@@ -36,8 +41,7 @@ class Method(Block):
     @property
     def signature(self):
         return_descriptor = 'V' if self.returns.get('annotation') is None else 'Lorg/python/Object;'
-        param_descriptor = 'Lorg/python/Object;' * len(self.parameters)
-        return '(%s)%s' % (param_descriptor, return_descriptor)
+        return '([Lorg/python/Object;Ljava/util/Hashtable;)%s' % return_descriptor
 
     def add_self(self):
         pass
@@ -51,7 +55,19 @@ class Method(Block):
         return self.parent
 
     def tweak(self, code):
-        return self.void_return(code)
+        # Delete the 'args' and 'kwargs' from the locals namespace,
+        # but move all the content into
+        # Load all the arguments into locals
+        setup = []
+        for i, arg in enumerate(self.parameters):
+            setup.extend([
+                JavaOpcodes.ALOAD_0(),
+                ICONST_val(i),
+                JavaOpcodes.AALOAD(),
+                ASTORE_name(self.localvars, arg['name']),
+            ])
+
+        return self.void_return(setup + code)
 
     def transpile(self):
         code = super().transpile()
@@ -68,14 +84,12 @@ class Method(Block):
 
 class InitMethod(Method):
     def __init__(self, parent, parameters, commands=None):
-        print ("CREATE INIT FOR ",parent)
         super().__init__(
             parent, '__init__',
             parameters=parameters[1:],
             returns={},
             commands=commands
         )
-        print("LOCALS", self.localvars)
 
     @property
     def method_name(self):
@@ -190,7 +204,7 @@ def extract_parameters(code):
 
         parameters.append({
             'name': name,
-            'annotation': annotations[name],
+            'annotation': annotations.get(name),
             'kind': KEYWORD_ONLY,
             'default': default
         })
@@ -204,7 +218,7 @@ def extract_parameters(code):
         name = arg_names[index]
         parameters.append({
             'name': name,
-            'annotation': annotations[name],
+            'annotation': annotations.get(name),
             'kind': VAR_KEYWORD
         })
 

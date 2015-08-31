@@ -1315,11 +1315,12 @@ class CALL_FUNCTION(Opcode):
                 JavaOpcodes.CHECKCAST('org/python/Callable'),
 
                 # Create an array to pass in arguments to invoke()
-                ICONST_val(len(arguments) - 1),
+                ICONST_val(self.args),
                 JavaOpcodes.ANEWARRAY('org/python/Object'),
             ]
 
-            for i, argument in enumerate(arguments[1:]):
+            # Push all the arguments into an array
+            for i, argument in enumerate(arguments[1:self.args+1]):
                 code.extend([
                     JavaOpcodes.DUP(),
                     ICONST_val(i),
@@ -1327,20 +1328,40 @@ class CALL_FUNCTION(Opcode):
                 code.extend(argument.operation.convert(context, argument.arguments))
                 code.append(JavaOpcodes.AASTORE())
 
+            # Create a Hashtable, and push all the kwargs into it.
             code.extend([
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Ljava/lang/Object;)Lorg/python/Object;', 2),
+                JavaOpcodes.NEW('java/util/Hashtable'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V')
+            ])
+
+            for name, argument in zip(arguments[self.args+1::2], arguments[self.args+2::2]):
+                code.extend([
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC(name),
+                ])
+                code.extend(argument.operation.convert(context, argument.arguments))
+                code.extend([
+                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                    JavaOpcodes.POP()
+                ])
+
+            code.extend([
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;', 2),
             ])
         return code
 
 
 class MAKE_FUNCTION(Opcode):
     def __init__(self, argc):
+        self.argc = argc
         self.default_args = argc & 0xff
         self.default_kwargs = ((argc >> 8) & 0xFF)
         self.annotations = (argc >> 16) & 0x7FFF
 
     def __arg_repr__(self):
-        return '%s default args, %s default kwargs, %s annotations' % (
+        return '%d %s default args, %s default kwargs, %s annotations' % (
+            self.argc,
             self.default_args,
             self.default_kwargs,
             self.annotations,
@@ -1359,7 +1380,7 @@ class MAKE_FUNCTION(Opcode):
 
     def convert(self, context, arguments):
         # Add a new method definition to the context class/module
-        code = arguments[0].operation.const
+        code = arguments[-2].operation.const
         method_name = arguments[-1].operation.const
 
         context.add_method(method_name, code)
@@ -1371,11 +1392,15 @@ class MAKE_FUNCTION(Opcode):
             TRY(),
                 JavaOpcodes.LDC(Classref(context.module.descriptor)),
                 JavaOpcodes.LDC(method_name),
-                JavaOpcodes.ICONST_1(),
+                JavaOpcodes.ICONST_2(),
                 JavaOpcodes.ANEWARRAY('java/lang/Class'),
                 JavaOpcodes.DUP(),
                 JavaOpcodes.ICONST_0(),
-                JavaOpcodes.LDC(Classref('org/python/Object')),
+                JavaOpcodes.LDC(Classref('[Lorg/python/Object;')),
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.ICONST_1(),
+                JavaOpcodes.LDC(Classref('java/util/Hashtable')),
                 JavaOpcodes.AASTORE(),
                 JavaOpcodes.INVOKEVIRTUAL(
                     'java/lang/Class',

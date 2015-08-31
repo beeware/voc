@@ -13,9 +13,9 @@ public class InstanceMethod implements Callable {
         this.method = method;
     }
 
-    public org.python.Object invoke(java.lang.Object... args) {
+    public org.python.Object invoke(org.python.Object[] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
         try {
-            return (org.python.Object) this.method.invoke(args);
+            return (org.python.Object) this.method.invoke(args, kwargs);
         } catch (IllegalAccessException e) {
             throw new RuntimeError("Illegal access to Java instance method " + this.method);
         } catch (InvocationTargetException e) {
