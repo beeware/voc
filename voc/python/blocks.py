@@ -7,7 +7,7 @@ from ..java import (
 )
 
 from .utils import extract_command
-from .opcodes import ASTORE_name, ALOAD_name
+from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
 
 
 class IgnoreBlock(Exception):
@@ -21,6 +21,16 @@ class CodeParts:
         self.code = []
         self.try_catches = []
         self.if_blocks = []
+
+        self.next_resolve_list = []
+
+    def add_opcodes(self, *opcodes):
+        self.code.extend(opcodes)
+        for (obj, attr) in self.next_resolve_list:
+            # print("        resolve %s reference on %s with %s" % (attr, id(obj), opcodes[0]))
+            setattr(obj, attr, opcodes[0])
+            opcodes[0].references.append((obj, attr))
+        self.next_resolve_list = []
 
     def tweak(self):
         self.code = self.context.tweak(self.code)
@@ -49,9 +59,30 @@ class Block:
         ]
 
     def load_name(self, name, arguments):
-        return [
-            ALOAD_name(self.localvars, self.name)
-        ]
+        code = []
+        try:
+            # Look for a local first.
+            code.append(ALOAD_name(self.localvars, self.name))
+        except KeyError:
+            code.extend([
+                # If there isn't a local, look for a global
+                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Lorg/python/Object;'),
+                JavaOpcodes.LDC(self.name),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+
+                # If there's nothing in the globals, then look for a builtin.
+                IF(
+                    [JavaOpcodes.DUP()],
+                    JavaOpcodes.IFNONNULL
+                ),
+                    JavaOpcodes.POP(),
+                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Lorg/python/Object;'),
+                    JavaOpcodes.LDC(self.name),
+                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+                END_IF()
+            ])
+
+        return code
 
     @property
     def is_module(self):
@@ -93,8 +124,23 @@ class Block:
         return code
 
     def void_return(self, code):
+        """Ensure that end of the code sequence is a Java-style return of void.
+
+        Java has a separate opcode for VOID returns, which is different to
+        RETURN NULL. Replace "SET NULL" "ARETURN" pair with "RETURN".
+        """
+
         if len(code) >= 2 and isinstance(code[-2], JavaOpcodes.ACONST_NULL) and isinstance(code[-1], JavaOpcodes.ARETURN):
-            code = code[:-2] + [JavaOpcodes.RETURN()]
+            # There might be opcodes referencing these two - in particular if
+            # the last thing in the function is the end of an IF or TRY block.
+            # Find all the blocks that reference these two opcodes and update
+            # the references.
+            return_opcode = JavaOpcodes.RETURN()
+            for obj, attr in code[-2].references:
+                setattr(obj, attr, return_opcode)
+            for obj, attr in code[-1].references:
+                setattr(obj, attr, return_opcode)
+            code = code[:-2] + [return_opcode]
         return code
 
     def transpile(self):
@@ -108,20 +154,14 @@ class Block:
         # or other
 
         parts = CodeParts(self)
-        prev = None
         for cmd in self.commands:
             for instruction in cmd.operation.convert(self, cmd.arguments):
                 instruction.process(parts)
-                if prev is not None:
-                    prev.post_process(parts)
-                prev = instruction
-        if prev is not None:
-            prev.post_process(parts)
 
         # Java requires that every body of code finishes with a return.
         # Make sure there is one.
         if not isinstance(parts.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
-            parts.code.append(JavaOpcodes.RETURN())
+            parts.add_opcodes(JavaOpcodes.RETURN())
 
         # Provide any tweaks that are needed because of the context in which
         # the block is being used.
@@ -140,6 +180,8 @@ class Block:
         # Record a frame range for each one.
         exceptions = []
         for try_catch in parts.try_catches:
+            # print("TRY CATCH START", id(try_catch), try_catch.start_op, try_catch.start_op.code_offset)
+            # print("            END", try_catch.end_op)
             for handler in try_catch.handlers:
                 exceptions.append(JavaExceptionInfo(
                     try_catch.start_op.code_offset,
@@ -152,15 +194,20 @@ class Block:
 
         # Lastly, update any IF-related offsets
         for if_block in parts.if_blocks:
+            # print ("IF BLOCK START", id(if_block), if_block.if_op, if_block.if_op.code_offset)
+            # print ("         END", if_block.end_op, if_block.end_op.code_offset)
+            # print ("IF BLOCK JUMP", if_block.jump_op, if_block.jump_op.code_offset)
             # Update the jumps for the initial IF block
             if_block.if_op.offset = if_block.end_op.code_offset - if_block.if_op.code_offset
             if if_block.jump_op:
                 if_block.jump_op.offset = if_block.end_op.code_offset - if_block.jump_op.code_offset
 
-            # Update the jumps for each ELIF/ELSE
+            # # Update the jumps for each ELIF/ELSE
             for else_if in if_block.elifs:
+                # print('    has elif')
                 else_if.if_op.offset = if_block.end_op.code_offset - else_if.if_op.code_offset
-                else_if.jump_op.offset = if_block.end_op.code_offset - else_if.jump_op.code_offset
+                if else_if.jump_op:
+                    else_if.jump_op.offset = if_block.end_op.code_offset - else_if.jump_op.code_offset
 
         return JavaCode(
             max_stack=parts.stack_depth(),

@@ -1,7 +1,7 @@
 from ..java import Method as JavaMethod, opcodes as JavaOpcodes
 
 from .blocks import Block
-from .opcodes import ASTORE_name, ICONST_val
+from .opcodes import ALOAD_name, ASTORE_name, ICONST_val
 
 
 POSITIONAL_OR_KEYWORD = 1
@@ -24,10 +24,11 @@ class Method(Block):
         else:
             self.returns = returns
 
-        self.add_self()
         # Load args and kwargs, but don't expose those names into the localvars.
-        self.localvars[None] = len(self.localvars)
-        self.localvars[None] = len(self.localvars)
+        self.add_self()
+        self.localvars['##__args__##'] = len(self.localvars)
+        self.localvars['##__kwargs__##'] = len(self.localvars)
+
         # Then reserve space for all the *actual* arguments.
         for i, arg in enumerate(self.parameters):
             self.localvars[arg['name']] = len(self.localvars)
@@ -55,13 +56,11 @@ class Method(Block):
         return self.parent
 
     def tweak(self, code):
-        # Delete the 'args' and 'kwargs' from the locals namespace,
-        # but move all the content into
         # Load all the arguments into locals
         setup = []
         for i, arg in enumerate(self.parameters):
             setup.extend([
-                JavaOpcodes.ALOAD_0(),
+                ALOAD_name(self.localvars, '##__args__##'),
                 ICONST_val(i),
                 JavaOpcodes.AALOAD(),
                 ASTORE_name(self.localvars, arg['name']),
@@ -104,23 +103,34 @@ class InitMethod(Method):
         return self.klass.module
 
     def add_self(self):
-        self.localvars['self'] = 0
+        self.localvars['self'] = len(self.localvars)
 
     def tweak(self, code):
         # If the block is an init method, make sure it invokes super().<init>
         super_found = False
-        for opcode in code:
-            if isinstance(opcode, JavaOpcodes.INVOKESPECIAL) and opcode.method.name == '<init>':
-                super_found = True
-                break
+        # FIXME: Search for existing calls on <init>
+        # for opcode in code:
+        #     if isinstance(opcode, JavaOpcodes.INVOKESPECIAL) and opcode.method.name == '<init>':
+        #         super_found = True
+        #         break
+
+        # Load all the arguments into locals
+        setup = []
+        for i, arg in enumerate(self.parameters):
+            setup.extend([
+                ALOAD_name(self.localvars, '##__args__##'),
+                ICONST_val(i),
+                JavaOpcodes.AALOAD(),
+                ASTORE_name(self.localvars, arg['name']),
+            ])
 
         if not super_found:
-            code = [
+            setup.extend([
                 JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.INVOKESPECIAL(self.klass.superclass, '<init>', '()V'),
-            ] + code
+                JavaOpcodes.INVOKESPECIAL(self.klass.super_name, '<init>', '()V'),
+            ])
 
-        return self.ignore_empty(self.void_return(code))
+        return self.ignore_empty(self.void_return(setup + code))
 
 
 class MainMethod(Method):

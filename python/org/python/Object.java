@@ -15,72 +15,85 @@ public class Object {
     /**
      * Copy Constructor
      */
-    public Object(org.python.Object v, Type t) {
+    public Object(java.lang.Object v, Type t) {
         value = v;
         type = t;
     }
 
     public Object() {
+        // System.out.println("Create Object");
         type = java.lang.Object.class;
         value = new Hashtable<String, org.python.Object>();
     }
 
     public Object(boolean v) {
+        // System.out.println("Create boolean");
         type = Boolean.class;
         value = v;
     }
 
     public Object(byte v) {
+        // System.out.println("Create byte");
         type = Long.class;
         value = (long)v;
     }
 
     public Object(short v) {
+        // System.out.println("Create short");
         type = Long.class;
         value = (long)v;
     }
 
     public Object(int v) {
+        // System.out.println("Create int");
         type = Long.class;
         value = (long)v;
     }
 
     public Object(long v) {
+        // System.out.println("Create long");
         type = Long.class;
         value = v;
     }
 
     public Object(float v) {
+        // System.out.println("Create float");
         type = Float.class;
         value = (double)v;
     }
 
     public Object(double v) {
+        // System.out.println("Create double");
         type = Float.class;
         value = v;
     }
 
     public Object(char v) {
+        // System.out.println("Create char");
         type = String.class;
         value = Character.toString(v);
     }
 
     public Object(String v) {
+        // System.out.println("Create String");
         type = String.class;
         value = v;
     }
 
     public Object(Map v) {
+        // System.out.println("Create Map");
         type = Map.class;
         value = v;
     }
 
     public Object(Set v) {
+        // System.out.println("Create Set");
         type = Set.class;
         value = v;
     }
 
     public Object(ArrayList v) {
+        // System.out.println("Create List");
         type = ArrayList.class;
         value = v;
     }
@@ -128,7 +141,7 @@ public class Object {
     }
 
     public org.python.Object __repr__() {
-        return new org.python.Object("<org.python.Object: " + this.type + ">");
+        return new org.python.Object("<PY:" + this.type + " " + System.identityHashCode(this) + ">");
     }
 
     public org.python.Object __str__() {
@@ -182,6 +195,46 @@ public class Object {
     }
 
     /**
+     * Section 3.3.2 - Emulating container types
+     */
+
+    public org.python.Object __getattr__(java.lang.String name) {
+        System.out.println("GET " + name + " on " + this.__repr__());
+        if (this.type == Object.class) {
+            org.python.Object obj = ((java.util.Hashtable<java.lang.String, org.python.Object>) this.value).get(name);
+            if (obj != null) {
+                return obj;
+            } else {
+                throw new org.python.exceptions.AttributeError("'" + this.type + "' object has no attribute '" + name + "'");
+            }
+        } else {
+            throw new org.python.exceptions.AttributeError("'" + this.type + "' object has no attribute '" + name + "'");
+        }
+    }
+
+    public org.python.Object __getattribute__(java.lang.String name) {
+        throw new NotImplementedError("Object method __getattr__ not implemented");
+    }
+
+    public void __setattr__(java.lang.String name, org.python.Object obj) {
+        System.out.println("SET " + name + " on " + this.__repr__() + " TO " + obj.__repr__());
+        if (this.type == java.lang.Object.class) {
+            ((java.util.Hashtable<java.lang.String, org.python.Object>) this.value).put(name, obj);
+            return;
+        } else {
+            throw new org.python.exceptions.AttributeError("'" + this.type + "' object has no attribute '" + name + "'");
+        }
+    }
+
+    public void __delattr__(java.lang.String name) {
+        throw new NotImplementedError("Object method __del gtattr__ not implemented");
+    }
+
+    public void __dir__() {
+        throw new NotImplementedError("Object method __dir__ not implemented");
+    }
+
+    /**
      * Section 3.3.4 - Customizing instance and subclass checks
      */
     public org.python.Object __instancecheck__(org.python.Object instance) {
@@ -216,15 +269,11 @@ public class Object {
     }
 
     public org.python.Object __missing__(org.python.Object key) {
-        throw new NotImplementedError("Object method __setitem__ not implemented");
+        throw new NotImplementedError("Object method __missing__ not implemented");
     }
 
     public void __setitem__(org.python.Object key, org.python.Object value) {
         throw new NotImplementedError("Object method __setitem__ not implemented");
-    }
-
-    public void __delattr__(org.python.Object attr) {
-        throw new NotImplementedError("Object method __delattr__ not implemented");
     }
 
     public org.python.Object __iter__() {

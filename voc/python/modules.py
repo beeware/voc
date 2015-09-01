@@ -12,7 +12,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import MainMethod, Method, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name
+from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
 
 
 class StaticBlock(Block):
@@ -46,6 +46,25 @@ class StaticBlock(Block):
             ALOAD_name(self.localvars, '#TEMP#'),
         ]
 
+    def load_name(self, name):
+        return [
+            # look for a global var.
+            JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.LDC(self.name),
+            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+
+            # If there's nothing in the globals, then look for a builtin.
+            IF(
+                [JavaOpcodes.DUP()],
+                JavaOpcodes.IFNONNULL
+            ),
+                JavaOpcodes.POP(),
+                JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.LDC(self.name),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+            END_IF()
+        ]
+
     @property
     def is_module(self):
         return True
@@ -58,6 +77,7 @@ class StaticBlock(Block):
         method = Method(self.module, method_name, extract_parameters(code), static=True)
         method.extract(code)
         self.module.methods.append(method.transpile())
+        return True
 
 
 class Module(Block):

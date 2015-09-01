@@ -23,7 +23,10 @@ class Command:
         self.arguments = []
 
     def __repr__(self):
-        return '<Command %s (%s args)>' % (self.operation.opname, len(self.arguments))
+        try:
+            return '<Command %s (%s args)> %s' % (self.operation.opname, len(self.arguments), self.arguments[0].operation)
+        except:
+            return '<Command %s (%s args)>' % (self.operation.opname, len(self.arguments))
 
     @property
     def consume_count(self):

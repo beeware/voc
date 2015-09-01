@@ -11,6 +11,9 @@ from .constants import Classref, Fieldref, Methodref, InterfaceMethodref, String
 class Opcode:
     opcodes = None
 
+    def __init__(self):
+        self.references = []
+
     def __repr__(self):
         return '<%s%s>' % (self.__class__.__name__, self.__arg_repr__())
 
@@ -57,7 +60,7 @@ class Opcode:
         return self.produce_count - self.consume_count
 
     def process(self, parts):
-        parts.code.append(self)
+        parts.add_opcodes(self)
 
     def post_process(self, parts):
         pass

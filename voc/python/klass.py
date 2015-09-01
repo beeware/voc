@@ -11,7 +11,7 @@ from ..java import (
 
 from .blocks import Block
 from .methods import InitMethod, Method, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name
+from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
 
 
 class ClassBlock(Block):
@@ -23,9 +23,9 @@ class ClassBlock(Block):
             JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
             JavaOpcodes.PUTSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
 
-            # Set the __module__ atribute to the name of the parent module.
+            # # Set the __name__ atribute to the name of the parent module.
             JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC('__module__'),
+            JavaOpcodes.LDC('__name__'),
             JavaOpcodes.NEW('org/python/Object'),
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC(self.module.descriptor.replace('/', '.')),
@@ -36,13 +36,48 @@ class ClassBlock(Block):
         return self.void_return(code)
 
     def store_name(self, name, arguments):
+        # Ignore a request to store __init__ - replace with the constructor
+        if name == '__init__':
+            return []
+
         return [
             ASTORE_name(self.localvars, '#TEMP#'),
             JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC(name),
             ALOAD_name(self.localvars, '#TEMP#'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.POP(),
             ALOAD_name(self.localvars, '#TEMP#'),
+        ]
+
+    def load_name(self, name):
+        return [
+            # look for a class attribute.
+            JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.LDC(name),
+            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+
+            # Look for a global var.
+            IF(
+                [JavaOpcodes.DUP()],
+                JavaOpcodes.IFNONNULL
+            ),
+                JavaOpcodes.POP(),
+                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.LDC(name),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+
+                # If there's nothing in the globals, then look for a builtin.
+                IF(
+                    [JavaOpcodes.DUP()],
+                    JavaOpcodes.IFNONNULL
+                ),
+                    JavaOpcodes.POP(),
+                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
+                    JavaOpcodes.LDC(name),
+                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+                END_IF(),
+            END_IF()
         ]
 
     @property
@@ -62,6 +97,8 @@ class ClassBlock(Block):
         method.extract(code)
         self.klass.methods.append(method.transpile())
 
+        return method_name != '%s.__init__' % self.klass.name
+
 
 class Class(Block):
     def __init__(self, module, name, super_name=None, methods=None, init=None):
@@ -74,6 +111,10 @@ class Class(Block):
     @property
     def descriptor(self):
         return '/'.join([self.parent.descriptor, self.name])
+
+    @property
+    def module(self):
+        return self.parent
 
     def add_method(self, method):
         self.methods.append(method)
