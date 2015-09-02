@@ -21,11 +21,8 @@ class Command:
     A command may also encompass an internal block - for example, a for
     or while loop. Those blocks
     """
-    def __init__(self, instruction, offset, starts_line, is_jump_target):
+    def __init__(self, instruction):
         self.operation = instruction
-        self.offset = offset
-        self.starts_line = starts_line
-        self.is_jump_target = is_jump_target
         self.arguments = []
 
     def __repr__(self):
@@ -46,9 +43,9 @@ class Command:
         for op in self.arguments:
             op.dump(depth=depth+1)
         print ('%s%s:%s ' % (
-                '>' if self.is_jump_target else ' ',
-                "%4s" % self.starts_line if self.starts_line is not None else '    ',
-                self.offset
+                '>' if self.operation.is_jump_target else ' ',
+                "%4s" % self.operation.starts_line if self.operation.starts_line is not None else '    ',
+                self.operation.code_offset
             ) + '    ' * depth, self.operation)
 
 
@@ -75,11 +72,11 @@ def extract_command(instructions, i):
         argval = argval | extended.argval
 
     if instruction.arg is None:
-        opcode = OpType()
+        opcode = OpType(instruction.offset, instruction.starts_line, instruction.is_jump_target)
     else:
-        opcode = OpType(argval)
+        opcode = OpType(argval, instruction.offset, instruction.starts_line, instruction.is_jump_target)
 
-    cmd = Command(opcode, instruction.offset, instruction.starts_line, instruction.is_jump_target)
+    cmd = Command(opcode)
 
     # If we find the end of a code block, create a command
     # that contains everything from the start of the block

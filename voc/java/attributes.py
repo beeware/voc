@@ -1417,9 +1417,16 @@ class SourceFile(Attribute):
 # 4.7.12. The LineNumberTable Attribute
 # ------------------------------------------------------------------------
 
-# The LineNumberTable attribute is an optional variable-length attribute in the attributes table of a Code (§4.7.3) attribute. It may be used by debuggers to determine which part of the Java Virtual Machine code array corresponds to a given line number in the original source file.
-
-# If LineNumberTable attributes are present in the attributes table of a given Code attribute, then they may appear in any order. Furthermore, multiple LineNumberTable attributes may together represent a given line of a source file; that is, LineNumberTable attributes need not be one-to-one with source lines.
+# The LineNumberTable attribute is an optional variable-length attribute in the
+# attributes table of a Code (§4.7.3) attribute. It may be used by debuggers to
+# determine which part of the Java Virtual Machine code array corresponds to a
+# given line number in the original source file.
+#
+# If LineNumberTable attributes are present in the attributes table of a given
+# Code attribute, then they may appear in any order. Furthermore, multiple
+# LineNumberTable attributes may together represent a given line of a source
+# file; that is, LineNumberTable attributes need not be one-to-one with source
+# lines.
 
 
 class LineNumberTable(Attribute):
@@ -1437,17 +1444,17 @@ class LineNumberTable(Attribute):
         # number in the original source file changes at a given point in the
         # code array. Each line_number_table entry must contain the following
         # two items:
-
+        #
         # * start_pc
         #     The value of the start_pc item must indicate the index into the code
         #     array at which the code for a new line in the original source file
         #     begins.
-
+        #
         # * line_number
         #     The value of start_pc must be less than the value of the code_length
         #     item of the Code attribute of which this LineNumberTable is an
         #     attribute.
-
+        #
         #     The value of the line_number item must give the corresponding line
         #     number in the original source file.
         self.line_number_table = line_numbers
@@ -1469,19 +1476,19 @@ class LineNumberTable(Attribute):
         if dump is not None:
             print("    " * dump, 'Line numbers (%s total):' % line_number_table_length)
 
-        line_numbers = {}
+        line_numbers = []
         for i in range(0, line_number_table_length):
             start_pc = reader.read_u2()
             line_number = reader.read_u2()
             if dump is not None:
                 print("    " * (dump + 1), '%s: %s' % (start_pc, line_number))
-            line_numbers[start_pc] = line_number
+            line_numbers.append((start_pc, line_number))
 
         return LineNumberTable(line_numbers)
 
     def write_info(self, writer):
         writer.write_u2(self.line_number_table_length)
-        for start_pc, line_number in self.line_number_table.items():
+        for start_pc, line_number in self.line_number_table:
             writer.write_u2(start_pc)
             writer.write_u2(line_number)
 

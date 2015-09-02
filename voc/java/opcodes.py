@@ -13,6 +13,7 @@ class Opcode:
 
     def __init__(self):
         self.references = []
+        self.starts_line = None
 
     def __repr__(self):
         return '<%s%s>' % (self.__class__.__name__, self.__arg_repr__())

@@ -16,6 +16,10 @@ class DEBUG:
         self.message = message
         self.show_top_of_stack = show_top_of_stack
 
+        # If this DEBUG can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
+
     def process(self, parts):
         # Add the stack prepration commands to the code list
         # print("PROCESS IF", id(self))
@@ -115,6 +119,10 @@ class IF:
         # all if-exiting jumps.
         self.end_op = None
 
+        # If this IF can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
+
     def process(self, parts):
         # Add the stack prepration commands to the code list
         # print("PROCESS IF", id(self))
@@ -147,6 +155,10 @@ class ELIF:
         # The jump operation at the end of the ELIF, jumping to the
         # end of the IF-ELSE block.
         self.jump_op = None
+
+        # If this ELIF can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
 
     def process(self, parts):
         # Find the most recent if block on the stack that hasn't been
@@ -194,8 +206,12 @@ class ELSE(ELIF):
 
 
 class END_IF:
-    # def __init__(self):
+    def __init__(self):
         # print("CREATE ENDIF")
+
+        # If this IF can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
 
     def process(self, parts):
         # Find the most recent if block on the stack that hasn't been
@@ -254,6 +270,10 @@ class TRY:
         self.handlers = []
         # print("CREATE TRY", id(self))
 
+        # If this TRY can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
+
     def process(self, parts):
         # print("PROCESS TRY", id(self))
         parts.try_catches.append(self)
@@ -268,9 +288,13 @@ class CATCH:
         self.descriptor = descriptor
         # print("CREATE CATCH", id(self), self.descriptor)
 
-    # The CATCH needs to be able to pass as an opcode under initial
-    # post processing
+        # If this CATCH can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
+
     def __len__(self):
+        # The CATCH needs to be able to pass as an opcode under initial
+        # post processing
         return 3
 
     def process(self, parts):
@@ -305,8 +329,12 @@ class CATCH:
 
 
 class END_TRY:
-    # def __init__(self):
+    def __init__(self):
         # print("CREATE END TRY", id(self))
+
+        # If this END TRY can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
 
     def process(self, parts):
         # Find the most recent exception on the stack that hasn't been
@@ -416,6 +444,11 @@ class Opcode:
     start_block = False
     end_block = False
 
+    def __init__(self, code_offset, starts_line, is_jump_target):
+        self.code_offset = code_offset
+        self.starts_line = starts_line
+        self.is_jump_target = is_jump_target
+
     @property
     def opname(self):
         return self.__class__.__name__
@@ -425,6 +458,16 @@ class Opcode:
 
     def __arg_repr__(self):
         return ''
+
+    def transpile(self, context, arguments):
+        code = self.convert(context, arguments)
+        if self.starts_line:
+            # print('>>>>', self, self.code_offset, self.starts_line)
+            if len(code) > 0:
+                # print("SET ON", code[0])
+                code[0].starts_line = self.starts_line
+
+        return code
 
 
 class UnaryOpcode(Opcode):
@@ -440,7 +483,7 @@ class UnaryOpcode(Opcode):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(context, argument.arguments))
+            code.extend(argument.operation.transpile(context, argument.arguments))
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
@@ -465,7 +508,7 @@ class BinaryOpcode(Opcode):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(context, argument.arguments))
+            code.extend(argument.operation.transpile(context, argument.arguments))
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
@@ -490,7 +533,7 @@ class InplaceOpcode(Opcode):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(context, argument.arguments))
+            code.extend(argument.operation.transpile(context, argument.arguments))
 
         code.append(
             JavaOpcodes.INVOKEVIRTUAL(
@@ -520,7 +563,7 @@ class POP_TOP(Opcode):
         code = []
         for argument in arguments:
             # print(argument)
-            code.extend(argument.operation.convert(context, argument.arguments))
+            code.extend(argument.operation.transpile(context, argument.arguments))
 
         # print('-----')
         # If the most recent command is stored as None, then this is
@@ -766,7 +809,7 @@ class RETURN_VALUE(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = arguments[0].operation.convert(context, arguments[0].arguments)
+        code = arguments[0].operation.transpile(context, arguments[0].arguments)
         code.append(JavaOpcodes.ARETURN())
         return code
 
@@ -796,7 +839,8 @@ class POP_BLOCK(Opcode):
 
 
 class STORE_NAME(Opcode):
-    def __init__(self, name):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -814,7 +858,7 @@ class STORE_NAME(Opcode):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(context, argument.arguments))
+            code.extend(argument.operation.transpile(context, argument.arguments))
 
         # If the most recent command is stored as None, then this is
         # return value of a void function. We can avoid a POP operation
@@ -834,7 +878,8 @@ class STORE_NAME(Opcode):
 
 
 class FOR_ITER(Opcode):
-    def __init__(self, delta):
+    def __init__(self, delta, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.delta = delta
 
     def __arg_repr__(self):
@@ -857,7 +902,8 @@ class FOR_ITER(Opcode):
 
 
 class STORE_ATTR(Opcode):
-    def __init__(self, name):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -874,9 +920,9 @@ class STORE_ATTR(Opcode):
     def convert(self, context, arguments):
         # FIXME
         code = []
-        code.extend(arguments[1].operation.convert(context, arguments[1].arguments))
+        code.extend(arguments[1].operation.transpile(context, arguments[1].arguments))
         code.append(JavaOpcodes.LDC(self.name))
-        code.extend(arguments[0].operation.convert(context, arguments[0].arguments))
+        code.extend(arguments[0].operation.transpile(context, arguments[0].arguments))
 
         code.extend([
             JavaOpcodes.INVOKEVIRTUAL('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
@@ -887,7 +933,8 @@ class STORE_ATTR(Opcode):
 # class DELETE_ATTR(Opcode):
 
 class STORE_GLOBAL(Opcode):
-    def __init__(self, name):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -905,7 +952,7 @@ class STORE_GLOBAL(Opcode):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(context, argument.arguments))
+            code.extend(argument.operation.transpile(context, argument.arguments))
 
         # If the most recent command is stored as None, then this is
         # return value of a void function. We can avoid a POP operation
@@ -923,7 +970,8 @@ class STORE_GLOBAL(Opcode):
 
 
 class LOAD_CONST(Opcode):
-    def __init__(self, const):
+    def __init__(self, const, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.const = const
 
     def __arg_repr__(self):
@@ -968,7 +1016,8 @@ class LOAD_CONST(Opcode):
 
 
 class LOAD_NAME(Opcode):
-    def __init__(self, name):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -987,7 +1036,8 @@ class LOAD_NAME(Opcode):
 
 
 class BUILD_TUPLE(Opcode):
-    def __init__(self, count):
+    def __init__(self, count, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1007,7 +1057,8 @@ class BUILD_TUPLE(Opcode):
 
 
 class BUILD_LIST(Opcode):
-    def __init__(self, count):
+    def __init__(self, count, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1027,7 +1078,8 @@ class BUILD_LIST(Opcode):
 
 
 class BUILD_SET(Opcode):
-    def __init__(self, count):
+    def __init__(self, count, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1047,7 +1099,8 @@ class BUILD_SET(Opcode):
 
 
 class BUILD_MAP(Opcode):
-    def __init__(self, count):
+    def __init__(self, count, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1067,7 +1120,8 @@ class BUILD_MAP(Opcode):
 
 
 class LOAD_ATTR(Opcode):
-    def __init__(self, name):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1084,7 +1138,7 @@ class LOAD_ATTR(Opcode):
     def convert(self, context, arguments):
         # print("LOAD_ATTR", context, arguments)
         code = []
-        code.extend(arguments[0].operation.convert(context, arguments[0].arguments))
+        code.extend(arguments[0].operation.transpile(context, arguments[0].arguments))
         code.append(JavaOpcodes.LDC(self.name))
 
         code.extend([
@@ -1094,7 +1148,8 @@ class LOAD_ATTR(Opcode):
 
 
 class COMPARE_OP(Opcode):
-    def __init__(self, comparison):
+    def __init__(self, comparison, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.comparison = comparison
 
     def __arg_repr__(self):
@@ -1110,7 +1165,8 @@ class COMPARE_OP(Opcode):
 
 
 class IMPORT_NAME(Opcode):
-    def __init__(self, target):
+    def __init__(self, target, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1131,7 +1187,8 @@ class IMPORT_NAME(Opcode):
 
 
 class JUMP_FORWARD(Opcode):
-    def __init__(self, delta):
+    def __init__(self, delta, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.delta = delta
 
     def __arg_repr__(self):
@@ -1151,7 +1208,8 @@ class JUMP_FORWARD(Opcode):
 
 
 class JUMP_ABSOLUTE(Opcode):
-    def __init__(self, target):
+    def __init__(self, target, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1171,7 +1229,8 @@ class JUMP_ABSOLUTE(Opcode):
 
 
 class POP_JUMP_IF_FALSE(Opcode):
-    def __init__(self, target):
+    def __init__(self, target, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1191,7 +1250,8 @@ class POP_JUMP_IF_FALSE(Opcode):
 
 
 class POP_JUMP_IF_TRUE(Opcode):
-    def __init__(self, target):
+    def __init__(self, target, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.target = target
 
     @property
@@ -1204,7 +1264,8 @@ class POP_JUMP_IF_TRUE(Opcode):
 
 
 class LOAD_GLOBAL(Opcode):
-    def __init__(self, name):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1228,7 +1289,8 @@ class LOAD_GLOBAL(Opcode):
 class SETUP_LOOP(Opcode):
     start_block = True
 
-    def __init__(self, delta):
+    def __init__(self, delta, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.delta = delta
 
     @property
@@ -1248,7 +1310,8 @@ class SETUP_LOOP(Opcode):
 
 
 class LOAD_FAST(Opcode):
-    def __init__(self, name):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1267,7 +1330,8 @@ class LOAD_FAST(Opcode):
 
 
 class STORE_FAST(Opcode):
-    def __init__(self, name):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1285,7 +1349,7 @@ class STORE_FAST(Opcode):
         code = []
 
         for argument in arguments:
-            code.extend(argument.operation.convert(context, argument.arguments))
+            code.extend(argument.operation.transpile(context, argument.arguments))
 
         code.append(ASTORE_name(context.localvars, self.name))
 
@@ -1297,7 +1361,8 @@ class STORE_FAST(Opcode):
 
 
 class CALL_FUNCTION(Opcode):
-    def __init__(self, argc):
+    def __init__(self, argc, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.args = argc & 0xff
         self.kwargs = ((argc >> 8) & 0xFF)
 
@@ -1376,7 +1441,7 @@ class CALL_FUNCTION(Opcode):
             # print("CALL_FUNCTION", context, arguments)
 
             # Retrive the function
-            code.extend(arguments[0].operation.convert(context, arguments[0].arguments))
+            code.extend(arguments[0].operation.transpile(context, arguments[0].arguments))
 
             code.extend([
                 JavaOpcodes.CHECKCAST('org/python/Callable'),
@@ -1405,7 +1470,7 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.DUP(),
                     ICONST_val(0),
                 ])
-                code.extend(arguments[0].arguments[0].operation.convert(context, arguments[0].arguments[0].arguments))
+                code.extend(arguments[0].arguments[0].operation.transpile(context, arguments[0].arguments[0].arguments))
                 code.append(JavaOpcodes.AASTORE())
 
             # Push all the arguments into an array
@@ -1414,7 +1479,7 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.DUP(),
                     ICONST_val(first_arg + i),
                 ])
-                code.extend(argument.operation.convert(context, argument.arguments))
+                code.extend(argument.operation.transpile(context, argument.arguments))
                 code.append(JavaOpcodes.AASTORE())
 
             # Create a Hashtable, and push all the kwargs into it.
@@ -1429,7 +1494,7 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC(name),
                 ])
-                code.extend(argument.operation.convert(context, argument.arguments))
+                code.extend(argument.operation.transpile(context, argument.arguments))
                 code.extend([
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                     JavaOpcodes.POP()
@@ -1442,7 +1507,8 @@ class CALL_FUNCTION(Opcode):
 
 
 class MAKE_FUNCTION(Opcode):
-    def __init__(self, argc):
+    def __init__(self, argc, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.argc = argc
         self.default_args = argc & 0xff
         self.default_kwargs = ((argc >> 8) & 0xFF)
@@ -1522,7 +1588,8 @@ class MAKE_FUNCTION(Opcode):
 # class BUILD_SLICE(Opcode):
 
 class MAKE_CLOSURE(Opcode):
-    def __init__(self, argc):
+    def __init__(self, argc, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.argc = argc
 
     def __arg_repr__(self):
@@ -1538,7 +1605,8 @@ class MAKE_CLOSURE(Opcode):
 
 
 class LOAD_CLOSURE(Opcode):
-    def __init__(self, i):
+    def __init__(self, i, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
         self.i = i
 
     def __arg_repr__(self):

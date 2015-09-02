@@ -4,6 +4,7 @@ from ..java import (
     Code as JavaCode,
     opcodes as JavaOpcodes,
     ExceptionInfo as JavaExceptionInfo,
+    LineNumberTable
 )
 
 from .utils import extract_command
@@ -21,11 +22,21 @@ class CodeParts:
         self.code = []
         self.try_catches = []
         self.if_blocks = []
-
+        self.source_lines = []
         self.next_resolve_list = []
+        self.next_opcode_starts_line = None
 
     def add_opcodes(self, *opcodes):
+        # If we've flagged a code line change, attach that to the opcode
+        if self.next_opcode_starts_line:
+            opcodes[0].starts_line = self.next_opcode_starts_line
+            # print("RECORD CODE START", opcodes[0])
+            self.next_opcode_starts_line = None
+
+        # Add the opcodes
         self.code.extend(opcodes)
+
+        # Resolve any references to the "next" opcode.
         for (obj, attr) in self.next_resolve_list:
             # print("        resolve %s reference on %s with %s" % (attr, id(obj), opcodes[0]))
             setattr(obj, attr, opcodes[0])
@@ -155,6 +166,14 @@ class Block:
                 setattr(obj, attr, return_opcode)
             for obj, attr in code[-1].references:
                 setattr(obj, attr, return_opcode)
+
+            # Then, check to see if either opcode had a line number association.
+            # if so, preserve the first one.
+            if code[-2].starts_line is not None:
+                return_opcode.starts_line = code[-2].starts_line
+            elif code[-1].starts_line is not None:
+                return_opcode.starts_line = code[-1].starts_line
+
             code = code[:-2] + [return_opcode]
         return code
 
@@ -170,7 +189,9 @@ class Block:
 
         parts = CodeParts(self)
         for cmd in self.commands:
-            for instruction in cmd.operation.convert(self, cmd.arguments):
+            for instruction in cmd.operation.transpile(self, cmd.arguments):
+                if instruction.starts_line:
+                    parts.next_opcode_starts_line = instruction.starts_line
                 instruction.process(parts)
 
         # Java requires that every body of code finishes with a return.
@@ -190,7 +211,7 @@ class Block:
             instruction.code_offset = offset
             offset += len(instruction)
 
-        # Then construct the exception table, updating any
+        # Construct the exception table, updating any
         # end-of-exception GOTO operations with the right opcode.
         # Record a frame range for each one.
         exceptions = []
@@ -207,7 +228,7 @@ class Block:
 
             try_catch.jump_op.offset = try_catch.end_op.code_offset - try_catch.jump_op.code_offset
 
-        # Lastly, update any IF-related offsets
+        # Update any IF-related offsets
         for if_block in parts.if_blocks:
             # print ("IF BLOCK START", id(if_block), if_block.if_op, if_block.if_op.code_offset)
             # print ("         END", if_block.end_op, if_block.end_op.code_offset)
@@ -224,9 +245,20 @@ class Block:
                 if else_if.jump_op:
                     else_if.jump_op.offset = if_block.end_op.code_offset - else_if.jump_op.code_offset
 
+        # Construct a line number table from
+        # the source code referece data on opcodes.
+        line_numbers = []
+        for code in parts.code:
+            if code.starts_line is not None:
+                line_numbers.append((code.code_offset, code.starts_line))
+        line_number_table = LineNumberTable(line_numbers)
+
         return JavaCode(
             max_stack=parts.stack_depth(),
             max_locals=len(self.localvars),
             code=parts.code,
             exceptions=exceptions,
+            attributes=[
+                line_number_table
+            ]
         )
