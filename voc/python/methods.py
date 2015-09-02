@@ -44,12 +44,16 @@ class Method(Block):
         return False
 
     @property
+    def has_void_return(self):
+        return self.returns.get('annotation', object()) is None
+
+    @property
     def callable(self):
         return 'org/python/Function'
 
     @property
     def signature(self):
-        return_descriptor = 'V' if self.returns.get('annotation', object()) is None else 'Lorg/python/Object;'
+        return_descriptor = 'V' if self.has_void_return else 'Lorg/python/Object;'
         return '([Lorg/python/Object;Ljava/util/Hashtable;)%s' % return_descriptor
 
     def add_self(self):
@@ -65,16 +69,23 @@ class Method(Block):
 
     def tweak(self, code):
         # Load all the arguments into locals
-        setup = []
+        tweaked = []
         for i, arg in enumerate(self.parameters):
-            setup.extend([
+            tweaked.extend([
                 ALOAD_name(self.localvars, '##__args__##'),
                 ICONST_val(i),
                 JavaOpcodes.AALOAD(),
                 ASTORE_name(self.localvars, arg['name']),
             ])
 
-        return self.void_return(setup + code)
+        # Then run the code as normal.
+        tweaked.extend(code)
+
+        # If the method has a void return, clean up the final opcodes.
+        if self.has_void_return:
+            tweaked = self.void_return(tweaked)
+
+        return tweaked
 
     def transpile(self):
         code = super().transpile()
