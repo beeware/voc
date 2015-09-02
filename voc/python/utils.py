@@ -24,7 +24,7 @@ class Command:
 
     def __repr__(self):
         try:
-            return '<Command %s (%s args)> %s' % (self.operation.opname, len(self.arguments), self.arguments[0].operation)
+            return '<Command %s (%s args)> %s' % (self.operation.opname, len(self.arguments), self.arguments[0].operation.name)
         except:
             return '<Command %s (%s args)>' % (self.operation.opname, len(self.arguments))
 

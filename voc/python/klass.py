@@ -10,7 +10,7 @@ from ..java import (
 )
 
 from .blocks import Block
-from .methods import InitMethod, Method, extract_parameters
+from .methods import InitMethod, InstanceMethod, extract_parameters
 from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
 
 
@@ -35,7 +35,7 @@ class ClassBlock(Block):
         ] + code
         return self.void_return(code)
 
-    def store_name(self, name, arguments):
+    def store_name(self, name, arguments, allow_locals=True):
         # Ignore a request to store __init__ - replace with the constructor
         if name == '__init__':
             return []
@@ -47,16 +47,19 @@ class ClassBlock(Block):
             ALOAD_name(self.localvars, '#TEMP#'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP(),
-            ALOAD_name(self.localvars, '#TEMP#'),
         ]
 
-    def load_name(self, name):
-        return [
-            # look for a class attribute.
-            JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC(name),
-            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-
+    def load_name(self, name, allow_locals=True):
+        if allow_locals:
+            code = [
+                # look for a class attribute.
+                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.LDC(name),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            ]
+        else:
+            code = []
+        return code + [
             # Look for a global var.
             IF(
                 [JavaOpcodes.DUP()],
@@ -75,10 +78,14 @@ class ClassBlock(Block):
                     JavaOpcodes.POP(),
                     JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
                     JavaOpcodes.LDC(name),
-                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 END_IF(),
             END_IF()
         ]
+
+    @property
+    def descriptor(self):
+        return self.parent.descriptor
 
     @property
     def klass(self):
@@ -88,16 +95,19 @@ class ClassBlock(Block):
     def module(self):
         return self.parent.parent
 
-    def add_method(self, method_name, code):
-        if method_name == '%s.__init__' % self.klass.name:
+    def add_method(self, full_method_name, code):
+        class_name, method_name = full_method_name.split('.')
+        if class_name != self.klass.name:
+            raise Exception("Method %s being added to %s!" % (full_method_name, self.klass.name))
+        if method_name == '__init__':
             method = InitMethod(self.klass, extract_parameters(code))
         else:
-            method = Method(self.klass, method_name, extract_parameters(code))
+            method = InstanceMethod(self.klass, method_name, extract_parameters(code))
 
         method.extract(code)
         self.klass.methods.append(method.transpile())
 
-        return method_name != '%s.__init__' % self.klass.name
+        return method
 
 
 class Class(Block):

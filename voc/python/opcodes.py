@@ -6,8 +6,33 @@ from ..java import opcodes as JavaOpcodes, Classref
 # attributes of the code, especially those depened on opcode offset.
 ##########################################################################
 
-# A sentinel value to mark open blocks
-OPEN_BLOCK = object()
+# A sentinel value to mark jumps that need to be resolved.
+RESOLVE = object()
+
+
+class DEBUG:
+    "Drop a debug print statement into a code path"
+    def __init__(self, message, show_top_of_stack=False):
+        self.message = message
+        self.show_top_of_stack = show_top_of_stack
+
+    def process(self, parts):
+        # Add the stack prepration commands to the code list
+        # print("PROCESS IF", id(self))
+        if False:
+            parts.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'),
+                JavaOpcodes.LDC(self.message),
+                JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/String;)V'),
+            )
+            if self.show_top_of_stack:
+                parts.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'),
+                    JavaOpcodes.SWAP(),
+                    JavaOpcodes.INVOKEVIRTUAL('org/python/Object', 'toString', '()Ljava/lang/String;'),
+                    JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/String;)V'),
+                )
 
 
 class IF:
@@ -88,7 +113,7 @@ class IF:
 
         # The last operation in the IF-ELSE block - the target for
         # all if-exiting jumps.
-        self.end_op = OPEN_BLOCK
+        self.end_op = None
 
     def process(self, parts):
         # Add the stack prepration commands to the code list
@@ -128,10 +153,10 @@ class ELIF:
         # ended. That's the block that the elif applies to.
         # print("PROCESS ELIF(or else)")
         for if_block in parts.if_blocks[::-1]:
-            if if_block.end_op is OPEN_BLOCK:
-                if_block.end_op = None
+            if if_block.end_op is None:
+                if_block.end_op = RESOLVE
                 break
-        # print ("    if block is", id(if_block))
+        # print("    if block is", id(if_block))
         # If this is the first elif, add a GOTO and use it as the
         # jump operation at the end of the IF block. If there are
         # ELIFs, add the GOTO as the jump operation on the most
@@ -140,14 +165,14 @@ class ELIF:
         parts.add_opcodes(jump_op)
 
         if len(if_block.elifs) == 0:
-            # print ("    first elif")
+            # print("    first elif")
             if_block.jump_op = jump_op
         else:
-            # print ("    already got an endif")
+            # print("    already got an endif")
             if_block.handlers[-1].jump_op = jump_op
 
         if self.opcode:
-            # print ("    this is an elif")
+            # print("    this is an elif")
             # Add the stack prepration commands to the code list
             parts.add_opcodes(*self.commands)
 
@@ -155,7 +180,7 @@ class ELIF:
             self.if_op = self.opcode(0)
             parts.add_opcodes(self.if_op)
         # else:
-            # print ("    this is an else")
+            # print("    this is an else")
 
         if_block.elifs.append(self)
         # print("IF BLOCKS: ", [(id(b), b.end_op) for b in parts.if_blocks])
@@ -177,8 +202,8 @@ class END_IF:
         # ended. That's the block that the elif applies to.
         # print("PROCESS ENDIF")
         for if_block in parts.if_blocks[::-1]:
-            if if_block.end_op is OPEN_BLOCK:
-                if_block.end_op = None
+            if if_block.end_op is None:
+                if_block.end_op = RESOLVE
                 break
         # print("    if block is", id(if_block))
 
@@ -225,7 +250,7 @@ class TRY:
     def __init__(self):
         self.start_op = None
         self.jump_op = None
-        self.end_op = OPEN_BLOCK
+        self.end_op = None
         self.handlers = []
         # print("CREATE TRY", id(self))
 
@@ -253,7 +278,7 @@ class CATCH:
         # ended. That's the block that the catch applies to.
         # print("PROCESS CATCH", id(self))
         for exception in parts.try_catches[::-1]:
-            if exception.end_op is OPEN_BLOCK:
+            if exception.end_op is None:
                 break
 
         # print("    current exception", exception)
@@ -288,8 +313,8 @@ class END_TRY:
         # ended. That's the block we're ending.
         # print("PROCESS END TRY", id(self))
         for exception in parts.try_catches[::-1]:
-            if exception.end_op is OPEN_BLOCK:
-                exception.end_op = None
+            if exception.end_op is None:
+                exception.end_op = RESOLVE
                 break
 
         # print("    current exception", exception)
@@ -491,13 +516,13 @@ class POP_TOP(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        print ('-----')
+        # print('-----')
         code = []
         for argument in arguments:
-            print (argument)
+            # print(argument)
             code.extend(argument.operation.convert(context, argument.arguments))
 
-        print ('-----')
+        # print('-----')
         # If the most recent command is stored as None, then this is
         # return value of a void function. We can avoid a POP operation
         # in this case.
@@ -861,7 +886,39 @@ class STORE_ATTR(Opcode):
 
 # class DELETE_ATTR(Opcode):
 
-# class STORE_GLOBAL(Opcode):
+class STORE_GLOBAL(Opcode):
+    def __init__(self, name):
+        self.name = name
+
+    def __arg_repr__(self):
+        return str(self.name)
+
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        code = []
+
+        for argument in arguments:
+            code.extend(argument.operation.convert(context, argument.arguments))
+
+        # If the most recent command is stored as None, then this is
+        # return value of a void function. We can avoid a POP operation
+        # in this case.
+        if code[-1] is None:
+            code.pop()
+        else:
+            # Depending on context, this might mean writing to local
+            # variables, class attributes, or to the global context.
+            code.extend(context.store_name(self.name, arguments, allow_locals=False))
+
+        return code
+
 # class DELETE_GLOBAL(Opcode):
 
 
@@ -1025,6 +1082,7 @@ class LOAD_ATTR(Opcode):
         return 1
 
     def convert(self, context, arguments):
+        # print("LOAD_ATTR", context, arguments)
         code = []
         code.extend(arguments[0].operation.convert(context, arguments[0].arguments))
         code.append(JavaOpcodes.LDC(self.name))
@@ -1160,6 +1218,9 @@ class LOAD_GLOBAL(Opcode):
     def product_count(self):
         return 1
 
+    def convert(self, context, arguments):
+        return context.load_name(self.name, allow_locals=False)
+
 
 # class CONTINUE_LOOP(Opcode):
 
@@ -1268,7 +1329,7 @@ class CALL_FUNCTION(Opcode):
             klass = Class(context.parent, class_name, super_name=super_name)
             klass.extract(code)
             context.parent.classes.append(klass.transpile())
-            # print ("DESCRIPTOR", klass.descriptor)
+            # print("DESCRIPTOR", klass.descriptor)
             # Push a callable onto the stack so that it can be stored
             # in globals and subsequently retrieved and run.
             return [
@@ -1309,37 +1370,46 @@ class CALL_FUNCTION(Opcode):
             ]
 
         else:
-            method_name = arguments[0].operation.name
+            # print("CALL_FUNCTION", context, arguments)
 
-            code = [
-                # Retrieve the callable from globals
-                JavaOpcodes.GETSTATIC(context.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(method_name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            # Retrive the function
+            code.extend(arguments[0].operation.convert(context, arguments[0].arguments))
 
-                # If there's nothing in the globals, then look for a builtin.
-                IF(
-                    [JavaOpcodes.DUP()],
-                    JavaOpcodes.IFNONNULL
-                ),
-                    JavaOpcodes.POP(),
-                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-                    JavaOpcodes.LDC(method_name),
-                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-                END_IF(),
-
+            code.extend([
                 JavaOpcodes.CHECKCAST('org/python/Callable'),
+            ])
 
+            final_args = self.args
+            first_arg = 0
+
+            # If the function has been retrived using LOAD_ATTR, that means
+            # it's an instance method. We need to pass the instance itself
+            # as the first argument, so make space for that.
+            if arguments[0].operation.opname == 'LOAD_ATTR':
+                final_args += 1
+                first_arg = 1
+
+            code.extend([
                 # Create an array to pass in arguments to invoke()
-                ICONST_val(self.args),
+                ICONST_val(final_args),
                 JavaOpcodes.ANEWARRAY('org/python/Object'),
-            ]
+            ])
+
+            # If it's an instance method, put the instance at the start of
+            # the argument list.
+            if arguments[0].operation.opname == 'LOAD_ATTR':
+                code.extend([
+                    JavaOpcodes.DUP(),
+                    ICONST_val(0),
+                ])
+                code.extend(arguments[0].arguments[0].operation.convert(context, arguments[0].arguments[0].arguments))
+                code.append(JavaOpcodes.AASTORE())
 
             # Push all the arguments into an array
             for i, argument in enumerate(arguments[1:self.args+1]):
                 code.extend([
                     JavaOpcodes.DUP(),
-                    ICONST_val(i),
+                    ICONST_val(first_arg + i),
                 ])
                 code.extend(argument.operation.convert(context, argument.arguments))
                 code.append(JavaOpcodes.AASTORE())
@@ -1397,18 +1467,18 @@ class MAKE_FUNCTION(Opcode):
     def convert(self, context, arguments):
         # Add a new method definition to the context class/module
         code = arguments[-2].operation.const
-        method_name = arguments[-1].operation.const
+        full_method_name = arguments[-1].operation.const
 
-        store = context.add_method(method_name, code)
+        method = context.add_method(full_method_name, code)
 
-        if store:
+        if not method.is_constructor:
             # Push a callable onto the stack so that it can be stored
             # in globals and subsequently retrieved and run.
             return [
                 # Get a Method representing the new function
                 TRY(),
-                    JavaOpcodes.LDC(Classref(context.module.descriptor)),
-                    JavaOpcodes.LDC(method_name),
+                    JavaOpcodes.LDC(Classref(context.descriptor)),
+                    JavaOpcodes.LDC(method.name),
                     JavaOpcodes.ICONST_2(),
                     JavaOpcodes.ANEWARRAY('java/lang/Class'),
                     JavaOpcodes.DUP(),
@@ -1427,15 +1497,15 @@ class MAKE_FUNCTION(Opcode):
                     ASTORE_name(context.localvars, '#METHOD#'),
 
                     # Then wrap that Method into a Callable.
-                    JavaOpcodes.NEW('org/python/Function'),
+                    JavaOpcodes.NEW(method.callable),
                     JavaOpcodes.DUP(),
                     ALOAD_name(context.localvars, '#METHOD#'),
-                    JavaOpcodes.INVOKESPECIAL('org/python/Function', '<init>', '(Ljava/lang/reflect/Method;)V'),
+                    JavaOpcodes.INVOKESPECIAL(method.callable, '<init>', '(Ljava/lang/reflect/Method;)V'),
                 CATCH('java/lang/NoSuchMethodError'),
                     ASTORE_name(context.localvars, '#EXCEPTION#'),
                     JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC('Unable to find MAKE_FUNCTION output %s.%s' % (context.module.descriptor, method_name)),
+                    JavaOpcodes.LDC('Unable to find MAKE_FUNCTION output %s.%s' % (context.module.descriptor, full_method_name)),
                     JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
                     JavaOpcodes.ATHROW(),
                 END_TRY()

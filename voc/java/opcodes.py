@@ -130,6 +130,9 @@ class ALOAD(Opcode):
     def __len__(self):
         return 2
 
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
     @classmethod
     def read_extra(cls, reader, dump=None):
         var = reader.read_u1()
@@ -291,6 +294,9 @@ class ASTORE(Opcode):
 
     def __len__(self):
         return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
 
     @classmethod
     def read_extra(cls, reader, dump=None):
@@ -1062,9 +1068,9 @@ class GETSTATIC(Opcode):
     # Stack: → value
     code = 0xb2
 
-    def __init__(self, class_name, fieldname, descriptor):
+    def __init__(self, class_name, field_name, descriptor):
         super(GETSTATIC, self).__init__()
-        self.field = Fieldref(class_name, fieldname, descriptor)
+        self.field = Fieldref(class_name, field_name, descriptor)
 
     def __len__(self):
         return 3
@@ -2941,14 +2947,44 @@ class POP2(Opcode):
 
 
 class PUTFIELD(Opcode):
+    # Set field to value in an object objectref, where the field is identified by a
+    # field reference index in constant pool (indexbyte1 << 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: objectref, value →
     code = 0xb5
 
-    def __init__(self):
+    def __init__(self, class_name, field_name, descriptor):
         super(PUTFIELD, self).__init__()
-# 2: indexbyte1, indexbyte2
-# objectref, value →
-# Set field to value in an object objectref, where the field is identified by a
-# field reference index in constant pool (indexbyte1 << 8 + indexbyte2)
+        self.field = Fieldref(class_name, field_name, descriptor)
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s.%s (%s)' % (self.field.klass.name, self.field.name, self.field.name_and_type.descriptor)
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        field = reader.constant_pool[reader.read_u2()]
+        return cls(
+            field.class_name,
+            field.name,
+            field.name_and_type.descriptor.bytes.decode('utf8')
+        )
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.field))
+
+    def resolve(self, constant_pool):
+        self.field.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class PUTSTATIC(Opcode):
@@ -2958,9 +2994,9 @@ class PUTSTATIC(Opcode):
     # Stack: value →
     code = 0xb3
 
-    def __init__(self, class_name, fieldname, descriptor):
+    def __init__(self, class_name, field_name, descriptor):
         super(PUTSTATIC, self).__init__()
-        self.field = Fieldref(class_name, fieldname, descriptor)
+        self.field = Fieldref(class_name, field_name, descriptor)
 
     def __len__(self):
         return 3

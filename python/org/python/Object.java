@@ -12,90 +12,143 @@ public class Object {
     public Type type;
     public java.lang.Object value;
 
+    // FIXME: This should be a class, and it should be static, too.
+    // public java.lang.String __class__;
+    // FIXME: This should be static, and it shouldn't exist on primitives.
+    // public java.lang.String __module__;
+
+    private String internalClassName() {
+        return this.getClass().getName();
+    }
+    private void set_class_attributes() {
+        // if (type == java.lang.String.class) {
+        //     __class__ = "str";
+        // } else if (type == java.lang.Boolean.class) {
+        //     __class__ = "bool";
+        // } else if (type == java.lang.Long.class) {
+        //     __class__ = "int";
+        // } else if (type == java.lang.Float.class) {
+        //     __class__ = "float";
+        // } else if (type == java.util.Map.class) {
+        //     __class__ = "map";
+        // } else if (type == java.util.Set.class) {
+        //     __class__ = "set";
+        // } else if (type == java.lang.Object.class) {
+        //     String [] parts = getClass().getName().split("\\.");
+        //     __class__ = parts[parts.length];
+
+        //     __module__ = parts[0];
+        //     for (int i = 1; i < parts.length - 1; i++) {
+        //         __module__ += __module__ + "." + parts[i];
+        //     }
+        // } else if (type == java.util.ArrayList.class) {
+        //     __class__ = "list";
+        // } else if (type == java.lang.reflect.Method.class) {
+        //     __class__ = "function";
+        // } else if (type == java.lang.reflect.Constructor.class) {
+        //     __class__ = "type";
+        // } else {
+        //     throw new org.python.exceptions.RuntimeError("Unknown type " + type);
+        // }
+    }
     /**
      * Copy Constructor
      */
     public Object(java.lang.Object v, Type t) {
         value = v;
         type = t;
+        set_class_attributes();
     }
 
     public Object() {
         // System.out.println("Create Object");
         type = java.lang.Object.class;
         value = new Hashtable<String, org.python.Object>();
+        set_class_attributes();
     }
 
     public Object(boolean v) {
         // System.out.println("Create boolean");
         type = Boolean.class;
         value = v;
+        set_class_attributes();
     }
 
     public Object(byte v) {
         // System.out.println("Create byte");
         type = Long.class;
         value = (long)v;
+        set_class_attributes();
     }
 
     public Object(short v) {
         // System.out.println("Create short");
         type = Long.class;
         value = (long)v;
+        set_class_attributes();
     }
 
     public Object(int v) {
         // System.out.println("Create int");
         type = Long.class;
         value = (long)v;
+        set_class_attributes();
     }
 
     public Object(long v) {
         // System.out.println("Create long");
         type = Long.class;
         value = v;
+        set_class_attributes();
     }
 
     public Object(float v) {
         // System.out.println("Create float");
         type = Float.class;
         value = (double)v;
+        set_class_attributes();
     }
 
     public Object(double v) {
         // System.out.println("Create double");
         type = Float.class;
         value = v;
+        set_class_attributes();
     }
 
     public Object(char v) {
         // System.out.println("Create char");
         type = String.class;
         value = Character.toString(v);
+        set_class_attributes();
     }
 
     public Object(String v) {
         // System.out.println("Create String");
         type = String.class;
         value = v;
+        set_class_attributes();
     }
 
     public Object(Map v) {
         // System.out.println("Create Map");
         type = Map.class;
         value = v;
+        set_class_attributes();
     }
 
     public Object(Set v) {
         // System.out.println("Create Set");
         type = Set.class;
         value = v;
+        set_class_attributes();
     }
 
     public Object(ArrayList v) {
         // System.out.println("Create List");
         type = ArrayList.class;
         value = v;
+        set_class_attributes();
     }
 
     /**
@@ -141,7 +194,7 @@ public class Object {
     }
 
     public org.python.Object __repr__() {
-        return new org.python.Object("<PY:" + this.type + " " + System.identityHashCode(this) + ">");
+        return new org.python.Object("<PY:" + this.getClass() + " " + System.identityHashCode(this) + ">");
     }
 
     public org.python.Object __str__() {
@@ -199,16 +252,30 @@ public class Object {
      */
 
     public org.python.Object __getattr__(java.lang.String name) {
-        System.out.println("GET " + name + " on " + this.__repr__());
-        if (this.type == Object.class) {
+        // System.out.println("GET " + name + " on " + this.__repr__());
+        if (this.type == java.lang.Object.class) {
+            // Look in the instance attributes
             org.python.Object obj = ((java.util.Hashtable<java.lang.String, org.python.Object>) this.value).get(name);
             if (obj != null) {
                 return obj;
             } else {
-                throw new org.python.exceptions.AttributeError("'" + this.type + "' object has no attribute '" + name + "'");
+                // Look in the class attributes
+                try {
+                    java.lang.reflect.Field field = this.getClass().getField("attrs");
+                    obj = ((java.util.Hashtable<java.lang.String, org.python.Object>) field.get(this)).get(name);
+                    if (obj != null) {
+                        return obj;
+                    } else {
+                        throw new org.python.exceptions.AttributeError("'" + internalClassName() + "' has no attribute '" + name + "'");
+                    }
+                } catch(NoSuchFieldException e) {
+                    throw new org.python.exceptions.AttributeError("'" + internalClassName() + "' has no class");
+                } catch(IllegalAccessException e) {
+                    throw new org.python.exceptions.AttributeError("Cannot access class attributes on '" + internalClassName() + "'");
+                }
             }
         } else {
-            throw new org.python.exceptions.AttributeError("'" + this.type + "' object has no attribute '" + name + "'");
+            throw new org.python.exceptions.AttributeError("'" + internalClassName() + "' has no attribute '" + name + "'");
         }
     }
 
@@ -217,12 +284,12 @@ public class Object {
     }
 
     public void __setattr__(java.lang.String name, org.python.Object obj) {
-        System.out.println("SET " + name + " on " + this.__repr__() + " TO " + obj.__repr__());
+        // System.out.println("SET " + name + " on " + this.__repr__() + " TO " + obj.__repr__());
         if (this.type == java.lang.Object.class) {
             ((java.util.Hashtable<java.lang.String, org.python.Object>) this.value).put(name, obj);
             return;
         } else {
-            throw new org.python.exceptions.AttributeError("'" + this.type + "' object has no attribute '" + name + "'");
+            throw new org.python.exceptions.AttributeError("'" + internalClassName() + "' object has no attribute '" + name + "'");
         }
     }
 
@@ -293,7 +360,7 @@ public class Object {
      */
 
     public org.python.Object __add__(org.python.Object other) {
-        // System.out.println("ADD " + this.type + " TO " + other.type);
+        // System.out.println("ADD " + this.__repr__() + " TO " + other.__repr__());
         if (this.type == String.class) {
             if (other.type == String.class) {
                 return new org.python.Object(((String) this.value) + ((String) other.value));
@@ -342,7 +409,7 @@ public class Object {
     }
 
     public org.python.Object __mul__(org.python.Object other) {
-        // System.out.println("MUL " + this.type + " TO " + other.type);
+        // System.out.println("MUL " + this.__repr__() + " BY " + other.__repr__());
         if (this.type == String.class) {
         } else if (this.type == Long.class) {
             if (other.type == String.class) {
@@ -381,7 +448,7 @@ public class Object {
     }
 
     public org.python.Object __pow__(org.python.Object other) {
-        // System.out.println("POW " + this.type + " TO " + other.type);
+        // System.out.println("POW " + this.__repr__() + " TO " + other.__repr__());
         if (this.type == String.class) {
         } else if (this.type == Long.class) {
             if (other.type == String.class) {

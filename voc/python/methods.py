@@ -36,12 +36,20 @@ class Method(Block):
         self.static = static
 
     @property
-    def descriptor(self):
-        return self.parent.descriptor
+    def is_constructor(self):
+        return False
+
+    @property
+    def is_instancemethod(self):
+        return False
+
+    @property
+    def callable(self):
+        return 'org/python/Function'
 
     @property
     def signature(self):
-        return_descriptor = 'V' if self.returns.get('annotation') is None else 'Lorg/python/Object;'
+        return_descriptor = 'V' if self.returns.get('annotation', object()) is None else 'Lorg/python/Object;'
         return '([Lorg/python/Object;Ljava/util/Hashtable;)%s' % return_descriptor
 
     def add_self(self):
@@ -86,9 +94,13 @@ class InitMethod(Method):
         super().__init__(
             parent, '__init__',
             parameters=parameters[1:],
-            returns={},
+            returns={'annotation': None},
             commands=commands
         )
+
+    @property
+    def is_constructor(self):
+        return True
 
     @property
     def method_name(self):
@@ -133,12 +145,51 @@ class InitMethod(Method):
         return self.ignore_empty(self.void_return(setup + code))
 
 
+class InstanceMethod(Method):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+        super().__init__(
+            parent, name,
+            parameters=parameters[1:],
+            returns=returns,
+            static=static,
+            commands=commands
+        )
+
+    @property
+    def is_instancemethod(self):
+        return False
+
+    @property
+    def callable(self):
+        return 'org/python/InstanceMethod'
+
+    @property
+    def klass(self):
+        return self.parent
+
+    @property
+    def module(self):
+        return self.klass.module
+
+    def add_self(self):
+        self.localvars['self'] = len(self.localvars)
+
+    def tweak(self, code):
+        # Load the implicit 'self' argument, then all the arguments, into locals
+        return [
+            ALOAD_name(self.localvars, '##__args__##'),
+            ICONST_val(0),
+            JavaOpcodes.AALOAD(),
+            ASTORE_name(self.localvars, 'self'),
+        ] + super().tweak(code)
+
+
 class MainMethod(Method):
     def __init__(self, parent, commands=None):
         super().__init__(
             parent, '__main__',
             parameters=[{'name': 'args', 'annotation': 'argv'}],
-            returns={},
+            returns={'annotation': None},
             static=True,
             commands=commands
         )
@@ -156,6 +207,8 @@ class MainMethod(Method):
         return '([Ljava/lang/String;)V'
 
     def tweak(self, code):
+        # return self.void_return(code)
+
         return self.ignore_empty(
             self.void_return(code)
         )

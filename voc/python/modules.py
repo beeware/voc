@@ -12,7 +12,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import MainMethod, Method, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
+from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF, DEBUG
 
 
 class StaticBlock(Block):
@@ -36,38 +36,43 @@ class StaticBlock(Block):
         ] + code
         return self.void_return(code)
 
-    def store_name(self, name, arguments):
+    def store_name(self, name, arguments, allow_locals=True):
         return [
             ASTORE_name(self.localvars, '#TEMP#'),
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC(name),
             ALOAD_name(self.localvars, '#TEMP#'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-            ALOAD_name(self.localvars, '#TEMP#'),
+            JavaOpcodes.POP(),
         ]
 
-    def load_name(self, name):
+    def load_name(self, name, allow_locals=True):
         return [
             # look for a global var.
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC(self.name),
-            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+            JavaOpcodes.LDC(name),
+            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
             # If there's nothing in the globals, then look for a builtin.
             IF(
                 [JavaOpcodes.DUP()],
                 JavaOpcodes.IFNONNULL
             ),
+                DEBUG('%s not found in globals' % name),
                 JavaOpcodes.POP(),
                 JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(self.name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+                JavaOpcodes.LDC(name),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             END_IF()
         ]
 
     @property
     def is_module(self):
         return True
+
+    @property
+    def descriptor(self):
+        return self.parent.descriptor
 
     @property
     def module(self):
@@ -77,7 +82,7 @@ class StaticBlock(Block):
         method = Method(self.module, method_name, extract_parameters(code), static=True)
         method.extract(code)
         self.module.methods.append(method.transpile())
-        return True
+        return method
 
 
 class Module(Block):

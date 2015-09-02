@@ -7,7 +7,7 @@ from ..java import (
 )
 
 from .utils import extract_command
-from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
+from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF, DEBUG
 
 
 class IgnoreBlock(Exception):
@@ -53,32 +53,47 @@ class Block:
         self.commands = commands if commands else []
         self.localvars = {}
 
-    def store_name(self, name, arguments):
-        return [
-            ASTORE_name(self.localvars, self.name)
-        ]
+    def store_name(self, name, arguments, allow_locals=True):
+        if allow_locals:
+            return [
+                ASTORE_name(self.localvars, name)
+            ]
+        else:
+            return [
+                ASTORE_name(self.localvars, '#TEMP#'),
+                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.LDC(name),
+                ALOAD_name(self.localvars, '#TEMP#'),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.POP(),
+            ]
 
-    def load_name(self, name, arguments):
+    def load_name(self, name, allow_locals=True):
         code = []
         try:
             # Look for a local first.
-            code.append(ALOAD_name(self.localvars, self.name))
+            if allow_locals:
+                code.append(ALOAD_name(self.localvars, name))
+            else:
+                code.append(DEBUG("Ignoring locals in search for %s" % name))
+                raise KeyError('Not scanning locals')
         except KeyError:
             code.extend([
                 # If there isn't a local, look for a global
-                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Lorg/python/Object;'),
-                JavaOpcodes.LDC(self.name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.LDC(name),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
                 # If there's nothing in the globals, then look for a builtin.
                 IF(
                     [JavaOpcodes.DUP()],
                     JavaOpcodes.IFNONNULL
                 ),
+                    DEBUG('%s not found in globals' % name),
                     JavaOpcodes.POP(),
-                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Lorg/python/Object;'),
-                    JavaOpcodes.LDC(self.name),
-                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/String;)Ljava/lang/Object;'),
+                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
+                    JavaOpcodes.LDC(name),
+                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 END_IF()
             ])
 
@@ -160,7 +175,7 @@ class Block:
 
         # Java requires that every body of code finishes with a return.
         # Make sure there is one.
-        if not isinstance(parts.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
+        if len(parts.code) == 0 or not isinstance(parts.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
             parts.add_opcodes(JavaOpcodes.RETURN())
 
         # Provide any tweaks that are needed because of the context in which

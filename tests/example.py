@@ -1,29 +1,29 @@
 
-# class Point:
-# #     # def __init__(self, x, y, z=4):
+
+class Point:
+    def __init__(self, x, y, z):
+        self.x = 37
+        self.y = 42
+        self.z = 6
+
+    def distance(self):
+        return self.x ** 2 + self.y ** 2 + self.z ** 2
+
+# # def foo():
+# #     for i in range(0, 10):
+# #         print("FOR LOOP", i)
+# #     print("All done")
+
+# # def bar():
+# #     i = 0
+# #     while i < 10:
+# #         print("WHILE LOOP", i)
+# #         i += 1
+# #     print("All done")
+
+# class Point3D(Point):
 #     def __init__(self):
-# #         # super(Point, self).__init__()
-# #         # super().__init__()
-#         self.x = 37
-#         self.y = 42
-#         self.z = 6
-# #         pass
-
-# #     # def distance(self):
-# #     #     # return self.x ** 2 + self.y ** 2 + self.z ** 2
-# #     #     return 42
-
-# def foo():
-#     for i in range(0, 10):
-#         print("FOR LOOP", i)
-#     print("All done")
-
-# def bar():
-#     i = 0
-#     while i < 10:
-#         print("WHILE LOOP", i)
-#         i += 1
-#     print("All done")
+#         pass
 
 
 def body(value):
@@ -35,15 +35,20 @@ def body(value):
 
     print ("Answer is", z)
 
-#     # print('Create point')
-#     # p = Point(2, 3, 4)
-# #     print('Distance with default is', p.distance())
-
+    print('Create point')
+    p = Point(2, 3, 4)
+    print('Distance with default is', p.distance())
+    return 123
 
 if __name__ == '__main__':
-#     p = Point()
-#     # p = Point(2, 3, 4)
-#     # p.distance()
+    print("Hello world")
+    result = body(42)
+    print("Result is", result)
 
-    body(42)
-    print ("Hello world")
+    p = Point(2, 3, 4)
+    print("Hello world", p)
+    print ("attr x =", p.x)
+
+    print("Method is", p.distance)
+    print ("Distance is:", p.distance())
+    print("No such attribute", p.no_such_attribute)
