@@ -1270,6 +1270,9 @@ class STORE_FAST(Opcode):
     def __init__(self, name):
         self.name = name
 
+    def __arg_repr__(self):
+        return str(self.name)
+
     @property
     def consume_count(self):
         return 1

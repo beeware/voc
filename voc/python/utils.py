@@ -8,6 +8,9 @@ class Command:
     A series of other instructions, known as `arguments` will be used
     to execute `operation`.
 
+    The command also tracks the line number and code offset that it
+    represents, plus whether the command is a jump target.
+
     Each argument is itself a Command; leaf nodes are Commands with no
     arguments.
 
@@ -18,8 +21,11 @@ class Command:
     A command may also encompass an internal block - for example, a for
     or while loop. Those blocks
     """
-    def __init__(self, instruction):
+    def __init__(self, instruction, offset, starts_line, is_jump_target):
         self.operation = instruction
+        self.offset = offset
+        self.starts_line = starts_line
+        self.is_jump_target = is_jump_target
         self.arguments = []
 
     def __repr__(self):
@@ -39,7 +45,11 @@ class Command:
     def dump(self, depth=0):
         for op in self.arguments:
             op.dump(depth=depth+1)
-        print ('    ' * depth, self.operation)
+        print ('%s%s:%s ' % (
+                '>' if self.is_jump_target else ' ',
+                "%4s" % self.starts_line if self.starts_line is not None else '    ',
+                self.offset
+            ) + '    ' * depth, self.operation)
 
 
 def extract_command(instructions, i):
@@ -69,7 +79,7 @@ def extract_command(instructions, i):
     else:
         opcode = OpType(argval)
 
-    cmd = Command(opcode)
+    cmd = Command(opcode, instruction.offset, instruction.starts_line, instruction.is_jump_target)
 
     # If we find the end of a code block, create a command
     # that contains everything from the start of the block
