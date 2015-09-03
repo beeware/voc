@@ -1,15 +1,8 @@
 package org.python;
 
-import java.lang.reflect.Type;
-import java.util.Hashtable;
-import java.util.Set;
-import java.util.Map;
-import java.util.ArrayList;
-
-import org.python.exceptions.NotImplementedError;
 
 public class Object {
-    public Type type;
+    public java.lang.reflect.Type type;
     public java.lang.Object value;
 
     // FIXME: This should be a class, and it should be static, too.
@@ -17,7 +10,7 @@ public class Object {
     // FIXME: This should be static, and it shouldn't exist on primitives.
     // public java.lang.String __module__;
 
-    private String internalClassName() {
+    String internalClassName() {
         return this.getClass().getName();
     }
     private void set_class_attributes() {
@@ -51,19 +44,50 @@ public class Object {
         //     throw new org.python.exceptions.RuntimeError("Unknown type " + type);
         // }
     }
+
     /**
      * Copy Constructor
      */
-    public Object(java.lang.Object v, Type t) {
+    public Object(org.python.Object v) {
+        if (v.type == java.lang.String.class) {
+            value = v.value;
+        } else if (v.type == java.lang.Boolean.class) {
+            value = v.value;
+        } else if (v.type == java.lang.Long.class) {
+            value = v.value;
+        } else if (v.type == java.lang.Float.class) {
+            value = v.value;
+        } else if (v.type == java.util.Map.class) {
+        } else if (v.type == java.util.Set.class) {
+        } else if (v.type == java.lang.Object.class) {
+        } else if (v.type == java.util.ArrayList.class) {
+        } else if (v.type == java.lang.reflect.Method.class) {
+            value = v.value;
+        } else if (v.type == java.lang.reflect.Constructor.class) {
+            value = v.value;
+        } else {
+            throw new org.python.exceptions.RuntimeError("Unknown type " + type);
+        }
+        type = v.type;
+        set_class_attributes();
+    }
+
+    /**
+     * Do-it-yourself constructor
+     */
+    public Object(java.lang.Object v, java.lang.reflect.Type t) {
         value = v;
         type = t;
         set_class_attributes();
     }
 
+    /**
+     * Specific type constructors
+     */
     public Object() {
         // System.out.println("Create Object");
         type = java.lang.Object.class;
-        value = new Hashtable<String, org.python.Object>();
+        value = new java.util.Hashtable<String, org.python.Object>();
         set_class_attributes();
     }
 
@@ -130,23 +154,23 @@ public class Object {
         set_class_attributes();
     }
 
-    public Object(Map v) {
+    public Object(java.util.Map<org.python.Object, org.python.Object> v) {
         // System.out.println("Create Map");
-        type = Map.class;
+        type = java.util.Map.class;
         value = v;
         set_class_attributes();
     }
 
-    public Object(Set v) {
-        // System.out.println("Create Set");
-        type = Set.class;
+    public Object(java.util.Set<org.python.Object> v) {
+        // System.out.println("Create java.util.Set");
+        type = java.util.Set.class;
         value = v;
         set_class_attributes();
     }
 
-    public Object(ArrayList v) {
+    public Object(java.util.ArrayList<org.python.Object> v) {
         // System.out.println("Create List");
-        type = ArrayList.class;
+        type = java.util.ArrayList.class;
         value = v;
         set_class_attributes();
     }
@@ -208,35 +232,35 @@ public class Object {
     }
 
     public org.python.Object __bytes__() {
-        throw new NotImplementedError("Object method __bytes__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __bytes__ not implemented");
     }
 
     public org.python.Object __format__() {
-        throw new NotImplementedError("Object method __format__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __format__ not implemented");
     }
 
     public org.python.Object __lt__(org.python.Object other) {
-        throw new NotImplementedError("Object method __lt__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __lt__ not implemented");
     }
 
     public org.python.Object __le__(org.python.Object other) {
-        throw new NotImplementedError("Object method __le__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __le__ not implemented");
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new NotImplementedError("Object method __eq__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __eq__ not implemented");
     }
 
     public org.python.Object __ne__(org.python.Object other) {
-        throw new NotImplementedError("Object method __ne__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __ne__ not implemented");
     }
 
     public org.python.Object __gt__(org.python.Object other) {
-        throw new NotImplementedError("Object method __gt__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __gt__ not implemented");
     }
 
     public org.python.Object __ge__(org.python.Object other) {
-        throw new NotImplementedError("Object method __ge__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __ge__ not implemented");
     }
 
     public org.python.Object __hash__() {
@@ -244,7 +268,7 @@ public class Object {
     }
 
     public org.python.Object __bool__() {
-        throw new NotImplementedError("Object method __bool__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __bool__ not implemented");
     }
 
     /**
@@ -280,7 +304,7 @@ public class Object {
     }
 
     public org.python.Object __getattribute__(java.lang.String name) {
-        throw new NotImplementedError("Object method __getattr__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __getattr__ not implemented");
     }
 
     public void __setattr__(java.lang.String name, org.python.Object obj) {
@@ -294,29 +318,29 @@ public class Object {
     }
 
     public void __delattr__(java.lang.String name) {
-        throw new NotImplementedError("Object method __del gtattr__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __del gtattr__ not implemented");
     }
 
     public void __dir__() {
-        throw new NotImplementedError("Object method __dir__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __dir__ not implemented");
     }
 
     /**
      * Section 3.3.4 - Customizing instance and subclass checks
      */
     public org.python.Object __instancecheck__(org.python.Object instance) {
-        throw new NotImplementedError("Object method __instancecheck__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __instancecheck__ not implemented");
     }
 
     public org.python.Object __subclasscheck__(org.python.Object subclass) {
-        throw new NotImplementedError("Object method __subclasscheck__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __subclasscheck__ not implemented");
     }
 
     /**
      * Section 3.3.5 - Emulating callable objects
      */
     public void __call__(org.python.Object... args) {
-        throw new NotImplementedError("Object method __call__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __call__ not implemented");
     }
 
     /**
@@ -324,35 +348,35 @@ public class Object {
      */
 
     public org.python.Object __len__() {
-        throw new NotImplementedError("Object method __len__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __len__ not implemented");
     }
 
     public org.python.Object __length_hint__() {
-        throw new NotImplementedError("Object method __length__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __length__ not implemented");
     }
 
     public org.python.Object __getitem__(org.python.Object key) {
-        throw new NotImplementedError("Object method __getitem__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __getitem__ not implemented");
     }
 
     public org.python.Object __missing__(org.python.Object key) {
-        throw new NotImplementedError("Object method __missing__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __missing__ not implemented");
     }
 
     public void __setitem__(org.python.Object key, org.python.Object value) {
-        throw new NotImplementedError("Object method __setitem__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __setitem__ not implemented");
     }
 
     public org.python.Object __iter__() {
-        throw new NotImplementedError("Object method __iter__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __iter__ not implemented");
     }
 
     public org.python.Object __reversed__() {
-        throw new NotImplementedError("Object method __reversed__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __reversed__ not implemented");
     }
 
     public org.python.Object __contains__(org.python.Object item) {
-        throw new NotImplementedError("Object method __reversed__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __reversed__ not implemented");
     }
 
     /**
@@ -368,10 +392,10 @@ public class Object {
                 return new org.python.Object(((String) this.value) + ((long) other.value));
             } else if (other.type == Float.class) {
                 return new org.python.Object(((String) this.value) + ((float) other.value));
-            } else if (other.type == Map.class) {
-            } else if (other.type == Set.class) {
-            } else if (other.type == Object.class) {
-            } else if (other.type == ArrayList.class) {
+            } else if (other.type == java.util.Map.class) {
+            } else if (other.type == java.util.Set.class) {
+            } else if (other.type == org.python.Object.class) {
+            } else if (other.type == java.util.ArrayList.class) {
             }
         } else if (this.type == Long.class) {
             if (other.type == String.class) {
@@ -380,10 +404,10 @@ public class Object {
                 return new org.python.Object(((Long) this.value) + ((Long) other.value));
             } else if (other.type == Float.class) {
                 return new org.python.Object(((float) this.value) + ((float) other.value));
-            } else if (other.type == Map.class) {
-            } else if (other.type == Set.class) {
-            } else if (other.type == Object.class) {
-            } else if (other.type == ArrayList.class) {
+            } else if (other.type == java.util.Map.class) {
+            } else if (other.type == java.util.Set.class) {
+            } else if (other.type == org.python.Object.class) {
+            } else if (other.type == java.util.ArrayList.class) {
             }
         } else if (this.type == Float.class) {
             if (other.type == String.class) {
@@ -391,15 +415,15 @@ public class Object {
             } else if (other.type == Long.class) {
                 return new org.python.Object(((float) this.value) + ((float) other.value));
             } else if (other.type == Float.class) {
-            } else if (other.type == Map.class) {
-            } else if (other.type == Set.class) {
-            } else if (other.type == Object.class) {
-            } else if (other.type == ArrayList.class) {
+            } else if (other.type == java.util.Map.class) {
+            } else if (other.type == java.util.Set.class) {
+            } else if (other.type == org.python.Object.class) {
+            } else if (other.type == java.util.ArrayList.class) {
             }
-        } else if (this.type == Map.class) {
-        } else if (this.type == Set.class) {
-        } else if (this.type == Object.class) {
-        } else if (this.type == ArrayList.class) {
+        } else if (this.type == java.util.Map.class) {
+        } else if (this.type == java.util.Set.class) {
+        } else if (this.type == org.python.Object.class) {
+        } else if (this.type == java.util.ArrayList.class) {
         }
         return null;
     }
@@ -416,16 +440,16 @@ public class Object {
             } else if (other.type == Long.class) {
                 return new org.python.Object(((Long) this.value) * ((Long) other.value));
             } else if (other.type == Float.class) {
-            } else if (other.type == Map.class) {
-            } else if (other.type == Set.class) {
-            } else if (other.type == Object.class) {
-            } else if (other.type == ArrayList.class) {
+            } else if (other.type == java.util.Map.class) {
+            } else if (other.type == java.util.Set.class) {
+            } else if (other.type == org.python.Object.class) {
+            } else if (other.type == java.util.ArrayList.class) {
             }
         } else if (this.type == Float.class) {
-        } else if (this.type == Map.class) {
-        } else if (this.type == Set.class) {
-        } else if (this.type == Object.class) {
-        } else if (this.type == ArrayList.class) {
+        } else if (this.type == java.util.Map.class) {
+        } else if (this.type == java.util.Set.class) {
+        } else if (this.type == org.python.Object.class) {
+        } else if (this.type == java.util.ArrayList.class) {
         }
         return null;
 
@@ -455,16 +479,16 @@ public class Object {
             } else if (other.type == Long.class) {
                 return new org.python.Object((long)Math.pow((Long) this.value, (Long) other.value));
             } else if (other.type == Float.class) {
-            } else if (other.type == Map.class) {
-            } else if (other.type == Set.class) {
-            } else if (other.type == Object.class) {
-            } else if (other.type == ArrayList.class) {
+            } else if (other.type == java.util.Map.class) {
+            } else if (other.type == java.util.Set.class) {
+            } else if (other.type == org.python.Object.class) {
+            } else if (other.type == java.util.ArrayList.class) {
             }
         } else if (this.type == Float.class) {
-        } else if (this.type == Map.class) {
-        } else if (this.type == Set.class) {
-        } else if (this.type == Object.class) {
-        } else if (this.type == ArrayList.class) {
+        } else if (this.type == java.util.Map.class) {
+        } else if (this.type == java.util.Set.class) {
+        } else if (this.type == org.python.Object.class) {
+        } else if (this.type == java.util.ArrayList.class) {
         }
         return null;
     }
@@ -591,19 +615,19 @@ public class Object {
     }
 
     public org.python.Object __neg__() {
-        throw new NotImplementedError("Object method __neg__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __neg__ not implemented");
     }
 
     public org.python.Object __pos__() {
-        throw new NotImplementedError("Object method __pos__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __pos__ not implemented");
     }
 
     public org.python.Object __abs__() {
-        throw new NotImplementedError("Object method __abs__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __abs__ not implemented");
     }
 
     public org.python.Object __invert__() {
-        throw new NotImplementedError("Object method __invert__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __invert__ not implemented");
     }
 
     public org.python.Object __not__() {
@@ -611,7 +635,7 @@ public class Object {
     }
 
     public org.python.Object __complex__(org.python.Object other) {
-        throw new NotImplementedError("Object method __complex__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __complex__ not implemented");
     }
 
     public org.python.Object __int__() {
@@ -623,18 +647,18 @@ public class Object {
     }
 
     public org.python.Object __round__() {
-        throw new NotImplementedError("Object method __round__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __round__ not implemented");
     }
 
     /**
      * Section 3.3.8 - With statement context
      */
     public org.python.Object __enter__() {
-        throw new NotImplementedError("Object method __enter__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __enter__ not implemented");
     }
 
     public org.python.Object __exit__(org.python.Object exc_type, org.python.Object exc_value, org.python.Object traceback) {
-        throw new NotImplementedError("Object method __exit__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __exit__ not implemented");
     }
 
 }

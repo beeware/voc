@@ -16,8 +16,8 @@ from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF, DEBUG
 
 
 class StaticBlock(Block):
-    def tweak(self, code):
-        code = [
+    def tweak(self):
+        self.code = [
             # Set up the globals dictionary for the module
             JavaOpcodes.NEW('java/util/Hashtable'),
             JavaOpcodes.DUP(),
@@ -33,8 +33,8 @@ class StaticBlock(Block):
             JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/util/Map;)V'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
-        ] + code
-        return self.void_return(code)
+        ] + self.code
+        self.void_return()
 
     def store_name(self, name, arguments, allow_locals=True):
         return [
@@ -65,10 +65,6 @@ class StaticBlock(Block):
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             END_IF()
         ]
-
-    @property
-    def is_module(self):
-        return True
 
     @property
     def descriptor(self):
@@ -118,7 +114,7 @@ class Module(Block):
             if main_end is not None:
                 # Marker for the end of the main block:
                 #   JUMP_FORWARD <main_end>
-                if len(cmd.arguments) == 0 and cmd.operation.opname == 'JUMP_FORWARD' and cmd.operation.delta == main_end:
+                if len(cmd.arguments) == 0 and cmd.operation.opname == 'JUMP_FORWARD' and cmd.operation.target == main_end:
                     main_end = None
 
                     try:

@@ -67,11 +67,11 @@ class Method(Block):
     def module(self):
         return self.parent
 
-    def tweak(self, code):
+    def tweak(self):
         # Load all the arguments into locals
-        tweaked = []
+        setup = []
         for i, arg in enumerate(self.parameters):
-            tweaked.extend([
+            setup.extend([
                 ALOAD_name(self.localvars, '##__args__##'),
                 ICONST_val(i),
                 JavaOpcodes.AALOAD(),
@@ -79,13 +79,11 @@ class Method(Block):
             ])
 
         # Then run the code as normal.
-        tweaked.extend(code)
+        self.code = setup + self.code
 
         # If the method has a void return, clean up the final opcodes.
         if self.has_void_return:
-            tweaked = self.void_return(tweaked)
-
-        return tweaked
+            self.void_return()
 
     def transpile(self):
         code = super().transpile()
@@ -128,7 +126,7 @@ class InitMethod(Method):
     def add_self(self):
         self.localvars['self'] = len(self.localvars)
 
-    def tweak(self, code):
+    def tweak(self):
         # If the block is an init method, make sure it invokes super().<init>
         super_found = False
         # FIXME: Search for existing calls on <init>
@@ -153,7 +151,9 @@ class InitMethod(Method):
                 JavaOpcodes.INVOKESPECIAL(self.klass.super_name, '<init>', '()V'),
             ])
 
-        return self.ignore_empty(self.void_return(setup + code))
+        self.code = setup + self.code
+        self.void_return()
+        self.ignore_empty()
 
 
 class InstanceMethod(Method):
@@ -217,12 +217,9 @@ class MainMethod(Method):
     def signature(self):
         return '([Ljava/lang/String;)V'
 
-    def tweak(self, code):
-        # return self.void_return(code)
-
-        return self.ignore_empty(
-            self.void_return(code)
-        )
+    def tweak(self):
+        self.void_return()
+        self.ignore_empty()
 
 
 def extract_parameters(code):

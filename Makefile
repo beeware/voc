@@ -5,7 +5,8 @@ ALL_FILES=\
 	python/org/python/Callable.class \
 	python/org/python/Function.class \
 	python/org/python/InstanceMethod.class \
-	python/org/python/Iterable.class \
+	python/org/python/Iterator.class \
+	python/org/python/Range.class \
 	python/org/python/StaticMethod.class \
 	python/org/python/Constructor.class \
 	python/org/python/exceptions/ArithmeticError.class \

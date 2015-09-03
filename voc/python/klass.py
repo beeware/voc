@@ -15,8 +15,8 @@ from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
 
 
 class ClassBlock(Block):
-    def tweak(self, code):
-        code = [
+    def tweak(self):
+        self.code = [
             # Set up the class attributes dictionary for the class
             JavaOpcodes.NEW('java/util/Hashtable'),
             JavaOpcodes.DUP(),
@@ -32,8 +32,8 @@ class ClassBlock(Block):
             JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/lang/String;)V'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
-        ] + code
-        return self.void_return(code)
+        ] + self.code
+        self.void_return()
 
     def store_name(self, name, arguments, allow_locals=True):
         # Ignore a request to store __init__ - replace with the constructor
