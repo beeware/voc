@@ -60,11 +60,8 @@ class Opcode:
     def stack_effect(self):
         return self.produce_count - self.consume_count
 
-    def process(self, parts):
-        parts.add_opcodes(self)
-
-    def post_process(self, parts):
-        pass
+    def process(self, context):
+        return True
 
 
 class AALOAD(Opcode):
@@ -2222,7 +2219,7 @@ class INVOKESTATIC(Opcode):
 
     @property
     def consume_count(self):
-        return 1 + len(self.method.descriptor.parameters)
+        return len(self.method.descriptor.parameters)
 
 
 class INVOKEVIRTUAL(Opcode):

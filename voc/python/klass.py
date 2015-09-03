@@ -38,28 +38,27 @@ class ClassBlock(Block):
     def store_name(self, name, arguments, allow_locals=True):
         # Ignore a request to store __init__ - replace with the constructor
         if name == '__init__':
-            return []
+            return
 
-        return [
-            ASTORE_name(self.localvars, '#TEMP#'),
+        self.add_opcodes(
+            ASTORE_name(self, '#TEMP#'),
             JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC(name),
-            ALOAD_name(self.localvars, '#TEMP#'),
+            ALOAD_name(self, '#TEMP#'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP(),
-        ]
+        )
 
     def load_name(self, name, allow_locals=True):
         if allow_locals:
-            code = [
+            self.add_opcodes(
                 # look for a class attribute.
                 JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-            ]
-        else:
-            code = []
-        return code + [
+            )
+
+        self.add_opcodes(
             # Look for a global var.
             IF(
                 [JavaOpcodes.DUP()],
@@ -81,7 +80,7 @@ class ClassBlock(Block):
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 END_IF(),
             END_IF()
-        ]
+        )
 
     @property
     def descriptor(self):

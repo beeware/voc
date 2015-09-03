@@ -625,7 +625,22 @@ public class Python {
     public static org.python.Object iter(
                 org.python.Object [] args,
                 java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' not implemented");
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("len() takes no keyword arguments");
+        }
+        if (args.length < 1) {
+            throw new org.python.exceptions.TypeError("len() expects at least argument, got " + args.length);
+        } else if (args.length == 1) {
+            if (args[0] instanceof org.python.Iterator) {
+                return args[0];
+            } else {
+                throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with iterable not implemented");
+            }
+        } else if (args.length == 2) {
+            throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with callable/sentinel not implemented");
+        } else {
+            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.length + " given)");
+        }
     }
 
     /**

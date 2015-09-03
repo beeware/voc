@@ -12,7 +12,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import MainMethod, Method, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF, DEBUG
+from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
 
 
 class StaticBlock(Block):
@@ -37,17 +37,17 @@ class StaticBlock(Block):
         self.void_return()
 
     def store_name(self, name, arguments, allow_locals=True):
-        return [
-            ASTORE_name(self.localvars, '#TEMP#'),
+        self.add_opcodes(
+            ASTORE_name(self, '#TEMP#'),
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC(name),
-            ALOAD_name(self.localvars, '#TEMP#'),
+            ALOAD_name(self, '#TEMP#'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP(),
-        ]
+        )
 
     def load_name(self, name, allow_locals=True):
-        return [
+        self.add_opcodes(
             # look for a global var.
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC(name),
@@ -58,13 +58,12 @@ class StaticBlock(Block):
                 [JavaOpcodes.DUP()],
                 JavaOpcodes.IFNONNULL
             ),
-                DEBUG('%s not found in globals' % name),
                 JavaOpcodes.POP(),
                 JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             END_IF()
-        ]
+        )
 
     @property
     def descriptor(self):

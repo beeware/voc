@@ -9,17 +9,19 @@ class Point:
     def distance(self):
         return self.x ** 2 + self.y ** 2 + self.z ** 2
 
-# # def foo():
-# #     for i in range(0, 10):
-# #         print("FOR LOOP", i)
-# #     print("All done")
 
-# # def bar():
-# #     i = 0
-# #     while i < 10:
-# #         print("WHILE LOOP", i)
-# #         i += 1
-# #     print("All done")
+def foo():
+    for i in range(0, 10):
+        print("FOR LOOP", i)
+    print("All done")
+
+
+# def bar():
+#     i = 0
+#     while i < 10:
+#         print("WHILE LOOP", i)
+#         i += 1
+#     print("All done")
 
 # class Point3D(Point):
 #     def __init__(self):
@@ -51,4 +53,5 @@ if __name__ == '__main__':
 
     print("Method is", p.distance)
     print ("Distance is:", p.distance())
-    print("No such attribute", p.no_such_attribute)
+    # print("No such attribute", p.no_such_attribute)
+    foo()

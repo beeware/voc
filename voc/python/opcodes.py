@@ -10,35 +10,6 @@ from ..java import opcodes as JavaOpcodes, Classref
 RESOLVE = object()
 
 
-class DEBUG:
-    "Drop a debug print statement into a code path"
-    def __init__(self, message, show_top_of_stack=False):
-        self.message = message
-        self.show_top_of_stack = show_top_of_stack
-
-        # If this DEBUG can be identified as the start of a new
-        # line of source code, track that line.
-        self.starts_line = None
-
-    def process(self, context):
-        # Add the stack prepration commands to the code list
-        # print("PROCESS IF", id(self))
-        if False:
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'),
-                JavaOpcodes.LDC(self.message),
-                JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/String;)V'),
-            )
-            if self.show_top_of_stack:
-                context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.GETSTATIC('java/lang/System', 'out', 'Ljava/io/PrintStream;'),
-                    JavaOpcodes.SWAP(),
-                    JavaOpcodes.INVOKEVIRTUAL('org/python/Object', 'toString', '()Ljava/lang/String;'),
-                    JavaOpcodes.INVOKEVIRTUAL('java/io/PrintStream', 'println', '(Ljava/lang/String;)V'),
-                )
-
-
 class IF:
     """Mark the start of an if-endif block.
 
@@ -102,8 +73,12 @@ class IF:
         # The commands to prepare the stack for the IF comparison
         self.commands = commands if commands is not None else []
         # print("CREATE IF", id(self), opcode)
+
         # The opcode class to instantiate
         self.opcode = opcode
+
+        # The opcode that is the first in the formal IF block
+        self.start_op = None
 
         # The instantiated opcode for the comparison
         self.if_op = None
@@ -132,9 +107,19 @@ class IF:
         self.if_op = self.opcode(0)
         context.add_opcodes(self.if_op)
 
+        # If there were commands, the first command is the start
+        # of the IF block. oetherwise, it's the if_op.
+        try:
+            self.start_op = self.commands[0]
+        except IndexError:
+            self.start_op = self.if_op
+
         # Record this IF.
         context.if_blocks.append(self)
         # print("IF BLOCKS: ", [(id(b), b.end_op) for b in context.if_blocks])
+
+        # This opcode isn't for the final output.
+        return False
 
 
 class ELIF:
@@ -169,6 +154,7 @@ class ELIF:
                 if_block.end_op = RESOLVE
                 break
         # print("    if block is", id(if_block))
+
         # If this is the first elif, add a GOTO and use it as the
         # jump operation at the end of the IF block. If there are
         # ELIFs, add the GOTO as the jump operation on the most
@@ -196,6 +182,9 @@ class ELIF:
 
         if_block.elifs.append(self)
         # print("IF BLOCKS: ", [(id(b), b.end_op) for b in context.if_blocks])
+
+        # This opcode isn't for the final output.
+        return False
 
 
 class ELSE(ELIF):
@@ -226,6 +215,9 @@ class END_IF:
         # The next opcode is the end of the IF-ELIF-ELSE block.
         context.next_resolve_list.append((if_block, 'end_op'))
         # print("IF BLOCKS: ", [(id(b), b.end_op) for b in context.if_blocks])
+
+        # This opcode isn't for the final output.
+        return False
 
 
 class TRY:
@@ -282,6 +274,9 @@ class TRY:
         # The next opcode is the start of the TRY block.
         context.next_resolve_list.append((self, 'start_op'))
 
+        # This opcode isn't for the final output.
+        return False
+
 
 class CATCH:
     def __init__(self, descriptor):
@@ -327,6 +322,9 @@ class CATCH:
         # The next opcode is the start of the catch block.
         context.next_resolve_list.append((self, 'start_op'))
 
+        # This opcode isn't for the final output.
+        return False
+
 
 class END_TRY:
     def __init__(self):
@@ -353,6 +351,9 @@ class END_TRY:
         # The next opcode is the end of the try-catch block.
         context.next_resolve_list.append((exception, 'end_op'))
 
+        # This opcode isn't for the final output.
+        return False
+
 
 ##########################################################################
 # Local variables are stored in a dictionary, keyed by name,
@@ -362,14 +363,14 @@ class END_TRY:
 # value.
 ##########################################################################
 
-def ALOAD_name(localvars, name):
+def ALOAD_name(context, name):
     """Generate the opcode to load a variable with the given name onto the stack.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    i = localvars[name]
+    i = context.localvars[name]
     if i is None:
         raise KeyError(name)
 
@@ -385,7 +386,7 @@ def ALOAD_name(localvars, name):
         return JavaOpcodes.ALOAD(i)
 
 
-def ASTORE_name(localvars, name):
+def ASTORE_name(context, name):
     """Generate the opcode to store a variable with the given name.
 
     This looks up the local variable dictionary to find which
@@ -393,12 +394,12 @@ def ASTORE_name(localvars, name):
     register operations for the first 4 local variables.
     """
     try:
-        i = localvars[name]
+        i = context.localvars[name]
         if i is None:
-            localvars[name] = i
+            context.localvars[name] = i
     except KeyError:
-        i = len(localvars)
-        localvars[name] = i
+        i = len(context.localvars)
+        context.localvars[name] = i
 
     if i == 0:
         return JavaOpcodes.ASTORE_0()
@@ -436,11 +437,54 @@ def ICONST_val(value):
         return JavaOpcodes.LDC(value)
 
 
+def resolve_jump(opcode, context, target, position):
+    """Resolve a jump target in an opcode.
+
+    target is the code offset in the Python code space.
+    When Python code is converted to Java, it will turn into
+    0-N opcodes. We need to specify which one will be used
+    as the Java offset:
+     * START - the first opcode
+     * END - the last opcode
+     * NEXT - the next opcode added after this block.
+    """
+    try:
+        # print("RESOLVE %s %s to %s %s" % (opcode, id(opcode), target, position))
+        py_opcode = context.jump_targets[target]
+        # print("PY OPCODE:", py_opcode)
+        if position == Opcode.START:
+            opcode.jump_op = py_opcode.start_op
+        elif position == Opcode.END:
+            opcode.jump_op = py_opcode.end_op
+        elif position == Opcode.NEXT:
+            # If we are resolving a forward reference, the 'next'
+            # opcode won't be known yet; so put it on the resolve list.
+            try:
+                opcode.jump_op = py_opcode.next_op
+            except AttributeError:
+                context.next_resolve_list.append((opcode, 'jump_op'))
+
+        else:
+            raise Exception("Unknown opcode position")
+
+        context.jumps.append(opcode)
+
+    except KeyError:
+        # print("    unknown reference %s %s... defer" % (opcode, id(opcode)))
+        context.unknown_jump_targets.setdefault(target, []).append((opcode, position))
+
+    return opcode
+
+
 ##########################################################################
 # Base classes for defining opcodes.
 ##########################################################################
 
 class Opcode:
+    START = 10
+    END = 20
+    NEXT = 30
+
     start_block = False
     end_block = False
 
@@ -448,10 +492,6 @@ class Opcode:
         self.code_offset = code_offset
         self.starts_line = starts_line
         self.is_jump_target = is_jump_target
-
-        self.start_op = None
-        self.end_op = None
-        self.next_op = None
 
     @property
     def opname(self):
@@ -464,27 +504,46 @@ class Opcode:
         return ''
 
     def transpile(self, context, arguments):
-        code = self.convert(context, arguments)
+        # print("TRANSPILE %s:%4d %s" % ('%4d' % self.starts_line if self.starts_line else '    ', self.code_offset, self))
+
+        # If the Python opcode marks the start of a line of code,
+        # transfer that relationship to the first opcode in the
+        # generated Java code.
         if self.starts_line:
-            # print('>>>>', self, self.code_offset, self.starts_line)
-            if len(code) > 0:
-                # print("SET ON", code[0])
-                code[0].starts_line = self.starts_line
+            context.next_opcode_starts_line = self.starts_line
 
-        # Store the start/end/next java opcodes, so they can
-        # be used to back-populate jump references.
-        context.next_resolve_list.append((self, 'next_op'))
-        if len(code) == 0:
-            # If there's no code added by this opcode,
-            # any reference pointing at this opcode should
-            # point at the next operation that is added.
-            self.start_op = self.next_op
-            self.end_op = self.next_op
-        else:
-            self.start_op = code[0]
-            self.end_op = code[-1]
+        # If this command is a jump target, then track
+        # the startop in the command sequence.
+        if self.is_jump_target:
+            context.next_resolve_list.append((self, 'start_op'))
+            n_ops = len(context.code)
 
-        return code
+        # Actually convert the opcode. This is recursive down the Command sequence.
+        self.convert(context, arguments)
+
+        # If this command is a jump target, then track
+        # the end and next op in the command sequence.
+        if self.is_jump_target:
+            if len(context.code) == n_ops:
+                context.next_resolve_list.append((self, 'end_op'))
+            else:
+                self.end_op = context.code[-1]
+
+            context.next_resolve_list.append((self, 'next_op'))
+
+            # Save the code offset for the jump operation.
+            context.jump_targets[self.code_offset] = self
+
+            # If this opcode has been a forward-referenced as a jump
+            # target, go back and resolve the reference.
+            try:
+                references = context.unknown_jump_targets.pop(self.code_offset)
+                # print("   resolving %s references to offset %s" % (len(references), self.code_offset))
+                for opcode, position in references:
+                    resolve_jump(opcode, context, self.code_offset, position)
+            except KeyError:
+                # print("   No unknown jump target at %s" % self.code_offset)
+                pass
 
 
 class UnaryOpcode(Opcode):
@@ -497,19 +556,16 @@ class UnaryOpcode(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        code = []
-
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        code.append(
+        context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/Object',
                 self.__method__,
                 '()Lorg/python/Object;'
             )
         )
-        return code
 
 
 class BinaryOpcode(Opcode):
@@ -522,19 +578,16 @@ class BinaryOpcode(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        code = []
-
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        code.append(
+        context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/Object',
                 self.__method__,
                 '(Lorg/python/Object;)Lorg/python/Object;'
             )
         )
-        return code
 
 
 class InplaceOpcode(Opcode):
@@ -547,19 +600,16 @@ class InplaceOpcode(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        code = []
-
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        code.append(
+        context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/Object',
                 self.__method__,
                 '(Lorg/python/Object;)V'
             )
         )
-        return code
 
 
 ##########################################################################
@@ -576,22 +626,11 @@ class POP_TOP(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        # print('-----')
-        code = []
         for argument in arguments:
-            # print(argument)
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        # print('-----')
-        # If the most recent command is stored as None, then this is
-        # return value of a void function. We can avoid a POP operation
-        # in this case.
-        if code[-1] is None:
-            code.pop()
-        else:
-            code.append(JavaOpcodes.POP())
-
-        return code
+        # Ignore the top of the stack.
+        context.add_opcodes(JavaOpcodes.POP())
 
 
 class ROT_TWO(Opcode):
@@ -604,9 +643,8 @@ class ROT_TWO(Opcode):
         return 2
 
     def convert(self, context, arguments):
-        code = []
-        code.append(JavaOpcodes.SWAP())
-        return code
+        context.add_opcodes(JavaOpcodes.SWAP())
+
 
 # class ROT_THREE(Opcode):
 
@@ -621,9 +659,7 @@ class DUP_TOP(Opcode):
         return 2
 
     def convert(self, context, arguments):
-        code = []
-        code.append(JavaOpcodes.DUP())
-        return code
+        context.add_opcodes(JavaOpcodes.DUP())
 
 
 class DUP_TOP_TWO(Opcode):
@@ -636,9 +672,7 @@ class DUP_TOP_TWO(Opcode):
         return 4
 
     def convert(self, context, arguments):
-        code = []
-        code.append(JavaOpcodes.DUP2())
-        return code
+        context.add_opcodes(JavaOpcodes.DUP2())
 
 
 class NOP(Opcode):
@@ -651,9 +685,7 @@ class NOP(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = []
-        code.append(JavaOpcodes.NOP())
-        return code
+        context.add_opcodes(JavaOpcodes.NOP())
 
 
 class UNARY_POSITIVE(Opcode):
@@ -769,18 +801,30 @@ class GET_ITER(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        print("CONVERT GET ITER")
-        code = [
-            # TRY()
-        ]
-
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        code.extend([
-        ])
-        print("get iter code", code)
-        return code
+        context.add_opcodes(
+            ASTORE_name(context, '##ITERABLE##'),
+            JavaOpcodes.ICONST_1(),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.ICONST_0(),
+            ALOAD_name(context, '##ITERABLE##'),
+            JavaOpcodes.AASTORE(),
+
+            JavaOpcodes.NEW('java/util/Hashtable'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
+
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'iter',
+                '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;'
+            ),
+
+            JavaOpcodes.CHECKCAST('org/python/Iterator'),
+        )
 
 
 class PRINT_EXPR(Opcode):
@@ -839,9 +883,10 @@ class RETURN_VALUE(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = arguments[0].operation.transpile(context, arguments[0].arguments)
-        code.append(JavaOpcodes.ARETURN())
-        return code
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(JavaOpcodes.ARETURN())
 
 
 # class IMPORT_STAR(Opcode):
@@ -860,11 +905,8 @@ class POP_BLOCK(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = []
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
-
-        return code
+            argument.operation.transpile(context, argument.arguments)
 
 
 # class END_FINALLY(Opcode):
@@ -888,22 +930,12 @@ class STORE_NAME(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = []
-
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        # If the most recent command is stored as None, then this is
-        # return value of a void function. We can avoid a POP operation
-        # in this case.
-        if code[-1] is None:
-            code.pop()
-        else:
-            # Depending on context, this might mean writing to local
-            # variables, class attributes, or to the global context.
-            code.extend(context.store_name(self.name, arguments))
-
-        return code
+        # Depending on context, this might mean writing to local
+        # variables, class attributes, or to the global context.
+        context.store_name(self.name, arguments)
 
 
 # class DELETE_NAME(Opcode):
@@ -929,22 +961,18 @@ class FOR_ITER(Opcode):
         return 2
 
     def convert(self, context, arguments):
-        code = [
-            TRY()
-        ]
+        context.add_opcodes(TRY())
 
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        code.extend([
+        context.add_opcodes(
                 JavaOpcodes.DUP(),
-                JavaOpcodes.CHECKCAST('org/python/Iterator'),
                 JavaOpcodes.INVOKEINTERFACE('org/python/Iterator', '__next__', '()Lorg/python/Object;', 0),
             CATCH('org/python/exceptions/StopIteration'),
-                JavaOpcodes.GOTO(64),
+                resolve_jump(JavaOpcodes.GOTO(0), context, self.target, Opcode.NEXT),
             END_TRY()
-        ])
-        return code
+        )
 
 
 # class UNPACK_EX(Opcode):
@@ -968,15 +996,13 @@ class STORE_ATTR(Opcode):
 
     def convert(self, context, arguments):
         # FIXME
-        code = []
-        code.extend(arguments[1].operation.transpile(context, arguments[1].arguments))
-        code.append(JavaOpcodes.LDC(self.name))
-        code.extend(arguments[0].operation.transpile(context, arguments[0].arguments))
+        arguments[1].operation.transpile(context, arguments[1].arguments)
+        context.add_opcodes(JavaOpcodes.LDC(self.name))
+        arguments[0].operation.transpile(context, arguments[0].arguments)
 
-        code.extend([
+        context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
-        ])
-        return code
+        )
 
 
 # class DELETE_ATTR(Opcode):
@@ -998,22 +1024,13 @@ class STORE_GLOBAL(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = []
-
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        # If the most recent command is stored as None, then this is
-        # return value of a void function. We can avoid a POP operation
-        # in this case.
-        if code[-1] is None:
-            code.pop()
-        else:
-            # Depending on context, this might mean writing to local
-            # variables, class attributes, or to the global context.
-            code.extend(context.store_name(self.name, arguments, allow_locals=False))
+        # Depending on context, this might mean writing to local
+        # variables, class attributes, or to the global context.
+        context.store_name(self.name, arguments, allow_locals=False)
 
-        return code
 
 # class DELETE_GLOBAL(Opcode):
 
@@ -1040,9 +1057,10 @@ class LOAD_CONST(Opcode):
         # cut a value out of the constant pool.
         # Otherwise, use LDC.
         if self.const is None:
-            return [
+            context.add_opcodes(
                 JavaOpcodes.ACONST_NULL()
-            ]
+            )
+            return
         elif isinstance(self.const, int) and self.const < 128:
             prototype = '(B)V'
             load_op = JavaOpcodes.BIPUSH(self.const)
@@ -1056,12 +1074,12 @@ class LOAD_CONST(Opcode):
             }[type(self.const)]
             load_op = JavaOpcodes.LDC(self.const)
 
-        return [
+        context.add_opcodes(
             JavaOpcodes.NEW('org/python/Object'),
             JavaOpcodes.DUP(),
             load_op,
             JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', prototype),
-        ]
+        )
 
 
 class LOAD_NAME(Opcode):
@@ -1081,7 +1099,7 @@ class LOAD_NAME(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        return context.load_name(self.name)
+        context.load_name(self.name)
 
 
 class BUILD_TUPLE(Opcode):
@@ -1186,14 +1204,12 @@ class LOAD_ATTR(Opcode):
 
     def convert(self, context, arguments):
         # print("LOAD_ATTR", context, arguments)
-        code = []
-        code.extend(arguments[0].operation.transpile(context, arguments[0].arguments))
-        code.append(JavaOpcodes.LDC(self.name))
+        arguments[0].operation.transpile(context, arguments[0].arguments)
+        context.add_opcodes(JavaOpcodes.LDC(self.name))
 
-        code.extend([
+        context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL('org/python/Object', '__getattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
-        ])
-        return code
+        )
 
 
 class COMPARE_OP(Opcode):
@@ -1230,7 +1246,8 @@ class IMPORT_NAME(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        return [None]
+        pass
+
 
 # class IMPORT_FROM(Opcode):
 
@@ -1252,10 +1269,10 @@ class JUMP_FORWARD(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = [
-            JavaOpcodes.GOTO(0)
-        ]
-        return code
+        context.add_opcodes(
+            resolve_jump(JavaOpcodes.GOTO(0), context, self.target, Opcode.START)
+        )
+
 
 # class JUMP_IF_FALSE_OR_POP(Opcode):
 # class JUMP_IF_TRUE_OR_POP(Opcode):
@@ -1278,10 +1295,9 @@ class JUMP_ABSOLUTE(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = [
-            JavaOpcodes.GOTO(-73)
-        ]
-        return code
+        context.add_opcodes(
+            resolve_jump(JavaOpcodes.GOTO(0), context, self.target, Opcode.START)
+        )
 
 
 class POP_JUMP_IF_FALSE(Opcode):
@@ -1301,8 +1317,7 @@ class POP_JUMP_IF_FALSE(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = []
-        return code
+        pass
 
 
 class POP_JUMP_IF_TRUE(Opcode):
@@ -1336,7 +1351,7 @@ class LOAD_GLOBAL(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        return context.load_name(self.name, allow_locals=False)
+        context.load_name(self.name, allow_locals=False)
 
 
 # class CONTINUE_LOOP(Opcode):
@@ -1357,9 +1372,9 @@ class SETUP_LOOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        code = []
-        return code
+    # def convert(self, context, arguments):
+    #     code = []
+    #     return code
 
 # class SETUP_EXCEPT(Opcode):
 # class SETUP_FINALLY(Opcode):
@@ -1382,7 +1397,7 @@ class LOAD_FAST(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        return [ALOAD_name(context.localvars, self.name)]
+        context.add_opcodes(ALOAD_name(context, self.name))
 
 
 class STORE_FAST(Opcode):
@@ -1402,16 +1417,14 @@ class STORE_FAST(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = []
-
         for argument in arguments:
-            code.extend(argument.operation.transpile(context, argument.arguments))
+            argument.operation.transpile(context, argument.arguments)
 
-        code.append(ASTORE_name(context.localvars, self.name))
+        context.add_opcodes(ASTORE_name(context, self.name))
 
-        return code
 
 # class DELETE_FAST(Opcode):
+
 
 # class RAISE_VARARGS(Opcode):
 
@@ -1456,7 +1469,7 @@ class CALL_FUNCTION(Opcode):
             # print("DESCRIPTOR", klass.descriptor)
             # Push a callable onto the stack so that it can be stored
             # in globals and subsequently retrieved and run.
-            return [
+            context.add_opcodes(
                 # Get a Method representing the new function
                 TRY(),
                     JavaOpcodes.LDC(Classref(klass.descriptor)),
@@ -1475,33 +1488,33 @@ class CALL_FUNCTION(Opcode):
                         'getConstructor',
                         '([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;'
                     ),
-                    ASTORE_name(context.localvars, '#CONSTRUCTOR#'),
+                    ASTORE_name(context, '#CONSTRUCTOR#'),
 
                     # # Then wrap that Constructor into a Callable.
                     JavaOpcodes.NEW('org/python/Constructor'),
                     JavaOpcodes.DUP(),
-                    ALOAD_name(context.localvars, '#CONSTRUCTOR#'),
+                    ALOAD_name(context, '#CONSTRUCTOR#'),
                     JavaOpcodes.INVOKESPECIAL('org/python/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
 
                 CATCH('java/lang/NoSuchMethodError'),
-                    ASTORE_name(context.localvars, '#EXCEPTION#'),
+                    ASTORE_name(context, '#EXCEPTION#'),
                     JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC('Unable to find class %s' % (klass.descriptor)),
                     JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
                     JavaOpcodes.ATHROW(),
                 END_TRY()
-            ]
+            )
 
         else:
             # print("CALL_FUNCTION", context, arguments)
 
             # Retrive the function
-            code.extend(arguments[0].operation.transpile(context, arguments[0].arguments))
+            arguments[0].operation.transpile(context, arguments[0].arguments)
 
-            code.extend([
+            context.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/Callable'),
-            ])
+            )
 
             final_args = self.args
             first_arg = 0
@@ -1513,52 +1526,52 @@ class CALL_FUNCTION(Opcode):
                 final_args += 1
                 first_arg = 1
 
-            code.extend([
+            context.add_opcodes(
                 # Create an array to pass in arguments to invoke()
                 ICONST_val(final_args),
                 JavaOpcodes.ANEWARRAY('org/python/Object'),
-            ])
+            )
 
             # If it's an instance method, put the instance at the start of
             # the argument list.
             if arguments[0].operation.opname == 'LOAD_ATTR':
-                code.extend([
+                context.add_opcodes(
                     JavaOpcodes.DUP(),
                     ICONST_val(0),
-                ])
-                code.extend(arguments[0].arguments[0].operation.transpile(context, arguments[0].arguments[0].arguments))
-                code.append(JavaOpcodes.AASTORE())
+                )
+                arguments[0].arguments[0].operation.transpile(context, arguments[0].arguments[0].arguments)
+                context.add_opcodes(JavaOpcodes.AASTORE())
 
             # Push all the arguments into an array
             for i, argument in enumerate(arguments[1:self.args+1]):
-                code.extend([
+                context.add_opcodes(
                     JavaOpcodes.DUP(),
                     ICONST_val(first_arg + i),
-                ])
-                code.extend(argument.operation.transpile(context, argument.arguments))
-                code.append(JavaOpcodes.AASTORE())
+                )
+                argument.operation.transpile(context, argument.arguments)
+                context.add_opcodes(JavaOpcodes.AASTORE())
 
             # Create a Hashtable, and push all the kwargs into it.
-            code.extend([
+            context.add_opcodes(
                 JavaOpcodes.NEW('java/util/Hashtable'),
                 JavaOpcodes.DUP(),
                 JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V')
-            ])
+            )
 
             for name, argument in zip(arguments[self.args+1::2], arguments[self.args+2::2]):
-                code.extend([
+                context.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC(name),
-                ])
-                code.extend(argument.operation.transpile(context, argument.arguments))
-                code.extend([
+                )
+                argument.operation.transpile(context, argument.arguments)
+                context.add_opcodes(
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                     JavaOpcodes.POP()
-                ])
+                )
 
-            code.extend([
+            context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;', 2),
-            ])
+            )
         return code
 
 
@@ -1599,7 +1612,7 @@ class MAKE_FUNCTION(Opcode):
         if not method.is_constructor:
             # Push a callable onto the stack so that it can be stored
             # in globals and subsequently retrieved and run.
-            return [
+            context.add_opcodes(
                 # Get a Method representing the new function
                 TRY(),
                     JavaOpcodes.LDC(Classref(context.descriptor)),
@@ -1619,26 +1632,26 @@ class MAKE_FUNCTION(Opcode):
                         'getMethod',
                         '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'
                     ),
-                    ASTORE_name(context.localvars, '#METHOD#'),
+                    ASTORE_name(context, '#METHOD#'),
 
                     # Then wrap that Method into a Callable.
                     JavaOpcodes.NEW(method.callable),
                     JavaOpcodes.DUP(),
-                    ALOAD_name(context.localvars, '#METHOD#'),
+                    ALOAD_name(context, '#METHOD#'),
                     JavaOpcodes.INVOKESPECIAL(method.callable, '<init>', '(Ljava/lang/reflect/Method;)V'),
                 CATCH('java/lang/NoSuchMethodError'),
-                    ASTORE_name(context.localvars, '#EXCEPTION#'),
+                    ASTORE_name(context, '#EXCEPTION#'),
                     JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC('Unable to find MAKE_FUNCTION output %s.%s' % (context.module.descriptor, full_method_name)),
                     JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
                     JavaOpcodes.ATHROW(),
                 END_TRY()
-            ]
+            )
         else:
-            return [
+            context.add_opcodes(
                 JavaOpcodes.ACONST_NULL()
-            ]
+            )
 
 
 # class BUILD_SLICE(Opcode):
@@ -1676,8 +1689,8 @@ class LOAD_CLOSURE(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
-        return []
+    # def convert(self, context, arguments):
+    #     return []
 
 # class LOAD_DEREF(Opcode):
 # class STORE_DEREF(Opcode):

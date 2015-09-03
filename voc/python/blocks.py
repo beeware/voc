@@ -8,7 +8,7 @@ from ..java import (
 )
 
 from .utils import extract_command
-from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF, DEBUG
+from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
 
 
 class IgnoreBlock(Exception):
@@ -25,36 +25,39 @@ class Block:
         self.code = []
         self.try_catches = []
         self.if_blocks = []
-        self.source_lines = []
+        self.jumps = []
+        self.jump_targets = {}
+        self.unknown_jump_targets = {}
+
         self.next_resolve_list = []
         self.next_opcode_starts_line = None
 
     def store_name(self, name, arguments, allow_locals=True):
         if allow_locals:
-            return [
-                ASTORE_name(self.localvars, name)
-            ]
+            self.add_opcodes(
+                ASTORE_name(self, name)
+            )
         else:
-            return [
-                ASTORE_name(self.localvars, '#TEMP#'),
+            self.add_opcodes(
+                ASTORE_name(self, '#TEMP#'),
                 JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC(name),
-                ALOAD_name(self.localvars, '#TEMP#'),
+                ALOAD_name(self, '#TEMP#'),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                 JavaOpcodes.POP(),
-            ]
+            )
 
     def load_name(self, name, allow_locals=True):
-        code = []
         try:
             # Look for a local first.
             if allow_locals:
-                code.append(ALOAD_name(self.localvars, name))
+                self.add_opcodes(
+                    ALOAD_name(self, name)
+                )
             else:
-                code.append(DEBUG("Ignoring locals in search for %s" % name))
                 raise KeyError('Not scanning locals')
         except KeyError:
-            code.extend([
+            self.add_opcodes(
                 # If there isn't a local, look for a global
                 JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC(name),
@@ -65,15 +68,12 @@ class Block:
                     [JavaOpcodes.DUP()],
                     JavaOpcodes.IFNONNULL
                 ),
-                    DEBUG('%s not found in globals' % name),
                     JavaOpcodes.POP(),
                     JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
                     JavaOpcodes.LDC(name),
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 END_IF()
-            ])
-
-        return code
+            )
 
     def extract(self, code):
         """Break a code object into the parts it defines, populating the
@@ -104,21 +104,24 @@ class Block:
         pass
 
     def add_opcodes(self, *opcodes):
-        # If we've flagged a code line change, attach that to the opcode
-        if self.next_opcode_starts_line:
-            opcodes[0].starts_line = self.next_opcode_starts_line
-            # print("RECORD CODE START", opcodes[0])
-            self.next_opcode_starts_line = None
+        # Add the opcodes to the code list and process them.
+        for opcode in opcodes:
+            # print("ADD OPCODE", id(opcode), opcode)
+            if opcode.process(self):
+                self.code.append(opcode)
 
-        # Add the opcodes to the code list.
-        self.code.extend(opcodes)
+                # If we've flagged a code line change, attach that to the opcode
+                if self.next_opcode_starts_line:
+                    opcode.starts_line = self.next_opcode_starts_line
+                    self.next_opcode_starts_line = None
 
-        # Resolve any references to the "next" opcode.
-        for (obj, attr) in self.next_resolve_list:
-            # print("        resolve %s reference on %s with %s" % (attr, id(obj), opcodes[0]))
-            setattr(obj, attr, opcodes[0])
-            opcodes[0].references.append((obj, attr))
-        self.next_resolve_list = []
+                # Resolve any references to the "next" opcode.
+                for (obj, attr) in self.next_resolve_list:
+                    # print("        resolve %s reference on %s %s with %s %s" % (attr, obj, id(obj), opcode, id(opcode)))
+                    setattr(obj, attr, opcode)
+                    opcode.references.append((obj, attr))
+
+                self.next_resolve_list = []
 
     def stack_depth(self):
         "Evaluate the maximum stack depth required by a sequence of Java opcodes"
@@ -173,10 +176,7 @@ class Block:
         # Most of the instructions will be opcodes. However, some will
         # be instructions to add exception blocks, line number references, etc
         for cmd in self.commands:
-            for instruction in cmd.operation.transpile(self, cmd.arguments):
-                if instruction.starts_line:
-                    self.next_opcode_starts_line = instruction.starts_line
-                instruction.process(self)
+            cmd.operation.transpile(self, cmd.arguments)
 
         # Java requires that every body of code finishes with a return.
         # Make sure there is one.
@@ -190,10 +190,13 @@ class Block:
         # Now that we have a complete opcode list, postprocess the list
         # with the known offsets.
         offset = 0
+        # print('===== set offsets')
         for index, instruction in enumerate(self.code):
+            # print("%4d:%4d (%s) %s" % (index, offset, id(instruction), instruction))
             instruction.code_index = index
             instruction.code_offset = offset
             offset += len(instruction)
+        # print('===== end set offsets')
 
         # Construct the exception table, updating any
         # end-of-exception GOTO operations with the right opcode.
@@ -228,6 +231,15 @@ class Block:
                 else_if.if_op.offset = if_block.end_op.code_offset - else_if.if_op.code_offset
                 if else_if.jump_op:
                     else_if.jump_op.offset = if_block.end_op.code_offset - else_if.jump_op.code_offset
+
+        # Update any jump instructions
+        for jump in self.jumps:
+            # print ("JUMP", id(jump), jump, jump.code_offset)
+
+            try:
+                jump.offset = jump.jump_op.code_offset - jump.code_offset
+            except AttributeError:
+                jump.offset = jump.jump_op.start_op.code_offset - jump.code_offset
 
         # Construct a line number table from
         # the source code reference data on opcodes.

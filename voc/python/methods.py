@@ -72,10 +72,10 @@ class Method(Block):
         setup = []
         for i, arg in enumerate(self.parameters):
             setup.extend([
-                ALOAD_name(self.localvars, '##__args__##'),
+                ALOAD_name(self, '##__args__##'),
                 ICONST_val(i),
                 JavaOpcodes.AALOAD(),
-                ASTORE_name(self.localvars, arg['name']),
+                ASTORE_name(self, arg['name']),
             ])
 
         # Then run the code as normal.
@@ -139,10 +139,10 @@ class InitMethod(Method):
         setup = []
         for i, arg in enumerate(self.parameters):
             setup.extend([
-                ALOAD_name(self.localvars, '##__args__##'),
+                ALOAD_name(self, '##__args__##'),
                 ICONST_val(i),
                 JavaOpcodes.AALOAD(),
-                ASTORE_name(self.localvars, arg['name']),
+                ASTORE_name(self, arg['name']),
             ])
 
         if not super_found:
@@ -185,14 +185,15 @@ class InstanceMethod(Method):
     def add_self(self):
         self.localvars['self'] = len(self.localvars)
 
-    def tweak(self, code):
+    def tweak(self):
         # Load the implicit 'self' argument, then all the arguments, into locals
-        return [
-            ALOAD_name(self.localvars, '##__args__##'),
+        super().tweak()
+        self.code = [
+            ALOAD_name(self, '##__args__##'),
             ICONST_val(0),
             JavaOpcodes.AALOAD(),
-            ASTORE_name(self.localvars, 'self'),
-        ] + super().tweak(code)
+            ASTORE_name(self, 'self'),
+        ] + self.code
 
 
 class MainMethod(Method):

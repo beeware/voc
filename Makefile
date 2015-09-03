@@ -86,4 +86,4 @@ python.jar: $(ALL_FILES)
 	cd python && jar -cf ../$@ $(subst python/org,org,$(ALL_FILES))
 
 %.class: %.java
-	javac -classpath python $<
+	javac  -Xlint:unchecked -classpath python $<

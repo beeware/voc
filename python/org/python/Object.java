@@ -48,6 +48,7 @@ public class Object {
     /**
      * Copy Constructor
      */
+
     public Object(org.python.Object v) {
         if (v.type == java.lang.String.class) {
             value = v.value;
@@ -274,7 +275,9 @@ public class Object {
     /**
      * Section 3.3.2 - Emulating container types
      */
-
+    // The cast back from java Object to Hashtable is, strictly speaking,
+    // unchecked, but given we know it's an Object, we know value is a Map.
+    @SuppressWarnings("unchecked")
     public org.python.Object __getattr__(java.lang.String name) {
         // System.out.println("GET " + name + " on " + this.__repr__());
         if (this.type == java.lang.Object.class) {
@@ -307,6 +310,9 @@ public class Object {
         throw new org.python.exceptions.NotImplementedError("Object method __getattr__ not implemented");
     }
 
+    @SuppressWarnings("unchecked")
+    // The cast back from java Object to Hashtable is, strictly speaking,
+    // unchecked, but given we know it's an Object, we know value is a Map.
     public void __setattr__(java.lang.String name, org.python.Object obj) {
         // System.out.println("SET " + name + " on " + this.__repr__() + " TO " + obj.__repr__());
         if (this.type == java.lang.Object.class) {
@@ -318,7 +324,7 @@ public class Object {
     }
 
     public void __delattr__(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("Object method __del gtattr__ not implemented");
+        throw new org.python.exceptions.NotImplementedError("Object method __delattr__ not implemented");
     }
 
     public void __dir__() {
