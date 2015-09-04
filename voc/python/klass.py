@@ -2,6 +2,7 @@ import os
 
 from ..java import (
     Class as JavaClass,
+    Code as JavaCode,
     Field as JavaField,
     Method as JavaMethod,
     opcodes as JavaOpcodes,
@@ -145,29 +146,30 @@ class Class(Block):
             static_init.attributes.append(body)
             classfile.methods.append(static_init)
 
-        # if self.init:
-        #     classfile.methods.append(self.init)
-        # else:
-        #     # Add default constructor
-        #     classfile.methods.append(
-        #         JavaMethod(
-        #             '<init>',
-        #             '()V',
-        #             attributes=[
-        #                 JavaCode(
-        #                     max_stack=1,
-        #                     max_locals=1,
-        #                     code=[
-        #                         JavaOpcodes.ALOAD_0(),
-        #                         JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '()V'),
-        #                         JavaOpcodes.RETURN(),
-        #                     ],
-        #                 )
-        #             ]
-        #         )
-        #     )
-
+        constructor_found = False
         for method in self.methods:
             classfile.methods.append(method)
+            if method.name == '<init>':
+                constructor_found = True
+
+        # If there's no constructor explicitly defined, add a default one.
+        if not constructor_found:
+            classfile.methods.append(
+                JavaMethod(
+                    '<init>',
+                    '()V',
+                    attributes=[
+                        JavaCode(
+                            max_stack=1,
+                            max_locals=1,
+                            code=[
+                                JavaOpcodes.ALOAD_0(),
+                                JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '()V'),
+                                JavaOpcodes.RETURN(),
+                            ],
+                        )
+                    ]
+                )
+            )
 
         return self.name, classfile

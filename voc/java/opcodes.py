@@ -3116,6 +3116,9 @@ class SIPUSH(Opcode):
     def __len__(self):
         return 3
 
+    def __arg_repr__(self):
+        return ' %s' % self.const
+
     @classmethod
     def read_extra(cls, reader, dump=None):
         const = reader.read_u2()

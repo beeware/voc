@@ -578,14 +578,35 @@ class BinaryOpcode(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
+        # The first argument to an inplace operator is the command
+        # that the operator is going to be invoked on.
+        arguments[0].operation.transpile(context, arguments[0].arguments)
 
         context.add_opcodes(
+            # Create the args array
+            ICONST_val(len(arguments) - 1),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+        for i, argument in enumerate(arguments[1:]):
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i),
+            )
+            argument.operation.transpile(context, argument.arguments)
+            context.add_opcodes(
+                JavaOpcodes.AASTORE(),
+            )
+
+        context.add_opcodes(
+            # Then add an (empty) kswargs dict.
+            JavaOpcodes.NEW('java/util/Hashtable'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
+
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/Object',
                 self.__method__,
-                '(Lorg/python/Object;)Lorg/python/Object;'
+                '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;'
             )
         )
 
@@ -600,14 +621,39 @@ class InplaceOpcode(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
+        # The first argument to an inplace operator is the command
+        # that the operator is going to be invoked on.
+        arguments[0].operation.transpile(context, arguments[0].arguments)
 
         context.add_opcodes(
+            # Duplicate the first argument, because it will be both the
+            # object on which the function is called, and the return value.
+            JavaOpcodes.DUP(),
+
+            # Create the args array
+            ICONST_val(len(arguments) - 1),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+        for i, argument in enumerate(arguments[1:]):
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i),
+            )
+            argument.operation.transpile(context, argument.arguments)
+            context.add_opcodes(
+                JavaOpcodes.AASTORE(),
+            )
+
+        context.add_opcodes(
+            # Then add an (empty) kswargs dict.
+            JavaOpcodes.NEW('java/util/Hashtable'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
+
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/Object',
                 self.__method__,
-                '(Lorg/python/Object;)V'
+                '([Lorg/python/Object;Ljava/util/Hashtable;)V'
             )
         )
 
@@ -688,20 +734,20 @@ class NOP(Opcode):
         context.add_opcodes(JavaOpcodes.NOP())
 
 
-class UNARY_POSITIVE(Opcode):
+class UNARY_POSITIVE(UnaryOpcode):
     __method__ = '__pos__'
 
 
-class UNARY_NEGATIVE(Opcode):
+class UNARY_NEGATIVE(UnaryOpcode):
     __method__ = '__neg__'
 
 
 # FIXME - there shouldn't be a __not__...
-class UNARY_NOT(Opcode):
+class UNARY_NOT(UnaryOpcode):
     __method__ = '__not__'
 
 
-class UNARY_INVERT(Opcode):
+class UNARY_INVERT(UnaryOpcode):
     __method__ = '__invert__'
 
 
@@ -1057,19 +1103,28 @@ class LOAD_CONST(Opcode):
         # cut a value out of the constant pool.
         # Otherwise, use LDC.
         if self.const is None:
-            context.add_opcodes(
-                JavaOpcodes.ACONST_NULL()
-            )
+            context.add_opcodes(JavaOpcodes.ACONST_NULL())
             return
-        elif isinstance(self.const, int) and self.const < 128:
-            prototype = '(B)V'
-            load_op = JavaOpcodes.BIPUSH(self.const)
-        elif isinstance(self.const, int) and self.const < 32768:
+        elif isinstance(self.const, int):
             prototype = '(I)V'
-            load_op = JavaOpcodes.SIPUSH(self.const)
+            if self.const == 0:
+                load_op = JavaOpcodes.ICONST_0()
+            elif self.const == 1:
+                load_op = JavaOpcodes.ICONST_1()
+            elif self.const == 2:
+                load_op = JavaOpcodes.ICONST_2()
+            elif self.const == 3:
+                load_op = JavaOpcodes.ICONST_3()
+            elif self.const == 4:
+                load_op = JavaOpcodes.ICONST_4()
+            elif self.const == 5:
+                load_op = JavaOpcodes.ICONST_5()
+            elif self.const == -1:
+                load_op = JavaOpcodes.ICONST_M1()
+            else:
+                load_op = JavaOpcodes.SIPUSH(self.const)
         else:
             prototype = {
-                int: '(I)V',
                 str: '(Ljava/lang/String;)V',
             }[type(self.const)]
             load_op = JavaOpcodes.LDC(self.const)
@@ -1228,6 +1283,42 @@ class COMPARE_OP(Opcode):
     def product_count(self):
         return 1
 
+    def convert(self, context, arguments):
+        print("COMPARE", self.comparison, context, arguments)
+
+        # Add the operand which will be the left side, and thus the
+        # target of the comparator operator.
+        arguments[0].operation.transpile(context, arguments[0].arguments)
+
+        # Now add an array of 1 element for the arguments to the comparator
+        context.add_opcodes(
+            JavaOpcodes.ICONST_1(),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.ICONST_0(),
+        )
+        arguments[1].operation.transpile(context, arguments[1].arguments)
+        context.add_opcodes(
+            JavaOpcodes.AASTORE(),
+
+            JavaOpcodes.NEW('java/util/Hashtable'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
+        )
+
+        comparator = {
+            '<': '__lt__',
+            '<=': '__lte__',
+            '>': '__gt__',
+            '>=': '__gte__',
+            '==': '__eq__',
+        }[self.comparison]
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKEVIRTUAL('org/python/Object', comparator, '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;')
+        )
+
 
 class IMPORT_NAME(Opcode):
     def __init__(self, target, code_offset, starts_line, is_jump_target):
@@ -1317,7 +1408,18 @@ class POP_JUMP_IF_FALSE(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        pass
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(
+            # (bool) TOS.value
+            JavaOpcodes.GETFIELD('org/python/Object', 'value', 'Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST('java/lang/Boolean'),
+            JavaOpcodes.INVOKEVIRTUAL('java/lang/Boolean', 'booleanValue', '()Z'),
+
+            # Jump if false
+            resolve_jump(JavaOpcodes.IFEQ(0), context, self.target, Opcode.NEXT)
+        )
 
 
 class POP_JUMP_IF_TRUE(Opcode):
@@ -1332,6 +1434,21 @@ class POP_JUMP_IF_TRUE(Opcode):
     @property
     def product_count(self):
         return 0
+
+    def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(
+            # (bool) TOS.value
+            JavaOpcodes.GETFIELD('org/python/Object', 'value', 'java/lang/Object'),
+            JavaOpcodes.CHECKCAST('java/lang/Boolean'),
+            JavaOpcodes.INVOKEVIRTUAL('java/lang/Boolean', 'booleanValue', '()Z'),
+
+            # Jump if not false
+            JavaOpcodes.ICONST_0(),
+            resolve_jump(JavaOpcodes.IFNE(0), context, self.target, Opcode.START)
+        )
 
 
 class LOAD_GLOBAL(Opcode):

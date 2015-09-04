@@ -16,12 +16,12 @@ def foo():
     print("All done")
 
 
-# def bar():
-#     i = 0
-#     while i < 10:
-#         print("WHILE LOOP", i)
-#         i += 1
-#     print("All done")
+def bar():
+    i = 0
+    while i < 10:
+        print("WHILE LOOP", i)
+        i += 1
+    print("All done")
 
 # class Point3D(Point):
 #     def __init__(self):
@@ -55,3 +55,4 @@ if __name__ == '__main__':
     print ("Distance is:", p.distance())
     # print("No such attribute", p.no_such_attribute)
     foo()
+    bar()

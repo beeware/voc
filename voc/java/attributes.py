@@ -755,7 +755,7 @@ class SameFrameExtended(StackMapFrame):
     # u1 frame_type = SAME_FRAME_EXTENDED; /* 251 */
     # u2 offset_delta;
 
-    def __init__(self, k, offset_delta):
+    def __init__(self, offset_delta):
         super().__init__(251)
         self.offset_delta = offset_delta
 
