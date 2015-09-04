@@ -579,8 +579,10 @@ class StackMapFrame:
             frameClass = SameFrameExtended
         elif 252 <= frame_type <= 254:
             frameClass = AppendFrame
-        elif frame_type == 254:
+        elif frame_type == 255:
             frameClass = FullFrame
+        else:
+            raise Exception("Unknown frame class %s" % frame_type)
 
         stack_map_frame = frameClass.read_info(reader, frame_type)
 
@@ -886,7 +888,43 @@ class FullFrame(StackMapFrame):
     # It is an error if, for any index i, stack[i] represents a stack entry
     # whose index is greater than the maximum operand stack size for the
     # method.
-    pass
+
+    def __init__(self, offset_delta, locals, stack):
+        super().__init__(255)
+        self.offset_delta = offset_delta
+        self.locals = locals
+        self.stack = stack
+
+    def __repr__(self):
+        return '<FullFrame %s, locals=%s, stack=%s>' % (self.offset_delta, self.locals, self.stack)
+
+    def __len__(self):
+        return 7 + sum(len(local) for local in locals) + sum(len(frame) for frame in self.stack)
+
+    @staticmethod
+    def read_info(reader, frame_type):
+        offset_delta = reader.read_u2()
+
+        n_locals = reader.read_u2()
+        locals = []
+        for i in range(0, n_locals):
+            locals.append(VerificationTypeInfo.read(reader))
+
+        n_frames = reader.read_u2()
+        stack = []
+        for i in range(0, n_frames):
+            stack.append(VerificationTypeInfo.read(reader))
+        return FullFrame(offset_delta, locals, stack)
+
+    def write_info(self, writer):
+        writer.write_u2(self.offset_delta)
+        for local in self.locals:
+            local.write(writer)
+
+    def resolve(self, constant_pool):
+        for local in self.locals:
+            local.resolve(constant_pool)
+
 
 # The verification_type_info structure consists of a one-byte tag followed by
 # zero or more bytes, giving more information about the tag. Each

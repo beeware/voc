@@ -301,7 +301,8 @@ class BaseClass:
         if dump is not None:
             print("    " * (dump + 1), 'Interfaces: (%s)' % interfaces_count)
         for i in range(0, interfaces_count):
-            Interface.read(reader, dump=dump + 2 if dump is not None else dump)
+            interface = reader.constant_pool[reader.read_u2()]
+            print("    " * (dump + 2), interface.name)
 
         fields_count = reader.read_u2()
         if dump is not None:

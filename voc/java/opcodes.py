@@ -1050,13 +1050,44 @@ class FSUB(Opcode):
 
 
 class GETFIELD(Opcode):
+    # Get a field value of an object objectref, where the field is identified by
+    # field reference in the constant pool index (index1 << 8 + index2)
+    # Args(2): index1, index2
+    # Stack: objectref → value
     code = 0xb4
 
-    def __init__(self):
+    def __init__(self, class_name, field_name, descriptor):
         super(GETFIELD, self).__init__()
-# 2: index1, index2   objectref → value
-# Get a field value of an object objectref, where the field is identified by
-# field reference in the constant pool index (index1 << 8 + index2)
+        self.field = Fieldref(class_name, field_name, descriptor)
+
+    def __len__(self):
+        return 3
+
+    def __arg_repr__(self):
+        return ' %s.%s (%s)' % (self.field.class_name, self.field.name, self.field.name_and_type.descriptor)
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        field = reader.constant_pool[reader.read_u2()]
+        return cls(
+            field.class_name,
+            field.name,
+            field.name_and_type.descriptor.bytes.decode('utf8')
+        )
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.field))
+
+    def resolve(self, constant_pool):
+        self.field.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class GETSTATIC(Opcode):
@@ -2902,12 +2933,12 @@ class NEWARRAY(Opcode):
 
 
 class NOP(Opcode):
+    # Perform no operation
+    # Stack: [No change]
     code = 0x00
 
     def __init__(self):
         super(NOP, self).__init__()
-# [No change]
-# Perform no operation
 
 
 class POP(Opcode):
