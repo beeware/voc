@@ -1,0 +1,232 @@
+              3 STORE_NAME               0 (__doc__)
+
+ 42           6 LOAD_CONST               1 (50000)
+              9 STORE_NAME               1 (LOOPS)
+
+ 44          12 LOAD_CONST               2 (0)
+             15 LOAD_CONST               3 (('clock',))
+             18 IMPORT_NAME              2 (time)
+             21 IMPORT_FROM              3 (clock)
+             24 STORE_NAME               3 (clock)
+             27 POP_TOP
+
+ 46          28 LOAD_CONST               4 ('1.2')
+             31 STORE_NAME               4 (__version__)
+
+ 48          34 LOAD_NAME                5 (range)
+             37 LOAD_CONST               5 (1)
+             40 LOAD_CONST               6 (6)
+             43 CALL_FUNCTION            2 (2 positional, 0 keyword pair)
+             46 UNPACK_SEQUENCE          5
+             49 STORE_NAME               6 (Ident1)
+             52 STORE_NAME               7 (Ident2)
+             55 STORE_NAME               8 (Ident3)
+             58 STORE_NAME               9 (Ident4)
+             61 STORE_NAME              10 (Ident5)
+
+ 50          64 LOAD_BUILD_CLASS
+             65 LOAD_CONST               7 (<code object Record at 0x10277e9c0, file "tests/pystone.py", line 50>)
+             68 LOAD_CONST               8 ('Record')
+             71 MAKE_FUNCTION            0
+             74 LOAD_CONST               8 ('Record')
+             77 CALL_FUNCTION            2 (2 positional, 0 keyword pair)
+             80 STORE_NAME              11 (Record)
+
+ 64          83 LOAD_CONST               5 (1)
+             86 STORE_NAME              12 (TRUE)
+
+ 65          89 LOAD_CONST               2 (0)
+             92 STORE_NAME              13 (FALSE)
+
+ 67          95 LOAD_NAME                1 (LOOPS)
+             98 LOAD_CONST               9 (<code object main at 0x10277eb70, file "tests/pystone.py", line 67>)
+            101 LOAD_CONST              10 ('main')
+            104 MAKE_FUNCTION            1
+            107 STORE_NAME              14 (main)
+
+ 74         110 LOAD_NAME                1 (LOOPS)
+            113 LOAD_CONST              11 (<code object pystones at 0x10277ec90, file "tests/pystone.py", line 74>)
+            116 LOAD_CONST              12 ('pystones')
+            119 MAKE_FUNCTION            1
+            122 STORE_NAME              15 (pystones)
+
+ 77         125 LOAD_CONST               2 (0)
+            128 STORE_GLOBAL            16 (IntGlob)
+
+ 78         131 LOAD_NAME               13 (FALSE)
+            134 STORE_GLOBAL            17 (BoolGlob)
+
+ 79         137 LOAD_CONST              13 ('\x00')
+            140 STORE_GLOBAL            18 (Char1Glob)
+
+ 80         143 LOAD_CONST              13 ('\x00')
+            146 STORE_GLOBAL            19 (Char2Glob)
+
+ 81         149 LOAD_CONST               2 (0)
+            152 BUILD_LIST               1
+            155 LOAD_CONST              14 (51)
+            158 BINARY_MULTIPLY
+            159 STORE_GLOBAL            20 (Array1Glob)
+
+ 82         162 LOAD_CONST              15 (<code object <listcomp> at 0x10277edb0, file "tests/pystone.py", line 82>)
+            165 LOAD_CONST              16 ('<listcomp>')
+            168 MAKE_FUNCTION            0
+            171 LOAD_GLOBAL             20 (Array1Glob)
+            174 BUILD_LIST               1
+            177 LOAD_CONST              14 (51)
+            180 BINARY_MULTIPLY
+            181 GET_ITER
+            182 CALL_FUNCTION            1 (1 positional, 0 keyword pair)
+            185 STORE_GLOBAL            21 (Array2Glob)
+
+ 83         188 LOAD_CONST              17 (None)
+            191 STORE_GLOBAL            22 (PtrGlb)
+
+ 84         194 LOAD_CONST              17 (None)
+            197 STORE_GLOBAL            23 (PtrGlbNext)
+
+ 86         200 LOAD_NAME                1 (LOOPS)
+            203 LOAD_CONST              18 (<code object Proc0 at 0x10277ef60, file "tests/pystone.py", line 86>)
+            206 LOAD_CONST              19 ('Proc0')
+            209 MAKE_FUNCTION            1
+            212 STORE_NAME              24 (Proc0)
+
+144         215 LOAD_CONST              20 (<code object Proc1 at 0x102789270, file "tests/pystone.py", line 144>)
+            218 LOAD_CONST              21 ('Proc1')
+            221 MAKE_FUNCTION            0
+            224 STORE_NAME              25 (Proc1)
+
+160         227 LOAD_CONST              22 (<code object Proc2 at 0x102789300, file "tests/pystone.py", line 160>)
+            230 LOAD_CONST              23 ('Proc2')
+            233 MAKE_FUNCTION            0
+            236 STORE_NAME              26 (Proc2)
+
+171         239 LOAD_CONST              24 (<code object Proc3 at 0x102789660, file "tests/pystone.py", line 171>)
+            242 LOAD_CONST              25 ('Proc3')
+            245 MAKE_FUNCTION            0
+            248 STORE_NAME              27 (Proc3)
+
+181         251 LOAD_CONST              26 (<code object Proc4 at 0x102789810, file "tests/pystone.py", line 181>)
+            254 LOAD_CONST              27 ('Proc4')
+            257 MAKE_FUNCTION            0
+            260 STORE_NAME              28 (Proc4)
+
+188         263 LOAD_CONST              28 (<code object Proc5 at 0x1027899c0, file "tests/pystone.py", line 188>)
+            266 LOAD_CONST              29 ('Proc5')
+            269 MAKE_FUNCTION            0
+            272 STORE_NAME              29 (Proc5)
+
+195         275 LOAD_CONST              30 (<code object Proc6 at 0x102789ae0, file "tests/pystone.py", line 195>)
+            278 LOAD_CONST              31 ('Proc6')
+            281 MAKE_FUNCTION            0
+            284 STORE_NAME              30 (Proc6)
+
+214         287 LOAD_CONST              32 (<code object Proc7 at 0x102789c00, file "tests/pystone.py", line 214>)
+            290 LOAD_CONST              33 ('Proc7')
+            293 MAKE_FUNCTION            0
+            296 STORE_NAME              31 (Proc7)
+
+219         299 LOAD_CONST              34 (<code object Proc8 at 0x102789db0, file "tests/pystone.py", line 219>)
+            302 LOAD_CONST              35 ('Proc8')
+            305 MAKE_FUNCTION            0
+            308 STORE_NAME              32 (Proc8)
+
+232         311 LOAD_CONST              36 (<code object Func1 at 0x102789f60, file "tests/pystone.py", line 232>)
+            314 LOAD_CONST              37 ('Func1')
+            317 MAKE_FUNCTION            0
+            320 STORE_NAME              33 (Func1)
+
+240         323 LOAD_CONST              38 (<code object Func2 at 0x10278c150, file "tests/pystone.py", line 240>)
+            326 LOAD_CONST              39 ('Func2')
+            329 MAKE_FUNCTION            0
+            332 STORE_NAME              34 (Func2)
+
+257         335 LOAD_CONST              40 (<code object Func3 at 0x10278c300, file "tests/pystone.py", line 257>)
+            338 LOAD_CONST              41 ('Func3')
+            341 MAKE_FUNCTION            0
+            344 STORE_NAME              35 (Func3)
+
+262         347 LOAD_NAME               36 (__name__)
+            350 LOAD_CONST              42 ('__main__')
+            353 COMPARE_OP               2 (==)
+            356 POP_JUMP_IF_FALSE      530
+
+263         359 LOAD_CONST               2 (0)
+            362 LOAD_CONST              17 (None)
+            365 IMPORT_NAME             37 (sys)
+            368 STORE_NAME              37 (sys)
+
+264         371 LOAD_CONST              43 (<code object error at 0x10278c4b0, file "tests/pystone.py", line 264>)
+            374 LOAD_CONST              44 ('error')
+            377 MAKE_FUNCTION            0
+            380 STORE_NAME              38 (error)
+
+268         383 LOAD_NAME               39 (len)
+            386 LOAD_NAME               37 (sys)
+            389 LOAD_ATTR               40 (argv)
+            392 CALL_FUNCTION            1 (1 positional, 0 keyword pair)
+            395 LOAD_CONST               5 (1)
+            398 BINARY_SUBTRACT
+            399 STORE_NAME              41 (nargs)
+
+269         402 LOAD_NAME               41 (nargs)
+            405 LOAD_CONST               5 (1)
+            408 COMPARE_OP               4 (>)
+            411 POP_JUMP_IF_FALSE      431
+
+270         414 LOAD_NAME               38 (error)
+            417 LOAD_CONST              45 ('%d arguments are too many;')
+            420 LOAD_NAME               41 (nargs)
+            423 BINARY_MODULO
+            424 CALL_FUNCTION            1 (1 positional, 0 keyword pair)
+            427 POP_TOP
+            428 JUMP_FORWARD            86 (to 517)
+
+271     >>  431 LOAD_NAME               41 (nargs)
+            434 LOAD_CONST               5 (1)
+            437 COMPARE_OP               2 (==)
+            440 POP_JUMP_IF_FALSE      511
+
+272         443 SETUP_EXCEPT            23 (to 469)
+            446 LOAD_NAME               42 (int)
+            449 LOAD_NAME               37 (sys)
+            452 LOAD_ATTR               40 (argv)
+            455 LOAD_CONST               5 (1)
+            458 BINARY_SUBSCR
+            459 CALL_FUNCTION            1 (1 positional, 0 keyword pair)
+            462 STORE_NAME              43 (loops)
+            465 POP_BLOCK
+            466 JUMP_ABSOLUTE          517
+
+273     >>  469 DUP_TOP
+            470 LOAD_NAME               44 (ValueError)
+            473 COMPARE_OP              10 (exception match)
+            476 POP_JUMP_IF_FALSE      507
+            479 POP_TOP
+            480 POP_TOP
+            481 POP_TOP
+
+274         482 LOAD_NAME               38 (error)
+            485 LOAD_CONST              46 ('Invalid argument %r;')
+            488 LOAD_NAME               37 (sys)
+            491 LOAD_ATTR               40 (argv)
+            494 LOAD_CONST               5 (1)
+            497 BINARY_SUBSCR
+            498 BINARY_MODULO
+            499 CALL_FUNCTION            1 (1 positional, 0 keyword pair)
+            502 POP_TOP
+            503 POP_EXCEPT
+            504 JUMP_ABSOLUTE          517
+        >>  507 END_FINALLY
+            508 JUMP_FORWARD             6 (to 517)
+
+276     >>  511 LOAD_NAME                1 (LOOPS)
+            514 STORE_NAME              43 (loops)
+
+277     >>  517 LOAD_NAME               14 (main)
+            520 LOAD_NAME               43 (loops)
+            523 CALL_FUNCTION            1 (1 positional, 0 keyword pair)
+            526 POP_TOP
+            527 JUMP_FORWARD             0 (to 530)
+        >>  530 LOAD_CONST              17 (None)
+            533 RETURN_VALUE

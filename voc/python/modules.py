@@ -65,6 +65,14 @@ class StaticBlock(Block):
             END_IF()
         )
 
+    def delete_name(self, name, allow_locals=True):
+        self.add_opcodes(
+            # look for a global var.
+            JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.LDC(name),
+            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+        )
+
     @property
     def descriptor(self):
         return self.parent.descriptor

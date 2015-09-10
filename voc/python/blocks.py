@@ -8,7 +8,7 @@ from ..java import (
 )
 
 from .utils import extract_command
-from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
+from .opcodes import ASTORE_name, ALOAD_name, ADELETE_name, IF, END_IF
 
 
 class IgnoreBlock(Exception):
@@ -75,6 +75,23 @@ class Block:
                 END_IF()
             )
 
+    def delete_name(self, name, allow_locals=True):
+        try:
+            # Look for a local first.
+            if allow_locals:
+                self.add_opcodes(
+                    ADELETE_name(self, name)
+                )
+            else:
+                raise KeyError('Not scanning locals')
+        except KeyError:
+            self.add_opcodes(
+                # If there isn't a local, look for a global
+                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.LDC(name),
+                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            )
+
     def extract(self, code):
         """Break a code object into the parts it defines, populating the
         provided block.
@@ -119,7 +136,6 @@ class Block:
                 for (obj, attr) in self.next_resolve_list:
                     # print("        resolve %s reference on %s %s with %s %s" % (attr, obj, id(obj), opcode, id(opcode)))
                     setattr(obj, attr, opcode)
-                    opcode.references.append((obj, attr))
 
                 self.next_resolve_list = []
 
@@ -148,15 +164,16 @@ class Block:
         """
 
         if len(self.code) >= 2 and isinstance(self.code[-2], JavaOpcodes.ACONST_NULL) and isinstance(self.code[-1], JavaOpcodes.ARETURN):
-            # There might be opcodes referencing these two - in particular if
-            # the last thing in the function is the end of an IF or TRY block.
-            # Find all the blocks that reference these two opcodes and update
-            # the references.
             return_opcode = JavaOpcodes.RETURN()
-            for obj, attr in self.code[-2].references:
-                setattr(obj, attr, return_opcode)
-            for obj, attr in self.code[-1].references:
-                setattr(obj, attr, return_opcode)
+
+            # Update the jump operation to point at the new return opcode.
+            for opcode in self.code[-1].references:
+                opcode.jump_op = return_opcode
+                return_opcode.references.append(opcode)
+
+            for opcode in self.code[-2].references:
+                opcode.jump_op = return_opcode
+                return_opcode.references.append(opcode)
 
             # Then, check to see if either opcode had a line number association.
             # if so, preserve the first one.
@@ -233,8 +250,9 @@ class Block:
                     else_if.jump_op.offset = if_block.end_op.code_offset - else_if.jump_op.code_offset
 
         # Update any jump instructions
+        # print ("There are %s jumps" % len(self.jumps))
         for jump in self.jumps:
-            # print ("JUMP", id(jump), jump, jump.code_offset)
+            # print ("JUMP", id(jump), jump, jump.code_offset, jump.jump_op, id(jump.jump_op))
 
             try:
                 jump.offset = jump.jump_op.code_offset - jump.code_offset

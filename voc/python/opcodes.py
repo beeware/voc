@@ -363,6 +363,8 @@ class END_TRY:
 # value.
 ##########################################################################
 
+DELETED = object()
+
 def ALOAD_name(context, name):
     """Generate the opcode to load a variable with the given name onto the stack.
 
@@ -371,7 +373,7 @@ def ALOAD_name(context, name):
     register operations for the first 4 local variables.
     """
     i = context.localvars[name]
-    if i is None:
+    if i == DELETED:
         raise KeyError(name)
 
     if i == 0:
@@ -395,7 +397,7 @@ def ASTORE_name(context, name):
     """
     try:
         i = context.localvars[name]
-        if i is None:
+        if i == DELETED:
             context.localvars[name] = i
     except KeyError:
         i = len(context.localvars)
@@ -411,6 +413,18 @@ def ASTORE_name(context, name):
         return JavaOpcodes.ASTORE_3()
     else:
         return JavaOpcodes.ASTORE(i)
+
+
+def ADELETE_name(context, name):
+    """Remove a name from the localvar pool
+    """
+    try:
+        value = context.localvars[name]
+        if value == DELETED:
+            raise KeyError("Local variable '%s' already deleted" % name)
+        context.localvars[name] = DELETED
+    except KeyError:
+        raise
 
 
 def ICONST_val(value):
@@ -444,9 +458,9 @@ def resolve_jump(opcode, context, target, position):
     When Python code is converted to Java, it will turn into
     0-N opcodes. We need to specify which one will be used
     as the Java offset:
-     * START - the first opcode
-     * END - the last opcode
-     * NEXT - the next opcode added after this block.
+     * START - the first Java opcode generated from this Python opcode
+     * END - the last Java opcode generated from the Python opcode
+     * NEXT - the next Java opcode added after this block.
     """
     try:
         # print("RESOLVE %s %s to %s %s" % (opcode, id(opcode), target, position))
@@ -468,6 +482,10 @@ def resolve_jump(opcode, context, target, position):
             raise Exception("Unknown opcode position")
 
         context.jumps.append(opcode)
+        try:
+            opcode.jump_op.references.append(opcode)
+        except AttributeError:
+            pass
 
     except KeyError:
         # print("    unknown reference %s %s... defer" % (opcode, id(opcode)))
@@ -541,6 +559,7 @@ class Opcode:
                 # print("   resolving %s references to offset %s" % (len(references), self.code_offset))
                 for opcode, position in references:
                     resolve_jump(opcode, context, self.code_offset, position)
+
             except KeyError:
                 # print("   No unknown jump target at %s" % self.code_offset)
                 pass
@@ -917,7 +936,7 @@ class INPLACE_OR(InplaceOpcode):
 
 # class BREAK_LOOP(Opcode):
 # class WITH_CLEANUP(Opcode):
-
+#     end_block = True
 
 class RETURN_VALUE(Opcode):
     @property
@@ -955,8 +974,35 @@ class POP_BLOCK(Opcode):
             argument.operation.transpile(context, argument.arguments)
 
 
-# class END_FINALLY(Opcode):
-# class POP_EXCEPT(Opcode):
+class END_FINALLY(Opcode):
+
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+
+class POP_EXCEPT(Opcode):
+    # end_block = 'except-handler' - implicit
+
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
 
 
 class STORE_NAME(Opcode):
@@ -984,12 +1030,54 @@ class STORE_NAME(Opcode):
         context.store_name(self.name, arguments)
 
 
-# class DELETE_NAME(Opcode):
-# class UNPACK_SEQUENCE(Opcode):
+class DELETE_NAME(Opcode):
+    def __init__(self, name, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
+        self.name = name
+
+    def __arg_repr__(self):
+        return str(self.name)
+
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+        # Depending on context, this might mean deleting from local
+        # variables, class attributes, or to the global context.
+        context.delete_name(self.name, arguments)
+
+
+class UNPACK_SEQUENCE(Opcode):
+    def __init__(self, count, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
+        self.count = count
+
+    def __arg_repr__(self):
+        return str(self.count)
+
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return self.count
+
+    # def convert(self, context, arguments):
+    #     for argument in arguments:
+    #         argument.operation.transpile(context, argument.arguments)
 
 
 class FOR_ITER(Opcode):
-    start_block = True
+    start_block = 'for-loop'
 
     def __init__(self, target, code_offset, starts_line, is_jump_target):
         super().__init__(code_offset, starts_line, is_jump_target)
@@ -1284,8 +1372,6 @@ class COMPARE_OP(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        print("COMPARE", self.comparison, context, arguments)
-
         # Add the operand which will be the left side, and thus the
         # target of the comparator operator.
         arguments[0].operation.transpile(context, arguments[0].arguments)
@@ -1313,6 +1399,7 @@ class COMPARE_OP(Opcode):
             '>': '__gt__',
             '>=': '__gte__',
             '==': '__eq__',
+            'exception match': '__eq__',
         }[self.comparison]
 
         context.add_opcodes(
@@ -1340,7 +1427,24 @@ class IMPORT_NAME(Opcode):
         pass
 
 
-# class IMPORT_FROM(Opcode):
+class IMPORT_FROM(Opcode):
+    def __init__(self, target, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
+        self.target = target
+
+    def __arg_repr__(self):
+        return str(self.target)
+
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert(self, context, arguments):
+        pass
 
 
 class JUMP_FORWARD(Opcode):
@@ -1475,7 +1579,7 @@ class LOAD_GLOBAL(Opcode):
 
 
 class SETUP_LOOP(Opcode):
-    start_block = True
+    start_block = 'while-loop'
 
     def __init__(self, delta, code_offset, starts_line, is_jump_target):
         super().__init__(code_offset, starts_line, is_jump_target)
@@ -1493,8 +1597,45 @@ class SETUP_LOOP(Opcode):
     #     code = []
     #     return code
 
-# class SETUP_EXCEPT(Opcode):
-# class SETUP_FINALLY(Opcode):
+
+class SETUP_EXCEPT(Opcode):
+    start_block = 'setup-except'
+
+    def __init__(self, delta, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
+        self.delta = delta
+
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        code = []
+        return code
+
+
+class SETUP_FINALLY(Opcode):
+    start_block = 'finally'
+
+    def __init__(self, delta, code_offset, starts_line, is_jump_target):
+        super().__init__(code_offset, starts_line, is_jump_target)
+        self.delta = delta
+
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        code = []
+        return code
 
 
 class LOAD_FAST(Opcode):
@@ -1817,6 +1958,7 @@ class LOAD_CLOSURE(Opcode):
 # class CALL_FUNCTION_VAR_KW(Opcode):
 
 # class SETUP_WITH(Opcode):
+#     start_block = 'finally'
 # class LIST_APPEND(Opcode):
 
 # class SET_ADD(Opcode):
