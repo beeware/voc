@@ -40,20 +40,15 @@ class Command:
         return sum(c.product_count for c in self.arguments) + self.operation.product_count
 
     def dump(self, depth=0):
-        if self.operation.end_block:
-            child_depth = 0
-            depth = 0
-        else:
-            child_depth = depth + 1
         for op in self.arguments:
-            op.dump(depth=child_depth)
-        print ('%s%s%s:%s ' % (
+            op.dump(depth=depth + 1)
+        print ('%s%s%4s:%4d ' % (
                 '{' if self.operation.start_block else
                     '}' if self.operation.end_block else ' ',
                 '>' if self.operation.is_jump_target else ' ',
-                "%4s" % self.operation.starts_line if self.operation.starts_line is not None else '    ',
+                self.operation.starts_line if self.operation.starts_line is not None else '    ',
                 self.operation.code_offset
-            ) + '    ' * depth, self.operation)
+            ) + '    ' * depth, self.operation, self.operation.consume_count, self.operation.product_count, self.operation.start_block, self.operation.end_block)
 
 
 class Frame:
@@ -61,7 +56,11 @@ class Frame:
     """
     def __init__(self, frame_type=None):
         self.frame_type = frame_type
-        self.stack_depth = 0
+        self.depth = 0
+        self.available = 0
+
+    def __repr__(self):
+        return u'<Frame %s: %s>' % (id(self), self.frame_type)
 
 
 def extract_command(instructions, i, frame_stack=None):
@@ -72,10 +71,10 @@ def extract_command(instructions, i, frame_stack=None):
     work backwards because each command is essentially working towards
     a final result; each Command can be thought of as a "result".
     """
-    global overall_depth
     if frame_stack is None:
         frame_stack = [Frame()]
     current_frame = frame_stack[-1]
+    current_frame.depth += 1
 
     i = i - 1
     instruction = instructions[i]
@@ -99,39 +98,84 @@ def extract_command(instructions, i, frame_stack=None):
 
     cmd = Command(opcode)
 
+    # print('>', instruction.offset, cmd.operation.opname, current_frame)
+
+    ended_blocks = 0
     # If we find the end of a code block, create a command
     # that contains everything from the start of the block
     if opcode.end_block:
+        # print ("END BLOCK", opcode, opcode.end_block)
+        if opcode.end_block == 'finally' and current_frame.frame_type != 'except':
+            opcode.end_block = 'except'
+        elif isinstance(opcode.end_block, bool) and current_frame.frame_type == 'except':
+            opcode.end_block = 'finally'
+
+        # print ("Add %s frame" % opcode.end_block)
         frame_stack.append(Frame(opcode.end_block))
-        while True:
-            i, arg = extract_command(instructions, i, frame_stack=frame_stack)
+        current_frame = frame_stack[-1]
+
+        while ended_blocks == 0:
+            i, arg, ended_blocks = extract_command(instructions, i, frame_stack=frame_stack)
             cmd.arguments.append(arg)
-            if arg.operation.start_block:
-                break
+
+        frame_types = [f.frame_type for f in frame_stack[1:]]
+        # print ("END %s BLOCK(s) %s on %s" % (ended_blocks, opcode.start_block, frame_types), repr(current_frame.frame_type))
+
+        ended_blocks -= 1
+        frame_stack.pop()
+        current_frame = frame_stack[-1]
 
     # If we find the start of a code block, that closes out
     # a command, so just return.
     elif opcode.start_block:
-        frame = frame_stack.pop()
         # Safety check - make sure we're found the
         # type of block we were expecting
-
-        assert isinstance(frame.frame_type, bool) or frame.frame_type == opcode.start_block
-        return i, cmd
+        frame_types = [f.frame_type for f in frame_stack[1:]]
+        # print ("START BLOCK %s on %s" % (opcode.start_block, frame_types), repr(current_frame.frame_type))
+        if opcode.start_block == 'except':
+            return i, cmd, 2
+        else:
+            return i, cmd, 1
 
     # Otherwise; look for a group of commands that will
     # bring the stack back to an empty state, indicating
     # an endpoint in a command chain.
     else:
-        stack = cmd.operation.consume_count
+        required = cmd.operation.consume_count
 
-        while stack > 0 and i > 0:
-            i, arg = extract_command(instructions, i, frame_stack=frame_stack)
+        # print("   top level frame", current_frame.frame_type, current_frame.depth)
+        if current_frame.frame_type == 'except':
+            if cmd.operation.opname == 'DUP_TOP' and instruction.is_jump_target:
+                current_frame.available = 3
+                pool_consume = min(current_frame.available, required)
+                current_frame.available -= pool_consume
+                required -= pool_consume
+
+        # print("   %s has %s required inputs (initial)" % (current_frame, required))
+        while required > 0 and ended_blocks == 0:
+            i, arg, ended_blocks = extract_command(instructions, i, frame_stack=frame_stack)
             cmd.arguments.append(arg)
+            # print ('   ', arg.operation.opname, 'produces', arg.operation.product_count)
+            required = required - arg.operation.product_count
 
-            stack = stack + arg.consume_count - arg.product_count
+            # print("   still requires %s (%s in pool); adjust" % (required, current_frame.available))
+            if required < 0:
+                # print("   Produced more than needed")
+                current_frame.available -= required
+
+            if required > 0 and current_frame.available:
+                # print("   Use stored stash")
+                pool_consume = min(current_frame.available, required)
+                current_frame.available -= pool_consume
+                required -= pool_consume
+
+            # print("   %s has %s required inputs (%s in pool)" % (current_frame, required, current_frame.available))
+
+    # print('<', instruction.offset, cmd.operation.opname, current_frame)
+
+    current_frame.depth -= 1
 
     # Since we did everything backwards, reverse to get
     # arguments back in the right order.
     cmd.arguments.reverse()
-    return i, cmd
+    return i, cmd, ended_blocks

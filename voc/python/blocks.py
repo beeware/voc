@@ -101,7 +101,7 @@ class Block:
         i = len(instructions)
         commands = []
         while i > 0:
-            i, command = extract_command(instructions, i)
+            i, command, ends_block = extract_command(instructions, i)
             commands.append(command)
 
         commands.reverse()

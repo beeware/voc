@@ -970,11 +970,13 @@ class POP_BLOCK(Opcode):
         return 0
 
     def convert(self, context, arguments):
+        # print("convert POP_BLOCK", len(arguments))
         for argument in arguments:
             argument.operation.transpile(context, argument.arguments)
 
 
 class END_FINALLY(Opcode):
+    end_block = 'finally'
 
     @property
     def consume_count(self):
@@ -985,12 +987,13 @@ class END_FINALLY(Opcode):
         return 0
 
     def convert(self, context, arguments):
+        # print("convert END_FINALLY ", [arg.operation for arg in arguments])
         for argument in arguments:
             argument.operation.transpile(context, argument.arguments)
 
 
 class POP_EXCEPT(Opcode):
-    # end_block = 'except-handler' - implicit
+    start_block = 'finally'
 
     @property
     def consume_count(self):
@@ -1001,6 +1004,7 @@ class POP_EXCEPT(Opcode):
         return 0
 
     def convert(self, context, arguments):
+        # print("convert POP_EXCEPT", len(arguments))
         for argument in arguments:
             argument.operation.transpile(context, argument.arguments)
 
@@ -1593,17 +1597,19 @@ class SETUP_LOOP(Opcode):
     def product_count(self):
         return 0
 
-    # def convert(self, context, arguments):
-    #     code = []
-    #     return code
+    def convert(self, context, arguments):
+        pass
 
 
 class SETUP_EXCEPT(Opcode):
-    start_block = 'setup-except'
+    start_block = 'except'
 
     def __init__(self, delta, code_offset, starts_line, is_jump_target):
         super().__init__(code_offset, starts_line, is_jump_target)
         self.delta = delta
+
+    def __arg_repr__(self):
+        return ' %s' % self.delta
 
     @property
     def consume_count(self):
@@ -1614,8 +1620,9 @@ class SETUP_EXCEPT(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = []
-        return code
+        # print("convert SETUP_FINALLY", len(arguments))
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
 
 
 class SETUP_FINALLY(Opcode):
@@ -1625,6 +1632,9 @@ class SETUP_FINALLY(Opcode):
         super().__init__(code_offset, starts_line, is_jump_target)
         self.delta = delta
 
+    def __arg_repr__(self):
+        return ' %s' % self.delta
+
     @property
     def consume_count(self):
         return 0
@@ -1634,8 +1644,9 @@ class SETUP_FINALLY(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        code = []
-        return code
+        # print("convert SETUP_FINALLY", len(arguments))
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
 
 
 class LOAD_FAST(Opcode):
