@@ -1,0 +1,9 @@
+language: python
+python:
+  - "3.4"
+install:
+  - "pip install ."
+  - "make"
+script: 
+  - "python -m voc tests/example.py org.pybee"
+  - "java -XX:-UseSplitVerifier -classpath python.jar:. org.pybee.example"
