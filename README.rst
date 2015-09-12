@@ -58,7 +58,7 @@ This will produce a `example.class`, in the org.pybee namespace, that you can
 run on any Java 1.7+ VM. You will need to make sure that the python.jar
 support file is in your classpath::
 
-    $ java -XX:-UseSplitVerifier --classpath python.jar:. example
+    $ java -XX:-UseSplitVerifier -classpath python.jar:. example
     Hello, World
 
 The ``-CC:-UsesplitVerifier`` argument is necessary to turn off stack map
