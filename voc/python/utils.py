@@ -42,13 +42,15 @@ class Command:
     def dump(self, depth=0):
         for op in self.arguments:
             op.dump(depth=depth + 1)
-        print ('%s%s%4s:%4d ' % (
+        print ('%s%s%4s:%4d -%s +%s' % (
                 '{' if self.operation.start_block else
                     '}' if self.operation.end_block else ' ',
                 '>' if self.operation.is_jump_target else ' ',
                 self.operation.starts_line if self.operation.starts_line is not None else '    ',
-                self.operation.code_offset
-            ) + '    ' * depth, self.operation, self.operation.consume_count, self.operation.product_count, self.operation.start_block, self.operation.end_block)
+                self.operation.code_offset,
+                self.operation.consume_count,
+                self.operation.product_count
+            ) + '    ' * depth, self.operation)
 
 
 class Frame:
