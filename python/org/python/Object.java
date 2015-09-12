@@ -66,6 +66,8 @@ public class Object {
             value = v.value;
         } else if (v.type == java.lang.reflect.Constructor.class) {
             value = v.value;
+        } else if (v.type == org.python.exceptions.BaseException.class) {
+            value = v.value;
         } else {
             throw new org.python.exceptions.RuntimeError("Unknown type " + type);
         }
@@ -172,6 +174,13 @@ public class Object {
     public Object(java.util.ArrayList<org.python.Object> v) {
         // System.out.println("Create List");
         type = java.util.ArrayList.class;
+        value = v;
+        set_class_attributes();
+    }
+
+    public Object(org.python.exceptions.BaseException v) {
+        // System.out.println("Create List");
+        type = org.python.exceptions.BaseException.class;
         value = v;
         set_class_attributes();
     }

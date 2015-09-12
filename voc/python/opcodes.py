@@ -287,6 +287,8 @@ class CATCH:
         # line of source code, track that line.
         self.starts_line = None
 
+        self.jump_op = None
+
     def __len__(self):
         # The CATCH needs to be able to pass as an opcode under initial
         # post processing
@@ -307,13 +309,17 @@ class CATCH:
         # The jump distance will be updated when all the CATCH blocks
         # have been processed and the exception is converted.
         # If it isn't the first catch, then this catch concludes the
-        # previous one. Record the end of the block for framing purposes.
+        # previous one. Add a goto to the end of the block, and
+        # record the end of the block for framing purposes.
         if len(exception.handlers) == 0:
             # print("    first catch")
             exception.jump_op = JavaOpcodes.GOTO(0)
             context.add_opcodes(exception.jump_op)
         else:
             # print("    nth catch")
+            end_jump = JavaOpcodes.GOTO(0)
+            exception.handlers[-1].jump_op = end_jump
+            context.add_opcodes(end_jump)
             exception.handlers[-1].end_op = context.code[-1]
 
         # Add this catch block as a handler
@@ -363,7 +369,9 @@ class END_TRY:
 # value.
 ##########################################################################
 
+# A marker for deleted variable names.
 DELETED = object()
+
 
 def ALOAD_name(context, name):
     """Generate the opcode to load a variable with the given name onto the stack.
@@ -988,8 +996,36 @@ class END_FINALLY(Opcode):
 
     def convert(self, context, arguments):
         # print("convert END_FINALLY ", [arg.operation for arg in arguments])
-        for argument in arguments:
+
+        context.add_opcodes(TRY())
+        for argument in arguments[0].arguments[1:]:
             argument.operation.transpile(context, argument.arguments)
+
+        n_handlers = len(arguments) % 4
+        for i in range(n_handlers, 0, -1):
+            exc_name = arguments[-4 * i].arguments[0].arguments[0].arguments[0].arguments[0].arguments[-1].operation.name
+            var_name = arguments[-4 * i].arguments[0].operation.name
+
+            # Define the exception handler.
+            # On entry to the exception, the stack will contain
+            # a single value - the exception being thrown.
+            # This exception must be wrapped into an org/python/Object
+            # so it can be used as an argument elsewhere.
+            context.add_opcodes(
+                CATCH('org/python/exceptions/%s' % exc_name),
+                ASTORE_name(context, var_name),
+                JavaOpcodes.NEW('org/python/Object'),
+                JavaOpcodes.DUP(),
+                ALOAD_name(context, var_name),
+                JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
+                ASTORE_name(context, var_name),
+            )
+
+            # Then roll out the body of the exception handler.
+            for argument in arguments[-4 * i + 1].arguments[1:]:
+                argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(END_TRY())
 
 
 class POP_EXCEPT(Opcode):

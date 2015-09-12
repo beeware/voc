@@ -143,8 +143,9 @@ class Block:
         "Evaluate the maximum stack depth required by a sequence of Java opcodes"
         depth = 0
         max_depth = 0
+
         for opcode in self.code:
-            # print("   ", opcode)
+            # print("   ", opcode, depth)
             depth = depth + opcode.stack_effect
             if depth > max_depth:
                 max_depth = depth
@@ -229,6 +230,11 @@ class Block:
                     handler.start_op.code_offset,
                     handler.descriptor
                 ))
+                # Flag the opcode that is the start of the handler;
+                # this will be used to bump up the stack depth
+                # calcuation.
+                if handler.jump_op:
+                    handler.jump_op.offset = try_catch.end_op.code_offset - handler.jump_op.code_offset
 
             try_catch.jump_op.offset = try_catch.end_op.code_offset - try_catch.jump_op.code_offset
 
@@ -268,7 +274,7 @@ class Block:
         line_number_table = LineNumberTable(line_numbers)
 
         return JavaCode(
-            max_stack=self.stack_depth(),
+            max_stack=self.stack_depth() + len(exceptions),
             max_locals=len(self.localvars),
             code=self.code,
             exceptions=exceptions,

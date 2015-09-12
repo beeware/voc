@@ -118,7 +118,7 @@ def extract_command(instructions, i, frame_stack=None):
             i, arg, ended_blocks = extract_command(instructions, i, frame_stack=frame_stack)
             cmd.arguments.append(arg)
 
-        frame_types = [f.frame_type for f in frame_stack[1:]]
+        # frame_types = [f.frame_type for f in frame_stack[1:]]
         # print ("END %s BLOCK(s) %s on %s" % (ended_blocks, opcode.start_block, frame_types), repr(current_frame.frame_type))
 
         ended_blocks -= 1
@@ -130,7 +130,7 @@ def extract_command(instructions, i, frame_stack=None):
     elif opcode.start_block:
         # Safety check - make sure we're found the
         # type of block we were expecting
-        frame_types = [f.frame_type for f in frame_stack[1:]]
+        # frame_types = [f.frame_type for f in frame_stack[1:]]
         # print ("START BLOCK %s on %s" % (opcode.start_block, frame_types), repr(current_frame.frame_type))
         if opcode.start_block == 'except':
             return i, cmd, 2

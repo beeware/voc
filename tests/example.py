@@ -23,9 +23,9 @@ def bar():
         i += 1
     print("All done")
 
-# class Point3D(Point):
-#     def __init__(self):
-#         pass
+# # class Point3D(Point):
+# #     def __init__(self):
+# #         pass
 
 
 def body(value):
@@ -40,7 +40,9 @@ def body(value):
     print('Create point')
     p = Point(2, 3, 4)
     print('Distance with default is', p.distance())
+
     return 123
+
 
 if __name__ == '__main__':
     print("Hello world")
@@ -51,8 +53,16 @@ if __name__ == '__main__':
     print("Hello world", p)
     print ("attr x =", p.x)
 
+    try:
+        p.no_such_attribute
+    except AttributeError as e:
+        # print("Got the error", e)
+        print("Got the error")
+    except TypeError as e:
+        # print("Got the Type error", e)
+        print("Got the Type error")
+
     print("Method is", p.distance)
-    print ("Distance is:", p.distance())
-    # print("No such attribute", p.no_such_attribute)
+    print("Distance is:", p.distance())
     foo()
     bar()
