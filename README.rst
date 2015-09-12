@@ -55,7 +55,13 @@ Install `voc`, then run the example script::
     Done.
 
 This will produce a `example.class`, in the org.pybee namespace, that you can
-run on any Java 1.7+ VM. You will need to make sure that the python.jar
+run on any Java 1.7+ VM.
+
+Next step - you need to compile the Python support libraries:
+
+    $ make
+
+This will compile `python.jar`. You will need to make sure that the python.jar
 support file is in your classpath::
 
     $ java -XX:-UseSplitVerifier -classpath python.jar:. example

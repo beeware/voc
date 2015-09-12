@@ -961,9 +961,9 @@ public class Python {
         }
 
         if (args.length == 3) {
-            return args[0].__pow__(args[1]);
+            throw new org.python.exceptions.NotImplementedError("pow() with mod not supported");
         } else {
-            return args[0].__pow__(args[1]).__mod__(args[2]);
+            return args[0].__pow__(new org.python.Object[] { args[1] }, kwargs);
         }
     }
 
