@@ -9,19 +9,54 @@ What it does:
 
 * Provides an API to let you programmatically create Java class files.
 
+* Compiles a Python source file into a Java class file in a nominated
+  package. Supports the conversion of:
+
+   * Class definition and construction
+
+   * Class instantiation
+
+   * Method definition and invocation
+
+   * Some mathematical operations
+
+   * Exception handling
+
+   * for/while/if constructs
+
+   * Identification of mainline entry points
+
+   * Static initialization of modules.
+
+It *doesn't* currently support
+
+* Keyword arguments
+
+* List comprehensions
+
+* Generators
+
+* Import statements
+
+* ``exec()``/``eval()``
+
+These things should all be *possible* - it's just a matter of time
+and development effort.
+
 Quickstart
 ----------
 
 Install `voc`, then run the sample script::
 
     $ pip install voc
-    $ python tests/sample.py
+    $ python -m voc tests/sample.py org.pyee
     Creating class 'sample'...
     Writing sample.class...
     Done.
 
-This will produce a `sample.class` that you can run on any Java 1.7+ VM. You will
-need to make sure that the python.jar support file is in your classpath::
+This will produce a `sample.class`, in the org.pybee namespace, that you can
+run on any Java 1.7+ VM. You will need to make sure that the python.jar
+support file is in your classpath::
 
     $ java -XX:-UseSplitVerifier --classpath python.jar:. sample
     Hello, World
