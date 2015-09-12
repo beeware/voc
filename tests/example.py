@@ -56,11 +56,11 @@ if __name__ == '__main__':
     try:
         p.no_such_attribute
     except AttributeError as e:
-        # print("Got the error", e)
-        print("Got the error")
+        print("Got the error", e)
+        # print("Got the error")
     except TypeError as e:
-        # print("Got the Type error", e)
-        print("Got the Type error")
+        print("Got the Type error", e)
+        # print("Got the Type error")
 
     print("Method is", p.distance)
     print("Distance is:", p.distance())

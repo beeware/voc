@@ -46,19 +46,19 @@ and development effort.
 Quickstart
 ----------
 
-Install `voc`, then run the sample script::
+Install `voc`, then run the example script::
 
     $ pip install voc
-    $ python -m voc tests/sample.py org.pyee
-    Creating class 'sample'...
-    Writing sample.class...
+    $ python -m voc tests/example.py org.pyee
+    Creating class 'example'...
+    Writing example.class...
     Done.
 
-This will produce a `sample.class`, in the org.pybee namespace, that you can
+This will produce a `example.class`, in the org.pybee namespace, that you can
 run on any Java 1.7+ VM. You will need to make sure that the python.jar
 support file is in your classpath::
 
-    $ java -XX:-UseSplitVerifier --classpath python.jar:. sample
+    $ java -XX:-UseSplitVerifier --classpath python.jar:. example
     Hello, World
 
 The ``-CC:-UsesplitVerifier`` argument is necessary to turn off stack map
