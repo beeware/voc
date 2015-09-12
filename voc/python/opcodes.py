@@ -1001,7 +1001,7 @@ class END_FINALLY(Opcode):
         for argument in arguments[0].arguments[1:]:
             argument.operation.transpile(context, argument.arguments)
 
-        n_handlers = len(arguments) % 4
+        n_handlers = len(arguments) // 4
         for i in range(n_handlers, 0, -1):
             exc_name = arguments[-4 * i].arguments[0].arguments[0].arguments[0].arguments[0].arguments[-1].operation.name
             var_name = arguments[-4 * i].arguments[0].operation.name
