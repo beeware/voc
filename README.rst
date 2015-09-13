@@ -1,6 +1,9 @@
 VOC
 ===
 
+.. image:: https://travis-ci.org/pybee/voc.svg?branch=master
+    :target: https://travis-ci.org/pybee/voc
+
 A transpiler that converts Python bytecode into Java bytecode.
 
 This is experimental code. If it breaks, you get to keep all the shiny pieces.
@@ -12,21 +15,21 @@ What it does:
 * Compiles a Python source file into a Java class file in a nominated
   package. Supports the conversion of:
 
-   * Class definition and construction
+  * Class definition and construction
 
-   * Class instantiation
+  * Class instantiation
 
-   * Method definition and invocation
+  * Method definition and invocation
 
-   * Some mathematical operations
+  * Some mathematical operations
 
-   * Exception handling
+  * Exception handling
 
-   * for/while/if constructs
+  * for/while/if constructs
 
-   * Identification of mainline entry points
+  * Identification of mainline entry points
 
-   * Static initialization of modules.
+  * Static initialization of modules.
 
 It *doesn't* currently support
 
