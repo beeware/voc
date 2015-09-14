@@ -1,3 +1,6 @@
+.. image:: http://pybee.org/voc/static/images/voc-144.png
+    :target: https://pybee.org/voc
+
 VOC
 ===
 
