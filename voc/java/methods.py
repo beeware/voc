@@ -148,8 +148,8 @@ class Method:
         descriptor = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
         attributes_count = reader.read_u2()
 
-        if dump:
-            print("    " * dump, 'Method %s %s' % (name, descriptor))
+        if dump is not None:
+            reader.debug("    " * dump, 'Method %s %s' % (name, descriptor))
 
             access_description = ', '.join(f for f in [
                     flag if access_flags & mask else None
@@ -168,9 +168,9 @@ class Method:
                         ('synthetic', Method.ACC_SYNTHETIC),
                     ]
                 ] if f)
-            print("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
+            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
 
-            print("    " * dump, '    Attributes: (%s)' % attributes_count)
+            reader.debug("    " * dump, '    Attributes: (%s)' % attributes_count)
 
         attributes = []
         for i in range(0, attributes_count):

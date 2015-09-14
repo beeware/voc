@@ -32,6 +32,10 @@ class Block:
         self.next_resolve_list = []
         self.next_opcode_starts_line = None
 
+    @property
+    def module(self):
+        return self.parent
+
     def store_name(self, name, arguments, allow_locals=True):
         if allow_locals:
             self.add_opcodes(
@@ -92,7 +96,7 @@ class Block:
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )
 
-    def extract(self, code):
+    def extract(self, code, debug=False):
         """Break a code object into the parts it defines, populating the
         provided block.
 
@@ -106,12 +110,13 @@ class Block:
 
         commands.reverse()
 
-        print ('=====' * 10)
-        print (code)
-        print ('-----' * 10)
-        for command in commands:
-            command.dump()
-        print ('=====' * 10)
+        if True:
+            print ('=====' * 10)
+            print (code)
+            print ('-----' * 10)
+            for command in commands:
+                command.dump()
+            print ('=====' * 10)
 
         # Append the extracted commands to any pre-existing ones.
         self.commands.extend(commands)

@@ -123,7 +123,7 @@ class Field:
         attributes_count = reader.read_u2()
 
         if dump:
-            print("    " * dump, 'Field %s (%s)' % (name, descriptor))
+            reader.debug("    " * dump, 'Field %s (%s)' % (name, descriptor))
 
             access_description = ', '.join(f for f in [
                     flag if access_flags & mask else None
@@ -139,9 +139,9 @@ class Field:
                         ('enum', Field.ACC_ENUM),
                     ]
                 ] if f)
-            print("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
+            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
 
-            print("    " * dump, '    Attributes: (%s)' % attributes_count)
+            reader.debug("    " * dump, '    Attributes: (%s)' % attributes_count)
 
         attributes = []
         for i in range(0, attributes_count):

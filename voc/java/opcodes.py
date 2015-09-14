@@ -39,7 +39,7 @@ class Opcode:
                     pass
         instance = Opcode.opcodes[code].read_extra(reader, dump)
         if dump:
-            print("    " * dump, '%3d: %s' % (reader.offset, instance))
+            reader.debug("    " * dump, '%3d: %s' % (reader.offset, instance))
         return instance
 
     @classmethod
@@ -439,7 +439,7 @@ class BIPUSH(Opcode):
         return cls(const)
 
     def write_extra(self, writer):
-        writer.write_u1(self.const)
+        writer.write_s1(self.const)
 
     @property
     def produce_count(self):
@@ -3121,11 +3121,11 @@ class SIPUSH(Opcode):
 
     @classmethod
     def read_extra(cls, reader, dump=None):
-        const = reader.read_u2()
+        const = reader.read_s2()
         return cls(const)
 
     def write_extra(self, writer):
-        writer.write_u2(self.const)
+        writer.write_s2(self.const)
 
     @property
     def produce_count(self):

@@ -59,6 +59,9 @@ class ClassFileWriter:
     def write_bytes(self, b):
         self._outfile.write(b)
 
+    def write_s1(self, u1):
+        self._outfile.write(struct.pack('b', u1))
+
     def write_u1(self, u1):
         self._outfile.write(struct.pack('B', u1))
 
@@ -76,9 +79,13 @@ class ClassFileWriter:
 
 
 class ClassFileReader:
-    def __init__(self, infile, constant_pool):
+    def __init__(self, infile, constant_pool, debug=None):
         self._infile = infile
         self.constant_pool = constant_pool
+        if debug is None:
+            self.debug = lambda *msg: print(*msg)
+        else:
+            self.debug = lambda *msg: debug.write(' '.join(msg) + '\n')
 
     def read_bytes(self, count):
         return self._infile.read(count)
@@ -260,17 +267,18 @@ class BaseClass:
         return '<%s %s>' % (self.__class__.__name__, self.this_class.name)
 
     @staticmethod
-    def read(infile, dump=True):
+    def read(infile, debug=None):
         constant_pool = ConstantPool()
-        reader = ClassFileReader(infile, constant_pool)
+        reader = ClassFileReader(infile, constant_pool, debug=debug)
+        dump = 0 if debug else None
 
         magic = reader.read_u4()
         minor_version = reader.read_u2()
         major_version = reader.read_u2()
 
         if dump is not None:
-            print("    " * dump, 'Magic: %x' % (magic))
-            print("    " * dump, 'Version: %s.%s' % (major_version, minor_version))
+            reader.debug("    " * dump, 'Magic: %x' % (magic))
+            reader.debug("    " * dump, 'Version: %s.%s' % (major_version, minor_version))
 
         reader.constant_pool.read(reader, dump)
 
@@ -279,8 +287,8 @@ class BaseClass:
         super_class = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
 
         if dump is not None:
-            print("    " * dump, 'Class %s' % this_class)
-            print("    " * dump, '    Extends %s' % super_class)
+            reader.debug("    " * dump, 'Class %s' % this_class)
+            reader.debug("    " * dump, '    Extends %s' % super_class)
 
             access_description = ', '.join(f for f in [
                     flag if access_flags & mask else None
@@ -295,30 +303,30 @@ class BaseClass:
                         ('enum', Class.ACC_ENUM),
                     ]
                 ] if f)
-            print("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
+            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
 
         interfaces_count = reader.read_u2()
         if dump is not None:
-            print("    " * (dump + 1), 'Interfaces: (%s)' % interfaces_count)
+            reader.debug("    " * (dump + 1), 'Interfaces: (%s)' % interfaces_count)
         for i in range(0, interfaces_count):
             interface = reader.constant_pool[reader.read_u2()]
-            print("    " * (dump + 2), interface.name)
+            reader.debug("    " * (dump + 2), interface.name)
 
         fields_count = reader.read_u2()
         if dump is not None:
-            print("    " * (dump + 1), 'Fields: (%s)' % fields_count)
+            reader.debug("    " * (dump + 1), 'Fields: (%s)' % fields_count)
         for i in range(0, fields_count):
             Field.read(reader, dump=dump + 2 if dump is not None else dump)
 
         methods_count = reader.read_u2()
         if dump is not None:
-            print("    " * (dump + 1), 'Methods: (%s)' % methods_count)
+            reader.debug("    " * (dump + 1), 'Methods: (%s)' % methods_count)
         for i in range(0, methods_count):
             Method.read(reader, dump=dump + 2 if dump is not None else dump)
 
         attributes_count = reader.read_u2()
         if dump is not None:
-            print("    " * (dump + 1), 'Attributes: (%s)' % attributes_count)
+            reader.debug("    " * (dump + 1), 'Attributes: (%s)' % attributes_count)
         for i in range(0, attributes_count):
             Attribute.read(reader, dump=dump + 2 if dump is not None else dump)
 

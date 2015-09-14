@@ -5,7 +5,7 @@ from .klass import Class
 
 def dump(filename):
     with open(filename, 'rb') as infile:
-        Class.read(infile, dump=0)
+        Class.read(infile, debug=sys.stdout)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

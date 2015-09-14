@@ -196,12 +196,12 @@ public class Object {
     }
 
     public int compareTo(java.lang.Object other) {
-        org.python.Object [] args = new org.python.Object [] { (org.python.Object) other };
-        java.util.Hashtable kwargs = new java.util.Hashtable();
-        if ((boolean) __lt__(args, kwargs).value) {
-            return -1;
-        } else if ((boolean) __gt__(args, kwargs).value) {
-            return 1;
+        if (other instanceof org.python.Object) {
+            if ((boolean) this.__lt__((org.python.Object) other).value) {
+                return -1;
+            } else if ((boolean) this.__gt__((org.python.Object) other).value) {
+                return 1;
+            }
         }
         return 0;
     }
@@ -255,6 +255,10 @@ public class Object {
 
     public org.python.Object __lt__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__lt__(other);
+    }
+
+    public org.python.Object __lt__(org.python.Object other) {
         // System.out.println("Comparison " + this.__repr__() + " < " + other.__repr__());
         boolean result = false;
         if (this.type == String.class) {
@@ -300,26 +304,46 @@ public class Object {
 
     public org.python.Object __le__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__le__(other);
+    }
+
+    public org.python.Object __le__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("Object method __le__ not implemented");
     }
 
     public org.python.Object __eq__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__eq__(other);
+    }
+
+    public org.python.Object __eq__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("Object method __eq__ not implemented");
     }
 
     public org.python.Object __ne__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__ne__(other);
+    }
+
+    public org.python.Object __ne__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("Object method __ne__ not implemented");
     }
 
     public org.python.Object __gt__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__gt__(other);
+    }
+
+    public org.python.Object __gt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("Object method __gt__ not implemented");
     }
 
     public org.python.Object __ge__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__ge__(other);
+    }
+
+    public org.python.Object __ge__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("Object method __ge__ not implemented");
     }
 
@@ -450,6 +474,10 @@ public class Object {
 
     public org.python.Object __add__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__add__(other);
+    }
+
+    public org.python.Object __add__(org.python.Object other) {
         // System.out.println("ADD " + this.__repr__() + " TO " + other.__repr__());
         if (this.type == String.class) {
             if (other.type == String.class) {
@@ -496,11 +524,19 @@ public class Object {
 
     public org.python.Object __sub__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__sub__(other);
+    }
+
+    public org.python.Object __sub__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __mul__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__mul__(other);
+    }
+
+    public org.python.Object __mul__(org.python.Object other) {
         // System.out.println("MUL " + this.__repr__() + " BY " + other.__repr__());
         if (this.type == String.class) {
         } else if (this.type == Long.class) {
@@ -525,26 +561,46 @@ public class Object {
 
     public org.python.Object __truediv__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__truediv__(other);
+    }
+
+    public org.python.Object __truediv__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __floordiv__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__floordiv__(other);
+    }
+
+    public org.python.Object __floordiv__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __mod__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__mod__(other);
+    }
+
+    public org.python.Object __mod__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __divmod__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__divmod__(other);
+    }
+
+    public org.python.Object __divmod__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __pow__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__pow__(other);
+    }
+
+    public org.python.Object __pow__(org.python.Object other) {
         // System.out.println("POW " + this.__repr__() + " TO " + other.__repr__());
         if (this.type == String.class) {
         } else if (this.type == Long.class) {
@@ -568,105 +624,164 @@ public class Object {
 
     public org.python.Object __lshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__lshift__(other);
+    }
+
+    public org.python.Object __lshift__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __rshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__rshift__(other);
+    }
+
+    public org.python.Object __rshift__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __and__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__and__(other);
+    }
+
+    public org.python.Object __and__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __xor__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__xor__(other);
+    }
+
+    public org.python.Object __xor__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __or__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
+        return this.__or__(other);
+    }
+
+    public org.python.Object __or__(org.python.Object other) {
         return null;
     }
 
     public org.python.Object __radd__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__add__(args, kwargs);
+        return this.__radd__(other);
+    }
+
+    public org.python.Object __radd__(org.python.Object other) {
+        return other.__add__(this);
     }
 
     public org.python.Object __rsub__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__sub__(args, kwargs);
+        return this.__rsub__(other);
+    }
+
+    public org.python.Object __rsub__(org.python.Object other) {
+        return other.__sub__(this);
     }
 
     public org.python.Object __rmul__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__mul__(args, kwargs);
+        return this.__rmul__(other);
+    }
+
+    public org.python.Object __rmul__(org.python.Object other) {
+        return other.__mul__(this);
     }
 
     public org.python.Object __rtruediv__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__truediv__(args, kwargs);
+        return this.__rtruediv__(other);
+    }
+
+    public org.python.Object __rtruediv__(org.python.Object other) {
+        return other.__truediv__(this);
     }
 
     public org.python.Object __rfloordiv__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__floordiv__(args, kwargs);
+        return this.__rfloordiv__(other);
+    }
+
+    public org.python.Object __rfloordiv__(org.python.Object other) {
+        return other.__floordiv__(this);
     }
 
     public org.python.Object __rmod__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__mod__(args, kwargs);
+        return this.__rmod__(other);
+    }
+
+    public org.python.Object __rmod__(org.python.Object other) {
+        return other.__mod__(this);
     }
 
     public org.python.Object __rdivmod__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__divmod__(args, kwargs);
+        return this.__rdivmod__(other);
+    }
+
+    public org.python.Object __rdivmod__(org.python.Object other) {
+        return other.__divmod__(this);
     }
 
     public org.python.Object __rpow__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__pow__(args, kwargs);
+        return this.__rpow__(other);
+    }
+
+    public org.python.Object __rpow__(org.python.Object other) {
+        return other.__pow__(this);
     }
 
     public org.python.Object __rlshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__lshift__(args, kwargs);
+        return this.__rlshift__(other);
+    }
+
+    public org.python.Object __rlshift__(org.python.Object other) {
+        return other.__lshift__(this);
     }
 
     public org.python.Object __rrshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__rshift__(args, kwargs);
+        return this.__rrshift__(other);
+    }
+
+    public org.python.Object __rrshift__(org.python.Object other) {
+        return other.__rshift__(this);
     }
 
     public org.python.Object __rand__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__and__(args, kwargs);
+        return this.__rand__(other);
+    }
+
+    public org.python.Object __rand__(org.python.Object other) {
+        return other.__and__(this);
     }
 
     public org.python.Object __rxor__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__xor__(args, kwargs);
+        return this.__rxor__(other);
+    }
+
+    public org.python.Object __rxor__(org.python.Object other) {
+        return other.__xor__(this);
     }
 
     public org.python.Object __ror__(org.python.Object [] args, java.util.Hashtable kwargs) {
         org.python.Object other = args[0];
-        org.python.Object [] rargs = new org.python.Object [] { this };
-        return other.__or__(args, kwargs);
+        return this.__ror__(other);
+    }
+
+    public org.python.Object __ror__(org.python.Object other) {
+        return other.__or__(this);
     }
 
 
@@ -674,48 +789,96 @@ public class Object {
         this.value = this.__add__(args, kwargs).value;
     }
 
+    public void __iadd__(org.python.Object other) {
+        this.value = this.__add__(other).value;
+    }
+
     public void __isub__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__sub__(args, kwargs).value;
+    }
+
+    public void __isub__(org.python.Object other) {
+        this.value = this.__sub__(other).value;
     }
 
     public void __imul__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__mul__(args, kwargs).value;
     }
 
+    public void __imul__(org.python.Object other) {
+        this.value = this.__mul__(other).value;
+    }
+
     public void __itruediv__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__truediv__(args, kwargs).value;
+    }
+
+    public void __itruediv__(org.python.Object other) {
+        this.value = this.__truediv__(other).value;
     }
 
     public void __ifloordiv__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__floordiv__(args, kwargs).value;
     }
 
+    public void __ifloordiv__(org.python.Object other) {
+        this.value = this.__or__(other).value;
+    }
+
     public void __imod__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__mod__(args, kwargs).value;
+    }
+
+    public void __imod(org.python.Object other) {
+        this.value = this.__mod__(other).value;
     }
 
     public void __ipow__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__pow__(args, kwargs).value;
     }
 
+    public void __ipow__(org.python.Object other) {
+        this.value = this.__pow__(other).value;
+    }
+
     public void __ilshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__lshift__(args, kwargs).value;
+    }
+
+    public void __ilshift(org.python.Object other) {
+        this.value = this.__lshift__(other).value;
     }
 
     public void __irshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__rshift__(args, kwargs).value;
     }
 
+    public void __irshift(org.python.Object other) {
+        this.value = this.__rshift__(other).value;
+    }
+
     public void __iand__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__and__(args, kwargs).value;
+    }
+
+    public void __iand(org.python.Object other) {
+        this.value = this.__and__(other).value;
     }
 
     public void __ixor__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__xor__(args, kwargs).value;
     }
 
+    public void __ixor__(org.python.Object other) {
+        this.value = this.__xor__(other).value;
+    }
+
     public void __ior__(org.python.Object [] args, java.util.Hashtable kwargs) {
         this.value = this.__or__(args, kwargs).value;
+    }
+
+    public void __ior__(org.python.Object other) {
+        this.value = this.__or__(other).value;
     }
 
     public org.python.Object __neg__() {

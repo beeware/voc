@@ -110,7 +110,7 @@ class ConstantPool:
     def read(self, reader, dump=None):
         count = reader.read_u2()
         if dump is not None:
-            print("    " * dump, 'Constant pool: (%s constants)' % (count - 1))
+            reader.debug("    " * dump, 'Constant pool: (%s constants)' % (count - 1))
 
         raw_pool = []
         for i in range(1, count):
@@ -124,7 +124,7 @@ class ConstantPool:
                 const = entry
             self.add(const, allow_duplicates=True)
             if dump is not None:
-                print("    " * (dump + 1), '%s: %s' % ((i + 1), repr(const)))
+                reader.debug("    " * (dump + 1), '%s: %s' % ((i + 1), repr(const)))
 
     def write(self, writer):
         writer.write_u2(self.count)

@@ -27,14 +27,14 @@ class Attribute:
         name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
         size = reader.read_u4()
         if dump is not None:
-            print("    " * dump, '%s (%s bytes)' % (name, size))
+            reader.debug("    " * dump, '%s (%s bytes)' % (name, size))
 
         try:
             return globals()[name].read_info(reader, dump + 1 if dump is not None else dump)
         except KeyError:
             # Unknown attribute - just read the bytes and ignore them.
             if dump is not None:
-                print("    " * (dump + 1), 'Reading and ignoring %s bytes' % size)
+                reader.debug("    " * (dump + 1), 'Reading and ignoring %s bytes' % size)
 
             reader.read_bytes(size)
 
@@ -261,7 +261,7 @@ class ExceptionInfo:
         catch_type = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
 
         if dump is not None:
-            print("    " * dump, '%s: %s-%s [%s]' % (
+            reader.debug("    " * dump, '%s: %s-%s [%s]' % (
                 catch_type, start_pc, end_pc, handler_pc,
             ))
 
@@ -373,12 +373,12 @@ class Code(Attribute):
         max_locals = reader.read_u2()
 
         if dump is not None:
-            print("    " * dump, 'Max stack: %s' % max_stack)
-            print("    " * dump, 'Max locals: %s' % max_locals)
+            reader.debug("    " * dump, 'Max stack: %s' % max_stack)
+            reader.debug("    " * dump, 'Max locals: %s' % max_locals)
 
         code_length = reader.read_u4()
         if dump is not None:
-            print("    " * dump, 'Bytecode: (%d bytes)' % code_length)
+            reader.debug("    " * dump, 'Bytecode: (%d bytes)' % code_length)
 
         code = []
         i = 0
@@ -391,7 +391,7 @@ class Code(Attribute):
 
         exception_table_length = reader.read_u2()
         if dump is not None:
-            print("    " * dump, 'Exceptions: (%d)' % exception_table_length)
+            reader.debug("    " * dump, 'Exceptions: (%d)' % exception_table_length)
 
         exceptions = []
         for i in range(0, exception_table_length):
@@ -399,7 +399,7 @@ class Code(Attribute):
 
         attributes_count = reader.read_u2()
         if dump is not None:
-            print("    " * dump, 'Attributes: (%s)' % attributes_count)
+            reader.debug("    " * dump, 'Attributes: (%s)' % attributes_count)
 
         attributes = []
         for i in range(0, attributes_count):
@@ -540,7 +540,7 @@ class StackMapTable(Attribute):
     def read_info(reader, dump=None):
         number_of_entries = reader.read_u2()
         if dump is not None:
-            print("    " * dump, 'Entries: (%d entries)' % number_of_entries)
+            reader.debug("    " * dump, 'Entries: (%d entries)' % number_of_entries)
 
         entries = []
         for i in range(0, number_of_entries):
@@ -587,7 +587,7 @@ class StackMapFrame:
         stack_map_frame = frameClass.read_info(reader, frame_type)
 
         if dump is not None:
-            print("    " * dump, stack_map_frame)
+            reader.debug("    " * dump, stack_map_frame)
 
         return stack_map_frame
 
@@ -1361,7 +1361,7 @@ class Signature(Attribute):
         signature = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
 
         if dump is not None:
-            print("    " * dump, 'Signature: %s' % signature)
+            reader.debug("    " * dump, 'Signature: %s' % signature)
 
         return Signature(signature)
 
@@ -1413,7 +1413,7 @@ class SourceFile(Attribute):
         sourcefile_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
 
         if dump is not None:
-            print("    " * dump, 'Source file: %s' % sourcefile_name)
+            reader.debug("    " * dump, 'Source file: %s' % sourcefile_name)
 
         return SourceFile(sourcefile_name)
 
@@ -1512,14 +1512,14 @@ class LineNumberTable(Attribute):
         line_number_table_length = reader.read_u2()
 
         if dump is not None:
-            print("    " * dump, 'Line numbers (%s total):' % line_number_table_length)
+            reader.debug("    " * dump, 'Line numbers (%s total):' % line_number_table_length)
 
         line_numbers = []
         for i in range(0, line_number_table_length):
             start_pc = reader.read_u2()
             line_number = reader.read_u2()
             if dump is not None:
-                print("    " * (dump + 1), '%s: %s' % (start_pc, line_number))
+                reader.debug("    " * (dump + 1), '%s: %s' % (start_pc, line_number))
             line_numbers.append((start_pc, line_number))
 
         return LineNumberTable(line_numbers)

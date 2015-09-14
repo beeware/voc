@@ -21,9 +21,12 @@ class Command:
     A command may also encompass an internal block - for example, a for
     or while loop. Those blocks
     """
-    def __init__(self, instruction):
+    def __init__(self, instruction, arguments=None):
         self.operation = instruction
-        self.arguments = []
+        if arguments:
+            self.arguments = arguments
+        else:
+            self.arguments = []
 
     def __repr__(self):
         try:

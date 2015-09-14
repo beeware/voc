@@ -576,7 +576,7 @@ class Opcode:
 class UnaryOpcode(Opcode):
     @property
     def consume_count(self):
-        return 2
+        return 1
 
     @property
     def product_count(self):
@@ -605,35 +605,14 @@ class BinaryOpcode(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        # The first argument to an inplace operator is the command
-        # that the operator is going to be invoked on.
-        arguments[0].operation.transpile(context, arguments[0].arguments)
-
-        context.add_opcodes(
-            # Create the args array
-            ICONST_val(len(arguments) - 1),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
-        )
-        for i, argument in enumerate(arguments[1:]):
-            context.add_opcodes(
-                JavaOpcodes.DUP(),
-                ICONST_val(i),
-            )
+        for argument in arguments:
             argument.operation.transpile(context, argument.arguments)
-            context.add_opcodes(
-                JavaOpcodes.AASTORE(),
-            )
 
         context.add_opcodes(
-            # Then add an (empty) kswargs dict.
-            JavaOpcodes.NEW('java/util/Hashtable'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
-
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/Object',
                 self.__method__,
-                '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;'
+                '(Lorg/python/Object;)Lorg/python/Object;'
             )
         )
 
@@ -648,39 +627,17 @@ class InplaceOpcode(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        # The first argument to an inplace operator is the command
-        # that the operator is going to be invoked on.
         arguments[0].operation.transpile(context, arguments[0].arguments)
+        context.add_opcodes(JavaOpcodes.DUP())
 
-        context.add_opcodes(
-            # Duplicate the first argument, because it will be both the
-            # object on which the function is called, and the return value.
-            JavaOpcodes.DUP(),
-
-            # Create the args array
-            ICONST_val(len(arguments) - 1),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
-        )
-        for i, argument in enumerate(arguments[1:]):
-            context.add_opcodes(
-                JavaOpcodes.DUP(),
-                ICONST_val(i),
-            )
+        for argument in arguments[1:]:
             argument.operation.transpile(context, argument.arguments)
-            context.add_opcodes(
-                JavaOpcodes.AASTORE(),
-            )
 
         context.add_opcodes(
-            # Then add an (empty) kswargs dict.
-            JavaOpcodes.NEW('java/util/Hashtable'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
-
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/Object',
                 self.__method__,
-                '([Lorg/python/Object;Ljava/util/Hashtable;)V'
+                '(Lorg/python/Object;)V'
             )
         )
 
@@ -1414,24 +1371,8 @@ class COMPARE_OP(Opcode):
     def convert(self, context, arguments):
         # Add the operand which will be the left side, and thus the
         # target of the comparator operator.
-        arguments[0].operation.transpile(context, arguments[0].arguments)
-
-        # Now add an array of 1 element for the arguments to the comparator
-        context.add_opcodes(
-            JavaOpcodes.ICONST_1(),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
-
-            JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_0(),
-        )
-        arguments[1].operation.transpile(context, arguments[1].arguments)
-        context.add_opcodes(
-            JavaOpcodes.AASTORE(),
-
-            JavaOpcodes.NEW('java/util/Hashtable'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
-        )
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
 
         comparator = {
             '<': '__lt__',
@@ -1443,7 +1384,7 @@ class COMPARE_OP(Opcode):
         }[self.comparison]
 
         context.add_opcodes(
-            JavaOpcodes.INVOKEVIRTUAL('org/python/Object', comparator, '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;')
+            JavaOpcodes.INVOKEVIRTUAL('org/python/Object', comparator, '(Lorg/python/Object;)Lorg/python/Object;')
         )
 
 
