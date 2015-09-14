@@ -1,4 +1,4 @@
-.. image:: http://pybee.org/voc/static/images/voc-144.png
+.. image:: http://pybee.org/voc/static/images/voc-72.png
     :target: https://pybee.org/voc
 
 VOC
