@@ -50,7 +50,7 @@ class Command:
                     '}' if self.operation.end_block else ' ',
                 '>' if self.operation.is_jump_target else ' ',
                 self.operation.starts_line if self.operation.starts_line is not None else '    ',
-                self.operation.code_offset,
+                self.operation.python_offset,
                 self.operation.consume_count,
                 self.operation.product_count
             ) + '    ' * depth, self.operation)

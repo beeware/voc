@@ -514,8 +514,8 @@ class Opcode:
     start_block = False
     end_block = False
 
-    def __init__(self, code_offset, starts_line, is_jump_target):
-        self.code_offset = code_offset
+    def __init__(self, python_offset, starts_line, is_jump_target):
+        self.python_offset = python_offset
         self.starts_line = starts_line
         self.is_jump_target = is_jump_target
 
@@ -530,7 +530,7 @@ class Opcode:
         return ''
 
     def transpile(self, context, arguments):
-        # print("TRANSPILE %s:%4d %s" % ('%4d' % self.starts_line if self.starts_line else '    ', self.code_offset, self))
+        # print("TRANSPILE %s:%4d %s" % ('%4d' % self.starts_line if self.starts_line else '    ', self.python_offset, self))
 
         # If the Python opcode marks the start of a line of code,
         # transfer that relationship to the first opcode in the
@@ -558,19 +558,7 @@ class Opcode:
             context.next_resolve_list.append((self, 'next_op'))
 
             # Save the code offset for the jump operation.
-            context.jump_targets[self.code_offset] = self
-
-            # If this opcode has been a forward-referenced as a jump
-            # target, go back and resolve the reference.
-            try:
-                references = context.unknown_jump_targets.pop(self.code_offset)
-                # print("   resolving %s references to offset %s" % (len(references), self.code_offset))
-                for opcode, position in references:
-                    resolve_jump(opcode, context, self.code_offset, position)
-
-            except KeyError:
-                # print("   No unknown jump target at %s" % self.code_offset)
-                pass
+            context.jump_targets[self.python_offset] = self
 
 
 class UnaryOpcode(Opcode):
@@ -935,9 +923,13 @@ class POP_BLOCK(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        # print("convert POP_BLOCK", len(arguments))
         for argument in arguments:
             argument.operation.transpile(context, argument.arguments)
+
+        # Special handling: If POP_BLOCK is the target of a
+        # jump, you don't want to include the contents of the
+        # block; re-record the start as the next operation.
+        context.next_resolve_list.append((self, 'start_op'))
 
 
 class END_FINALLY(Opcode):
@@ -1003,8 +995,8 @@ class POP_EXCEPT(Opcode):
 
 
 class STORE_NAME(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1028,8 +1020,8 @@ class STORE_NAME(Opcode):
 
 
 class DELETE_NAME(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1053,8 +1045,8 @@ class DELETE_NAME(Opcode):
 
 
 class UNPACK_SEQUENCE(Opcode):
-    def __init__(self, count, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, count, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1076,8 +1068,8 @@ class UNPACK_SEQUENCE(Opcode):
 class FOR_ITER(Opcode):
     start_block = 'for-loop'
 
-    def __init__(self, target, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1110,8 +1102,8 @@ class FOR_ITER(Opcode):
 
 
 class STORE_ATTR(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1139,8 +1131,8 @@ class STORE_ATTR(Opcode):
 # class DELETE_ATTR(Opcode):
 
 class STORE_GLOBAL(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1167,8 +1159,8 @@ class STORE_GLOBAL(Opcode):
 
 
 class LOAD_CONST(Opcode):
-    def __init__(self, const, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, const, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.const = const
 
     def __arg_repr__(self):
@@ -1223,8 +1215,8 @@ class LOAD_CONST(Opcode):
 
 
 class LOAD_NAME(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1243,8 +1235,8 @@ class LOAD_NAME(Opcode):
 
 
 class BUILD_TUPLE(Opcode):
-    def __init__(self, count, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, count, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1264,8 +1256,8 @@ class BUILD_TUPLE(Opcode):
 
 
 class BUILD_LIST(Opcode):
-    def __init__(self, count, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, count, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1285,8 +1277,8 @@ class BUILD_LIST(Opcode):
 
 
 class BUILD_SET(Opcode):
-    def __init__(self, count, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, count, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1306,8 +1298,8 @@ class BUILD_SET(Opcode):
 
 
 class BUILD_MAP(Opcode):
-    def __init__(self, count, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, count, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.count = count
 
     def __arg_repr__(self):
@@ -1327,8 +1319,8 @@ class BUILD_MAP(Opcode):
 
 
 class LOAD_ATTR(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1353,8 +1345,8 @@ class LOAD_ATTR(Opcode):
 
 
 class COMPARE_OP(Opcode):
-    def __init__(self, comparison, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, comparison, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.comparison = comparison
 
     def __arg_repr__(self):
@@ -1389,8 +1381,8 @@ class COMPARE_OP(Opcode):
 
 
 class IMPORT_NAME(Opcode):
-    def __init__(self, target, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1409,8 +1401,8 @@ class IMPORT_NAME(Opcode):
 
 
 class IMPORT_FROM(Opcode):
-    def __init__(self, target, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1429,8 +1421,8 @@ class IMPORT_FROM(Opcode):
 
 
 class JUMP_FORWARD(Opcode):
-    def __init__(self, target, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1455,8 +1447,8 @@ class JUMP_FORWARD(Opcode):
 
 
 class JUMP_ABSOLUTE(Opcode):
-    def __init__(self, target, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1477,8 +1469,8 @@ class JUMP_ABSOLUTE(Opcode):
 
 
 class POP_JUMP_IF_FALSE(Opcode):
-    def __init__(self, target, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.target = target
 
     def __arg_repr__(self):
@@ -1503,13 +1495,13 @@ class POP_JUMP_IF_FALSE(Opcode):
             JavaOpcodes.INVOKEVIRTUAL('java/lang/Boolean', 'booleanValue', '()Z'),
 
             # Jump if false
-            resolve_jump(JavaOpcodes.IFEQ(0), context, self.target, Opcode.NEXT)
+            resolve_jump(JavaOpcodes.IFEQ(0), context, self.target, Opcode.START)
         )
 
 
 class POP_JUMP_IF_TRUE(Opcode):
-    def __init__(self, target, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.target = target
 
     @property
@@ -1537,8 +1529,8 @@ class POP_JUMP_IF_TRUE(Opcode):
 
 
 class LOAD_GLOBAL(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1562,8 +1554,8 @@ class LOAD_GLOBAL(Opcode):
 class SETUP_LOOP(Opcode):
     start_block = 'while-loop'
 
-    def __init__(self, delta, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, delta, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.delta = delta
 
     @property
@@ -1581,8 +1573,8 @@ class SETUP_LOOP(Opcode):
 class SETUP_EXCEPT(Opcode):
     start_block = 'except'
 
-    def __init__(self, delta, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, delta, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.delta = delta
 
     def __arg_repr__(self):
@@ -1605,8 +1597,8 @@ class SETUP_EXCEPT(Opcode):
 class SETUP_FINALLY(Opcode):
     start_block = 'finally'
 
-    def __init__(self, delta, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, delta, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.delta = delta
 
     def __arg_repr__(self):
@@ -1627,8 +1619,8 @@ class SETUP_FINALLY(Opcode):
 
 
 class LOAD_FAST(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1647,8 +1639,8 @@ class LOAD_FAST(Opcode):
 
 
 class STORE_FAST(Opcode):
-    def __init__(self, name, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
 
     def __arg_repr__(self):
@@ -1676,8 +1668,8 @@ class STORE_FAST(Opcode):
 
 
 class CALL_FUNCTION(Opcode):
-    def __init__(self, argc, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, argc, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.args = argc & 0xff
         self.kwargs = ((argc >> 8) & 0xFF)
 
@@ -1822,8 +1814,8 @@ class CALL_FUNCTION(Opcode):
 
 
 class MAKE_FUNCTION(Opcode):
-    def __init__(self, argc, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, argc, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.argc = argc
         self.default_args = argc & 0xff
         self.default_kwargs = ((argc >> 8) & 0xFF)
@@ -1903,8 +1895,8 @@ class MAKE_FUNCTION(Opcode):
 # class BUILD_SLICE(Opcode):
 
 class MAKE_CLOSURE(Opcode):
-    def __init__(self, argc, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, argc, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.argc = argc
 
     def __arg_repr__(self):
@@ -1920,8 +1912,8 @@ class MAKE_CLOSURE(Opcode):
 
 
 class LOAD_CLOSURE(Opcode):
-    def __init__(self, i, code_offset, starts_line, is_jump_target):
-        super().__init__(code_offset, starts_line, is_jump_target)
+    def __init__(self, i, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
         self.i = i
 
     def __arg_repr__(self):
