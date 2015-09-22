@@ -122,12 +122,8 @@ class Module(Block):
                 # Marker for the end of the main block:
                 if cmd.is_main_end(main_end):
                     main_end = None
-
                     try:
-                        # The last command recorded will be the JUMP_FORWARD
-                        # to the point outside the main function. This opcode
-                        # can be ignored.
-                        main = MainMethod(self, main_commands[:-1]).transpile()
+                        main = MainMethod(self, main_commands).transpile()
                     except IgnoreBlock:
                         pass
                 else:

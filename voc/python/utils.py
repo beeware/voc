@@ -192,6 +192,10 @@ class TryExcept:
                         JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
                         opcodes.ASTORE_name(context, handler.var_name),
                     )
+                else:
+                    # No named exception, but there is still an exception
+                    # on the stack. Pop it off.
+                    context.add_opcodes(JavaOpcodes.POP())
 
                 handler.transpile(context)
             elif len(handler.exceptions) == 1:  # catch single - except A as v:
@@ -207,10 +211,20 @@ class TryExcept:
                         JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
                         opcodes.ASTORE_name(context, handler.var_name),
                     )
+                else:
+                    # No named exception, but there is still an exception
+                    # on the stack. Pop it off.
+                    context.add_opcodes(JavaOpcodes.POP())
 
                 handler.transpile(context)
-            else:  # The bucket case - except:
-                context.add_opcodes(opcodes.CATCH())
+            else:
+                # The bucket case - except:
+                # No named exception, but there is still an exception
+                # on the stack. Pop it off.
+                context.add_opcodes(
+                    opcodes.CATCH(),
+                    JavaOpcodes.POP(),
+                )
                 handler.transpile(context)
 
         # # Handle else block
@@ -447,11 +461,11 @@ class WhileLoop:
 
 def find_blocks(instructions):
     offset_index = {}
-    # print(">>>>>" * 10)
+    print(">>>>>" * 10)
     for i, instruction in enumerate(instructions):
-        # print("%4d:%4d %s %s" % (i, instruction.offset, instruction.opname, instruction.argval if instruction.argval else ''))
+        print("%4d:%4d %s %s" % (i, instruction.offset, instruction.opname, instruction.argval if instruction.argval else ''))
         offset_index[instruction.offset] = i
-    # print(">>>>>" * 10)
+    print(">>>>>" * 10)
 
     blocks = {}
     i = 0
@@ -473,6 +487,7 @@ def find_blocks(instructions):
             # print("TRY END OFFSET", instructions[try_end_index].offset)
             # print("END INDEX", end_block_index)
             # print("END OFFSET", end_block_offset)
+
             block = TryExcept(
                 start=try_start_index,
                 end=try_end_index,
@@ -493,27 +508,46 @@ def find_blocks(instructions):
                 # a BUILD_TUPLE instruction that needs to be skipped.
                 if len(exceptions) > 1:
                     i = i + 1
-                i = i + 1
 
-                if instructions[i].opname == 'POP_TOP':
-                    # raw except statement
-                    var_name = None
+                if instructions[i].opname == 'COMPARE_OP':
+                    # An exception has been explicitly named
+                    i = i + 3
 
-                    except_start_index = i + 1
-                    except_end_index = end_block_index - 2
-
-                    i = end_block_index + 1
-
-                else:
-                    if instructions[i + 2].opname == 'STORE_NAME':
-                        var_name = instructions[i + 2].argval
-                    else:
+                    # print ("CHECK", i, instructions[i].opname)
+                    if instructions[i].opname == 'POP_TOP':
+                        # Exception is specified, but not a name.
                         var_name = None
 
-                    except_start_index = i + 5
-                    except_end_index = offset_index[instructions[except_start_index - 1].argval] - 3
+                        except_start_index = i + 2
+                        # print("EXCEPT START", except_start_index)
 
-                    i = offset_index[instructions[except_start_index - 1].argval] + 6
+                    elif instructions[i].opname == 'STORE_NAME':
+                        var_name = instructions[i].argval
+
+                        except_start_index = i + 3
+                        # print("EXCEPT START e", except_start_index)
+
+                else:
+                    i = i + 3
+
+                    # Exception is specified, but not a name.
+                    var_name = None
+
+                    except_start_index = i
+                    # print("EXCEPT START anon", except_start_index)
+
+                while instructions[i].opname != 'COMPARE_OP' and instructions[i].argval != end_block_offset:
+                    i = i + 1
+
+                if var_name:
+                    except_end_index = i - 7
+                else:
+                    except_end_index = i - 1
+
+                # print("EXCEPT END", except_end_index)
+                # Step forward to the start of the next except block
+                # (or the end of the try/catch)
+                i = i + 2
 
                 block.handlers.append(
                     ExceptionHandler(
