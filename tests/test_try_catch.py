@@ -10,7 +10,6 @@ class TryExceptTests(TranspileTestCase):
     #                 obj.no_such_attribute
     #             except AttributeError:
     #                 print("Got an error")
-    #             x = 3
     #             """,
     #         java="""
     #             """)

@@ -7,7 +7,7 @@ from ..java import (
     LineNumberTable
 )
 
-from .utils import extract_command
+from .utils import extract_command, find_blocks
 from .opcodes import ASTORE_name, ALOAD_name, ADELETE_name, IF, END_IF, resolve_jump
 
 
@@ -24,7 +24,7 @@ class Block:
 
         self.code = []
         self.try_catches = []
-        self.if_blocks = []
+        self.blocks = []
         self.jumps = []
         self.jump_targets = {}
         self.unknown_jump_targets = {}
@@ -102,15 +102,18 @@ class Block:
 
         """
         instructions = list(dis.Bytecode(code))
+
+        blocks = find_blocks(instructions)
+
         i = len(instructions)
         commands = []
         while i > 0:
-            i, command, ends_block = extract_command(instructions, i)
+            i, command = extract_command(instructions, blocks, i)
             commands.append(command)
 
         commands.reverse()
 
-        if True:
+        if False:
             print ('=====' * 10)
             print (code)
             print ('-----' * 10)
@@ -199,34 +202,36 @@ class Block:
         # Most of the instructions will be opcodes. However, some will
         # be instructions to add exception blocks, line number references, etc
         for cmd in self.commands:
-            cmd.operation.transpile(self, cmd.arguments)
-
-        # Since we've processed all the Python opcodes, we can now resolve
-        # all the unknown jump targets.
-        for python_offset, references in self.unknown_jump_targets.items():
-            # print("   resolving %s references to offset %s" % (len(references), python_offset))
-            for opcode, position in references:
-                resolve_jump(opcode, self, python_offset, position)
+            cmd.transpile(self)
 
         # Java requires that every body of code finishes with a return.
         # Make sure there is one.
         if len(self.code) == 0 or not isinstance(self.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
             self.add_opcodes(JavaOpcodes.RETURN())
 
+        # Since we've processed all the Python opcodes, we can now resolve
+        # all the unknown jump targets.
+        # print('>>>>> Resolve references')
+        for target, references in self.unknown_jump_targets.items():
+            # print("   resolving %s references to %s" % (len(references), target))
+            for opcode, position in references:
+                resolve_jump(opcode, self, target, position)
+
         # Provide any tweaks that are needed because of the context in which
         # the block is being used.
+        # print('>>>>> Tweak opcodes')
         self.tweak()
 
         # Now that we have a complete opcode list, postprocess the list
         # with the known offsets.
         offset = 0
-        # print('===== set offsets')
+        # print('>>>>> set offsets')
         for index, instruction in enumerate(self.code):
             # print("%4d:%4d (%s) %s" % (index, offset, id(instruction), instruction))
             instruction.java_index = index
             instruction.java_offset = offset
             offset += len(instruction)
-        # print('===== end set offsets')
+        # print('>>>>> end set offsets')
 
         # Construct the exception table, updating any
         # end-of-exception GOTO operations with the right opcode.
@@ -236,36 +241,21 @@ class Block:
             # print("TRY CATCH START", id(try_catch), try_catch.start_op, try_catch.start_op.java_offset)
             # print("            END", try_catch.end_op)
             for handler in try_catch.handlers:
-                exceptions.append(JavaExceptionInfo(
-                    try_catch.start_op.java_offset,
-                    try_catch.jump_op.java_offset,
-                    handler.start_op.java_offset,
-                    handler.descriptor
-                ))
-                # Flag the opcode that is the start of the handler;
-                # this will be used to bump up the stack depth
-                # calcuation.
-                if handler.jump_op:
-                    handler.jump_op.offset = try_catch.end_op.java_offset - handler.jump_op.java_offset
-
-            try_catch.jump_op.offset = try_catch.end_op.java_offset - try_catch.jump_op.java_offset
-
-        # Update any IF-related offsets
-        for if_block in self.if_blocks:
-            # print ("IF BLOCK START", id(if_block), if_block.if_op, if_block.if_op.java_offset)
-            # print ("         END", if_block.end_op, if_block.end_op.java_offset)
-            # print ("IF BLOCK JUMP", if_block.jump_op, if_block.jump_op.java_offset)
-            # Update the jumps for the initial IF block
-            if_block.if_op.offset = if_block.end_op.java_offset - if_block.if_op.java_offset
-            if if_block.jump_op:
-                if_block.jump_op.offset = if_block.end_op.java_offset - if_block.jump_op.java_offset
-
-            # # Update the jumps for each ELIF/ELSE
-            for else_if in if_block.elifs:
-                # print('    has elif')
-                else_if.if_op.offset = if_block.end_op.java_offset - else_if.if_op.java_offset
-                if else_if.jump_op:
-                    else_if.jump_op.offset = if_block.end_op.java_offset - else_if.jump_op.java_offset
+                if handler.descriptors:
+                    for descriptor in handler.descriptors:
+                        exceptions.append(JavaExceptionInfo(
+                            try_catch.start_op.java_offset,
+                            try_catch.jump_op.java_offset,
+                            handler.start_op.java_offset,
+                            descriptor
+                        ))
+                else:
+                    exceptions.append(JavaExceptionInfo(
+                        try_catch.start_op.java_offset,
+                        try_catch.jump_op.java_offset,
+                        handler.start_op.java_offset,
+                        'org/python/exceptions/BaseException'
+                    ))
 
         # Update any jump instructions
         # print ("There are %s jumps" % len(self.jumps))

@@ -120,12 +120,14 @@ class Module(Block):
         for cmd in self.commands:
             if main_end is not None:
                 # Marker for the end of the main block:
-                #   JUMP_FORWARD <main_end>
-                if len(cmd.arguments) == 0 and cmd.operation.opname == 'JUMP_FORWARD' and cmd.operation.target == main_end:
+                if cmd.is_main_end(main_end):
                     main_end = None
 
                     try:
-                        main = MainMethod(self, main_commands).transpile()
+                        # The last command recorded will be the JUMP_FORWARD
+                        # to the point outside the main function. This opcode
+                        # can be ignored.
+                        main = MainMethod(self, main_commands[:-1]).transpile()
                     except IgnoreBlock:
                         pass
                 else:
@@ -138,14 +140,11 @@ class Module(Block):
                 #         LOAD_NAME: __name__
                 #         LOAD_CONST: __main__
                 #     COMPARE_OP: ==
-                #  POP_JUMP_IF_FALSE: <end of block>
+                #  POP_JUMP_IF_FALSE: <end of block target>
                 #  ... <main code>
-                #  JUMP_FORWARD <end of block>
-                if (cmd.operation.opname == 'POP_JUMP_IF_FALSE'
-                        and cmd.arguments[0].operation.opname == 'COMPARE_OP' and cmd.arguments[0].operation.comparison == '=='
-                        and cmd.arguments[0].arguments[0].operation.opname == 'LOAD_NAME' and cmd.arguments[0].arguments[0].operation.name == '__name__'
-                        and cmd.arguments[0].arguments[1].operation.opname == 'LOAD_CONST' and cmd.arguments[0].arguments[1].operation.const == '__main__'):
-                    # print("Found main block")
+                #  <end of block target>
+                if cmd.is_main_start():
+                    # print("Found main block", cmd.operation.target)
                     if main is not None:
                         print("Found duplicate main block... replacing previous main")
 

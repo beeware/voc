@@ -7,7 +7,76 @@ from ..java import opcodes as JavaOpcodes, Classref
 ##########################################################################
 
 # A sentinel value to mark jumps that need to be resolved.
+# This is used to differntiate from the "none" value indicating
+# a currently open IF/TRY block.
 RESOLVE = object()
+
+
+class START_LOOP:
+    """A pseudo instruction that can be used to mark the
+    start of a loop (either a FOR or a WHILE)
+    """
+    def __init__(self):
+        # The opcode that is the first in the formal LOOP block
+        self.start_op = None
+
+        # The last operation in the LOOP block
+        self.end_op = None
+
+        # If this IF can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
+
+    def process(self, context):
+        # Record the start of the if block
+        context.next_resolve_list.append((self, 'start_op'))
+
+        # Record this loop.
+        context.blocks.append(self)
+
+        # This opcode isn't for the final output.
+        return False
+
+
+class END_LOOP:
+    """A no-op pseudo instruction that can be used to mark the
+    end of a loop
+    """
+    def __init__(self):
+        # The opcode that is the first in the formal IF block
+        self.start_op = None
+
+        # The last operation in the IF-ELSE block - the target for
+        # all if-exiting jumps.
+        self.end_op = None
+
+        # If this IF can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
+
+    def process(self, context):
+        # Find the most recent if block on the stack that hasn't been
+        # ended. That's the block that the elif applies to.
+        for loop in context.blocks[::-1]:
+            if loop.end_op is None:
+                loop.end_op = RESOLVE
+                break
+
+        # A jump back to the start of the loop for another iteration
+        context.add_opcodes(jump(JavaOpcodes.GOTO(0), context, loop, Opcode.START))
+
+        # The next opcode is outside the LOOP block.
+        context.next_resolve_list.append((loop, 'next_op'))
+        context.next_resolve_list.append((loop, 'end_op'))
+
+        # The end operation is virtual, so all markers point
+        # to the next operation
+        context.next_resolve_list.append((self, 'start_op'))
+        context.next_resolve_list.append((self, 'end_op'))
+        context.next_resolve_list.append((self, 'next_op'))
+
+        # This opcode isn't for the final output.
+        return False
 
 
 class IF:
@@ -48,7 +117,7 @@ class IF:
     special handling is required to account for this.
 
         1. When the IF is created, it is empty, and has no start_op.
-           The empty pseudo-instruction is added to the if_blocks list.
+           The empty pseudo-instruction is added to the blocks list.
         2. When the instruction *after* the IF, ELIF or ELSE is processed,
            it is post-processed to fill in the operation marking the
            start of the relevant section.
@@ -65,7 +134,7 @@ class IF:
            is no longer current.
 
     IF-ELSE blocks can be nested, so when an ELIF, ELSE or END_IF is found,
-    it is recorded against the last IF in the if_blocks list
+    it is recorded against the last IF in the blocks list
     that has no end_op recorded.
 
     """
@@ -99,24 +168,18 @@ class IF:
         self.starts_line = None
 
     def process(self, context):
+        # Record the start of the if block
+        context.next_resolve_list.append((self, 'start_op'))
+
         # Add the stack prepration commands to the code list
-        # print("PROCESS IF", id(self))
         context.add_opcodes(*self.commands)
 
         # Create an instance of the opcode and put it on the code list
         self.if_op = self.opcode(0)
         context.add_opcodes(self.if_op)
 
-        # If there were commands, the first command is the start
-        # of the IF block. oetherwise, it's the if_op.
-        try:
-            self.start_op = self.commands[0]
-        except IndexError:
-            self.start_op = self.if_op
-
         # Record this IF.
-        context.if_blocks.append(self)
-        # print("IF BLOCKS: ", [(id(b), b.end_op) for b in context.if_blocks])
+        context.blocks.append(self)
 
         # This opcode isn't for the final output.
         return False
@@ -126,7 +189,6 @@ class ELIF:
     def __init__(self, commands, opcode):
         # The master IF block
         self.if_block = None
-        # print("CREATE %s" % "ELIF" if opcode else "ELSE", id(self))
 
         # The commands to prepare the stack for the IF comparison
         self.commands = commands if commands is not None else []
@@ -148,12 +210,10 @@ class ELIF:
     def process(self, context):
         # Find the most recent if block on the stack that hasn't been
         # ended. That's the block that the elif applies to.
-        # print("PROCESS ELIF(or else)")
-        for if_block in context.if_blocks[::-1]:
+        for if_block in context.blocks[::-1]:
             if if_block.end_op is None:
                 if_block.end_op = RESOLVE
                 break
-        # print("    if block is", id(if_block))
 
         # If this is the first elif, add a GOTO and use it as the
         # jump operation at the end of the IF block. If there are
@@ -163,11 +223,17 @@ class ELIF:
         context.add_opcodes(jump_op)
 
         if len(if_block.elifs) == 0:
-            # print("    first elif")
             if_block.jump_op = jump_op
+
+            jump(if_block.if_op, context, self, Opcode.START)
         else:
             # print("    already got an endif")
             if_block.handlers[-1].jump_op = jump_op
+
+            jump(if_block.handlers[-1].if_op, context, self, Opcode.START)
+
+        # Record the start of the elif block
+        context.next_resolve_list.append((self, 'start_op'))
 
         if self.opcode:
             # print("    this is an elif")
@@ -177,11 +243,12 @@ class ELIF:
             # Create an instance of the opcode and put it on the code list
             self.if_op = self.opcode(0)
             context.add_opcodes(self.if_op)
+
         # else:
             # print("    this is an else")
 
         if_block.elifs.append(self)
-        # print("IF BLOCKS: ", [(id(b), b.end_op) for b in context.if_blocks])
+        # print("IF BLOCKS: ", [(id(b), b.end_op) for b in context.blocks])
 
         # This opcode isn't for the final output.
         return False
@@ -191,13 +258,10 @@ class ELSE(ELIF):
     def __init__(self):
         # ELSE if an ELIF with no preparation and no comparison opcode
         super().__init__(None, None)
-        # print("CREATE ELSE", id(self))
 
 
 class END_IF:
     def __init__(self):
-        # print("CREATE ENDIF")
-
         # If this IF can be identified as the start of a new
         # line of source code, track that line.
         self.starts_line = None
@@ -205,16 +269,26 @@ class END_IF:
     def process(self, context):
         # Find the most recent if block on the stack that hasn't been
         # ended. That's the block that the elif applies to.
-        # print("PROCESS ENDIF")
-        for if_block in context.if_blocks[::-1]:
+        for if_block in context.blocks[::-1]:
             if if_block.end_op is None:
                 if_block.end_op = RESOLVE
                 break
-        # print("    if block is", id(if_block))
 
-        # The next opcode is the end of the IF-ELIF-ELSE block.
-        context.next_resolve_list.append((if_block, 'end_op'))
-        # print("IF BLOCKS: ", [(id(b), b.end_op) for b in context.if_blocks])
+        # If there aren't any ELIF/ELSE definitions, then the
+        # main if block jumps straight to the end.
+        if len(if_block.elifs) == 0:
+            jump(if_block.if_op, context, if_block, Opcode.NEXT)
+
+        # Each of the 'end of block' jumps go to the end as well.
+        if if_block.jump_op:
+            jump(if_block.jump_op, context, if_block, Opcode.NEXT)
+
+        for block in if_block.elifs:
+            if block.jump_op:
+                jump(block.jump_op, context, if_block, Opcode.NEXT)
+
+        # The next opcode is outside the IF/ELIF/ELSE block.
+        context.next_resolve_list.append((if_block, 'next_op'))
 
         # This opcode isn't for the final output.
         return False
@@ -226,9 +300,11 @@ class TRY:
     This forms the first of at least three pseudo-operations:
         TRY()
             ...
-        CATCH('your/exception/descriptor')
+        CATCH(['your/exception/descriptor1', 'your/exception/descriptor2'])
             ...
         CATCH('your/other/exception')
+            ...
+        CATCH()
             ...
         END_TRY()
 
@@ -260,14 +336,12 @@ class TRY:
         self.jump_op = None
         self.end_op = None
         self.handlers = []
-        # print("CREATE TRY", id(self))
 
         # If this TRY can be identified as the start of a new
         # line of source code, track that line.
         self.starts_line = None
 
     def process(self, context):
-        # print("PROCESS TRY", id(self))
         context.try_catches.append(self)
         # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
 
@@ -279,9 +353,13 @@ class TRY:
 
 
 class CATCH:
-    def __init__(self, descriptor):
-        self.descriptor = descriptor
-        # print("CREATE CATCH", id(self), self.descriptor)
+    def __init__(self, descriptors=None):
+        if descriptors is None:
+            self.descriptors = []
+        elif isinstance(descriptors, str):
+            self.descriptors = [descriptors]
+        else:
+            self.descriptors = descriptors
 
         # If this CATCH can be identified as the start of a new
         # line of source code, track that line.
@@ -297,33 +375,31 @@ class CATCH:
     def process(self, context):
         # Find the most recent exception on the stack that hasn't been
         # ended. That's the block that the catch applies to.
-        # print("PROCESS CATCH", id(self))
-        for exception in context.try_catches[::-1]:
-            if exception.end_op is None:
+        for try_catch in context.try_catches[::-1]:
+            if try_catch.end_op is None:
                 break
 
-        # print("    current exception", exception)
+        # print("    current try_catch", try_catch)
         # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
 
         # If this is the first catch, insert a GOTO operation.
         # The jump distance will be updated when all the CATCH blocks
-        # have been processed and the exception is converted.
+        # have been processed and the try_catch is converted.
         # If it isn't the first catch, then this catch concludes the
         # previous one. Add a goto to the end of the block, and
         # record the end of the block for framing purposes.
-        if len(exception.handlers) == 0:
-            # print("    first catch")
-            exception.jump_op = JavaOpcodes.GOTO(0)
-            context.add_opcodes(exception.jump_op)
+        end_jump = JavaOpcodes.GOTO(0)
+        if len(try_catch.handlers) == 0:
+            try_catch.jump_op = end_jump
         else:
-            # print("    nth catch")
-            end_jump = JavaOpcodes.GOTO(0)
-            exception.handlers[-1].jump_op = end_jump
-            context.add_opcodes(end_jump)
-            exception.handlers[-1].end_op = context.code[-1]
+            try_catch.handlers[-1].jump_op = end_jump
+            try_catch.handlers[-1].end_op = context.code[-1]
+
+        context.add_opcodes(end_jump)
+        jump(end_jump, context, try_catch, Opcode.NEXT)
 
         # Add this catch block as a handler
-        exception.handlers.append(self)
+        try_catch.handlers.append(self)
 
         # The next opcode is the start of the catch block.
         context.next_resolve_list.append((self, 'start_op'))
@@ -334,8 +410,6 @@ class CATCH:
 
 class END_TRY:
     def __init__(self):
-        # print("CREATE END TRY", id(self))
-
         # If this END TRY can be identified as the start of a new
         # line of source code, track that line.
         self.starts_line = None
@@ -343,19 +417,18 @@ class END_TRY:
     def process(self, context):
         # Find the most recent exception on the stack that hasn't been
         # ended. That's the block we're ending.
-        # print("PROCESS END TRY", id(self))
-        for exception in context.try_catches[::-1]:
-            if exception.end_op is None:
-                exception.end_op = RESOLVE
+        for try_catch in context.try_catches[::-1]:
+            if try_catch.end_op is None:
+                try_catch.end_op = RESOLVE
                 break
 
-        # print("    current exception", exception)
+        # print("    current try_catch", try_catch)
         # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
 
-        exception.handlers[-1].end_op = context.code[-1]
+        try_catch.handlers[-1].end_op = context.code[-1]
 
         # The next opcode is the end of the try-catch block.
-        context.next_resolve_list.append((exception, 'end_op'))
+        context.next_resolve_list.append((try_catch, 'next_op'))
 
         # This opcode isn't for the final output.
         return False
@@ -459,10 +532,46 @@ def ICONST_val(value):
         return JavaOpcodes.LDC(value)
 
 
+class Ref:
+    """A reference to an opcode by target offset"""
+    def __init__(self, context, target):
+        self.context = context
+        self.target = target
+
+    def __repr__(self):
+        try:
+            return repr(self.context.jump_targets[self.target])
+        except KeyError:
+            return '<Ref: offset %s>' % self.target
+
+    @property
+    def start_op(self):
+        return self.context.jump_targets[self.target].start_op
+
+    @property
+    def end_op(self):
+        return self.context.jump_targets[self.target].end_op
+
+    @property
+    def next_op(self):
+        return self.context.jump_targets[self.target].next_op
+
+
+def jump(opcode, context, target, position):
+    """Define a jump operation.
+
+    The specific offset will be resolved once all the
+    Java opcodes have been instantiated
+    """
+    # print("    add jump to reference %s %s %s %s..." % (opcode, id(opcode), target, position))
+    context.unknown_jump_targets.setdefault(target, []).append((opcode, position))
+    return opcode
+
+
 def resolve_jump(opcode, context, target, position):
     """Resolve a jump target in an opcode.
 
-    target is the code offset in the Python code space.
+    target is the Python opcode (or a Ref instance).
     When Python code is converted to Java, it will turn into
     0-N opcodes. We need to specify which one will be used
     as the Java offset:
@@ -470,36 +579,18 @@ def resolve_jump(opcode, context, target, position):
      * END - the last Java opcode generated from the Python opcode
      * NEXT - the next Java opcode added after this block.
     """
-    try:
-        # print("RESOLVE %s %s to %s %s" % (opcode, id(opcode), target, position))
-        py_opcode = context.jump_targets[target]
-        # print("PY OPCODE:", py_opcode)
-        if position == Opcode.START:
-            opcode.jump_op = py_opcode.start_op
-        elif position == Opcode.END:
-            opcode.jump_op = py_opcode.end_op
-        elif position == Opcode.NEXT:
-            # If we are resolving a forward reference, the 'next'
-            # opcode won't be known yet; so put it on the resolve list.
-            try:
-                opcode.jump_op = py_opcode.next_op
-            except AttributeError:
-                context.next_resolve_list.append((opcode, 'jump_op'))
+    # print("RESOLVE %s %s to %s %s" % (opcode, id(opcode), target, position))
+    if position == Opcode.START:
+        opcode.jump_op = target.start_op
+    elif position == Opcode.END:
+        opcode.jump_op = target.end_op
+    elif position == Opcode.NEXT:
+        opcode.jump_op = target.next_op
+    else:
+        raise Exception("Unknown opcode position")
 
-        else:
-            raise Exception("Unknown opcode position")
-
-        context.jumps.append(opcode)
-        try:
-            opcode.jump_op.references.append(opcode)
-        except AttributeError:
-            pass
-
-    except KeyError:
-        # print("    unknown reference %s %s... defer" % (opcode, id(opcode)))
-        context.unknown_jump_targets.setdefault(target, []).append((opcode, position))
-
-    return opcode
+    context.jumps.append(opcode)
+    opcode.jump_op.references.append(opcode)
 
 
 ##########################################################################
@@ -510,9 +601,6 @@ class Opcode:
     START = 10
     END = 20
     NEXT = 30
-
-    start_block = False
-    end_block = False
 
     def __init__(self, python_offset, starts_line, is_jump_target):
         self.python_offset = python_offset
@@ -538,27 +626,21 @@ class Opcode:
         if self.starts_line:
             context.next_opcode_starts_line = self.starts_line
 
-        # If this command is a jump target, then track
-        # the startop in the command sequence.
-        if self.is_jump_target:
-            context.next_resolve_list.append((self, 'start_op'))
-            n_ops = len(context.code)
+        context.next_resolve_list.append((self, 'start_op'))
+        n_ops = len(context.code)
 
         # Actually convert the opcode. This is recursive down the Command sequence.
         self.convert(context, arguments)
 
-        # If this command is a jump target, then track
-        # the end and next op in the command sequence.
-        if self.is_jump_target:
-            if len(context.code) == n_ops:
-                context.next_resolve_list.append((self, 'end_op'))
-            else:
-                self.end_op = context.code[-1]
+        if len(context.code) == n_ops:
+            context.next_resolve_list.append((self, 'end_op'))
+        else:
+            self.end_op = context.code[-1]
 
-            context.next_resolve_list.append((self, 'next_op'))
+        context.next_resolve_list.append((self, 'next_op'))
 
-            # Save the code offset for the jump operation.
-            context.jump_targets[self.python_offset] = self
+        # Save the code offset for the jump operation.
+        context.jump_targets[self.python_offset] = self
 
 
 class UnaryOpcode(Opcode):
@@ -889,7 +971,6 @@ class INPLACE_OR(InplaceOpcode):
 
 # class BREAK_LOOP(Opcode):
 # class WITH_CLEANUP(Opcode):
-#     end_block = True
 
 class RETURN_VALUE(Opcode):
     @property
@@ -912,8 +993,6 @@ class RETURN_VALUE(Opcode):
 
 
 class POP_BLOCK(Opcode):
-    end_block = True
-
     @property
     def consume_count(self):
         return 0
@@ -933,8 +1012,6 @@ class POP_BLOCK(Opcode):
 
 
 class END_FINALLY(Opcode):
-    end_block = 'finally'
-
     @property
     def consume_count(self):
         return 2
@@ -943,43 +1020,8 @@ class END_FINALLY(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        # print("convert END_FINALLY ", [arg.operation for arg in arguments])
-
-        context.add_opcodes(TRY())
-        for argument in arguments[0].arguments[1:]:
-            argument.operation.transpile(context, argument.arguments)
-
-        n_handlers = len(arguments) // 4
-        for i in range(n_handlers, 0, -1):
-            exc_name = arguments[-4 * i].arguments[0].arguments[0].arguments[0].arguments[0].arguments[-1].operation.name
-            var_name = arguments[-4 * i].arguments[0].operation.name
-
-            # Define the exception handler.
-            # On entry to the exception, the stack will contain
-            # a single value - the exception being thrown.
-            # This exception must be wrapped into an org/python/Object
-            # so it can be used as an argument elsewhere.
-            context.add_opcodes(
-                CATCH('org/python/exceptions/%s' % exc_name),
-                ASTORE_name(context, var_name),
-                JavaOpcodes.NEW('org/python/Object'),
-                JavaOpcodes.DUP(),
-                ALOAD_name(context, var_name),
-                JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
-                ASTORE_name(context, var_name),
-            )
-
-            # Then roll out the body of the exception handler.
-            for argument in arguments[-4 * i + 1].arguments[1:]:
-                argument.operation.transpile(context, argument.arguments)
-
-        context.add_opcodes(END_TRY())
-
 
 class POP_EXCEPT(Opcode):
-    start_block = 'finally'
-
     @property
     def consume_count(self):
         return 0
@@ -1066,8 +1108,6 @@ class UNPACK_SEQUENCE(Opcode):
 
 
 class FOR_ITER(Opcode):
-    start_block = 'for-loop'
-
     def __init__(self, target, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.target = target
@@ -1082,20 +1122,6 @@ class FOR_ITER(Opcode):
     @property
     def product_count(self):
         return 2
-
-    def convert(self, context, arguments):
-        context.add_opcodes(TRY())
-
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
-        context.add_opcodes(
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Iterator', '__next__', '()Lorg/python/Object;', 0),
-            CATCH('org/python/exceptions/StopIteration'),
-                resolve_jump(JavaOpcodes.GOTO(0), context, self.target, Opcode.NEXT),
-            END_TRY()
-        )
 
 
 # class UNPACK_EX(Opcode):
@@ -1438,7 +1464,7 @@ class JUMP_FORWARD(Opcode):
 
     def convert(self, context, arguments):
         context.add_opcodes(
-            resolve_jump(JavaOpcodes.GOTO(0), context, self.target, Opcode.START)
+            jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START)
         )
 
 
@@ -1464,7 +1490,7 @@ class JUMP_ABSOLUTE(Opcode):
 
     def convert(self, context, arguments):
         context.add_opcodes(
-            resolve_jump(JavaOpcodes.GOTO(0), context, self.target, Opcode.START)
+            jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START)
         )
 
 
@@ -1495,7 +1521,7 @@ class POP_JUMP_IF_FALSE(Opcode):
             JavaOpcodes.INVOKEVIRTUAL('java/lang/Boolean', 'booleanValue', '()Z'),
 
             # Jump if false
-            resolve_jump(JavaOpcodes.IFEQ(0), context, self.target, Opcode.START)
+            jump(JavaOpcodes.IFEQ(0), context, Ref(context, self.target), Opcode.START)
         )
 
 
@@ -1524,7 +1550,7 @@ class POP_JUMP_IF_TRUE(Opcode):
 
             # Jump if not false
             JavaOpcodes.ICONST_0(),
-            resolve_jump(JavaOpcodes.IFNE(0), context, self.target, Opcode.START)
+            jump(JavaOpcodes.IFNE(0), context, Ref(context, self.target), Opcode.START)
         )
 
 
@@ -1552,8 +1578,6 @@ class LOAD_GLOBAL(Opcode):
 
 
 class SETUP_LOOP(Opcode):
-    start_block = 'while-loop'
-
     def __init__(self, delta, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.delta = delta
@@ -1571,8 +1595,6 @@ class SETUP_LOOP(Opcode):
 
 
 class SETUP_EXCEPT(Opcode):
-    start_block = 'except'
-
     def __init__(self, delta, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.delta = delta
@@ -1595,8 +1617,6 @@ class SETUP_EXCEPT(Opcode):
 
 
 class SETUP_FINALLY(Opcode):
-    start_block = 'finally'
-
     def __init__(self, delta, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.delta = delta
@@ -1938,7 +1958,6 @@ class LOAD_CLOSURE(Opcode):
 # class CALL_FUNCTION_VAR_KW(Opcode):
 
 # class SETUP_WITH(Opcode):
-#     start_block = 'finally'
 # class LIST_APPEND(Opcode):
 
 # class SET_ADD(Opcode):

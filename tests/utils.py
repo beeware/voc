@@ -11,7 +11,7 @@ from voc.java.attributes import Code as JavaCode
 class TranspileTestCase(TestCase):
     def assertBlock(self, python, java):
         self.maxDiff = None
-        dump = True
+        dump = False
 
         py_block = PyBlock(parent=PyModule('test', 'test.py'))
         if python:

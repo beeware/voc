@@ -189,10 +189,9 @@ public class Object {
      * Proxy Java object methods onto their Python counterparts.
      */
 
+    @SuppressWarnings("unchecked")
     public boolean equals(java.lang.Object other) {
-        org.python.Object [] args = new org.python.Object [] { (org.python.Object) other };
-        java.util.Hashtable kwargs = new java.util.Hashtable();
-        return (boolean) __eq__(args, kwargs).value;
+        return (boolean) __eq__((org.python.Object) other).value;
     }
 
     public int compareTo(java.lang.Object other) {
@@ -317,7 +316,44 @@ public class Object {
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("Object method __eq__ not implemented");
+        // System.out.println("Comparison " + this.__repr__() + " < " + other.__repr__());
+        boolean result = false;
+        if (this.type == String.class) {
+            if (other.type == String.class) {
+                return new org.python.Object(((String) this.value) == ((String) other.value));
+            } else if (other.type == Long.class) {
+            } else if (other.type == Float.class) {
+            } else if (other.type == java.util.Map.class) {
+            } else if (other.type == java.util.Set.class) {
+            } else if (other.type == org.python.Object.class) {
+            } else if (other.type == java.util.ArrayList.class) {
+            }
+        } else if (this.type == Long.class) {
+            if (other.type == String.class) {
+            } else if (other.type == Long.class) {
+                return new org.python.Object(((Long) this.value) == ((Long) other.value));
+            } else if (other.type == Float.class) {
+            } else if (other.type == java.util.Map.class) {
+            } else if (other.type == java.util.Set.class) {
+            } else if (other.type == org.python.Object.class) {
+            } else if (other.type == java.util.ArrayList.class) {
+            }
+        } else if (this.type == Float.class) {
+            if (other.type == String.class) {
+            } else if (other.type == Long.class) {
+            } else if (other.type == Float.class) {
+                return new org.python.Object(((Float) this.value) == ((Float) other.value));
+            } else if (other.type == java.util.Map.class) {
+            } else if (other.type == java.util.Set.class) {
+            } else if (other.type == org.python.Object.class) {
+            } else if (other.type == java.util.ArrayList.class) {
+            }
+        } else if (this.type == java.util.Map.class) {
+        } else if (this.type == java.util.Set.class) {
+        } else if (this.type == org.python.Object.class) {
+        } else if (this.type == java.util.ArrayList.class) {
+        }
+        return new org.python.Object(result);
     }
 
     public org.python.Object __ne__(org.python.Object [] args, java.util.Hashtable kwargs) {

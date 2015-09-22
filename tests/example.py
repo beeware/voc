@@ -23,9 +23,9 @@ def bar():
         i += 1
     print("All done")
 
-# # class Point3D(Point):
-# #     def __init__(self):
-# #         pass
+# # # class Point3D(Point):
+# # #     def __init__(self):
+# # #         pass
 
 
 def body(value):
@@ -46,6 +46,7 @@ def body(value):
 
 if __name__ == '__main__':
     print("Hello world")
+    x = 3
     result = body(42)
     print("Result is", result)
 
@@ -55,12 +56,24 @@ if __name__ == '__main__':
 
     try:
         p.no_such_attribute
-    except AttributeError as e:
+    except (AttributeError, TypeError) as e:
         print("Got the error", e)
+    except NameError as e:
+        print("Got the error", e)
+    # except:
+    #     print("Bucket")
+
+    # else:
+    #     print("Do elese")
+    # finally:
+    #     print("Do finally")
+
+    # except AttributeError as e:
+    #     print("Got the error", e)
         # print("Got the error")
-    except TypeError as e:
-        print("Got the Type error", e)
-        # print("Got the Type error")
+    # except TypeError as e:
+    #     print("Got the Type error", e)
+    #     # print("Got the Type error")
 
     print("Method is", p.distance)
     print("Distance is:", p.distance())

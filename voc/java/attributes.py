@@ -251,18 +251,25 @@ class ExceptionInfo:
 
         # If the value of the catch_type item is zero, this exception handler is
         # called for all exceptions. This is used to implement finally (§3.13).
-        self.catch_type = Classref(catch_type)
+        if catch_type is None:
+            self.catch_type = None
+        else:
+            self.catch_type = Classref(catch_type)
 
     @staticmethod
     def read(reader, dump=None):
         start_pc = reader.read_u2()
         end_pc = reader.read_u2()
         handler_pc = reader.read_u2()
-        catch_type = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
+        item = reader.read_u2()
+        if item != 0:
+            catch_type = reader.constant_pool[item].name.bytes.decode('utf8')
+        else:
+            catch_type = None
 
         if dump is not None:
             reader.debug("    " * dump, '%s: %s-%s [%s]' % (
-                catch_type, start_pc, end_pc, handler_pc,
+                catch_type if catch_type else 'finally', start_pc, end_pc, handler_pc,
             ))
 
         return ExceptionInfo(start_pc, end_pc, handler_pc, catch_type)
@@ -271,10 +278,14 @@ class ExceptionInfo:
         writer.write_u2(self.start_pc)
         writer.write_u2(self.end_pc)
         writer.write_u2(self.handler_pc)
-        writer.write_u2(writer.constant_pool.index(self.catch_type))
+        if self.catch_type is None:
+            writer.write_u2(0)
+        else:
+            writer.write_u2(writer.constant_pool.index(self.catch_type))
 
     def resolve(self, constant_pool):
-        self.catch_type.resolve(constant_pool)
+        if self.catch_type:
+            self.catch_type.resolve(constant_pool)
 
     def __len__(self):
         return 2 + 2 + 2 + 2
@@ -587,7 +598,7 @@ class StackMapFrame:
         stack_map_frame = frameClass.read_info(reader, frame_type)
 
         if dump is not None:
-            reader.debug("    " * dump, stack_map_frame)
+            reader.debug("    " * dump, str(stack_map_frame))
 
         return stack_map_frame
 

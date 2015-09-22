@@ -1,4 +1,5 @@
 from . import opcodes
+from ..java import opcodes as JavaOpcodes
 
 
 class Command:
@@ -42,12 +43,25 @@ class Command:
     def product_count(self):
         return sum(c.product_count for c in self.arguments) + self.operation.product_count
 
+    def is_main_start(self):
+        return (
+            self.operation.opname == 'POP_JUMP_IF_FALSE'
+            and self.arguments[0].operation.opname == 'COMPARE_OP' and self.arguments[0].operation.comparison == '=='
+            and self.arguments[0].arguments[0].operation.opname == 'LOAD_NAME' and self.arguments[0].arguments[0].operation.name == '__name__'
+            and self.arguments[0].arguments[1].operation.opname == 'LOAD_CONST' and self.arguments[0].arguments[1].operation.const == '__main__'
+        )
+
+    def is_main_end(self, main_end):
+        if main_end == self.operation.python_offset:
+            return True
+        elif self.arguments and main_end <= self.arguments[0].operation.python_offset:
+            return True
+        return False
+
     def dump(self, depth=0):
         for op in self.arguments:
             op.dump(depth=depth + 1)
-        print ('%s%s%4s:%4d -%s +%s' % (
-                '{' if self.operation.start_block else
-                    '}' if self.operation.end_block else ' ',
+        print ('%s%4s:%4d -%s +%s' % (
                 '>' if self.operation.is_jump_target else ' ',
                 self.operation.starts_line if self.operation.starts_line is not None else '    ',
                 self.operation.python_offset,
@@ -55,20 +69,523 @@ class Command:
                 self.operation.product_count
             ) + '    ' * depth, self.operation)
 
+    def transpile(self, context):
+        self.operation.transpile(context, self.arguments)
 
-class Frame:
-    """A representation of a stack frame.
-    """
-    def __init__(self, frame_type=None):
-        self.frame_type = frame_type
-        self.depth = 0
-        self.available = 0
+
+class TryExcept:
+    def __init__(self, start, end, start_offset, end_offset, starts_line):
+        self.start = start
+        self.end = end
+
+        self.start_offset = start_offset
+        self.end_offset = end_offset
+
+        self.starts_line = starts_line
+        self.commands = []
+
+        self.handlers = []
+
+        self.else_range = None
+        self.else_commands = []
+
+        self.finally_range = None
+        self.finally_commands = []
 
     def __repr__(self):
-        return u'<Frame %s: %s>' % (id(self), self.frame_type)
+        return '<Try %s-%s | %s%s%s>' % (
+            self.start,
+            self.end,
+            ', '.join(str(handler) for handler in self.handlers),
+            'else: %s-%s' % self.else_range if self.else_range else '',
+            'finally: %s-%s' % self.finally_range if self.else_range else ''
+        )
+
+    @property
+    def consume_count(self):
+        return sum(c.consume_count for c in self.commands)
+
+    @property
+    def product_count(self):
+        return sum(c.product_count for c in self.commands)
+
+    def is_main_start(self):
+        return False
+
+    def is_main_end(self, main_end):
+        return False
+
+    def dump(self, depth=0):
+        print (' %4s:%4d      ' % (
+                self.starts_line if self.starts_line is not None else '    ',
+                self.start_offset,
+            ) + '    ' * depth,
+            'TRY:'
+        )
+
+        for command in self.commands:
+            command.dump(depth=depth + 1)
+
+        for handler in self.handlers:
+            handler.dump(depth=depth)
+
+        # if else_range:
+            # handler.dump(depth=depth + 1)
+
+        # if finally_range:
+            # handler.dump(depth=depth + 1)
+
+        print ('     :%4d      ' % (
+                self.end_offset,
+            ) + '    ' * depth,
+            'END TRY'
+        )
+
+    def extract(self, instructions, blocks):
+        self.operation = instructions[self.start - 1]
+        i = self.end
+        self.commands = []
+        while i > self.start:
+            i, command = extract_command(instructions, blocks, i, self.start)
+            self.commands.append(command)
+
+        self.commands.reverse()
+
+        for handler in self.handlers:
+            handler.extract(instructions, blocks)
+
+        # self.else_commands = []
+        # while i > self.start:
+        #     i, command = extract_command(instructions, blocks, i, self.start)
+        #     self.else_commands.append(command)
+
+        # self.else_commands.reverse()
+
+        # self.finally_commands = []
+        # while i > self.start:
+        #     i, command = extract_command(instructions, blocks, i, self.start)
+        #     self.finally_commands.append(command)
+
+        # self.finally_commands.reverse()
+
+    def transpile(self, context):
+        context.add_opcodes(opcodes.TRY())
+        for command in self.commands:
+            command.transpile(context)
+
+        for handler in self.handlers:
+            # Define the exception handler.
+            # On entry to the exception, the stack will contain
+            # a single value - the exception being thrown.
+            # This exception must be wrapped into an org/python/Object
+            # so it can be used as an argument elsewhere.
+            if len(handler.exceptions) > 1:  # catch multiple - except (A, B) as v:
+                context.add_opcodes(
+                    opcodes.CATCH('org/python/exceptions/%s' % handler.exceptions[0]),
+                )
+                if handler.var_name:
+                    context.add_opcodes(
+                        opcodes.ASTORE_name(context, handler.var_name),
+                        JavaOpcodes.NEW('org/python/Object'),
+                        JavaOpcodes.DUP(),
+                        opcodes.ALOAD_name(context, handler.var_name),
+                        JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
+                        opcodes.ASTORE_name(context, handler.var_name),
+                    )
+
+                handler.transpile(context)
+            elif len(handler.exceptions) == 1:  # catch single - except A as v:
+                context.add_opcodes(
+                    opcodes.CATCH('org/python/exceptions/%s' % handler.exceptions[0]),
+                )
+                if handler.var_name:
+                    context.add_opcodes(
+                        opcodes.ASTORE_name(context, handler.var_name),
+                        JavaOpcodes.NEW('org/python/Object'),
+                        JavaOpcodes.DUP(),
+                        opcodes.ALOAD_name(context, handler.var_name),
+                        JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
+                        opcodes.ASTORE_name(context, handler.var_name),
+                    )
+
+                handler.transpile(context)
+            else:  # The bucket case - except:
+                context.add_opcodes(opcodes.CATCH())
+                handler.transpile(context)
+
+        # # Handle else block
+
+        # # Handle finally block
+
+        context.add_opcodes(opcodes.END_TRY())
 
 
-def extract_command(instructions, i, frame_stack=None):
+class ExceptionHandler:
+    def __init__(self, exceptions, var_name, start, end, start_offset, end_offset, starts_line):
+        self.exceptions = exceptions
+        self.var_name = var_name
+        self.start = start
+        self.end = end
+        self.start_offset = start_offset
+        self.end_offset = end_offset
+        self.starts_line = starts_line
+        self.commands = []
+
+    def __repr__(self):
+        if self.exceptions:
+            if self.var_name:
+                return '%s (%s): %s-%s' % (','.join(self.exceptions), self.var_name, self.start, self.end)
+            else:
+                return '%s: %s-%s' % (','.join(self.exceptions), self.start, self.end)
+        else:
+            return 'Bucket: %s-%s' % (self.start, self.end)
+
+    def dump(self, depth=0):
+        print (' %4s:%4d      ' % (
+                self.starts_line if self.starts_line is not None else '    ',
+                self.start_offset,
+            ) + '    ' * depth,
+            'CATCH %s%s:' % (
+                ', '.join(self.exceptions) if self.exceptions else '',
+                ' as %s' % self.var_name if self.var_name else '',
+            )
+        )
+
+        for command in self.commands:
+            command.dump(depth=depth + 1)
+
+    def extract(self, instructions, blocks):
+        i = self.end
+        self.commands = []
+        while i > self.start:
+            i, command = extract_command(instructions, blocks, i, self.start)
+            self.commands.append(command)
+
+        self.commands.reverse()
+
+    def transpile(self, context):
+        context.next_opcode_starts_line = self.starts_line
+        for command in self.commands:
+            command.transpile(context)
+
+
+class ForLoop:
+    def __init__(self, start, loop, varname, end, start_offset, loop_offset, end_offset, starts_line):
+        self.start = start
+        self.loop = loop
+        self.end = end
+
+        self.varname = varname
+
+        self.start_offset = start_offset
+        self.loop_offset = loop_offset
+        self.end_offset = end_offset
+
+        self.starts_line = starts_line
+
+        self.loop_commands = []
+        self.commands = []
+
+    def __repr__(self):
+        return '<For %s: %s-%s>' % (
+            self.start,
+            self.loop,
+            self.end,
+        )
+
+    @property
+    def consume_count(self):
+        return sum(c.consume_count for c in self.commands)
+
+    @property
+    def product_count(self):
+        return sum(c.product_count for c in self.commands)
+
+    def is_main_start(self):
+        return False
+
+    def is_main_end(self, main_end):
+        return False
+
+    def dump(self, depth=0):
+        print (' %4s:%4d      ' % (
+                self.starts_line if self.starts_line is not None else '    ',
+                self.start_offset,
+            ) + '    ' * depth,
+            'FOR:'
+        )
+
+        for command in self.loop_commands:
+            command.dump(depth=depth + 1)
+
+        print ('     :%4d      ' % (
+                self.loop_offset,
+            ) + '    ' * depth,
+            'LOOP:'
+        )
+
+        for command in self.commands:
+            command.dump(depth=depth + 1)
+
+        print ('     :%4d      ' % (
+                self.end_offset,
+            ) + '    ' * depth,
+            'END FOR'
+        )
+
+    def extract(self, instructions, blocks):
+        # Collect the commands related to setting up the loop variable
+        i = self.end
+        while i > self.loop:
+            i, command = extract_command(instructions, blocks, i, self.loop)
+            self.commands.append(command)
+
+        self.commands.reverse()
+
+        # Collect the commands for the actual loop
+        i = self.loop - 2
+        while i > self.start:
+            i, command = extract_command(instructions, blocks, i, self.start)
+            self.loop_commands.append(command)
+
+        self.loop_commands.reverse()
+
+    def transpile(self, context):
+        context.next_opcode_starts_line = self.starts_line
+        for command in self.loop_commands:
+            command.transpile(context)
+
+        loop = opcodes.START_LOOP()
+
+        context.add_opcodes(
+            loop,
+                opcodes.TRY(),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterator', '__next__', '()Lorg/python/Object;', 0),
+                opcodes.CATCH('org/python/exceptions/StopIteration'),
+                    opcodes.jump(JavaOpcodes.GOTO(0), context, loop, opcodes.Opcode.NEXT),
+                opcodes.END_TRY(),
+                opcodes.ASTORE_name(context, self.varname),
+        )
+
+        for command in self.commands:
+            command.transpile(context)
+
+        context.add_opcodes(opcodes.END_LOOP())
+
+
+class WhileLoop:
+    def __init__(self, start, end, start_offset, end_offset, starts_line):
+        self.start = start
+        self.end = end
+
+        self.start_offset = start_offset
+        self.end_offset = end_offset
+
+        self.starts_line = starts_line
+        self.commands = []
+
+    def __repr__(self):
+        return '<For %s-%s>' % (
+            self.start,
+            self.end,
+        )
+
+    @property
+    def consume_count(self):
+        return sum(c.consume_count for c in self.commands)
+
+    @property
+    def product_count(self):
+        return sum(c.product_count for c in self.commands)
+
+    def is_main_start(self):
+        return False
+
+    def is_main_end(self, main_end):
+        return False
+
+    def dump(self, depth=0):
+        print (' %4s:%4d      ' % (
+                self.starts_line if self.starts_line is not None else '    ',
+                self.start_offset,
+            ) + '    ' * depth,
+            'WHILE:'
+        )
+
+        for command in self.commands:
+            command.dump(depth=depth + 1)
+
+        print ('     :%4d      ' % (
+                self.end_offset,
+            ) + '    ' * depth,
+            'END WHILE'
+        )
+
+    def extract(self, instructions, blocks):
+        self.operation = instructions[self.start]
+        i = self.end
+        self.commands = []
+        while i > self.start:
+            i, command = extract_command(instructions, blocks, i, self.start)
+            self.commands.append(command)
+
+        self.commands.reverse()
+
+    def transpile(self, context):
+        context.next_opcode_starts_line = self.starts_line
+        context.add_opcodes(opcodes.START_LOOP())
+
+        for command in self.commands:
+            command.transpile(context)
+
+        end_loop = opcodes.END_LOOP()
+        context.add_opcodes(end_loop)
+
+        context.jump_targets[self.end_offset] = end_loop
+
+
+def find_blocks(instructions):
+    offset_index = {}
+    # print(">>>>>" * 10)
+    for i, instruction in enumerate(instructions):
+        # print("%4d:%4d %s %s" % (i, instruction.offset, instruction.opname, instruction.argval if instruction.argval else ''))
+        offset_index[instruction.offset] = i
+    # print(">>>>>" * 10)
+
+    blocks = {}
+    i = 0
+    while i < len(instructions):
+        instruction = instructions[i]
+        if instruction.opname == 'SETUP_EXCEPT':
+
+            try_start_index = i + 1
+            try_end_index = offset_index[instruction.argval] - 2
+
+            # Find the end of the entire try block
+            end_jump_index = offset_index[instruction.argval] - 1
+            end_block_offset = instructions[end_jump_index].argval
+            end_block_index = offset_index[end_block_offset] - 1
+
+            # print("START INDEX", try_start_index)
+            # print("START OFFSET", instructions[try_start_index].offset)
+            # print("TRY END INDEX", try_end_index)
+            # print("TRY END OFFSET", instructions[try_end_index].offset)
+            # print("END INDEX", end_block_index)
+            # print("END OFFSET", end_block_offset)
+            block = TryExcept(
+                start=try_start_index,
+                end=try_end_index,
+                start_offset=instructions[try_start_index].offset,
+                end_offset=instructions[try_end_index].offset,
+                starts_line=instruction.starts_line
+            )
+
+            # find all the except blocks
+            i = offset_index[instruction.argval] + 1
+            while i < end_block_index:
+                exceptions = []
+                starts_line = instructions[offset_index[instruction.argval]].starts_line
+                while instructions[i].opname == 'LOAD_NAME':
+                    exceptions.append(instructions[i].argval)
+                    i = i + 1
+                # If there's more than 1 exception named, there will be
+                # a BUILD_TUPLE instruction that needs to be skipped.
+                if len(exceptions) > 1:
+                    i = i + 1
+                i = i + 1
+
+                if instructions[i].opname == 'POP_TOP':
+                    # raw except statement
+                    var_name = None
+
+                    except_start_index = i + 1
+                    except_end_index = end_block_index - 2
+
+                    i = end_block_index + 1
+
+                else:
+                    if instructions[i + 2].opname == 'STORE_NAME':
+                        var_name = instructions[i + 2].argval
+                    else:
+                        var_name = None
+
+                    except_start_index = i + 5
+                    except_end_index = offset_index[instructions[except_start_index - 1].argval] - 3
+
+                    i = offset_index[instructions[except_start_index - 1].argval] + 6
+
+                block.handlers.append(
+                    ExceptionHandler(
+                        exceptions=exceptions,
+                        var_name=var_name,
+                        start=except_start_index,
+                        end=except_end_index,
+                        start_offset=instructions[except_start_index].offset,
+                        end_offset=instructions[except_end_index].offset,
+                        starts_line=starts_line
+                    )
+                )
+
+            blocks[end_block_index] = block
+            # print ("BLOCK @ %s: %s" % (end_block_index, block))
+
+        # elif instruction.opcode == 'SETUP_FINALLY':
+        #     block = ('finally', instruction.argval, )
+
+        elif instruction.opname == 'SETUP_LOOP':
+            i = i + 1
+            start_index = i
+
+            while instructions[i].opname not in ('FOR_ITER', 'POP_JUMP_IF_FALSE'):
+                i = i + 1
+
+            # Find the end of the entire loop block.
+            # Ignore the final instruction to jump back to the start.
+            end_offset = instructions[i].argval
+            end_index = offset_index[end_offset] - 1
+
+            # print("START INDEX", start_index)
+            # print("START OFFSET", instructions[start_index].offset)
+
+            # print("END INDEX", end_index)
+            # print("END OFFSET", end_offset)
+
+            if instructions[i].opname == 'FOR_ITER':
+                loop_offset = instructions[i + 2].offset
+                loop_index = offset_index[loop_offset]
+
+                # print("LOOP INDEX", loop_index)
+                # print("LOOP OFFSET", loop_offset)
+                # print("LOOP VAR", instructions[loop_index - 1].argval)
+
+                block = ForLoop(
+                    start=start_index,
+                    loop=loop_index,
+                    varname=instructions[loop_index - 1].argval,
+                    end=end_index,
+                    start_offset=instructions[start_index].offset,
+                    loop_offset=loop_offset,
+                    end_offset=end_offset,
+                    starts_line=instruction.starts_line
+                )
+            else:
+                block = WhileLoop(
+                    start=start_index,
+                    end=end_index,
+                    start_offset=instructions[start_index].offset,
+                    end_offset=end_offset,
+                    starts_line=instruction.starts_line,
+                )
+
+            blocks[end_index + 1] = block
+
+        i = i + 1
+
+    return blocks
+
+
+def extract_command(instructions, blocks, i, start_index=0):
     """Extract a single command from the end of the instruction list.
 
     See the definition of Command for details on the recursive nature
@@ -76,11 +593,6 @@ def extract_command(instructions, i, frame_stack=None):
     work backwards because each command is essentially working towards
     a final result; each Command can be thought of as a "result".
     """
-    if frame_stack is None:
-        frame_stack = [Frame()]
-    current_frame = frame_stack[-1]
-    current_frame.depth += 1
-
     i = i - 1
     instruction = instructions[i]
     argval = instruction.argval
@@ -96,91 +608,34 @@ def extract_command(instructions, i, frame_stack=None):
 
         argval = argval | extended.argval
 
-    if instruction.arg is None:
-        opcode = OpType(instruction.offset, instruction.starts_line, instruction.is_jump_target)
-    else:
-        opcode = OpType(argval, instruction.offset, instruction.starts_line, instruction.is_jump_target)
+    try:
+        # If this is a known block, defer to the block for
+        # extraction instructions.
+        cmd = blocks[i]
+        cmd.extract(instructions, blocks)
 
-    cmd = Command(opcode)
+        i = cmd.start - 1
 
-    # print('>', instruction.offset, cmd.operation.opname, current_frame)
-
-    ended_blocks = 0
-    # If we find the end of a code block, create a command
-    # that contains everything from the start of the block
-    if opcode.end_block:
-        # print ("END BLOCK", opcode, opcode.end_block)
-        if opcode.end_block == 'finally' and current_frame.frame_type != 'except':
-            opcode.end_block = 'except'
-        elif isinstance(opcode.end_block, bool) and current_frame.frame_type == 'except':
-            opcode.end_block = 'finally'
-
-        # print ("Add %s frame" % opcode.end_block)
-        frame_stack.append(Frame(opcode.end_block))
-        current_frame = frame_stack[-1]
-
-        while ended_blocks == 0:
-            i, arg, ended_blocks = extract_command(instructions, i, frame_stack=frame_stack)
-            cmd.arguments.append(arg)
-
-        # frame_types = [f.frame_type for f in frame_stack[1:]]
-        # print ("END %s BLOCK(s) %s on %s" % (ended_blocks, opcode.start_block, frame_types), repr(current_frame.frame_type))
-
-        ended_blocks -= 1
-        frame_stack.pop()
-        current_frame = frame_stack[-1]
-
-    # If we find the start of a code block, that closes out
-    # a command, so just return.
-    elif opcode.start_block:
-        # Safety check - make sure we're found the
-        # type of block we were expecting
-        # frame_types = [f.frame_type for f in frame_stack[1:]]
-        # print ("START BLOCK %s on %s" % (opcode.start_block, frame_types), repr(current_frame.frame_type))
-        if opcode.start_block == 'except':
-            return i, cmd, 2
+    except KeyError:
+        if instruction.arg is None:
+            opcode = OpType(instruction.offset, instruction.starts_line, instruction.is_jump_target)
         else:
-            return i, cmd, 1
+            opcode = OpType(argval, instruction.offset, instruction.starts_line, instruction.is_jump_target)
 
-    # Otherwise; look for a group of commands that will
-    # bring the stack back to an empty state, indicating
-    # an endpoint in a command chain.
-    else:
+        cmd = Command(opcode)
+
+        # print('>', i, instruction.offset, cmd.operation.opname, cmd.operation.consume_count)
+
         required = cmd.operation.consume_count
-
-        # print("   top level frame", current_frame.frame_type, current_frame.depth)
-        if current_frame.frame_type == 'except':
-            if cmd.operation.opname == 'DUP_TOP' and instruction.is_jump_target:
-                current_frame.available = 3
-                pool_consume = min(current_frame.available, required)
-                current_frame.available -= pool_consume
-                required -= pool_consume
-
-        # print("   %s has %s required inputs (initial)" % (current_frame, required))
-        while required > 0 and ended_blocks == 0:
-            i, arg, ended_blocks = extract_command(instructions, i, frame_stack=frame_stack)
+        while required > 0 and i > start_index:
+            i, arg = extract_command(instructions, blocks, i)
             cmd.arguments.append(arg)
-            # print ('   ', arg.operation.opname, 'produces', arg.operation.product_count)
-            required = required - arg.operation.product_count
+            required = required - arg.product_count + arg.consume_count
 
-            # print("   still requires %s (%s in pool); adjust" % (required, current_frame.available))
-            if required < 0:
-                # print("   Produced more than needed")
-                current_frame.available -= required
+        # print('<', i, instruction.offset, cmd.operation.opname)
 
-            if required > 0 and current_frame.available:
-                # print("   Use stored stash")
-                pool_consume = min(current_frame.available, required)
-                current_frame.available -= pool_consume
-                required -= pool_consume
+        # Since we did everything backwards, reverse to get
+        # arguments back in the right order.
+        cmd.arguments.reverse()
 
-            # print("   %s has %s required inputs (%s in pool)" % (current_frame, required, current_frame.available))
-
-    # print('<', instruction.offset, cmd.operation.opname, current_frame)
-
-    current_frame.depth -= 1
-
-    # Since we did everything backwards, reverse to get
-    # arguments back in the right order.
-    cmd.arguments.reverse()
-    return i, cmd, ended_blocks
+    return i, cmd
