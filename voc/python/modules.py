@@ -123,7 +123,10 @@ class Module(Block):
                 if cmd.is_main_end(main_end):
                     main_end = None
                     try:
-                        main = MainMethod(self, main_commands).transpile()
+                        # The last command in the main block is a jump.
+                        # Not sure why it is required, but we can ignore
+                        # it for transpilation purposes.
+                        main = MainMethod(self, main_commands[:-1]).transpile()
                     except IgnoreBlock:
                         pass
                 else:
@@ -140,7 +143,6 @@ class Module(Block):
                 #  ... <main code>
                 #  <end of block target>
                 if cmd.is_main_start():
-                    # print("Found main block", cmd.operation.target)
                     if main is not None:
                         print("Found duplicate main block... replacing previous main")
 

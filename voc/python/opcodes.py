@@ -331,11 +331,29 @@ class TRY:
     that has no end_op recorded.
 
     """
-    def __init__(self):
+    def __init__(self, else_block=None, finally_block=None):
+        # The first command covered by the try block
         self.start_op = None
+
+        # The last command covered by the try
+        self.try_end_op = None
+
+        # The jump at the end of the try block, after any
+        # else and finally processing
         self.jump_op = None
+
+        # The last command in the try/catch/else sequence
         self.end_op = None
         self.handlers = []
+
+        # The commands for the "else" block
+        self.else_block = else_block
+
+        # The commands for the "finally" block
+        self.finally_block = finally_block
+
+        # A handler for the finally block
+        self.finally_handler = None
 
         # If this TRY can be identified as the start of a new
         # line of source code, track that line.
@@ -365,6 +383,11 @@ class CATCH:
         # line of source code, track that line.
         self.starts_line = None
 
+        # The last command covered by the catch
+        self.catch_end_op = None
+
+        # The jump at the end of the catch block, after any
+        # finally processing
         self.jump_op = None
 
     def __len__(self):
@@ -390,8 +413,30 @@ class CATCH:
         # record the end of the block for framing purposes.
         end_jump = JavaOpcodes.GOTO(0)
         if len(try_catch.handlers) == 0:
+            if try_catch.else_block or try_catch.finally_block:
+                context.next_resolve_list.append((try_catch, 'try_end_op'))
+            else:
+                try_catch.try_end_op = end_jump
+
+            if try_catch.else_block:
+                for command in try_catch.else_block.commands:
+                    command.transpile(context)
+
+            if try_catch.finally_block:
+                for command in try_catch.finally_block.commands:
+                    command.transpile(context)
+
             try_catch.jump_op = end_jump
         else:
+            if try_catch.else_block or try_catch.finally_block:
+                context.next_resolve_list.append((try_catch.handlers[-1], 'catch_end_op'))
+            else:
+                try_catch.handlers[-1].catch_end_op = end_jump
+
+            if try_catch.finally_block:
+                for command in try_catch.finally_block.commands:
+                    command.transpile(context)
+
             try_catch.handlers[-1].jump_op = end_jump
             try_catch.handlers[-1].end_op = context.code[-1]
 
@@ -402,6 +447,78 @@ class CATCH:
         try_catch.handlers.append(self)
 
         # The next opcode is the start of the catch block.
+        context.next_resolve_list.append((self, 'start_op'))
+
+        # This opcode isn't for the final output.
+        return False
+
+
+class FINALLY:
+    def __init__(self):
+        # If this FINALLY can be identified as the start of a new
+        # line of source code, track that line.
+        self.starts_line = None
+
+        # The last command covered by the finally
+        self.end_op = None
+
+    def __len__(self):
+        # The FINALLY needs to be able to pass as an opcode under initial
+        # post processing
+        return 3
+
+    def process(self, context):
+        # Find the most recent exception on the stack that hasn't been
+        # ended. That's the block that the catch applies to.
+        for try_catch in context.try_catches[::-1]:
+            if try_catch.end_op is None:
+                break
+
+        # print("    current try_catch", try_catch)
+        # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
+
+        # If this is the first catch, insert a GOTO operation.
+        # The jump distance will be updated when all the CATCH blocks
+        # have been processed and the try_catch is converted.
+        # If it isn't the first catch, then this catch concludes the
+        # previous one. Add a goto to the end of the block, and
+        # record the end of the block for framing purposes.
+        end_jump = JavaOpcodes.GOTO(0)
+        if len(try_catch.handlers) == 0:
+            if try_catch.else_block or try_catch.finally_block:
+                context.next_resolve_list.append((try_catch, 'try_end_op'))
+            else:
+                try_catch.try_end_op = end_jump
+
+            if try_catch.else_block:
+                for command in try_catch.else_block.commands:
+                    command.transpile(context)
+
+            if try_catch.finally_block:
+                for command in try_catch.finally_block.commands:
+                    command.transpile(context)
+
+            try_catch.jump_op = end_jump
+        else:
+            if try_catch.else_block or try_catch.finally_block:
+                context.next_resolve_list.append((try_catch.handlers[-1], 'catch_end_op'))
+            else:
+                try_catch.handlers[-1].catch_end_op = end_jump
+
+            if try_catch.finally_block:
+                for command in try_catch.finally_block.commands:
+                    command.transpile(context)
+
+            try_catch.handlers[-1].jump_op = end_jump
+            try_catch.handlers[-1].end_op = context.code[-1]
+
+        context.add_opcodes(end_jump)
+        jump(end_jump, context, try_catch, Opcode.NEXT)
+
+        # Add this catch block as a handler
+        try_catch.finally_handler = self
+
+        # The next opcode is the start of the finally block.
         context.next_resolve_list.append((self, 'start_op'))
 
         # This opcode isn't for the final output.
@@ -425,7 +542,12 @@ class END_TRY:
         # print("    current try_catch", try_catch)
         # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
 
-        try_catch.handlers[-1].end_op = context.code[-1]
+        if try_catch.finally_handler:
+            try_catch.finally_handler.end_op = context.code[-1]
+        elif len(try_catch.handlers) > 0:
+            try_catch.handlers[-1].end_op = context.code[-1]
+
+        try_catch.end_op = context.code[-1]
 
         # The next opcode is the end of the try-catch block.
         context.next_resolve_list.append((try_catch, 'next_op'))
@@ -618,8 +740,6 @@ class Opcode:
         return ''
 
     def transpile(self, context, arguments):
-        # print("TRANSPILE %s:%4d %s" % ('%4d' % self.starts_line if self.starts_line else '    ', self.python_offset, self))
-
         # If the Python opcode marks the start of a line of code,
         # transfer that relationship to the first opcode in the
         # generated Java code.
@@ -1001,15 +1121,6 @@ class POP_BLOCK(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
-        # Special handling: If POP_BLOCK is the target of a
-        # jump, you don't want to include the contents of the
-        # block; re-record the start as the next operation.
-        context.next_resolve_list.append((self, 'start_op'))
-
 
 class END_FINALLY(Opcode):
     @property
@@ -1144,7 +1255,6 @@ class STORE_ATTR(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        # FIXME
         arguments[1].operation.transpile(context, arguments[1].arguments)
         context.add_opcodes(JavaOpcodes.LDC(self.name))
         arguments[0].operation.transpile(context, arguments[0].arguments)
@@ -1610,11 +1720,6 @@ class SETUP_EXCEPT(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        # print("convert SETUP_FINALLY", len(arguments))
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
 
 class SETUP_FINALLY(Opcode):
     def __init__(self, delta, python_offset, starts_line, is_jump_target):
@@ -1631,11 +1736,6 @@ class SETUP_FINALLY(Opcode):
     @property
     def product_count(self):
         return 0
-
-    def convert(self, context, arguments):
-        # print("convert SETUP_FINALLY", len(arguments))
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
 
 
 class LOAD_FAST(Opcode):

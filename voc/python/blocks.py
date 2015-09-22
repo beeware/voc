@@ -113,7 +113,7 @@ class Block:
 
         commands.reverse()
 
-        if True:
+        if False:
             print ('=====' * 10)
             print (code)
             print ('-----' * 10)
@@ -239,22 +239,42 @@ class Block:
         exceptions = []
         for try_catch in self.try_catches:
             # print("TRY CATCH START", id(try_catch), try_catch.start_op, try_catch.start_op.java_offset)
-            # print("            END", try_catch.end_op)
+            # print("        TRY END", try_catch.try_end_op, try_catch.try_end_op.java_offset)
+            # print("            END", try_catch.end_op, try_catch.end_op.java_offset)
             for handler in try_catch.handlers:
+                # print("  HANDLER", handler.start_op, handler.end_op, handler.descriptors)
                 if handler.descriptors:
                     for descriptor in handler.descriptors:
                         exceptions.append(JavaExceptionInfo(
                             try_catch.start_op.java_offset,
-                            try_catch.jump_op.java_offset,
+                            try_catch.try_end_op.java_offset,
                             handler.start_op.java_offset,
                             descriptor
                         ))
                 else:
                     exceptions.append(JavaExceptionInfo(
                         try_catch.start_op.java_offset,
-                        try_catch.jump_op.java_offset,
+                        try_catch.try_end_op.java_offset,
                         handler.start_op.java_offset,
                         'org/python/exceptions/BaseException'
+                    ))
+
+            # Add definitions for the finally block
+            if try_catch.finally_handler:
+                # print("  FINALLY", try_catch.finally_handler.start_op.java_offset, try_catch.finally_handler.end_op.java_offset)
+                exceptions.append(JavaExceptionInfo(
+                    try_catch.start_op.java_offset,
+                    try_catch.try_end_op.java_offset,
+                    try_catch.finally_handler.start_op.java_offset,
+                    None
+                ))
+                for handler in try_catch.handlers:
+                    # print("   h", handler.descriptors)
+                    exceptions.append(JavaExceptionInfo(
+                        handler.start_op.java_offset,
+                        handler.catch_end_op.java_offset,
+                        try_catch.finally_handler.start_op.java_offset,
+                        None
                     ))
 
         # Update any jump instructions

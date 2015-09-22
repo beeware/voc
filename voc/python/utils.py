@@ -84,22 +84,26 @@ class TryExcept:
         self.starts_line = starts_line
         self.commands = []
 
-        self.handlers = []
+        self.exceptions = []
 
-        self.else_range = None
-        self.else_commands = []
-
-        self.finally_range = None
-        self.finally_commands = []
+        self.else_block = None
+        self.finally_block = None
 
     def __repr__(self):
         return '<Try %s-%s | %s%s%s>' % (
             self.start,
             self.end,
-            ', '.join(str(handler) for handler in self.handlers),
-            'else: %s-%s' % self.else_range if self.else_range else '',
-            'finally: %s-%s' % self.finally_range if self.else_range else ''
+            ', '.join(str(handler) for handler in self.exceptions),
+            ' %s' % self.else_block if self.else_block else '',
+            ' %s' % self.finally_block if self.finally_block else ''
         )
+
+    @property
+    def resume_index(self):
+        if self.finally_block and self.exceptions:
+            return self.start - 2
+        else:
+            return self.start - 1
 
     @property
     def consume_count(self):
@@ -126,14 +130,14 @@ class TryExcept:
         for command in self.commands:
             command.dump(depth=depth + 1)
 
-        for handler in self.handlers:
+        for handler in self.exceptions:
             handler.dump(depth=depth)
 
-        # if else_range:
-            # handler.dump(depth=depth + 1)
+        if self.else_block:
+            self.else_block.dump(depth=depth)
 
-        # if finally_range:
-            # handler.dump(depth=depth + 1)
+        if self.finally_block:
+            self.finally_block.dump(depth=depth)
 
         print ('     :%4d      ' % (
                 self.end_offset,
@@ -151,29 +155,24 @@ class TryExcept:
 
         self.commands.reverse()
 
-        for handler in self.handlers:
+        for handler in self.exceptions:
             handler.extract(instructions, blocks)
 
-        # self.else_commands = []
-        # while i > self.start:
-        #     i, command = extract_command(instructions, blocks, i, self.start)
-        #     self.else_commands.append(command)
+        if self.else_block:
+            self.else_block.extract(instructions, blocks)
 
-        # self.else_commands.reverse()
-
-        # self.finally_commands = []
-        # while i > self.start:
-        #     i, command = extract_command(instructions, blocks, i, self.start)
-        #     self.finally_commands.append(command)
-
-        # self.finally_commands.reverse()
+        if self.finally_block:
+            self.finally_block.extract(instructions, blocks)
 
     def transpile(self, context):
-        context.add_opcodes(opcodes.TRY())
+        context.add_opcodes(opcodes.TRY(
+                self.else_block,
+                self.finally_block
+            ))
         for command in self.commands:
             command.transpile(context)
 
-        for handler in self.handlers:
+        for handler in self.exceptions:
             # Define the exception handler.
             # On entry to the exception, the stack will contain
             # a single value - the exception being thrown.
@@ -227,21 +226,34 @@ class TryExcept:
                 )
                 handler.transpile(context)
 
-        # # Handle else block
+        if self.finally_block:
+            context.add_opcodes(
+                opcodes.FINALLY(),
+                opcodes.ASTORE_name(context, '##exception-%d##' % id(self))
+            )
 
-        # # Handle finally block
+            for command in self.finally_block.commands:
+                command.transpile(context)
+
+            context.add_opcodes(
+                opcodes.ALOAD_name(context, '##exception-%d##' % id(self)),
+                JavaOpcodes.ATHROW(),
+            )
 
         context.add_opcodes(opcodes.END_TRY())
 
 
-class ExceptionHandler:
+class ExceptionBlock:
     def __init__(self, exceptions, var_name, start, end, start_offset, end_offset, starts_line):
         self.exceptions = exceptions
         self.var_name = var_name
+
         self.start = start
         self.end = end
+
         self.start_offset = start_offset
         self.end_offset = end_offset
+
         self.starts_line = starts_line
         self.commands = []
 
@@ -283,6 +295,86 @@ class ExceptionHandler:
             command.transpile(context)
 
 
+class FinallyBlock:
+    def __init__(self, start, end, start_offset, end_offset, starts_line):
+        self.start = start
+        self.end = end
+
+        self.start_offset = start_offset
+        self.end_offset = end_offset
+
+        self.starts_line = starts_line
+        self.commands = []
+
+    def __repr__(self):
+        return 'Finally: %s-%s' % (self.start, self.end)
+
+    def dump(self, depth=0):
+        print (' %4s:%4d      ' % (
+                self.starts_line if self.starts_line is not None else '    ',
+                self.start_offset,
+            ) + '    ' * depth,
+            'FINALLY:'
+        )
+
+        for command in self.commands:
+            command.dump(depth=depth + 1)
+
+    def extract(self, instructions, blocks):
+        i = self.end
+        self.commands = []
+        while i > self.start:
+            i, command = extract_command(instructions, blocks, i, self.start)
+            self.commands.append(command)
+
+        self.commands.reverse()
+
+    def transpile(self, context):
+        context.next_opcode_starts_line = self.starts_line
+        for command in self.commands:
+            command.transpile(context)
+
+
+class ElseBlock:
+    def __init__(self, start, end, start_offset, end_offset, starts_line):
+        self.start = start
+        self.end = end
+
+        self.start_offset = start_offset
+        self.end_offset = end_offset
+
+        self.starts_line = starts_line
+        self.commands = []
+
+    def __repr__(self):
+        return 'Else: %s-%s' % (self.start, self.end)
+
+    def dump(self, depth=0):
+        print (' %4s:%4d      ' % (
+                self.starts_line if self.starts_line is not None else '    ',
+                self.start_offset,
+            ) + '    ' * depth,
+            'ELSE:'
+        )
+
+        for command in self.commands:
+            command.dump(depth=depth + 1)
+
+    def extract(self, instructions, blocks):
+        i = self.end
+        self.commands = []
+        while i > self.start:
+            i, command = extract_command(instructions, blocks, i, self.start, literal=(i == self.end))
+            self.commands.append(command)
+
+        self.commands.reverse()
+
+    def transpile(self, context):
+        context.next_opcode_starts_line = self.starts_line
+        for command in self.commands:
+            command.transpile(context)
+
+
 class ForLoop:
     def __init__(self, start, loop, varname, end, start_offset, loop_offset, end_offset, starts_line):
         self.start = start
@@ -314,6 +406,10 @@ class ForLoop:
     @property
     def product_count(self):
         return sum(c.product_count for c in self.commands)
+
+    @property
+    def resume_index(self):
+        return self.start - 1
 
     def is_main_start(self):
         return False
@@ -413,6 +509,10 @@ class WhileLoop:
     def product_count(self):
         return sum(c.product_count for c in self.commands)
 
+    @property
+    def resume_index(self):
+        return self.start - 1
+
     def is_main_start(self):
         return False
 
@@ -459,113 +559,179 @@ class WhileLoop:
         context.jump_targets[self.end_offset] = end_loop
 
 
+def find_try_except(offset_index, instructions, i):
+    instruction = instructions[i]
+    try_start_index = i + 1
+    try_end_index = offset_index[instruction.argval] - 2
+
+    # Find the end of the entire try block
+    end_jump_index = offset_index[instruction.argval] - 1
+    end_block_offset = instructions[end_jump_index].argval
+    end_block_index = offset_index[end_block_offset]
+
+    while instructions[end_block_index].opname != 'END_FINALLY':
+        end_block_index -= 1
+
+    # print("START INDEX", try_start_index)
+    # print("START OFFSET", instructions[try_start_index].offset)
+    # print("TRY END INDEX", try_end_index)
+    # print("TRY END OFFSET", instructions[try_end_index].offset)
+    # print("END INDEX", end_block_index)
+    # print("END OFFSET", instructions[end_block_index].offset)
+
+    block = TryExcept(
+        start=try_start_index,
+        end=try_end_index,
+        start_offset=instructions[try_start_index].offset,
+        end_offset=instructions[try_end_index].offset,
+        starts_line=instruction.starts_line
+    )
+
+    # find all the except blocks
+    i = offset_index[instruction.argval] + 1
+    while i < end_block_index:
+        exceptions = []
+        starts_line = instructions[offset_index[instruction.argval]].starts_line
+        while instructions[i].opname == 'LOAD_NAME':
+            exceptions.append(instructions[i].argval)
+            i = i + 1
+
+        # If there's more than 1 exception named, there will be
+        # a BUILD_TUPLE instruction that needs to be skipped.
+        if len(exceptions) > 1:
+            i = i + 1
+
+        if instructions[i].opname == 'COMPARE_OP':
+            # An exception has been explicitly named
+            i = i + 3
+
+            # print ("CHECK", i, instructions[i].opname)
+            if instructions[i].opname == 'POP_TOP':
+                # Exception is specified, but not a name.
+                var_name = None
+
+                except_start_index = i + 2
+                # print("EXCEPT START", except_start_index)
+
+            elif instructions[i].opname == 'STORE_NAME':
+                var_name = instructions[i].argval
+
+                except_start_index = i + 3
+                # print("EXCEPT START e", except_start_index)
+
+        else:
+            i = i + 3
+
+            # Exception is specified, but not a name.
+            var_name = None
+
+            except_start_index = i
+            # print("EXCEPT START anon", except_start_index)
+
+        while not (instructions[i].opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE') and instructions[i].argval >= end_block_offset):
+            i = i + 1
+
+        if var_name:
+            except_end_index = i - 7
+        else:
+            except_end_index = i - 1
+
+        jump_offset = instructions[i].argval
+
+        # print("EXCEPT END", except_end_index)
+        # Step forward to the start of the next except block
+        # (or the end of the try/catch)
+        i = i + 2
+
+        block.exceptions.append(
+            ExceptionBlock(
+                exceptions=exceptions,
+                var_name=var_name,
+                start=except_start_index,
+                end=except_end_index,
+                start_offset=instructions[except_start_index].offset,
+                end_offset=instructions[except_end_index].offset,
+                starts_line=starts_line
+            )
+        )
+
+    if jump_offset > end_block_offset:
+        start_else_index = end_block_index + 1
+
+        end_else_index = offset_index[jump_offset]
+        if instructions[end_else_index-1].opname == 'JUMP_FORWARD':
+            end_else_index -= 1
+
+        block.else_block = ElseBlock(
+            start=start_else_index,
+            end=end_else_index,
+            start_offset=instructions[start_else_index].offset,
+            end_offset=jump_offset,
+            starts_line=instructions[end_block_index].starts_line
+        )
+
+        i = end_else_index
+
+    return i, block
+
+
 def find_blocks(instructions):
     offset_index = {}
-    print(">>>>>" * 10)
+    # print(">>>>>" * 10)
     for i, instruction in enumerate(instructions):
-        print("%4d:%4d %s %s" % (i, instruction.offset, instruction.opname, instruction.argval if instruction.argval else ''))
+        # print("%4d:%4d %s %s" % (i, instruction.offset, instruction.opname, instruction.argval if instruction.argval else ''))
         offset_index[instruction.offset] = i
-    print(">>>>>" * 10)
+    # print(">>>>>" * 10)
 
     blocks = {}
     i = 0
     while i < len(instructions):
         instruction = instructions[i]
         if instruction.opname == 'SETUP_EXCEPT':
+            i, block = find_try_except(offset_index, instructions, i)
+            blocks[i - 1] = block
 
-            try_start_index = i + 1
-            try_end_index = offset_index[instruction.argval] - 2
+        elif instruction.opname == 'SETUP_FINALLY':
+            start_index = offset_index[instruction.argval]
 
-            # Find the end of the entire try block
-            end_jump_index = offset_index[instruction.argval] - 1
-            end_block_offset = instructions[end_jump_index].argval
-            end_block_index = offset_index[end_block_offset] - 1
+            # print("FINALLY START INDEX", start_index)
+            # print("FINALLY START OFFSET", instructions[start_index].offset)
 
-            # print("START INDEX", try_start_index)
-            # print("START OFFSET", instructions[try_start_index].offset)
-            # print("TRY END INDEX", try_end_index)
-            # print("TRY END OFFSET", instructions[try_end_index].offset)
-            # print("END INDEX", end_block_index)
-            # print("END OFFSET", end_block_offset)
+            i = i + 1
+            if instructions[i].opname == 'SETUP_EXCEPT':
+                i, block = find_try_except(offset_index, instructions, i)
+            else:
+                # print("START INDEX", i)
+                # print("START OFFSET", instructions[i].offset)
 
-            block = TryExcept(
-                start=try_start_index,
-                end=try_end_index,
-                start_offset=instructions[try_start_index].offset,
-                end_offset=instructions[try_end_index].offset,
+                # print("END INDEX", start_index - 2)
+                # print("END OFFSET", instructions[start_index - 2].offset)
+
+                block = TryExcept(
+                    start=i,
+                    end=start_index - 2,
+                    start_offset=instructions[i].offset,
+                    end_offset=instructions[start_index - 2].offset,
+                    starts_line=instruction.starts_line
+                )
+
+            i = i + 1
+            while instructions[i].opname != 'END_FINALLY':
+                i = i + 1
+
+            # print("FINALLY END INDEX", i)
+            # print("FINALLY END OFFSET", instructions[i].offset)
+
+            block.finally_block = FinallyBlock(
+                start=start_index,
+                end=i,
+                start_offset=instructions[start_index].offset,
+                end_offset=instructions[i].offset,
                 starts_line=instruction.starts_line
             )
 
-            # find all the except blocks
-            i = offset_index[instruction.argval] + 1
-            while i < end_block_index:
-                exceptions = []
-                starts_line = instructions[offset_index[instruction.argval]].starts_line
-                while instructions[i].opname == 'LOAD_NAME':
-                    exceptions.append(instructions[i].argval)
-                    i = i + 1
-                # If there's more than 1 exception named, there will be
-                # a BUILD_TUPLE instruction that needs to be skipped.
-                if len(exceptions) > 1:
-                    i = i + 1
-
-                if instructions[i].opname == 'COMPARE_OP':
-                    # An exception has been explicitly named
-                    i = i + 3
-
-                    # print ("CHECK", i, instructions[i].opname)
-                    if instructions[i].opname == 'POP_TOP':
-                        # Exception is specified, but not a name.
-                        var_name = None
-
-                        except_start_index = i + 2
-                        # print("EXCEPT START", except_start_index)
-
-                    elif instructions[i].opname == 'STORE_NAME':
-                        var_name = instructions[i].argval
-
-                        except_start_index = i + 3
-                        # print("EXCEPT START e", except_start_index)
-
-                else:
-                    i = i + 3
-
-                    # Exception is specified, but not a name.
-                    var_name = None
-
-                    except_start_index = i
-                    # print("EXCEPT START anon", except_start_index)
-
-                while instructions[i].opname != 'COMPARE_OP' and instructions[i].argval != end_block_offset:
-                    i = i + 1
-
-                if var_name:
-                    except_end_index = i - 7
-                else:
-                    except_end_index = i - 1
-
-                # print("EXCEPT END", except_end_index)
-                # Step forward to the start of the next except block
-                # (or the end of the try/catch)
-                i = i + 2
-
-                block.handlers.append(
-                    ExceptionHandler(
-                        exceptions=exceptions,
-                        var_name=var_name,
-                        start=except_start_index,
-                        end=except_end_index,
-                        start_offset=instructions[except_start_index].offset,
-                        end_offset=instructions[except_end_index].offset,
-                        starts_line=starts_line
-                    )
-                )
-
-            blocks[end_block_index] = block
-            # print ("BLOCK @ %s: %s" % (end_block_index, block))
-
-        # elif instruction.opcode == 'SETUP_FINALLY':
-        #     block = ('finally', instruction.argval, )
+            blocks[i] = block
+            i = i + 1
 
         elif instruction.opname == 'SETUP_LOOP':
             i = i + 1
@@ -613,13 +779,14 @@ def find_blocks(instructions):
                 )
 
             blocks[end_index + 1] = block
-
-        i = i + 1
+            i = i + 1
+        else:
+            i = i + 1
 
     return blocks
 
 
-def extract_command(instructions, blocks, i, start_index=0):
+def extract_command(instructions, blocks, i, start_index=0, literal=False):
     """Extract a single command from the end of the instruction list.
 
     See the definition of Command for details on the recursive nature
@@ -643,12 +810,15 @@ def extract_command(instructions, blocks, i, start_index=0):
         argval = argval | extended.argval
 
     try:
+        if literal:
+            raise KeyError()
         # If this is a known block, defer to the block for
         # extraction instructions.
         cmd = blocks[i]
+
         cmd.extract(instructions, blocks)
 
-        i = cmd.start - 1
+        i = cmd.resume_index
 
     except KeyError:
         if instruction.arg is None:
