@@ -1,5 +1,6 @@
-from .constants import Utf8, Classref
+from .constants import Utf8, Classref, NameAndType
 from .opcodes import Opcode
+from .signatures import method_descriptor
 
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 
@@ -1209,126 +1210,371 @@ class UninitializedVariableInfo(VerificationTypeInfo):
 # 4.7.6. The InnerClasses Attribute
 # ------------------------------------------------------------------------
 
-# The InnerClasses attribute is a variable-length attribute in the attributes table of a ClassFile structure (§4.1). If the constant pool of a class or interface C contains a CONSTANT_Class_info entry which represents a class or interface that is not a member of a package, then C's ClassFile structure must have exactly one InnerClasses attribute in its attributes table.
+# The InnerClasses attribute is a variable-length attribute in the attributes
+# table of a ClassFile structure (§4.1). If the constant pool of a class or
+# interface C contains a CONSTANT_Class_info entry which represents a class or
+# interface that is not a member of a package, then C's ClassFile structure must
+# have exactly one InnerClasses attribute in its attributes table.
 
-# The InnerClasses attribute has the following format:
+class InnerClass:
+    # Table 4.8. Nested class access and property flags
 
-# InnerClasses_attribute {
-#     u2 attribute_name_index;
-#     u4 attribute_length;
-#     u2 number_of_classes;
-#     {   u2 inner_class_info_index;
-#         u2 outer_class_info_index;
-#         u2 inner_name_index;
-#         u2 inner_class_access_flags;
-#     } classes[number_of_classes];
-# }
-# The items of the InnerClasses_attribute structure are as follows:
+    ACC_PUBLIC = 0x0001  # Marked or implicitly public in source.
+    ACC_PRIVATE = 0x0002  # Marked private in source.
+    ACC_PROTECTED = 0x0004  # Marked protected in source.
+    ACC_STATIC = 0x0008  # Marked or implicitly static in source.
+    ACC_FINAL = 0x0010  # Marked final in source.
+    ACC_INTERFACE = 0x0200  # Was an interface in source.
+    ACC_ABSTRACT = 0x0400  # Marked or implicitly abstract in source.
+    ACC_SYNTHETIC = 0x1000  # Declared synthetic; not present in the source code.
+    ACC_ANNOTATION = 0x2000  # Declared as an annotation type.
+    ACC_ENUM = 0x4000  # Declared as an enum type.
 
-# attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "InnerClasses".
+    def __init__(self, inner_class_name, outer_class_name, inner_name,
+            public=True, private=False, protected=False, static=False,
+            final=False, interface=False, abstract=False, synthetic=False,
+            annotation=False, enum=False):
 
-# attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+        self.public = public
+        self.private = private
+        self.protected = protected
+        self.static = static
+        self.final = final
+        self.interface = interface
+        self.abstract = abstract
+        self.synthetic = synthetic
+        self.annotation = annotation
+        self.enum = enum
+        # Each classes array entry contains the following four items:
 
-# number_of_classes
-# The value of the number_of_classes item indicates the number of entries in the classes array.
+        # The value of the inner_class_info_index item must be a valid index
+        # into the constant_pool table. The constant_pool entry at that index
+        # must be a CONSTANT_Class_info structure (§4.4.1) representing C. The
+        # remaining items in the classes array entry give information about C.
+        self.inner_class_name = inner_class_name
+        self.inner_class = Classref(inner_class_name)
 
-# classes[]
-# Every CONSTANT_Class_info entry in the constant_pool table which represents a class or interface C that is not a package member must have exactly one corresponding entry in the classes array.
+        # If C is not a member of a class or an interface (that is, if C is a
+        # top-level class or interface (JLS §7.6) or a local class (JLS §14.3)
+        # or an anonymous class (JLS §15.9.5)), the value of the
+        # outer_class_info_index item must be zero.
+        #
+        # Otherwise, the value of the outer_class_info_index item must be a
+        # valid index into the constant_pool table, and the entry at that index
+        # must be a CONSTANT_Class_info (§4.4.1) structure representing the
+        # class or interface of which C is a member.
+        if outer_class_name is None:
+            self.outer_class_name = None
+            self.outer_class = None
+        else:
+            self.outer_class_name = outer_class_name
+            self.outer_class = Classref(outer_class_name)
 
-# If a class has members that are classes or interfaces, its constant_pool table (and hence its InnerClasses attribute) must refer to each such member, even if that member is not otherwise mentioned by the class. These rules imply that a nested class or interface member will have InnerClasses information for each enclosing class and for each immediate member.
+        # If C is anonymous (JLS §15.9.5), the value of the inner_name_index
+        # item must be zero.
+        #
+        # Otherwise, the value of the inner_name_index item must be a valid
+        # index into the constant_pool table, and the entry at that index must
+        # be a CONSTANT_Utf8_info (§4.4.7) structure that represents the
+        # original simple name of C, as given in the source code from which this
+        # class file was compiled.
+        if inner_name:
+            self.inner_name = Utf8(inner_name)
+        else:
+            self.inner_name = None
 
-# Each classes array entry contains the following four items:
+    @property
+    def inner_class_access_flags(self):
+        # The value of the inner_class_access_flags item is a mask of flags used
+        # to denote access permissions to and properties of class or interface C
+        # as declared in the source code from which this class file was
+        # compiled. It is used by a compiler to recover the original information
+        # when source code is not available. The flags are shown in Table 4.8.
+        #
+        # All bits of the inner_class_access_flags item not assigned in Table
+        # 4.8 are reserved for future use. They should be set to zero in
+        # generated class files and should be ignored by Java Virtual Machine
+        # implementations.
+        return (
+            (self.ACC_PUBLIC if self.public else 0) |
+            (self.ACC_PRIVATE if self.private else 0) |
+            (self.ACC_PROTECTED if self.protected else 0) |
+            (self.ACC_STATIC if self.static else 0) |
+            (self.ACC_FINAL if self.final else 0) |
+            (self.ACC_INTERFACE if self.interface else 0) |
+            (self.ACC_ABSTRACT if self.abstract else 0) |
+            (self.ACC_SYNTHETIC if self.synthetic else 0) |
+            (self.ACC_ANNOTATION if self.annotation else 0) |
+            (self.ACC_ENUM if self.enum else 0)
+        )
 
-# inner_class_info_index
-# The value of the inner_class_info_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Class_info structure (§4.4.1) representing C. The remaining items in the classes array entry give information about C.
 
-# outer_class_info_index
-# If C is not a member of a class or an interface (that is, if C is a top-level class or interface (JLS §7.6) or a local class (JLS §14.3) or an anonymous class (JLS §15.9.5)), the value of the outer_class_info_index item must be zero.
+class InnerClasses(Attribute):
+    # The InnerClasses attribute has the following format:
 
-# Otherwise, the value of the outer_class_info_index item must be a valid index into the constant_pool table, and the entry at that index must be a CONSTANT_Class_info (§4.4.1) structure representing the class or interface of which C is a member.
+    # u2 attribute_name_index;
+    # u4 attribute_length;
+    # u2 number_of_classes;
+    # {
+    #     u2 inner_class_info_index;
+    #     u2 outer_class_info_index;
+    #     u2 inner_name_index;
+    #     u2 inner_class_access_flags;
+    # } classes[number_of_classes];
 
-# inner_name_index
-# If C is anonymous (JLS §15.9.5), the value of the inner_name_index item must be zero.
+    def __init__(self, classes=None):
+        super(InnerClasses, self).__init__()
 
-# Otherwise, the value of the inner_name_index item must be a valid index into the constant_pool table, and the entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure that represents the original simple name of C, as given in the source code from which this class file was compiled.
+        # The items of the InnerClasses_attribute structure are as follows:
 
-# inner_class_access_flags
-# The value of the inner_class_access_flags item is a mask of flags used to denote access permissions to and properties of class or interface C as declared in the source code from which this class file was compiled. It is used by a compiler to recover the original information when source code is not available. The flags are shown in Table 4.8.
+        # Every CONSTANT_Class_info entry in the constant_pool table which
+        # represents a class or interface C that is not a package member must
+        # have exactly one corresponding entry in the classes array.
 
-# Table 4.8. Nested class access and property flags
+        # If a class has members that are classes or interfaces, its
+        # constant_pool table (and hence its InnerClasses attribute) must refer
+        # to each such member, even if that member is not otherwise mentioned by
+        # the class. These rules imply that a nested class or interface member
+        # will have InnerClasses information for each enclosing class and for
+        # each immediate member.
+        if classes:
+            self.classes = classes
+        else:
+            self.classes = []
 
-# Flag Name   Value   Interpretation
-# ACC_PUBLIC  0x0001  Marked or implicitly public in source.
-# ACC_PRIVATE 0x0002  Marked private in source.
-# ACC_PROTECTED   0x0004  Marked protected in source.
-# ACC_STATIC  0x0008  Marked or implicitly static in source.
-# ACC_FINAL   0x0010  Marked final in source.
-# ACC_INTERFACE   0x0200  Was an interface in source.
-# ACC_ABSTRACT    0x0400  Marked or implicitly abstract in source.
-# ACC_SYNTHETIC   0x1000  Declared synthetic; not present in the source code.
-# ACC_ANNOTATION  0x2000  Declared as an annotation type.
-# ACC_ENUM    0x4000  Declared as an enum type.
-# All bits of the inner_class_access_flags item not assigned in Table 4.8 are reserved for future use. They should be set to zero in generated class files and should be ignored by Java Virtual Machine implementations.
+        # If a class file has a version number that is greater than or equal to
+        # 51.0, and has an InnerClasses attribute in its attributes table, then
+        # for all entries in the classes array of the InnerClasses attribute,
+        # the value of the outer_class_info_index item must be zero if the value
+        # of the inner_name_index item is zero.
 
-# If a class file has a version number that is greater than or equal to 51.0, and has an InnerClasses attribute in its attributes table, then for all entries in the classes array of the InnerClasses attribute, the value of the outer_class_info_index item must be zero if the value of the inner_name_index item is zero.
+        # Oracle's Java Virtual Machine implementation does not check the
+        # consistency of an InnerClasses attribute against a class file
+        # representing a class or interface referenced by the attribute.
 
-# Oracle's Java Virtual Machine implementation does not check the consistency of an InnerClasses attribute against a class file representing a class or interface referenced by the attribute.
+    def __repr__(self):
+        return '<EnclosingMethod %s.%s>' % (self.klass, self.method)
+
+    def __len__(self):
+        return 2 + (2 + 2 + 2 + 2) * self.number_of_classes
+
+    @property
+    def number_of_classes(self):
+        # The value of the number_of_classes item indicates the number of
+        # entries in the classes array.
+        return len(self.classes)
+
+    @staticmethod
+    def read_info(reader, dump=None):
+        n_classes = reader.read_u2()
+        classes = []
+
+        if dump is not None:
+            reader.debug("    " * (dump + 1), 'Inner Classes: (%s)' % n_classes)
+
+        for i in range(0, n_classes):
+            c1 = reader.read_u2()
+            inner_class = reader.constant_pool[c1].name.string
+            if dump is not None:
+                reader.debug("    " * (dump + 2), 'Inner Class: %s' % inner_class)
+
+            c2 = reader.read_u2()
+            if c2 == 0:
+                outer_class = None
+                if dump is not None:
+                    reader.debug("    " * (dump + 3), 'Outer Class: (Anonymous)')
+            else:
+                outer_class = reader.constant_pool[c2].name.string
+                if dump is not None:
+                    reader.debug("    " * (dump + 3), 'Outer Class: %s' % outer_class)
+
+            c3 = reader.read_u2()
+            if c3 == 0:
+                inner_name = None
+            else:
+                inner_name = reader.constant_pool[c3].string
+                if dump is not None:
+                    reader.debug("    " * (dump + 3), 'Inner Name: %s' % inner_name)
+
+            flags = reader.read_u2()
+
+            if dump is not None:
+                access_description = ', '.join(f for f in [
+                        flag if flags & mask else None
+                        for flag, mask in [
+                            ('public', InnerClass.ACC_PUBLIC),
+                            ('private', InnerClass.ACC_PRIVATE),
+                            ('protected', InnerClass.ACC_PROTECTED),
+                            ('static', InnerClass.ACC_STATIC),
+                            ('final', InnerClass.ACC_FINAL),
+                            ('interface', InnerClass.ACC_INTERFACE),
+                            ('abstract', InnerClass.ACC_ABSTRACT),
+                            ('synthetic', InnerClass.ACC_SYNTHETIC),
+                            ('annotation', InnerClass.ACC_ANNOTATION),
+                            ('enum', InnerClass.ACC_ENUM),
+                        ]
+                    ] if f)
+                reader.debug("    " * (dump + 3), 'Flags: 0x%04x%s' % (flags, ' (%s)') % (access_description if access_description else ''))
+
+            classes.append(
+                InnerClass(
+                    inner_class,
+                    outer_class,
+                    inner_name,
+                    public=bool(flags & InnerClass.ACC_PUBLIC),
+                    private=bool(flags & InnerClass.ACC_PRIVATE),
+                    protected=bool(flags & InnerClass.ACC_PROTECTED),
+                    static=bool(flags & InnerClass.ACC_STATIC),
+                    final=bool(flags & InnerClass.ACC_FINAL),
+                    abstract=bool(flags & InnerClass.ACC_ABSTRACT),
+                    synthetic=bool(flags & InnerClass.ACC_SYNTHETIC),
+                    annotation=bool(flags & InnerClass.ACC_ANNOTATION),
+                    enum=bool(flags & InnerClass.ACC_ENUM),
+                )
+            )
+
+        return InnerClasses(classes)
+
+    def write_info(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.inner_class))
+
+        if self.outer_class:
+            writer.write_u2(writer.constant_pool.index(self.outer_class))
+        else:
+            writer.write_u2(0)
+
+        if self.inner_name:
+            writer.write_u2(writer.constant_pool.index(self.inner_name))
+        else:
+            writer.write_u2(0)
+
+    def resolve_info(self, constant_pool):
+        self.inner_class.resolve(constant_pool)
+        if self.outer_class:
+            self.outer_class.resolve(constant_pool)
+        if self.inner_name:
+            self.inner_name.resolve(constant_pool)
 
 # ------------------------------------------------------------------------
 # 4.7.7. The EnclosingMethod Attribute
 # ------------------------------------------------------------------------
 
-# The EnclosingMethod attribute is an optional fixed-length attribute in the attributes table of a ClassFile structure (§4.1). A class must have an EnclosingMethod attribute if and only if it is a local class or an anonymous class. A class may have no more than one EnclosingMethod attribute.
+# The EnclosingMethod attribute is an optional fixed-length attribute in the
+# attributes table of a ClassFile structure (§4.1). A class must have an
+# EnclosingMethod attribute if and only if it is a local class or an anonymous
+# class. A class may have no more than one EnclosingMethod attribute.
 
-# The EnclosingMethod attribute has the following format:
 
-# EnclosingMethod_attribute {
-#     u2 attribute_name_index;
-#     u4 attribute_length;
-#     u2 class_index;
-#     u2 method_index;
-# }
-# The items of the EnclosingMethod_attribute structure are as follows:
+class EnclosingMethod(Attribute):
+    # The EnclosingMethod attribute has the following format:
 
-# attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "EnclosingMethod".
+    # u2 attribute_name_index;
+    # u4 attribute_length;
+    # u2 class_index;
+    # u2 method_index;
 
-# attribute_length
-# The value of the attribute_length item is four.
+    def __init__(self, class_name, method_name, descriptor):
+        super(EnclosingMethod, self).__init__()
 
-# class_index
-# The value of the class_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Class_info (§4.4.1) structure representing the innermost class that encloses the declaration of the current class.
+        # The items of the EnclosingMethod_attribute structure are as follows:
 
-# method_index
-# If the current class is not immediately enclosed by a method or constructor, then the value of the method_index item must be zero.
+        # The value of the class_index item must be a valid index into the
+        # constant_pool table. The constant_pool entry at that index must be a
+        # CONSTANT_Class_info (§4.4.1) structure representing the innermost
+        # class that encloses the declaration of the current class.
+        self.class_name = class_name
+        self.klass = Classref(class_name)
 
-# Otherwise, the value of the method_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_NameAndType_info structure (§4.4.6) representing the name and type of a method in the class referenced by the class_index attribute above.
+        # If the current class is not immediately enclosed by a method or
+        # constructor, then the value of the method_index item must be zero.
+        #
+        # Otherwise, the value of the method_index item must be a valid index
+        # into the constant_pool table. The constant_pool entry at that index
+        # must be a CONSTANT_NameAndType_info structure (§4.4.6) representing
+        # the name and type of a method in the class referenced by the
+        # class_index attribute above.
+        #
+        # It is the responsibility of a Java compiler to ensure that the method
+        # identified via the method_index is indeed the closest lexically
+        # enclosing method of the class that contains this EnclosingMethod
+        # attribute.
+        self.method_name = method_name
+        self.descriptor = method_descriptor(descriptor)
 
-# It is the responsibility of a Java compiler to ensure that the method identified via the method_index is indeed the closest lexically enclosing method of the class that contains this EnclosingMethod attribute.
+        self.method = NameAndType(method_name, descriptor)
+
+    def __repr__(self):
+        return '<EnclosingMethod %s.%s>' % (self.klass, self.method)
+
+    def __len__(self):
+        return 2 + 2
+
+    @staticmethod
+    def read_info(reader, dump=None):
+        klass = reader.read_u2()
+        name_and_type = reader.read_u2()
+
+        if dump is not None:
+            reader.debug("    " * dump, '%s.%s %s' % (
+                reader.constant_pool[klass].name,
+                reader.constant_pool[name_and_type].name,
+                reader.constant_pool[name_and_type].descriptor
+            ))
+
+        return EnclosingMethod(
+            reader.constant_pool[klass].name.bytes.decode('utf8'),
+            reader.constant_pool[name_and_type].name.bytes.decode('utf8'),
+            reader.constant_pool[name_and_type].descriptor.bytes.decode('utf8'),
+        )
+
+    def write_info(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.klass))
+        writer.write_u2(writer.constant_pool.index(self.name_and_type))
+
+    def resolve_info(self, constant_pool):
+        self.klass.resolve(constant_pool)
+        self.name_and_type.resolve(constant_pool)
+
 
 # ------------------------------------------------------------------------
 # 4.7.8. The Synthetic Attribute
 # ------------------------------------------------------------------------
 
-# The Synthetic attribute is a fixed-length attribute in the attributes table of a ClassFile, field_info, or method_info structure (§4.1, §4.5, §4.6). A class member that does not appear in the source code must be marked using a Synthetic attribute, or else it must have its ACC_SYNTHETIC flag set. The only exceptions to this requirement are compiler-generated methods which are not considered implementation artifacts, namely the instance initialization method representing a default constructor of the Java programming language (§2.9), the class initialization method (§2.9), and the Enum.values() and Enum.valueOf() methods.
+# The Synthetic attribute is a fixed-length attribute in the attributes table of
+# a ClassFile, field_info, or method_info structure (§4.1, §4.5, §4.6). A class
+# member that does not appear in the source code must be marked using a
+# Synthetic attribute, or else it must have its ACC_SYNTHETIC flag set. The only
+# exceptions to this requirement are compiler-generated methods which are not
+# considered implementation artifacts, namely the instance initialization method
+# representing a default constructor of the Java programming language (§2.9),
+# the class initialization method (§2.9), and the Enum.values() and
+# Enum.valueOf() methods.
 
-# The Synthetic attribute was introduced in JDK release 1.1 to support nested classes and interfaces.
+# The Synthetic attribute was introduced in JDK release 1.1 to support nested
+# classes and interfaces.
 
-# The Synthetic attribute has the following format:
+class Synthetic(Attribute):
+    # The Synthetic attribute has the following format:
 
-# Synthetic_attribute {
-#     u2 attribute_name_index;
-#     u4 attribute_length;
-# }
-# The items of the Synthetic_attribute structure are as follows:
+    # u2 attribute_name_index;
+    # u4 attribute_length;
+    # u2 signature_index;
 
-# attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "Synthetic".
+    def __repr__(self):
+        return '<Synthetic>'
 
-# attribute_length
-# The value of the attribute_length item is zero.
+    def __len__(self):
+        return 0
+
+    @staticmethod
+    def read_info(reader, dump=None):
+        return Synthetic()
+
+    def write_info(self, writer):
+        pass
+
+    def resolve_info(self, constant_pool):
+        pass
 
 # ------------------------------------------------------------------------
 # 4.7.9. The Signature Attribute

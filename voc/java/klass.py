@@ -85,7 +85,7 @@ class ClassFileReader:
         if debug is None:
             self.debug = lambda *msg: print(*msg)
         else:
-            self.debug = lambda *msg: debug.write(' '.join(msg) + '\n')
+            self.debug = lambda *msg: debug.write(' '.join(str(m) for m in msg) + '\n')
 
     def read_bytes(self, count):
         return self._infile.read(count)
@@ -144,7 +144,8 @@ class BaseClass:
     def __init__(
                 self, name, supername=None,
                 public=True, final=False, interface=False,
-                abstract=False, synthetic=False, annotation=False, enum=False
+                abstract=False, synthetic=False, annotation=False, enum=False,
+                interfaces=None
             ):
 
         # Constructor properties.
@@ -191,7 +192,10 @@ class BaseClass:
         # (§4.4.1) representing an interface that is a direct superinterface of this
         # class or interface type, in the left-to-right order given in the source for
         # the type.
-        self.interfaces = []
+        if interfaces is None:
+            self.interfaces = []
+        else:
+            self.interfaces = [Classref(iface) for iface in interfaces]
 
         # Each value in the fields table must be a field_info (§4.5) structure giving a
         # complete description of a field in this class or interface. The fields table
@@ -283,8 +287,10 @@ class BaseClass:
         reader.constant_pool.read(reader, dump)
 
         access_flags = reader.read_u2()
-        this_class = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
-        super_class = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
+        val = reader.read_u2()
+        this_class = reader.constant_pool[val].name.bytes.decode('utf8')
+        val = reader.read_u2()
+        super_class = reader.constant_pool[val].name.bytes.decode('utf8')
 
         if dump is not None:
             reader.debug("    " * dump, 'Class %s' % this_class)
@@ -303,13 +309,14 @@ class BaseClass:
                         ('enum', Class.ACC_ENUM),
                     ]
                 ] if f)
-            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
+            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % (access_description if access_description else ''))
 
         interfaces_count = reader.read_u2()
         if dump is not None:
             reader.debug("    " * (dump + 1), 'Interfaces: (%s)' % interfaces_count)
         for i in range(0, interfaces_count):
-            interface = reader.constant_pool[reader.read_u2()]
+            val = reader.read_u2()
+            interface = reader.constant_pool[val]
             reader.debug("    " * (dump + 2), interface.name)
 
         fields_count = reader.read_u2()
@@ -385,7 +392,7 @@ class BaseClass:
 
         writer.write_u2(self.interfaces_count)
         for interface in self.interfaces:
-            interface.write(writer)
+            writer.write_u2(writer.constant_pool.index(interface))
 
         writer.write_u2(self.fields_count)
         for field in self.fields:
@@ -483,13 +490,13 @@ class BaseClass:
 
 
 class Class(BaseClass):
-    def __init__(self, name, supername=None, public=True, final=False, abstract=False):
-        super(Class, self).__init__(name, supername, public=public, final=final, abstract=abstract)
+    def __init__(self, name, supername=None, interfaces=None, public=True, final=False, abstract=False):
+        super(Class, self).__init__(name, supername, interfaces=interfaces, public=public, final=final, abstract=abstract)
 
 
 class Interface(BaseClass):
-    def __init__(self, name, supername=None, public=True, final=False):
-        super(Interface, self).__init__(name, supername, public=public, final=final, interface=True)
+    def __init__(self, name, supername=None, public=True, final=False, abstract=False):
+        super(Interface, self).__init__(name, supername, public=public, final=final, abstract=False, interface=True)
 
 
 class Enum(BaseClass):
