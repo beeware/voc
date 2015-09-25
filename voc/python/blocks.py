@@ -92,7 +92,7 @@ class Block:
 
                 END_IF(),
                 # Make sure we actually have a Python object
-                JavaOpcodes.CHECKCAST('org/python/Object')
+                JavaOpcodes.CHECKCAST('org/python/types/Object')
             )
 
     def delete_name(self, name, allow_locals=True):

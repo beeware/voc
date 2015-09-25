@@ -27,10 +27,10 @@ class ClassBlock(Block):
             # # Set the __name__ atribute to the name of the parent module.
             JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC('__name__'),
-            JavaOpcodes.NEW('org/python/Object'),
+            JavaOpcodes.NEW('org/python/types/Object'),
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC(self.module.descriptor.replace('/', '.')),
-            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Ljava/lang/String;)V'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
         ] + self.code
@@ -95,7 +95,7 @@ class ClassBlock(Block):
                 END_IF(),
             END_IF(),
             # Make sure we actually have a Python object
-            JavaOpcodes.CHECKCAST('org/python/Object')
+            JavaOpcodes.CHECKCAST('org/python/types/Object')
         )
 
     def delete_name(self, name, allow_locals=True):
@@ -145,7 +145,7 @@ class Class(Block):
     def __init__(self, module, name, namespace=None, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
         super().__init__(module)
         self.name = name
-        self.super_name = super_name if super_name else 'org/python/Object'
+        self.super_name = super_name if super_name else 'org/python/types/Object'
         self.interfaces = interfaces
         self.public = public
         self.final = final
@@ -209,7 +209,7 @@ class Class(Block):
                             max_locals=1,
                             code=[
                                 JavaOpcodes.ALOAD_0(),
-                                JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '()V'),
+                                JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '()V'),
                                 JavaOpcodes.RETURN(),
                             ],
                         )

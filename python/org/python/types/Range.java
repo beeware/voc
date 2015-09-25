@@ -1,22 +1,22 @@
 package org.python.types;
 
 
-public class Range extends org.python.Object implements org.python.Iterable {
+public class Range extends org.python.types.Object implements org.python.Iterable {
     private long index;
 
     private long stop;
     private long start;
     private long step;
 
-    public Range(org.python.Object stop) {
-        this(new org.python.Object(0), stop, new org.python.Object(1));
+    public Range(org.python.types.Object stop) {
+        this(new org.python.types.Object(0), stop, new org.python.types.Object(1));
     }
 
-    public Range(org.python.Object start, org.python.Object stop) {
-        this(start, stop, new org.python.Object(1));
+    public Range(org.python.types.Object start, org.python.types.Object stop) {
+        this(start, stop, new org.python.types.Object(1));
     }
 
-    public Range(org.python.Object start, org.python.Object stop, org.python.Object step) {
+    public Range(org.python.types.Object start, org.python.types.Object stop, org.python.types.Object step) {
         super();
         if (start.type != Long.class) {
             throw new org.python.exceptions.TypeError("'" + start.type + "' object cannot be interpreted as an integer");
@@ -28,7 +28,7 @@ public class Range extends org.python.Object implements org.python.Iterable {
             throw new org.python.exceptions.TypeError("'" + step.type + "' object cannot be interpreted as an integer");
         }
 
-        java.util.Hashtable<java.lang.String, org.python.Object> attrs = new java.util.Hashtable<java.lang.String, org.python.Object>();
+        java.util.Hashtable<java.lang.String, org.python.types.Object> attrs = new java.util.Hashtable<java.lang.String, org.python.types.Object>();
 
         attrs.put("start", start);
         this.start = (long) start.value;
@@ -42,16 +42,16 @@ public class Range extends org.python.Object implements org.python.Iterable {
         value = attrs;
     }
 
-    public org.python.Object __iter__() {
+    public org.python.types.Object __iter__() {
         return this;
     }
 
-    public org.python.Object __next__() {
+    public org.python.types.Object __next__() {
         if (this.index >= this.stop) {
             throw new org.python.exceptions.StopIteration();
         }
         this.index += this.step;
-        return new org.python.Object(this.index);
+        return new org.python.types.Object(this.index);
     }
 
 }

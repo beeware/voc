@@ -1,9 +1,7 @@
 
 ALL_FILES=\
 	python/org/Python.class \
-	python/org/python/Object.class \
 	python/org/python/Callable.class \
-	python/org/python/Function.class \
 	python/org/python/InstanceMethod.class \
 	python/org/python/Iterable.class \
 	python/org/python/StaticMethod.class \
@@ -89,6 +87,7 @@ ALL_FILES=\
 	python/org/python/types/Module.class \
 	python/org/python/types/NotImplemented.class \
 	python/org/python/types/Null.class \
+	python/org/python/types/Object.class \
 	python/org/python/types/Range.class \
 	python/org/python/types/Set.class \
 	python/org/python/types/Str.class \

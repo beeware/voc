@@ -56,12 +56,12 @@ class Method(Block):
 
     @property
     def callable(self):
-        return 'org/python/Function'
+        return 'org/python/types/Function'
 
     @property
     def signature(self):
-        return_descriptor = 'V' if self.has_void_return else 'Lorg/python/Object;'
-        return '([Lorg/python/Object;Ljava/util/Hashtable;)%s' % return_descriptor
+        return_descriptor = 'V' if self.has_void_return else 'Lorg/python/types/Object;'
+        return '([Lorg/python/types/Object;Ljava/util/Hashtable;)%s' % return_descriptor
 
     def add_self(self):
         pass
@@ -80,7 +80,7 @@ class Method(Block):
         from .klass import AnonymousInnerClass
         callable = AnonymousInnerClass(
             parent=self.parent,
-            super_name='org/python/Object',
+            super_name='org/python/types/Object',
             interfaces=['org/python/Callable'],
             public=False,
             final=True,

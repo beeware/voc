@@ -781,9 +781,9 @@ class UnaryOpcode(Opcode):
 
         context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/Object',
+                'org/python/types/Object',
                 self.__method__,
-                '()Lorg/python/Object;'
+                '()Lorg/python/types/Object;'
             )
         )
 
@@ -803,9 +803,9 @@ class BinaryOpcode(Opcode):
 
         context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/Object',
+                'org/python/types/Object',
                 self.__method__,
-                '(Lorg/python/Object;)Lorg/python/Object;'
+                '(Lorg/python/types/Object;)Lorg/python/types/Object;'
             )
         )
 
@@ -828,9 +828,9 @@ class InplaceOpcode(Opcode):
 
         context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/Object',
+                'org/python/types/Object',
                 self.__method__,
-                '(Lorg/python/Object;)V'
+                '(Lorg/python/types/Object;)V'
             )
         )
 
@@ -1053,7 +1053,7 @@ class GET_ITER(Opcode):
         context.add_opcodes(
             ASTORE_name(context, '##ITERABLE##'),
             JavaOpcodes.ICONST_1(),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
+            JavaOpcodes.ANEWARRAY('org/python/types/Object'),
             JavaOpcodes.DUP(),
             JavaOpcodes.ICONST_0(),
             ALOAD_name(context, '##ITERABLE##'),
@@ -1066,7 +1066,7 @@ class GET_ITER(Opcode):
             JavaOpcodes.INVOKESTATIC(
                 'org/Python',
                 'iter',
-                '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;'
+                '([Lorg/python/types/Object;Ljava/util/Hashtable;)Lorg/python/types/Object;'
             ),
 
             JavaOpcodes.CHECKCAST('org/python/Iterable'),
@@ -1251,7 +1251,7 @@ class UNPACK_SEQUENCE(Opcode):
             context.add_opcodes(
                 ALOAD_name(context, '##TEMP_%d##' % id(self)),
                 ICONST_val(i - 1),
-                JavaOpcodes.INVOKEVIRTUAL('org/python/Object', '__getitem__', '(I)Lorg/python/Object;'),
+                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Object', '__getitem__', '(I)Lorg/python/types/Object;'),
             )
 
 
@@ -1299,7 +1299,7 @@ class STORE_ATTR(Opcode):
         arguments[0].operation.transpile(context, arguments[0].arguments)
 
         context.add_opcodes(
-            JavaOpcodes.INVOKEVIRTUAL('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/types/Object;)V'),
         )
 
 
@@ -1358,7 +1358,7 @@ class LOAD_CONST(Opcode):
             return
         else:
             context.add_opcodes(
-                JavaOpcodes.NEW('org/python/Object'),
+                JavaOpcodes.NEW('org/python/types/Object'),
                 JavaOpcodes.DUP(),
             )
             if isinstance(self.const, int):
@@ -1379,10 +1379,10 @@ class LOAD_CONST(Opcode):
                     context.add_opcodes(
                         JavaOpcodes.DUP(),
 
-                        JavaOpcodes.NEW('org/python/Object'),
+                        JavaOpcodes.NEW('org/python/types/Object'),
                         JavaOpcodes.DUP(),
                         ICONST_val(val),
-                        JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(I)V'),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(I)V'),
 
                         JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
                         JavaOpcodes.POP()
@@ -1397,7 +1397,7 @@ class LOAD_CONST(Opcode):
                 context.add_opcodes(JavaOpcodes.LDC(self.const))
 
             context.add_opcodes(
-                JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', prototype),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', prototype),
             )
 
 
@@ -1439,7 +1439,7 @@ class BUILD_TUPLE(Opcode):
 
     def convert(self, context, arguments):
         context.add_opcodes(
-            JavaOpcodes.NEW('org/python/Object'),
+            JavaOpcodes.NEW('org/python/types/Object'),
             JavaOpcodes.DUP(),
 
             JavaOpcodes.NEW('java/util/ArrayList'),
@@ -1461,7 +1461,7 @@ class BUILD_TUPLE(Opcode):
             )
 
         context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/util/ArrayList;)V')
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Ljava/util/ArrayList;)V')
         )
 
 
@@ -1483,7 +1483,7 @@ class BUILD_LIST(Opcode):
 
     def convert(self, context, arguments):
         context.add_opcodes(
-            JavaOpcodes.NEW('org/python/Object'),
+            JavaOpcodes.NEW('org/python/types/Object'),
             JavaOpcodes.DUP(),
 
             JavaOpcodes.NEW('java/util/ArrayList'),
@@ -1505,7 +1505,7 @@ class BUILD_LIST(Opcode):
             )
 
         context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/util/ArrayList;)V')
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Ljava/util/ArrayList;)V')
         )
 
 
@@ -1573,7 +1573,7 @@ class LOAD_ATTR(Opcode):
         context.add_opcodes(JavaOpcodes.LDC(self.name))
 
         context.add_opcodes(
-            JavaOpcodes.INVOKEVIRTUAL('org/python/Object', '__getattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Object', '__getattr__', '(Ljava/lang/String;)Lorg/python/types/Object;'),
         )
 
 
@@ -1609,7 +1609,7 @@ class COMPARE_OP(Opcode):
         }[self.comparison]
 
         context.add_opcodes(
-            JavaOpcodes.INVOKEVIRTUAL('org/python/Object', comparator, '(Lorg/python/Object;)Lorg/python/Object;')
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Object', comparator, '(Lorg/python/types/Object;)Lorg/python/types/Object;')
         )
 
 
@@ -1723,7 +1723,7 @@ class POP_JUMP_IF_FALSE(Opcode):
 
         context.add_opcodes(
             # (bool) TOS.value
-            JavaOpcodes.GETFIELD('org/python/Object', 'value', 'Ljava/lang/Object;'),
+            JavaOpcodes.GETFIELD('org/python/types/Object', 'value', 'Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('java/lang/Boolean'),
             JavaOpcodes.INVOKEVIRTUAL('java/lang/Boolean', 'booleanValue', '()Z'),
 
@@ -1751,7 +1751,7 @@ class POP_JUMP_IF_TRUE(Opcode):
 
         context.add_opcodes(
             # (bool) TOS.value
-            JavaOpcodes.GETFIELD('org/python/Object', 'value', 'java/lang/Object'),
+            JavaOpcodes.GETFIELD('org/python/types/Object', 'value', 'java/lang/Object'),
             JavaOpcodes.CHECKCAST('java/lang/Boolean'),
             JavaOpcodes.INVOKEVIRTUAL('java/lang/Boolean', 'booleanValue', '()Z'),
 
@@ -1932,7 +1932,7 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.ANEWARRAY('java/lang/Class'),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_0(),
-                    JavaOpcodes.LDC(Classref('[Lorg/python/Object;')),
+                    JavaOpcodes.LDC(Classref('[Lorg/python/types/Object;')),
                     JavaOpcodes.AASTORE(),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_1(),
@@ -1984,7 +1984,7 @@ class CALL_FUNCTION(Opcode):
             context.add_opcodes(
                 # Create an array to pass in arguments to invoke()
                 ICONST_val(final_args),
-                JavaOpcodes.ANEWARRAY('org/python/Object'),
+                JavaOpcodes.ANEWARRAY('org/python/types/Object'),
             )
 
             # If it's an instance method, put the instance at the start of
@@ -2025,7 +2025,7 @@ class CALL_FUNCTION(Opcode):
                 )
 
             context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;', 2),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/types/Object;Ljava/util/Hashtable;)Lorg/python/types/Object;', 2),
             )
         return code
 
@@ -2086,7 +2086,7 @@ class MAKE_FUNCTION(Opcode):
                     JavaOpcodes.ANEWARRAY('java/lang/Class'),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_0(),
-                    JavaOpcodes.LDC(Classref('[Lorg/python/Object;')),
+                    JavaOpcodes.LDC(Classref('[Lorg/python/types/Object;')),
                     JavaOpcodes.AASTORE(),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_1(),

@@ -1,5 +1,5 @@
 package org.python.types;
 
-public class ContextManager extends org.python.Object {
+public class ContextManager extends org.python.types.Object {
 
 }

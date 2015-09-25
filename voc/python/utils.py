@@ -176,7 +176,7 @@ class TryExcept:
             # Define the exception handler.
             # On entry to the exception, the stack will contain
             # a single value - the exception being thrown.
-            # This exception must be wrapped into an org/python/Object
+            # This exception must be wrapped into an org/python/types/Object
             # so it can be used as an argument elsewhere.
             if len(handler.exceptions) > 1:  # catch multiple - except (A, B) as v:
                 context.add_opcodes(
@@ -185,10 +185,10 @@ class TryExcept:
                 if handler.var_name:
                     context.add_opcodes(
                         opcodes.ASTORE_name(context, handler.var_name),
-                        JavaOpcodes.NEW('org/python/Object'),
+                        JavaOpcodes.NEW('org/python/types/Object'),
                         JavaOpcodes.DUP(),
                         opcodes.ALOAD_name(context, handler.var_name),
-                        JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
                         opcodes.ASTORE_name(context, handler.var_name),
                     )
                 else:
@@ -204,10 +204,10 @@ class TryExcept:
                 if handler.var_name:
                     context.add_opcodes(
                         opcodes.ASTORE_name(context, handler.var_name),
-                        JavaOpcodes.NEW('org/python/Object'),
+                        JavaOpcodes.NEW('org/python/types/Object'),
                         JavaOpcodes.DUP(),
                         opcodes.ALOAD_name(context, handler.var_name),
-                        JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
                         opcodes.ASTORE_name(context, handler.var_name),
                     )
                 else:
@@ -471,7 +471,7 @@ class ForLoop:
             loop,
                 opcodes.TRY(),
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;', 0),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/types/Object;', 0),
                 opcodes.CATCH('org/python/exceptions/StopIteration'),
                     opcodes.jump(JavaOpcodes.GOTO(0), context, loop, opcodes.Opcode.NEXT),
                 opcodes.END_TRY(),

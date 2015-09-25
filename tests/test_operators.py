@@ -13,13 +13,13 @@ class UnaryOpcodeTests(TranspileTestCase):
                      Max stack: 3
                      Max locals: 2
                      Bytecode: (18 bytes)
-                           0: <NEW org/python/Object>
+                           0: <NEW org/python/types/Object>
                            3: <DUP>
                            4: <SIPUSH %(x)s>
-                           7: <INVOKESPECIAL org/python/Object.<init> (I)V>
+                           7: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
                           10: <ASTORE_0>
                           11: <ALOAD_0>
-                          12: <INVOKEVIRTUAL org/python/Object.%(method)s ()Lorg/python/Object;>
+                          12: <INVOKEVIRTUAL org/python/types/Object.%(method)s ()Lorg/python/types/Object;>
                           15: <ASTORE_1>
                           16: <ACONST_NULL>
                           17: <ARETURN>
@@ -48,13 +48,13 @@ class UnaryOpcodeTests(TranspileTestCase):
                      Max stack: 3
                      Max locals: 2
                      Bytecode: (16 bytes)
-                           0: <NEW org/python/Object>
+                           0: <NEW org/python/types/Object>
                            3: <DUP>
                            4: <ICONST_1>
-                           5: <INVOKESPECIAL org/python/Object.<init> (I)V>
+                           5: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
                            8: <ASTORE_0>
                            9: <ALOAD_0>
-                          10: <INVOKEVIRTUAL org/python/Object.__not__ ()Lorg/python/Object;>
+                          10: <INVOKEVIRTUAL org/python/types/Object.__not__ ()Lorg/python/types/Object;>
                           13: <ASTORE_1>
                           14: <ACONST_NULL>
                           15: <ARETURN>
@@ -83,19 +83,19 @@ class BinaryOpcodeTests(TranspileTestCase):
                      Max stack: 3
                      Max locals: 3
                      Bytecode: (30 bytes)
-                           0: <NEW org/python/Object>
+                           0: <NEW org/python/types/Object>
                            3: <DUP>
                            4: <SIPUSH 42>
-                           7: <INVOKESPECIAL org/python/Object.<init> (I)V>
+                           7: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
                           10: <ASTORE_0>
-                          11: <NEW org/python/Object>
+                          11: <NEW org/python/types/Object>
                           14: <DUP>
                           15: <SIPUSH 37>
-                          18: <INVOKESPECIAL org/python/Object.<init> (I)V>
+                          18: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
                           21: <ASTORE_1>
                           22: <ALOAD_0>
                           23: <ALOAD_1>
-                          24: <INVOKEVIRTUAL org/python/Object.%(method)s (Lorg/python/Object;)Lorg/python/Object;>
+                          24: <INVOKEVIRTUAL org/python/types/Object.%(method)s (Lorg/python/types/Object;)Lorg/python/types/Object;>
                           27: <ASTORE_2>
                           28: <ACONST_NULL>
                           29: <ARETURN>
@@ -160,15 +160,15 @@ class InplaceOpcodeTests(TranspileTestCase):
                      Max stack: 3
                      Max locals: 1
                      Bytecode: (20 bytes)
-                           0: <NEW org/python/Object>
+                           0: <NEW org/python/types/Object>
                            3: <DUP>
                            4: <SIPUSH 42>
-                           7: <INVOKESPECIAL org/python/Object.<init> (I)V>
+                           7: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
                           10: <ASTORE_0>
                           11: <ALOAD_0>
                           12: <DUP>
                           13: <ALOAD_0>
-                          14: <INVOKEVIRTUAL org/python/Object.%(method)s (Lorg/python/Object;)V>
+                          14: <INVOKEVIRTUAL org/python/types/Object.%(method)s (Lorg/python/types/Object;)V>
                           17: <ASTORE_0>
                           18: <ACONST_NULL>
                           19: <ARETURN>

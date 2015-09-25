@@ -27,10 +27,10 @@ class StaticBlock(Block):
             # Load the Python builtins into the globals.
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC('__builtins__'),
-            JavaOpcodes.NEW('org/python/Object'),
+            JavaOpcodes.NEW('org/python/types/Object'),
             JavaOpcodes.DUP(),
             JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/util/Map;)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Ljava/util/Map;)V'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
         ] + self.code
@@ -77,7 +77,7 @@ class StaticBlock(Block):
                 END_IF(),
             END_IF(),
             # Make sure we actually have a Python object
-            JavaOpcodes.CHECKCAST('org/python/Object')
+            JavaOpcodes.CHECKCAST('org/python/types/Object')
         )
 
     def delete_name(self, name, allow_locals=True):
@@ -172,7 +172,7 @@ class Module(Block):
 
         # If there is any static content, generate a classfile
         # for this module
-        classfile = JavaClass(self.descriptor, supername='org/python/Object')
+        classfile = JavaClass(self.descriptor, supername='org/python/types/Object')
         classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
 
         # Add a globals dictionary to the module.
@@ -183,7 +183,7 @@ class Module(Block):
                 public=True,
                 static=True,
                 attributes=[
-                    Signature('Ljava/util/Hashtable<Ljava/lang/String;Lorg/python/Object;>;')
+                    Signature('Ljava/util/Hashtable<Ljava/lang/String;Lorg/python/types/Object;>;')
                 ]
             )
         )

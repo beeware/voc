@@ -16,38 +16,38 @@ class WhileLoopTests(TranspileTestCase):
                      Max stack: 5
                      Max locals: 2
                      Bytecode: (70 bytes)
-                           0: <NEW org/python/Object>
+                           0: <NEW org/python/types/Object>
                            3: <DUP>
                            4: <ICONST_0>
-                           5: <INVOKESPECIAL org/python/Object.<init> (I)V>
+                           5: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
                            8: <ASTORE_0>
-                           9: <NEW org/python/Object>
+                           9: <NEW org/python/types/Object>
                           12: <DUP>
                           13: <ICONST_0>
-                          14: <INVOKESPECIAL org/python/Object.<init> (I)V>
+                          14: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
                           17: <ASTORE_1>
                           18: <ALOAD_0>
-                          19: <NEW org/python/Object>
+                          19: <NEW org/python/types/Object>
                           22: <DUP>
                           23: <SIPUSH 10>
-                          26: <INVOKESPECIAL org/python/Object.<init> (I)V>
-                          29: <INVOKEVIRTUAL org/python/Object.__lt__ (Lorg/python/Object;)Lorg/python/Object;>
-                          32: <GETFIELD org/python/Object.value (Ljava/lang/Object;)>
+                          26: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          29: <INVOKEVIRTUAL org/python/types/Object.__lt__ (Lorg/python/types/Object;)Lorg/python/types/Object;>
+                          32: <GETFIELD org/python/types/Object.value (Ljava/lang/Object;)>
                           35: <CHECKCAST <Class java/lang/Boolean>>
                           38: <INVOKEVIRTUAL java/lang/Boolean.booleanValue ()Z>
                           41: <IFEQ 27>
                           44: <ALOAD_0>
                           45: <DUP>
-                          46: <NEW org/python/Object>
+                          46: <NEW org/python/types/Object>
                           49: <DUP>
                           50: <ICONST_1>
-                          51: <INVOKESPECIAL org/python/Object.<init> (I)V>
-                          54: <INVOKEVIRTUAL org/python/Object.__iadd__ (Lorg/python/Object;)V>
+                          51: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          54: <INVOKEVIRTUAL org/python/types/Object.__iadd__ (Lorg/python/types/Object;)V>
                           57: <ASTORE_0>
                           58: <ALOAD_1>
                           59: <DUP>
                           60: <ALOAD_0>
-                          61: <INVOKEVIRTUAL org/python/Object.__iadd__ (Lorg/python/Object;)V>
+                          61: <INVOKEVIRTUAL org/python/types/Object.__iadd__ (Lorg/python/types/Object;)V>
                           64: <ASTORE_1>
                           65: <GOTO -47>
                           68: <ACONST_NULL>

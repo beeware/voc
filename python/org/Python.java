@@ -2,18 +2,18 @@ package org;
 
 
 public class Python {
-    public static java.util.Hashtable<java.lang.String, org.python.Object> builtins;
+    public static java.util.Hashtable<java.lang.String, org.python.types.Object> builtins;
 
     /**
      * Load all the builtins into the dictionary as callables
      */
     static {
-        builtins = new java.util.Hashtable<java.lang.String, org.python.Object>();
+        builtins = new java.util.Hashtable<java.lang.String, org.python.types.Object>();
 
         // Iterate over all methods, adding the static ones to builtins
         for (java.lang.reflect.Method method: Python.class.getMethods()) {
             if (java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
-                builtins.put(method.getName(), new org.python.Function(method));
+                builtins.put(method.getName(), new org.python.types.Function(method));
             }
         }
     }
@@ -35,9 +35,9 @@ public class Python {
      * absolute or relative imports. 0 is absolute while a positive number
      * is the number of parent directories to search relative to the current module.
      */
-    public static org.python.Object __import__(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object __import__(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function '__import__' not implemented");
     }
 
@@ -46,9 +46,9 @@ public class Python {
      *
      * Return the absolute value of the argument.
      */
-    public static org.python.Object abs(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object abs(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'abs' not implemented");
     }
 
@@ -58,9 +58,9 @@ public class Python {
      * Return True if bool(x) is True for all values x in the iterable.
      * If the iterable is empty, return True.
      */
-    public static org.python.Object all(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object all(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'all' not implemented");
     }
 
@@ -70,9 +70,9 @@ public class Python {
      * Return True if bool(x) is True for any x in the iterable.
      * If the iterable is empty, return False.
      */
-    public static org.python.Object any(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object any(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'any' not implemented");
     }
 
@@ -84,9 +84,9 @@ public class Python {
      * repr() using \\x, \\u or \\U escapes.  This generates a string similar
      * to that returned by repr() in Python 2.
      */
-    public static org.python.Object ascii(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object ascii(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'ascii' not implemented");
     }
 
@@ -98,16 +98,16 @@ public class Python {
      *   >>> bin(2796202)
      *   '0b1010101010101010101010'
      */
-    public static org.python.Object bin(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object bin(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("bin() takes exactly one argument (" + args.length + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("bin() takes no keyword arguments");
         }
-        return new org.python.Object(String.format("0b%b", args[0].value));
+        return new org.python.types.Object(String.format("0b%b", args[0].value));
     }
 
     /**
@@ -117,9 +117,9 @@ public class Python {
      * The builtins True and False are the only two instances of the class bool.
      * The class bool is a subclass of the class int, and cannot be subclassed.
      */
-    public static org.python.Object bool(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object bool(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'bool' not implemented");
     }
 
@@ -137,9 +137,9 @@ public class Python {
      *  - any object implementing the buffer API.
      *  - an integer
      */
-    public static org.python.Object bytearray(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object bytearray(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
     }
 
@@ -156,9 +156,9 @@ public class Python {
      *  - any object implementing the buffer API.
      *  - an integer
      */
-    public static org.python.Object bytes(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object bytes(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'bytes' not implemented");
     }
 
@@ -169,9 +169,9 @@ public class Python {
      * Note that classes are callable, as are instances of classes with a
      * __call__() method.
      */
-    public static org.python.Object callable(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object callable(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'callable' not implemented");
     }
 
@@ -180,9 +180,9 @@ public class Python {
      *
      * Return a Unicode string of one character with ordinal i; 0 <= i <= 0x10ffff.
      */
-    public static org.python.Object chr(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object chr(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'callable' not implemented");
     }
 
@@ -207,9 +207,9 @@ public class Python {
      * Class methods are different than C++ or Java static methods.
      * If you want those, see the staticmethod builtin.
      */
-    public static org.python.Object classmethod(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object classmethod(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'classmethod' not implemented");
     }
 
@@ -228,9 +228,9 @@ public class Python {
      * compile; if absent or zero these statements do influence the compilation,
      * in addition to any features explicitly specified.
      */
-    public static org.python.Object compile(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object compile(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'compile' not implemented");
     }
 
@@ -240,9 +240,9 @@ public class Python {
      * Create a complex number from a real part and an optional imaginary part.
      * This is equivalent to (real + imag*1j) where imag defaults to 0.
      */
-    public static org.python.Object complex(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object complex(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'complex' not implemented");
     }
 
@@ -250,9 +250,9 @@ public class Python {
      * interactive prompt objects for printing the license text, a list of
      * contributors and the copyright notice.
      */
-    public static org.python.Object copyright(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object copyright(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'copyright' not implemented");
     }
 
@@ -260,9 +260,9 @@ public class Python {
      * interactive prompt objects for printing the license text, a list of
      * contributors and the copyright notice.
      */
-    public static org.python.Object credits(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object credits(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'credits' not implemented");
     }
 
@@ -272,9 +272,9 @@ public class Python {
      * Delete a named attribute on an object; delattr(x, 'y') is equivalent to
      * ``del x.y''.
     */
-    public static org.python.Object delattr(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object delattr(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'delattr' not implemented");
     }
 
@@ -289,15 +289,15 @@ public class Python {
      * dict(**kwargs) -> new dictionary initialized with the name=value pairs
      *     in the keyword argument list.  For example:  dict(one=1, two=2)
      */
-    public static org.python.Object dict(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object dict(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'dict' not implemented");
     }
 
-    // public static org.python.Object dict(**
-    //        org.python.Object [] args,
-    //        java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    // public static org.python.types.Object dict(**
+    //        org.python.types.Object [] args,
+    //        java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
     //     throw new org.python.exceptions.NotImplementedError("Builtin function 'dict' not implemented");
     // }
 
@@ -315,9 +315,9 @@ public class Python {
      *     for any other object: its attributes, its class's attributes, and
      *     recursively the attributes of its class's base classes.
      */
-    public static org.python.Object dir(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object dir(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'dir' not implemented");
     }
 
@@ -326,9 +326,9 @@ public class Python {
      *
      * Return the tuple ((x-x%y)/y, x%y).  Invariant: div*y + mod == x.
      */
-    public static org.python.Object divmod(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object divmod(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'divmod' not implemented");
     }
 
@@ -341,9 +341,9 @@ public class Python {
      * enumerate is useful for obtaining an indexed list:
      *        (0, seq[0]), (1, seq[1]), (2, seq[2]), ...
      */
-    public static org.python.Object enumerate(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object enumerate(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'enumerate' not implemented");
     }
 
@@ -357,9 +357,9 @@ public class Python {
      * defaulting to the current globals and locals.
      * If only globals is given, locals defaults to it.
      */
-    public static org.python.Object eval(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object eval(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'eval' not implemented");
     }
 
@@ -371,9 +371,9 @@ public class Python {
      * The globals and locals are dictionaries, defaulting to the current
      * globals and locals.  If only globals is given, locals defaults to it.
     */
-    public static org.python.Object exec(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object exec(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'exec' not implemented");
     }
 
@@ -383,9 +383,9 @@ public class Python {
      * Return an iterator yielding those items of iterable for which function(item)
      * is true. If function is None, return the items that are true.
      */
-    public static org.python.Object filter(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object filter(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'filter' not implemented");
     }
 
@@ -394,9 +394,9 @@ public class Python {
      *
      * Convert a string or number to a floating point number, if possible.
      */
-    public static org.python.Object float_cast(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object float_cast(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("float() takes exactly one argument (" + args.length + " given)");
         }
@@ -412,9 +412,9 @@ public class Python {
      * Returns value.__format__(format_spec)
      * format_spec defaults to ""
     */
-    public static org.python.Object format(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object format(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'format' not implemented");
     }
 
@@ -424,9 +424,9 @@ public class Python {
      *
      * Build an immutable unordered collection of unique elements.
      */
-    public static org.python.Object frozenset(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object frozenset(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'frozenset' not implemented");
     }
 
@@ -437,9 +437,9 @@ public class Python {
      * When a default argument is given, it is returned when the attribute doesn't
      * exist; without it, an exception is raised in that case.
      */
-    public static org.python.Object getattr(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object getattr(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'getattr' not implemented");
     }
 
@@ -448,9 +448,9 @@ public class Python {
      *
      * Return the dictionary containing the current scope's global variables.
      */
-    public static org.python.Object globals(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object globals(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'globals' not implemented");
     }
 
@@ -460,9 +460,9 @@ public class Python {
      * Return whether the object has an attribute with the given name.
      * (This is done by calling getattr(object, name) and catching AttributeError.)
      */
-    public static org.python.Object hasattr(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object hasattr(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'hasattr' not implemented");
     }
 
@@ -472,9 +472,9 @@ public class Python {
      * Return a hash value for the object.  Two objects with the same value have
      * the same hash value.  The reverse is not necessarily true, but likely.
      */
-    public static org.python.Object hash(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object hash(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("hash() takes exactly one argument (" + args.length + " given)");
         }
@@ -488,9 +488,9 @@ public class Python {
      * Define the built-in 'help'.
      * This is a wrapper around pydoc.help (with a twist).
      */
-    public static org.python.Object help(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object help(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'help' not implemented");
     }
 
@@ -502,16 +502,16 @@ public class Python {
      *   >>> hex(3735928559)
      *   '0xdeadbeef'
      */
-    public static org.python.Object hex(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object hex(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("hex() takes exactly one argument (" + args.length + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("hex() takes no keyword arguments");
         }
-        return new org.python.Object(String.format("0x%x", args[0].value));
+        return new org.python.types.Object(String.format("0x%x", args[0].value));
     }
 
     /**
@@ -520,16 +520,16 @@ public class Python {
      * Return the identity of an object.  This is guaranteed to be unique among
      * simultaneously existing objects.
      */
-    public static org.python.Object id(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object id(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("id() takes exactly one argument (" + args.length + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("id() takes no keyword arguments");
         }
-        return new org.python.Object(System.identityHashCode(args[0]));
+        return new org.python.types.Object(System.identityHashCode(args[0]));
     }
 
     /**
@@ -540,9 +540,9 @@ public class Python {
      * The prompt string, if given,
      * is printed without a trailing newline before reading.
      */
-    public static org.python.Object input(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object input(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length > 1) {
             throw new org.python.exceptions.TypeError("input() expected at most one arguments ( got " + args.length + ")");
         }
@@ -558,7 +558,7 @@ public class Python {
         }
 
         try {
-            return new org.python.Object(reader.readLine());
+            return new org.python.types.Object(reader.readLine());
         } catch (java.io.IOException e) {
             throw new org.python.exceptions.OSError();
         }
@@ -581,9 +581,9 @@ public class Python {
      *   >>> int('0b100', base=0)
      *   4
      */
-    public static org.python.Object int_cast(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object int_cast(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'int_cast' with base not implemented");
     }
 
@@ -595,9 +595,9 @@ public class Python {
      * The form using a tuple, isinstance(x, (A, B, ...)), is a shortcut for
      * isinstance(x, A) or isinstance(x, B) or ... (etc.).
      */
-    public static org.python.Object isinstance(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object isinstance(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'isinstance' not implemented");
     }
 
@@ -608,9 +608,9 @@ public class Python {
      * When using a tuple as the second argument issubclass(X, (A, B, ...)),
      * is a shortcut for issubclass(X, A) or issubclass(X, B) or ... (etc.).
      */
-    public static org.python.Object issubclass(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object issubclass(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'issubclass' not implemented");
     }
 
@@ -622,9 +622,9 @@ public class Python {
      * supply its own iterator, or be a sequence.
      * In the second form, the callable is called until it returns the sentinel.
      */
-    public static org.python.Object iter(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object iter(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("len() takes no keyword arguments");
         }
@@ -648,9 +648,9 @@ public class Python {
      *
      * Return the number of items of a sequence or collection.
      */
-    public static org.python.Object len(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object len(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.length + " given)");
         }
@@ -664,9 +664,9 @@ public class Python {
      * interactive prompt objects for printing the license text, a list of
      * contributors and the copyright notice.
      */
-    public static org.python.Object license(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object license(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'license' not implemented");
     }
 
@@ -674,9 +674,9 @@ public class Python {
      * list() -> new empty list
      * list(iterable) -> new list initialized from iterable's items
      */
-    public static org.python.Object list(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object list(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'list' not implemented");
     }
 
@@ -685,9 +685,9 @@ public class Python {
      *
      * Update and return a dictionary containing the current scope's local variables.
      */
-    public static org.python.Object locals(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object locals(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'locals' not implemented");
     }
 
@@ -697,9 +697,9 @@ public class Python {
      * Make an iterator that computes the function using arguments from
      * each of the iterables.  Stops when the shortest iterable is exhausted.
      */
-    public static org.python.Object map(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object map(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
     }
 
@@ -712,9 +712,9 @@ public class Python {
      * the provided iterable is empty.
      * With two or more arguments, return the largest argument.
      */
-    public static org.python.Object max(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object max(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'max' not implemented");
     }
 
@@ -723,9 +723,9 @@ public class Python {
      *
      * Create a new memoryview object which references the given object.
      */
-    public static org.python.Object memoryview(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object memoryview(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'memoryview' not implemented");
     }
 
@@ -738,9 +738,9 @@ public class Python {
      * the provided iterable is empty.
      * With two or more arguments, return the smallest argument.
      */
-    public static org.python.Object min(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object min(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'min' not implemented");
     }
 
@@ -750,18 +750,18 @@ public class Python {
      * Return the next item from the iterator. If default is given and the iterator
      * is exhausted, it is returned instead of raising StopIteration.
      */
-    public static org.python.Object next(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object next(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'next' not implemented");
     }
 
     /**
      * The most base type
      */
-    public static org.python.Object object(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object object(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'object' not implemented");
     }
 
@@ -773,16 +773,16 @@ public class Python {
      *    >>> oct(342391)
      *   '0o1234567'
      */
-    public static org.python.Object oct(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object oct(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("oct() takes exactly one argument (" + args.length + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("oct() takes no keyword arguments");
         }
-        return new org.python.Object(String.format("0o%o", args[0].value));
+        return new org.python.types.Object(String.format("0o%o", args[0].value));
     }
 
     /**
@@ -908,9 +908,9 @@ public class Python {
      * opened in a text mode, and for bytes a BytesIO can be used like a file
      * opened in a binary mode.
      */
-    public static org.python.Object open(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object open(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'open' not implemented");
     }
 
@@ -919,9 +919,9 @@ public class Python {
      *
      * Return the integer ordinal of a one-character string.
      */
-    public static org.python.Object ord(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object ord(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("org() takes exactly one argument (" + args.length + " given)");
         }
@@ -932,7 +932,7 @@ public class Python {
         if (args[0].type == String.class) {
             int length = ((String) args[0].value).length();
             if (length != 1) {
-                return new org.python.Object((int) ((String) args[0].value).charAt(0));
+                return new org.python.types.Object((int) ((String) args[0].value).charAt(0));
             } else {
                 throw new org.python.exceptions.TypeError("ord() expected string of length 1, but string of length " + length + " found");
             }
@@ -947,9 +947,9 @@ public class Python {
      * With two arguments, equivalent to x**y.  With three arguments,
      * equivalent to (x**y) % z, but may be more efficient (e.g. for ints).
      */
-    public static org.python.Object pow(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object pow(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length < 2) {
             throw new org.python.exceptions.TypeError("pow() expected at least 2 arguments, got " + args.length);
         }
@@ -963,7 +963,7 @@ public class Python {
         if (args.length == 3) {
             throw new org.python.exceptions.NotImplementedError("pow() with mod not supported");
         } else {
-            return args[0].__pow__(new org.python.Object[] { args[1] }, kwargs);
+            return args[0].__pow__(new org.python.types.Object[] { args[1] }, kwargs);
         }
     }
 
@@ -978,12 +978,12 @@ public class Python {
      * flush: whether to forcibly flush the stream.
      */
     public static void print(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        org.python.Object file = kwargs.get("file");
-        org.python.Object sep = kwargs.get("sep");
-        org.python.Object end = kwargs.get("end");
-        org.python.Object flush = kwargs.get("flush");
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
+        org.python.types.Object file = kwargs.get("file");
+        org.python.types.Object sep = kwargs.get("sep");
+        org.python.types.Object end = kwargs.get("end");
+        org.python.types.Object flush = kwargs.get("flush");
 
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
@@ -1031,9 +1031,9 @@ public class Python {
      *     def x(self):
      *         del self._x
      */
-    public static org.python.Object property(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object property(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'property' not implemented");
     }
 
@@ -1043,9 +1043,9 @@ public class Python {
      *
      * Return a virtual sequence of numbers from start to stop by step.
      */
-    public static org.python.Object range(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object range(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length == 1) {
             return new org.python.types.Range(args[0]);
         } else if (args.length == 2) {
@@ -1065,9 +1065,9 @@ public class Python {
      * Return the canonical string representation of the object.
      * For most object types, eval(repr(object)) == object.
      */
-    public static org.python.Object repr(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object repr(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         if (args.length != 1) {
             throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.length + " given)");
         }
@@ -1082,9 +1082,9 @@ public class Python {
      *
      * Return a reverse iterator
      */
-    public static org.python.Object reversed(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object reversed(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'reversed' not implemented");
     }
 
@@ -1095,9 +1095,9 @@ public class Python {
      * This returns an int when called with one argument, otherwise the
      * same type as the number. ndigits may be negative.
      */
-    public static org.python.Object round(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object round(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'round' not implemented");
     }
 
@@ -1107,9 +1107,9 @@ public class Python {
      *
      * Build an unordered collection of unique elements.
      */
-    public static org.python.Object set(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object set(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'set' not implemented");
     }
 
@@ -1119,9 +1119,9 @@ public class Python {
      * Set a named attribute on an object; setattr(x, 'y', v) is equivalent to
      * ``x.y = v''.
      */
-    public static org.python.Object setattr(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object setattr(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'setattr' not implemented");
     }
 
@@ -1131,18 +1131,18 @@ public class Python {
      *
      * Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).
      */
-    public static org.python.Object slice(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object slice(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
     }
 
     /**
      * sorted(iterable, key=None, reverse=False) --> new sorted list
      */
-    public static org.python.Object sorted(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object sorted(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'sorted' not implemented");
     }
 
@@ -1164,9 +1164,9 @@ public class Python {
      * Static methods in Python are similar to those found in Java or C++.
      * For a more advanced concept, see the classmethod builtin.
      */
-    public static org.python.Object staticmethod(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object staticmethod(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'staticmethod' not implemented");
     }
 
@@ -1182,10 +1182,10 @@ public class Python {
      * encoding defaults to sys.getdefaultencoding().
      * errors defaults to 'strict'.
      */
-    public static org.python.Object str(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        return new org.python.Object(args[0].value.toString());
+    public static org.python.types.Object str(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
+        return new org.python.types.Object(args[0].value.toString());
     }
 
     /**
@@ -1195,9 +1195,9 @@ public class Python {
      * of parameter 'start' (which defaults to 0).  When the iterable is
      * empty, return start.
      */
-    public static org.python.Object sum(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object sum(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'sum' not implemented");
     }
 
@@ -1217,9 +1217,9 @@ public class Python {
      *    super().cmeth(arg)
      */
 
-    public static org.python.Object super_call(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object super_call(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'super' not implemented");
     }
 
@@ -1229,9 +1229,9 @@ public class Python {
      *
      * If the argument is a tuple, the return value is the same object.
      */
-    public static org.python.Object tuple(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object tuple(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
     }
 
@@ -1240,9 +1240,9 @@ public class Python {
      * type(object) -> the object's type
      * type(name, bases, dict) -> a new type
      */
-    public static org.python.Object type(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object type(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'type' not implemented");
     }
 
@@ -1252,9 +1252,9 @@ public class Python {
      * Without arguments, equivalent to locals().
      * With an argument, equivalent to object.__dict__.
      */
-    public static org.python.Object vars(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object vars(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'vars' not implemented");
     }
 
@@ -1266,9 +1266,9 @@ public class Python {
      * method continues until the shortest iterable in the argument sequence
      * is exhausted and then it raises StopIteration.
      */
-    public static org.python.Object zip(
-                org.python.Object [] args,
-                java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Object zip(
+                org.python.types.Object [] args,
+                java.util.Hashtable<java.lang.String, org.python.types.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'zip' not implemented");
     }
 }

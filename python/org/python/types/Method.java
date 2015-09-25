@@ -1,5 +1,5 @@
 package org.python.types;
 
-public class Method extends org.python.Object {
+public class Method extends org.python.types.Object {
 
 }
