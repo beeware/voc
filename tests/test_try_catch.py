@@ -12,57 +12,75 @@ class TryExceptTests(TranspileTestCase):
                     print("Got an error")
                 """,
             java="""
-                 Code (122 bytes)
+                 Code (158 bytes)
                      Max stack: 7
                      Max locals: 0
-                     Bytecode: (86 bytes)
+                     Bytecode: (122 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 57>
-                          30: <POP>
-                          31: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          34: <LDC <String 'print'>>
-                          36: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          39: <DUP>
-                          40: <IFNONNULL 12>
-                          43: <POP>
-                          44: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          47: <LDC <String 'print'>>
-                          49: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          52: <CHECKCAST <Class org/python/Callable>>
-                          55: <ICONST_1>
-                          56: <ANEWARRAY org/python/Object>
-                          59: <DUP>
-                          60: <ICONST_0>
-                          61: <NEW org/python/Object>
-                          64: <DUP>
-                          65: <LDC <String 'Got an error'>>
-                          67: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          70: <AASTORE>
-                          71: <NEW java/util/Hashtable>
-                          74: <DUP>
-                          75: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          78: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          83: <POP>
-                          84: <ACONST_NULL>
-                          85: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 75>
+                          48: <POP>
+                          49: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          52: <LDC <String 'print'>>
+                          54: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          57: <DUP>
+                          58: <IFNONNULL 27>
+                          61: <POP>
+                          62: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          65: <LDC <String 'print'>>
+                          67: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          70: <DUP>
+                          71: <IFNONNULL 14>
+                          74: <POP>
+                          75: <NEW org/python/exceptions/NameError>
+                          78: <DUP>
+                          79: <LDC <String 'print'>>
+                          81: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          84: <ATHROW>
+                          85: <CHECKCAST <Class org/python/Object>>
+                          88: <CHECKCAST <Class org/python/Callable>>
+                          91: <ICONST_1>
+                          92: <ANEWARRAY org/python/Object>
+                          95: <DUP>
+                          96: <ICONST_0>
+                          97: <NEW org/python/Object>
+                         100: <DUP>
+                         101: <LDC <String 'Got an error'>>
+                         103: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         106: <AASTORE>
+                         107: <NEW java/util/Hashtable>
+                         110: <DUP>
+                         111: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         114: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         119: <POP>
+                         120: <ACONST_NULL>
+                         121: <ARETURN>
                      Exceptions: (1)
-                         org/python/exceptions/BaseException: 0-27 [30]
+                         org/python/exceptions/BaseException: 0-45 [48]
                      Attributes: (1)
                          LineNumberTable (10 bytes)
                              Line numbers (2 total):
                                  0: 3
-                                 31: 5
+                                 49: 5
                 """)
 
     def test_try_except_unnamed(self):
@@ -74,57 +92,75 @@ class TryExceptTests(TranspileTestCase):
                     print("Got an error")
                 """,
             java="""
-                 Code (122 bytes)
+                 Code (158 bytes)
                      Max stack: 7
                      Max locals: 0
-                     Bytecode: (86 bytes)
+                     Bytecode: (122 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 57>
-                          30: <POP>
-                          31: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          34: <LDC <String 'print'>>
-                          36: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          39: <DUP>
-                          40: <IFNONNULL 12>
-                          43: <POP>
-                          44: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          47: <LDC <String 'print'>>
-                          49: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          52: <CHECKCAST <Class org/python/Callable>>
-                          55: <ICONST_1>
-                          56: <ANEWARRAY org/python/Object>
-                          59: <DUP>
-                          60: <ICONST_0>
-                          61: <NEW org/python/Object>
-                          64: <DUP>
-                          65: <LDC <String 'Got an error'>>
-                          67: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          70: <AASTORE>
-                          71: <NEW java/util/Hashtable>
-                          74: <DUP>
-                          75: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          78: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          83: <POP>
-                          84: <ACONST_NULL>
-                          85: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 75>
+                          48: <POP>
+                          49: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          52: <LDC <String 'print'>>
+                          54: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          57: <DUP>
+                          58: <IFNONNULL 27>
+                          61: <POP>
+                          62: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          65: <LDC <String 'print'>>
+                          67: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          70: <DUP>
+                          71: <IFNONNULL 14>
+                          74: <POP>
+                          75: <NEW org/python/exceptions/NameError>
+                          78: <DUP>
+                          79: <LDC <String 'print'>>
+                          81: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          84: <ATHROW>
+                          85: <CHECKCAST <Class org/python/Object>>
+                          88: <CHECKCAST <Class org/python/Callable>>
+                          91: <ICONST_1>
+                          92: <ANEWARRAY org/python/Object>
+                          95: <DUP>
+                          96: <ICONST_0>
+                          97: <NEW org/python/Object>
+                         100: <DUP>
+                         101: <LDC <String 'Got an error'>>
+                         103: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         106: <AASTORE>
+                         107: <NEW java/util/Hashtable>
+                         110: <DUP>
+                         111: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         114: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         119: <POP>
+                         120: <ACONST_NULL>
+                         121: <ARETURN>
                      Exceptions: (1)
-                         org/python/exceptions/AttributeError: 0-27 [30]
+                         org/python/exceptions/AttributeError: 0-45 [48]
                      Attributes: (1)
                          LineNumberTable (10 bytes)
                              Line numbers (2 total):
                                  0: 3
-                                 31: 5
+                                 49: 5
                 """)
 
     def test_try_except_named(self):
@@ -136,66 +172,84 @@ class TryExceptTests(TranspileTestCase):
                     print("Got an error", e)
                 """,
             java="""
-                 Code (135 bytes)
+                 Code (171 bytes)
                      Max stack: 7
                      Max locals: 1
-                     Bytecode: (99 bytes)
+                     Bytecode: (135 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 70>
-                          30: <ASTORE_0>
-                          31: <NEW org/python/Object>
-                          34: <DUP>
-                          35: <ALOAD_0>
-                          36: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                          39: <ASTORE_0>
-                          40: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <DUP>
-                          49: <IFNONNULL 12>
-                          52: <POP>
-                          53: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          56: <LDC <String 'print'>>
-                          58: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          61: <CHECKCAST <Class org/python/Callable>>
-                          64: <ICONST_2>
-                          65: <ANEWARRAY org/python/Object>
-                          68: <DUP>
-                          69: <ICONST_0>
-                          70: <NEW org/python/Object>
-                          73: <DUP>
-                          74: <LDC <String 'Got an error'>>
-                          76: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          79: <AASTORE>
-                          80: <DUP>
-                          81: <ICONST_1>
-                          82: <ALOAD_0>
-                          83: <AASTORE>
-                          84: <NEW java/util/Hashtable>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 88>
+                          48: <ASTORE_0>
+                          49: <NEW org/python/Object>
+                          52: <DUP>
+                          53: <ALOAD_0>
+                          54: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                          57: <ASTORE_0>
+                          58: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 27>
+                          70: <POP>
+                          71: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          74: <LDC <String 'print'>>
+                          76: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          79: <DUP>
+                          80: <IFNONNULL 14>
+                          83: <POP>
+                          84: <NEW org/python/exceptions/NameError>
                           87: <DUP>
-                          88: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          91: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          96: <POP>
-                          97: <ACONST_NULL>
-                          98: <ARETURN>
+                          88: <LDC <String 'print'>>
+                          90: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          93: <ATHROW>
+                          94: <CHECKCAST <Class org/python/Object>>
+                          97: <CHECKCAST <Class org/python/Callable>>
+                         100: <ICONST_2>
+                         101: <ANEWARRAY org/python/Object>
+                         104: <DUP>
+                         105: <ICONST_0>
+                         106: <NEW org/python/Object>
+                         109: <DUP>
+                         110: <LDC <String 'Got an error'>>
+                         112: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         115: <AASTORE>
+                         116: <DUP>
+                         117: <ICONST_1>
+                         118: <ALOAD_0>
+                         119: <AASTORE>
+                         120: <NEW java/util/Hashtable>
+                         123: <DUP>
+                         124: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         127: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         132: <POP>
+                         133: <ACONST_NULL>
+                         134: <ARETURN>
                      Exceptions: (1)
-                         org/python/exceptions/AttributeError: 0-27 [30]
+                         org/python/exceptions/AttributeError: 0-45 [48]
                      Attributes: (1)
                          LineNumberTable (10 bytes)
                              Line numbers (2 total):
                                  0: 3
-                                 40: 5
+                                 58: 5
                 """)
 
     def test_try_multiple_except(self):
@@ -209,85 +263,112 @@ class TryExceptTests(TranspileTestCase):
                     print("Got a NameError")
                 """,
             java="""
-                 Code (191 bytes)
+                 Code (245 bytes)
                      Max stack: 8
                      Max locals: 0
-                     Bytecode: (143 bytes)
+                     Bytecode: (197 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 114>
-                          30: <POP>
-                          31: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          34: <LDC <String 'print'>>
-                          36: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          39: <DUP>
-                          40: <IFNONNULL 12>
-                          43: <POP>
-                          44: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          47: <LDC <String 'print'>>
-                          49: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          52: <CHECKCAST <Class org/python/Callable>>
-                          55: <ICONST_1>
-                          56: <ANEWARRAY org/python/Object>
-                          59: <DUP>
-                          60: <ICONST_0>
-                          61: <NEW org/python/Object>
-                          64: <DUP>
-                          65: <LDC <String 'Got an AttributeError'>>
-                          67: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          70: <AASTORE>
-                          71: <NEW java/util/Hashtable>
-                          74: <DUP>
-                          75: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          78: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          83: <POP>
-                          84: <GOTO 57>
-                          87: <POP>
-                          88: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          91: <LDC <String 'print'>>
-                          93: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          96: <DUP>
-                          97: <IFNONNULL 12>
-                         100: <POP>
-                         101: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         104: <LDC <String 'print'>>
-                         106: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         109: <CHECKCAST <Class org/python/Callable>>
-                         112: <ICONST_1>
-                         113: <ANEWARRAY org/python/Object>
-                         116: <DUP>
-                         117: <ICONST_0>
-                         118: <NEW org/python/Object>
-                         121: <DUP>
-                         122: <LDC <String 'Got a NameError'>>
-                         124: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         127: <AASTORE>
-                         128: <NEW java/util/Hashtable>
-                         131: <DUP>
-                         132: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         135: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         140: <POP>
-                         141: <ACONST_NULL>
-                         142: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 150>
+                          48: <POP>
+                          49: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          52: <LDC <String 'print'>>
+                          54: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          57: <DUP>
+                          58: <IFNONNULL 27>
+                          61: <POP>
+                          62: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          65: <LDC <String 'print'>>
+                          67: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          70: <DUP>
+                          71: <IFNONNULL 14>
+                          74: <POP>
+                          75: <NEW org/python/exceptions/NameError>
+                          78: <DUP>
+                          79: <LDC <String 'print'>>
+                          81: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          84: <ATHROW>
+                          85: <CHECKCAST <Class org/python/Object>>
+                          88: <CHECKCAST <Class org/python/Callable>>
+                          91: <ICONST_1>
+                          92: <ANEWARRAY org/python/Object>
+                          95: <DUP>
+                          96: <ICONST_0>
+                          97: <NEW org/python/Object>
+                         100: <DUP>
+                         101: <LDC <String 'Got an AttributeError'>>
+                         103: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         106: <AASTORE>
+                         107: <NEW java/util/Hashtable>
+                         110: <DUP>
+                         111: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         114: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         119: <POP>
+                         120: <GOTO 75>
+                         123: <POP>
+                         124: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         127: <LDC <String 'print'>>
+                         129: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         132: <DUP>
+                         133: <IFNONNULL 27>
+                         136: <POP>
+                         137: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         140: <LDC <String 'print'>>
+                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         145: <DUP>
+                         146: <IFNONNULL 14>
+                         149: <POP>
+                         150: <NEW org/python/exceptions/NameError>
+                         153: <DUP>
+                         154: <LDC <String 'print'>>
+                         156: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         159: <ATHROW>
+                         160: <CHECKCAST <Class org/python/Object>>
+                         163: <CHECKCAST <Class org/python/Callable>>
+                         166: <ICONST_1>
+                         167: <ANEWARRAY org/python/Object>
+                         170: <DUP>
+                         171: <ICONST_0>
+                         172: <NEW org/python/Object>
+                         175: <DUP>
+                         176: <LDC <String 'Got a NameError'>>
+                         178: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         181: <AASTORE>
+                         182: <NEW java/util/Hashtable>
+                         185: <DUP>
+                         186: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         189: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         194: <POP>
+                         195: <ACONST_NULL>
+                         196: <ARETURN>
                      Exceptions: (2)
-                         org/python/exceptions/AttributeError: 0-27 [30]
-                         org/python/exceptions/NameError: 0-27 [87]
+                         org/python/exceptions/AttributeError: 0-45 [48]
+                         org/python/exceptions/NameError: 0-45 [123]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
-                                 31: 5
-                                 88: 7
+                                 49: 5
+                                 124: 7
                 """)
 
     def test_try_multiple_except_named(self):
@@ -301,103 +382,130 @@ class TryExceptTests(TranspileTestCase):
                     print("Got a NameError", e)
                 """,
             java="""
-                 Code (217 bytes)
+                 Code (271 bytes)
                      Max stack: 8
                      Max locals: 1
-                     Bytecode: (169 bytes)
+                     Bytecode: (223 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 140>
-                          30: <ASTORE_0>
-                          31: <NEW org/python/Object>
-                          34: <DUP>
-                          35: <ALOAD_0>
-                          36: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                          39: <ASTORE_0>
-                          40: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <DUP>
-                          49: <IFNONNULL 12>
-                          52: <POP>
-                          53: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          56: <LDC <String 'print'>>
-                          58: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          61: <CHECKCAST <Class org/python/Callable>>
-                          64: <ICONST_2>
-                          65: <ANEWARRAY org/python/Object>
-                          68: <DUP>
-                          69: <ICONST_0>
-                          70: <NEW org/python/Object>
-                          73: <DUP>
-                          74: <LDC <String 'Got an AttributeError'>>
-                          76: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          79: <AASTORE>
-                          80: <DUP>
-                          81: <ICONST_1>
-                          82: <ALOAD_0>
-                          83: <AASTORE>
-                          84: <NEW java/util/Hashtable>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 176>
+                          48: <ASTORE_0>
+                          49: <NEW org/python/Object>
+                          52: <DUP>
+                          53: <ALOAD_0>
+                          54: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                          57: <ASTORE_0>
+                          58: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 27>
+                          70: <POP>
+                          71: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          74: <LDC <String 'print'>>
+                          76: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          79: <DUP>
+                          80: <IFNONNULL 14>
+                          83: <POP>
+                          84: <NEW org/python/exceptions/NameError>
                           87: <DUP>
-                          88: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          91: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          96: <POP>
-                          97: <GOTO 70>
-                         100: <ASTORE_0>
-                         101: <NEW org/python/Object>
+                          88: <LDC <String 'print'>>
+                          90: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          93: <ATHROW>
+                          94: <CHECKCAST <Class org/python/Object>>
+                          97: <CHECKCAST <Class org/python/Callable>>
+                         100: <ICONST_2>
+                         101: <ANEWARRAY org/python/Object>
                          104: <DUP>
-                         105: <ALOAD_0>
-                         106: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                         109: <ASTORE_0>
-                         110: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         113: <LDC <String 'print'>>
-                         115: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         118: <DUP>
-                         119: <IFNONNULL 12>
-                         122: <POP>
-                         123: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         126: <LDC <String 'print'>>
-                         128: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         131: <CHECKCAST <Class org/python/Callable>>
-                         134: <ICONST_2>
-                         135: <ANEWARRAY org/python/Object>
-                         138: <DUP>
-                         139: <ICONST_0>
-                         140: <NEW org/python/Object>
-                         143: <DUP>
-                         144: <LDC <String 'Got a NameError'>>
-                         146: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         149: <AASTORE>
-                         150: <DUP>
-                         151: <ICONST_1>
-                         152: <ALOAD_0>
-                         153: <AASTORE>
-                         154: <NEW java/util/Hashtable>
-                         157: <DUP>
-                         158: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         161: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         166: <POP>
-                         167: <ACONST_NULL>
-                         168: <ARETURN>
+                         105: <ICONST_0>
+                         106: <NEW org/python/Object>
+                         109: <DUP>
+                         110: <LDC <String 'Got an AttributeError'>>
+                         112: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         115: <AASTORE>
+                         116: <DUP>
+                         117: <ICONST_1>
+                         118: <ALOAD_0>
+                         119: <AASTORE>
+                         120: <NEW java/util/Hashtable>
+                         123: <DUP>
+                         124: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         127: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         132: <POP>
+                         133: <GOTO 88>
+                         136: <ASTORE_0>
+                         137: <NEW org/python/Object>
+                         140: <DUP>
+                         141: <ALOAD_0>
+                         142: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                         145: <ASTORE_0>
+                         146: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         149: <LDC <String 'print'>>
+                         151: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         154: <DUP>
+                         155: <IFNONNULL 27>
+                         158: <POP>
+                         159: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         162: <LDC <String 'print'>>
+                         164: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         167: <DUP>
+                         168: <IFNONNULL 14>
+                         171: <POP>
+                         172: <NEW org/python/exceptions/NameError>
+                         175: <DUP>
+                         176: <LDC <String 'print'>>
+                         178: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         181: <ATHROW>
+                         182: <CHECKCAST <Class org/python/Object>>
+                         185: <CHECKCAST <Class org/python/Callable>>
+                         188: <ICONST_2>
+                         189: <ANEWARRAY org/python/Object>
+                         192: <DUP>
+                         193: <ICONST_0>
+                         194: <NEW org/python/Object>
+                         197: <DUP>
+                         198: <LDC <String 'Got a NameError'>>
+                         200: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         203: <AASTORE>
+                         204: <DUP>
+                         205: <ICONST_1>
+                         206: <ALOAD_0>
+                         207: <AASTORE>
+                         208: <NEW java/util/Hashtable>
+                         211: <DUP>
+                         212: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         215: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         220: <POP>
+                         221: <ACONST_NULL>
+                         222: <ARETURN>
                      Exceptions: (2)
-                         org/python/exceptions/AttributeError: 0-27 [30]
-                         org/python/exceptions/NameError: 0-27 [100]
+                         org/python/exceptions/AttributeError: 0-45 [48]
+                         org/python/exceptions/NameError: 0-45 [136]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
-                                 40: 5
-                                 110: 7
+                                 58: 5
+                                 146: 7
                 """)
 
     def test_try_multiple_match_except_unnamed(self):
@@ -411,85 +519,112 @@ class TryExceptTests(TranspileTestCase):
                     print("Got a NameError")
                 """,
             java="""
-                 Code (191 bytes)
+                 Code (245 bytes)
                      Max stack: 8
                      Max locals: 0
-                     Bytecode: (143 bytes)
+                     Bytecode: (197 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 114>
-                          30: <POP>
-                          31: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          34: <LDC <String 'print'>>
-                          36: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          39: <DUP>
-                          40: <IFNONNULL 12>
-                          43: <POP>
-                          44: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          47: <LDC <String 'print'>>
-                          49: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          52: <CHECKCAST <Class org/python/Callable>>
-                          55: <ICONST_1>
-                          56: <ANEWARRAY org/python/Object>
-                          59: <DUP>
-                          60: <ICONST_0>
-                          61: <NEW org/python/Object>
-                          64: <DUP>
-                          65: <LDC <String 'Got an AttributeError'>>
-                          67: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          70: <AASTORE>
-                          71: <NEW java/util/Hashtable>
-                          74: <DUP>
-                          75: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          78: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          83: <POP>
-                          84: <GOTO 57>
-                          87: <POP>
-                          88: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          91: <LDC <String 'print'>>
-                          93: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          96: <DUP>
-                          97: <IFNONNULL 12>
-                         100: <POP>
-                         101: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         104: <LDC <String 'print'>>
-                         106: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         109: <CHECKCAST <Class org/python/Callable>>
-                         112: <ICONST_1>
-                         113: <ANEWARRAY org/python/Object>
-                         116: <DUP>
-                         117: <ICONST_0>
-                         118: <NEW org/python/Object>
-                         121: <DUP>
-                         122: <LDC <String 'Got a NameError'>>
-                         124: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         127: <AASTORE>
-                         128: <NEW java/util/Hashtable>
-                         131: <DUP>
-                         132: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         135: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         140: <POP>
-                         141: <ACONST_NULL>
-                         142: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 150>
+                          48: <POP>
+                          49: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          52: <LDC <String 'print'>>
+                          54: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          57: <DUP>
+                          58: <IFNONNULL 27>
+                          61: <POP>
+                          62: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          65: <LDC <String 'print'>>
+                          67: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          70: <DUP>
+                          71: <IFNONNULL 14>
+                          74: <POP>
+                          75: <NEW org/python/exceptions/NameError>
+                          78: <DUP>
+                          79: <LDC <String 'print'>>
+                          81: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          84: <ATHROW>
+                          85: <CHECKCAST <Class org/python/Object>>
+                          88: <CHECKCAST <Class org/python/Callable>>
+                          91: <ICONST_1>
+                          92: <ANEWARRAY org/python/Object>
+                          95: <DUP>
+                          96: <ICONST_0>
+                          97: <NEW org/python/Object>
+                         100: <DUP>
+                         101: <LDC <String 'Got an AttributeError'>>
+                         103: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         106: <AASTORE>
+                         107: <NEW java/util/Hashtable>
+                         110: <DUP>
+                         111: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         114: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         119: <POP>
+                         120: <GOTO 75>
+                         123: <POP>
+                         124: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         127: <LDC <String 'print'>>
+                         129: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         132: <DUP>
+                         133: <IFNONNULL 27>
+                         136: <POP>
+                         137: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         140: <LDC <String 'print'>>
+                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         145: <DUP>
+                         146: <IFNONNULL 14>
+                         149: <POP>
+                         150: <NEW org/python/exceptions/NameError>
+                         153: <DUP>
+                         154: <LDC <String 'print'>>
+                         156: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         159: <ATHROW>
+                         160: <CHECKCAST <Class org/python/Object>>
+                         163: <CHECKCAST <Class org/python/Callable>>
+                         166: <ICONST_1>
+                         167: <ANEWARRAY org/python/Object>
+                         170: <DUP>
+                         171: <ICONST_0>
+                         172: <NEW org/python/Object>
+                         175: <DUP>
+                         176: <LDC <String 'Got a NameError'>>
+                         178: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         181: <AASTORE>
+                         182: <NEW java/util/Hashtable>
+                         185: <DUP>
+                         186: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         189: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         194: <POP>
+                         195: <ACONST_NULL>
+                         196: <ARETURN>
                      Exceptions: (2)
-                         org/python/exceptions/AttributeError: 0-27 [30]
-                         org/python/exceptions/NameError: 0-27 [87]
+                         org/python/exceptions/AttributeError: 0-45 [48]
+                         org/python/exceptions/NameError: 0-45 [123]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
-                                 31: 5
-                                 88: 7
+                                 49: 5
+                                 124: 7
                 """)
 
     def test_try_multiple_match_except_named(self):
@@ -503,103 +638,130 @@ class TryExceptTests(TranspileTestCase):
                     print("Got a NameError", e)
                 """,
             java="""
-                 Code (217 bytes)
+                 Code (271 bytes)
                      Max stack: 8
                      Max locals: 1
-                     Bytecode: (169 bytes)
+                     Bytecode: (223 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 140>
-                          30: <ASTORE_0>
-                          31: <NEW org/python/Object>
-                          34: <DUP>
-                          35: <ALOAD_0>
-                          36: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                          39: <ASTORE_0>
-                          40: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <DUP>
-                          49: <IFNONNULL 12>
-                          52: <POP>
-                          53: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          56: <LDC <String 'print'>>
-                          58: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          61: <CHECKCAST <Class org/python/Callable>>
-                          64: <ICONST_2>
-                          65: <ANEWARRAY org/python/Object>
-                          68: <DUP>
-                          69: <ICONST_0>
-                          70: <NEW org/python/Object>
-                          73: <DUP>
-                          74: <LDC <String 'Got an AttributeError'>>
-                          76: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          79: <AASTORE>
-                          80: <DUP>
-                          81: <ICONST_1>
-                          82: <ALOAD_0>
-                          83: <AASTORE>
-                          84: <NEW java/util/Hashtable>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 176>
+                          48: <ASTORE_0>
+                          49: <NEW org/python/Object>
+                          52: <DUP>
+                          53: <ALOAD_0>
+                          54: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                          57: <ASTORE_0>
+                          58: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 27>
+                          70: <POP>
+                          71: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          74: <LDC <String 'print'>>
+                          76: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          79: <DUP>
+                          80: <IFNONNULL 14>
+                          83: <POP>
+                          84: <NEW org/python/exceptions/NameError>
                           87: <DUP>
-                          88: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          91: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          96: <POP>
-                          97: <GOTO 70>
-                         100: <ASTORE_0>
-                         101: <NEW org/python/Object>
+                          88: <LDC <String 'print'>>
+                          90: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          93: <ATHROW>
+                          94: <CHECKCAST <Class org/python/Object>>
+                          97: <CHECKCAST <Class org/python/Callable>>
+                         100: <ICONST_2>
+                         101: <ANEWARRAY org/python/Object>
                          104: <DUP>
-                         105: <ALOAD_0>
-                         106: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                         109: <ASTORE_0>
-                         110: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         113: <LDC <String 'print'>>
-                         115: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         118: <DUP>
-                         119: <IFNONNULL 12>
-                         122: <POP>
-                         123: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         126: <LDC <String 'print'>>
-                         128: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         131: <CHECKCAST <Class org/python/Callable>>
-                         134: <ICONST_2>
-                         135: <ANEWARRAY org/python/Object>
-                         138: <DUP>
-                         139: <ICONST_0>
-                         140: <NEW org/python/Object>
-                         143: <DUP>
-                         144: <LDC <String 'Got a NameError'>>
-                         146: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         149: <AASTORE>
-                         150: <DUP>
-                         151: <ICONST_1>
-                         152: <ALOAD_0>
-                         153: <AASTORE>
-                         154: <NEW java/util/Hashtable>
-                         157: <DUP>
-                         158: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         161: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         166: <POP>
-                         167: <ACONST_NULL>
-                         168: <ARETURN>
+                         105: <ICONST_0>
+                         106: <NEW org/python/Object>
+                         109: <DUP>
+                         110: <LDC <String 'Got an AttributeError'>>
+                         112: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         115: <AASTORE>
+                         116: <DUP>
+                         117: <ICONST_1>
+                         118: <ALOAD_0>
+                         119: <AASTORE>
+                         120: <NEW java/util/Hashtable>
+                         123: <DUP>
+                         124: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         127: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         132: <POP>
+                         133: <GOTO 88>
+                         136: <ASTORE_0>
+                         137: <NEW org/python/Object>
+                         140: <DUP>
+                         141: <ALOAD_0>
+                         142: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                         145: <ASTORE_0>
+                         146: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         149: <LDC <String 'print'>>
+                         151: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         154: <DUP>
+                         155: <IFNONNULL 27>
+                         158: <POP>
+                         159: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         162: <LDC <String 'print'>>
+                         164: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         167: <DUP>
+                         168: <IFNONNULL 14>
+                         171: <POP>
+                         172: <NEW org/python/exceptions/NameError>
+                         175: <DUP>
+                         176: <LDC <String 'print'>>
+                         178: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         181: <ATHROW>
+                         182: <CHECKCAST <Class org/python/Object>>
+                         185: <CHECKCAST <Class org/python/Callable>>
+                         188: <ICONST_2>
+                         189: <ANEWARRAY org/python/Object>
+                         192: <DUP>
+                         193: <ICONST_0>
+                         194: <NEW org/python/Object>
+                         197: <DUP>
+                         198: <LDC <String 'Got a NameError'>>
+                         200: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         203: <AASTORE>
+                         204: <DUP>
+                         205: <ICONST_1>
+                         206: <ALOAD_0>
+                         207: <AASTORE>
+                         208: <NEW java/util/Hashtable>
+                         211: <DUP>
+                         212: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         215: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         220: <POP>
+                         221: <ACONST_NULL>
+                         222: <ARETURN>
                      Exceptions: (2)
-                         org/python/exceptions/AttributeError: 0-27 [30]
-                         org/python/exceptions/NameError: 0-27 [100]
+                         org/python/exceptions/AttributeError: 0-45 [48]
+                         org/python/exceptions/NameError: 0-45 [136]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
-                                 40: 5
-                                 110: 7
+                                 58: 5
+                                 146: 7
                 """)
 
     def test_try_multiple_except_mixed1(self):
@@ -613,94 +775,121 @@ class TryExceptTests(TranspileTestCase):
                     print("Got a NameError", e)
                 """,
             java="""
-                 Code (204 bytes)
+                 Code (258 bytes)
                      Max stack: 8
                      Max locals: 1
-                     Bytecode: (156 bytes)
+                     Bytecode: (210 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 127>
-                          30: <POP>
-                          31: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          34: <LDC <String 'print'>>
-                          36: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          39: <DUP>
-                          40: <IFNONNULL 12>
-                          43: <POP>
-                          44: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          47: <LDC <String 'print'>>
-                          49: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          52: <CHECKCAST <Class org/python/Callable>>
-                          55: <ICONST_1>
-                          56: <ANEWARRAY org/python/Object>
-                          59: <DUP>
-                          60: <ICONST_0>
-                          61: <NEW org/python/Object>
-                          64: <DUP>
-                          65: <LDC <String 'Got an AttributeError'>>
-                          67: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          70: <AASTORE>
-                          71: <NEW java/util/Hashtable>
-                          74: <DUP>
-                          75: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          78: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          83: <POP>
-                          84: <GOTO 70>
-                          87: <ASTORE_0>
-                          88: <NEW org/python/Object>
-                          91: <DUP>
-                          92: <ALOAD_0>
-                          93: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                          96: <ASTORE_0>
-                          97: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         100: <LDC <String 'print'>>
-                         102: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         105: <DUP>
-                         106: <IFNONNULL 12>
-                         109: <POP>
-                         110: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         113: <LDC <String 'print'>>
-                         115: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         118: <CHECKCAST <Class org/python/Callable>>
-                         121: <ICONST_2>
-                         122: <ANEWARRAY org/python/Object>
-                         125: <DUP>
-                         126: <ICONST_0>
-                         127: <NEW org/python/Object>
-                         130: <DUP>
-                         131: <LDC <String 'Got a NameError'>>
-                         133: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         136: <AASTORE>
-                         137: <DUP>
-                         138: <ICONST_1>
-                         139: <ALOAD_0>
-                         140: <AASTORE>
-                         141: <NEW java/util/Hashtable>
-                         144: <DUP>
-                         145: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         148: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         153: <POP>
-                         154: <ACONST_NULL>
-                         155: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 163>
+                          48: <POP>
+                          49: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          52: <LDC <String 'print'>>
+                          54: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          57: <DUP>
+                          58: <IFNONNULL 27>
+                          61: <POP>
+                          62: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          65: <LDC <String 'print'>>
+                          67: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          70: <DUP>
+                          71: <IFNONNULL 14>
+                          74: <POP>
+                          75: <NEW org/python/exceptions/NameError>
+                          78: <DUP>
+                          79: <LDC <String 'print'>>
+                          81: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          84: <ATHROW>
+                          85: <CHECKCAST <Class org/python/Object>>
+                          88: <CHECKCAST <Class org/python/Callable>>
+                          91: <ICONST_1>
+                          92: <ANEWARRAY org/python/Object>
+                          95: <DUP>
+                          96: <ICONST_0>
+                          97: <NEW org/python/Object>
+                         100: <DUP>
+                         101: <LDC <String 'Got an AttributeError'>>
+                         103: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         106: <AASTORE>
+                         107: <NEW java/util/Hashtable>
+                         110: <DUP>
+                         111: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         114: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         119: <POP>
+                         120: <GOTO 88>
+                         123: <ASTORE_0>
+                         124: <NEW org/python/Object>
+                         127: <DUP>
+                         128: <ALOAD_0>
+                         129: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                         132: <ASTORE_0>
+                         133: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         136: <LDC <String 'print'>>
+                         138: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         141: <DUP>
+                         142: <IFNONNULL 27>
+                         145: <POP>
+                         146: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         149: <LDC <String 'print'>>
+                         151: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         154: <DUP>
+                         155: <IFNONNULL 14>
+                         158: <POP>
+                         159: <NEW org/python/exceptions/NameError>
+                         162: <DUP>
+                         163: <LDC <String 'print'>>
+                         165: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         168: <ATHROW>
+                         169: <CHECKCAST <Class org/python/Object>>
+                         172: <CHECKCAST <Class org/python/Callable>>
+                         175: <ICONST_2>
+                         176: <ANEWARRAY org/python/Object>
+                         179: <DUP>
+                         180: <ICONST_0>
+                         181: <NEW org/python/Object>
+                         184: <DUP>
+                         185: <LDC <String 'Got a NameError'>>
+                         187: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         190: <AASTORE>
+                         191: <DUP>
+                         192: <ICONST_1>
+                         193: <ALOAD_0>
+                         194: <AASTORE>
+                         195: <NEW java/util/Hashtable>
+                         198: <DUP>
+                         199: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         202: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         207: <POP>
+                         208: <ACONST_NULL>
+                         209: <ARETURN>
                      Exceptions: (2)
-                         org/python/exceptions/AttributeError: 0-27 [30]
-                         org/python/exceptions/NameError: 0-27 [87]
+                         org/python/exceptions/AttributeError: 0-45 [48]
+                         org/python/exceptions/NameError: 0-45 [123]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
-                                 31: 5
-                                 97: 7
+                                 49: 5
+                                 133: 7
                 """)
 
     def test_try_multiple_except_mixed2(self):
@@ -714,94 +903,121 @@ class TryExceptTests(TranspileTestCase):
                     print("Got a NameError")
                 """,
             java="""
-                 Code (204 bytes)
+                 Code (258 bytes)
                      Max stack: 8
                      Max locals: 1
-                     Bytecode: (156 bytes)
+                     Bytecode: (210 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 127>
-                          30: <ASTORE_0>
-                          31: <NEW org/python/Object>
-                          34: <DUP>
-                          35: <ALOAD_0>
-                          36: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                          39: <ASTORE_0>
-                          40: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <DUP>
-                          49: <IFNONNULL 12>
-                          52: <POP>
-                          53: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          56: <LDC <String 'print'>>
-                          58: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          61: <CHECKCAST <Class org/python/Callable>>
-                          64: <ICONST_2>
-                          65: <ANEWARRAY org/python/Object>
-                          68: <DUP>
-                          69: <ICONST_0>
-                          70: <NEW org/python/Object>
-                          73: <DUP>
-                          74: <LDC <String 'Got an AttributeError'>>
-                          76: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          79: <AASTORE>
-                          80: <DUP>
-                          81: <ICONST_1>
-                          82: <ALOAD_0>
-                          83: <AASTORE>
-                          84: <NEW java/util/Hashtable>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 163>
+                          48: <ASTORE_0>
+                          49: <NEW org/python/Object>
+                          52: <DUP>
+                          53: <ALOAD_0>
+                          54: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                          57: <ASTORE_0>
+                          58: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 27>
+                          70: <POP>
+                          71: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          74: <LDC <String 'print'>>
+                          76: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          79: <DUP>
+                          80: <IFNONNULL 14>
+                          83: <POP>
+                          84: <NEW org/python/exceptions/NameError>
                           87: <DUP>
-                          88: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          91: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          96: <POP>
-                          97: <GOTO 57>
-                         100: <POP>
-                         101: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         104: <LDC <String 'print'>>
-                         106: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          88: <LDC <String 'print'>>
+                          90: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          93: <ATHROW>
+                          94: <CHECKCAST <Class org/python/Object>>
+                          97: <CHECKCAST <Class org/python/Callable>>
+                         100: <ICONST_2>
+                         101: <ANEWARRAY org/python/Object>
+                         104: <DUP>
+                         105: <ICONST_0>
+                         106: <NEW org/python/Object>
                          109: <DUP>
-                         110: <IFNONNULL 12>
-                         113: <POP>
-                         114: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         117: <LDC <String 'print'>>
-                         119: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         122: <CHECKCAST <Class org/python/Callable>>
-                         125: <ICONST_1>
-                         126: <ANEWARRAY org/python/Object>
-                         129: <DUP>
-                         130: <ICONST_0>
-                         131: <NEW org/python/Object>
-                         134: <DUP>
-                         135: <LDC <String 'Got a NameError'>>
-                         137: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         140: <AASTORE>
-                         141: <NEW java/util/Hashtable>
-                         144: <DUP>
-                         145: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         148: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         153: <POP>
-                         154: <ACONST_NULL>
-                         155: <ARETURN>
+                         110: <LDC <String 'Got an AttributeError'>>
+                         112: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         115: <AASTORE>
+                         116: <DUP>
+                         117: <ICONST_1>
+                         118: <ALOAD_0>
+                         119: <AASTORE>
+                         120: <NEW java/util/Hashtable>
+                         123: <DUP>
+                         124: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         127: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         132: <POP>
+                         133: <GOTO 75>
+                         136: <POP>
+                         137: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         140: <LDC <String 'print'>>
+                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         145: <DUP>
+                         146: <IFNONNULL 27>
+                         149: <POP>
+                         150: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         153: <LDC <String 'print'>>
+                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         158: <DUP>
+                         159: <IFNONNULL 14>
+                         162: <POP>
+                         163: <NEW org/python/exceptions/NameError>
+                         166: <DUP>
+                         167: <LDC <String 'print'>>
+                         169: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         172: <ATHROW>
+                         173: <CHECKCAST <Class org/python/Object>>
+                         176: <CHECKCAST <Class org/python/Callable>>
+                         179: <ICONST_1>
+                         180: <ANEWARRAY org/python/Object>
+                         183: <DUP>
+                         184: <ICONST_0>
+                         185: <NEW org/python/Object>
+                         188: <DUP>
+                         189: <LDC <String 'Got a NameError'>>
+                         191: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         194: <AASTORE>
+                         195: <NEW java/util/Hashtable>
+                         198: <DUP>
+                         199: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         202: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         207: <POP>
+                         208: <ACONST_NULL>
+                         209: <ARETURN>
                      Exceptions: (2)
-                         org/python/exceptions/AttributeError: 0-27 [30]
-                         org/python/exceptions/NameError: 0-27 [100]
+                         org/python/exceptions/AttributeError: 0-45 [48]
+                         org/python/exceptions/NameError: 0-45 [136]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
-                                 40: 5
-                                 101: 7
+                                 58: 5
+                                 137: 7
                 """)
 
     def test_try_multiple_except_mixed3(self):
@@ -817,122 +1033,158 @@ class TryExceptTests(TranspileTestCase):
                     print("Got an anonymous error")
                 """,
             java="""
-                 Code (273 bytes)
+                 Code (345 bytes)
                      Max stack: 9
                      Max locals: 1
-                     Bytecode: (213 bytes)
+                     Bytecode: (285 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GOTO 184>
-                          30: <ASTORE_0>
-                          31: <NEW org/python/Object>
-                          34: <DUP>
-                          35: <ALOAD_0>
-                          36: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                          39: <ASTORE_0>
-                          40: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <DUP>
-                          49: <IFNONNULL 12>
-                          52: <POP>
-                          53: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          56: <LDC <String 'print'>>
-                          58: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          61: <CHECKCAST <Class org/python/Callable>>
-                          64: <ICONST_2>
-                          65: <ANEWARRAY org/python/Object>
-                          68: <DUP>
-                          69: <ICONST_0>
-                          70: <NEW org/python/Object>
-                          73: <DUP>
-                          74: <LDC <String 'Got an AttributeError'>>
-                          76: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          79: <AASTORE>
-                          80: <DUP>
-                          81: <ICONST_1>
-                          82: <ALOAD_0>
-                          83: <AASTORE>
-                          84: <NEW java/util/Hashtable>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GOTO 238>
+                          48: <ASTORE_0>
+                          49: <NEW org/python/Object>
+                          52: <DUP>
+                          53: <ALOAD_0>
+                          54: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                          57: <ASTORE_0>
+                          58: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 27>
+                          70: <POP>
+                          71: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          74: <LDC <String 'print'>>
+                          76: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          79: <DUP>
+                          80: <IFNONNULL 14>
+                          83: <POP>
+                          84: <NEW org/python/exceptions/NameError>
                           87: <DUP>
-                          88: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          91: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          96: <POP>
-                          97: <GOTO 114>
-                         100: <POP>
-                         101: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         104: <LDC <String 'print'>>
-                         106: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          88: <LDC <String 'print'>>
+                          90: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          93: <ATHROW>
+                          94: <CHECKCAST <Class org/python/Object>>
+                          97: <CHECKCAST <Class org/python/Callable>>
+                         100: <ICONST_2>
+                         101: <ANEWARRAY org/python/Object>
+                         104: <DUP>
+                         105: <ICONST_0>
+                         106: <NEW org/python/Object>
                          109: <DUP>
-                         110: <IFNONNULL 12>
-                         113: <POP>
-                         114: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         117: <LDC <String 'print'>>
-                         119: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         122: <CHECKCAST <Class org/python/Callable>>
-                         125: <ICONST_1>
-                         126: <ANEWARRAY org/python/Object>
-                         129: <DUP>
-                         130: <ICONST_0>
-                         131: <NEW org/python/Object>
-                         134: <DUP>
-                         135: <LDC <String 'Got a NameError'>>
-                         137: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         140: <AASTORE>
-                         141: <NEW java/util/Hashtable>
-                         144: <DUP>
-                         145: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         148: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         153: <POP>
-                         154: <GOTO 57>
-                         157: <POP>
-                         158: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         161: <LDC <String 'print'>>
-                         163: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         110: <LDC <String 'Got an AttributeError'>>
+                         112: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         115: <AASTORE>
+                         116: <DUP>
+                         117: <ICONST_1>
+                         118: <ALOAD_0>
+                         119: <AASTORE>
+                         120: <NEW java/util/Hashtable>
+                         123: <DUP>
+                         124: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         127: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         132: <POP>
+                         133: <GOTO 150>
+                         136: <POP>
+                         137: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         140: <LDC <String 'print'>>
+                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         145: <DUP>
+                         146: <IFNONNULL 27>
+                         149: <POP>
+                         150: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         153: <LDC <String 'print'>>
+                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         158: <DUP>
+                         159: <IFNONNULL 14>
+                         162: <POP>
+                         163: <NEW org/python/exceptions/NameError>
                          166: <DUP>
-                         167: <IFNONNULL 12>
-                         170: <POP>
-                         171: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         174: <LDC <String 'print'>>
-                         176: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         179: <CHECKCAST <Class org/python/Callable>>
-                         182: <ICONST_1>
-                         183: <ANEWARRAY org/python/Object>
-                         186: <DUP>
-                         187: <ICONST_0>
-                         188: <NEW org/python/Object>
-                         191: <DUP>
-                         192: <LDC <String 'Got an anonymous error'>>
-                         194: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         197: <AASTORE>
-                         198: <NEW java/util/Hashtable>
-                         201: <DUP>
-                         202: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         205: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         210: <POP>
-                         211: <ACONST_NULL>
-                         212: <ARETURN>
+                         167: <LDC <String 'print'>>
+                         169: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         172: <ATHROW>
+                         173: <CHECKCAST <Class org/python/Object>>
+                         176: <CHECKCAST <Class org/python/Callable>>
+                         179: <ICONST_1>
+                         180: <ANEWARRAY org/python/Object>
+                         183: <DUP>
+                         184: <ICONST_0>
+                         185: <NEW org/python/Object>
+                         188: <DUP>
+                         189: <LDC <String 'Got a NameError'>>
+                         191: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         194: <AASTORE>
+                         195: <NEW java/util/Hashtable>
+                         198: <DUP>
+                         199: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         202: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         207: <POP>
+                         208: <GOTO 75>
+                         211: <POP>
+                         212: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         215: <LDC <String 'print'>>
+                         217: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         220: <DUP>
+                         221: <IFNONNULL 27>
+                         224: <POP>
+                         225: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         228: <LDC <String 'print'>>
+                         230: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         233: <DUP>
+                         234: <IFNONNULL 14>
+                         237: <POP>
+                         238: <NEW org/python/exceptions/NameError>
+                         241: <DUP>
+                         242: <LDC <String 'print'>>
+                         244: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         247: <ATHROW>
+                         248: <CHECKCAST <Class org/python/Object>>
+                         251: <CHECKCAST <Class org/python/Callable>>
+                         254: <ICONST_1>
+                         255: <ANEWARRAY org/python/Object>
+                         258: <DUP>
+                         259: <ICONST_0>
+                         260: <NEW org/python/Object>
+                         263: <DUP>
+                         264: <LDC <String 'Got an anonymous error'>>
+                         266: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         269: <AASTORE>
+                         270: <NEW java/util/Hashtable>
+                         273: <DUP>
+                         274: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         277: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         282: <POP>
+                         283: <ACONST_NULL>
+                         284: <ARETURN>
                      Exceptions: (3)
-                         org/python/exceptions/AttributeError: 0-27 [30]
-                         org/python/exceptions/NameError: 0-27 [100]
-                         org/python/exceptions/BaseException: 0-27 [157]
+                         org/python/exceptions/AttributeError: 0-45 [48]
+                         org/python/exceptions/NameError: 0-45 [136]
+                         org/python/exceptions/BaseException: 0-45 [211]
                      Attributes: (1)
                          LineNumberTable (18 bytes)
                              Line numbers (4 total):
                                  0: 3
-                                 40: 5
-                                 101: 7
-                                 158: 9
+                                 58: 5
+                                 137: 7
+                                 212: 9
                 """)
 
 
@@ -946,10 +1198,10 @@ class TryExceptFinallyTests(TranspileTestCase):
                     print("Do final cleanup")
                 """,
             java="""
-                 Code (163 bytes)
+                 Code (199 bytes)
                      Max stack: 8
                      Max locals: 2
-                     Bytecode: (123 bytes)
+                     Bytecode: (159 bytes)
                            0: <NEW org/python/Object>
                            3: <DUP>
                            4: <ICONST_3>
@@ -959,64 +1211,82 @@ class TryExceptFinallyTests(TranspileTestCase):
                           12: <LDC <String 'print'>>
                           14: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                           17: <DUP>
-                          18: <IFNONNULL 12>
+                          18: <IFNONNULL 27>
                           21: <POP>
                           22: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           25: <LDC <String 'print'>>
                           27: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          30: <CHECKCAST <Class org/python/Callable>>
-                          33: <ICONST_1>
-                          34: <ANEWARRAY org/python/Object>
-                          37: <DUP>
-                          38: <ICONST_0>
-                          39: <NEW org/python/Object>
-                          42: <DUP>
-                          43: <LDC <String 'Do final cleanup'>>
-                          45: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          48: <AASTORE>
-                          49: <NEW java/util/Hashtable>
-                          52: <DUP>
-                          53: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          56: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          61: <POP>
-                          62: <GOTO 59>
-                          65: <ASTORE_1>
-                          66: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          69: <LDC <String 'print'>>
-                          71: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          74: <DUP>
-                          75: <IFNONNULL 12>
-                          78: <POP>
-                          79: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          82: <LDC <String 'print'>>
-                          84: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          87: <CHECKCAST <Class org/python/Callable>>
-                          90: <ICONST_1>
-                          91: <ANEWARRAY org/python/Object>
-                          94: <DUP>
-                          95: <ICONST_0>
-                          96: <NEW org/python/Object>
-                          99: <DUP>
-                         100: <LDC <String 'Do final cleanup'>>
-                         102: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         105: <AASTORE>
-                         106: <NEW java/util/Hashtable>
-                         109: <DUP>
-                         110: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         113: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         118: <POP>
-                         119: <ALOAD_1>
-                         120: <ATHROW>
-                         121: <ACONST_NULL>
-                         122: <ARETURN>
+                          30: <DUP>
+                          31: <IFNONNULL 14>
+                          34: <POP>
+                          35: <NEW org/python/exceptions/NameError>
+                          38: <DUP>
+                          39: <LDC <String 'print'>>
+                          41: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          44: <ATHROW>
+                          45: <CHECKCAST <Class org/python/Object>>
+                          48: <CHECKCAST <Class org/python/Callable>>
+                          51: <ICONST_1>
+                          52: <ANEWARRAY org/python/Object>
+                          55: <DUP>
+                          56: <ICONST_0>
+                          57: <NEW org/python/Object>
+                          60: <DUP>
+                          61: <LDC <String 'Do final cleanup'>>
+                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                          66: <AASTORE>
+                          67: <NEW java/util/Hashtable>
+                          70: <DUP>
+                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                          79: <POP>
+                          80: <GOTO 77>
+                          83: <ASTORE_1>
+                          84: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          87: <LDC <String 'print'>>
+                          89: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          92: <DUP>
+                          93: <IFNONNULL 27>
+                          96: <POP>
+                          97: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         100: <LDC <String 'print'>>
+                         102: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         105: <DUP>
+                         106: <IFNONNULL 14>
+                         109: <POP>
+                         110: <NEW org/python/exceptions/NameError>
+                         113: <DUP>
+                         114: <LDC <String 'print'>>
+                         116: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         119: <ATHROW>
+                         120: <CHECKCAST <Class org/python/Object>>
+                         123: <CHECKCAST <Class org/python/Callable>>
+                         126: <ICONST_1>
+                         127: <ANEWARRAY org/python/Object>
+                         130: <DUP>
+                         131: <ICONST_0>
+                         132: <NEW org/python/Object>
+                         135: <DUP>
+                         136: <LDC <String 'Do final cleanup'>>
+                         138: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         141: <AASTORE>
+                         142: <NEW java/util/Hashtable>
+                         145: <DUP>
+                         146: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         149: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         154: <POP>
+                         155: <ALOAD_1>
+                         156: <ATHROW>
+                         157: <ACONST_NULL>
+                         158: <ARETURN>
                      Exceptions: (1)
-                         finally: 0-9 [65]
+                         finally: 0-9 [83]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
                                  9: 5
-                                 66: 5
+                                 84: 5
                 """)
 
     def test_try_except_finally(self):
@@ -1030,138 +1300,183 @@ class TryExceptFinallyTests(TranspileTestCase):
                     print("Do final cleanup")
                 """,
             java="""
-                 Code (315 bytes)
+                 Code (405 bytes)
                      Max stack: 10
                      Max locals: 1
-                     Bytecode: (251 bytes)
+                     Bytecode: (341 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do final cleanup'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GOTO 169>
-                          83: <POP>
-                          84: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          87: <LDC <String 'print'>>
-                          89: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          92: <DUP>
-                          93: <IFNONNULL 12>
-                          96: <POP>
-                          97: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         100: <LDC <String 'print'>>
-                         102: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         105: <CHECKCAST <Class org/python/Callable>>
-                         108: <ICONST_1>
-                         109: <ANEWARRAY org/python/Object>
-                         112: <DUP>
-                         113: <ICONST_0>
-                         114: <NEW org/python/Object>
-                         117: <DUP>
-                         118: <LDC <String 'Got an error'>>
-                         120: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         123: <AASTORE>
-                         124: <NEW java/util/Hashtable>
-                         127: <DUP>
-                         128: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         131: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         136: <POP>
-                         137: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         140: <LDC <String 'print'>>
-                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         145: <DUP>
-                         146: <IFNONNULL 12>
-                         149: <POP>
-                         150: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         153: <LDC <String 'print'>>
-                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         158: <CHECKCAST <Class org/python/Callable>>
-                         161: <ICONST_1>
-                         162: <ANEWARRAY org/python/Object>
-                         165: <DUP>
-                         166: <ICONST_0>
-                         167: <NEW org/python/Object>
-                         170: <DUP>
-                         171: <LDC <String 'Do final cleanup'>>
-                         173: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         176: <AASTORE>
-                         177: <NEW java/util/Hashtable>
-                         180: <DUP>
-                         181: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         184: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         189: <POP>
-                         190: <GOTO 59>
-                         193: <ASTORE_0>
-                         194: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         197: <LDC <String 'print'>>
-                         199: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         202: <DUP>
-                         203: <IFNONNULL 12>
-                         206: <POP>
-                         207: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         210: <LDC <String 'print'>>
-                         212: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         215: <CHECKCAST <Class org/python/Callable>>
-                         218: <ICONST_1>
-                         219: <ANEWARRAY org/python/Object>
-                         222: <DUP>
-                         223: <ICONST_0>
-                         224: <NEW org/python/Object>
-                         227: <DUP>
-                         228: <LDC <String 'Do final cleanup'>>
-                         230: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         233: <AASTORE>
-                         234: <NEW java/util/Hashtable>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do final cleanup'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GOTO 223>
+                         119: <POP>
+                         120: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         123: <LDC <String 'print'>>
+                         125: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         128: <DUP>
+                         129: <IFNONNULL 27>
+                         132: <POP>
+                         133: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         136: <LDC <String 'print'>>
+                         138: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         141: <DUP>
+                         142: <IFNONNULL 14>
+                         145: <POP>
+                         146: <NEW org/python/exceptions/NameError>
+                         149: <DUP>
+                         150: <LDC <String 'print'>>
+                         152: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         155: <ATHROW>
+                         156: <CHECKCAST <Class org/python/Object>>
+                         159: <CHECKCAST <Class org/python/Callable>>
+                         162: <ICONST_1>
+                         163: <ANEWARRAY org/python/Object>
+                         166: <DUP>
+                         167: <ICONST_0>
+                         168: <NEW org/python/Object>
+                         171: <DUP>
+                         172: <LDC <String 'Got an error'>>
+                         174: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         177: <AASTORE>
+                         178: <NEW java/util/Hashtable>
+                         181: <DUP>
+                         182: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         185: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         190: <POP>
+                         191: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         194: <LDC <String 'print'>>
+                         196: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         199: <DUP>
+                         200: <IFNONNULL 27>
+                         203: <POP>
+                         204: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         207: <LDC <String 'print'>>
+                         209: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         212: <DUP>
+                         213: <IFNONNULL 14>
+                         216: <POP>
+                         217: <NEW org/python/exceptions/NameError>
+                         220: <DUP>
+                         221: <LDC <String 'print'>>
+                         223: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         226: <ATHROW>
+                         227: <CHECKCAST <Class org/python/Object>>
+                         230: <CHECKCAST <Class org/python/Callable>>
+                         233: <ICONST_1>
+                         234: <ANEWARRAY org/python/Object>
                          237: <DUP>
-                         238: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         241: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         246: <POP>
-                         247: <ALOAD_0>
-                         248: <ATHROW>
-                         249: <ACONST_NULL>
-                         250: <ARETURN>
+                         238: <ICONST_0>
+                         239: <NEW org/python/Object>
+                         242: <DUP>
+                         243: <LDC <String 'Do final cleanup'>>
+                         245: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         248: <AASTORE>
+                         249: <NEW java/util/Hashtable>
+                         252: <DUP>
+                         253: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         256: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         261: <POP>
+                         262: <GOTO 77>
+                         265: <ASTORE_0>
+                         266: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         269: <LDC <String 'print'>>
+                         271: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         274: <DUP>
+                         275: <IFNONNULL 27>
+                         278: <POP>
+                         279: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         282: <LDC <String 'print'>>
+                         284: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         287: <DUP>
+                         288: <IFNONNULL 14>
+                         291: <POP>
+                         292: <NEW org/python/exceptions/NameError>
+                         295: <DUP>
+                         296: <LDC <String 'print'>>
+                         298: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         301: <ATHROW>
+                         302: <CHECKCAST <Class org/python/Object>>
+                         305: <CHECKCAST <Class org/python/Callable>>
+                         308: <ICONST_1>
+                         309: <ANEWARRAY org/python/Object>
+                         312: <DUP>
+                         313: <ICONST_0>
+                         314: <NEW org/python/Object>
+                         317: <DUP>
+                         318: <LDC <String 'Do final cleanup'>>
+                         320: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         323: <AASTORE>
+                         324: <NEW java/util/Hashtable>
+                         327: <DUP>
+                         328: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         331: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         336: <POP>
+                         337: <ALOAD_0>
+                         338: <ATHROW>
+                         339: <ACONST_NULL>
+                         340: <ARETURN>
                      Exceptions: (3)
-                         org/python/exceptions/BaseException: 0-27 [83]
-                         finally: 0-27 [193]
-                         finally: 83-137 [193]
+                         org/python/exceptions/BaseException: 0-45 [119]
+                         finally: 0-45 [265]
+                         finally: 119-191 [265]
                      Attributes: (1)
                          LineNumberTable (22 bytes)
                              Line numbers (5 total):
                                  0: 3
-                                 27: 7
-                                 84: 5
-                                 137: 7
-                                 194: 7
+                                 45: 7
+                                 120: 5
+                                 191: 7
+                                 266: 7
                 """)
 
     def test_try_except_unnamed_finally(self):
@@ -1175,138 +1490,183 @@ class TryExceptFinallyTests(TranspileTestCase):
                     print("Do final cleanup")
                 """,
             java="""
-                 Code (315 bytes)
+                 Code (405 bytes)
                      Max stack: 10
                      Max locals: 1
-                     Bytecode: (251 bytes)
+                     Bytecode: (341 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do final cleanup'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GOTO 169>
-                          83: <POP>
-                          84: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          87: <LDC <String 'print'>>
-                          89: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          92: <DUP>
-                          93: <IFNONNULL 12>
-                          96: <POP>
-                          97: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         100: <LDC <String 'print'>>
-                         102: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         105: <CHECKCAST <Class org/python/Callable>>
-                         108: <ICONST_1>
-                         109: <ANEWARRAY org/python/Object>
-                         112: <DUP>
-                         113: <ICONST_0>
-                         114: <NEW org/python/Object>
-                         117: <DUP>
-                         118: <LDC <String 'Got an error'>>
-                         120: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         123: <AASTORE>
-                         124: <NEW java/util/Hashtable>
-                         127: <DUP>
-                         128: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         131: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         136: <POP>
-                         137: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         140: <LDC <String 'print'>>
-                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         145: <DUP>
-                         146: <IFNONNULL 12>
-                         149: <POP>
-                         150: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         153: <LDC <String 'print'>>
-                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         158: <CHECKCAST <Class org/python/Callable>>
-                         161: <ICONST_1>
-                         162: <ANEWARRAY org/python/Object>
-                         165: <DUP>
-                         166: <ICONST_0>
-                         167: <NEW org/python/Object>
-                         170: <DUP>
-                         171: <LDC <String 'Do final cleanup'>>
-                         173: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         176: <AASTORE>
-                         177: <NEW java/util/Hashtable>
-                         180: <DUP>
-                         181: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         184: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         189: <POP>
-                         190: <GOTO 59>
-                         193: <ASTORE_0>
-                         194: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         197: <LDC <String 'print'>>
-                         199: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         202: <DUP>
-                         203: <IFNONNULL 12>
-                         206: <POP>
-                         207: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         210: <LDC <String 'print'>>
-                         212: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         215: <CHECKCAST <Class org/python/Callable>>
-                         218: <ICONST_1>
-                         219: <ANEWARRAY org/python/Object>
-                         222: <DUP>
-                         223: <ICONST_0>
-                         224: <NEW org/python/Object>
-                         227: <DUP>
-                         228: <LDC <String 'Do final cleanup'>>
-                         230: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         233: <AASTORE>
-                         234: <NEW java/util/Hashtable>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do final cleanup'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GOTO 223>
+                         119: <POP>
+                         120: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         123: <LDC <String 'print'>>
+                         125: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         128: <DUP>
+                         129: <IFNONNULL 27>
+                         132: <POP>
+                         133: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         136: <LDC <String 'print'>>
+                         138: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         141: <DUP>
+                         142: <IFNONNULL 14>
+                         145: <POP>
+                         146: <NEW org/python/exceptions/NameError>
+                         149: <DUP>
+                         150: <LDC <String 'print'>>
+                         152: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         155: <ATHROW>
+                         156: <CHECKCAST <Class org/python/Object>>
+                         159: <CHECKCAST <Class org/python/Callable>>
+                         162: <ICONST_1>
+                         163: <ANEWARRAY org/python/Object>
+                         166: <DUP>
+                         167: <ICONST_0>
+                         168: <NEW org/python/Object>
+                         171: <DUP>
+                         172: <LDC <String 'Got an error'>>
+                         174: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         177: <AASTORE>
+                         178: <NEW java/util/Hashtable>
+                         181: <DUP>
+                         182: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         185: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         190: <POP>
+                         191: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         194: <LDC <String 'print'>>
+                         196: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         199: <DUP>
+                         200: <IFNONNULL 27>
+                         203: <POP>
+                         204: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         207: <LDC <String 'print'>>
+                         209: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         212: <DUP>
+                         213: <IFNONNULL 14>
+                         216: <POP>
+                         217: <NEW org/python/exceptions/NameError>
+                         220: <DUP>
+                         221: <LDC <String 'print'>>
+                         223: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         226: <ATHROW>
+                         227: <CHECKCAST <Class org/python/Object>>
+                         230: <CHECKCAST <Class org/python/Callable>>
+                         233: <ICONST_1>
+                         234: <ANEWARRAY org/python/Object>
                          237: <DUP>
-                         238: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         241: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         246: <POP>
-                         247: <ALOAD_0>
-                         248: <ATHROW>
-                         249: <ACONST_NULL>
-                         250: <ARETURN>
+                         238: <ICONST_0>
+                         239: <NEW org/python/Object>
+                         242: <DUP>
+                         243: <LDC <String 'Do final cleanup'>>
+                         245: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         248: <AASTORE>
+                         249: <NEW java/util/Hashtable>
+                         252: <DUP>
+                         253: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         256: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         261: <POP>
+                         262: <GOTO 77>
+                         265: <ASTORE_0>
+                         266: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         269: <LDC <String 'print'>>
+                         271: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         274: <DUP>
+                         275: <IFNONNULL 27>
+                         278: <POP>
+                         279: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         282: <LDC <String 'print'>>
+                         284: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         287: <DUP>
+                         288: <IFNONNULL 14>
+                         291: <POP>
+                         292: <NEW org/python/exceptions/NameError>
+                         295: <DUP>
+                         296: <LDC <String 'print'>>
+                         298: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         301: <ATHROW>
+                         302: <CHECKCAST <Class org/python/Object>>
+                         305: <CHECKCAST <Class org/python/Callable>>
+                         308: <ICONST_1>
+                         309: <ANEWARRAY org/python/Object>
+                         312: <DUP>
+                         313: <ICONST_0>
+                         314: <NEW org/python/Object>
+                         317: <DUP>
+                         318: <LDC <String 'Do final cleanup'>>
+                         320: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         323: <AASTORE>
+                         324: <NEW java/util/Hashtable>
+                         327: <DUP>
+                         328: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         331: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         336: <POP>
+                         337: <ALOAD_0>
+                         338: <ATHROW>
+                         339: <ACONST_NULL>
+                         340: <ARETURN>
                      Exceptions: (3)
-                         org/python/exceptions/AttributeError: 0-27 [83]
-                         finally: 0-27 [193]
-                         finally: 83-137 [193]
+                         org/python/exceptions/AttributeError: 0-45 [119]
+                         finally: 0-45 [265]
+                         finally: 119-191 [265]
                      Attributes: (1)
                          LineNumberTable (22 bytes)
                              Line numbers (5 total):
                                  0: 3
-                                 27: 7
-                                 84: 5
-                                 137: 7
-                                 194: 7
+                                 45: 7
+                                 120: 5
+                                 191: 7
+                                 266: 7
                 """)
 
     def test_try_except_named_finally(self):
@@ -1320,147 +1680,192 @@ class TryExceptFinallyTests(TranspileTestCase):
                     print("Do final cleanup")
                 """,
             java="""
-                 Code (328 bytes)
+                 Code (418 bytes)
                      Max stack: 10
                      Max locals: 2
-                     Bytecode: (264 bytes)
+                     Bytecode: (354 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do final cleanup'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GOTO 182>
-                          83: <ASTORE_0>
-                          84: <NEW org/python/Object>
-                          87: <DUP>
-                          88: <ALOAD_0>
-                          89: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                          92: <ASTORE_0>
-                          93: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          96: <LDC <String 'print'>>
-                          98: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         101: <DUP>
-                         102: <IFNONNULL 12>
-                         105: <POP>
-                         106: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         109: <LDC <String 'print'>>
-                         111: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         114: <CHECKCAST <Class org/python/Callable>>
-                         117: <ICONST_2>
-                         118: <ANEWARRAY org/python/Object>
-                         121: <DUP>
-                         122: <ICONST_0>
-                         123: <NEW org/python/Object>
-                         126: <DUP>
-                         127: <LDC <String 'Got an AttributeError'>>
-                         129: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         132: <AASTORE>
-                         133: <DUP>
-                         134: <ICONST_1>
-                         135: <ALOAD_0>
-                         136: <AASTORE>
-                         137: <NEW java/util/Hashtable>
-                         140: <DUP>
-                         141: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         144: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         149: <POP>
-                         150: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         153: <LDC <String 'print'>>
-                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do final cleanup'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GOTO 236>
+                         119: <ASTORE_0>
+                         120: <NEW org/python/Object>
+                         123: <DUP>
+                         124: <ALOAD_0>
+                         125: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                         128: <ASTORE_0>
+                         129: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         132: <LDC <String 'print'>>
+                         134: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         137: <DUP>
+                         138: <IFNONNULL 27>
+                         141: <POP>
+                         142: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         145: <LDC <String 'print'>>
+                         147: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         150: <DUP>
+                         151: <IFNONNULL 14>
+                         154: <POP>
+                         155: <NEW org/python/exceptions/NameError>
                          158: <DUP>
-                         159: <IFNONNULL 12>
-                         162: <POP>
-                         163: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         166: <LDC <String 'print'>>
-                         168: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         171: <CHECKCAST <Class org/python/Callable>>
-                         174: <ICONST_1>
-                         175: <ANEWARRAY org/python/Object>
-                         178: <DUP>
-                         179: <ICONST_0>
-                         180: <NEW org/python/Object>
-                         183: <DUP>
-                         184: <LDC <String 'Do final cleanup'>>
-                         186: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         189: <AASTORE>
-                         190: <NEW java/util/Hashtable>
-                         193: <DUP>
-                         194: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         197: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         202: <POP>
-                         203: <GOTO 59>
-                         206: <ASTORE_1>
-                         207: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         210: <LDC <String 'print'>>
-                         212: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         215: <DUP>
-                         216: <IFNONNULL 12>
-                         219: <POP>
-                         220: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         223: <LDC <String 'print'>>
-                         225: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         228: <CHECKCAST <Class org/python/Callable>>
-                         231: <ICONST_1>
-                         232: <ANEWARRAY org/python/Object>
-                         235: <DUP>
-                         236: <ICONST_0>
-                         237: <NEW org/python/Object>
-                         240: <DUP>
-                         241: <LDC <String 'Do final cleanup'>>
-                         243: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         246: <AASTORE>
-                         247: <NEW java/util/Hashtable>
+                         159: <LDC <String 'print'>>
+                         161: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         164: <ATHROW>
+                         165: <CHECKCAST <Class org/python/Object>>
+                         168: <CHECKCAST <Class org/python/Callable>>
+                         171: <ICONST_2>
+                         172: <ANEWARRAY org/python/Object>
+                         175: <DUP>
+                         176: <ICONST_0>
+                         177: <NEW org/python/Object>
+                         180: <DUP>
+                         181: <LDC <String 'Got an AttributeError'>>
+                         183: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         186: <AASTORE>
+                         187: <DUP>
+                         188: <ICONST_1>
+                         189: <ALOAD_0>
+                         190: <AASTORE>
+                         191: <NEW java/util/Hashtable>
+                         194: <DUP>
+                         195: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         198: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         203: <POP>
+                         204: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         207: <LDC <String 'print'>>
+                         209: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         212: <DUP>
+                         213: <IFNONNULL 27>
+                         216: <POP>
+                         217: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         220: <LDC <String 'print'>>
+                         222: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         225: <DUP>
+                         226: <IFNONNULL 14>
+                         229: <POP>
+                         230: <NEW org/python/exceptions/NameError>
+                         233: <DUP>
+                         234: <LDC <String 'print'>>
+                         236: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         239: <ATHROW>
+                         240: <CHECKCAST <Class org/python/Object>>
+                         243: <CHECKCAST <Class org/python/Callable>>
+                         246: <ICONST_1>
+                         247: <ANEWARRAY org/python/Object>
                          250: <DUP>
-                         251: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         254: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         259: <POP>
-                         260: <ALOAD_1>
-                         261: <ATHROW>
-                         262: <ACONST_NULL>
-                         263: <ARETURN>
+                         251: <ICONST_0>
+                         252: <NEW org/python/Object>
+                         255: <DUP>
+                         256: <LDC <String 'Do final cleanup'>>
+                         258: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         261: <AASTORE>
+                         262: <NEW java/util/Hashtable>
+                         265: <DUP>
+                         266: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         269: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         274: <POP>
+                         275: <GOTO 77>
+                         278: <ASTORE_1>
+                         279: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         282: <LDC <String 'print'>>
+                         284: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         287: <DUP>
+                         288: <IFNONNULL 27>
+                         291: <POP>
+                         292: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         295: <LDC <String 'print'>>
+                         297: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         300: <DUP>
+                         301: <IFNONNULL 14>
+                         304: <POP>
+                         305: <NEW org/python/exceptions/NameError>
+                         308: <DUP>
+                         309: <LDC <String 'print'>>
+                         311: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         314: <ATHROW>
+                         315: <CHECKCAST <Class org/python/Object>>
+                         318: <CHECKCAST <Class org/python/Callable>>
+                         321: <ICONST_1>
+                         322: <ANEWARRAY org/python/Object>
+                         325: <DUP>
+                         326: <ICONST_0>
+                         327: <NEW org/python/Object>
+                         330: <DUP>
+                         331: <LDC <String 'Do final cleanup'>>
+                         333: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         336: <AASTORE>
+                         337: <NEW java/util/Hashtable>
+                         340: <DUP>
+                         341: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         344: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         349: <POP>
+                         350: <ALOAD_1>
+                         351: <ATHROW>
+                         352: <ACONST_NULL>
+                         353: <ARETURN>
                      Exceptions: (3)
-                         org/python/exceptions/AttributeError: 0-27 [83]
-                         finally: 0-27 [206]
-                         finally: 83-150 [206]
+                         org/python/exceptions/AttributeError: 0-45 [119]
+                         finally: 0-45 [278]
+                         finally: 119-204 [278]
                      Attributes: (1)
                          LineNumberTable (22 bytes)
                              Line numbers (5 total):
                                  0: 3
-                                 27: 7
-                                 93: 5
-                                 150: 7
-                                 207: 7
+                                 45: 7
+                                 129: 5
+                                 204: 7
+                                 279: 7
                 """)
 
     def test_try_multiple_except_finally(self):
@@ -1476,201 +1881,264 @@ class TryExceptFinallyTests(TranspileTestCase):
                     print("Do final cleanup")
                 """,
             java="""
-                 Code (462 bytes)
+                 Code (588 bytes)
                      Max stack: 12
                      Max locals: 2
-                     Bytecode: (374 bytes)
+                     Bytecode: (500 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do final cleanup'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GOTO 292>
-                          83: <POP>
-                          84: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          87: <LDC <String 'print'>>
-                          89: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          92: <DUP>
-                          93: <IFNONNULL 12>
-                          96: <POP>
-                          97: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         100: <LDC <String 'print'>>
-                         102: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         105: <CHECKCAST <Class org/python/Callable>>
-                         108: <ICONST_1>
-                         109: <ANEWARRAY org/python/Object>
-                         112: <DUP>
-                         113: <ICONST_0>
-                         114: <NEW org/python/Object>
-                         117: <DUP>
-                         118: <LDC <String 'Got an AttributeError'>>
-                         120: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         123: <AASTORE>
-                         124: <NEW java/util/Hashtable>
-                         127: <DUP>
-                         128: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         131: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         136: <POP>
-                         137: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         140: <LDC <String 'print'>>
-                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         145: <DUP>
-                         146: <IFNONNULL 12>
-                         149: <POP>
-                         150: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         153: <LDC <String 'print'>>
-                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         158: <CHECKCAST <Class org/python/Callable>>
-                         161: <ICONST_1>
-                         162: <ANEWARRAY org/python/Object>
-                         165: <DUP>
-                         166: <ICONST_0>
-                         167: <NEW org/python/Object>
-                         170: <DUP>
-                         171: <LDC <String 'Do final cleanup'>>
-                         173: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         176: <AASTORE>
-                         177: <NEW java/util/Hashtable>
-                         180: <DUP>
-                         181: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         184: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         189: <POP>
-                         190: <GOTO 182>
-                         193: <ASTORE_0>
-                         194: <NEW org/python/Object>
-                         197: <DUP>
-                         198: <ALOAD_0>
-                         199: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                         202: <ASTORE_0>
-                         203: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         206: <LDC <String 'print'>>
-                         208: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         211: <DUP>
-                         212: <IFNONNULL 12>
-                         215: <POP>
-                         216: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         219: <LDC <String 'print'>>
-                         221: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         224: <CHECKCAST <Class org/python/Callable>>
-                         227: <ICONST_2>
-                         228: <ANEWARRAY org/python/Object>
-                         231: <DUP>
-                         232: <ICONST_0>
-                         233: <NEW org/python/Object>
-                         236: <DUP>
-                         237: <LDC <String 'Got a NameError'>>
-                         239: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         242: <AASTORE>
-                         243: <DUP>
-                         244: <ICONST_1>
-                         245: <ALOAD_0>
-                         246: <AASTORE>
-                         247: <NEW java/util/Hashtable>
-                         250: <DUP>
-                         251: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         254: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         259: <POP>
-                         260: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         263: <LDC <String 'print'>>
-                         265: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         268: <DUP>
-                         269: <IFNONNULL 12>
-                         272: <POP>
-                         273: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         276: <LDC <String 'print'>>
-                         278: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         281: <CHECKCAST <Class org/python/Callable>>
-                         284: <ICONST_1>
-                         285: <ANEWARRAY org/python/Object>
-                         288: <DUP>
-                         289: <ICONST_0>
-                         290: <NEW org/python/Object>
-                         293: <DUP>
-                         294: <LDC <String 'Do final cleanup'>>
-                         296: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         299: <AASTORE>
-                         300: <NEW java/util/Hashtable>
-                         303: <DUP>
-                         304: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         307: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         312: <POP>
-                         313: <GOTO 59>
-                         316: <ASTORE_1>
-                         317: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         320: <LDC <String 'print'>>
-                         322: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         325: <DUP>
-                         326: <IFNONNULL 12>
-                         329: <POP>
-                         330: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         333: <LDC <String 'print'>>
-                         335: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         338: <CHECKCAST <Class org/python/Callable>>
-                         341: <ICONST_1>
-                         342: <ANEWARRAY org/python/Object>
-                         345: <DUP>
-                         346: <ICONST_0>
-                         347: <NEW org/python/Object>
-                         350: <DUP>
-                         351: <LDC <String 'Do final cleanup'>>
-                         353: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         356: <AASTORE>
-                         357: <NEW java/util/Hashtable>
-                         360: <DUP>
-                         361: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         364: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         369: <POP>
-                         370: <ALOAD_1>
-                         371: <ATHROW>
-                         372: <ACONST_NULL>
-                         373: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do final cleanup'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GOTO 382>
+                         119: <POP>
+                         120: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         123: <LDC <String 'print'>>
+                         125: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         128: <DUP>
+                         129: <IFNONNULL 27>
+                         132: <POP>
+                         133: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         136: <LDC <String 'print'>>
+                         138: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         141: <DUP>
+                         142: <IFNONNULL 14>
+                         145: <POP>
+                         146: <NEW org/python/exceptions/NameError>
+                         149: <DUP>
+                         150: <LDC <String 'print'>>
+                         152: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         155: <ATHROW>
+                         156: <CHECKCAST <Class org/python/Object>>
+                         159: <CHECKCAST <Class org/python/Callable>>
+                         162: <ICONST_1>
+                         163: <ANEWARRAY org/python/Object>
+                         166: <DUP>
+                         167: <ICONST_0>
+                         168: <NEW org/python/Object>
+                         171: <DUP>
+                         172: <LDC <String 'Got an AttributeError'>>
+                         174: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         177: <AASTORE>
+                         178: <NEW java/util/Hashtable>
+                         181: <DUP>
+                         182: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         185: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         190: <POP>
+                         191: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         194: <LDC <String 'print'>>
+                         196: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         199: <DUP>
+                         200: <IFNONNULL 27>
+                         203: <POP>
+                         204: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         207: <LDC <String 'print'>>
+                         209: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         212: <DUP>
+                         213: <IFNONNULL 14>
+                         216: <POP>
+                         217: <NEW org/python/exceptions/NameError>
+                         220: <DUP>
+                         221: <LDC <String 'print'>>
+                         223: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         226: <ATHROW>
+                         227: <CHECKCAST <Class org/python/Object>>
+                         230: <CHECKCAST <Class org/python/Callable>>
+                         233: <ICONST_1>
+                         234: <ANEWARRAY org/python/Object>
+                         237: <DUP>
+                         238: <ICONST_0>
+                         239: <NEW org/python/Object>
+                         242: <DUP>
+                         243: <LDC <String 'Do final cleanup'>>
+                         245: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         248: <AASTORE>
+                         249: <NEW java/util/Hashtable>
+                         252: <DUP>
+                         253: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         256: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         261: <POP>
+                         262: <GOTO 236>
+                         265: <ASTORE_0>
+                         266: <NEW org/python/Object>
+                         269: <DUP>
+                         270: <ALOAD_0>
+                         271: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                         274: <ASTORE_0>
+                         275: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         278: <LDC <String 'print'>>
+                         280: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         283: <DUP>
+                         284: <IFNONNULL 27>
+                         287: <POP>
+                         288: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         291: <LDC <String 'print'>>
+                         293: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         296: <DUP>
+                         297: <IFNONNULL 14>
+                         300: <POP>
+                         301: <NEW org/python/exceptions/NameError>
+                         304: <DUP>
+                         305: <LDC <String 'print'>>
+                         307: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         310: <ATHROW>
+                         311: <CHECKCAST <Class org/python/Object>>
+                         314: <CHECKCAST <Class org/python/Callable>>
+                         317: <ICONST_2>
+                         318: <ANEWARRAY org/python/Object>
+                         321: <DUP>
+                         322: <ICONST_0>
+                         323: <NEW org/python/Object>
+                         326: <DUP>
+                         327: <LDC <String 'Got a NameError'>>
+                         329: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         332: <AASTORE>
+                         333: <DUP>
+                         334: <ICONST_1>
+                         335: <ALOAD_0>
+                         336: <AASTORE>
+                         337: <NEW java/util/Hashtable>
+                         340: <DUP>
+                         341: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         344: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         349: <POP>
+                         350: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         353: <LDC <String 'print'>>
+                         355: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         358: <DUP>
+                         359: <IFNONNULL 27>
+                         362: <POP>
+                         363: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         366: <LDC <String 'print'>>
+                         368: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         371: <DUP>
+                         372: <IFNONNULL 14>
+                         375: <POP>
+                         376: <NEW org/python/exceptions/NameError>
+                         379: <DUP>
+                         380: <LDC <String 'print'>>
+                         382: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         385: <ATHROW>
+                         386: <CHECKCAST <Class org/python/Object>>
+                         389: <CHECKCAST <Class org/python/Callable>>
+                         392: <ICONST_1>
+                         393: <ANEWARRAY org/python/Object>
+                         396: <DUP>
+                         397: <ICONST_0>
+                         398: <NEW org/python/Object>
+                         401: <DUP>
+                         402: <LDC <String 'Do final cleanup'>>
+                         404: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         407: <AASTORE>
+                         408: <NEW java/util/Hashtable>
+                         411: <DUP>
+                         412: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         415: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         420: <POP>
+                         421: <GOTO 77>
+                         424: <ASTORE_1>
+                         425: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         428: <LDC <String 'print'>>
+                         430: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         433: <DUP>
+                         434: <IFNONNULL 27>
+                         437: <POP>
+                         438: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         441: <LDC <String 'print'>>
+                         443: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         446: <DUP>
+                         447: <IFNONNULL 14>
+                         450: <POP>
+                         451: <NEW org/python/exceptions/NameError>
+                         454: <DUP>
+                         455: <LDC <String 'print'>>
+                         457: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         460: <ATHROW>
+                         461: <CHECKCAST <Class org/python/Object>>
+                         464: <CHECKCAST <Class org/python/Callable>>
+                         467: <ICONST_1>
+                         468: <ANEWARRAY org/python/Object>
+                         471: <DUP>
+                         472: <ICONST_0>
+                         473: <NEW org/python/Object>
+                         476: <DUP>
+                         477: <LDC <String 'Do final cleanup'>>
+                         479: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         482: <AASTORE>
+                         483: <NEW java/util/Hashtable>
+                         486: <DUP>
+                         487: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         490: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         495: <POP>
+                         496: <ALOAD_1>
+                         497: <ATHROW>
+                         498: <ACONST_NULL>
+                         499: <ARETURN>
                      Exceptions: (5)
-                         org/python/exceptions/AttributeError: 0-27 [83]
-                         org/python/exceptions/NameError: 0-27 [193]
-                         finally: 0-27 [316]
-                         finally: 83-137 [316]
-                         finally: 193-260 [316]
+                         org/python/exceptions/AttributeError: 0-45 [119]
+                         org/python/exceptions/NameError: 0-45 [265]
+                         finally: 0-45 [424]
+                         finally: 119-191 [424]
+                         finally: 265-350 [424]
                      Attributes: (1)
                          LineNumberTable (30 bytes)
                              Line numbers (7 total):
                                  0: 3
-                                 27: 9
-                                 84: 5
-                                 137: 9
-                                 203: 7
-                                 260: 9
-                                 317: 9
+                                 45: 9
+                                 120: 5
+                                 191: 9
+                                 275: 7
+                                 350: 9
+                                 425: 9
                 """)
 
 
@@ -1686,82 +2154,109 @@ class TryExceptElseTests(TranspileTestCase):
                     print("Do else handling")
                 """,
             java="""
-                 Code (179 bytes)
+                 Code (233 bytes)
                      Max stack: 8
                      Max locals: 0
-                     Bytecode: (139 bytes)
+                     Bytecode: (193 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do else handling'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GOTO 57>
-                          83: <POP>
-                          84: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          87: <LDC <String 'print'>>
-                          89: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          92: <DUP>
-                          93: <IFNONNULL 12>
-                          96: <POP>
-                          97: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         100: <LDC <String 'print'>>
-                         102: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         105: <CHECKCAST <Class org/python/Callable>>
-                         108: <ICONST_1>
-                         109: <ANEWARRAY org/python/Object>
-                         112: <DUP>
-                         113: <ICONST_0>
-                         114: <NEW org/python/Object>
-                         117: <DUP>
-                         118: <LDC <String 'Got an error'>>
-                         120: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         123: <AASTORE>
-                         124: <NEW java/util/Hashtable>
-                         127: <DUP>
-                         128: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         131: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         136: <POP>
-                         137: <ACONST_NULL>
-                         138: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do else handling'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GOTO 75>
+                         119: <POP>
+                         120: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         123: <LDC <String 'print'>>
+                         125: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         128: <DUP>
+                         129: <IFNONNULL 27>
+                         132: <POP>
+                         133: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         136: <LDC <String 'print'>>
+                         138: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         141: <DUP>
+                         142: <IFNONNULL 14>
+                         145: <POP>
+                         146: <NEW org/python/exceptions/NameError>
+                         149: <DUP>
+                         150: <LDC <String 'print'>>
+                         152: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         155: <ATHROW>
+                         156: <CHECKCAST <Class org/python/Object>>
+                         159: <CHECKCAST <Class org/python/Callable>>
+                         162: <ICONST_1>
+                         163: <ANEWARRAY org/python/Object>
+                         166: <DUP>
+                         167: <ICONST_0>
+                         168: <NEW org/python/Object>
+                         171: <DUP>
+                         172: <LDC <String 'Got an error'>>
+                         174: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         177: <AASTORE>
+                         178: <NEW java/util/Hashtable>
+                         181: <DUP>
+                         182: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         185: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         190: <POP>
+                         191: <ACONST_NULL>
+                         192: <ARETURN>
                      Exceptions: (1)
-                         org/python/exceptions/BaseException: 0-27 [83]
+                         org/python/exceptions/BaseException: 0-45 [119]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
-                                 27: 7
-                                 84: 5
+                                 45: 7
+                                 120: 5
                 """)
 
     def test_try_except_unnamed_else(self):
@@ -1775,82 +2270,109 @@ class TryExceptElseTests(TranspileTestCase):
                     print("Do else handling")
                 """,
             java="""
-                 Code (179 bytes)
+                 Code (233 bytes)
                      Max stack: 8
                      Max locals: 0
-                     Bytecode: (139 bytes)
+                     Bytecode: (193 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do else handling'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GOTO 57>
-                          83: <POP>
-                          84: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          87: <LDC <String 'print'>>
-                          89: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          92: <DUP>
-                          93: <IFNONNULL 12>
-                          96: <POP>
-                          97: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         100: <LDC <String 'print'>>
-                         102: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         105: <CHECKCAST <Class org/python/Callable>>
-                         108: <ICONST_1>
-                         109: <ANEWARRAY org/python/Object>
-                         112: <DUP>
-                         113: <ICONST_0>
-                         114: <NEW org/python/Object>
-                         117: <DUP>
-                         118: <LDC <String 'Got an error'>>
-                         120: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         123: <AASTORE>
-                         124: <NEW java/util/Hashtable>
-                         127: <DUP>
-                         128: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         131: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         136: <POP>
-                         137: <ACONST_NULL>
-                         138: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do else handling'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GOTO 75>
+                         119: <POP>
+                         120: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         123: <LDC <String 'print'>>
+                         125: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         128: <DUP>
+                         129: <IFNONNULL 27>
+                         132: <POP>
+                         133: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         136: <LDC <String 'print'>>
+                         138: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         141: <DUP>
+                         142: <IFNONNULL 14>
+                         145: <POP>
+                         146: <NEW org/python/exceptions/NameError>
+                         149: <DUP>
+                         150: <LDC <String 'print'>>
+                         152: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         155: <ATHROW>
+                         156: <CHECKCAST <Class org/python/Object>>
+                         159: <CHECKCAST <Class org/python/Callable>>
+                         162: <ICONST_1>
+                         163: <ANEWARRAY org/python/Object>
+                         166: <DUP>
+                         167: <ICONST_0>
+                         168: <NEW org/python/Object>
+                         171: <DUP>
+                         172: <LDC <String 'Got an error'>>
+                         174: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         177: <AASTORE>
+                         178: <NEW java/util/Hashtable>
+                         181: <DUP>
+                         182: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         185: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         190: <POP>
+                         191: <ACONST_NULL>
+                         192: <ARETURN>
                      Exceptions: (1)
-                         org/python/exceptions/AttributeError: 0-27 [83]
+                         org/python/exceptions/AttributeError: 0-45 [119]
                      Attributes: (1)
                          LineNumberTable (14 bytes)
                              Line numbers (3 total):
                                  0: 3
-                                 27: 7
-                                 84: 5
+                                 45: 7
+                                 120: 5
                 """)
 
     def test_try_multiple_except_else(self):
@@ -1866,119 +2388,155 @@ class TryExceptElseTests(TranspileTestCase):
                     print("Do else handling")
                 """,
             java="""
-                 Code (261 bytes)
+                 Code (333 bytes)
                      Max stack: 9
                      Max locals: 1
-                     Bytecode: (209 bytes)
+                     Bytecode: (281 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do else handling'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GOTO 127>
-                          83: <POP>
-                          84: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          87: <LDC <String 'print'>>
-                          89: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          92: <DUP>
-                          93: <IFNONNULL 12>
-                          96: <POP>
-                          97: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         100: <LDC <String 'print'>>
-                         102: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         105: <CHECKCAST <Class org/python/Callable>>
-                         108: <ICONST_1>
-                         109: <ANEWARRAY org/python/Object>
-                         112: <DUP>
-                         113: <ICONST_0>
-                         114: <NEW org/python/Object>
-                         117: <DUP>
-                         118: <LDC <String 'Got an AttributeError'>>
-                         120: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         123: <AASTORE>
-                         124: <NEW java/util/Hashtable>
-                         127: <DUP>
-                         128: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         131: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         136: <POP>
-                         137: <GOTO 70>
-                         140: <ASTORE_0>
-                         141: <NEW org/python/Object>
-                         144: <DUP>
-                         145: <ALOAD_0>
-                         146: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                         149: <ASTORE_0>
-                         150: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         153: <LDC <String 'print'>>
-                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         158: <DUP>
-                         159: <IFNONNULL 12>
-                         162: <POP>
-                         163: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         166: <LDC <String 'print'>>
-                         168: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         171: <CHECKCAST <Class org/python/Callable>>
-                         174: <ICONST_2>
-                         175: <ANEWARRAY org/python/Object>
-                         178: <DUP>
-                         179: <ICONST_0>
-                         180: <NEW org/python/Object>
-                         183: <DUP>
-                         184: <LDC <String 'Got a NameError'>>
-                         186: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         189: <AASTORE>
-                         190: <DUP>
-                         191: <ICONST_1>
-                         192: <ALOAD_0>
-                         193: <AASTORE>
-                         194: <NEW java/util/Hashtable>
-                         197: <DUP>
-                         198: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         201: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         206: <POP>
-                         207: <ACONST_NULL>
-                         208: <ARETURN>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do else handling'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GOTO 163>
+                         119: <POP>
+                         120: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         123: <LDC <String 'print'>>
+                         125: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         128: <DUP>
+                         129: <IFNONNULL 27>
+                         132: <POP>
+                         133: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         136: <LDC <String 'print'>>
+                         138: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         141: <DUP>
+                         142: <IFNONNULL 14>
+                         145: <POP>
+                         146: <NEW org/python/exceptions/NameError>
+                         149: <DUP>
+                         150: <LDC <String 'print'>>
+                         152: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         155: <ATHROW>
+                         156: <CHECKCAST <Class org/python/Object>>
+                         159: <CHECKCAST <Class org/python/Callable>>
+                         162: <ICONST_1>
+                         163: <ANEWARRAY org/python/Object>
+                         166: <DUP>
+                         167: <ICONST_0>
+                         168: <NEW org/python/Object>
+                         171: <DUP>
+                         172: <LDC <String 'Got an AttributeError'>>
+                         174: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         177: <AASTORE>
+                         178: <NEW java/util/Hashtable>
+                         181: <DUP>
+                         182: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         185: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         190: <POP>
+                         191: <GOTO 88>
+                         194: <ASTORE_0>
+                         195: <NEW org/python/Object>
+                         198: <DUP>
+                         199: <ALOAD_0>
+                         200: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                         203: <ASTORE_0>
+                         204: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         207: <LDC <String 'print'>>
+                         209: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         212: <DUP>
+                         213: <IFNONNULL 27>
+                         216: <POP>
+                         217: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         220: <LDC <String 'print'>>
+                         222: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         225: <DUP>
+                         226: <IFNONNULL 14>
+                         229: <POP>
+                         230: <NEW org/python/exceptions/NameError>
+                         233: <DUP>
+                         234: <LDC <String 'print'>>
+                         236: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         239: <ATHROW>
+                         240: <CHECKCAST <Class org/python/Object>>
+                         243: <CHECKCAST <Class org/python/Callable>>
+                         246: <ICONST_2>
+                         247: <ANEWARRAY org/python/Object>
+                         250: <DUP>
+                         251: <ICONST_0>
+                         252: <NEW org/python/Object>
+                         255: <DUP>
+                         256: <LDC <String 'Got a NameError'>>
+                         258: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         261: <AASTORE>
+                         262: <DUP>
+                         263: <ICONST_1>
+                         264: <ALOAD_0>
+                         265: <AASTORE>
+                         266: <NEW java/util/Hashtable>
+                         269: <DUP>
+                         270: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         273: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         278: <POP>
+                         279: <ACONST_NULL>
+                         280: <ARETURN>
                      Exceptions: (2)
-                         org/python/exceptions/AttributeError: 0-27 [83]
-                         org/python/exceptions/NameError: 0-27 [140]
+                         org/python/exceptions/AttributeError: 0-45 [119]
+                         org/python/exceptions/NameError: 0-45 [194]
                      Attributes: (1)
                          LineNumberTable (18 bytes)
                              Line numbers (4 total):
                                  0: 3
-                                 27: 9
-                                 84: 5
-                                 150: 7
+                                 45: 9
+                                 120: 5
+                                 204: 7
                 """)
 
 
@@ -1996,163 +2554,217 @@ class TryExceptElseFinallyTests(TranspileTestCase):
                     print("Do final cleanup")
                 """,
             java="""
-                 Code (372 bytes)
+                 Code (480 bytes)
                      Max stack: 10
                      Max locals: 1
-                     Bytecode: (304 bytes)
+                     Bytecode: (412 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do else handling'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          83: <LDC <String 'print'>>
-                          85: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          88: <DUP>
-                          89: <IFNONNULL 12>
-                          92: <POP>
-                          93: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          96: <LDC <String 'print'>>
-                          98: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         101: <CHECKCAST <Class org/python/Callable>>
-                         104: <ICONST_1>
-                         105: <ANEWARRAY org/python/Object>
-                         108: <DUP>
-                         109: <ICONST_0>
-                         110: <NEW org/python/Object>
-                         113: <DUP>
-                         114: <LDC <String 'Do final cleanup'>>
-                         116: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         119: <AASTORE>
-                         120: <NEW java/util/Hashtable>
-                         123: <DUP>
-                         124: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         127: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         132: <POP>
-                         133: <GOTO 169>
-                         136: <POP>
-                         137: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         140: <LDC <String 'print'>>
-                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do else handling'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         119: <LDC <String 'print'>>
+                         121: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         124: <DUP>
+                         125: <IFNONNULL 27>
+                         128: <POP>
+                         129: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         132: <LDC <String 'print'>>
+                         134: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         137: <DUP>
+                         138: <IFNONNULL 14>
+                         141: <POP>
+                         142: <NEW org/python/exceptions/NameError>
                          145: <DUP>
-                         146: <IFNONNULL 12>
-                         149: <POP>
-                         150: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         153: <LDC <String 'print'>>
-                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         158: <CHECKCAST <Class org/python/Callable>>
-                         161: <ICONST_1>
-                         162: <ANEWARRAY org/python/Object>
-                         165: <DUP>
-                         166: <ICONST_0>
-                         167: <NEW org/python/Object>
-                         170: <DUP>
-                         171: <LDC <String 'Got an error'>>
-                         173: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         176: <AASTORE>
-                         177: <NEW java/util/Hashtable>
-                         180: <DUP>
-                         181: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         184: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         189: <POP>
-                         190: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         193: <LDC <String 'print'>>
-                         195: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         198: <DUP>
-                         199: <IFNONNULL 12>
-                         202: <POP>
-                         203: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         206: <LDC <String 'print'>>
-                         208: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         211: <CHECKCAST <Class org/python/Callable>>
-                         214: <ICONST_1>
-                         215: <ANEWARRAY org/python/Object>
-                         218: <DUP>
-                         219: <ICONST_0>
-                         220: <NEW org/python/Object>
-                         223: <DUP>
-                         224: <LDC <String 'Do final cleanup'>>
-                         226: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         229: <AASTORE>
-                         230: <NEW java/util/Hashtable>
-                         233: <DUP>
-                         234: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         237: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         242: <POP>
-                         243: <GOTO 59>
-                         246: <ASTORE_0>
-                         247: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         250: <LDC <String 'print'>>
-                         252: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         255: <DUP>
-                         256: <IFNONNULL 12>
-                         259: <POP>
-                         260: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         263: <LDC <String 'print'>>
-                         265: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         268: <CHECKCAST <Class org/python/Callable>>
-                         271: <ICONST_1>
-                         272: <ANEWARRAY org/python/Object>
-                         275: <DUP>
-                         276: <ICONST_0>
-                         277: <NEW org/python/Object>
-                         280: <DUP>
-                         281: <LDC <String 'Do final cleanup'>>
-                         283: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         286: <AASTORE>
-                         287: <NEW java/util/Hashtable>
-                         290: <DUP>
-                         291: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         294: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         299: <POP>
-                         300: <ALOAD_0>
-                         301: <ATHROW>
-                         302: <ACONST_NULL>
-                         303: <ARETURN>
+                         146: <LDC <String 'print'>>
+                         148: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         151: <ATHROW>
+                         152: <CHECKCAST <Class org/python/Object>>
+                         155: <CHECKCAST <Class org/python/Callable>>
+                         158: <ICONST_1>
+                         159: <ANEWARRAY org/python/Object>
+                         162: <DUP>
+                         163: <ICONST_0>
+                         164: <NEW org/python/Object>
+                         167: <DUP>
+                         168: <LDC <String 'Do final cleanup'>>
+                         170: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         173: <AASTORE>
+                         174: <NEW java/util/Hashtable>
+                         177: <DUP>
+                         178: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         181: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         186: <POP>
+                         187: <GOTO 223>
+                         190: <POP>
+                         191: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         194: <LDC <String 'print'>>
+                         196: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         199: <DUP>
+                         200: <IFNONNULL 27>
+                         203: <POP>
+                         204: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         207: <LDC <String 'print'>>
+                         209: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         212: <DUP>
+                         213: <IFNONNULL 14>
+                         216: <POP>
+                         217: <NEW org/python/exceptions/NameError>
+                         220: <DUP>
+                         221: <LDC <String 'print'>>
+                         223: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         226: <ATHROW>
+                         227: <CHECKCAST <Class org/python/Object>>
+                         230: <CHECKCAST <Class org/python/Callable>>
+                         233: <ICONST_1>
+                         234: <ANEWARRAY org/python/Object>
+                         237: <DUP>
+                         238: <ICONST_0>
+                         239: <NEW org/python/Object>
+                         242: <DUP>
+                         243: <LDC <String 'Got an error'>>
+                         245: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         248: <AASTORE>
+                         249: <NEW java/util/Hashtable>
+                         252: <DUP>
+                         253: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         256: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         261: <POP>
+                         262: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         265: <LDC <String 'print'>>
+                         267: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         270: <DUP>
+                         271: <IFNONNULL 27>
+                         274: <POP>
+                         275: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         278: <LDC <String 'print'>>
+                         280: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         283: <DUP>
+                         284: <IFNONNULL 14>
+                         287: <POP>
+                         288: <NEW org/python/exceptions/NameError>
+                         291: <DUP>
+                         292: <LDC <String 'print'>>
+                         294: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         297: <ATHROW>
+                         298: <CHECKCAST <Class org/python/Object>>
+                         301: <CHECKCAST <Class org/python/Callable>>
+                         304: <ICONST_1>
+                         305: <ANEWARRAY org/python/Object>
+                         308: <DUP>
+                         309: <ICONST_0>
+                         310: <NEW org/python/Object>
+                         313: <DUP>
+                         314: <LDC <String 'Do final cleanup'>>
+                         316: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         319: <AASTORE>
+                         320: <NEW java/util/Hashtable>
+                         323: <DUP>
+                         324: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         327: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         332: <POP>
+                         333: <GOTO 77>
+                         336: <ASTORE_0>
+                         337: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         340: <LDC <String 'print'>>
+                         342: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         345: <DUP>
+                         346: <IFNONNULL 27>
+                         349: <POP>
+                         350: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         353: <LDC <String 'print'>>
+                         355: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         358: <DUP>
+                         359: <IFNONNULL 14>
+                         362: <POP>
+                         363: <NEW org/python/exceptions/NameError>
+                         366: <DUP>
+                         367: <LDC <String 'print'>>
+                         369: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         372: <ATHROW>
+                         373: <CHECKCAST <Class org/python/Object>>
+                         376: <CHECKCAST <Class org/python/Callable>>
+                         379: <ICONST_1>
+                         380: <ANEWARRAY org/python/Object>
+                         383: <DUP>
+                         384: <ICONST_0>
+                         385: <NEW org/python/Object>
+                         388: <DUP>
+                         389: <LDC <String 'Do final cleanup'>>
+                         391: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         394: <AASTORE>
+                         395: <NEW java/util/Hashtable>
+                         398: <DUP>
+                         399: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         402: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         407: <POP>
+                         408: <ALOAD_0>
+                         409: <ATHROW>
+                         410: <ACONST_NULL>
+                         411: <ARETURN>
                      Exceptions: (3)
-                         org/python/exceptions/BaseException: 0-27 [136]
-                         finally: 0-27 [246]
-                         finally: 136-190 [246]
+                         org/python/exceptions/BaseException: 0-45 [190]
+                         finally: 0-45 [336]
+                         finally: 190-262 [336]
                      Attributes: (1)
                          LineNumberTable (26 bytes)
                              Line numbers (6 total):
                                  0: 3
-                                 27: 7
-                                 80: 9
-                                 137: 5
-                                 190: 9
-                                 247: 9
+                                 45: 7
+                                 116: 9
+                                 191: 5
+                                 262: 9
+                                 337: 9
                 """)
 
     def test_try_except_unnamed_else(self):
@@ -2168,163 +2780,217 @@ class TryExceptElseFinallyTests(TranspileTestCase):
                     print("Do final cleanup")
                 """,
             java="""
-                 Code (372 bytes)
+                 Code (480 bytes)
                      Max stack: 10
                      Max locals: 1
-                     Bytecode: (304 bytes)
+                     Bytecode: (412 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do else handling'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          83: <LDC <String 'print'>>
-                          85: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          88: <DUP>
-                          89: <IFNONNULL 12>
-                          92: <POP>
-                          93: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          96: <LDC <String 'print'>>
-                          98: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         101: <CHECKCAST <Class org/python/Callable>>
-                         104: <ICONST_1>
-                         105: <ANEWARRAY org/python/Object>
-                         108: <DUP>
-                         109: <ICONST_0>
-                         110: <NEW org/python/Object>
-                         113: <DUP>
-                         114: <LDC <String 'Do final cleanup'>>
-                         116: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         119: <AASTORE>
-                         120: <NEW java/util/Hashtable>
-                         123: <DUP>
-                         124: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         127: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         132: <POP>
-                         133: <GOTO 169>
-                         136: <POP>
-                         137: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         140: <LDC <String 'print'>>
-                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do else handling'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         119: <LDC <String 'print'>>
+                         121: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         124: <DUP>
+                         125: <IFNONNULL 27>
+                         128: <POP>
+                         129: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         132: <LDC <String 'print'>>
+                         134: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         137: <DUP>
+                         138: <IFNONNULL 14>
+                         141: <POP>
+                         142: <NEW org/python/exceptions/NameError>
                          145: <DUP>
-                         146: <IFNONNULL 12>
-                         149: <POP>
-                         150: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         153: <LDC <String 'print'>>
-                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         158: <CHECKCAST <Class org/python/Callable>>
-                         161: <ICONST_1>
-                         162: <ANEWARRAY org/python/Object>
-                         165: <DUP>
-                         166: <ICONST_0>
-                         167: <NEW org/python/Object>
-                         170: <DUP>
-                         171: <LDC <String 'Got an error'>>
-                         173: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         176: <AASTORE>
-                         177: <NEW java/util/Hashtable>
-                         180: <DUP>
-                         181: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         184: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         189: <POP>
-                         190: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         193: <LDC <String 'print'>>
-                         195: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         198: <DUP>
-                         199: <IFNONNULL 12>
-                         202: <POP>
-                         203: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         206: <LDC <String 'print'>>
-                         208: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         211: <CHECKCAST <Class org/python/Callable>>
-                         214: <ICONST_1>
-                         215: <ANEWARRAY org/python/Object>
-                         218: <DUP>
-                         219: <ICONST_0>
-                         220: <NEW org/python/Object>
-                         223: <DUP>
-                         224: <LDC <String 'Do final cleanup'>>
-                         226: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         229: <AASTORE>
-                         230: <NEW java/util/Hashtable>
-                         233: <DUP>
-                         234: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         237: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         242: <POP>
-                         243: <GOTO 59>
-                         246: <ASTORE_0>
-                         247: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         250: <LDC <String 'print'>>
-                         252: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         255: <DUP>
-                         256: <IFNONNULL 12>
-                         259: <POP>
-                         260: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         263: <LDC <String 'print'>>
-                         265: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         268: <CHECKCAST <Class org/python/Callable>>
-                         271: <ICONST_1>
-                         272: <ANEWARRAY org/python/Object>
-                         275: <DUP>
-                         276: <ICONST_0>
-                         277: <NEW org/python/Object>
-                         280: <DUP>
-                         281: <LDC <String 'Do final cleanup'>>
-                         283: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         286: <AASTORE>
-                         287: <NEW java/util/Hashtable>
-                         290: <DUP>
-                         291: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         294: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         299: <POP>
-                         300: <ALOAD_0>
-                         301: <ATHROW>
-                         302: <ACONST_NULL>
-                         303: <ARETURN>
+                         146: <LDC <String 'print'>>
+                         148: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         151: <ATHROW>
+                         152: <CHECKCAST <Class org/python/Object>>
+                         155: <CHECKCAST <Class org/python/Callable>>
+                         158: <ICONST_1>
+                         159: <ANEWARRAY org/python/Object>
+                         162: <DUP>
+                         163: <ICONST_0>
+                         164: <NEW org/python/Object>
+                         167: <DUP>
+                         168: <LDC <String 'Do final cleanup'>>
+                         170: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         173: <AASTORE>
+                         174: <NEW java/util/Hashtable>
+                         177: <DUP>
+                         178: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         181: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         186: <POP>
+                         187: <GOTO 223>
+                         190: <POP>
+                         191: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         194: <LDC <String 'print'>>
+                         196: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         199: <DUP>
+                         200: <IFNONNULL 27>
+                         203: <POP>
+                         204: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         207: <LDC <String 'print'>>
+                         209: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         212: <DUP>
+                         213: <IFNONNULL 14>
+                         216: <POP>
+                         217: <NEW org/python/exceptions/NameError>
+                         220: <DUP>
+                         221: <LDC <String 'print'>>
+                         223: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         226: <ATHROW>
+                         227: <CHECKCAST <Class org/python/Object>>
+                         230: <CHECKCAST <Class org/python/Callable>>
+                         233: <ICONST_1>
+                         234: <ANEWARRAY org/python/Object>
+                         237: <DUP>
+                         238: <ICONST_0>
+                         239: <NEW org/python/Object>
+                         242: <DUP>
+                         243: <LDC <String 'Got an error'>>
+                         245: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         248: <AASTORE>
+                         249: <NEW java/util/Hashtable>
+                         252: <DUP>
+                         253: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         256: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         261: <POP>
+                         262: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         265: <LDC <String 'print'>>
+                         267: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         270: <DUP>
+                         271: <IFNONNULL 27>
+                         274: <POP>
+                         275: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         278: <LDC <String 'print'>>
+                         280: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         283: <DUP>
+                         284: <IFNONNULL 14>
+                         287: <POP>
+                         288: <NEW org/python/exceptions/NameError>
+                         291: <DUP>
+                         292: <LDC <String 'print'>>
+                         294: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         297: <ATHROW>
+                         298: <CHECKCAST <Class org/python/Object>>
+                         301: <CHECKCAST <Class org/python/Callable>>
+                         304: <ICONST_1>
+                         305: <ANEWARRAY org/python/Object>
+                         308: <DUP>
+                         309: <ICONST_0>
+                         310: <NEW org/python/Object>
+                         313: <DUP>
+                         314: <LDC <String 'Do final cleanup'>>
+                         316: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         319: <AASTORE>
+                         320: <NEW java/util/Hashtable>
+                         323: <DUP>
+                         324: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         327: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         332: <POP>
+                         333: <GOTO 77>
+                         336: <ASTORE_0>
+                         337: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         340: <LDC <String 'print'>>
+                         342: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         345: <DUP>
+                         346: <IFNONNULL 27>
+                         349: <POP>
+                         350: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         353: <LDC <String 'print'>>
+                         355: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         358: <DUP>
+                         359: <IFNONNULL 14>
+                         362: <POP>
+                         363: <NEW org/python/exceptions/NameError>
+                         366: <DUP>
+                         367: <LDC <String 'print'>>
+                         369: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         372: <ATHROW>
+                         373: <CHECKCAST <Class org/python/Object>>
+                         376: <CHECKCAST <Class org/python/Callable>>
+                         379: <ICONST_1>
+                         380: <ANEWARRAY org/python/Object>
+                         383: <DUP>
+                         384: <ICONST_0>
+                         385: <NEW org/python/Object>
+                         388: <DUP>
+                         389: <LDC <String 'Do final cleanup'>>
+                         391: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         394: <AASTORE>
+                         395: <NEW java/util/Hashtable>
+                         398: <DUP>
+                         399: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         402: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         407: <POP>
+                         408: <ALOAD_0>
+                         409: <ATHROW>
+                         410: <ACONST_NULL>
+                         411: <ARETURN>
                      Exceptions: (3)
-                         org/python/exceptions/AttributeError: 0-27 [136]
-                         finally: 0-27 [246]
-                         finally: 136-190 [246]
+                         org/python/exceptions/AttributeError: 0-45 [190]
+                         finally: 0-45 [336]
+                         finally: 190-262 [336]
                      Attributes: (1)
                          LineNumberTable (26 bytes)
                              Line numbers (6 total):
                                  0: 3
-                                 27: 7
-                                 80: 9
-                                 137: 5
-                                 190: 9
-                                 247: 9
+                                 45: 7
+                                 116: 9
+                                 191: 5
+                                 262: 9
+                                 337: 9
                 """)
 
     def test_try_multiple_except_else(self):
@@ -2342,224 +3008,296 @@ class TryExceptElseFinallyTests(TranspileTestCase):
                     print("Do final cleanup")
                 """,
             java="""
-                 Code (519 bytes)
+                 Code (663 bytes)
                      Max stack: 12
                      Max locals: 2
-                     Bytecode: (427 bytes)
+                     Bytecode: (571 bytes)
                            0: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                            3: <LDC <String 'obj'>>
                            5: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
                            8: <DUP>
-                           9: <IFNONNULL 12>
+                           9: <IFNONNULL 27>
                           12: <POP>
                           13: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
                           16: <LDC <String 'obj'>>
                           18: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          21: <LDC <String 'no_such_attribute'>>
-                          23: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
-                          26: <POP>
-                          27: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          30: <LDC <String 'print'>>
-                          32: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          35: <DUP>
-                          36: <IFNONNULL 12>
-                          39: <POP>
-                          40: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          43: <LDC <String 'print'>>
-                          45: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          48: <CHECKCAST <Class org/python/Callable>>
-                          51: <ICONST_1>
-                          52: <ANEWARRAY org/python/Object>
-                          55: <DUP>
-                          56: <ICONST_0>
-                          57: <NEW org/python/Object>
-                          60: <DUP>
-                          61: <LDC <String 'Do else handling'>>
-                          63: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                          66: <AASTORE>
-                          67: <NEW java/util/Hashtable>
-                          70: <DUP>
-                          71: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          74: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                          79: <POP>
-                          80: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                          83: <LDC <String 'print'>>
-                          85: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                          88: <DUP>
-                          89: <IFNONNULL 12>
-                          92: <POP>
-                          93: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                          96: <LDC <String 'print'>>
-                          98: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         101: <CHECKCAST <Class org/python/Callable>>
-                         104: <ICONST_1>
-                         105: <ANEWARRAY org/python/Object>
-                         108: <DUP>
-                         109: <ICONST_0>
-                         110: <NEW org/python/Object>
-                         113: <DUP>
-                         114: <LDC <String 'Do final cleanup'>>
-                         116: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         119: <AASTORE>
-                         120: <NEW java/util/Hashtable>
-                         123: <DUP>
-                         124: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         127: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         132: <POP>
-                         133: <GOTO 292>
-                         136: <POP>
-                         137: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         140: <LDC <String 'print'>>
-                         142: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          21: <DUP>
+                          22: <IFNONNULL 14>
+                          25: <POP>
+                          26: <NEW org/python/exceptions/NameError>
+                          29: <DUP>
+                          30: <LDC <String 'obj'>>
+                          32: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          35: <ATHROW>
+                          36: <CHECKCAST <Class org/python/Object>>
+                          39: <LDC <String 'no_such_attribute'>>
+                          41: <INVOKEVIRTUAL org/python/Object.__getattr__ (Ljava/lang/String;)Lorg/python/Object;>
+                          44: <POP>
+                          45: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                          48: <LDC <String 'print'>>
+                          50: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          53: <DUP>
+                          54: <IFNONNULL 27>
+                          57: <POP>
+                          58: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                          61: <LDC <String 'print'>>
+                          63: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                          66: <DUP>
+                          67: <IFNONNULL 14>
+                          70: <POP>
+                          71: <NEW org/python/exceptions/NameError>
+                          74: <DUP>
+                          75: <LDC <String 'print'>>
+                          77: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                          80: <ATHROW>
+                          81: <CHECKCAST <Class org/python/Object>>
+                          84: <CHECKCAST <Class org/python/Callable>>
+                          87: <ICONST_1>
+                          88: <ANEWARRAY org/python/Object>
+                          91: <DUP>
+                          92: <ICONST_0>
+                          93: <NEW org/python/Object>
+                          96: <DUP>
+                          97: <LDC <String 'Do else handling'>>
+                          99: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         102: <AASTORE>
+                         103: <NEW java/util/Hashtable>
+                         106: <DUP>
+                         107: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         110: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         115: <POP>
+                         116: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         119: <LDC <String 'print'>>
+                         121: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         124: <DUP>
+                         125: <IFNONNULL 27>
+                         128: <POP>
+                         129: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         132: <LDC <String 'print'>>
+                         134: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         137: <DUP>
+                         138: <IFNONNULL 14>
+                         141: <POP>
+                         142: <NEW org/python/exceptions/NameError>
                          145: <DUP>
-                         146: <IFNONNULL 12>
-                         149: <POP>
-                         150: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         153: <LDC <String 'print'>>
-                         155: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         158: <CHECKCAST <Class org/python/Callable>>
-                         161: <ICONST_1>
-                         162: <ANEWARRAY org/python/Object>
-                         165: <DUP>
-                         166: <ICONST_0>
-                         167: <NEW org/python/Object>
-                         170: <DUP>
-                         171: <LDC <String 'Got an AttributeError'>>
-                         173: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         176: <AASTORE>
-                         177: <NEW java/util/Hashtable>
-                         180: <DUP>
-                         181: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         184: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         189: <POP>
-                         190: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         193: <LDC <String 'print'>>
-                         195: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         198: <DUP>
-                         199: <IFNONNULL 12>
-                         202: <POP>
-                         203: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         206: <LDC <String 'print'>>
-                         208: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         211: <CHECKCAST <Class org/python/Callable>>
-                         214: <ICONST_1>
-                         215: <ANEWARRAY org/python/Object>
-                         218: <DUP>
-                         219: <ICONST_0>
-                         220: <NEW org/python/Object>
-                         223: <DUP>
-                         224: <LDC <String 'Do final cleanup'>>
-                         226: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         229: <AASTORE>
-                         230: <NEW java/util/Hashtable>
-                         233: <DUP>
-                         234: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         237: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         242: <POP>
-                         243: <GOTO 182>
-                         246: <ASTORE_0>
-                         247: <NEW org/python/Object>
-                         250: <DUP>
-                         251: <ALOAD_0>
-                         252: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
-                         255: <ASTORE_0>
-                         256: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         259: <LDC <String 'print'>>
-                         261: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         264: <DUP>
-                         265: <IFNONNULL 12>
-                         268: <POP>
-                         269: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         272: <LDC <String 'print'>>
-                         274: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         277: <CHECKCAST <Class org/python/Callable>>
-                         280: <ICONST_2>
-                         281: <ANEWARRAY org/python/Object>
-                         284: <DUP>
-                         285: <ICONST_0>
-                         286: <NEW org/python/Object>
-                         289: <DUP>
-                         290: <LDC <String 'Got a NameError'>>
-                         292: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         295: <AASTORE>
-                         296: <DUP>
-                         297: <ICONST_1>
-                         298: <ALOAD_0>
-                         299: <AASTORE>
-                         300: <NEW java/util/Hashtable>
-                         303: <DUP>
-                         304: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         307: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         312: <POP>
-                         313: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         316: <LDC <String 'print'>>
-                         318: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         321: <DUP>
-                         322: <IFNONNULL 12>
-                         325: <POP>
-                         326: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         329: <LDC <String 'print'>>
-                         331: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         334: <CHECKCAST <Class org/python/Callable>>
-                         337: <ICONST_1>
-                         338: <ANEWARRAY org/python/Object>
-                         341: <DUP>
-                         342: <ICONST_0>
-                         343: <NEW org/python/Object>
-                         346: <DUP>
-                         347: <LDC <String 'Do final cleanup'>>
-                         349: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         352: <AASTORE>
-                         353: <NEW java/util/Hashtable>
-                         356: <DUP>
-                         357: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         360: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         365: <POP>
-                         366: <GOTO 59>
-                         369: <ASTORE_1>
-                         370: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
-                         373: <LDC <String 'print'>>
-                         375: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         378: <DUP>
-                         379: <IFNONNULL 12>
-                         382: <POP>
-                         383: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
-                         386: <LDC <String 'print'>>
-                         388: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
-                         391: <CHECKCAST <Class org/python/Callable>>
-                         394: <ICONST_1>
-                         395: <ANEWARRAY org/python/Object>
-                         398: <DUP>
-                         399: <ICONST_0>
-                         400: <NEW org/python/Object>
-                         403: <DUP>
-                         404: <LDC <String 'Do final cleanup'>>
-                         406: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
-                         409: <AASTORE>
-                         410: <NEW java/util/Hashtable>
-                         413: <DUP>
-                         414: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         417: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         422: <POP>
-                         423: <ALOAD_1>
-                         424: <ATHROW>
-                         425: <ACONST_NULL>
-                         426: <ARETURN>
+                         146: <LDC <String 'print'>>
+                         148: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         151: <ATHROW>
+                         152: <CHECKCAST <Class org/python/Object>>
+                         155: <CHECKCAST <Class org/python/Callable>>
+                         158: <ICONST_1>
+                         159: <ANEWARRAY org/python/Object>
+                         162: <DUP>
+                         163: <ICONST_0>
+                         164: <NEW org/python/Object>
+                         167: <DUP>
+                         168: <LDC <String 'Do final cleanup'>>
+                         170: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         173: <AASTORE>
+                         174: <NEW java/util/Hashtable>
+                         177: <DUP>
+                         178: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         181: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         186: <POP>
+                         187: <GOTO 382>
+                         190: <POP>
+                         191: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         194: <LDC <String 'print'>>
+                         196: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         199: <DUP>
+                         200: <IFNONNULL 27>
+                         203: <POP>
+                         204: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         207: <LDC <String 'print'>>
+                         209: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         212: <DUP>
+                         213: <IFNONNULL 14>
+                         216: <POP>
+                         217: <NEW org/python/exceptions/NameError>
+                         220: <DUP>
+                         221: <LDC <String 'print'>>
+                         223: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         226: <ATHROW>
+                         227: <CHECKCAST <Class org/python/Object>>
+                         230: <CHECKCAST <Class org/python/Callable>>
+                         233: <ICONST_1>
+                         234: <ANEWARRAY org/python/Object>
+                         237: <DUP>
+                         238: <ICONST_0>
+                         239: <NEW org/python/Object>
+                         242: <DUP>
+                         243: <LDC <String 'Got an AttributeError'>>
+                         245: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         248: <AASTORE>
+                         249: <NEW java/util/Hashtable>
+                         252: <DUP>
+                         253: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         256: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         261: <POP>
+                         262: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         265: <LDC <String 'print'>>
+                         267: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         270: <DUP>
+                         271: <IFNONNULL 27>
+                         274: <POP>
+                         275: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         278: <LDC <String 'print'>>
+                         280: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         283: <DUP>
+                         284: <IFNONNULL 14>
+                         287: <POP>
+                         288: <NEW org/python/exceptions/NameError>
+                         291: <DUP>
+                         292: <LDC <String 'print'>>
+                         294: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         297: <ATHROW>
+                         298: <CHECKCAST <Class org/python/Object>>
+                         301: <CHECKCAST <Class org/python/Callable>>
+                         304: <ICONST_1>
+                         305: <ANEWARRAY org/python/Object>
+                         308: <DUP>
+                         309: <ICONST_0>
+                         310: <NEW org/python/Object>
+                         313: <DUP>
+                         314: <LDC <String 'Do final cleanup'>>
+                         316: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         319: <AASTORE>
+                         320: <NEW java/util/Hashtable>
+                         323: <DUP>
+                         324: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         327: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         332: <POP>
+                         333: <GOTO 236>
+                         336: <ASTORE_0>
+                         337: <NEW org/python/Object>
+                         340: <DUP>
+                         341: <ALOAD_0>
+                         342: <INVOKESPECIAL org/python/Object.<init> (Lorg/python/exceptions/BaseException;)V>
+                         345: <ASTORE_0>
+                         346: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         349: <LDC <String 'print'>>
+                         351: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         354: <DUP>
+                         355: <IFNONNULL 27>
+                         358: <POP>
+                         359: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         362: <LDC <String 'print'>>
+                         364: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         367: <DUP>
+                         368: <IFNONNULL 14>
+                         371: <POP>
+                         372: <NEW org/python/exceptions/NameError>
+                         375: <DUP>
+                         376: <LDC <String 'print'>>
+                         378: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         381: <ATHROW>
+                         382: <CHECKCAST <Class org/python/Object>>
+                         385: <CHECKCAST <Class org/python/Callable>>
+                         388: <ICONST_2>
+                         389: <ANEWARRAY org/python/Object>
+                         392: <DUP>
+                         393: <ICONST_0>
+                         394: <NEW org/python/Object>
+                         397: <DUP>
+                         398: <LDC <String 'Got a NameError'>>
+                         400: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         403: <AASTORE>
+                         404: <DUP>
+                         405: <ICONST_1>
+                         406: <ALOAD_0>
+                         407: <AASTORE>
+                         408: <NEW java/util/Hashtable>
+                         411: <DUP>
+                         412: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         415: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         420: <POP>
+                         421: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         424: <LDC <String 'print'>>
+                         426: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         429: <DUP>
+                         430: <IFNONNULL 27>
+                         433: <POP>
+                         434: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         437: <LDC <String 'print'>>
+                         439: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         442: <DUP>
+                         443: <IFNONNULL 14>
+                         446: <POP>
+                         447: <NEW org/python/exceptions/NameError>
+                         450: <DUP>
+                         451: <LDC <String 'print'>>
+                         453: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         456: <ATHROW>
+                         457: <CHECKCAST <Class org/python/Object>>
+                         460: <CHECKCAST <Class org/python/Callable>>
+                         463: <ICONST_1>
+                         464: <ANEWARRAY org/python/Object>
+                         467: <DUP>
+                         468: <ICONST_0>
+                         469: <NEW org/python/Object>
+                         472: <DUP>
+                         473: <LDC <String 'Do final cleanup'>>
+                         475: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         478: <AASTORE>
+                         479: <NEW java/util/Hashtable>
+                         482: <DUP>
+                         483: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         486: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         491: <POP>
+                         492: <GOTO 77>
+                         495: <ASTORE_1>
+                         496: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
+                         499: <LDC <String 'print'>>
+                         501: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         504: <DUP>
+                         505: <IFNONNULL 27>
+                         508: <POP>
+                         509: <GETSTATIC org/Python.builtins (Ljava/util/Hashtable;)>
+                         512: <LDC <String 'print'>>
+                         514: <INVOKEVIRTUAL java/util/Hashtable.get (Ljava/lang/Object;)Ljava/lang/Object;>
+                         517: <DUP>
+                         518: <IFNONNULL 14>
+                         521: <POP>
+                         522: <NEW org/python/exceptions/NameError>
+                         525: <DUP>
+                         526: <LDC <String 'print'>>
+                         528: <INVOKESPECIAL org/python/exceptions/NameError.<init> (Ljava/lang/String;)V>
+                         531: <ATHROW>
+                         532: <CHECKCAST <Class org/python/Object>>
+                         535: <CHECKCAST <Class org/python/Callable>>
+                         538: <ICONST_1>
+                         539: <ANEWARRAY org/python/Object>
+                         542: <DUP>
+                         543: <ICONST_0>
+                         544: <NEW org/python/Object>
+                         547: <DUP>
+                         548: <LDC <String 'Do final cleanup'>>
+                         550: <INVOKESPECIAL org/python/Object.<init> (Ljava/lang/String;)V>
+                         553: <AASTORE>
+                         554: <NEW java/util/Hashtable>
+                         557: <DUP>
+                         558: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
+                         561: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
+                         566: <POP>
+                         567: <ALOAD_1>
+                         568: <ATHROW>
+                         569: <ACONST_NULL>
+                         570: <ARETURN>
                      Exceptions: (5)
-                         org/python/exceptions/AttributeError: 0-27 [136]
-                         org/python/exceptions/NameError: 0-27 [246]
-                         finally: 0-27 [369]
-                         finally: 136-190 [369]
-                         finally: 246-313 [369]
+                         org/python/exceptions/AttributeError: 0-45 [190]
+                         org/python/exceptions/NameError: 0-45 [336]
+                         finally: 0-45 [495]
+                         finally: 190-262 [495]
+                         finally: 336-421 [495]
                      Attributes: (1)
                          LineNumberTable (34 bytes)
                              Line numbers (8 total):
                                  0: 3
-                                 27: 9
-                                 80: 11
-                                 137: 5
-                                 190: 11
-                                 256: 7
-                                 313: 11
-                                 370: 11
+                                 45: 9
+                                 116: 11
+                                 191: 5
+                                 262: 11
+                                 346: 7
+                                 421: 11
+                                 496: 11
                 """)

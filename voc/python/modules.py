@@ -62,7 +62,22 @@ class StaticBlock(Block):
                 JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-            END_IF()
+
+                # If we still don't have something, throw a NameError.
+                IF(
+                    [JavaOpcodes.DUP()],
+                    JavaOpcodes.IFNONNULL
+                ),
+                    JavaOpcodes.POP(),
+                    JavaOpcodes.NEW('org/python/exceptions/NameError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC(name),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW(),
+                END_IF(),
+            END_IF(),
+            # Make sure we actually have a Python object
+            JavaOpcodes.CHECKCAST('org/python/Object')
         )
 
     def delete_name(self, name, allow_locals=True):
@@ -97,6 +112,7 @@ class Module(Block):
 
         self.methods = []
         self.classes = []
+        self.anonymous_inner_class_count = 0
 
     @property
     def descriptor(self):
@@ -203,7 +219,7 @@ class Module(Block):
         # at least one entry - the class for the module itself.
         classfiles = [(self.namespace, self.name, classfile)]
         # Also output any classes defined in this module.
-        for class_name, classfile in self.classes:
-            classfiles.append(('%s.%s' % (self.namespace, self.name), class_name, classfile))
+        for namespace, class_name, classfile in self.classes:
+            classfiles.append((namespace, class_name, classfile))
 
         return classfiles

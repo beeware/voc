@@ -79,8 +79,23 @@ class ClassBlock(Block):
                     JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
                     JavaOpcodes.LDC(name),
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+
+                    # If we still don't have something, throw a NameError.
+                    IF(
+                        [JavaOpcodes.DUP()],
+                        JavaOpcodes.IFNONNULL
+                    ),
+                        JavaOpcodes.POP(),
+                        JavaOpcodes.NEW('org/python/exceptions/NameError'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.LDC(name),
+                        JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
+                        JavaOpcodes.ATHROW(),
+                    END_IF(),
                 END_IF(),
-            END_IF()
+            END_IF(),
+            # Make sure we actually have a Python object
+            JavaOpcodes.CHECKCAST('org/python/Object')
         )
 
     def delete_name(self, name, allow_locals=True):
@@ -98,7 +113,6 @@ class ClassBlock(Block):
                 JavaOpcodes.LDC(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )
-
 
     @property
     def descriptor(self):
@@ -128,16 +142,24 @@ class ClassBlock(Block):
 
 
 class Class(Block):
-    def __init__(self, module, name, super_name=None, methods=None, init=None):
+    def __init__(self, module, name, namespace=None, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
         super().__init__(module)
         self.name = name
         self.super_name = super_name if super_name else 'org/python/Object'
+        self.interfaces = interfaces
+        self.public = public
+        self.final = final
         self.methods = methods if methods else []
         self.init = init
+        if namespace is None:
+            self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
+        else:
+            self.namespace = namespace
+        self.anonymous_inner_class_count = 0
 
     @property
     def descriptor(self):
-        return '/'.join([self.parent.descriptor, self.name])
+        return '/'.join([self.namespace.replace('.', '/'), self.name])
 
     @property
     def module(self):
@@ -147,8 +169,14 @@ class Class(Block):
         self.methods.append(method)
 
     def transpile(self):
-        classfile = JavaClass(self.descriptor, supername=self.super_name)
-        classfile.attributes.append(SourceFile(os.path.basename(self.parent.sourcefile)))
+        classfile = JavaClass(
+            self.descriptor,
+            supername=self.super_name,
+            interfaces=self.interfaces,
+            public=self.public,
+            final=self.final
+        )
+        classfile.attributes.append(SourceFile(os.path.basename(self.module.sourcefile)))
 
         body = ClassBlock(self, self.commands).transpile()
 
@@ -189,4 +217,44 @@ class Class(Block):
                 )
             )
 
-        return self.name, classfile
+        return self.namespace, self.name, classfile
+
+
+class InnerClass(Class):
+    def __init__(self, parent, name, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+        if isinstance(parent, Class):
+            module = parent.module
+        else:
+            module = parent
+        super().__init__(
+            module=module,
+            name=name,
+            namespace=parent.namespace,
+            super_name=super_name,
+            interfaces=interfaces,
+            public=public,
+            final=final,
+            methods=methods,
+            init=init
+        )
+
+
+class AnonymousInnerClass(Class):
+    def __init__(self, parent, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+        if isinstance(parent, Class):
+            module = parent.module
+        else:
+            module = parent
+        parent.anonymous_inner_class_count += 1
+        counter = parent.anonymous_inner_class_count
+        super().__init__(
+            module=module,
+            name="%s$%d" % (parent.name, counter),
+            namespace=parent.namespace,
+            super_name=super_name,
+            interfaces=interfaces,
+            public=public,
+            final=final,
+            methods=methods,
+            init=init
+        )

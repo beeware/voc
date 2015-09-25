@@ -76,7 +76,23 @@ class Block:
                     JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
                     JavaOpcodes.LDC(name),
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-                END_IF()
+
+                    # If we still don't have something, throw a NameError.
+                    IF(
+                        [JavaOpcodes.DUP()],
+                        JavaOpcodes.IFNONNULL
+                    ),
+                        JavaOpcodes.POP(),
+                        JavaOpcodes.NEW('org/python/exceptions/NameError'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.LDC(name),
+                        JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
+                        JavaOpcodes.ATHROW(),
+                    END_IF(),
+
+                END_IF(),
+                # Make sure we actually have a Python object
+                JavaOpcodes.CHECKCAST('org/python/Object')
             )
 
     def delete_name(self, name, allow_locals=True):
@@ -113,7 +129,7 @@ class Block:
 
         commands.reverse()
 
-        if False:
+        if True:
             print ('=====' * 10)
             print (code)
             print ('-----' * 10)

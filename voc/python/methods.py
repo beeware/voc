@@ -1,4 +1,7 @@
-from ..java import Method as JavaMethod, opcodes as JavaOpcodes
+from ..java import (
+    Method as JavaMethod,
+    opcodes as JavaOpcodes,
+)
 
 from .blocks import Block
 from .opcodes import ALOAD_name, ASTORE_name, ICONST_val
@@ -44,6 +47,10 @@ class Method(Block):
         return False
 
     @property
+    def is_closuremethod(self):
+        return False
+
+    @property
     def has_void_return(self):
         return self.returns.get('annotation', object()) is None
 
@@ -66,6 +73,26 @@ class Method(Block):
     @property
     def module(self):
         return self.parent
+
+    def add_method(self, method_name, code):
+        # If a method is added to a method, it is added as an anonymous
+        # inner class.
+        from .klass import AnonymousInnerClass
+        callable = AnonymousInnerClass(
+            parent=self.parent,
+            super_name='org/python/Object',
+            interfaces=['org/python/Callable'],
+            public=False,
+            final=True,
+        )
+
+        method = ClosureMethod(callable, 'invoke', extract_parameters(code))
+        method.extract(code)
+        callable.methods.append(method.transpile())
+
+        self.parent.classes.append(callable.transpile())
+
+        return method
 
     def tweak(self):
         # Load all the arguments into locals
@@ -221,6 +248,16 @@ class MainMethod(Method):
     def tweak(self):
         self.void_return()
         self.ignore_empty()
+
+
+class ClosureMethod(Method):
+    @property
+    def is_closuremethod(self):
+        return True
+
+    @property
+    def callable(self):
+        return self.parent.descriptor
 
 
 def extract_parameters(code):

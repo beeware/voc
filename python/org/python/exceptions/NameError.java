@@ -1,11 +1,7 @@
 package org.python.exceptions;
 
 public class NameError extends org.python.exceptions.Exception {
-    public NameError() {
-        super();
-    }
-
-    public NameError(String msg) {
-        super(msg);
+    public NameError(String var_name) {
+        super("name '" + var_name + "' is not defined");
     }
 }

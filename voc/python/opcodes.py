@@ -636,20 +636,23 @@ def ICONST_val(value):
     There are a couple of opcodes that can be used to optimize the
     loading of small integers; use them if possible.
     """
-    if value == 0:
-        return JavaOpcodes.ICONST_0()
-    elif value == 1:
-        return JavaOpcodes.ICONST_1()
-    elif value == 2:
-        return JavaOpcodes.ICONST_2()
-    elif value == 3:
-        return JavaOpcodes.ICONST_3()
-    elif value == 4:
-        return JavaOpcodes.ICONST_4()
-    elif value == 5:
-        return JavaOpcodes.ICONST_5()
-    elif value == -1:
-        return JavaOpcodes.ICONST_M1()
+    if isinstance(value, int):
+        if value == 0:
+            return JavaOpcodes.ICONST_0()
+        elif value == 1:
+            return JavaOpcodes.ICONST_1()
+        elif value == 2:
+            return JavaOpcodes.ICONST_2()
+        elif value == 3:
+            return JavaOpcodes.ICONST_3()
+        elif value == 4:
+            return JavaOpcodes.ICONST_4()
+        elif value == 5:
+            return JavaOpcodes.ICONST_5()
+        elif value == -1:
+            return JavaOpcodes.ICONST_M1()
+        else:
+            return JavaOpcodes.SIPUSH(value)
     else:
         return JavaOpcodes.LDC(value)
 
@@ -946,7 +949,7 @@ class BINARY_SUBTRACT(BinaryOpcode):
 
 
 class BINARY_SUBSCR(BinaryOpcode):
-    __method__ = '__subscr__'
+    __method__ = '__getitem__'
 
 
 class BINARY_FLOOR_DIVIDE(BinaryOpcode):
@@ -967,6 +970,7 @@ class INPLACE_TRUE_DIVIDE(InplaceOpcode):
 
 # class STORE_MAP(Opcode):
 
+
 class INPLACE_ADD(InplaceOpcode):
     __method__ = '__iadd__'
 
@@ -983,8 +987,30 @@ class INPLACE_MODULO(InplaceOpcode):
     __method__ = '__imod__'
 
 
-# class STORE_SUBSCR(Opcode):
-# class DELETE_SUBSCR(Opcode):
+class STORE_SUBSCR(Opcode):
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert(self, context, arguments):
+        pass  # FIXME
+
+
+class DELETE_SUBSCR(Opcode):
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert(self, context, arguments):
+        pass  # FIXME
 
 
 class BINARY_LSHIFT(BinaryOpcode):
@@ -1213,9 +1239,20 @@ class UNPACK_SEQUENCE(Opcode):
     def product_count(self):
         return self.count
 
-    # def convert(self, context, arguments):
-    #     for argument in arguments:
-    #         argument.operation.transpile(context, argument.arguments)
+    def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(
+            ASTORE_name(context, '##TEMP_%d##' % id(self))
+        )
+
+        for i in range(self.count, 0, -1):
+            context.add_opcodes(
+                ALOAD_name(context, '##TEMP_%d##' % id(self)),
+                ICONST_val(i - 1),
+                JavaOpcodes.INVOKEVIRTUAL('org/python/Object', '__getitem__', '(I)Lorg/python/Object;'),
+            )
 
 
 class FOR_ITER(Opcode):
@@ -1234,6 +1271,8 @@ class FOR_ITER(Opcode):
     def product_count(self):
         return 2
 
+    def convert(self, context, arguments):
+        pass # REMOVE
 
 # class UNPACK_EX(Opcode):
 
@@ -1314,40 +1353,52 @@ class LOAD_CONST(Opcode):
         # A None value has it's own opcode.
         # If the constant is a byte or a short, we can
         # cut a value out of the constant pool.
-        # Otherwise, use LDC.
         if self.const is None:
             context.add_opcodes(JavaOpcodes.ACONST_NULL())
             return
-        elif isinstance(self.const, int):
-            prototype = '(I)V'
-            if self.const == 0:
-                load_op = JavaOpcodes.ICONST_0()
-            elif self.const == 1:
-                load_op = JavaOpcodes.ICONST_1()
-            elif self.const == 2:
-                load_op = JavaOpcodes.ICONST_2()
-            elif self.const == 3:
-                load_op = JavaOpcodes.ICONST_3()
-            elif self.const == 4:
-                load_op = JavaOpcodes.ICONST_4()
-            elif self.const == 5:
-                load_op = JavaOpcodes.ICONST_5()
-            elif self.const == -1:
-                load_op = JavaOpcodes.ICONST_M1()
-            else:
-                load_op = JavaOpcodes.SIPUSH(self.const)
         else:
-            prototype = {
-                str: '(Ljava/lang/String;)V',
-            }[type(self.const)]
-            load_op = JavaOpcodes.LDC(self.const)
+            context.add_opcodes(
+                JavaOpcodes.NEW('org/python/Object'),
+                JavaOpcodes.DUP(),
+            )
+            if isinstance(self.const, int):
+                prototype = '(I)V'
+                context.add_opcodes(ICONST_val(self.const))
 
-        context.add_opcodes(
-            JavaOpcodes.NEW('org/python/Object'),
-            JavaOpcodes.DUP(),
-            load_op,
-            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', prototype),
-        )
+            elif isinstance(self.const, tuple):
+                prototype = '(Ljava/util/ArrayList;)V'
+
+                context.add_opcodes(
+                    JavaOpcodes.NEW('java/util/ArrayList'),
+                    JavaOpcodes.DUP(),
+                    ICONST_val(len(self.const)),
+                    JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
+                )
+
+                for val in self.const:
+                    context.add_opcodes(
+                        JavaOpcodes.DUP(),
+
+                        JavaOpcodes.NEW('org/python/Object'),
+                        JavaOpcodes.DUP(),
+                        ICONST_val(val),
+                        JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(I)V'),
+
+                        JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                        JavaOpcodes.POP()
+                    )
+
+            else:
+                prototype = {
+                    str: '(Ljava/lang/String;)V',
+                    float: '(Ljava/lang/Double;)V',
+                    bool: '(Ljava/lang/Boolean;)V',
+                }[type(self.const)]
+                context.add_opcodes(JavaOpcodes.LDC(self.const))
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', prototype),
+            )
 
 
 class LOAD_NAME(Opcode):
@@ -1386,9 +1437,32 @@ class BUILD_TUPLE(Opcode):
     def product_count(self):
         return 1
 
-    # def convert(self, context, arguments):
-    #     code = []
-    #     return code
+    def convert(self, context, arguments):
+        context.add_opcodes(
+            JavaOpcodes.NEW('org/python/Object'),
+            JavaOpcodes.DUP(),
+
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            ICONST_val(self.count),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
+        )
+
+        for argument in arguments:
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+
+            argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/util/ArrayList;)V')
+        )
 
 
 class BUILD_LIST(Opcode):
@@ -1407,9 +1481,32 @@ class BUILD_LIST(Opcode):
     def product_count(self):
         return 1
 
-    # def convert(self, context, arguments):
-    #     code = []
-    #     return code
+    def convert(self, context, arguments):
+        context.add_opcodes(
+            JavaOpcodes.NEW('org/python/Object'),
+            JavaOpcodes.DUP(),
+
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            ICONST_val(self.count),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
+        )
+
+        for argument in arguments:
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+
+            argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/Object', '<init>', '(Ljava/util/ArrayList;)V')
+        )
 
 
 class BUILD_SET(Opcode):
@@ -1533,7 +1630,7 @@ class IMPORT_NAME(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        pass
+        pass  # FIXME
 
 
 class IMPORT_FROM(Opcode):
@@ -1967,7 +2064,17 @@ class MAKE_FUNCTION(Opcode):
 
         method = context.add_method(full_method_name, code)
 
-        if not method.is_constructor:
+        if method.is_constructor:
+            context.add_opcodes(
+                JavaOpcodes.ACONST_NULL()
+            )
+        elif method.is_closuremethod:
+            context.add_opcodes(
+                JavaOpcodes.NEW(method.callable),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL(method.callable, '<init>', '()V'),
+            )
+        else:
             # Push a callable onto the stack so that it can be stored
             # in globals and subsequently retrieved and run.
             context.add_opcodes(
@@ -2006,13 +2113,28 @@ class MAKE_FUNCTION(Opcode):
                     JavaOpcodes.ATHROW(),
                 END_TRY()
             )
-        else:
-            context.add_opcodes(
-                JavaOpcodes.ACONST_NULL()
-            )
 
 
-# class BUILD_SLICE(Opcode):
+class BUILD_SLICE(Opcode):
+    def __init__(self, argc, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.argc = argc
+
+    def __arg_repr__(self):
+        return '%s' % (self.argc)
+
+    @property
+    def consume_count(self):
+        return self.argc
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
 
 class MAKE_CLOSURE(Opcode):
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
@@ -2058,7 +2180,46 @@ class LOAD_CLOSURE(Opcode):
 # class CALL_FUNCTION_VAR_KW(Opcode):
 
 # class SETUP_WITH(Opcode):
-# class LIST_APPEND(Opcode):
+
+
+class LIST_APPEND(Opcode):
+    def __init__(self, index, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.index = index
+
+    def __arg_repr__(self):
+        return str(self.index)
+
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        for i in range(1, self.index):
+            context.add_opcodes(
+                ASTORE_name(context, '##temp-%s-%s##' % (id(self), i))
+            )
+
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+        )
+
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/util/ArrayList;)Z'),
+            JavaOpcodes.POP(),
+        )
+
+        for i in range(self.index, 1, -1):
+            context.add_opcodes(
+                ALOAD_name(context, '##temp-%s-%s##' % (id(self), i - 1))
+            )
 
 # class SET_ADD(Opcode):
 # class MAP_ADD(Opcode):

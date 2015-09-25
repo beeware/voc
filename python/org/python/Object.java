@@ -480,7 +480,79 @@ public class Object {
         throw new org.python.exceptions.NotImplementedError("Object method __length__ not implemented");
     }
 
-    public org.python.Object __getitem__(org.python.Object key) {
+    public org.python.Object __getitem__(org.python.Object [] args, java.util.Hashtable kwargs) {
+        org.python.Object index = args[0];
+        return this.__getitem__(index);
+    }
+
+    @SuppressWarnings("unchecked")
+    public org.python.Object __getitem__(org.python.Object index) {
+        // System.out.println("ADD " + this.__repr__() + " TO " + other.__repr__());
+
+        if (this.type == String.class) {
+            if (index.type == Long.class) {
+                return this.__getitem__(((Long)index.value).intValue());
+            } else {
+                throw new org.python.exceptions.TypeError("string indices must be integers");
+            }
+        } else if (this.type == Long.class) {
+        } else if (this.type == Float.class) {
+        } else if (this.type == java.util.Map.class) {
+            return ((java.util.Map<org.python.Object, org.python.Object>) this.value).get(index);
+        } else if (this.type == java.util.Set.class) {
+        } else if (this.type == org.python.Object.class) {
+        } else if (this.type == java.util.ArrayList.class) {
+            if (index.type == Long.class) {
+                return this.__getitem__(((Long)index.value).intValue());
+            } else {
+                throw new org.python.exceptions.TypeError("list indices must be integers");
+            }
+        }
+        throw new org.python.exceptions.NotImplementedError("Object method __getitem__ not implemented");
+    }
+
+    @SuppressWarnings("unchecked")
+    public org.python.Object __getitem__(int index) {
+        // System.out.println("ADD " + this.__repr__() + " TO " + other.__repr__());
+        if (this.type == String.class) {
+            java.lang.String val = (java.lang.String) this.value;
+
+            if (index >= 0) {
+                if (index >= val.length()) {
+                    throw new org.python.exceptions.IndexError("string index out of range");
+                } else {
+                    return new org.python.Object(val.charAt(index));
+                }
+            } else {
+                if (index < -val.length()) {
+                    throw new org.python.exceptions.IndexError("string index out of range");
+                } else {
+                    return new org.python.Object(val.charAt(val.length() + index));
+                }
+            }
+        } else if (this.type == Long.class) {
+        } else if (this.type == Float.class) {
+        } else if (this.type == java.util.Map.class) {
+            return ((java.util.Map<org.python.Object, org.python.Object>) this.value).get(index);
+        } else if (this.type == java.util.Set.class) {
+        } else if (this.type == org.python.Object.class) {
+        } else if (this.type == java.util.ArrayList.class) {
+            java.util.ArrayList<org.python.Object> val = (java.util.ArrayList<org.python.Object>) this.value;
+
+            if (index >= 0) {
+                if (index >= val.size()) {
+                    throw new org.python.exceptions.IndexError("list index out of range");
+                } else {
+                    return val.get(index);
+                }
+            } else {
+                if (index < -val.size()) {
+                    throw new org.python.exceptions.IndexError("list index out of range");
+                } else {
+                    return val.get(val.size() + index);
+                }
+            }
+        }
         throw new org.python.exceptions.NotImplementedError("Object method __getitem__ not implemented");
     }
 
@@ -493,7 +565,15 @@ public class Object {
     }
 
     public org.python.Object __iter__() {
-        throw new org.python.exceptions.NotImplementedError("Object method __iter__ not implemented");
+        if (this.type == String.class) {
+        } else if (this.type == Long.class) {
+        } else if (this.type == Float.class) {
+        } else if (this.type == java.util.Map.class) {
+        } else if (this.type == java.util.Set.class) {
+        } else if (this.type == org.python.Object.class) {
+        } else if (this.type == java.util.ArrayList.class) {
+            return org.python.JavaIterator(((java.util.ArrayList<>)this.value).iterator());
+        }
     }
 
     public org.python.Object __reversed__() {

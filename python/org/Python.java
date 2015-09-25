@@ -634,7 +634,7 @@ public class Python {
             if (args[0] instanceof org.python.Iterator) {
                 return args[0];
             } else {
-                throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with iterable not implemented");
+                return args[0].__iter__();
             }
         } else if (args.length == 2) {
             throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with callable/sentinel not implemented");

@@ -124,7 +124,7 @@ class BinaryOpcodeTests(TranspileTestCase):
         self.assertBinaryOpcode(operation='x - y', method="__sub__")
 
     def test_BINARY_SUBSCR(self):
-        self.assertBinaryOpcode(operation='x[y]', method="__subscr__")
+        self.assertBinaryOpcode(operation='x[y]', method="__getitem__")
 
     def test_BINARY_FLOOR_DIVIDE(self):
         self.assertBinaryOpcode(operation='x // y', method="__floordiv__")
