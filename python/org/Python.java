@@ -631,7 +631,7 @@ public class Python {
         if (args.length < 1) {
             throw new org.python.exceptions.TypeError("len() expects at least argument, got " + args.length);
         } else if (args.length == 1) {
-            if (args[0] instanceof org.python.Iterator) {
+            if (args[0] instanceof org.python.Iterable) {
                 return args[0];
             } else {
                 return args[0].__iter__();
@@ -1047,11 +1047,11 @@ public class Python {
                 org.python.Object [] args,
                 java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
         if (args.length == 1) {
-            return new org.python.Range(args[0]);
+            return new org.python.types.Range(args[0]);
         } else if (args.length == 2) {
-            return new org.python.Range(args[0], args[1]);
+            return new org.python.types.Range(args[0], args[1]);
         } else if (args.length == 3) {
-            return new org.python.Range(args[0], args[1], args[2]);
+            return new org.python.types.Range(args[0], args[1], args[2]);
         } else if (args.length == 0) {
             throw new org.python.exceptions.TypeError("range expected 1 arguments, got " + args.length);
         } else {

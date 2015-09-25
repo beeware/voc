@@ -572,8 +572,8 @@ public class Object {
         } else if (this.type == java.util.Set.class) {
         } else if (this.type == org.python.Object.class) {
         } else if (this.type == java.util.ArrayList.class) {
-            return org.python.JavaIterator(((java.util.ArrayList<>)this.value).iterator());
         }
+        return null;
     }
 
     public org.python.Object __reversed__() {

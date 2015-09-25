@@ -69,9 +69,9 @@ class ForLoopTests(TranspileTestCase):
                          103: <DUP>
                          104: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
                          107: <INVOKESTATIC org/Python.iter ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
-                         110: <CHECKCAST <Class org/python/Iterator>>
+                         110: <CHECKCAST <Class org/python/Iterable>>
                          113: <DUP>
-                         114: <INVOKEINTERFACE org/python/Iterator.__next__ ()Lorg/python/Object;>
+                         114: <INVOKEINTERFACE org/python/Iterable.__next__ ()Lorg/python/Object;>
                          119: <GOTO 6>
                          122: <GOTO 13>
                          125: <ASTORE_2>

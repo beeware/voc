@@ -1069,7 +1069,7 @@ class GET_ITER(Opcode):
                 '([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;'
             ),
 
-            JavaOpcodes.CHECKCAST('org/python/Iterator'),
+            JavaOpcodes.CHECKCAST('org/python/Iterable'),
         )
 
 

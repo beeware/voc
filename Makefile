@@ -5,8 +5,7 @@ ALL_FILES=\
 	python/org/python/Callable.class \
 	python/org/python/Function.class \
 	python/org/python/InstanceMethod.class \
-	python/org/python/Iterator.class \
-	python/org/python/Range.class \
+	python/org/python/Iterable.class \
 	python/org/python/StaticMethod.class \
 	python/org/python/Constructor.class \
 	python/org/python/exceptions/ArithmeticError.class \
@@ -62,7 +61,6 @@ ALL_FILES=\
 	python/org/python/exceptions/TimeoutError.java \
 	python/org/python/exceptions/TypeError.class \
 	python/org/python/exceptions/UnboundLocalError.class \
-	python/org/python/exceptions/UnboundLocalErrorNameError.java \
 	python/org/python/exceptions/UnicodeDecodeError.class \
 	python/org/python/exceptions/UnicodeEncodeError.class \
 	python/org/python/exceptions/UnicodeError.class \
@@ -71,8 +69,31 @@ ALL_FILES=\
 	python/org/python/exceptions/UserWarning.java \
 	python/org/python/exceptions/ValueError.class \
 	python/org/python/exceptions/Warning.java \
-	python/org/python/exceptions/ZeroDivisionError.class
-
+	python/org/python/exceptions/ZeroDivisionError.class \
+	python/org/python/types/Bool.class \
+	python/org/python/types/ByteArray.class \
+	python/org/python/types/Bytes.class \
+	python/org/python/types/Class.class \
+	python/org/python/types/Complex.class \
+	python/org/python/types/ContextManager.class \
+	python/org/python/types/Dict.class \
+	python/org/python/types/DictView.class \
+	python/org/python/types/Ellipsis.class \
+	python/org/python/types/Float.class \
+	python/org/python/types/FrozenSet.class \
+	python/org/python/types/Function.class \
+	python/org/python/types/Int.class \
+	python/org/python/types/List.class \
+	python/org/python/types/MemoryView.class \
+	python/org/python/types/Method.class \
+	python/org/python/types/Module.class \
+	python/org/python/types/NotImplemented.class \
+	python/org/python/types/Null.class \
+	python/org/python/types/Range.class \
+	python/org/python/types/Set.class \
+	python/org/python/types/Str.class \
+	python/org/python/types/Tuple.class \
+	python/org/python/types/Type.class \
 
 .PHONY: all clean
 

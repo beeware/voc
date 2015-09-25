@@ -471,7 +471,7 @@ class ForLoop:
             loop,
                 opcodes.TRY(),
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterator', '__next__', '()Lorg/python/Object;', 0),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;', 0),
                 opcodes.CATCH('org/python/exceptions/StopIteration'),
                     opcodes.jump(JavaOpcodes.GOTO(0), context, loop, opcodes.Opcode.NEXT),
                 opcodes.END_TRY(),

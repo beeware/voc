@@ -1,7 +1,7 @@
-package org.python;
+package org.python.types;
 
 
-public class Range extends org.python.Object implements org.python.Iterator {
+public class Range extends org.python.Object implements org.python.Iterable {
     private long index;
 
     private long stop;
@@ -42,6 +42,10 @@ public class Range extends org.python.Object implements org.python.Iterator {
         value = attrs;
     }
 
+    public org.python.Object __iter__() {
+        return this;
+    }
+
     public org.python.Object __next__() {
         if (this.index >= this.stop) {
             throw new org.python.exceptions.StopIteration();
@@ -49,4 +53,5 @@ public class Range extends org.python.Object implements org.python.Iterator {
         this.index += this.step;
         return new org.python.Object(this.index);
     }
+
 }
