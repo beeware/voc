@@ -1,6 +1,7 @@
 
 ALL_FILES=\
 	python/org/Python.class \
+	python/org/python/Object.class \
 	python/org/python/Callable.class \
 	python/org/python/InstanceMethod.class \
 	python/org/python/Iterable.class \

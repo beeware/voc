@@ -27,10 +27,10 @@ class StaticBlock(Block):
             # Load the Python builtins into the globals.
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC('__builtins__'),
-            JavaOpcodes.NEW('org/python/types/Object'),
+            JavaOpcodes.NEW('org/python/types/Dict'),
             JavaOpcodes.DUP(),
             JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Ljava/util/Map;)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '(Ljava/util/Map;)V'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
         ] + self.code

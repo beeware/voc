@@ -22,15 +22,15 @@ class ClassBlock(Block):
             JavaOpcodes.NEW('java/util/Hashtable'),
             JavaOpcodes.DUP(),
             JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
-            JavaOpcodes.PUTSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.PUTSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
 
             # # Set the __name__ atribute to the name of the parent module.
-            JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC('__name__'),
-            JavaOpcodes.NEW('org/python/types/Object'),
+            JavaOpcodes.NEW('org/python/types/Str'),
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC(self.module.descriptor.replace('/', '.')),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
         ] + self.code
@@ -43,7 +43,7 @@ class ClassBlock(Block):
 
         self.add_opcodes(
             ASTORE_name(self, '#TEMP#'),
-            JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
             JavaOpcodes.LDC(name),
             ALOAD_name(self, '#TEMP#'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
@@ -54,7 +54,7 @@ class ClassBlock(Block):
         if allow_locals:
             self.add_opcodes(
                 # look for a class attribute.
-                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )
@@ -102,7 +102,7 @@ class ClassBlock(Block):
         if allow_locals:
             self.add_opcodes(
                 # look for a class attribute.
-                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )
@@ -180,9 +180,9 @@ class Class(Block):
 
         body = ClassBlock(self, self.commands).transpile()
 
-        # Add a attrs dictionary to the class.
+        # Add a class attributes dictionary to the class.
         classfile.fields.append(
-            JavaField('attrs', 'Ljava/util/Hashtable;', public=True, static=True)
+            JavaField('classattrs', 'Ljava/util/Hashtable;', public=True, static=True)
         )
 
         if body:

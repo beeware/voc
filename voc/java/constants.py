@@ -97,6 +97,8 @@ class ConstantPool:
         if allow_duplicates or obj not in self._constants:
             self._constant_pool.append(obj)
             self._constants[obj] = len(self)
+            if obj.__class__ in (Double, Long):
+                self._constant_pool.append(None)
 
     def __len__(self):
         return len(self._constant_pool)
@@ -113,10 +115,18 @@ class ConstantPool:
             reader.debug("    " * dump, 'Constant pool: (%s constants)' % (count - 1))
 
         raw_pool = []
-        for i in range(1, count):
-            raw_pool.append(Constant.read(reader))
+        i = 1
+        while i < count:
+            constant = Constant.read(reader)
+            raw_pool.append(constant)
+            if constant[0] in (Double, Long):
+                raw_pool.append(None)
+                i += 2
+            else:
+                i += 1
 
-        for i in range(0, count-1):
+        i = 0
+        while i < count - 1:
             entry = raw_pool[i]
             if isinstance(entry, tuple):
                 const = resolve(entry, raw_pool)
@@ -125,11 +135,16 @@ class ConstantPool:
             self.add(const, allow_duplicates=True)
             if dump is not None:
                 reader.debug("    " * (dump + 1), '%s: %s' % ((i + 1), repr(const)))
+            if const.__class__ in (Double, Long):
+                i += 2
+            else:
+                i += 1
 
     def write(self, writer):
         writer.write_u2(self.count)
-        for constant in self._constant_pool:
-            constant.write(writer)
+        for i, constant in enumerate(self._constant_pool):
+            if constant:
+                constant.write(writer)
 
 
 # All constant_pool table entries have the following general format:
@@ -168,22 +183,24 @@ class Constant:
     def read(reader):
         tag = reader.read_u1()
         klass = {
+            0: None,
             Constant.CONSTANT_Class: Classref,
             Constant.CONSTANT_Fieldref: Fieldref,
             Constant.CONSTANT_Methodref: Methodref,
             Constant.CONSTANT_InterfaceMethodref: InterfaceMethodref,
             Constant.CONSTANT_String: String,
             Constant.CONSTANT_Integer: Integer,
-            # Constant.CONSTANT_Float: Float,
+            Constant.CONSTANT_Float: Float,
             Constant.CONSTANT_Long: Long,
-            # Constant.CONSTANT_Double: Double,
+            Constant.CONSTANT_Double: Double,
             Constant.CONSTANT_NameAndType: NameAndType,
             Constant.CONSTANT_Utf8: Utf8,
             # Constant.CONSTANT_MethodHandle: MethodHandle
             # Constant.CONSTANT_MethodType: MethodType
             # Constant.CONSTANT_InvokeDynamic: InvokeDynamic
         }[tag]
-        return klass.read_info(reader)
+        if klass:
+            return klass.read_info(reader)
 
     def write(self, writer):
         writer.write_u1(self.tag)
@@ -209,7 +226,7 @@ class Classref(Constant):
 
     def __init__(self, name):
         # The tag item has the value CONSTANT_Class (7).
-        super(Classref, self).__init__(Constant.CONSTANT_Class)
+        super().__init__(Constant.CONSTANT_Class)
 
         # The value of the name item must be a valid index into the
         # constant_pool table. The constant_pool entry at that index must be a
@@ -278,7 +295,7 @@ class Fieldref(Constant):
 
         # The tag item of a CONSTANT_Fieldref_info structure has the value
         # CONSTANT_Fieldref (9).
-        super(Fieldref, self).__init__(Constant.CONSTANT_Fieldref)
+        super().__init__(Constant.CONSTANT_Fieldref)
 
         # The value of the class item must be a valid index into the
         # constant_pool table. The constant_pool entry at that index must be a
@@ -343,7 +360,7 @@ class Methodref(Constant):
 
         # The tag item of a CONSTANT_Methodref_info structure has the value
         # CONSTANT_Methodref (10).
-        super(Methodref, self).__init__(Constant.CONSTANT_Methodref)
+        super().__init__(Constant.CONSTANT_Methodref)
 
         # The value of the class item must be a valid index into the
         # constant_pool table. The constant_pool entry at that index must be a
@@ -409,7 +426,7 @@ class InterfaceMethodref(Constant):
 
         # The tag item of a CONSTANT_InterfaceMethodref_info structure has the value
         # CONSTANT_InterfaceMethodref (11).
-        super(InterfaceMethodref, self).__init__(Constant.CONSTANT_InterfaceMethodref)
+        super().__init__(Constant.CONSTANT_InterfaceMethodref)
 
         # The value of the class item must be a valid index into the
         # constant_pool table. The constant_pool entry at that index must be a
@@ -475,7 +492,7 @@ class String(Constant):
     def __init__(self, value):
         # The tag item of the CONSTANT_String_info structure has the value
         # CONSTANT_String (8).
-        super(String, self).__init__(Constant.CONSTANT_String)
+        super().__init__(Constant.CONSTANT_String)
 
         # The value of the string item must be a valid index into the
         # constant_pool table. The constant_pool entry at that index must be a
@@ -511,7 +528,9 @@ class String(Constant):
 # ------------------------------------------------------------------------
 
 # The CONSTANT_Integer_info and CONSTANT_Float_info structures represent 4-byte
-# numeric (int and float) constants:
+# numeric (int and float) constants.
+#
+# The items of these structures are as follows:
 
 class Integer(Constant):
     # u1 tag;
@@ -520,7 +539,11 @@ class Integer(Constant):
     def __init__(self, value):
         # The tag item of the CONSTANT_Integer_info structure has the value
         # CONSTANT_Integer (3).
-        super(Integer, self).__init__(Constant.CONSTANT_Integer)
+        super().__init__(Constant.CONSTANT_Integer)
+
+        # The bytes item of the CONSTANT_Integer_info structure represents the
+        # value of the int constant. The bytes of the value are stored in big-
+        # endian (high byte first) order.
 
         self.value = value
 
@@ -542,39 +565,61 @@ class Integer(Constant):
         writer.write_u4(self.value)
 
 
-# CONSTANT_Float_info {
-#     u1 tag;
-#     u4 bytes;
-# }
-# The items of these structures are as follows:
+class Float(Constant):
+    # u1 tag;
+    # u4 bytes;
 
-# tag
-# The tag item of the CONSTANT_Integer_info structure has the value CONSTANT_Integer (3).
+    def __init__(self, value):
+        # The tag item of the CONSTANT_Float_info structure has the value
+        # CONSTANT_Float (4).
+        super().__init__(Constant.CONSTANT_Float)
 
-# The tag item of the CONSTANT_Float_info structure has the value CONSTANT_Float (4).
+        # The bytes item of the CONSTANT_Float_info structure represents the
+        # value of the float constant in IEEE 754 floating-point single format
+        # (§2.3.2). The bytes of the single format representation are stored in
+        # big-endian (high byte first) order.
+        #
+        # The value represented by the CONSTANT_Float_info structure is
+        # determined as follows. The bytes of the value are first converted into
+        # an int constant bits. Then:
+        #
+        #  * If bits is 0x7f800000, the float value will be positive infinity.
+        #
+        #  * If bits is 0xff800000, the float value will be negative infinity.
+        #
+        #  * If bits is in the range 0x7f800001 through 0x7fffffff or in the range
+        #    0xff800001 through 0xffffffff, the float value will be NaN.
+        #
+        # In all other cases, let s, e, and m be three values that might be
+        # computed from bits:
+        #
+        #     int s = ((bits >> 31) == 0) ? 1 : -1;
+        #     int e = ((bits >> 23) & 0xff);
+        #     int m = (e == 0) ?
+        #               (bits & 0x7fffff) << 1 :
+        #               (bits & 0x7fffff) | 0x800000;
+        #
+        # Then the float value equals the result of the mathematical expression
+        # s · m · 2e-150.
 
-# bytes
-# The bytes item of the CONSTANT_Integer_info structure represents the value of the int constant. The bytes of the value are stored in big-endian (high byte first) order.
+        self.value = value
 
-# The bytes item of the CONSTANT_Float_info structure represents the value of the float constant in IEEE 754 floating-point single format (§2.3.2). The bytes of the single format representation are stored in big-endian (high byte first) order.
+    def __repr__(self):
+        return '<Float %s>' % self.value
 
-# The value represented by the CONSTANT_Float_info structure is determined as follows. The bytes of the value are first converted into an int constant bits. Then:
+    def __eq__(self, other):
+        return multieq(self, other, 'tag', 'value')
 
-# If bits is 0x7f800000, the float value will be positive infinity.
+    def __hash__(self):
+        return multihash(self, 'tag', 'value')
 
-# If bits is 0xff800000, the float value will be negative infinity.
+    @staticmethod
+    def read_info(reader):
+        value = reader.read_f()
+        return Integer, (value,)
 
-# If bits is in the range 0x7f800001 through 0x7fffffff or in the range 0xff800001 through 0xffffffff, the float value will be NaN.
-
-# In all other cases, let s, e, and m be three values that might be computed from bits:
-
-# int s = ((bits >> 31) == 0) ? 1 : -1;
-# int e = ((bits >> 23) & 0xff);
-# int m = (e == 0) ?
-#           (bits & 0x7fffff) << 1 :
-#           (bits & 0x7fffff) | 0x800000;
-
-# Then the float value equals the result of the mathematical expression s · m · 2e-150.
+    def write_info(self, writer):
+        writer.write_f(self.value)
 
 
 # ------------------------------------------------------------------------
@@ -582,17 +627,36 @@ class Integer(Constant):
 # ------------------------------------------------------------------------
 
 # The CONSTANT_Long_info and CONSTANT_Double_info represent 8-byte numeric (long
-# and double) constants:
+# and double) constants.
+
+# All 8-byte constants take up two entries in the constant_pool table of the
+# class file. If a CONSTANT_Long_info or CONSTANT_Double_info structure is the
+# item in the constant_pool table at index n, then the next usable item in the
+# pool is located at index n+2. The constant_pool index n+1 must be valid but is
+# considered unusable.
+
+# In retrospect, making 8-byte constants take two constant pool entries was a
+# poor choice.
+
+# The items of these structures are as follows:
 
 class Long(Constant):
     # u1 tag;
     # u4 high_bytes;
     # u4 low_bytes;
 
+    # The unsigned high_bytes and low_bytes items of the CONSTANT_Long_info
+    # structure together represent the value of the long constant:
+    #
+    #     ((long) high_bytes << 32) + low_bytes
+    #
+    # where the bytes of each of high_bytes and low_bytes are stored in big-
+    # endian (high byte first) order.
+
     def __init__(self, value):
         # The tag item of the CONSTANT_LONG_info structure has the value
         # CONSTANT_LONG (3).
-        super(Long, self).__init__(Constant.CONSTANT_LONG)
+        super().__init__(Constant.CONSTANT_LONG)
 
         self.value = value
 
@@ -614,52 +678,67 @@ class Long(Constant):
         writer.write_u8(self.value)
 
 
-# CONSTANT_Double_info {
-#     u1 tag;
-#     u4 high_bytes;
-#     u4 low_bytes;
-# }
-# All 8-byte constants take up two entries in the constant_pool table of the class file. If a CONSTANT_Long_info or CONSTANT_Double_info structure is the item in the constant_pool table at index n, then the next usable item in the pool is located at index n+2. The constant_pool index n+1 must be valid but is considered unusable.
+class Double(Constant):
+    # u1 tag;
+    # u4 high_bytes;
+    # u4 low_bytes;
 
-# In retrospect, making 8-byte constants take two constant pool entries was a poor choice.
+    # The high_bytes and low_bytes items of the CONSTANT_Double_info structure
+    # together represent the double value in IEEE 754 floating-point double
+    # format (§2.3.2). The bytes of each item are stored in big-endian (high
+    # byte first) order.
+    #
+    # The value represented by the CONSTANT_Double_info structure is determined
+    # as follows. The high_bytes and low_bytes items are converted into the long
+    # constant bits, which is equal to
+    #
+    # ((long) high_bytes << 32) + low_bytes
+    #
+    # Then:
+    #
+    #  * If bits is 0x7ff0000000000000L, the double value will be positive infinity.
+    #
+    #  * If bits is 0xfff0000000000000L, the double value will be negative infinity.
+    #
+    #  * If bits is in the range 0x7ff0000000000001L through 0x7fffffffffffffffL or
+    #    in the range 0xfff0000000000001L through 0xffffffffffffffffL, the double
+    #    value will be NaN.
+    #
+    # In all other cases, let s, e, and m be three values that might be computed
+    # from bits:
+    #
+    #     int s = ((bits >> 63) == 0) ? 1 : -1;
+    #     int e = (int)((bits >> 52) & 0x7ffL);
+    #     long m = (e == 0) ?
+    #                (bits & 0xfffffffffffffL) << 1 :
+    #                (bits & 0xfffffffffffffL) | 0x10000000000000L;
+    #
+    # Then the floating-point value equals the double value of the mathematical
+    # expression s · m · 2e-1075.
 
-# The items of these structures are as follows:
+    def __init__(self, value):
+        # The tag item of the CONSTANT_Double_info structure has the value
+        # CONSTANT_Double (6).
+        super().__init__(Constant.CONSTANT_Double)
 
-# tag
-# The tag item of the CONSTANT_Long_info structure has the value CONSTANT_Long (5).
+        self.value = value
 
-# The tag item of the CONSTANT_Double_info structure has the value CONSTANT_Double (6).
+    def __repr__(self):
+        return '<Double %s>' % self.value
 
-# high_bytes, low_bytes
-# The unsigned high_bytes and low_bytes items of the CONSTANT_Long_info structure together represent the value of the long constant
+    def __eq__(self, other):
+        return multieq(self, other, 'tag', 'value')
 
-# ((long) high_bytes << 32) + low_bytes
+    def __hash__(self):
+        return multihash(self, 'tag', 'value')
 
-# where the bytes of each of high_bytes and low_bytes are stored in big-endian (high byte first) order.
+    @staticmethod
+    def read_info(reader):
+        value = reader.read_d()
+        return Double, (value,)
 
-# The high_bytes and low_bytes items of the CONSTANT_Double_info structure together represent the double value in IEEE 754 floating-point double format (§2.3.2). The bytes of each item are stored in big-endian (high byte first) order.
-
-# The value represented by the CONSTANT_Double_info structure is determined as follows. The high_bytes and low_bytes items are converted into the long constant bits, which is equal to
-
-# ((long) high_bytes << 32) + low_bytes
-
-# Then:
-
-# If bits is 0x7ff0000000000000L, the double value will be positive infinity.
-
-# If bits is 0xfff0000000000000L, the double value will be negative infinity.
-
-# If bits is in the range 0x7ff0000000000001L through 0x7fffffffffffffffL or in the range 0xfff0000000000001L through 0xffffffffffffffffL, the double value will be NaN.
-
-# In all other cases, let s, e, and m be three values that might be computed from bits:
-
-# int s = ((bits >> 63) == 0) ? 1 : -1;
-# int e = (int)((bits >> 52) & 0x7ffL);
-# long m = (e == 0) ?
-#            (bits & 0xfffffffffffffL) << 1 :
-#            (bits & 0xfffffffffffffL) | 0x10000000000000L;
-
-# Then the floating-point value equals the double value of the mathematical expression s · m · 2e-1075.
+    def write_info(self, writer):
+        writer.write_d(self.value)
 
 
 # ------------------------------------------------------------------------
@@ -678,7 +757,7 @@ class NameAndType(Constant):
 
         # The tag item of the CONSTANT_NameAndType_info structure has the value
         # CONSTANT_NameAndType (12).
-        super(NameAndType, self).__init__(Constant.CONSTANT_NameAndType)
+        super().__init__(Constant.CONSTANT_NameAndType)
 
         # The value of the name item must be a valid index into the
         # constant_pool table. The constant_pool entry at that index must be a
@@ -737,7 +816,7 @@ class Utf8(Constant):
 
         # The tag item of the CONSTANT_Utf8_info structure has the value
         # CONSTANT_Utf8 (1).
-        super(Utf8, self).__init__(Constant.CONSTANT_Utf8)
+        super().__init__(Constant.CONSTANT_Utf8)
 
         # The value of the length item gives the number of bytes in the bytes
         # array (not the length of the resulting string). The strings in the

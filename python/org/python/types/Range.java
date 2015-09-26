@@ -4,54 +4,56 @@ package org.python.types;
 public class Range extends org.python.types.Object implements org.python.Iterable {
     private long index;
 
-    private long stop;
     private long start;
+    private long stop;
     private long step;
 
-    public Range(org.python.types.Object stop) {
-        this(new org.python.types.Object(0), stop, new org.python.types.Object(1));
+    public Range(org.python.Object stop) {
+        this(new org.python.types.Int(0), stop, new org.python.types.Int(1));
     }
 
-    public Range(org.python.types.Object start, org.python.types.Object stop) {
-        this(start, stop, new org.python.types.Object(1));
+    public Range(org.python.Object start, org.python.Object stop) {
+        this(start, stop, new org.python.types.Int(1));
     }
 
-    public Range(org.python.types.Object start, org.python.types.Object stop, org.python.types.Object step) {
+    public Range(org.python.Object start, org.python.Object stop, org.python.Object step) {
         super();
-        if (start.type != Long.class) {
-            throw new org.python.exceptions.TypeError("'" + start.type + "' object cannot be interpreted as an integer");
+        if (!(start instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("'" + start.getClass().getName() + "' object cannot be interpreted as an integer");
         }
-        if (stop.type != Long.class) {
-            throw new org.python.exceptions.TypeError("'" + stop.type + "' object cannot be interpreted as an integer");
+        if (!(stop instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("'" + stop.getClass().getName() + "' object cannot be interpreted as an integer");
         }
-        if (step.type != Long.class) {
-            throw new org.python.exceptions.TypeError("'" + step.type + "' object cannot be interpreted as an integer");
+        if (!(step instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("'" + step.getClass().getName() + "' object cannot be interpreted as an integer");
         }
 
-        java.util.Hashtable<java.lang.String, org.python.types.Object> attrs = new java.util.Hashtable<java.lang.String, org.python.types.Object>();
+        java.util.Hashtable<java.lang.String, org.python.Object> attrs = new java.util.Hashtable<java.lang.String, org.python.Object>();
 
         attrs.put("start", start);
-        this.start = (long) start.value;
+        this.start = ((org.python.types.Int) start).value;
 
         attrs.put("stop", stop);
-        this.stop = (long) stop.value;
+        this.stop = ((org.python.types.Int) stop).value;
 
         attrs.put("step", step);
-        this.step = (long) step.value;
+        this.step = ((org.python.types.Int) step).value;
 
-        value = attrs;
+        index = this.start;
+        // value = attrs;
     }
 
-    public org.python.types.Object __iter__() {
+    public org.python.Iterable __iter__() {
         return this;
     }
 
-    public org.python.types.Object __next__() {
+    public org.python.Object __next__() {
         if (this.index >= this.stop) {
             throw new org.python.exceptions.StopIteration();
         }
+        org.python.Object result = new org.python.types.Int(this.index);
         this.index += this.step;
-        return new org.python.types.Object(this.index);
+        return result;
     }
 
 }

@@ -17,32 +17,32 @@ class TupleTests(TranspileTestCase):
                      Max stack: 5
                      Max locals: 6
                      Bytecode: (96 bytes)
-                           0: <NEW org/python/types/Object>
+                           0: <NEW org/python/types/Int>
                            3: <DUP>
                            4: <ICONST_1>
-                           5: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                           5: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                            8: <ASTORE_0>
-                           9: <NEW org/python/types/Object>
+                           9: <NEW org/python/types/Int>
                           12: <DUP>
                           13: <ICONST_2>
-                          14: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          14: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           17: <ASTORE_1>
-                          18: <NEW org/python/types/Object>
+                          18: <NEW org/python/types/Int>
                           21: <DUP>
                           22: <ICONST_3>
-                          23: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          23: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           26: <ASTORE_2>
-                          27: <NEW org/python/types/Object>
+                          27: <NEW org/python/types/Int>
                           30: <DUP>
                           31: <ICONST_4>
-                          32: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          32: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           35: <ASTORE_3>
-                          36: <NEW org/python/types/Object>
+                          36: <NEW org/python/types/Int>
                           39: <DUP>
                           40: <ICONST_5>
-                          41: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          41: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           44: <ASTORE 4>
-                          46: <NEW org/python/types/Object>
+                          46: <NEW org/python/types/Tuple>
                           49: <DUP>
                           50: <NEW java/util/ArrayList>
                           53: <DUP>
@@ -68,7 +68,7 @@ class TupleTests(TranspileTestCase):
                           83: <ALOAD 4>
                           85: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
                           88: <POP>
-                          89: <INVOKESPECIAL org/python/types/Object.<init> (Ljava/util/ArrayList;)V>
+                          89: <INVOKESPECIAL org/python/types/Tuple.<init> (Ljava/util/ArrayList;)V>
                           92: <ASTORE 5>
                           94: <ACONST_NULL>
                           95: <ARETURN>
@@ -94,51 +94,113 @@ class TupleTests(TranspileTestCase):
                      Max stack: 7
                      Max locals: 1
                      Bytecode: (83 bytes)
-                           0: <NEW org/python/types/Object>
+                           0: <NEW org/python/types/Tuple>
                            3: <DUP>
                            4: <NEW java/util/ArrayList>
                            7: <DUP>
                            8: <ICONST_5>
                            9: <INVOKESPECIAL java/util/ArrayList.<init> (I)V>
                           12: <DUP>
-                          13: <NEW org/python/types/Object>
+                          13: <NEW org/python/types/Int>
                           16: <DUP>
                           17: <ICONST_1>
-                          18: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          18: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           21: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
                           24: <POP>
                           25: <DUP>
-                          26: <NEW org/python/types/Object>
+                          26: <NEW org/python/types/Int>
                           29: <DUP>
                           30: <ICONST_2>
-                          31: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          31: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           34: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
                           37: <POP>
                           38: <DUP>
-                          39: <NEW org/python/types/Object>
+                          39: <NEW org/python/types/Int>
                           42: <DUP>
                           43: <ICONST_3>
-                          44: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          44: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           47: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
                           50: <POP>
                           51: <DUP>
-                          52: <NEW org/python/types/Object>
+                          52: <NEW org/python/types/Int>
                           55: <DUP>
                           56: <ICONST_4>
-                          57: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          57: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           60: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
                           63: <POP>
                           64: <DUP>
-                          65: <NEW org/python/types/Object>
+                          65: <NEW org/python/types/Int>
                           68: <DUP>
                           69: <ICONST_5>
-                          70: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          70: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           73: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
                           76: <POP>
-                          77: <INVOKESPECIAL org/python/types/Object.<init> (Ljava/util/ArrayList;)V>
+                          77: <INVOKESPECIAL org/python/types/Tuple.<init> (Ljava/util/ArrayList;)V>
                           80: <ASTORE_0>
                           81: <ACONST_NULL>
                           82: <ARETURN>
+                     Exceptions: (0)
+                     Attributes: (1)
+                         LineNumberTable (6 bytes)
+                             Line numbers (1 total):
+                                 0: 2
+                """)
+
+    def test_const_creation_multitype(self):
+        self.assertBlock(
+            python="""
+                x = (1, 2.5, "3", True, 5)
+                """,
+            java="""
+                 Code (110 bytes)
+                     Max stack: 7
+                     Max locals: 1
+                     Bytecode: (86 bytes)
+                           0: <NEW org/python/types/Tuple>
+                           3: <DUP>
+                           4: <NEW java/util/ArrayList>
+                           7: <DUP>
+                           8: <ICONST_5>
+                           9: <INVOKESPECIAL java/util/ArrayList.<init> (I)V>
+                          12: <DUP>
+                          13: <NEW org/python/types/Int>
+                          16: <DUP>
+                          17: <ICONST_1>
+                          18: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
+                          21: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
+                          24: <POP>
+                          25: <DUP>
+                          26: <NEW org/python/types/Float>
+                          29: <DUP>
+                          30: <LDC2_W <Double 2.5>>
+                          33: <INVOKESPECIAL org/python/types/Float.<init> (D)V>
+                          36: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
+                          39: <POP>
+                          40: <DUP>
+                          41: <NEW org/python/types/Str>
+                          44: <DUP>
+                          45: <LDC <String '3'>>
+                          47: <INVOKESPECIAL org/python/types/Str.<init> (Ljava/lang/String;)V>
+                          50: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
+                          53: <POP>
+                          54: <DUP>
+                          55: <NEW org/python/types/Bool>
+                          58: <DUP>
+                          59: <ICONST_1>
+                          60: <INVOKESPECIAL org/python/types/Bool.<init> (Z)V>
+                          63: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
+                          66: <POP>
+                          67: <DUP>
+                          68: <NEW org/python/types/Int>
+                          71: <DUP>
+                          72: <ICONST_5>
+                          73: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
+                          76: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
+                          79: <POP>
+                          80: <INVOKESPECIAL org/python/types/Tuple.<init> (Ljava/util/ArrayList;)V>
+                          83: <ASTORE_0>
+                          84: <ACONST_NULL>
+                          85: <ARETURN>
                      Exceptions: (0)
                      Attributes: (1)
                          LineNumberTable (6 bytes)
@@ -153,41 +215,41 @@ class TupleTests(TranspileTestCase):
                 a = x[1]
                 """,
             java="""
-                 Code (85 bytes)
+                 Code (87 bytes)
                      Max stack: 7
                      Max locals: 2
-                     Bytecode: (57 bytes)
-                           0: <NEW org/python/types/Object>
+                     Bytecode: (59 bytes)
+                           0: <NEW org/python/types/Tuple>
                            3: <DUP>
                            4: <NEW java/util/ArrayList>
                            7: <DUP>
                            8: <ICONST_2>
                            9: <INVOKESPECIAL java/util/ArrayList.<init> (I)V>
                           12: <DUP>
-                          13: <NEW org/python/types/Object>
+                          13: <NEW org/python/types/Int>
                           16: <DUP>
                           17: <ICONST_1>
-                          18: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          18: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           21: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
                           24: <POP>
                           25: <DUP>
-                          26: <NEW org/python/types/Object>
+                          26: <NEW org/python/types/Int>
                           29: <DUP>
                           30: <ICONST_2>
-                          31: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          31: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           34: <INVOKEVIRTUAL java/util/ArrayList.add (Ljava/lang/Object;)Z>
                           37: <POP>
-                          38: <INVOKESPECIAL org/python/types/Object.<init> (Ljava/util/ArrayList;)V>
+                          38: <INVOKESPECIAL org/python/types/Tuple.<init> (Ljava/util/ArrayList;)V>
                           41: <ASTORE_0>
                           42: <ALOAD_0>
-                          43: <NEW org/python/types/Object>
+                          43: <NEW org/python/types/Int>
                           46: <DUP>
                           47: <ICONST_1>
-                          48: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
-                          51: <INVOKEVIRTUAL org/python/types/Object.__getitem__ (Lorg/python/types/Object;)Lorg/python/types/Object;>
-                          54: <ASTORE_1>
-                          55: <ACONST_NULL>
-                          56: <ARETURN>
+                          48: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
+                          51: <INVOKEINTERFACE org/python/Object.__getitem__ (Lorg/python/Object;)Lorg/python/Object;>
+                          56: <ASTORE_1>
+                          57: <ACONST_NULL>
+                          58: <ARETURN>
                      Exceptions: (0)
                      Attributes: (1)
                          LineNumberTable (10 bytes)

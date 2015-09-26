@@ -1,4 +1,4 @@
-from .constants import Classref, Fieldref, Methodref, InterfaceMethodref, String, Integer, Long, Constant
+from .constants import Classref, Fieldref, Methodref, InterfaceMethodref, String, Integer, Long, Float, Double, Constant
 
 # From: https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 # Reference" http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.2
@@ -2118,7 +2118,7 @@ class INVOKEINTERFACE(Opcode):
     # Stack: objectref, [arg1, arg2, ...] → result
     code = 0xb9
 
-    def __init__(self, class_name, method_name, descriptor, count):
+    def __init__(self, class_name, method_name, descriptor):
         super(INVOKEINTERFACE, self).__init__()
         self.method = InterfaceMethodref(class_name, method_name, descriptor)
 
@@ -2131,13 +2131,12 @@ class INVOKEINTERFACE(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         method = reader.constant_pool[reader.read_u2()]
-        count = reader.read_u1()
-        reader.read_u1()
+        reader.read_u1()  # Count (can be interpolated from parameters)
+        reader.read_u1()  # Blank value
         return cls(
             method.class_name,
             method.name,
             method.name_and_type.descriptor.bytes.decode('utf8'),
-            count
         )
 
     def write_extra(self, writer):
@@ -2623,8 +2622,10 @@ class LDC2_W(Opcode):
         super(LDC2_W, self).__init__()
         if isinstance(const, float):
             self.const = Double(const)
-        elif isinstance(const, long):
+        elif isinstance(const, int):
             self.const = Long(const)
+        elif isinstance(const, Constant):
+            self.const = const
         else:
             raise TypeError('Invalid type for LDC_W: %s' % type(const))
 

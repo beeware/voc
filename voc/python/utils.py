@@ -185,11 +185,6 @@ class TryExcept:
                 if handler.var_name:
                     context.add_opcodes(
                         opcodes.ASTORE_name(context, handler.var_name),
-                        JavaOpcodes.NEW('org/python/types/Object'),
-                        JavaOpcodes.DUP(),
-                        opcodes.ALOAD_name(context, handler.var_name),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
-                        opcodes.ASTORE_name(context, handler.var_name),
                     )
                 else:
                     # No named exception, but there is still an exception
@@ -203,11 +198,6 @@ class TryExcept:
                 )
                 if handler.var_name:
                     context.add_opcodes(
-                        opcodes.ASTORE_name(context, handler.var_name),
-                        JavaOpcodes.NEW('org/python/types/Object'),
-                        JavaOpcodes.DUP(),
-                        opcodes.ALOAD_name(context, handler.var_name),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '(Lorg/python/exceptions/BaseException;)V'),
                         opcodes.ASTORE_name(context, handler.var_name),
                     )
                 else:
@@ -471,7 +461,7 @@ class ForLoop:
             loop,
                 opcodes.TRY(),
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/types/Object;', 0),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;'),
                 opcodes.CATCH('org/python/exceptions/StopIteration'),
                     opcodes.jump(JavaOpcodes.GOTO(0), context, loop, opcodes.Opcode.NEXT),
                 opcodes.END_TRY(),

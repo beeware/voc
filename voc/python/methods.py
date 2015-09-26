@@ -60,8 +60,8 @@ class Method(Block):
 
     @property
     def signature(self):
-        return_descriptor = 'V' if self.has_void_return else 'Lorg/python/types/Object;'
-        return '([Lorg/python/types/Object;Ljava/util/Hashtable;)%s' % return_descriptor
+        return_descriptor = 'V' if self.has_void_return else 'Lorg/python/Object;'
+        return '([Lorg/python/Object;Ljava/util/Hashtable;)%s' % return_descriptor
 
     def add_self(self):
         pass

@@ -9,20 +9,20 @@ class UnaryOpcodeTests(TranspileTestCase):
                 y = %(operand)sx
                 """ % kwargs,
             java="""
-                 Code (46 bytes)
+                 Code (48 bytes)
                      Max stack: 3
                      Max locals: 2
-                     Bytecode: (18 bytes)
-                           0: <NEW org/python/types/Object>
+                     Bytecode: (20 bytes)
+                           0: <NEW org/python/types/Int>
                            3: <DUP>
                            4: <SIPUSH %(x)s>
-                           7: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                           7: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           10: <ASTORE_0>
                           11: <ALOAD_0>
-                          12: <INVOKEVIRTUAL org/python/types/Object.%(method)s ()Lorg/python/types/Object;>
-                          15: <ASTORE_1>
-                          16: <ACONST_NULL>
-                          17: <ARETURN>
+                          12: <INVOKEINTERFACE org/python/Object.%(method)s ()Lorg/python/Object;>
+                          17: <ASTORE_1>
+                          18: <ACONST_NULL>
+                          19: <ARETURN>
                      Exceptions: (0)
                      Attributes: (1)
                          LineNumberTable (10 bytes)
@@ -44,20 +44,20 @@ class UnaryOpcodeTests(TranspileTestCase):
                 y = not x
                 """,
             java="""
-                 Code (44 bytes)
+                 Code (46 bytes)
                      Max stack: 3
                      Max locals: 2
-                     Bytecode: (16 bytes)
-                           0: <NEW org/python/types/Object>
+                     Bytecode: (18 bytes)
+                           0: <NEW org/python/types/Bool>
                            3: <DUP>
                            4: <ICONST_1>
-                           5: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                           5: <INVOKESPECIAL org/python/types/Bool.<init> (Z)V>
                            8: <ASTORE_0>
                            9: <ALOAD_0>
-                          10: <INVOKEVIRTUAL org/python/types/Object.__not__ ()Lorg/python/types/Object;>
-                          13: <ASTORE_1>
-                          14: <ACONST_NULL>
-                          15: <ARETURN>
+                          10: <INVOKEINTERFACE org/python/Object.__not__ ()Lorg/python/Object;>
+                          15: <ASTORE_1>
+                          16: <ACONST_NULL>
+                          17: <ARETURN>
                      Exceptions: (0)
                      Attributes: (1)
                          LineNumberTable (10 bytes)
@@ -79,26 +79,26 @@ class BinaryOpcodeTests(TranspileTestCase):
                 z = %(operation)s
                 """ % kwargs,
             java="""
-                 Code (62 bytes)
+                 Code (64 bytes)
                      Max stack: 3
                      Max locals: 3
-                     Bytecode: (30 bytes)
-                           0: <NEW org/python/types/Object>
+                     Bytecode: (32 bytes)
+                           0: <NEW org/python/types/Int>
                            3: <DUP>
                            4: <SIPUSH 42>
-                           7: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                           7: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           10: <ASTORE_0>
-                          11: <NEW org/python/types/Object>
+                          11: <NEW org/python/types/Int>
                           14: <DUP>
                           15: <SIPUSH 37>
-                          18: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          18: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           21: <ASTORE_1>
                           22: <ALOAD_0>
                           23: <ALOAD_1>
-                          24: <INVOKEVIRTUAL org/python/types/Object.%(method)s (Lorg/python/types/Object;)Lorg/python/types/Object;>
-                          27: <ASTORE_2>
-                          28: <ACONST_NULL>
-                          29: <ARETURN>
+                          24: <INVOKEINTERFACE org/python/Object.%(method)s (Lorg/python/Object;)Lorg/python/Object;>
+                          29: <ASTORE_2>
+                          30: <ACONST_NULL>
+                          31: <ARETURN>
                      Exceptions: (0)
                      Attributes: (1)
                          LineNumberTable (14 bytes)
@@ -156,22 +156,22 @@ class InplaceOpcodeTests(TranspileTestCase):
                 x %(operand)s x
                 """ % kwargs,
             java="""
-                 Code (48 bytes)
+                 Code (50 bytes)
                      Max stack: 3
                      Max locals: 1
-                     Bytecode: (20 bytes)
-                           0: <NEW org/python/types/Object>
+                     Bytecode: (22 bytes)
+                           0: <NEW org/python/types/Int>
                            3: <DUP>
                            4: <SIPUSH 42>
-                           7: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                           7: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           10: <ASTORE_0>
                           11: <ALOAD_0>
                           12: <DUP>
                           13: <ALOAD_0>
-                          14: <INVOKEVIRTUAL org/python/types/Object.%(method)s (Lorg/python/types/Object;)V>
-                          17: <ASTORE_0>
-                          18: <ACONST_NULL>
-                          19: <ARETURN>
+                          14: <INVOKEINTERFACE org/python/Object.%(method)s (Lorg/python/Object;)V>
+                          19: <ASTORE_0>
+                          20: <ACONST_NULL>
+                          21: <ARETURN>
                      Exceptions: (0)
                      Attributes: (1)
                          LineNumberTable (10 bytes)

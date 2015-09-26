@@ -10,14 +10,14 @@ class ForLoopTests(TranspileTestCase):
                     total = total + i
                 """,
             java="""
-                 Code (177 bytes)
+                 Code (179 bytes)
                      Max stack: 8
                      Max locals: 3
-                     Bytecode: (137 bytes)
-                           0: <NEW org/python/types/Object>
+                     Bytecode: (139 bytes)
+                           0: <NEW org/python/types/Int>
                            3: <DUP>
                            4: <ICONST_0>
-                           5: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                           5: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                            8: <ASTORE_0>
                            9: <GETSTATIC test/test.globals (Ljava/util/Hashtable;)>
                           12: <LDC <String 'range'>>
@@ -39,28 +39,28 @@ class ForLoopTests(TranspileTestCase):
                           45: <CHECKCAST <Class org/python/types/Object>>
                           48: <CHECKCAST <Class org/python/Callable>>
                           51: <ICONST_2>
-                          52: <ANEWARRAY org/python/types/Object>
+                          52: <ANEWARRAY org/python/Object>
                           55: <DUP>
                           56: <ICONST_0>
-                          57: <NEW org/python/types/Object>
+                          57: <NEW org/python/types/Int>
                           60: <DUP>
                           61: <ICONST_0>
-                          62: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          62: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           65: <AASTORE>
                           66: <DUP>
                           67: <ICONST_1>
-                          68: <NEW org/python/types/Object>
+                          68: <NEW org/python/types/Int>
                           71: <DUP>
                           72: <SIPUSH 10>
-                          75: <INVOKESPECIAL org/python/types/Object.<init> (I)V>
+                          75: <INVOKESPECIAL org/python/types/Int.<init> (I)V>
                           78: <AASTORE>
                           79: <NEW java/util/Hashtable>
                           82: <DUP>
                           83: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                          86: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/types/Object;Ljava/util/Hashtable;)Lorg/python/types/Object;>
+                          86: <INVOKEINTERFACE org/python/Callable.invoke ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Object;>
                           91: <ASTORE_1>
                           92: <ICONST_1>
-                          93: <ANEWARRAY org/python/types/Object>
+                          93: <ANEWARRAY org/python/Object>
                           96: <DUP>
                           97: <ICONST_0>
                           98: <ALOAD_1>
@@ -68,20 +68,20 @@ class ForLoopTests(TranspileTestCase):
                          100: <NEW java/util/Hashtable>
                          103: <DUP>
                          104: <INVOKESPECIAL java/util/Hashtable.<init> ()V>
-                         107: <INVOKESTATIC org/Python.iter ([Lorg/python/types/Object;Ljava/util/Hashtable;)Lorg/python/types/Object;>
+                         107: <INVOKESTATIC org/Python.iter ([Lorg/python/Object;Ljava/util/Hashtable;)Lorg/python/Iterable;>
                          110: <CHECKCAST <Class org/python/Iterable>>
                          113: <DUP>
-                         114: <INVOKEINTERFACE org/python/Iterable.__next__ ()Lorg/python/types/Object;>
+                         114: <INVOKEINTERFACE org/python/Iterable.__next__ ()Lorg/python/Object;>
                          119: <GOTO 6>
-                         122: <GOTO 13>
+                         122: <GOTO 15>
                          125: <ASTORE_2>
                          126: <ALOAD_0>
                          127: <ALOAD_2>
-                         128: <INVOKEVIRTUAL org/python/types/Object.__add__ (Lorg/python/types/Object;)Lorg/python/types/Object;>
-                         131: <ASTORE_0>
-                         132: <GOTO -19>
-                         135: <ACONST_NULL>
-                         136: <ARETURN>
+                         128: <INVOKEINTERFACE org/python/Object.__add__ (Lorg/python/Object;)Lorg/python/Object;>
+                         133: <ASTORE_0>
+                         134: <GOTO -21>
+                         137: <ACONST_NULL>
+                         138: <ARETURN>
                      Exceptions: (1)
                          org/python/exceptions/StopIteration: 113-119 [122]
                      Attributes: (1)
