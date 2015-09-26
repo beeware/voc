@@ -1,7 +1,7 @@
-package org.python;
+package org.python.types;
 
 
-public class Constructor extends org.python.types.Object implements Callable {
+public class Constructor extends org.python.types.Object implements org.python.Callable {
     java.lang.reflect.Constructor value;
 
     public Constructor(java.lang.reflect.Constructor constructor) {

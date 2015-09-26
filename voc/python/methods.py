@@ -199,7 +199,7 @@ class InstanceMethod(Method):
 
     @property
     def callable(self):
-        return 'org/python/InstanceMethod'
+        return 'org/python/types/Method'
 
     @property
     def klass(self):

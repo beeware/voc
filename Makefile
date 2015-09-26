@@ -3,10 +3,7 @@ ALL_FILES=\
 	python/org/Python.class \
 	python/org/python/Object.class \
 	python/org/python/Callable.class \
-	python/org/python/InstanceMethod.class \
 	python/org/python/Iterable.class \
-	python/org/python/StaticMethod.class \
-	python/org/python/Constructor.class \
 	python/org/python/exceptions/ArithmeticError.class \
 	python/org/python/exceptions/AssertionError.class \
 	python/org/python/exceptions/AttributeError.class \
@@ -74,6 +71,7 @@ ALL_FILES=\
 	python/org/python/types/Bytes.class \
 	python/org/python/types/Class.class \
 	python/org/python/types/Complex.class \
+	python/org/python/types/Constructor.class \
 	python/org/python/types/ContextManager.class \
 	python/org/python/types/Dict.class \
 	python/org/python/types/DictView.class \

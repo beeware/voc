@@ -1972,10 +1972,10 @@ class CALL_FUNCTION(Opcode):
                     ASTORE_name(context, '#CONSTRUCTOR#'),
 
                     # # Then wrap that Constructor into a Callable.
-                    JavaOpcodes.NEW('org/python/Constructor'),
+                    JavaOpcodes.NEW('org/python/types/Constructor'),
                     JavaOpcodes.DUP(),
                     ALOAD_name(context, '#CONSTRUCTOR#'),
-                    JavaOpcodes.INVOKESPECIAL('org/python/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
 
                 CATCH('java/lang/NoSuchMethodError'),
                     ASTORE_name(context, '#EXCEPTION#'),
@@ -2129,7 +2129,8 @@ class MAKE_FUNCTION(Opcode):
                     JavaOpcodes.NEW(method.callable),
                     JavaOpcodes.DUP(),
                     ALOAD_name(context, '#METHOD#'),
-                    JavaOpcodes.INVOKESPECIAL(method.callable, '<init>', '(Ljava/lang/reflect/Method;)V'),
+                    ICONST_val(method.static),
+                    JavaOpcodes.INVOKESPECIAL(method.callable, '<init>', '(Ljava/lang/reflect/Method;Z)V'),
                 CATCH('java/lang/NoSuchMethodError'),
                     ASTORE_name(context, '#EXCEPTION#'),
                     JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
