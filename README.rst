@@ -55,7 +55,7 @@ Quickstart
 Install `voc`, then run the example script::
 
     $ pip install voc
-    $ python -m voc tests/example.py org.pyee
+    $ python -m voc tests/example.py org.pybee
     Creating class 'example'...
     Writing example.class...
     Done.
@@ -73,7 +73,7 @@ support file is in your classpath::
     $ java -XX:-UseSplitVerifier -classpath python.jar:. example
     Hello, World
 
-The ``-CC:-UsesplitVerifier`` argument is necessary to turn off stack map
+The ``-CC:-UseSplitVerifier`` argument is necessary to turn off stack map
 verification in Java 7. This could be addressed by computing stack maps
 for generated code.
 
