@@ -26,10 +26,10 @@ class ClassBlock(Block):
 
             # # Set the __name__ atribute to the name of the parent module.
             JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC('__name__'),
+            JavaOpcodes.LDC_W('__name__'),
             JavaOpcodes.NEW('org/python/types/Str'),
             JavaOpcodes.DUP(),
-            JavaOpcodes.LDC(self.module.descriptor.replace('/', '.')),
+            JavaOpcodes.LDC_W(self.module.descriptor.replace('/', '.')),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
@@ -44,7 +44,7 @@ class ClassBlock(Block):
         self.add_opcodes(
             ASTORE_name(self, '#TEMP#'),
             JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC(name),
+            JavaOpcodes.LDC_W(name),
             ALOAD_name(self, '#TEMP#'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP(),
@@ -55,7 +55,7 @@ class ClassBlock(Block):
             self.add_opcodes(
                 # look for a class attribute.
                 JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(name),
+                JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )
 
@@ -67,7 +67,7 @@ class ClassBlock(Block):
             ),
                 JavaOpcodes.POP(),
                 JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(name),
+                JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
                 # If there's nothing in the globals, then look for a builtin.
@@ -77,7 +77,7 @@ class ClassBlock(Block):
                 ),
                     JavaOpcodes.POP(),
                     JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-                    JavaOpcodes.LDC(name),
+                    JavaOpcodes.LDC_W(name),
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
                     # If we still don't have something, throw a NameError.
@@ -88,7 +88,7 @@ class ClassBlock(Block):
                         JavaOpcodes.POP(),
                         JavaOpcodes.NEW('org/python/exceptions/NameError'),
                         JavaOpcodes.DUP(),
-                        JavaOpcodes.LDC(name),
+                        JavaOpcodes.LDC_W(name),
                         JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
                         JavaOpcodes.ATHROW(),
                     END_IF(),
@@ -103,14 +103,14 @@ class ClassBlock(Block):
             self.add_opcodes(
                 # look for a class attribute.
                 JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(name),
+                JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )
         else:
             self.add_opcodes(
                 # look for a global var.
                 JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(name),
+                JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )
 

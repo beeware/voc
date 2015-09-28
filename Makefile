@@ -80,6 +80,7 @@ ALL_FILES=\
 	python/org/python/types/FrozenSet.class \
 	python/org/python/types/Function.class \
 	python/org/python/types/Int.class \
+	python/org/python/types/Iterator.class \
 	python/org/python/types/List.class \
 	python/org/python/types/MemoryView.class \
 	python/org/python/types/Method.class \

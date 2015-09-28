@@ -764,7 +764,6 @@ class Opcode:
             context.next_resolve_list.append((self, 'end_op'))
         else:
             self.end_op = context.code[-1]
-
         context.next_resolve_list.append((self, 'next_op'))
 
         # Save the code offset for the jump operation.
@@ -1051,16 +1050,18 @@ class GET_ITER(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
 
         context.add_opcodes(
-            ASTORE_name(context, '##ITERABLE##'),
             JavaOpcodes.ICONST_1(),
             JavaOpcodes.ANEWARRAY('org/python/Object'),
             JavaOpcodes.DUP(),
             JavaOpcodes.ICONST_0(),
-            ALOAD_name(context, '##ITERABLE##'),
+        )
+
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(
             JavaOpcodes.AASTORE(),
 
             JavaOpcodes.NEW('java/util/Hashtable'),
@@ -1297,7 +1298,7 @@ class STORE_ATTR(Opcode):
 
     def convert(self, context, arguments):
         arguments[1].operation.transpile(context, arguments[1].arguments)
-        context.add_opcodes(JavaOpcodes.LDC(self.name))
+        context.add_opcodes(JavaOpcodes.LDC_W(self.name))
         arguments[0].operation.transpile(context, arguments[0].arguments)
 
         context.add_opcodes(
@@ -1387,7 +1388,7 @@ class LOAD_CONST(Opcode):
                 context.add_opcodes(
                     JavaOpcodes.NEW('org/python/types/Str'),
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC(const),
+                    JavaOpcodes.LDC_W(const),
                     JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
                 )
 
@@ -1395,7 +1396,7 @@ class LOAD_CONST(Opcode):
             #     context.add_opcodes(
             #         JavaOpcodes.NEW('org/python/types/Bytes'),
             #         JavaOpcodes.DUP(),
-            #         JavaOpcodes.LDC(const),
+            #         JavaOpcodes.LDC_W(const),
             #         JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
             #     )
 
@@ -1599,7 +1600,7 @@ class LOAD_ATTR(Opcode):
     def convert(self, context, arguments):
         # print("LOAD_ATTR", context, arguments)
         arguments[0].operation.transpile(context, arguments[0].arguments)
-        context.add_opcodes(JavaOpcodes.LDC(self.name))
+        context.add_opcodes(JavaOpcodes.LDC_W(self.name))
 
         context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
@@ -1953,16 +1954,16 @@ class CALL_FUNCTION(Opcode):
             context.add_opcodes(
                 # Get a Method representing the new function
                 TRY(),
-                    JavaOpcodes.LDC(Classref(klass.descriptor)),
+                    JavaOpcodes.LDC_W(Classref(klass.descriptor)),
                     JavaOpcodes.ICONST_2(),
                     JavaOpcodes.ANEWARRAY('java/lang/Class'),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_0(),
-                    JavaOpcodes.LDC(Classref('[Lorg/python/Object;')),
+                    JavaOpcodes.LDC_W(Classref('[Lorg/python/Object;')),
                     JavaOpcodes.AASTORE(),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_1(),
-                    JavaOpcodes.LDC(Classref('java/util/Hashtable')),
+                    JavaOpcodes.LDC_W(Classref('java/util/Hashtable')),
                     JavaOpcodes.AASTORE(),
                     JavaOpcodes.INVOKEVIRTUAL(
                         'java/lang/Class',
@@ -1981,14 +1982,19 @@ class CALL_FUNCTION(Opcode):
                     ASTORE_name(context, '#EXCEPTION#'),
                     JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC('Unable to find class %s' % (klass.descriptor)),
+                    JavaOpcodes.LDC_W('Unable to find class %s' % (klass.descriptor)),
                     JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
                     JavaOpcodes.ATHROW(),
                 END_TRY()
             )
 
         else:
-            # print("CALL_FUNCTION", context, arguments)
+            if arguments[0].operation.opname == 'MAKE_FUNCTION':
+                # If this is an comprehension, the line of code
+                # defining the inline function will be associated with the
+                # class that is created; pull out that line of code and
+                # associate it with the use of the function, too.
+                context.next_opcode_starts_line = arguments[0].arguments[0].operation.starts_line
 
             # Retrive the function
             arguments[0].operation.transpile(context, arguments[0].arguments)
@@ -2003,9 +2009,18 @@ class CALL_FUNCTION(Opcode):
             # If the function has been retrived using LOAD_ATTR, that means
             # it's an instance method. We need to pass the instance itself
             # as the first argument, so make space for that.
+            # If MAKE_FUNCTION was used, that means it's an inline function
+            # definition - the result of a comprehension.
             if arguments[0].operation.opname == 'LOAD_ATTR':
                 final_args += 1
                 first_arg = 1
+            elif arguments[0].operation.opname == 'MAKE_FUNCTION':
+                final_args += 1
+                first_arg = 1
+                context.add_opcodes(
+                    ASTORE_name(context, '##comprehension##'),
+                    ALOAD_name(context, '##comprehension##')
+                )
 
             context.add_opcodes(
                 # Create an array to pass in arguments to invoke()
@@ -2022,6 +2037,16 @@ class CALL_FUNCTION(Opcode):
                 )
                 arguments[0].arguments[0].operation.transpile(context, arguments[0].arguments[0].arguments)
                 context.add_opcodes(JavaOpcodes.AASTORE())
+            elif arguments[0].operation.opname == 'MAKE_FUNCTION':
+                context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    ICONST_val(0),
+                )
+
+                context.add_opcodes(
+                    ALOAD_name(context, '##comprehension##'),
+                    JavaOpcodes.AASTORE()
+                )
 
             # Push all the arguments into an array
             for i, argument in enumerate(arguments[1:self.args+1]):
@@ -2042,7 +2067,7 @@ class CALL_FUNCTION(Opcode):
             for name, argument in zip(arguments[self.args+1::2], arguments[self.args+2::2]):
                 context.add_opcodes(
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC(name),
+                    JavaOpcodes.LDC_W(name),
                 )
                 argument.operation.transpile(context, argument.arguments)
                 context.add_opcodes(
@@ -2091,9 +2116,8 @@ class MAKE_FUNCTION(Opcode):
         method = context.add_method(full_method_name, code)
 
         if method.is_constructor:
-            context.add_opcodes(
-                JavaOpcodes.ACONST_NULL()
-            )
+            pass
+            # Nothing needed on stack; class construction is self contained.
         elif method.is_closuremethod:
             context.add_opcodes(
                 JavaOpcodes.NEW(method.callable),
@@ -2106,17 +2130,17 @@ class MAKE_FUNCTION(Opcode):
             context.add_opcodes(
                 # Get a Method representing the new function
                 TRY(),
-                    JavaOpcodes.LDC(Classref(context.descriptor)),
-                    JavaOpcodes.LDC(method.name),
+                    JavaOpcodes.LDC_W(Classref(context.descriptor)),
+                    JavaOpcodes.LDC_W(method.name),
                     JavaOpcodes.ICONST_2(),
                     JavaOpcodes.ANEWARRAY('java/lang/Class'),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_0(),
-                    JavaOpcodes.LDC(Classref('[Lorg/python/Object;')),
+                    JavaOpcodes.LDC_W(Classref('[Lorg/python/Object;')),
                     JavaOpcodes.AASTORE(),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_1(),
-                    JavaOpcodes.LDC(Classref('java/util/Hashtable')),
+                    JavaOpcodes.LDC_W(Classref('java/util/Hashtable')),
                     JavaOpcodes.AASTORE(),
                     JavaOpcodes.INVOKEVIRTUAL(
                         'java/lang/Class',
@@ -2135,7 +2159,7 @@ class MAKE_FUNCTION(Opcode):
                     ASTORE_name(context, '#EXCEPTION#'),
                     JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC('Unable to find MAKE_FUNCTION output %s.%s' % (context.module.descriptor, full_method_name)),
+                    JavaOpcodes.LDC_W('Unable to find MAKE_FUNCTION output %s.%s' % (context.module.descriptor, full_method_name)),
                     JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
                     JavaOpcodes.ATHROW(),
                 END_TRY()
@@ -2226,27 +2250,43 @@ class LIST_APPEND(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        for i in range(1, self.index):
+
+        if self.index == 2:
             context.add_opcodes(
-                ASTORE_name(context, '##temp-%s-%s##' % (id(self), i))
+                JavaOpcodes.GETFIELD('org/python/types/List', 'value', 'Ljava/util/ArrayList;'),
             )
 
-        context.add_opcodes(
-            JavaOpcodes.DUP(),
-        )
+            for argument in arguments:
+                argument.operation.transpile(context, argument.arguments)
 
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
-        context.add_opcodes(
-            JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/util/ArrayList;)Z'),
-            JavaOpcodes.POP(),
-        )
-
-        for i in range(self.index, 1, -1):
             context.add_opcodes(
-                ALOAD_name(context, '##temp-%s-%s##' % (id(self), i - 1))
+                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
             )
+        else:
+            raise RuntimeError("Don't know how to handle LIST_APPEND at index %d" % self.index)
+
+        # for i in range(1, self.index):
+        #     context.add_opcodes(
+        #         ASTORE_name(context, '##temp-%s-%s##' % (id(self), i))
+        #     )
+
+        # context.add_opcodes(
+        #     JavaOpcodes.DUP(),
+        # )
+
+        # for argument in arguments:
+        #     argument.operation.transpile(context, argument.arguments)
+
+        # context.add_opcodes(
+        #     JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/util/ArrayList;)Z'),
+        #     JavaOpcodes.POP(),
+        # )
+
+        # for i in range(self.index, 1, -1):
+        #     context.add_opcodes(
+        #         ALOAD_name(context, '##temp-%s-%s##' % (id(self), i - 1))
+        #     )
 
 # class SET_ADD(Opcode):
 # class MAP_ADD(Opcode):

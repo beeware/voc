@@ -26,7 +26,7 @@ class StaticBlock(Block):
 
             # Load the Python builtins into the globals.
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC('__builtins__'),
+            JavaOpcodes.LDC_W('__builtins__'),
             JavaOpcodes.NEW('org/python/types/Dict'),
             JavaOpcodes.DUP(),
             JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
@@ -40,7 +40,7 @@ class StaticBlock(Block):
         self.add_opcodes(
             ASTORE_name(self, '#TEMP#'),
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC(name),
+            JavaOpcodes.LDC_W(name),
             ALOAD_name(self, '#TEMP#'),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP(),
@@ -50,7 +50,7 @@ class StaticBlock(Block):
         self.add_opcodes(
             # look for a global var.
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC(name),
+            JavaOpcodes.LDC_W(name),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
             # If there's nothing in the globals, then look for a builtin.
@@ -60,7 +60,7 @@ class StaticBlock(Block):
             ),
                 JavaOpcodes.POP(),
                 JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(name),
+                JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
                 # If we still don't have something, throw a NameError.
@@ -71,7 +71,7 @@ class StaticBlock(Block):
                     JavaOpcodes.POP(),
                     JavaOpcodes.NEW('org/python/exceptions/NameError'),
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC(name),
+                    JavaOpcodes.LDC_W(name),
                     JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
                     JavaOpcodes.ATHROW(),
                 END_IF(),
@@ -84,7 +84,7 @@ class StaticBlock(Block):
         self.add_opcodes(
             # look for a global var.
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC(name),
+            JavaOpcodes.LDC_W(name),
             JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
         )
 

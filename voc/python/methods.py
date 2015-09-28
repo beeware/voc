@@ -38,6 +38,9 @@ class Method(Block):
 
         self.static = static
 
+    def __repr__(self):
+        return '<Method %s (%s parameters>' % (self.name, len(self.parameters))
+
     @property
     def is_constructor(self):
         return False
@@ -53,6 +56,12 @@ class Method(Block):
     @property
     def has_void_return(self):
         return self.returns.get('annotation', object()) is None
+
+    def add_return(self):
+        if self.has_void_return:
+            self.add_opcodes(JavaOpcodes.RETURN())
+        else:
+            self.add_opcodes(JavaOpcodes.ARETURN())
 
     @property
     def callable(self):
@@ -100,7 +109,7 @@ class Method(Block):
         for i, arg in enumerate(self.parameters):
             setup.extend([
                 ALOAD_name(self, '##__args__##'),
-                ICONST_val(i),
+                ICONST_val(i + 1 if self.is_instancemethod else 0),
                 JavaOpcodes.AALOAD(),
                 ASTORE_name(self, arg['name']),
             ])
@@ -133,6 +142,9 @@ class InitMethod(Method):
             returns={'annotation': None},
             commands=commands
         )
+
+    def __repr__(self):
+        return '<Constructor %s (%s parameters>' % (self.klass.name, len(self.parameters))
 
     @property
     def is_constructor(self):
@@ -193,9 +205,12 @@ class InstanceMethod(Method):
             commands=commands
         )
 
+    def __repr__(self):
+        return '<InstanceMethod %s.%s (%s parameters>' % (self.klass.name, self.name, len(self.parameters))
+
     @property
     def is_instancemethod(self):
-        return False
+        return True
 
     @property
     def callable(self):
@@ -212,16 +227,6 @@ class InstanceMethod(Method):
     def add_self(self):
         self.localvars['self'] = len(self.localvars)
 
-    def tweak(self):
-        # Load the implicit 'self' argument, then all the arguments, into locals
-        super().tweak()
-        self.code = [
-            ALOAD_name(self, '##__args__##'),
-            ICONST_val(0),
-            JavaOpcodes.AALOAD(),
-            ASTORE_name(self, 'self'),
-        ] + self.code
-
 
 class MainMethod(Method):
     def __init__(self, parent, commands=None):
@@ -232,6 +237,9 @@ class MainMethod(Method):
             static=True,
             commands=commands
         )
+
+    def __repr__(self):
+        return '<MainMethod %s' % self.module.name
 
     @property
     def method_name(self):
@@ -251,6 +259,22 @@ class MainMethod(Method):
 
 
 class ClosureMethod(Method):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+        super().__init__(
+            parent, name,
+            parameters=parameters,
+            returns=returns,
+            static=static,
+            commands=commands
+        )
+
+    def __repr__(self):
+        return '<ClosureMethod %s (%s parameters>' % (self.name, len(self.parameters))
+
+    @property
+    def is_instancemethod(self):
+        return True
+
     @property
     def is_closuremethod(self):
         return True
@@ -258,6 +282,9 @@ class ClosureMethod(Method):
     @property
     def callable(self):
         return self.parent.descriptor
+
+    def add_self(self):
+        self.localvars['self'] = len(self.localvars)
 
 
 def extract_parameters(code):

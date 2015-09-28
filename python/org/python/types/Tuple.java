@@ -33,7 +33,7 @@ public class Tuple extends org.python.types.Object {
     //     throw new org.python.exceptions.NotImplementedError("tuple.__init__() has not been implemented.");
     // }
 
-    public org.python.types.Str __repr__(org.python.Object other) {
+    public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("(");
         boolean first = true;
         for (org.python.Object obj: this.value) {

@@ -9,6 +9,9 @@ class Point:
     def distance(self):
         return self.x ** 2 + self.y ** 2 + self.z ** 2
 
+    def distance_plus(self, delta):
+        return self.x ** 2 + self.y ** 2 + self.z ** 2 + delta
+
 
 def foo():
     for i in range(0, 10):
@@ -80,12 +83,12 @@ if __name__ == '__main__':
         print('post')
     except (AttributeError, TypeError) as e:
         print("Got the error", e)
-    # except (AttributeError, TypeError):
-        # print("Got the error")
-    # except AttributeError as e:
-        # print("Got the error", e)
-    # except AttributeError:
-        # print("Got the error")
+    # # except (AttributeError, TypeError):
+    #     # print("Got the error")
+    # # except AttributeError as e:
+    #     # print("Got the error", e)
+    # # except AttributeError:
+    #     # print("Got the error")
     except NameError as e:
         print("Got the error", e)
     except RuntimeError:
@@ -99,6 +102,7 @@ if __name__ == '__main__':
 
     print("Method is", p.distance)
     print("Distance is:", p.distance())
+    print("Distance plus is:", p.distance_plus(100))
 
     foo()
     bar()
@@ -133,10 +137,11 @@ if __name__ == '__main__':
     a, b, c, d, e = x
     print("SEQUENCE:", a, b, c, d, e)
 
-    # x = [1, 2, 3, 4, 5]
-    # print([v**2 for v in x])
+    x = [1, 2, 3, 4, 5]
+    result = [v**2 for v in x]
+    print(result)
 
-    # total = 0
-    # for i in [1, 2, 3, 5, 8, 13, 21]:
-    #     total = total + i
-    # print(total)
+    total = 0
+    for i in [1, 2, 3, 5, 8, 13, 21]:
+        total = total + i
+    print(total)

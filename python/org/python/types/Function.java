@@ -21,7 +21,16 @@ public class Function extends org.python.types.Object implements org.python.Call
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java function " + this.value);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new org.python.exceptions.RuntimeError(e.getCause().toString());
+            try {
+                // If the Java method raised an Python exception, re-raise that
+                // exception as-is. If it wasn't a Python exception, wrap it
+                // as one and continue.
+                throw (org.python.exceptions.BaseException) e.getCause();
+            } catch (ClassCastException java_e) {
+                throw new org.python.exceptions.RuntimeError(e.getCause().getMessage());
+            }
+        } finally {
+        //     System.out.println("INVOKE METHOD DONE");
         }
     }
 }

@@ -114,16 +114,16 @@ class ListTests(TranspileTestCase):
                                  42: 3
                 """)
 
-    def test_list_comprehensions(self):
-        self.assertBlock(
-            python="""
-                # x = [1, 2, 3]
-                # y = [v**2 for v in x]
-                x = 1
-                def foo(delta):
-                    x += delta
-                foo(3)
-                print(x)
-                """,
-            java="""
-                """)
+    # def test_list_comprehensions(self):
+    #     self.assertModule(
+    #         python="""
+    #             x = [1, 2, 3]
+    #             y = [v**2 for v in x]
+    #             """,
+    #         java=[
+    #             ('test', 'test', {
+    #                 (None, None): """
+
+    #                 """
+    #             })
+    #         ])

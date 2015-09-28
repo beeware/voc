@@ -45,7 +45,7 @@ class Block:
             self.add_opcodes(
                 ASTORE_name(self, '#TEMP#'),
                 JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(name),
+                JavaOpcodes.LDC_W(name),
                 ALOAD_name(self, '#TEMP#'),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                 JavaOpcodes.POP(),
@@ -64,7 +64,7 @@ class Block:
             self.add_opcodes(
                 # If there isn't a local, look for a global
                 JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(name),
+                JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
                 # If there's nothing in the globals, then look for a builtin.
@@ -74,7 +74,7 @@ class Block:
                 ),
                     JavaOpcodes.POP(),
                     JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-                    JavaOpcodes.LDC(name),
+                    JavaOpcodes.LDC_W(name),
                     JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
                     # If we still don't have something, throw a NameError.
@@ -85,7 +85,7 @@ class Block:
                         JavaOpcodes.POP(),
                         JavaOpcodes.NEW('org/python/exceptions/NameError'),
                         JavaOpcodes.DUP(),
-                        JavaOpcodes.LDC(name),
+                        JavaOpcodes.LDC_W(name),
                         JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
                         JavaOpcodes.ATHROW(),
                     END_IF(),
@@ -108,7 +108,7 @@ class Block:
             self.add_opcodes(
                 # If there isn't a local, look for a global
                 JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC(name),
+                JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )
 
@@ -129,7 +129,7 @@ class Block:
 
         commands.reverse()
 
-        if True:
+        if False:
             print ('=====' * 10)
             print (code)
             print ('-----' * 10)
@@ -169,8 +169,8 @@ class Block:
         max_depth = 0
 
         for opcode in self.code:
-            # print("   ", opcode, depth)
             depth = depth + opcode.stack_effect
+            # print("   ", opcode, depth)
             if depth > max_depth:
                 max_depth = depth
         return max_depth
@@ -209,6 +209,9 @@ class Block:
 
             self.code = self.code[:-2] + [return_opcode]
 
+    def add_return(self):
+        self.add_opcodes(JavaOpcodes.RETURN())
+
     def transpile(self):
         """Create a JavaCode object representing the commands stored in the block
 
@@ -223,7 +226,7 @@ class Block:
         # Java requires that every body of code finishes with a return.
         # Make sure there is one.
         if len(self.code) == 0 or not isinstance(self.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
-            self.add_opcodes(JavaOpcodes.RETURN())
+            self.add_return()
 
         # Since we've processed all the Python opcodes, we can now resolve
         # all the unknown jump targets.

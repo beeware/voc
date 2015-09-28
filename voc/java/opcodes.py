@@ -2548,9 +2548,11 @@ class LDC(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         const = reader.read_u1()
+        print("READ LDC CONSTANT", const, reader.constant_pool[const])
         return cls(reader.constant_pool[const])
 
     def write_extra(self, writer):
+        print("WRITE LDC CONSTANT", writer.constant_pool.index(self.const))
         writer.write_u1(writer.constant_pool.index(self.const))
 
     def resolve(self, constant_pool):
@@ -3083,7 +3085,7 @@ class RETURN(Opcode):
 
     @property
     def consume_count(self):
-        return 1
+        return 0
 
 
 class SALOAD(Opcode):

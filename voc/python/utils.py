@@ -450,8 +450,24 @@ class ForLoop:
 
         self.loop_commands.reverse()
 
+    def pre_loop(self, context):
+        pass
+
+    def pre_iteration(self, context):
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+        )
+
+    def post_loop(self, context):
+        context.add_opcodes(
+            JavaOpcodes.POP(),
+        )
+
     def transpile(self, context):
         context.next_opcode_starts_line = self.starts_line
+
+        self.pre_loop(context)
+
         for command in self.loop_commands:
             command.transpile(context)
 
@@ -460,9 +476,14 @@ class ForLoop:
         context.add_opcodes(
             loop,
                 opcodes.TRY(),
-                    JavaOpcodes.DUP(),
+        )
+        self.pre_iteration(context)
+        context.add_opcodes(
                     JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;'),
                 opcodes.CATCH('org/python/exceptions/StopIteration'),
+        )
+        self.post_loop(context)
+        context.add_opcodes(
                     opcodes.jump(JavaOpcodes.GOTO(0), context, loop, opcodes.Opcode.NEXT),
                 opcodes.END_TRY(),
                 opcodes.ASTORE_name(context, self.varname),
@@ -472,6 +493,29 @@ class ForLoop:
             command.transpile(context)
 
         context.add_opcodes(opcodes.END_LOOP())
+
+
+class ComprehensionForLoop(ForLoop):
+    def __init__(self, start, loop, varname, end, start_offset, loop_offset, end_offset, starts_line):
+        super().__init__(start, loop, varname, end, start_offset, loop_offset, end_offset, starts_line)
+
+    def pre_loop(self, context):
+        context.add_opcodes(
+            opcodes.ASTORE_name(context, '##FOR-%s' % id(self)),
+            opcodes.ALOAD_name(context, '##FOR-%s' % id(self)),
+        )
+
+    def pre_iteration(self, context):
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+            opcodes.ALOAD_name(context, '.0'),
+        )
+
+    def post_loop(self, context):
+        context.add_opcodes(
+            JavaOpcodes.POP(),
+            opcodes.ALOAD_name(context, '##FOR-%s' % id(self)),
+        )
 
 
 class WhileLoop:
@@ -669,7 +713,7 @@ def find_blocks(instructions):
     offset_index = {}
     # print(">>>>>" * 10)
     for i, instruction in enumerate(instructions):
-        # print("%4d:%4d %s %s" % (i, instruction.offset, instruction.opname, instruction.argval if instruction.argval else ''))
+        # print("%4d:%4d %s %s" % (i, instruction.offset, instruction.opname, instruction.argval if instruction.argval is not None else ''))
         offset_index[instruction.offset] = i
     # print(">>>>>" * 10)
 
@@ -770,6 +814,43 @@ def find_blocks(instructions):
 
             blocks[end_index + 1] = block
             i = i + 1
+
+        elif instruction.opname == 'FOR_ITER':
+            i = i + 1
+            start_index = i - 1
+
+            # Find the end of the entire loop block.
+            # Ignore the final instruction to jump back to the start.
+            end_offset = instruction.argval
+            end_index = offset_index[end_offset] - 1
+
+            # print("START INDEX", start_index)
+            # print("START OFFSET", instructions[start_index].offset)
+
+            # print("END INDEX", end_index)
+            # print("END OFFSET", end_offset)
+
+            loop_offset = instructions[i+1].offset
+            loop_index = offset_index[loop_offset]
+
+            # print("LOOP INDEX", loop_index)
+            # print("LOOP OFFSET", loop_offset)
+            # print("LOOP VAR", instructions[loop_index].argval)
+
+            block = ComprehensionForLoop(
+                start=start_index,
+                loop=loop_index,
+                varname=instructions[loop_index - 1].argval,
+                end=end_index,
+                start_offset=instructions[start_index].offset,
+                loop_offset=loop_offset,
+                end_offset=end_offset,
+                starts_line=instruction.starts_line
+            )
+
+            blocks[end_index + 1] = block
+            i = i + 1
+
         else:
             i = i + 1
 

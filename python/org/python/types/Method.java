@@ -12,7 +12,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
 
     public org.python.Object invoke(org.python.Object[] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println(this.value + " ARGS:");
+            // System.out.println("INVOKE METHOD:" + this.value);
             // for (org.python.Object arg: args) {
             //     System.out.println("  " + arg);
             // }
@@ -24,7 +24,16 @@ public class Method extends org.python.types.Object implements org.python.Callab
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java instance method " + this.value);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new org.python.exceptions.RuntimeError(e.getCause().toString());
+            try {
+                // If the Java method raised an Python exception, re-raise that
+                // exception as-is. If it wasn't a Python exception, wrap it
+                // as one and continue.
+                throw (org.python.exceptions.BaseException) e.getCause();
+            } catch (ClassCastException java_e) {
+                throw new org.python.exceptions.RuntimeError(e.getCause().getMessage());
+            }
+        } finally {
+        //     System.out.println("INVOKE METHOD DONE");
         }
     }
 }
