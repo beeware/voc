@@ -131,11 +131,18 @@ if __name__ == '__main__':
     e = 5
     x = [a, b, c, d, e]
     print("LIST:", x)
-    print(x[0], x[-1])
+    print(x[0], x[2], x[-1])
 
-    print ("hello")
-    a, b, c, d, e = x
-    print("SEQUENCE:", a, b, c, d, e)
+    x[2] = 42
+    print(x[0], x[2], x[-1])
+    print(c)
+
+    del x[2]
+    print(x)
+    print(c)
+
+    a, b, c, d = x
+    print("SEQUENCE:", a, b, c, d)
 
     x = [1, 2, 3, 4, 5]
     result = [v**2 for v in x]

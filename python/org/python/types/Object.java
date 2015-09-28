@@ -436,6 +436,27 @@ public class Object implements org.python.Object {
     }
 
 
+    public void __delitem__(org.python.Object [] args, java.util.Hashtable kwargs) {
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("wrapper __delitem__ doesn't take keyword arguments");
+        }
+        if (args.length == 1) {
+            this.__delitem__(args[0]);
+        }
+        else {
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+        }
+    }
+
+    public void __delitem__(org.python.Object index) {
+        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__delitem__'");
+    }
+
+    public void __delitem__(int index) {
+        this.__delitem__(new org.python.types.Int(index));
+    }
+
+
     public org.python.Iterable __iter__() {
         throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__iter__'");
     }

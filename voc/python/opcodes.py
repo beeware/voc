@@ -1000,7 +1000,20 @@ class STORE_SUBSCR(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        pass  # FIXME
+        # At the time STORE_SUBSCR is called, the top two elements
+        # on the stack will be the number to store, and the subject of the store.
+        # We need the subject to be first.
+        context.add_opcodes(
+            JavaOpcodes.SWAP(),
+        )
+        # The stack is now subject, value.
+        # Compute the arguments of the store, giving the store index:
+        arguments[0].operation.transpile(context, arguments[0].arguments)
+        # And again, we need the order tweaked; the store index should be last.
+        context.add_opcodes(
+            JavaOpcodes.SWAP(),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+        )
 
 
 class DELETE_SUBSCR(Opcode):
@@ -1013,7 +1026,10 @@ class DELETE_SUBSCR(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        pass  # FIXME
+        arguments[0].operation.transpile(context, arguments[0].arguments)
+        context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__delitem__', '(Lorg/python/Object;)V'),
+        )
 
 
 class BINARY_LSHIFT(BinaryOpcode):

@@ -103,6 +103,10 @@ public interface Object {
     public void __setitem__(org.python.Object index, org.python.Object value);
     public void __setitem__(int index, org.python.Object value);
 
+    public void __delitem__(org.python.Object [] args, java.util.Hashtable kwargs);
+    public void __delitem__(org.python.Object index);
+    public void __delitem__(int index);
+
     public org.python.Iterable __iter__();
 
     public org.python.Iterable __reversed__();

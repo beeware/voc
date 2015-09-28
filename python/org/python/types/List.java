@@ -105,8 +105,30 @@ public class List extends org.python.types.Object {
     }
 
     public void __setitem__(org.python.Object index, org.python.Object value) {
-        throw new org.python.exceptions.NotImplementedError("list.__setitem__() has not been implemented.");
+        try {
+            this.__setitem__((int) ((org.python.types.Int) index).value, value);
+        } catch (ClassCastException e) {
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.getPythonName());
+        }
     }
+
+    public void __setitem__(int index, org.python.Object value) {
+        this.value.set(index, value);
+    }
+
+
+    public void __delitem__(org.python.Object index) {
+        try {
+            this.__delitem__((int) ((org.python.types.Int) index).value);
+        } catch (ClassCastException e) {
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.getPythonName());
+        }
+    }
+
+    public void __delitem__(int index) {
+        this.value.remove(index);
+    }
+
 
     public org.python.Iterable __iter__() {
         return new org.python.types.Iterator(this);
