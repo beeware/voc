@@ -120,6 +120,25 @@ public class Tuple extends org.python.types.Object {
         }
     }
 
+
+    public void __setitem__(org.python.Object index, org.python.Object value) {
+        try {
+            this.__setitem__((int) ((org.python.types.Int) index).value, value);
+        } catch (ClassCastException e) {
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.getPythonName());
+        }
+    }
+
+    public void __setitem__(int index, org.python.Object value) {
+        this.value.set(index, value);
+    }
+
+
+    public void __delitem__(org.python.Object index) {
+        throw new org.python.exceptions.TypeError("'tuple' object doesn't support item deletion");
+    }
+
+
     public org.python.Iterable __iter__() {
         throw new org.python.exceptions.NotImplementedError("tuple.__iter__() has not been implemented.");
     }
