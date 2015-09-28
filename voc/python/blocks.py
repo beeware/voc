@@ -129,7 +129,7 @@ class Block:
 
         commands.reverse()
 
-        if True:
+        if False:
             print ('=====' * 10)
             print (code)
             print ('-----' * 10)
