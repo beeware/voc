@@ -13,7 +13,13 @@ public class Python {
         // Iterate over all methods, adding the static ones to builtins
         for (java.lang.reflect.Method method: Python.class.getMethods()) {
             if (java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
-                builtins.put(method.getName(), new org.python.types.Function(method, false));
+                if (method.getName() == "int_cast") {
+                    builtins.put("int", new org.python.types.Function(method, false));
+                } else if (method.getName() == "float_cast") {
+                    builtins.put("float", new org.python.types.Function(method, false));
+                } else {
+                    builtins.put(method.getName(), new org.python.types.Function(method, false));
+                }
             }
         }
     }

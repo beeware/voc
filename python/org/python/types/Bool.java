@@ -34,7 +34,11 @@ public class Bool extends org.python.types.Object {
     // }
 
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(java.lang.Boolean.toString(this.value));
+        if (this.value) {
+            return new org.python.types.Str("True");
+        } else {
+            return new org.python.types.Str("False");
+        }
     }
 
     public org.python.types.Str __format__() {

@@ -2606,7 +2606,7 @@ class LDC_W(Opcode):
 
     @property
     def produce_count(self):
-        return 1
+        return 2
 
     @property
     def consume_count(self):
@@ -2650,7 +2650,7 @@ class LDC2_W(Opcode):
 
     @property
     def produce_count(self):
-        return 1
+        return 2
 
     @property
     def consume_count(self):

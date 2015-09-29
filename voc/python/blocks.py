@@ -36,7 +36,7 @@ class Block:
     def module(self):
         return self.parent
 
-    def store_name(self, name, arguments, allow_locals=True):
+    def store_name(self, name, allow_locals=True):
         if allow_locals:
             self.add_opcodes(
                 ASTORE_name(self, name)
@@ -92,7 +92,7 @@ class Block:
 
                 END_IF(),
                 # Make sure we actually have a Python object
-                JavaOpcodes.CHECKCAST('org/python/types/Object')
+                JavaOpcodes.CHECKCAST('org/python/Object')
             )
 
     def delete_name(self, name, allow_locals=True):
@@ -129,7 +129,7 @@ class Block:
 
         commands.reverse()
 
-        if False:
+        if True:
             print ('=====' * 10)
             print (code)
             print ('-----' * 10)

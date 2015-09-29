@@ -33,11 +33,31 @@ public class Str extends org.python.types.Object {
     // }
 
     public org.python.types.Str __repr__() {
+        return new org.python.types.Str("'" + this.value + "'");
+    }
+
+    public org.python.types.Str __str__() {
         return new org.python.types.Str(this.value);
     }
 
     public org.python.types.Str __format__() {
         throw new org.python.exceptions.NotImplementedError("str.__format__() has not been implemented.");
+    }
+
+    public org.python.types.Int __int__() {
+        try {
+            return new org.python.types.Int(Long.parseLong(this.value));
+        } catch (NumberFormatException e) {
+            throw new org.python.exceptions.ValueError("invalid literal for int() with base 10: '" + this.value + "'");
+        }
+    }
+
+    public org.python.types.Float __float__() {
+        try {
+            return new org.python.types.Float(Double.parseDouble(this.value));
+        } catch (NumberFormatException e) {
+            throw new org.python.exceptions.ValueError("could not convert string to float: '" + this.value + "'");
+        }
     }
 
     public org.python.Object __lt__(org.python.Object other) {

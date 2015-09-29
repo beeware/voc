@@ -36,7 +36,7 @@ class ClassBlock(Block):
         ] + self.code
         self.void_return()
 
-    def store_name(self, name, arguments, allow_locals=True):
+    def store_name(self, name, allow_locals=True):
         # Ignore a request to store __init__ - replace with the constructor
         if name == '__init__':
             return
@@ -95,7 +95,7 @@ class ClassBlock(Block):
                 END_IF(),
             END_IF(),
             # Make sure we actually have a Python object
-            JavaOpcodes.CHECKCAST('org/python/types/Object')
+            JavaOpcodes.CHECKCAST('org/python/Object')
         )
 
     def delete_name(self, name, allow_locals=True):

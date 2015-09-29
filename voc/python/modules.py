@@ -36,7 +36,7 @@ class StaticBlock(Block):
         ] + self.code
         self.void_return()
 
-    def store_name(self, name, arguments, allow_locals=True):
+    def store_name(self, name, allow_locals=True):
         self.add_opcodes(
             ASTORE_name(self, '#TEMP#'),
             JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
@@ -77,7 +77,7 @@ class StaticBlock(Block):
                 END_IF(),
             END_IF(),
             # Make sure we actually have a Python object
-            JavaOpcodes.CHECKCAST('org/python/types/Object')
+            JavaOpcodes.CHECKCAST('org/python/Object')
         )
 
     def delete_name(self, name, allow_locals=True):

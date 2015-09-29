@@ -48,9 +48,12 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     }
 
     public org.python.Object __next__() {
-        if (this.index >= this.stop) {
+        if (this.step > 0 && this.index >= this.stop) {
+            throw new org.python.exceptions.StopIteration();
+        } else if (this.step < 0 && this.index <= this.stop) {
             throw new org.python.exceptions.StopIteration();
         }
+
         org.python.Object result = new org.python.types.Int(this.index);
         this.index += this.step;
         return result;

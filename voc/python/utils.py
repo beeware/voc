@@ -180,12 +180,13 @@ class TryExcept:
             # so it can be used as an argument elsewhere.
             if len(handler.exceptions) > 1:  # catch multiple - except (A, B) as v:
                 context.add_opcodes(
-                    opcodes.CATCH('org/python/exceptions/%s' % handler.exceptions[0]),
+                    opcodes.CATCH([
+                            'org/python/exceptions/%s' % e
+                            for e in handler.exceptions
+                        ]),
                 )
                 if handler.var_name:
-                    context.add_opcodes(
-                        opcodes.ASTORE_name(context, handler.var_name),
-                    )
+                    context.store_name(handler.var_name),
                 else:
                     # No named exception, but there is still an exception
                     # on the stack. Pop it off.
@@ -197,9 +198,7 @@ class TryExcept:
                     opcodes.CATCH('org/python/exceptions/%s' % handler.exceptions[0]),
                 )
                 if handler.var_name:
-                    context.add_opcodes(
-                        opcodes.ASTORE_name(context, handler.var_name),
-                    )
+                    context.store_name(handler.var_name),
                 else:
                     # No named exception, but there is still an exception
                     # on the stack. Pop it off.
@@ -219,14 +218,14 @@ class TryExcept:
         if self.finally_block:
             context.add_opcodes(
                 opcodes.FINALLY(),
-                opcodes.ASTORE_name(context, '##exception-%d##' % id(self))
             )
+            opcodes.ASTORE_name(context, '##exception-%d##' % id(self))
 
             for command in self.finally_block.commands:
                 command.transpile(context)
 
+            opcodes.ALOAD_name(context, '##exception-%d##' % id(self)),
             context.add_opcodes(
-                opcodes.ALOAD_name(context, '##exception-%d##' % id(self)),
                 JavaOpcodes.ATHROW(),
             )
 
@@ -486,8 +485,8 @@ class ForLoop:
         context.add_opcodes(
                     opcodes.jump(JavaOpcodes.GOTO(0), context, loop, opcodes.Opcode.NEXT),
                 opcodes.END_TRY(),
-                opcodes.ASTORE_name(context, self.varname),
         )
+        context.store_name(self.varname),
 
         for command in self.commands:
             command.transpile(context)
@@ -500,22 +499,20 @@ class ComprehensionForLoop(ForLoop):
         super().__init__(start, loop, varname, end, start_offset, loop_offset, end_offset, starts_line)
 
     def pre_loop(self, context):
-        context.add_opcodes(
-            opcodes.ASTORE_name(context, '##FOR-%s' % id(self)),
-            opcodes.ALOAD_name(context, '##FOR-%s' % id(self)),
-        )
+        context.store_name('##FOR-%s' % id(self)),
+        context.load_name('##FOR-%s' % id(self)),
 
     def pre_iteration(self, context):
         context.add_opcodes(
             JavaOpcodes.DUP(),
-            opcodes.ALOAD_name(context, '.0'),
         )
+        context.load_name('.0'),
 
     def post_loop(self, context):
         context.add_opcodes(
             JavaOpcodes.POP(),
-            opcodes.ALOAD_name(context, '##FOR-%s' % id(self)),
         )
+        context.load_name('##FOR-%s' % id(self)),
 
 
 class WhileLoop:

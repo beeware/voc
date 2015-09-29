@@ -6,12 +6,12 @@ import py_compile
 from .python.modules import Module
 
 
-def transpile(sourcefile, namespace, outdir=None):
-    print("Compiling %s ..." % sourcefile)
-    py_compile.compile(sourcefile)
+def transpile(filename, namespace, outdir=None):
+    print("Compiling %s ..." % filename)
+    py_compile.compile(filename)
 
     transpiler = Transpiler(namespace)
-    transpiler.transpile(sourcefile)
+    transpiler.transpile(filename)
     transpiler.write(outdir)
 
 
@@ -20,7 +20,7 @@ class Transpiler:
         self.namespace = namespace
         self.classfiles = []
 
-    def write(self, outdir):
+    def write(self, outdir, verbosity=1):
         # Create directory tree to store classfile
         if outdir:
             basedir = [outdir]
@@ -36,20 +36,33 @@ class Transpiler:
 
             classfilename = os.path.join(dirname, '%s.class' % class_name)
 
-            print("Writing %s ..." % classfilename)
+            if verbosity:
+                print("Writing %s ..." % classfilename)
             with open(classfilename, 'wb') as out:
                 javaclassfile.write(out)
-        print("Done.")
+        if verbosity:
+            print("Done.")
 
-    def transpile(self, sourcefile):
-        with open(importlib.util.cache_from_source(sourcefile), 'rb') as compiled:
+    def transpile(self, filename):
+        "Transpile a Python source file into class files"
+        with open(importlib.util.cache_from_source(filename), 'rb') as compiled:
             # Read off the magic from the start of the PYC file.
             compiled.read(12)
 
             # Decompile the code object.
             code = marshal.load(compiled)
 
-        module = Module(self.namespace, sourcefile)
+            self.transpile_code(filename, code)
+
+    def transpile_string(self, filename, code_string):
+        "Transpile a string containing Python code into class files"
+        code = compile(code_string, filename, "exec")
+
+        self.transpile_code(filename, code)
+
+    def transpile_code(self, filename, code):
+        "Transpile a code object into class files"
+        module = Module(self.namespace, filename)
 
         # Extract commands from the code block
         module.extract(code)

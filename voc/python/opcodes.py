@@ -1216,7 +1216,7 @@ class STORE_NAME(Opcode):
 
         # Depending on context, this might mean writing to local
         # variables, class attributes, or to the global context.
-        context.store_name(self.name, arguments)
+        context.store_name(self.name)
 
 
 class DELETE_NAME(Opcode):
@@ -1241,7 +1241,7 @@ class DELETE_NAME(Opcode):
 
         # Depending on context, this might mean deleting from local
         # variables, class attributes, or to the global context.
-        context.delete_name(self.name, arguments)
+        context.delete_name(self.name)
 
 
 class UNPACK_SEQUENCE(Opcode):
@@ -1346,7 +1346,7 @@ class STORE_GLOBAL(Opcode):
 
         # Depending on context, this might mean writing to local
         # variables, class attributes, or to the global context.
-        context.store_name(self.name, arguments, allow_locals=False)
+        context.store_name(self.name, allow_locals=False)
 
 
 # class DELETE_GLOBAL(Opcode):
