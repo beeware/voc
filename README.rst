@@ -15,7 +15,7 @@ What it does:
 
 * Provides an API to let you programmatically create Java class files.
 
-* Compiles a Python source file into a Java class file in a nominated
+* Compiles a Python 3.4 source file into a Java class file in a nominated
   package. Supports the conversion of:
 
   * Class definition and construction
@@ -34,11 +34,11 @@ What it does:
 
   * Static initialization of modules.
 
-It *doesn't* currently support
+  * List comprehensions
+
+It *doesn't* currently support:
 
 * Keyword arguments
-
-* List comprehensions
 
 * Generators
 
@@ -52,7 +52,7 @@ and development effort.
 Quickstart
 ----------
 
-Install `voc`, then run the example script::
+Using Python 3.4, install `voc`, then run the example script::
 
     $ pip install voc
     $ python -m voc tests/example.py org.pybee
@@ -60,7 +60,7 @@ Install `voc`, then run the example script::
     Writing example.class...
     Done.
 
-This will produce a `example.class`, in the org.pybee namespace, that you can
+This will produce an `example.class`, in the org.pybee namespace, that you can
 run on any Java 1.7+ VM.
 
 Next step - you need to compile the Python support libraries:
