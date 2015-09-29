@@ -4,6 +4,5 @@ python:
 install:
   - "pip install ."
   - "make"
-script: 
-  - "python -m voc tests/example.py org.pybee"
-  - "java -XX:-UseSplitVerifier -classpath python.jar:. org.pybee.example"
+script:
+  - "python setup.py test"
