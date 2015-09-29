@@ -70,7 +70,7 @@ Next step - you need to compile the Python support libraries:
 This will compile `python.jar`. You will need to make sure that the python.jar
 support file is in your classpath::
 
-    $ java -XX:-UseSplitVerifier -classpath python.jar:. example
+    $ java -XX:-UseSplitVerifier -classpath python.jar:. org.pybee.example
     Hello, World
 
 The ``-CC:-UseSplitVerifier`` argument is necessary to turn off stack map
