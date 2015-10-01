@@ -1,4 +1,4 @@
-from .utils import TranspileTestCase
+from ..utils import TranspileTestCase
 
 
 class FunctionTests(TranspileTestCase):

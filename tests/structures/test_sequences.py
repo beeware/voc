@@ -1,6 +1,6 @@
 import unittest
 
-from .utils import TranspileTestCase
+from ..utils import TranspileTestCase
 
 
 class SequenceTests(TranspileTestCase):
