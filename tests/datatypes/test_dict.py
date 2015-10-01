@@ -1,398 +1,401 @@
-from unittest import expectedFailure
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
 class UnaryDictOperationTests(UnaryOperationTestCase, TranspileTestCase):
     x = "{'a': 1, 'b': 'value', 'c': 1.2345}"
 
-UnaryDictOperationTests.test_unary_positive = expectedFailure(UnaryDictOperationTests.test_unary_positive)
-UnaryDictOperationTests.test_unary_negative = expectedFailure(UnaryDictOperationTests.test_unary_negative)
-UnaryDictOperationTests.test_unary_not = expectedFailure(UnaryDictOperationTests.test_unary_not)
-UnaryDictOperationTests.test_unary_invert = expectedFailure(UnaryDictOperationTests.test_unary_invert)
-
+    not_implemented = [
+        'test_unary_positive',
+        'test_unary_negative',
+        'test_unary_not',
+        'test_unary_invert',
+    ]
 
 class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
     x = "{'a': 1, 'b': 'value', 'c': 1.2345}"
 
-BinaryDictOperationTests.test_add_bool_true = expectedFailure(BinaryDictOperationTests.test_add_bool_true)
-BinaryDictOperationTests.test_subtract_bool_true = expectedFailure(BinaryDictOperationTests.test_subtract_bool_true)
-BinaryDictOperationTests.test_multiply_bool_true = expectedFailure(BinaryDictOperationTests.test_multiply_bool_true)
-BinaryDictOperationTests.test_floor_divide_bool_true = expectedFailure(BinaryDictOperationTests.test_floor_divide_bool_true)
-BinaryDictOperationTests.test_true_divide_bool_true = expectedFailure(BinaryDictOperationTests.test_true_divide_bool_true)
-BinaryDictOperationTests.test_modulo_bool_true = expectedFailure(BinaryDictOperationTests.test_modulo_bool_true)
-BinaryDictOperationTests.test_power_bool_true = expectedFailure(BinaryDictOperationTests.test_power_bool_true)
-BinaryDictOperationTests.test_subscr_bool_true = expectedFailure(BinaryDictOperationTests.test_subscr_bool_true)
-BinaryDictOperationTests.test_lshift_bool_true = expectedFailure(BinaryDictOperationTests.test_lshift_bool_true)
-BinaryDictOperationTests.test_rshift_bool_true = expectedFailure(BinaryDictOperationTests.test_rshift_bool_true)
-BinaryDictOperationTests.test_and_bool_true = expectedFailure(BinaryDictOperationTests.test_and_bool_true)
-BinaryDictOperationTests.test_xor_bool_true = expectedFailure(BinaryDictOperationTests.test_xor_bool_true)
-BinaryDictOperationTests.test_or_bool_true = expectedFailure(BinaryDictOperationTests.test_or_bool_true)
+    not_implemented = [
+        'test_add_bool_true',
+        'test_subtract_bool_true',
+        'test_multiply_bool_true',
+        'test_floor_divide_bool_true',
+        'test_true_divide_bool_true',
+        'test_modulo_bool_true',
+        'test_power_bool_true',
+        'test_subscr_bool_true',
+        'test_lshift_bool_true',
+        'test_rshift_bool_true',
+        'test_and_bool_true',
+        'test_xor_bool_true',
+        'test_or_bool_true',
 
-BinaryDictOperationTests.test_add_bool_false = expectedFailure(BinaryDictOperationTests.test_add_bool_false)
-BinaryDictOperationTests.test_subtract_bool_false = expectedFailure(BinaryDictOperationTests.test_subtract_bool_false)
-BinaryDictOperationTests.test_multiply_bool_false = expectedFailure(BinaryDictOperationTests.test_multiply_bool_false)
-BinaryDictOperationTests.test_floor_divide_bool_false = expectedFailure(BinaryDictOperationTests.test_floor_divide_bool_false)
-BinaryDictOperationTests.test_true_divide_bool_false = expectedFailure(BinaryDictOperationTests.test_true_divide_bool_false)
-BinaryDictOperationTests.test_modulo_bool_false = expectedFailure(BinaryDictOperationTests.test_modulo_bool_false)
-BinaryDictOperationTests.test_power_bool_false = expectedFailure(BinaryDictOperationTests.test_power_bool_false)
-BinaryDictOperationTests.test_subscr_bool_false = expectedFailure(BinaryDictOperationTests.test_subscr_bool_false)
-BinaryDictOperationTests.test_lshift_bool_false = expectedFailure(BinaryDictOperationTests.test_lshift_bool_false)
-BinaryDictOperationTests.test_rshift_bool_false = expectedFailure(BinaryDictOperationTests.test_rshift_bool_false)
-BinaryDictOperationTests.test_and_bool_false = expectedFailure(BinaryDictOperationTests.test_and_bool_false)
-BinaryDictOperationTests.test_xor_bool_false = expectedFailure(BinaryDictOperationTests.test_xor_bool_false)
-BinaryDictOperationTests.test_or_bool_false = expectedFailure(BinaryDictOperationTests.test_or_bool_false)
+        'test_add_bool_false',
+        'test_subtract_bool_false',
+        'test_multiply_bool_false',
+        'test_floor_divide_bool_false',
+        'test_true_divide_bool_false',
+        'test_modulo_bool_false',
+        'test_power_bool_false',
+        'test_subscr_bool_false',
+        'test_lshift_bool_false',
+        'test_rshift_bool_false',
+        'test_and_bool_false',
+        'test_xor_bool_false',
+        'test_or_bool_false',
 
-# BinaryDictOperationTests.test_add_bytearray = expectedFailure(BinaryDictOperationTests.test_add_bytearray)
-# BinaryDictOperationTests.test_subtract_bytearray = expectedFailure(BinaryDictOperationTests.test_subtract_bytearray)
-# BinaryDictOperationTests.test_multiply_bytearray = expectedFailure(BinaryDictOperationTests.test_multiply_bytearray)
-# BinaryDictOperationTests.test_floor_divide_bytearray = expectedFailure(BinaryDictOperationTests.test_floor_divide_bytearray)
-# BinaryDictOperationTests.test_true_divide_bytearray = expectedFailure(BinaryDictOperationTests.test_true_divide_bytearray)
-# BinaryDictOperationTests.test_modulo_bytearray = expectedFailure(BinaryDictOperationTests.test_modulo_bytearray)
-# BinaryDictOperationTests.test_power_bytearray = expectedFailure(BinaryDictOperationTests.test_power_bytearray)
-# BinaryDictOperationTests.test_subscr_bytearray = expectedFailure(BinaryDictOperationTests.test_subscr_bytearray)
-# BinaryDictOperationTests.test_lshift_bytearray = expectedFailure(BinaryDictOperationTests.test_lshift_bytearray)
-# BinaryDictOperationTests.test_rshift_bytearray = expectedFailure(BinaryDictOperationTests.test_rshift_bytearray)
-# BinaryDictOperationTests.test_and_bytearray = expectedFailure(BinaryDictOperationTests.test_and_bytearray)
-# BinaryDictOperationTests.test_xor_bytearray = expectedFailure(BinaryDictOperationTests.test_xor_bytearray)
-# BinaryDictOperationTests.test_or_bytearray = expectedFailure(BinaryDictOperationTests.test_or_bytearray)
+        'test_add_bytearray',
+        'test_subtract_bytearray',
+        'test_multiply_bytearray',
+        'test_floor_divide_bytearray',
+        'test_true_divide_bytearray',
+        'test_modulo_bytearray',
+        'test_power_bytearray',
+        'test_subscr_bytearray',
+        'test_lshift_bytearray',
+        'test_rshift_bytearray',
+        'test_and_bytearray',
+        'test_xor_bytearray',
+        'test_or_bytearray',
 
-BinaryDictOperationTests.test_add_bytes = expectedFailure(BinaryDictOperationTests.test_add_bytes)
-BinaryDictOperationTests.test_subtract_bytes = expectedFailure(BinaryDictOperationTests.test_subtract_bytes)
-BinaryDictOperationTests.test_multiply_bytes = expectedFailure(BinaryDictOperationTests.test_multiply_bytes)
-BinaryDictOperationTests.test_floor_divide_bytes = expectedFailure(BinaryDictOperationTests.test_floor_divide_bytes)
-BinaryDictOperationTests.test_true_divide_bytes = expectedFailure(BinaryDictOperationTests.test_true_divide_bytes)
-BinaryDictOperationTests.test_modulo_bytes = expectedFailure(BinaryDictOperationTests.test_modulo_bytes)
-BinaryDictOperationTests.test_power_bytes = expectedFailure(BinaryDictOperationTests.test_power_bytes)
-BinaryDictOperationTests.test_subscr_bytes = expectedFailure(BinaryDictOperationTests.test_subscr_bytes)
-BinaryDictOperationTests.test_lshift_bytes = expectedFailure(BinaryDictOperationTests.test_lshift_bytes)
-BinaryDictOperationTests.test_rshift_bytes = expectedFailure(BinaryDictOperationTests.test_rshift_bytes)
-BinaryDictOperationTests.test_and_bytes = expectedFailure(BinaryDictOperationTests.test_and_bytes)
-BinaryDictOperationTests.test_xor_bytes = expectedFailure(BinaryDictOperationTests.test_xor_bytes)
-BinaryDictOperationTests.test_or_bytes = expectedFailure(BinaryDictOperationTests.test_or_bytes)
+        'test_add_bytes',
+        'test_subtract_bytes',
+        'test_multiply_bytes',
+        'test_floor_divide_bytes',
+        'test_true_divide_bytes',
+        'test_modulo_bytes',
+        'test_power_bytes',
+        'test_subscr_bytes',
+        'test_lshift_bytes',
+        'test_rshift_bytes',
+        'test_and_bytes',
+        'test_xor_bytes',
+        'test_or_bytes',
 
-# BinaryDictOperationTests.test_add_class = expectedFailure(BinaryDictOperationTests.test_add_class)
-# BinaryDictOperationTests.test_subtract_class = expectedFailure(BinaryDictOperationTests.test_subtract_class)
-# BinaryDictOperationTests.test_multiply_class = expectedFailure(BinaryDictOperationTests.test_multiply_class)
-# BinaryDictOperationTests.test_floor_divide_class = expectedFailure(BinaryDictOperationTests.test_floor_divide_class)
-# BinaryDictOperationTests.test_true_divide_class = expectedFailure(BinaryDictOperationTests.test_true_divide_class)
-# BinaryDictOperationTests.test_modulo_class = expectedFailure(BinaryDictOperationTests.test_modulo_class)
-# BinaryDictOperationTests.test_power_class = expectedFailure(BinaryDictOperationTests.test_power_class)
-# BinaryDictOperationTests.test_subscr_class = expectedFailure(BinaryDictOperationTests.test_subscr_class)
-# BinaryDictOperationTests.test_lshift_class = expectedFailure(BinaryDictOperationTests.test_lshift_class)
-# BinaryDictOperationTests.test_rshift_class = expectedFailure(BinaryDictOperationTests.test_rshift_class)
-# BinaryDictOperationTests.test_and_class = expectedFailure(BinaryDictOperationTests.test_and_class)
-# BinaryDictOperationTests.test_xor_class = expectedFailure(BinaryDictOperationTests.test_xor_class)
-# BinaryDictOperationTests.test_or_class = expectedFailure(BinaryDictOperationTests.test_or_class)
+        'test_add_class',
+        'test_subtract_class',
+        'test_multiply_class',
+        'test_floor_divide_class',
+        'test_true_divide_class',
+        'test_modulo_class',
+        'test_power_class',
+        'test_subscr_class',
+        'test_lshift_class',
+        'test_rshift_class',
+        'test_and_class',
+        'test_xor_class',
+        'test_or_class',
 
-# BinaryDictOperationTests.test_add_complex = expectedFailure(BinaryDictOperationTests.test_add_complex)
-# BinaryDictOperationTests.test_subtract_complex = expectedFailure(BinaryDictOperationTests.test_subtract_complex)
-# BinaryDictOperationTests.test_multiply_complex = expectedFailure(BinaryDictOperationTests.test_multiply_complex)
-# BinaryDictOperationTests.test_floor_divide_complex = expectedFailure(BinaryDictOperationTests.test_floor_divide_complex)
-# BinaryDictOperationTests.test_true_divide_complex = expectedFailure(BinaryDictOperationTests.test_true_divide_complex)
-# BinaryDictOperationTests.test_modulo_complex = expectedFailure(BinaryDictOperationTests.test_modulo_complex)
-# BinaryDictOperationTests.test_power_complex = expectedFailure(BinaryDictOperationTests.test_power_complex)
-# BinaryDictOperationTests.test_subscr_complex = expectedFailure(BinaryDictOperationTests.test_subscr_complex)
-# BinaryDictOperationTests.test_lshift_complex = expectedFailure(BinaryDictOperationTests.test_lshift_complex)
-# BinaryDictOperationTests.test_rshift_complex = expectedFailure(BinaryDictOperationTests.test_rshift_complex)
-# BinaryDictOperationTests.test_and_complex = expectedFailure(BinaryDictOperationTests.test_and_complex)
-# BinaryDictOperationTests.test_xor_complex = expectedFailure(BinaryDictOperationTests.test_xor_complex)
-# BinaryDictOperationTests.test_or_complex = expectedFailure(BinaryDictOperationTests.test_or_complex)
+        'test_add_complex',
+        'test_subtract_complex',
+        'test_multiply_complex',
+        'test_floor_divide_complex',
+        'test_true_divide_complex',
+        'test_modulo_complex',
+        'test_power_complex',
+        'test_subscr_complex',
+        'test_lshift_complex',
+        'test_rshift_complex',
+        'test_and_complex',
+        'test_xor_complex',
+        'test_or_complex',
 
-BinaryDictOperationTests.test_add_dict = expectedFailure(BinaryDictOperationTests.test_add_dict)
-BinaryDictOperationTests.test_subtract_dict = expectedFailure(BinaryDictOperationTests.test_subtract_dict)
-BinaryDictOperationTests.test_multiply_dict = expectedFailure(BinaryDictOperationTests.test_multiply_dict)
-BinaryDictOperationTests.test_floor_divide_dict = expectedFailure(BinaryDictOperationTests.test_floor_divide_dict)
-BinaryDictOperationTests.test_true_divide_dict = expectedFailure(BinaryDictOperationTests.test_true_divide_dict)
-BinaryDictOperationTests.test_modulo_dict = expectedFailure(BinaryDictOperationTests.test_modulo_dict)
-BinaryDictOperationTests.test_power_dict = expectedFailure(BinaryDictOperationTests.test_power_dict)
-BinaryDictOperationTests.test_subscr_dict = expectedFailure(BinaryDictOperationTests.test_subscr_dict)
-BinaryDictOperationTests.test_lshift_dict = expectedFailure(BinaryDictOperationTests.test_lshift_dict)
-BinaryDictOperationTests.test_rshift_dict = expectedFailure(BinaryDictOperationTests.test_rshift_dict)
-BinaryDictOperationTests.test_and_dict = expectedFailure(BinaryDictOperationTests.test_and_dict)
-BinaryDictOperationTests.test_xor_dict = expectedFailure(BinaryDictOperationTests.test_xor_dict)
-BinaryDictOperationTests.test_or_dict = expectedFailure(BinaryDictOperationTests.test_or_dict)
+        'test_add_dict',
+        'test_subtract_dict',
+        'test_multiply_dict',
+        'test_floor_divide_dict',
+        'test_true_divide_dict',
+        'test_modulo_dict',
+        'test_power_dict',
+        'test_subscr_dict',
+        'test_lshift_dict',
+        'test_rshift_dict',
+        'test_and_dict',
+        'test_xor_dict',
+        'test_or_dict',
 
-BinaryDictOperationTests.test_add_float = expectedFailure(BinaryDictOperationTests.test_add_float)
-BinaryDictOperationTests.test_subtract_float = expectedFailure(BinaryDictOperationTests.test_subtract_float)
-BinaryDictOperationTests.test_multiply_float = expectedFailure(BinaryDictOperationTests.test_multiply_float)
-BinaryDictOperationTests.test_floor_divide_float = expectedFailure(BinaryDictOperationTests.test_floor_divide_float)
-BinaryDictOperationTests.test_true_divide_float = expectedFailure(BinaryDictOperationTests.test_true_divide_float)
-BinaryDictOperationTests.test_modulo_float = expectedFailure(BinaryDictOperationTests.test_modulo_float)
-BinaryDictOperationTests.test_power_float = expectedFailure(BinaryDictOperationTests.test_power_float)
-BinaryDictOperationTests.test_subscr_float = expectedFailure(BinaryDictOperationTests.test_subscr_float)
-BinaryDictOperationTests.test_lshift_float = expectedFailure(BinaryDictOperationTests.test_lshift_float)
-BinaryDictOperationTests.test_rshift_float = expectedFailure(BinaryDictOperationTests.test_rshift_float)
-BinaryDictOperationTests.test_and_float = expectedFailure(BinaryDictOperationTests.test_and_float)
-BinaryDictOperationTests.test_xor_float = expectedFailure(BinaryDictOperationTests.test_xor_float)
-BinaryDictOperationTests.test_or_float = expectedFailure(BinaryDictOperationTests.test_or_float)
+        'test_add_float',
+        'test_subtract_float',
+        'test_multiply_float',
+        'test_floor_divide_float',
+        'test_true_divide_float',
+        'test_modulo_float',
+        'test_power_float',
+        'test_subscr_float',
+        'test_lshift_float',
+        'test_rshift_float',
+        'test_and_float',
+        'test_xor_float',
+        'test_or_float',
 
-# BinaryDictOperationTests.test_add_frozenset = expectedFailure(BinaryDictOperationTests.test_add_frozenset)
-# BinaryDictOperationTests.test_subtract_frozenset = expectedFailure(BinaryDictOperationTests.test_subtract_frozenset)
-# BinaryDictOperationTests.test_multiply_frozenset = expectedFailure(BinaryDictOperationTests.test_multiply_frozenset)
-# BinaryDictOperationTests.test_floor_divide_frozenset = expectedFailure(BinaryDictOperationTests.test_floor_divide_frozenset)
-# BinaryDictOperationTests.test_true_divide_frozenset = expectedFailure(BinaryDictOperationTests.test_true_divide_frozenset)
-# BinaryDictOperationTests.test_modulo_frozenset = expectedFailure(BinaryDictOperationTests.test_modulo_frozenset)
-# BinaryDictOperationTests.test_power_frozenset = expectedFailure(BinaryDictOperationTests.test_power_frozenset)
-# BinaryDictOperationTests.test_subscr_frozenset = expectedFailure(BinaryDictOperationTests.test_subscr_frozenset)
-# BinaryDictOperationTests.test_lshift_frozenset = expectedFailure(BinaryDictOperationTests.test_lshift_frozenset)
-# BinaryDictOperationTests.test_rshift_frozenset = expectedFailure(BinaryDictOperationTests.test_rshift_frozenset)
-# BinaryDictOperationTests.test_and_frozenset = expectedFailure(BinaryDictOperationTests.test_and_frozenset)
-# BinaryDictOperationTests.test_xor_frozenset = expectedFailure(BinaryDictOperationTests.test_xor_frozenset)
-# BinaryDictOperationTests.test_or_frozenset = expectedFailure(BinaryDictOperationTests.test_or_frozenset)
+        'test_add_frozenset',
+        'test_subtract_frozenset',
+        'test_multiply_frozenset',
+        'test_floor_divide_frozenset',
+        'test_true_divide_frozenset',
+        'test_modulo_frozenset',
+        'test_power_frozenset',
+        'test_subscr_frozenset',
+        'test_lshift_frozenset',
+        'test_rshift_frozenset',
+        'test_and_frozenset',
+        'test_xor_frozenset',
+        'test_or_frozenset',
 
-BinaryDictOperationTests.test_add_int = expectedFailure(BinaryDictOperationTests.test_add_int)
-BinaryDictOperationTests.test_subtract_int = expectedFailure(BinaryDictOperationTests.test_subtract_int)
-BinaryDictOperationTests.test_multiply_int = expectedFailure(BinaryDictOperationTests.test_multiply_int)
-BinaryDictOperationTests.test_floor_divide_int = expectedFailure(BinaryDictOperationTests.test_floor_divide_int)
-BinaryDictOperationTests.test_true_divide_int = expectedFailure(BinaryDictOperationTests.test_true_divide_int)
-BinaryDictOperationTests.test_modulo_int = expectedFailure(BinaryDictOperationTests.test_modulo_int)
-BinaryDictOperationTests.test_power_int = expectedFailure(BinaryDictOperationTests.test_power_int)
-BinaryDictOperationTests.test_subscr_int = expectedFailure(BinaryDictOperationTests.test_subscr_int)
-BinaryDictOperationTests.test_lshift_int = expectedFailure(BinaryDictOperationTests.test_lshift_int)
-BinaryDictOperationTests.test_rshift_int = expectedFailure(BinaryDictOperationTests.test_rshift_int)
-BinaryDictOperationTests.test_and_int = expectedFailure(BinaryDictOperationTests.test_and_int)
-BinaryDictOperationTests.test_xor_int = expectedFailure(BinaryDictOperationTests.test_xor_int)
-BinaryDictOperationTests.test_or_int = expectedFailure(BinaryDictOperationTests.test_or_int)
+        'test_add_int',
+        'test_subtract_int',
+        'test_multiply_int',
+        'test_floor_divide_int',
+        'test_true_divide_int',
+        'test_modulo_int',
+        'test_power_int',
+        'test_subscr_int',
+        'test_lshift_int',
+        'test_rshift_int',
+        'test_and_int',
+        'test_xor_int',
+        'test_or_int',
 
-BinaryDictOperationTests.test_add_list = expectedFailure(BinaryDictOperationTests.test_add_list)
-BinaryDictOperationTests.test_subtract_list = expectedFailure(BinaryDictOperationTests.test_subtract_list)
-BinaryDictOperationTests.test_multiply_list = expectedFailure(BinaryDictOperationTests.test_multiply_list)
-BinaryDictOperationTests.test_floor_divide_list = expectedFailure(BinaryDictOperationTests.test_floor_divide_list)
-BinaryDictOperationTests.test_true_divide_list = expectedFailure(BinaryDictOperationTests.test_true_divide_list)
-BinaryDictOperationTests.test_modulo_list = expectedFailure(BinaryDictOperationTests.test_modulo_list)
-BinaryDictOperationTests.test_power_list = expectedFailure(BinaryDictOperationTests.test_power_list)
-BinaryDictOperationTests.test_subscr_list = expectedFailure(BinaryDictOperationTests.test_subscr_list)
-BinaryDictOperationTests.test_lshift_list = expectedFailure(BinaryDictOperationTests.test_lshift_list)
-BinaryDictOperationTests.test_rshift_list = expectedFailure(BinaryDictOperationTests.test_rshift_list)
-BinaryDictOperationTests.test_and_list = expectedFailure(BinaryDictOperationTests.test_and_list)
-BinaryDictOperationTests.test_xor_list = expectedFailure(BinaryDictOperationTests.test_xor_list)
-BinaryDictOperationTests.test_or_list = expectedFailure(BinaryDictOperationTests.test_or_list)
+        'test_add_list',
+        'test_subtract_list',
+        'test_multiply_list',
+        'test_floor_divide_list',
+        'test_true_divide_list',
+        'test_modulo_list',
+        'test_power_list',
+        'test_subscr_list',
+        'test_lshift_list',
+        'test_rshift_list',
+        'test_and_list',
+        'test_xor_list',
+        'test_or_list',
 
-BinaryDictOperationTests.test_add_set = expectedFailure(BinaryDictOperationTests.test_add_set)
-BinaryDictOperationTests.test_subtract_set = expectedFailure(BinaryDictOperationTests.test_subtract_set)
-BinaryDictOperationTests.test_multiply_set = expectedFailure(BinaryDictOperationTests.test_multiply_set)
-BinaryDictOperationTests.test_floor_divide_set = expectedFailure(BinaryDictOperationTests.test_floor_divide_set)
-BinaryDictOperationTests.test_true_divide_set = expectedFailure(BinaryDictOperationTests.test_true_divide_set)
-BinaryDictOperationTests.test_modulo_set = expectedFailure(BinaryDictOperationTests.test_modulo_set)
-BinaryDictOperationTests.test_power_set = expectedFailure(BinaryDictOperationTests.test_power_set)
-BinaryDictOperationTests.test_subscr_set = expectedFailure(BinaryDictOperationTests.test_subscr_set)
-BinaryDictOperationTests.test_lshift_set = expectedFailure(BinaryDictOperationTests.test_lshift_set)
-BinaryDictOperationTests.test_rshift_set = expectedFailure(BinaryDictOperationTests.test_rshift_set)
-BinaryDictOperationTests.test_and_set = expectedFailure(BinaryDictOperationTests.test_and_set)
-BinaryDictOperationTests.test_xor_set = expectedFailure(BinaryDictOperationTests.test_xor_set)
-BinaryDictOperationTests.test_or_set = expectedFailure(BinaryDictOperationTests.test_or_set)
+        'test_add_set',
+        'test_subtract_set',
+        'test_multiply_set',
+        'test_floor_divide_set',
+        'test_true_divide_set',
+        'test_modulo_set',
+        'test_power_set',
+        'test_subscr_set',
+        'test_lshift_set',
+        'test_rshift_set',
+        'test_and_set',
+        'test_xor_set',
+        'test_or_set',
 
-BinaryDictOperationTests.test_add_str = expectedFailure(BinaryDictOperationTests.test_add_str)
-BinaryDictOperationTests.test_subtract_str = expectedFailure(BinaryDictOperationTests.test_subtract_str)
-BinaryDictOperationTests.test_multiply_str = expectedFailure(BinaryDictOperationTests.test_multiply_str)
-BinaryDictOperationTests.test_floor_divide_str = expectedFailure(BinaryDictOperationTests.test_floor_divide_str)
-BinaryDictOperationTests.test_true_divide_str = expectedFailure(BinaryDictOperationTests.test_true_divide_str)
-BinaryDictOperationTests.test_modulo_str = expectedFailure(BinaryDictOperationTests.test_modulo_str)
-BinaryDictOperationTests.test_power_str = expectedFailure(BinaryDictOperationTests.test_power_str)
-BinaryDictOperationTests.test_subscr_str = expectedFailure(BinaryDictOperationTests.test_subscr_str)
-BinaryDictOperationTests.test_lshift_str = expectedFailure(BinaryDictOperationTests.test_lshift_str)
-BinaryDictOperationTests.test_rshift_str = expectedFailure(BinaryDictOperationTests.test_rshift_str)
-BinaryDictOperationTests.test_and_str = expectedFailure(BinaryDictOperationTests.test_and_str)
-BinaryDictOperationTests.test_xor_str = expectedFailure(BinaryDictOperationTests.test_xor_str)
-BinaryDictOperationTests.test_or_str = expectedFailure(BinaryDictOperationTests.test_or_str)
+        'test_add_str',
+        'test_subtract_str',
+        'test_multiply_str',
+        'test_floor_divide_str',
+        'test_true_divide_str',
+        'test_modulo_str',
+        'test_power_str',
+        'test_subscr_str',
+        'test_lshift_str',
+        'test_rshift_str',
+        'test_and_str',
+        'test_xor_str',
+        'test_or_str',
 
-BinaryDictOperationTests.test_add_tuple = expectedFailure(BinaryDictOperationTests.test_add_tuple)
-BinaryDictOperationTests.test_subtract_tuple = expectedFailure(BinaryDictOperationTests.test_subtract_tuple)
-BinaryDictOperationTests.test_multiply_tuple = expectedFailure(BinaryDictOperationTests.test_multiply_tuple)
-BinaryDictOperationTests.test_floor_divide_tuple = expectedFailure(BinaryDictOperationTests.test_floor_divide_tuple)
-BinaryDictOperationTests.test_true_divide_tuple = expectedFailure(BinaryDictOperationTests.test_true_divide_tuple)
-BinaryDictOperationTests.test_modulo_tuple = expectedFailure(BinaryDictOperationTests.test_modulo_tuple)
-BinaryDictOperationTests.test_power_tuple = expectedFailure(BinaryDictOperationTests.test_power_tuple)
-BinaryDictOperationTests.test_subscr_tuple = expectedFailure(BinaryDictOperationTests.test_subscr_tuple)
-BinaryDictOperationTests.test_lshift_tuple = expectedFailure(BinaryDictOperationTests.test_lshift_tuple)
-BinaryDictOperationTests.test_rshift_tuple = expectedFailure(BinaryDictOperationTests.test_rshift_tuple)
-BinaryDictOperationTests.test_and_tuple = expectedFailure(BinaryDictOperationTests.test_and_tuple)
-BinaryDictOperationTests.test_xor_tuple = expectedFailure(BinaryDictOperationTests.test_xor_tuple)
-BinaryDictOperationTests.test_or_tuple = expectedFailure(BinaryDictOperationTests.test_or_tuple)
+        'test_add_tuple',
+        'test_subtract_tuple',
+        'test_multiply_tuple',
+        'test_floor_divide_tuple',
+        'test_true_divide_tuple',
+        'test_modulo_tuple',
+        'test_power_tuple',
+        'test_subscr_tuple',
+        'test_lshift_tuple',
+        'test_rshift_tuple',
+        'test_and_tuple',
+        'test_xor_tuple',
+        'test_or_tuple',
+    ]
 
 
 class InplaceDictOperationTests(InplaceOperationTestCase, TranspileTestCase):
     x = "{'a': 1, 'b': 'value', 'c': 1.2345}"
 
+    not_implemented = [
+        'test_add_bool_true',
+        'test_subtract_bool_true',
+        'test_multiply_bool_true',
+        'test_floor_divide_bool_true',
+        'test_true_divide_bool_true',
+        'test_modulo_bool_true',
+        'test_power_bool_true',
+        'test_lshift_bool_true',
+        'test_rshift_bool_true',
+        'test_and_bool_true',
+        'test_xor_bool_true',
+        'test_or_bool_true',
 
-InplaceDictOperationTests.test_add_bool_true = expectedFailure(InplaceDictOperationTests.test_add_bool_true)
-InplaceDictOperationTests.test_subtract_bool_true = expectedFailure(InplaceDictOperationTests.test_subtract_bool_true)
-InplaceDictOperationTests.test_multiply_bool_true = expectedFailure(InplaceDictOperationTests.test_multiply_bool_true)
-InplaceDictOperationTests.test_floor_divide_bool_true = expectedFailure(InplaceDictOperationTests.test_floor_divide_bool_true)
-InplaceDictOperationTests.test_true_divide_bool_true = expectedFailure(InplaceDictOperationTests.test_true_divide_bool_true)
-InplaceDictOperationTests.test_modulo_bool_true = expectedFailure(InplaceDictOperationTests.test_modulo_bool_true)
-InplaceDictOperationTests.test_power_bool_true = expectedFailure(InplaceDictOperationTests.test_power_bool_true)
-InplaceDictOperationTests.test_lshift_bool_true = expectedFailure(InplaceDictOperationTests.test_lshift_bool_true)
-InplaceDictOperationTests.test_rshift_bool_true = expectedFailure(InplaceDictOperationTests.test_rshift_bool_true)
-InplaceDictOperationTests.test_and_bool_true = expectedFailure(InplaceDictOperationTests.test_and_bool_true)
-InplaceDictOperationTests.test_xor_bool_true = expectedFailure(InplaceDictOperationTests.test_xor_bool_true)
-InplaceDictOperationTests.test_or_bool_true = expectedFailure(InplaceDictOperationTests.test_or_bool_true)
+        'test_add_bool_false',
+        'test_subtract_bool_false',
+        'test_multiply_bool_false',
+        'test_floor_divide_bool_false',
+        'test_true_divide_bool_false',
+        'test_modulo_bool_false',
+        'test_power_bool_false',
+        'test_lshift_bool_false',
+        'test_rshift_bool_false',
+        'test_and_bool_false',
+        'test_xor_bool_false',
+        'test_or_bool_false',
 
-InplaceDictOperationTests.test_add_bool_false = expectedFailure(InplaceDictOperationTests.test_add_bool_false)
-InplaceDictOperationTests.test_subtract_bool_false = expectedFailure(InplaceDictOperationTests.test_subtract_bool_false)
-InplaceDictOperationTests.test_multiply_bool_false = expectedFailure(InplaceDictOperationTests.test_multiply_bool_false)
-InplaceDictOperationTests.test_floor_divide_bool_false = expectedFailure(InplaceDictOperationTests.test_floor_divide_bool_false)
-InplaceDictOperationTests.test_true_divide_bool_false = expectedFailure(InplaceDictOperationTests.test_true_divide_bool_false)
-InplaceDictOperationTests.test_modulo_bool_false = expectedFailure(InplaceDictOperationTests.test_modulo_bool_false)
-InplaceDictOperationTests.test_power_bool_false = expectedFailure(InplaceDictOperationTests.test_power_bool_false)
-InplaceDictOperationTests.test_lshift_bool_false = expectedFailure(InplaceDictOperationTests.test_lshift_bool_false)
-InplaceDictOperationTests.test_rshift_bool_false = expectedFailure(InplaceDictOperationTests.test_rshift_bool_false)
-InplaceDictOperationTests.test_and_bool_false = expectedFailure(InplaceDictOperationTests.test_and_bool_false)
-InplaceDictOperationTests.test_xor_bool_false = expectedFailure(InplaceDictOperationTests.test_xor_bool_false)
-InplaceDictOperationTests.test_or_bool_false = expectedFailure(InplaceDictOperationTests.test_or_bool_false)
+        'test_add_bytearray',
+        'test_subtract_bytearray',
+        'test_multiply_bytearray',
+        'test_floor_divide_bytearray',
+        'test_true_divide_bytearray',
+        'test_modulo_bytearray',
+        'test_power_bytearray',
+        'test_lshift_bytearray',
+        'test_rshift_bytearray',
+        'test_and_bytearray',
+        'test_xor_bytearray',
+        'test_or_bytearray',
 
-# InplaceDictOperationTests.test_add_bytearray = expectedFailure(InplaceDictOperationTests.test_add_bytearray)
-# InplaceDictOperationTests.test_subtract_bytearray = expectedFailure(InplaceDictOperationTests.test_subtract_bytearray)
-# InplaceDictOperationTests.test_multiply_bytearray = expectedFailure(InplaceDictOperationTests.test_multiply_bytearray)
-# InplaceDictOperationTests.test_floor_divide_bytearray = expectedFailure(InplaceDictOperationTests.test_floor_divide_bytearray)
-# InplaceDictOperationTests.test_true_divide_bytearray = expectedFailure(InplaceDictOperationTests.test_true_divide_bytearray)
-# InplaceDictOperationTests.test_modulo_bytearray = expectedFailure(InplaceDictOperationTests.test_modulo_bytearray)
-# InplaceDictOperationTests.test_power_bytearray = expectedFailure(InplaceDictOperationTests.test_power_bytearray)
-# InplaceDictOperationTests.test_lshift_bytearray = expectedFailure(InplaceDictOperationTests.test_lshift_bytearray)
-# InplaceDictOperationTests.test_rshift_bytearray = expectedFailure(InplaceDictOperationTests.test_rshift_bytearray)
-# InplaceDictOperationTests.test_and_bytearray = expectedFailure(InplaceDictOperationTests.test_and_bytearray)
-# InplaceDictOperationTests.test_xor_bytearray = expectedFailure(InplaceDictOperationTests.test_xor_bytearray)
-# InplaceDictOperationTests.test_or_bytearray = expectedFailure(InplaceDictOperationTests.test_or_bytearray)
+        'test_add_bytes',
+        'test_subtract_bytes',
+        'test_multiply_bytes',
+        'test_floor_divide_bytes',
+        'test_true_divide_bytes',
+        'test_modulo_bytes',
+        'test_power_bytes',
+        'test_lshift_bytes',
+        'test_rshift_bytes',
+        'test_and_bytes',
+        'test_xor_bytes',
+        'test_or_bytes',
 
-InplaceDictOperationTests.test_add_bytes = expectedFailure(InplaceDictOperationTests.test_add_bytes)
-InplaceDictOperationTests.test_subtract_bytes = expectedFailure(InplaceDictOperationTests.test_subtract_bytes)
-InplaceDictOperationTests.test_multiply_bytes = expectedFailure(InplaceDictOperationTests.test_multiply_bytes)
-InplaceDictOperationTests.test_floor_divide_bytes = expectedFailure(InplaceDictOperationTests.test_floor_divide_bytes)
-InplaceDictOperationTests.test_true_divide_bytes = expectedFailure(InplaceDictOperationTests.test_true_divide_bytes)
-InplaceDictOperationTests.test_modulo_bytes = expectedFailure(InplaceDictOperationTests.test_modulo_bytes)
-InplaceDictOperationTests.test_power_bytes = expectedFailure(InplaceDictOperationTests.test_power_bytes)
-InplaceDictOperationTests.test_lshift_bytes = expectedFailure(InplaceDictOperationTests.test_lshift_bytes)
-InplaceDictOperationTests.test_rshift_bytes = expectedFailure(InplaceDictOperationTests.test_rshift_bytes)
-InplaceDictOperationTests.test_and_bytes = expectedFailure(InplaceDictOperationTests.test_and_bytes)
-InplaceDictOperationTests.test_xor_bytes = expectedFailure(InplaceDictOperationTests.test_xor_bytes)
-InplaceDictOperationTests.test_or_bytes = expectedFailure(InplaceDictOperationTests.test_or_bytes)
+        'test_add_class',
+        'test_subtract_class',
+        'test_multiply_class',
+        'test_floor_divide_class',
+        'test_true_divide_class',
+        'test_modulo_class',
+        'test_power_class',
+        'test_lshift_class',
+        'test_rshift_class',
+        'test_and_class',
+        'test_xor_class',
+        'test_or_class',
 
-# InplaceDictOperationTests.test_add_class = expectedFailure(InplaceDictOperationTests.test_add_class)
-# InplaceDictOperationTests.test_subtract_class = expectedFailure(InplaceDictOperationTests.test_subtract_class)
-# InplaceDictOperationTests.test_multiply_class = expectedFailure(InplaceDictOperationTests.test_multiply_class)
-# InplaceDictOperationTests.test_floor_divide_class = expectedFailure(InplaceDictOperationTests.test_floor_divide_class)
-# InplaceDictOperationTests.test_true_divide_class = expectedFailure(InplaceDictOperationTests.test_true_divide_class)
-# InplaceDictOperationTests.test_modulo_class = expectedFailure(InplaceDictOperationTests.test_modulo_class)
-# InplaceDictOperationTests.test_power_class = expectedFailure(InplaceDictOperationTests.test_power_class)
-# InplaceDictOperationTests.test_lshift_class = expectedFailure(InplaceDictOperationTests.test_lshift_class)
-# InplaceDictOperationTests.test_rshift_class = expectedFailure(InplaceDictOperationTests.test_rshift_class)
-# InplaceDictOperationTests.test_and_class = expectedFailure(InplaceDictOperationTests.test_and_class)
-# InplaceDictOperationTests.test_xor_class = expectedFailure(InplaceDictOperationTests.test_xor_class)
-# InplaceDictOperationTests.test_or_class = expectedFailure(InplaceDictOperationTests.test_or_class)
+        'test_add_complex',
+        'test_subtract_complex',
+        'test_multiply_complex',
+        'test_floor_divide_complex',
+        'test_true_divide_complex',
+        'test_modulo_complex',
+        'test_power_complex',
+        'test_lshift_complex',
+        'test_rshift_complex',
+        'test_and_complex',
+        'test_xor_complex',
+        'test_or_complex',
 
-# InplaceDictOperationTests.test_add_complex = expectedFailure(InplaceDictOperationTests.test_add_complex)
-# InplaceDictOperationTests.test_subtract_complex = expectedFailure(InplaceDictOperationTests.test_subtract_complex)
-# InplaceDictOperationTests.test_multiply_complex = expectedFailure(InplaceDictOperationTests.test_multiply_complex)
-# InplaceDictOperationTests.test_floor_divide_complex = expectedFailure(InplaceDictOperationTests.test_floor_divide_complex)
-# InplaceDictOperationTests.test_true_divide_complex = expectedFailure(InplaceDictOperationTests.test_true_divide_complex)
-# InplaceDictOperationTests.test_modulo_complex = expectedFailure(InplaceDictOperationTests.test_modulo_complex)
-# InplaceDictOperationTests.test_power_complex = expectedFailure(InplaceDictOperationTests.test_power_complex)
-# InplaceDictOperationTests.test_lshift_complex = expectedFailure(InplaceDictOperationTests.test_lshift_complex)
-# InplaceDictOperationTests.test_rshift_complex = expectedFailure(InplaceDictOperationTests.test_rshift_complex)
-# InplaceDictOperationTests.test_and_complex = expectedFailure(InplaceDictOperationTests.test_and_complex)
-# InplaceDictOperationTests.test_xor_complex = expectedFailure(InplaceDictOperationTests.test_xor_complex)
-# InplaceDictOperationTests.test_or_complex = expectedFailure(InplaceDictOperationTests.test_or_complex)
+        'test_add_dict',
+        'test_subtract_dict',
+        'test_multiply_dict',
+        'test_floor_divide_dict',
+        'test_true_divide_dict',
+        'test_modulo_dict',
+        'test_power_dict',
+        'test_lshift_dict',
+        'test_rshift_dict',
+        'test_and_dict',
+        'test_xor_dict',
+        'test_or_dict',
 
-InplaceDictOperationTests.test_add_dict = expectedFailure(InplaceDictOperationTests.test_add_dict)
-InplaceDictOperationTests.test_subtract_dict = expectedFailure(InplaceDictOperationTests.test_subtract_dict)
-InplaceDictOperationTests.test_multiply_dict = expectedFailure(InplaceDictOperationTests.test_multiply_dict)
-InplaceDictOperationTests.test_floor_divide_dict = expectedFailure(InplaceDictOperationTests.test_floor_divide_dict)
-InplaceDictOperationTests.test_true_divide_dict = expectedFailure(InplaceDictOperationTests.test_true_divide_dict)
-InplaceDictOperationTests.test_modulo_dict = expectedFailure(InplaceDictOperationTests.test_modulo_dict)
-InplaceDictOperationTests.test_power_dict = expectedFailure(InplaceDictOperationTests.test_power_dict)
-InplaceDictOperationTests.test_lshift_dict = expectedFailure(InplaceDictOperationTests.test_lshift_dict)
-InplaceDictOperationTests.test_rshift_dict = expectedFailure(InplaceDictOperationTests.test_rshift_dict)
-InplaceDictOperationTests.test_and_dict = expectedFailure(InplaceDictOperationTests.test_and_dict)
-InplaceDictOperationTests.test_xor_dict = expectedFailure(InplaceDictOperationTests.test_xor_dict)
-InplaceDictOperationTests.test_or_dict = expectedFailure(InplaceDictOperationTests.test_or_dict)
+        'test_add_float',
+        'test_subtract_float',
+        'test_multiply_float',
+        'test_floor_divide_float',
+        'test_true_divide_float',
+        'test_modulo_float',
+        'test_power_float',
+        'test_lshift_float',
+        'test_rshift_float',
+        'test_and_float',
+        'test_xor_float',
+        'test_or_float',
 
-InplaceDictOperationTests.test_add_float = expectedFailure(InplaceDictOperationTests.test_add_float)
-InplaceDictOperationTests.test_subtract_float = expectedFailure(InplaceDictOperationTests.test_subtract_float)
-InplaceDictOperationTests.test_multiply_float = expectedFailure(InplaceDictOperationTests.test_multiply_float)
-InplaceDictOperationTests.test_floor_divide_float = expectedFailure(InplaceDictOperationTests.test_floor_divide_float)
-InplaceDictOperationTests.test_true_divide_float = expectedFailure(InplaceDictOperationTests.test_true_divide_float)
-InplaceDictOperationTests.test_modulo_float = expectedFailure(InplaceDictOperationTests.test_modulo_float)
-InplaceDictOperationTests.test_power_float = expectedFailure(InplaceDictOperationTests.test_power_float)
-InplaceDictOperationTests.test_lshift_float = expectedFailure(InplaceDictOperationTests.test_lshift_float)
-InplaceDictOperationTests.test_rshift_float = expectedFailure(InplaceDictOperationTests.test_rshift_float)
-InplaceDictOperationTests.test_and_float = expectedFailure(InplaceDictOperationTests.test_and_float)
-InplaceDictOperationTests.test_xor_float = expectedFailure(InplaceDictOperationTests.test_xor_float)
-InplaceDictOperationTests.test_or_float = expectedFailure(InplaceDictOperationTests.test_or_float)
+        'test_add_frozenset',
+        'test_subtract_frozenset',
+        'test_multiply_frozenset',
+        'test_floor_divide_frozenset',
+        'test_true_divide_frozenset',
+        'test_modulo_frozenset',
+        'test_power_frozenset',
+        'test_lshift_frozenset',
+        'test_rshift_frozenset',
+        'test_and_frozenset',
+        'test_xor_frozenset',
+        'test_or_frozenset',
 
-# InplaceDictOperationTests.test_add_frozenset = expectedFailure(InplaceDictOperationTests.test_add_frozenset)
-# InplaceDictOperationTests.test_subtract_frozenset = expectedFailure(InplaceDictOperationTests.test_subtract_frozenset)
-# InplaceDictOperationTests.test_multiply_frozenset = expectedFailure(InplaceDictOperationTests.test_multiply_frozenset)
-# InplaceDictOperationTests.test_floor_divide_frozenset = expectedFailure(InplaceDictOperationTests.test_floor_divide_frozenset)
-# InplaceDictOperationTests.test_true_divide_frozenset = expectedFailure(InplaceDictOperationTests.test_true_divide_frozenset)
-# InplaceDictOperationTests.test_modulo_frozenset = expectedFailure(InplaceDictOperationTests.test_modulo_frozenset)
-# InplaceDictOperationTests.test_power_frozenset = expectedFailure(InplaceDictOperationTests.test_power_frozenset)
-# InplaceDictOperationTests.test_lshift_frozenset = expectedFailure(InplaceDictOperationTests.test_lshift_frozenset)
-# InplaceDictOperationTests.test_rshift_frozenset = expectedFailure(InplaceDictOperationTests.test_rshift_frozenset)
-# InplaceDictOperationTests.test_and_frozenset = expectedFailure(InplaceDictOperationTests.test_and_frozenset)
-# InplaceDictOperationTests.test_xor_frozenset = expectedFailure(InplaceDictOperationTests.test_xor_frozenset)
-# InplaceDictOperationTests.test_or_frozenset = expectedFailure(InplaceDictOperationTests.test_or_frozenset)
+        'test_add_int',
+        'test_subtract_int',
+        'test_multiply_int',
+        'test_floor_divide_int',
+        'test_true_divide_int',
+        'test_modulo_int',
+        'test_power_int',
+        'test_lshift_int',
+        'test_rshift_int',
+        'test_and_int',
+        'test_xor_int',
+        'test_or_int',
 
-InplaceDictOperationTests.test_add_int = expectedFailure(InplaceDictOperationTests.test_add_int)
-InplaceDictOperationTests.test_subtract_int = expectedFailure(InplaceDictOperationTests.test_subtract_int)
-InplaceDictOperationTests.test_multiply_int = expectedFailure(InplaceDictOperationTests.test_multiply_int)
-InplaceDictOperationTests.test_floor_divide_int = expectedFailure(InplaceDictOperationTests.test_floor_divide_int)
-InplaceDictOperationTests.test_true_divide_int = expectedFailure(InplaceDictOperationTests.test_true_divide_int)
-InplaceDictOperationTests.test_modulo_int = expectedFailure(InplaceDictOperationTests.test_modulo_int)
-InplaceDictOperationTests.test_power_int = expectedFailure(InplaceDictOperationTests.test_power_int)
-InplaceDictOperationTests.test_lshift_int = expectedFailure(InplaceDictOperationTests.test_lshift_int)
-InplaceDictOperationTests.test_rshift_int = expectedFailure(InplaceDictOperationTests.test_rshift_int)
-InplaceDictOperationTests.test_and_int = expectedFailure(InplaceDictOperationTests.test_and_int)
-InplaceDictOperationTests.test_xor_int = expectedFailure(InplaceDictOperationTests.test_xor_int)
-InplaceDictOperationTests.test_or_int = expectedFailure(InplaceDictOperationTests.test_or_int)
+        'test_add_list',
+        'test_subtract_list',
+        'test_multiply_list',
+        'test_floor_divide_list',
+        'test_true_divide_list',
+        'test_modulo_list',
+        'test_power_list',
+        'test_lshift_list',
+        'test_rshift_list',
+        'test_and_list',
+        'test_xor_list',
+        'test_or_list',
 
-InplaceDictOperationTests.test_add_list = expectedFailure(InplaceDictOperationTests.test_add_list)
-InplaceDictOperationTests.test_subtract_list = expectedFailure(InplaceDictOperationTests.test_subtract_list)
-InplaceDictOperationTests.test_multiply_list = expectedFailure(InplaceDictOperationTests.test_multiply_list)
-InplaceDictOperationTests.test_floor_divide_list = expectedFailure(InplaceDictOperationTests.test_floor_divide_list)
-InplaceDictOperationTests.test_true_divide_list = expectedFailure(InplaceDictOperationTests.test_true_divide_list)
-InplaceDictOperationTests.test_modulo_list = expectedFailure(InplaceDictOperationTests.test_modulo_list)
-InplaceDictOperationTests.test_power_list = expectedFailure(InplaceDictOperationTests.test_power_list)
-InplaceDictOperationTests.test_lshift_list = expectedFailure(InplaceDictOperationTests.test_lshift_list)
-InplaceDictOperationTests.test_rshift_list = expectedFailure(InplaceDictOperationTests.test_rshift_list)
-InplaceDictOperationTests.test_and_list = expectedFailure(InplaceDictOperationTests.test_and_list)
-InplaceDictOperationTests.test_xor_list = expectedFailure(InplaceDictOperationTests.test_xor_list)
-InplaceDictOperationTests.test_or_list = expectedFailure(InplaceDictOperationTests.test_or_list)
+        'test_add_set',
+        'test_subtract_set',
+        'test_multiply_set',
+        'test_floor_divide_set',
+        'test_true_divide_set',
+        'test_modulo_set',
+        'test_power_set',
+        'test_lshift_set',
+        'test_rshift_set',
+        'test_and_set',
+        'test_xor_set',
+        'test_or_set',
 
-InplaceDictOperationTests.test_add_set = expectedFailure(InplaceDictOperationTests.test_add_set)
-InplaceDictOperationTests.test_subtract_set = expectedFailure(InplaceDictOperationTests.test_subtract_set)
-InplaceDictOperationTests.test_multiply_set = expectedFailure(InplaceDictOperationTests.test_multiply_set)
-InplaceDictOperationTests.test_floor_divide_set = expectedFailure(InplaceDictOperationTests.test_floor_divide_set)
-InplaceDictOperationTests.test_true_divide_set = expectedFailure(InplaceDictOperationTests.test_true_divide_set)
-InplaceDictOperationTests.test_modulo_set = expectedFailure(InplaceDictOperationTests.test_modulo_set)
-InplaceDictOperationTests.test_power_set = expectedFailure(InplaceDictOperationTests.test_power_set)
-InplaceDictOperationTests.test_lshift_set = expectedFailure(InplaceDictOperationTests.test_lshift_set)
-InplaceDictOperationTests.test_rshift_set = expectedFailure(InplaceDictOperationTests.test_rshift_set)
-InplaceDictOperationTests.test_and_set = expectedFailure(InplaceDictOperationTests.test_and_set)
-InplaceDictOperationTests.test_xor_set = expectedFailure(InplaceDictOperationTests.test_xor_set)
-InplaceDictOperationTests.test_or_set = expectedFailure(InplaceDictOperationTests.test_or_set)
+        'test_add_str',
+        'test_subtract_str',
+        'test_multiply_str',
+        'test_floor_divide_str',
+        'test_true_divide_str',
+        'test_modulo_str',
+        'test_power_str',
+        'test_lshift_str',
+        'test_rshift_str',
+        'test_and_str',
+        'test_xor_str',
+        'test_or_str',
 
-InplaceDictOperationTests.test_add_str = expectedFailure(InplaceDictOperationTests.test_add_str)
-InplaceDictOperationTests.test_subtract_str = expectedFailure(InplaceDictOperationTests.test_subtract_str)
-InplaceDictOperationTests.test_multiply_str = expectedFailure(InplaceDictOperationTests.test_multiply_str)
-InplaceDictOperationTests.test_floor_divide_str = expectedFailure(InplaceDictOperationTests.test_floor_divide_str)
-InplaceDictOperationTests.test_true_divide_str = expectedFailure(InplaceDictOperationTests.test_true_divide_str)
-InplaceDictOperationTests.test_modulo_str = expectedFailure(InplaceDictOperationTests.test_modulo_str)
-InplaceDictOperationTests.test_power_str = expectedFailure(InplaceDictOperationTests.test_power_str)
-InplaceDictOperationTests.test_lshift_str = expectedFailure(InplaceDictOperationTests.test_lshift_str)
-InplaceDictOperationTests.test_rshift_str = expectedFailure(InplaceDictOperationTests.test_rshift_str)
-InplaceDictOperationTests.test_and_str = expectedFailure(InplaceDictOperationTests.test_and_str)
-InplaceDictOperationTests.test_xor_str = expectedFailure(InplaceDictOperationTests.test_xor_str)
-InplaceDictOperationTests.test_or_str = expectedFailure(InplaceDictOperationTests.test_or_str)
-
-InplaceDictOperationTests.test_add_tuple = expectedFailure(InplaceDictOperationTests.test_add_tuple)
-InplaceDictOperationTests.test_subtract_tuple = expectedFailure(InplaceDictOperationTests.test_subtract_tuple)
-InplaceDictOperationTests.test_multiply_tuple = expectedFailure(InplaceDictOperationTests.test_multiply_tuple)
-InplaceDictOperationTests.test_floor_divide_tuple = expectedFailure(InplaceDictOperationTests.test_floor_divide_tuple)
-InplaceDictOperationTests.test_true_divide_tuple = expectedFailure(InplaceDictOperationTests.test_true_divide_tuple)
-InplaceDictOperationTests.test_modulo_tuple = expectedFailure(InplaceDictOperationTests.test_modulo_tuple)
-InplaceDictOperationTests.test_power_tuple = expectedFailure(InplaceDictOperationTests.test_power_tuple)
-InplaceDictOperationTests.test_lshift_tuple = expectedFailure(InplaceDictOperationTests.test_lshift_tuple)
-InplaceDictOperationTests.test_rshift_tuple = expectedFailure(InplaceDictOperationTests.test_rshift_tuple)
-InplaceDictOperationTests.test_and_tuple = expectedFailure(InplaceDictOperationTests.test_and_tuple)
-InplaceDictOperationTests.test_xor_tuple = expectedFailure(InplaceDictOperationTests.test_xor_tuple)
-InplaceDictOperationTests.test_or_tuple = expectedFailure(InplaceDictOperationTests.test_or_tuple)
+        'test_add_tuple',
+        'test_subtract_tuple',
+        'test_multiply_tuple',
+        'test_floor_divide_tuple',
+        'test_true_divide_tuple',
+        'test_modulo_tuple',
+        'test_power_tuple',
+        'test_lshift_tuple',
+        'test_rshift_tuple',
+        'test_and_tuple',
+        'test_xor_tuple',
+        'test_or_tuple',
+    ]
