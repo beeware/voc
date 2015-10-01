@@ -49,7 +49,7 @@ class JavanNormalizationTests(unittest.TestCase):
             Caused by: org.python.exceptions.IndexError: list index out of range
                 at org.python.types.List.__getitem__(List.java:100)
                 at org.python.types.List.__getitem__(List.java:85)
-                at org.pybee.test.<clinit>(test.py:2)
+                at python.test.<clinit>(test.py:2)
             """,
             """
             ### EXCEPTION ###
@@ -65,7 +65,7 @@ class JavanNormalizationTests(unittest.TestCase):
             Caused by: org.python.exceptions.IndexError: list index out of range
                 at org.python.types.List.__getitem__(List.java:100)
                 at org.python.types.List.__getitem__(List.java:85)
-                at org.pybee.test.<clinit>(test.py:2)
+                at python.test.<clinit>(test.py:2)
             """,
             """
             Hello, world.
@@ -80,7 +80,7 @@ class JavanNormalizationTests(unittest.TestCase):
             Exception in thread "main" org.python.exceptions.IndexError: list index out of range
                 at org.python.types.List.__getitem__(List.java:100)
                 at org.python.types.List.__getitem__(List.java:85)
-                at org.pybee.test.main(test.py:3)
+                at python.test.main(test.py:3)
             """,
             """
             ### EXCEPTION ###
@@ -95,7 +95,7 @@ class JavanNormalizationTests(unittest.TestCase):
             Exception in thread "main" org.python.exceptions.IndexError: list index out of range
                 at org.python.types.List.__getitem__(List.java:100)
                 at org.python.types.List.__getitem__(List.java:85)
-                at org.pybee.test.main(test.py:3)
+                at python.test.main(test.py:3)
             """,
             """
             Hello, world.

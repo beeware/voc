@@ -42,7 +42,7 @@ def adjust(text):
 def runAsJava(main_code, **extra):
     """Run a block of Python code as a Java program."""
 
-    transpiler = Transpiler('org.pybee')
+    transpiler = Transpiler()
     with capture_output():
         transpiler.transpile_string("test.py", main_code)
 
@@ -52,7 +52,7 @@ def runAsJava(main_code, **extra):
     transpiler.write(os.path.dirname(__file__), verbosity=0)
 
     proc = subprocess.Popen(
-        ["java", "-classpath", "../python.jar:.", "-XX:-UseSplitVerifier", "org.pybee.test"],
+        ["java", "-classpath", "../python.jar:.", "-XX:-UseSplitVerifier", "python.test"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
