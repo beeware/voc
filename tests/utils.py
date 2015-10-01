@@ -154,17 +154,17 @@ SAMPLE_DATA = [
     ('bool_true', 'True'),
     ('bool_false', 'False'),
     # ('bytearray', 3),
-    ('bytes', "b'this is a string of bytes'"),
+    ('bytes', "b'This is another string of bytes'"),
     # ('class', ''),
     # ('complex', ''),
-    ('dict', "{'a': 3, 'b': 'value', 'c': 1.23}"),
-    ('float', '1.2345'),
+    ('dict', "{'a': 1, 'c': 2.3456, 'd': 'another'}"),
+    ('float', '2.3456'),
     # ('frozenset', ),
     ('int', '3'),
     ('list', "[3, 4, 5]"),
-    ('set', "{3, 'value', 1.23}"),
-    ('str', '"this is a string"'),
-    ('tuple', "(3, 'value', 1.23)"),
+    ('set', "{1, 2.3456, 'another'}"),
+    ('str', '"This is another string"'),
+    ('tuple', "(1, 2.3456, 'another')"),
 ]
 
 
