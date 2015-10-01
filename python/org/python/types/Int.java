@@ -58,7 +58,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) < ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() < " + other.getClass().getName() + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() < " + other.getPythonName() + "()");
     }
 
     public org.python.Object __le__(org.python.Object other) {
@@ -67,7 +67,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) <= ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() <= " + other.getClass().getName() + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() <= " + other.getPythonName() + "()");
     }
 
     public org.python.Object __eq__(org.python.Object other) {
@@ -76,7 +76,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) == ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() == " + other.getClass().getName() + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() == " + other.getPythonName() + "()");
     }
 
     public org.python.Object __ne__(org.python.Object other) {
@@ -85,7 +85,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) != ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() != " + other.getClass().getName() + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() != " + other.getPythonName() + "()");
     }
 
     public org.python.Object __gt__(org.python.Object other) {
@@ -94,7 +94,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) > ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() > " + other.getClass().getName() + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() > " + other.getPythonName() + "()");
     }
 
     public org.python.Object __ge__(org.python.Object other) {
@@ -103,7 +103,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) >= ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() >= " + other.getClass().getName() + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() >= " + other.getPythonName() + "()");
     }
 
     public org.python.types.Bool __bool__() {
@@ -132,7 +132,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) + ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + other.getClass().getName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + other.getPythonName() + "'");
     }
 
     public org.python.Object __sub__(org.python.Object other) {
@@ -143,7 +143,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) - ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'int' and '" + other.getClass().getName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'int' and '" + other.getPythonName() + "'");
     }
 
     public org.python.Object __mul__(org.python.Object other) {
@@ -158,7 +158,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Tuple) {
             return other.__mul__(this);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'int' and '" + other.getClass().getName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'int' and '" + other.getPythonName() + "'");
     }
 
     public org.python.Object __truediv__(org.python.Object other) {
@@ -170,6 +170,34 @@ public class Int extends org.python.types.Object {
     }
 
     public org.python.Object __mod__(org.python.Object other) {
+        // try {
+        //     if (other instanceof org.python.types.Bool) {
+        //         if (((org.python.types.Bool) other).value) {
+        //             return new org.python.types.Int(0);
+        //         } else {
+        //             throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+        //         }
+        //     } else if (other instanceof org.python.types.Bytes) {
+        //         // Fall through to the exception.
+        //     } else if (other instanceof org.python.types.Dict) {
+        //         // Fall through to the exception.
+        //     } else if (other instanceof org.python.types.Int) {
+        //         long other_val = ((org.python.types.Int) other).value;
+        //         if (other_val == 0) {
+        //             throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+        //         }
+        //         return new org.python.types.Int(this.value % other_val);
+        //     } else if (other instanceof org.python.types.Float) {
+        //         return new org.python.types.Float(((double) this.value) % ((org.python.types.Float) other).value);
+        //     } else if (other instanceof org.python.types.List) {
+        //         return other.__mod__(this);
+        //     } else if (other instanceof org.python.types.Tuple) {
+        //         return other.__mod__(this);
+        //     }
+        // } catch (org.python.exceptions.TypeError e) {
+        //     throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.getPythonName() + "'");
+        // }
+        // throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.getPythonName() + "'");
         throw new org.python.exceptions.NotImplementedError("int.__mod__() has not been implemented");
     }
 
@@ -179,15 +207,32 @@ public class Int extends org.python.types.Object {
 
     public org.python.Object __pow__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            long result = this.value;
-            for (long count = 1; count < ((org.python.types.Int) other).value; count++) {
-                result *= this.value;
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                if (this.value == 0) {
+                    throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
+                }
+
+                double result = 1.0;
+                for (long count = 0; count < -other_val; count++) {
+                    result *= this.value;
+                }
+                return new org.python.types.Float(1.0 / result);
+            } else {
+                long result = 1;
+                for (long count = 0; count < other_val; count++) {
+                    result *= this.value;
+                }
+                return new org.python.types.Int(result);
             }
-            return new org.python.types.Int(result);
         } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Float(java.lang.Math.pow((double) this.value, ((org.python.types.Float) other).value));
+            double other_val = ((org.python.types.Float) other).value;
+            if (this.value == 0 && other_val < 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
+            }
+            return new org.python.types.Float(java.lang.Math.pow((double) this.value, other_val));
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'int' and '" + other.getClass().getName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'int' and '" + other.getPythonName() + "'");
     }
 
     public org.python.Object __lshift__(org.python.Object other) {

@@ -454,6 +454,17 @@ public class Python {
                 org.python.Object [] args,
                 java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'frozenset' not implemented");
+        // if (kwargs.size() != 0) {
+        //     throw new org.python.exceptions.TypeError("frozenset() does not take keyword arguments");
+        // }
+        // if (args.length == 0) {
+        //     return new org.python.types.Set();
+        // } else if (args.length == 1) {
+        //     // return new org.python.types.Set(args[0]);
+        //     throw new org.python.exceptions.NotImplementedError("Builtin function 'frozenset' with iterator not implemented");
+        // } else {
+        //     throw new org.python.exceptions.TypeError("frozenset() expected at most 1 arguments ( got " + args.length + ")");
+        // }
     }
 
     /**
@@ -1142,7 +1153,17 @@ public class Python {
     public static org.python.types.Set set(
                 org.python.Object [] args,
                 java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'set' not implemented");
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("set() does not take keyword arguments");
+        }
+        if (args.length == 0) {
+            return new org.python.types.Set();
+        } else if (args.length == 1) {
+            // return new org.python.types.Set(args[0]);
+            throw new org.python.exceptions.NotImplementedError("Builtin function 'set' with iterator not implemented");
+        } else {
+            throw new org.python.exceptions.TypeError("set() expected at most 1 arguments ( got " + args.length + ")");
+        }
     }
 
     /**

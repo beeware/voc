@@ -19,13 +19,13 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     public Range(org.python.Object start, org.python.Object stop, org.python.Object step) {
         super();
         if (!(start instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("'" + start.getClass().getName() + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + start.getPythonName() + "' object cannot be interpreted as an integer");
         }
         if (!(stop instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("'" + stop.getClass().getName() + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + stop.getPythonName() + "' object cannot be interpreted as an integer");
         }
         if (!(step instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("'" + step.getClass().getName() + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + step.getPythonName() + "' object cannot be interpreted as an integer");
         }
 
         java.util.Hashtable<java.lang.String, org.python.Object> attrs = new java.util.Hashtable<java.lang.String, org.python.Object>();

@@ -1,6 +1,6 @@
 import unittest
 
-from .utils import adjust, cleanse_java_exceptions, cleanse_python_exceptions
+from .utils import adjust, cleanse_java, cleanse_python
 
 
 class AdjustTests(unittest.TestCase):
@@ -28,9 +28,9 @@ print('Done.')
 """))
 
 
-class JavaExceptionNormalizationTests(unittest.TestCase):
+class JavanNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
-        self.assertEqual(cleanse_java_exceptions(adjust(actual)), adjust(expected))
+        self.assertEqual(cleanse_java(adjust(actual)), adjust(expected))
 
     def test_no_exception(self):
         self.assertNormalized(
@@ -104,10 +104,13 @@ class JavaExceptionNormalizationTests(unittest.TestCase):
             """
         )
 
+    def test_float(self):
+        self.assertNormalized('7.950899459780156E-6', '7.950899459780156e-6')
 
-class PythonExceptionNormalizationTests(unittest.TestCase):
+
+class PythonNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
-        self.assertEqual(cleanse_python_exceptions(adjust(actual)), adjust(expected))
+        self.assertEqual(cleanse_python(adjust(actual)), adjust(expected))
 
     def assert_no_exception(self):
         self.assertNormalized(
@@ -150,3 +153,6 @@ class PythonExceptionNormalizationTests(unittest.TestCase):
             IndexError: list index out of range
             """
         )
+
+    def test_float(self):
+        self.assertNormalized('7.950899459780156e-06', '7.950899459780156e-6')

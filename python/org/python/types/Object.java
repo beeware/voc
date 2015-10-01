@@ -929,7 +929,11 @@ public class Object implements org.python.Object {
     }
 
     public void __iadd__(org.python.Object other) {
-        this.setValue(this.__add__(other));
+        try {
+            this.setValue(this.__add__(other));
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        }
     }
 
 
