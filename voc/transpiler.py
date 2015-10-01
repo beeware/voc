@@ -6,17 +6,17 @@ import py_compile
 from .python.modules import Module
 
 
-def transpile(filename, namespace, outdir=None):
+def transpile(filename, outdir=None):
     print("Compiling %s ..." % filename)
     py_compile.compile(filename)
 
-    transpiler = Transpiler(namespace)
+    transpiler = Transpiler()
     transpiler.transpile(filename)
     transpiler.write(outdir)
 
 
 class Transpiler:
-    def __init__(self, namespace):
+    def __init__(self, namespace="python"):
         self.namespace = namespace
         self.classfiles = []
 
