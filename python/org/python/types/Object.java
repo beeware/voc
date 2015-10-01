@@ -1014,7 +1014,7 @@ public class Object implements org.python.Object {
     }
 
     public void __imod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__im__'");
+        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__imod__'");
     }
 
 
@@ -1048,7 +1048,7 @@ public class Object implements org.python.Object {
     }
 
     public void __ilshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__ilshi__'");
+        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__ilshift__'");
     }
 
 
@@ -1065,7 +1065,7 @@ public class Object implements org.python.Object {
     }
 
     public void __irshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__irshi__'");
+        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__irshift__'");
     }
 
 
@@ -1082,7 +1082,7 @@ public class Object implements org.python.Object {
     }
 
     public void __iand__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__ia__'");
+        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__iand__'");
     }
 
 

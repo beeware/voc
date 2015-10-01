@@ -1,11 +1,12 @@
 import contextlib
 from io import StringIO, BytesIO
+import inspect
 import os
 import re
 import subprocess
 import sys
 import traceback
-from unittest import TestCase, expectedFailure
+from unittest import TestCase, SkipTest
 
 from voc.python.blocks import Block as PyBlock
 from voc.python.modules import Module as PyModule
@@ -138,15 +139,23 @@ class UnaryOperationTestCase:
             """ % kwargs)
 
     def test_unary_positive(self):
+        if 'test_unary_positive' in self.not_implemented:
+            raise SkipTest('Operation not yet implemented')
         self.assertUnaryOperator(x=self.x, operand='+', format=self.format)
 
     def test_unary_negative(self):
+        if 'test_unary_negative' in self.not_implemented:
+            raise SkipTest('Operation not yet implemented')
         self.assertUnaryOperator(x=self.x, operand='-', format=self.format)
 
     def test_unary_not(self):
-        self.assertUnaryOperator(x=self.x, operand='-', format=self.format)
+        if 'test_unary_not' in self.not_implemented:
+            raise SkipTest('Operation not yet implemented')
+        self.assertUnaryOperator(x=self.x, operand='not ', format=self.format)
 
     def test_unary_invert(self):
+        if 'test_unary_invert' in self.not_implemented:
+            raise SkipTest('Operation not yet implemented')
         self.assertUnaryOperator(x=self.x, operand='~', format=self.format)
 
 
@@ -168,6 +177,14 @@ SAMPLE_DATA = [
 ]
 
 
+def _binary_test(test_name, operation, value):
+    def func(self):
+        if test_name in self.not_implemented:
+            raise SkipTest('Operation not yet implemented')
+        self.assertBinaryOperation(x=self.x, y=value, operation=operation, format=self.format)
+    return func
+
+
 class BinaryOperationTestCase:
     format = ''
     y = 3
@@ -179,26 +196,28 @@ class BinaryOperationTestCase:
             print(%(format)s%(operation)s)
             """ % kwargs)
 
+    for datatype, example in SAMPLE_DATA:
+        vars()['test_add_%s' % datatype] = _binary_test('test_add_%s' % datatype, 'x + y', example)
+        vars()['test_subtract_%s' % datatype] = _binary_test('test_subtract_%s' % datatype, 'x - y', example)
+        vars()['test_multiply_%s' % datatype] = _binary_test('test_multiply_%s' % datatype, 'x * y', example)
+        vars()['test_floor_divide_%s' % datatype] = _binary_test('test_floor_divide_%s' % datatype, 'x // y', example)
+        vars()['test_true_divide_%s' % datatype] = _binary_test('test_true_divide_%s' % datatype, 'x / y', example)
+        vars()['test_modulo_%s' % datatype] = _binary_test('test_modulo_%s' % datatype, 'x % y', example)
+        vars()['test_power_%s' % datatype] = _binary_test('test_power_%s' % datatype, 'x ** y', example)
+        vars()['test_subscr_%s' % datatype] = _binary_test('test_subscr_%s' % datatype, 'x[y]', example)
+        vars()['test_lshift_%s' % datatype] = _binary_test('test_lshift_%s' % datatype, 'x << y', example)
+        vars()['test_rshift_%s' % datatype] = _binary_test('test_rshift_%s' % datatype, 'x >> y', example)
+        vars()['test_and_%s' % datatype] = _binary_test('test_and_%s' % datatype, 'x & y', example)
+        vars()['test_xor_%s' % datatype] = _binary_test('test_xor_%s' % datatype, 'x ^ y', example)
+        vars()['test_or_%s' % datatype] = _binary_test('test_or_%s' % datatype, 'x | y', example)
 
-def _binary_test(operation, value):
+
+def _inplace_test(test_name, operation, value):
     def func(self):
-        self.assertBinaryOperation(x=self.x, y=value, operation=operation, format=self.format)
+        if test_name in self.not_implemented:
+            raise SkipTest('Operation not yet implemented')
+        self.assertInplaceOperation(x=self.x, y=value, operation=operation, format=self.format)
     return func
-
-for datatype, example in SAMPLE_DATA:
-    setattr(BinaryOperationTestCase, 'test_add_%s' % datatype, _binary_test('x + y', example))
-    setattr(BinaryOperationTestCase, 'test_subtract_%s' % datatype, _binary_test('x - y', example))
-    setattr(BinaryOperationTestCase, 'test_multiply_%s' % datatype, _binary_test('x * y', example))
-    setattr(BinaryOperationTestCase, 'test_floor_divide_%s' % datatype, _binary_test('x // y', example))
-    setattr(BinaryOperationTestCase, 'test_true_divide_%s' % datatype, _binary_test('x / y', example))
-    setattr(BinaryOperationTestCase, 'test_modulo_%s' % datatype, _binary_test('x % y', example))
-    setattr(BinaryOperationTestCase, 'test_power_%s' % datatype, _binary_test('x ** y', example))
-    setattr(BinaryOperationTestCase, 'test_subscr_%s' % datatype, _binary_test('x[y]', example))
-    setattr(BinaryOperationTestCase, 'test_lshift_%s' % datatype, _binary_test('x << y', example))
-    setattr(BinaryOperationTestCase, 'test_rshift_%s' % datatype, _binary_test('x >> y', example))
-    setattr(BinaryOperationTestCase, 'test_and_%s' % datatype, _binary_test('x & y', example))
-    setattr(BinaryOperationTestCase, 'test_xor_%s' % datatype, _binary_test('x ^ y', example))
-    setattr(BinaryOperationTestCase, 'test_or_%s' % datatype, _binary_test('x | y', example))
 
 
 class InplaceOperationTestCase:
@@ -213,22 +232,16 @@ class InplaceOperationTestCase:
             print(%(format)sx)
             """ % kwargs)
 
-
-def _inplace_test(operation, value):
-    def func(self):
-        self.assertInplaceOperation(x=self.x, y=value, operation=operation, format=self.format)
-    return func
-
-for datatype, example in SAMPLE_DATA:
-    setattr(InplaceOperationTestCase, 'test_add_%s' % datatype, _inplace_test('x += y', example))
-    setattr(InplaceOperationTestCase, 'test_subtract_%s' % datatype, _inplace_test('x -= y', example))
-    setattr(InplaceOperationTestCase, 'test_multiply_%s' % datatype, _inplace_test('x *= y', example))
-    setattr(InplaceOperationTestCase, 'test_floor_divide_%s' % datatype, _inplace_test('x //= y', example))
-    setattr(InplaceOperationTestCase, 'test_true_divide_%s' % datatype, _inplace_test('x /= y', example))
-    setattr(InplaceOperationTestCase, 'test_modulo_%s' % datatype, _inplace_test('x %= y', example))
-    setattr(InplaceOperationTestCase, 'test_power_%s' % datatype, _inplace_test('x **= y', example))
-    setattr(InplaceOperationTestCase, 'test_lshift_%s' % datatype, _inplace_test('x <<= y', example))
-    setattr(InplaceOperationTestCase, 'test_rshift_%s' % datatype, _inplace_test('x >>= y', example))
-    setattr(InplaceOperationTestCase, 'test_and_%s' % datatype, _inplace_test('x &= y', example))
-    setattr(InplaceOperationTestCase, 'test_xor_%s' % datatype, _inplace_test('x ^= y', example))
-    setattr(InplaceOperationTestCase, 'test_or_%s' % datatype, _inplace_test('x |= y', example))
+    for datatype, example in SAMPLE_DATA:
+        vars()['test_add_%s' % datatype] = _inplace_test('test_add_%s' % datatype, 'x += y', example)
+        vars()['test_subtract_%s' % datatype] = _inplace_test('test_subtract_%s' % datatype, 'x -= y', example)
+        vars()['test_multiply_%s' % datatype] = _inplace_test('test_multiply_%s' % datatype, 'x *= y', example)
+        vars()['test_floor_divide_%s' % datatype] = _inplace_test('test_floor_divide_%s' % datatype, 'x //= y', example)
+        vars()['test_true_divide_%s' % datatype] = _inplace_test('test_true_divide_%s' % datatype, 'x /= y', example)
+        vars()['test_modulo_%s' % datatype] = _inplace_test('test_modulo_%s' % datatype, 'x %= y', example)
+        vars()['test_power_%s' % datatype] = _inplace_test('test_power_%s' % datatype, 'x **= y', example)
+        vars()['test_lshift_%s' % datatype] = _inplace_test('test_lshift_%s' % datatype, 'x <<= y', example)
+        vars()['test_rshift_%s' % datatype] = _inplace_test('test_rshift_%s' % datatype, 'x >>= y', example)
+        vars()['test_and_%s' % datatype] = _inplace_test('test_and_%s' % datatype, 'x &= y', example)
+        vars()['test_xor_%s' % datatype] = _inplace_test('test_xor_%s' % datatype, 'x ^= y', example)
+        vars()['test_or_%s' % datatype] = _inplace_test('test_or_%s' % datatype, 'x |= y', example)
