@@ -20,6 +20,11 @@ public class Dict extends org.python.types.Object {
         this.value = ((org.python.types.Dict) obj).value;
     }
 
+    public Dict() {
+        super();
+        this.value = new java.util.HashMap<java.lang.String, org.python.Object>();
+    }
+
     public Dict(java.util.Map<java.lang.String, org.python.Object> dict) {
         this.value = dict;
     }

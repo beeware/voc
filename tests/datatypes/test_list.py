@@ -42,7 +42,7 @@ class ListTests(TranspileTestCase):
 
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    x = '[1, 2, 3, 4, 5]'
+    values = ['[]', '[1, 2, 3, 4, 5]']
 
     not_implemented = [
         'test_unary_positive',
@@ -53,16 +53,12 @@ class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
 
 
 class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    x = '[1, 2, 3, 4, 5]'
+    values = ['[]', '[1, 2, 3, 4, 5]']
 
     not_implemented = [
-        'test_add_bool_true',
-        'test_multiply_bool_true',
-        'test_subscr_bool_true',
-
-        'test_add_bool_false',
-        'test_multiply_bool_false',
-        'test_subscr_bool_false',
+        'test_add_bool',
+        'test_multiply_bool',
+        'test_subscr_bool',
 
         'test_add_bytearray',
         'test_subtract_bytearray',
@@ -183,34 +179,21 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    x = '[1, 2, 3, 4, 5]'
+    values = ['[]', '[1, 2, 3, 4, 5]']
 
     not_implemented = [
-        'test_add_bool_true',
-        'test_subtract_bool_true',
-        'test_multiply_bool_true',
-        'test_floor_divide_bool_true',
-        'test_true_divide_bool_true',
-        'test_modulo_bool_true',
-        'test_power_bool_true',
-        'test_lshift_bool_true',
-        'test_rshift_bool_true',
-        'test_and_bool_true',
-        'test_xor_bool_true',
-        'test_or_bool_true',
-
-        'test_add_bool_false',
-        'test_subtract_bool_false',
-        'test_multiply_bool_false',
-        'test_floor_divide_bool_false',
-        'test_true_divide_bool_false',
-        'test_modulo_bool_false',
-        'test_power_bool_false',
-        'test_lshift_bool_false',
-        'test_rshift_bool_false',
-        'test_and_bool_false',
-        'test_xor_bool_false',
-        'test_or_bool_false',
+        'test_add_bool',
+        'test_subtract_bool',
+        'test_multiply_bool',
+        'test_floor_divide_bool',
+        'test_true_divide_bool',
+        'test_modulo_bool',
+        'test_power_bool',
+        'test_lshift_bool',
+        'test_rshift_bool',
+        'test_and_bool',
+        'test_xor_bool',
+        'test_or_bool',
 
         'test_add_bytearray',
         'test_subtract_bytearray',

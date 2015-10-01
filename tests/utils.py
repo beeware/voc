@@ -1,6 +1,5 @@
 import contextlib
 from io import StringIO, BytesIO
-import inspect
 import os
 import re
 import subprocess
@@ -64,15 +63,20 @@ def runAsJava(main_code, **extra):
 
 
 JAVA_EXCEPTION = re.compile('^Exception in thread "main" ([^\n]+\nCaused by: )?org\.python\.exceptions\.([\w]+): ([^\n]+)\n([^\n]+\n)+', re.MULTILINE)
+JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
+
 PYTHON_EXCEPTION = re.compile('^Traceback \(most recent call last\):\n(  .*\n)+(.*): (.*)\n', re.MULTILINE)
+PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
 
 
-def cleanse_java_exceptions(input):
-    return JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\2: \\3\n', input)
+def cleanse_java(input):
+    out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\2: \\3\n', input)
+    return JAVA_FLOAT.sub('\\1e\\2\\3', out)
 
 
-def cleanse_python_exceptions(input):
-    return PYTHON_EXCEPTION.sub('### EXCEPTION ###\n\\2: \\3\n', input)
+def cleanse_python(input):
+    out = PYTHON_EXCEPTION.sub('### EXCEPTION ###\n\\2: \\3\n', input)
+    return PYTHON_FLOAT.sub('\\1e\\2\\3', out)
 
 
 class TranspileTestCase(TestCase):
@@ -109,7 +113,7 @@ class TranspileTestCase(TestCase):
         java = adjust(java)
         self.assertEqual(debug.getvalue(), java[1:])
 
-    def assertCodeExecution(self, code):
+    def assertCodeExecution(self, code, message=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
         code = adjust(code)
@@ -120,13 +124,22 @@ class TranspileTestCase(TestCase):
             exec(code, {'__name__': '__main__'}, {})
         py_out = py_out.getvalue()
 
-        # Cleanse the Python and Java exception output, producing a simple
-        # normalized form.
-        java_out = cleanse_java_exceptions(java_out)
-        py_out = cleanse_python_exceptions(py_out)
+        # Cleanse the Python and Java output, producing a simple
+        # normalized format for exceptions, floats etc.
+        java_out = cleanse_java(java_out)
+        py_out = cleanse_python(py_out)
 
         # Confirm that the output of the Java code is the same as the Python code.
-        self.assertEqual(java_out, py_out)
+        self.assertEqual(java_out, py_out, message)
+
+
+def _unary_test(test_name, operation):
+    def func(self):
+        if test_name in self.not_implemented:
+            raise SkipTest('Operation not yet implemented')
+        for value in self.values:
+            self.assertUnaryOperation(x=value, operation=operation, format=self.format)
+    return func
 
 
 class UnaryOperationTestCase:
@@ -138,50 +151,36 @@ class UnaryOperationTestCase:
             print(%(format)s%(operand)sx)
             """ % kwargs)
 
-    def test_unary_positive(self):
-        if 'test_unary_positive' in self.not_implemented:
-            raise SkipTest('Operation not yet implemented')
-        self.assertUnaryOperator(x=self.x, operand='+', format=self.format)
-
-    def test_unary_negative(self):
-        if 'test_unary_negative' in self.not_implemented:
-            raise SkipTest('Operation not yet implemented')
-        self.assertUnaryOperator(x=self.x, operand='-', format=self.format)
-
-    def test_unary_not(self):
-        if 'test_unary_not' in self.not_implemented:
-            raise SkipTest('Operation not yet implemented')
-        self.assertUnaryOperator(x=self.x, operand='not ', format=self.format)
-
-    def test_unary_invert(self):
-        if 'test_unary_invert' in self.not_implemented:
-            raise SkipTest('Operation not yet implemented')
-        self.assertUnaryOperator(x=self.x, operand='~', format=self.format)
+    test_unary_positive = _unary_test('test_unary_positive', '+')
+    test_unary_negative = _unary_test('test_unary_negative', '-')
+    test_unary_not = _unary_test('test_unary_not', 'not ')
+    test_unary_invert = _unary_test('test_unary_invert', '~')
 
 
 SAMPLE_DATA = [
-    ('bool_true', 'True'),
-    ('bool_false', 'False'),
-    # ('bytearray', 3),
-    ('bytes', "b'This is another string of bytes'"),
-    # ('class', ''),
-    # ('complex', ''),
-    ('dict', "{'a': 1, 'c': 2.3456, 'd': 'another'}"),
-    ('float', '2.3456'),
+    ('bool', ['True', 'False']),
+    # ('bytearray', [3]),
+    ('bytes', ["b''", "b'This is another string of bytes'"]),
+    # ('class', ['']),
+    # ('complex', ['']),
+    ('dict', ["{}", "{'a': 1, 'c': 2.3456, 'd': 'another'}"]),
+    ('float', ['2.3456', '0.0', '-3.14159']),
     # ('frozenset', ),
-    ('int', '3'),
-    ('list', "[3, 4, 5]"),
-    ('set', "{1, 2.3456, 'another'}"),
-    ('str', '"This is another string"'),
-    ('tuple', "(1, 2.3456, 'another')"),
+    ('int', ['3', '0', '-5']),
+    ('list', ["[]", "[3, 4, 5]"]),
+    ('set', ["set()", "{1, 2.3456, 'another'}"]),
+    ('str', ['""', '"This is another string"']),
+    ('tuple', ["(1, 2.3456, 'another')"]),
 ]
 
 
-def _binary_test(test_name, operation, value):
+def _binary_test(test_name, operation, examples):
     def func(self):
         if test_name in self.not_implemented:
             raise SkipTest('Operation not yet implemented')
-        self.assertBinaryOperation(x=self.x, y=value, operation=operation, format=self.format)
+        for value in self.values:
+            for example in examples:
+                self.assertBinaryOperation(x=value, y=example, operation=operation, format=self.format)
     return func
 
 
@@ -194,29 +193,31 @@ class BinaryOperationTestCase:
             x = %(x)s
             y = %(y)s
             print(%(format)s%(operation)s)
-            """ % kwargs)
+            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs)
 
-    for datatype, example in SAMPLE_DATA:
-        vars()['test_add_%s' % datatype] = _binary_test('test_add_%s' % datatype, 'x + y', example)
-        vars()['test_subtract_%s' % datatype] = _binary_test('test_subtract_%s' % datatype, 'x - y', example)
-        vars()['test_multiply_%s' % datatype] = _binary_test('test_multiply_%s' % datatype, 'x * y', example)
-        vars()['test_floor_divide_%s' % datatype] = _binary_test('test_floor_divide_%s' % datatype, 'x // y', example)
-        vars()['test_true_divide_%s' % datatype] = _binary_test('test_true_divide_%s' % datatype, 'x / y', example)
-        vars()['test_modulo_%s' % datatype] = _binary_test('test_modulo_%s' % datatype, 'x % y', example)
-        vars()['test_power_%s' % datatype] = _binary_test('test_power_%s' % datatype, 'x ** y', example)
-        vars()['test_subscr_%s' % datatype] = _binary_test('test_subscr_%s' % datatype, 'x[y]', example)
-        vars()['test_lshift_%s' % datatype] = _binary_test('test_lshift_%s' % datatype, 'x << y', example)
-        vars()['test_rshift_%s' % datatype] = _binary_test('test_rshift_%s' % datatype, 'x >> y', example)
-        vars()['test_and_%s' % datatype] = _binary_test('test_and_%s' % datatype, 'x & y', example)
-        vars()['test_xor_%s' % datatype] = _binary_test('test_xor_%s' % datatype, 'x ^ y', example)
-        vars()['test_or_%s' % datatype] = _binary_test('test_or_%s' % datatype, 'x | y', example)
+    for datatype, examples in SAMPLE_DATA:
+        vars()['test_add_%s' % datatype] = _binary_test('test_add_%s' % datatype, 'x + y', examples)
+        vars()['test_subtract_%s' % datatype] = _binary_test('test_subtract_%s' % datatype, 'x - y', examples)
+        vars()['test_multiply_%s' % datatype] = _binary_test('test_multiply_%s' % datatype, 'x * y', examples)
+        vars()['test_floor_divide_%s' % datatype] = _binary_test('test_floor_divide_%s' % datatype, 'x // y', examples)
+        vars()['test_true_divide_%s' % datatype] = _binary_test('test_true_divide_%s' % datatype, 'x / y', examples)
+        vars()['test_modulo_%s' % datatype] = _binary_test('test_modulo_%s' % datatype, 'x % y', examples)
+        vars()['test_power_%s' % datatype] = _binary_test('test_power_%s' % datatype, 'x ** y', examples)
+        vars()['test_subscr_%s' % datatype] = _binary_test('test_subscr_%s' % datatype, 'x[y]', examples)
+        vars()['test_lshift_%s' % datatype] = _binary_test('test_lshift_%s' % datatype, 'x << y', examples)
+        vars()['test_rshift_%s' % datatype] = _binary_test('test_rshift_%s' % datatype, 'x >> y', examples)
+        vars()['test_and_%s' % datatype] = _binary_test('test_and_%s' % datatype, 'x & y', examples)
+        vars()['test_xor_%s' % datatype] = _binary_test('test_xor_%s' % datatype, 'x ^ y', examples)
+        vars()['test_or_%s' % datatype] = _binary_test('test_or_%s' % datatype, 'x | y', examples)
 
 
-def _inplace_test(test_name, operation, value):
+def _inplace_test(test_name, operation, examples):
     def func(self):
         if test_name in self.not_implemented:
             raise SkipTest('Operation not yet implemented')
-        self.assertInplaceOperation(x=self.x, y=value, operation=operation, format=self.format)
+        for value in self.values:
+            for example in self.examples:
+                self.assertInplaceOperation(x=value, y=example, operation=operation, format=self.format)
     return func
 
 
@@ -230,18 +231,18 @@ class InplaceOperationTestCase:
             y = %(y)s
             %(operation)s
             print(%(format)sx)
-            """ % kwargs)
+            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs)
 
-    for datatype, example in SAMPLE_DATA:
-        vars()['test_add_%s' % datatype] = _inplace_test('test_add_%s' % datatype, 'x += y', example)
-        vars()['test_subtract_%s' % datatype] = _inplace_test('test_subtract_%s' % datatype, 'x -= y', example)
-        vars()['test_multiply_%s' % datatype] = _inplace_test('test_multiply_%s' % datatype, 'x *= y', example)
-        vars()['test_floor_divide_%s' % datatype] = _inplace_test('test_floor_divide_%s' % datatype, 'x //= y', example)
-        vars()['test_true_divide_%s' % datatype] = _inplace_test('test_true_divide_%s' % datatype, 'x /= y', example)
-        vars()['test_modulo_%s' % datatype] = _inplace_test('test_modulo_%s' % datatype, 'x %= y', example)
-        vars()['test_power_%s' % datatype] = _inplace_test('test_power_%s' % datatype, 'x **= y', example)
-        vars()['test_lshift_%s' % datatype] = _inplace_test('test_lshift_%s' % datatype, 'x <<= y', example)
-        vars()['test_rshift_%s' % datatype] = _inplace_test('test_rshift_%s' % datatype, 'x >>= y', example)
-        vars()['test_and_%s' % datatype] = _inplace_test('test_and_%s' % datatype, 'x &= y', example)
-        vars()['test_xor_%s' % datatype] = _inplace_test('test_xor_%s' % datatype, 'x ^= y', example)
-        vars()['test_or_%s' % datatype] = _inplace_test('test_or_%s' % datatype, 'x |= y', example)
+    for datatype, examples in SAMPLE_DATA:
+        vars()['test_add_%s' % datatype] = _inplace_test('test_add_%s' % datatype, 'x += y', examples)
+        vars()['test_subtract_%s' % datatype] = _inplace_test('test_subtract_%s' % datatype, 'x -= y', examples)
+        vars()['test_multiply_%s' % datatype] = _inplace_test('test_multiply_%s' % datatype, 'x *= y', examples)
+        vars()['test_floor_divide_%s' % datatype] = _inplace_test('test_floor_divide_%s' % datatype, 'x //= y', examples)
+        vars()['test_true_divide_%s' % datatype] = _inplace_test('test_true_divide_%s' % datatype, 'x /= y', examples)
+        vars()['test_modulo_%s' % datatype] = _inplace_test('test_modulo_%s' % datatype, 'x %= y', examples)
+        vars()['test_power_%s' % datatype] = _inplace_test('test_power_%s' % datatype, 'x **= y', examples)
+        vars()['test_lshift_%s' % datatype] = _inplace_test('test_lshift_%s' % datatype, 'x <<= y', examples)
+        vars()['test_rshift_%s' % datatype] = _inplace_test('test_rshift_%s' % datatype, 'x >>= y', examples)
+        vars()['test_and_%s' % datatype] = _inplace_test('test_and_%s' % datatype, 'x &= y', examples)
+        vars()['test_xor_%s' % datatype] = _inplace_test('test_xor_%s' % datatype, 'x ^= y', examples)
+        vars()['test_or_%s' % datatype] = _inplace_test('test_or_%s' % datatype, 'x |= y', examples)
