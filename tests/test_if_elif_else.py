@@ -4,7 +4,7 @@ from .utils import TranspileTestCase
 class IfElifElseTests(TranspileTestCase):
     def test_if(self):
         # Matches if
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 1
             if x < 5:
                 print('Small x')
@@ -12,7 +12,7 @@ class IfElifElseTests(TranspileTestCase):
             """)
 
         # No match on if
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 10
             if x < 5:
                 print('Small x')
@@ -20,7 +20,7 @@ class IfElifElseTests(TranspileTestCase):
             """)
 
     def test_if_else(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 1
             if x < 5:
                 print('Small x')
@@ -29,7 +29,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 10
             if x < 5:
                 print('Small x')
@@ -39,7 +39,7 @@ class IfElifElseTests(TranspileTestCase):
             """)
 
     def test_if_elif_else(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 1
             if x < 5:
                 print('Small x')
@@ -50,7 +50,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 10
             if x < 5:
                 print('Small x')
@@ -61,7 +61,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 100
             if x < 5:
                 print('Small x')
@@ -73,7 +73,7 @@ class IfElifElseTests(TranspileTestCase):
             """)
 
     def test_if_elif_elif_else(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 1
             if x < 5:
                 print('Small x')
@@ -86,7 +86,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 10
             if x < 5:
                 print('Small x')
@@ -99,7 +99,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 100
             if x < 5:
                 print('Small x')
@@ -112,7 +112,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 1000
             if x < 5:
                 print('Small x')
@@ -126,7 +126,7 @@ class IfElifElseTests(TranspileTestCase):
             """)
 
     def test_if_elif_elif(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 1
             if x < 5:
                 print('Small x')
@@ -137,7 +137,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 10
             if x < 5:
                 print('Small x')
@@ -148,7 +148,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 100
             if x < 5:
                 print('Small x')
@@ -159,7 +159,7 @@ class IfElifElseTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 1000
             if x < 5:
                 print('Small x')

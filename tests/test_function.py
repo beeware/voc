@@ -3,7 +3,7 @@ from .utils import TranspileTestCase
 
 class FunctionTests(TranspileTestCase):
     def test_function(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             def myfunc(value):
                 print(value * 3)
                 return value + 5
@@ -13,7 +13,7 @@ class FunctionTests(TranspileTestCase):
             """)
 
     def test_void_function(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             def myfunc(value):
                 print(value * 3)
 

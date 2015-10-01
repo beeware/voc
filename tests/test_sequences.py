@@ -5,7 +5,7 @@ from .utils import TranspileTestCase
 
 class SequenceTests(TranspileTestCase):
     def test_unpack_sequence(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = [1, 2, 3]
             a, b, c = x
             print(a)
@@ -15,7 +15,7 @@ class SequenceTests(TranspileTestCase):
 
     @unittest.expectedFailure
     def test_unpack_sequence_overflow(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = [1, 2, 3]
             a, b = x
             print(a)
@@ -24,7 +24,7 @@ class SequenceTests(TranspileTestCase):
 
     @unittest.expectedFailure
     def test_unpack_sequence_underflow(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = [1, 2]
             a, b, c = x
             print(a)

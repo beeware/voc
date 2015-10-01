@@ -1,8 +1,10 @@
 import contextlib
 from io import StringIO, BytesIO
 import os
+import re
 import subprocess
 import sys
+import traceback
 from unittest import TestCase
 
 from voc.python.blocks import Block as PyBlock
@@ -17,13 +19,14 @@ from voc.transpiler import Transpiler
 def capture_output():
     oldout, olderr = sys.stdout, sys.stderr
     try:
-        out = [StringIO(), StringIO()]
-        sys.stdout, sys.stderr = out
+        out = StringIO()
+        sys.stdout = out
+        sys.stderr = out
         yield out
+    except:
+        traceback.print_exc()
     finally:
         sys.stdout, sys.stderr = oldout, olderr
-        out[0] = out[0].getvalue()
-        out[1] = out[1].getvalue()
 
 
 def adjust(text):
@@ -56,7 +59,19 @@ def runAsJava(main_code, **extra):
         cwd=os.path.dirname(__file__),
     )
     out = proc.communicate()
-    return out[0].decode('utf8').replace('\t', '    ')
+    return out[0].decode('utf8')
+
+
+JAVA_EXCEPTION = re.compile('^Exception in thread "main" ([^\n]+\nCaused by: )?org\.python\.exceptions\.([\w]+): ([^\n]+)\n([^\n]+\n)+', re.MULTILINE)
+PYTHON_EXCEPTION = re.compile('^Traceback \(most recent call last\):\n(  .*\n)+(.*): (.*)\n', re.MULTILINE)
+
+
+def cleanse_java_exceptions(input):
+    return JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\2: \\3\n', input)
+
+
+def cleanse_python_exceptions(input):
+    return PYTHON_EXCEPTION.sub('### EXCEPTION ###\n\\2: \\3\n', input)
 
 
 class TranspileTestCase(TestCase):
@@ -93,7 +108,7 @@ class TranspileTestCase(TestCase):
         java = adjust(java)
         self.assertEqual(debug.getvalue(), java[1:])
 
-    def assertCode(self, code):
+    def assertCodeExecution(self, code):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
         code = adjust(code)
@@ -101,22 +116,13 @@ class TranspileTestCase(TestCase):
         java_out = runAsJava(code)
 
         with capture_output() as py_out:
-            exec(code, {}, {})
+            exec(code, {'__name__': '__main__'}, {})
+        py_out = py_out.getvalue()
 
-        # If there was any stderr output, fail the test.
-        if py_out[1]:
-            self.fail(py_out[1])
+        # Cleanse the Python and Java exception output, producing a simple
+        # normalized form.
+        java_out = cleanse_java_exceptions(java_out)
+        py_out = cleanse_python_exceptions(py_out)
 
         # Confirm that the output of the Java code is the same as the Python code.
-        self.assertEqual(java_out, py_out[0])
-
-    def assertCodeOutput(self, code, expected):
-        "Run code under Java, and make sure the output is as expected."
-        self.maxDiff = None
-        code = adjust(code)
-        expected = adjust(expected)
-
-        out = runAsJava(code)
-
-        # Confirm that the expected output is what we got.
-        self.assertEqual(out, expected)
+        self.assertEqual(java_out, py_out)

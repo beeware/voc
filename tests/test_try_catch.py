@@ -5,7 +5,7 @@ class TryExceptTests(TranspileTestCase):
 
     def test_try_except(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -15,7 +15,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -26,7 +26,7 @@ class TryExceptTests(TranspileTestCase):
 
     def test_try_except_unnamed(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -36,7 +36,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -46,29 +46,18 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
             except NameError:
                 print("Got an error")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_except_named(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -78,7 +67,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -88,29 +77,18 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
             except NameError as e:
                 print("Got a NameError")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_except(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -122,7 +100,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught first exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -134,7 +112,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught second exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -146,7 +124,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -155,22 +133,11 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError:
                 print("Got an AttributeError")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_except_named(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -182,7 +149,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught first exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -194,7 +161,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught second exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -206,7 +173,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -215,22 +182,11 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError as e:
                 print("Got an AttributeError")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_match_except_unnamed(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -242,7 +198,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught first exception, first handler
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -254,7 +210,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught second exception, first handler
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -266,7 +222,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught first exception, second handler
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -278,7 +234,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught second exception, second handler
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -290,7 +246,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -299,22 +255,11 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError:
                 print("Got an AttributeError")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_match_except_named(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -326,7 +271,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught first exception, first handler
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -338,7 +283,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught second exception, first handler
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -350,7 +295,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught first exception, second handler
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -362,7 +307,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught second exception, second handler
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -374,7 +319,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -383,22 +328,11 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError as e:
                 print("Got an AttributeError")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_except_mixed1(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -410,7 +344,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -422,7 +356,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -431,21 +365,10 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError as e:
                 print("Got an AttributeError")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_except_mixed2(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -456,7 +379,7 @@ class TryExceptTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -467,7 +390,7 @@ class TryExceptTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -476,22 +399,11 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError:
                 print("Got an AttributeError")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_except_mixed3(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -505,7 +417,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -519,7 +431,7 @@ class TryExceptTests(TranspileTestCase):
             """)
 
         # Caught as bucket case
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -536,7 +448,7 @@ class TryExceptTests(TranspileTestCase):
 class TryExceptFinallyTests(TranspileTestCase):
     def test_try_finally(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -546,7 +458,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Uncaugt Exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -554,23 +466,11 @@ class TryExceptFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """, """
-            Do final cleanup
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_except_finally(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -582,7 +482,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Caught Exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -595,7 +495,7 @@ class TryExceptFinallyTests(TranspileTestCase):
 
     def test_try_except_unnamed_finally(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -607,7 +507,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -619,7 +519,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -628,23 +528,11 @@ class TryExceptFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """, """
-            Do final cleanup
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_except_named_finally(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -656,7 +544,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -668,7 +556,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -677,23 +565,11 @@ class TryExceptFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """, """
-            Do final cleanup
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_except_finally(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -707,7 +583,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Caught first exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -721,7 +597,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Caught second exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -735,7 +611,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -746,25 +622,13 @@ class TryExceptFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """, """
-            Do final cleanup
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
 
 class TryExceptElseTests(TranspileTestCase):
     def test_try_except_else(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -776,7 +640,7 @@ class TryExceptElseTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -789,7 +653,7 @@ class TryExceptElseTests(TranspileTestCase):
 
     def test_try_except_unnamed_else(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -801,7 +665,7 @@ class TryExceptElseTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -813,7 +677,7 @@ class TryExceptElseTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -822,22 +686,11 @@ class TryExceptElseTests(TranspileTestCase):
             else:
                 print("Do else handling")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_except_else(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -851,7 +704,7 @@ class TryExceptElseTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -865,7 +718,7 @@ class TryExceptElseTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -876,24 +729,13 @@ class TryExceptElseTests(TranspileTestCase):
             else:
                 print("Do else handling")
             print('Done.')
-            """, """
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
 
 class TryExceptElseFinallyTests(TranspileTestCase):
     def test_try_except_else(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -907,7 +749,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -922,7 +764,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
 
     def test_try_except_unnamed_else(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj = 3
                 print('OK')
@@ -936,7 +778,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -950,7 +792,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -961,23 +803,11 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """, """
-            Do final cleanup
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)
 
     def test_try_multiple_except_else(self):
         # No exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -993,7 +823,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             """)
 
         # Caught exception
-        self.assertCode("""
+        self.assertCodeExecution("""
             try:
                 obj.no_such_attribute
                 print('OK')
@@ -1009,7 +839,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             """)
 
         # Uncaught exception
-        self.assertCodeOutput("""
+        self.assertCodeExecution("""
             try:
                 obj = int('asdf')
                 print('OK')
@@ -1022,16 +852,4 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """, """
-            Do final cleanup
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:51)
-                at org.Python.int_cast(Python.java:615)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:20)
-                at org.pybee.test.<clinit>(test.py:2)
             """)

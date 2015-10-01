@@ -4,7 +4,7 @@ from .utils import TranspileTestCase
 class ForLoopTests(TranspileTestCase):
     def test_for_over_range(self):
         # Normal range
-        self.assertCode("""
+        self.assertCodeExecution("""
             total = 0
             for i in range(0, 5):
                 total = total + i
@@ -13,7 +13,7 @@ class ForLoopTests(TranspileTestCase):
             """)
 
         # Empty range
-        self.assertCode("""
+        self.assertCodeExecution("""
               total = 0
               for i in range(0, 0):
                   total = total + i
@@ -22,7 +22,7 @@ class ForLoopTests(TranspileTestCase):
               """)
 
         # Stepped range
-        self.assertCode("""
+        self.assertCodeExecution("""
               total = 0
               for i in range(0, 10, 2):
                   total = total + i
@@ -31,7 +31,7 @@ class ForLoopTests(TranspileTestCase):
               """)
 
         # Reverse range
-        self.assertCode("""
+        self.assertCodeExecution("""
               total = 0
               for i in range(5, 0, -1):
                   total = total + i
@@ -40,7 +40,7 @@ class ForLoopTests(TranspileTestCase):
               """)
 
     def test_for_over_iterable(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             total = 0
             for i in [1, 2, 3, 5]:
                 total = total + i
@@ -48,7 +48,7 @@ class ForLoopTests(TranspileTestCase):
             print('Done.')
             """)
 
-        self.assertCode("""
+        self.assertCodeExecution("""
             total = 0
             for i in []:
                 total = total + i
@@ -57,7 +57,7 @@ class ForLoopTests(TranspileTestCase):
             """)
 
     # def test_for_else(self):
-    #     self.assertCode(
+    #     self.assertCodeExecution(
     #         code="""
     #             total = 0
     #             for i in []:

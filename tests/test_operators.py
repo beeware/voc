@@ -4,7 +4,7 @@ from .utils import TranspileTestCase
 
 class UnaryOpcodeTests(TranspileTestCase):
     def assertUnaryOpcode(self, **kwargs):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = %(x)s
             print(%(operand)sx)
             """ % kwargs)
@@ -18,7 +18,7 @@ class UnaryOpcodeTests(TranspileTestCase):
         self.assertUnaryOpcode(x='42', operand='-', method='__neg__')
 
     def test_UNARY_NOT(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = True
             print(not x)
             """)
@@ -30,7 +30,7 @@ class UnaryOpcodeTests(TranspileTestCase):
 
 class BinaryOpcodeTests(TranspileTestCase):
     def assertBinaryOpcode(self, **kwargs):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 2
             y = 3
             print(%(operation)s)
@@ -53,7 +53,7 @@ class BinaryOpcodeTests(TranspileTestCase):
         self.assertBinaryOpcode(operation='x - y', method="__sub__")
 
     def test_BINARY_SUBSCR(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
             print(x[2])
             """)
@@ -89,7 +89,7 @@ class BinaryOpcodeTests(TranspileTestCase):
 
 class InplaceOpcodeTests(TranspileTestCase):
     def assertInplaceOpcode(self, **kwargs):
-        self.assertCode("""
+        self.assertCodeExecution("""
             x = 2
             y = 3
             x %(operand)s y

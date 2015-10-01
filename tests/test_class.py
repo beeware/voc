@@ -3,7 +3,7 @@ from .utils import TranspileTestCase
 
 class ClassTests(TranspileTestCase):
     def test_simple(self):
-        self.assertCode("""
+        self.assertCodeExecution("""
             class MyClass:
                 def __init__(self, val):
                     print("VAL: ", val)
