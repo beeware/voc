@@ -134,13 +134,10 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_xor_int',
         'test_or_int',
 
-        'test_add_list',
-        'test_subtract_list',
         'test_multiply_list',
         'test_floor_divide_list',
         'test_true_divide_list',
         'test_modulo_list',
-        'test_power_list',
         'test_subscr_list',
         'test_lshift_list',
         'test_rshift_list',
@@ -148,13 +145,9 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_xor_list',
         'test_or_list',
 
-        'test_add_set',
-        'test_subtract_set',
-        'test_multiply_set',
         'test_floor_divide_set',
         'test_true_divide_set',
         'test_modulo_set',
-        'test_power_set',
         'test_subscr_set',
         'test_lshift_set',
         'test_rshift_set',
@@ -162,13 +155,11 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_xor_set',
         'test_or_set',
 
-        'test_add_str',
         'test_subtract_str',
         'test_multiply_str',
         'test_floor_divide_str',
         'test_true_divide_str',
         'test_modulo_str',
-        'test_power_str',
         'test_subscr_str',
         'test_lshift_str',
         'test_rshift_str',
@@ -176,13 +167,10 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_xor_str',
         'test_or_str',
 
-        'test_add_tuple',
-        'test_subtract_tuple',
         'test_multiply_tuple',
         'test_floor_divide_tuple',
         'test_true_divide_tuple',
         'test_modulo_tuple',
-        'test_power_tuple',
         'test_subscr_tuple',
         'test_lshift_tuple',
         'test_rshift_tuple',
@@ -196,7 +184,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
     values = ['42', '0']  # , '-37']
 
     not_implemented = [
-        'test_add_bool',
         'test_subtract_bool',
         'test_multiply_bool',
         'test_floor_divide_bool',
@@ -222,7 +209,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_bytearray',
         'test_or_bytearray',
 
-        'test_add_bytes',
         'test_subtract_bytes',
         'test_multiply_bytes',
         'test_floor_divide_bytes',
@@ -261,7 +247,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_complex',
         'test_or_complex',
 
-        'test_add_dict',
         'test_subtract_dict',
         'test_multiply_dict',
         'test_floor_divide_dict',
@@ -274,7 +259,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_dict',
         'test_or_dict',
 
-        'test_add_float',
         'test_subtract_float',
         'test_multiply_float',
         'test_floor_divide_float',
@@ -312,7 +296,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_int',
         'test_or_int',
 
-        'test_add_list',
         'test_subtract_list',
         'test_multiply_list',
         'test_floor_divide_list',
@@ -325,7 +308,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_list',
         'test_or_list',
 
-        'test_add_set',
         'test_subtract_set',
         'test_multiply_set',
         'test_floor_divide_set',
@@ -338,7 +320,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_set',
         'test_or_set',
 
-        'test_add_str',
         'test_subtract_str',
         'test_multiply_str',
         'test_floor_divide_str',
@@ -351,7 +332,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_str',
         'test_or_str',
 
-        'test_add_tuple',
         'test_subtract_tuple',
         'test_multiply_tuple',
         'test_floor_divide_tuple',
