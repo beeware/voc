@@ -5,7 +5,7 @@ import re
 import subprocess
 import sys
 import traceback
-from unittest import TestCase, SkipTest
+from unittest import TestCase
 
 from voc.python.blocks import Block as PyBlock
 from voc.python.modules import Module as PyModule
@@ -135,8 +135,6 @@ class TranspileTestCase(TestCase):
 
 def _unary_test(test_name, operation):
     def func(self):
-        if test_name in self.not_implemented:
-            raise SkipTest('Operation not yet implemented')
         for value in self.values:
             self.assertUnaryOperation(x=value, operation=operation, format=self.format)
     return func
@@ -144,6 +142,14 @@ def _unary_test(test_name, operation):
 
 class UnaryOperationTestCase:
     format = ''
+
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        return super().run(result=result)
 
     def assertUnaryOperator(self, **kwargs):
         self.assertCodeExecution("""
@@ -176,8 +182,6 @@ SAMPLE_DATA = [
 
 def _binary_test(test_name, operation, examples):
     def func(self):
-        if test_name in self.not_implemented:
-            raise SkipTest('Operation not yet implemented')
         for value in self.values:
             for example in examples:
                 self.assertBinaryOperation(x=value, y=example, operation=operation, format=self.format)
@@ -187,6 +191,14 @@ def _binary_test(test_name, operation, examples):
 class BinaryOperationTestCase:
     format = ''
     y = 3
+
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        return super().run(result=result)
 
     def assertBinaryOperation(self, **kwargs):
         self.assertCodeExecution("""
@@ -213,8 +225,6 @@ class BinaryOperationTestCase:
 
 def _inplace_test(test_name, operation, examples):
     def func(self):
-        if test_name in self.not_implemented:
-            raise SkipTest('Operation not yet implemented')
         for value in self.values:
             for example in self.examples:
                 self.assertInplaceOperation(x=value, y=example, operation=operation, format=self.format)
@@ -224,6 +234,14 @@ def _inplace_test(test_name, operation, examples):
 class InplaceOperationTestCase:
     format = ''
     y = 3
+
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        return super().run(result=result)
 
     def assertInplaceOperation(self, **kwargs):
         self.assertCodeExecution("""
