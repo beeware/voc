@@ -5,7 +5,7 @@ import re
 import subprocess
 import sys
 import traceback
-from unittest import TestCase
+from unittest import TestCase, expectedFailure
 
 from voc.python.blocks import Block as PyBlock
 from voc.python.modules import Module as PyModule
@@ -126,3 +126,109 @@ class TranspileTestCase(TestCase):
 
         # Confirm that the output of the Java code is the same as the Python code.
         self.assertEqual(java_out, py_out)
+
+
+class UnaryOperationTestCase:
+    format = ''
+
+    def assertUnaryOperator(self, **kwargs):
+        self.assertCodeExecution("""
+            x = %(x)s
+            print(%(format)s%(operand)sx)
+            """ % kwargs)
+
+    def test_unary_positive(self):
+        self.assertUnaryOperator(x=self.x, operand='+', format=self.format)
+
+    def test_unary_negative(self):
+        self.assertUnaryOperator(x=self.x, operand='-', format=self.format)
+
+    def test_unary_not(self):
+        self.assertUnaryOperator(x=self.x, operand='-', format=self.format)
+
+    def test_unary_invert(self):
+        self.assertUnaryOperator(x=self.x, operand='~', format=self.format)
+
+
+SAMPLE_DATA = [
+    ('bool_true', 'True'),
+    ('bool_false', 'False'),
+    # ('bytearray', 3),
+    ('bytes', "b'this is a string of bytes'"),
+    # ('class', ''),
+    # ('complex', ''),
+    ('dict', "{'a': 3, 'b': 'value', 'c': 1.23}"),
+    ('float', '1.2345'),
+    # ('frozenset', ),
+    ('int', '3'),
+    ('list', "[3, 4, 5]"),
+    ('set', "{3, 'value', 1.23}"),
+    ('str', '"this is a string"'),
+    ('tuple', "(3, 'value', 1.23)"),
+]
+
+
+class BinaryOperationTestCase:
+    format = ''
+    y = 3
+
+    def assertBinaryOperation(self, **kwargs):
+        self.assertCodeExecution("""
+            x = %(x)s
+            y = %(y)s
+            print(%(format)s%(operation)s)
+            """ % kwargs)
+
+
+def _binary_test(operation, value):
+    def func(self):
+        self.assertBinaryOperation(x=self.x, y=value, operation=operation, format=self.format)
+    return func
+
+for datatype, example in SAMPLE_DATA:
+    setattr(BinaryOperationTestCase, 'test_add_%s' % datatype, _binary_test('x + y', example))
+    setattr(BinaryOperationTestCase, 'test_subtract_%s' % datatype, _binary_test('x - y', example))
+    setattr(BinaryOperationTestCase, 'test_multiply_%s' % datatype, _binary_test('x * y', example))
+    setattr(BinaryOperationTestCase, 'test_floor_divide_%s' % datatype, _binary_test('x // y', example))
+    setattr(BinaryOperationTestCase, 'test_true_divide_%s' % datatype, _binary_test('x / y', example))
+    setattr(BinaryOperationTestCase, 'test_modulo_%s' % datatype, _binary_test('x % y', example))
+    setattr(BinaryOperationTestCase, 'test_power_%s' % datatype, _binary_test('x ** y', example))
+    setattr(BinaryOperationTestCase, 'test_subscr_%s' % datatype, _binary_test('x[y]', example))
+    setattr(BinaryOperationTestCase, 'test_lshift_%s' % datatype, _binary_test('x << y', example))
+    setattr(BinaryOperationTestCase, 'test_rshift_%s' % datatype, _binary_test('x >> y', example))
+    setattr(BinaryOperationTestCase, 'test_and_%s' % datatype, _binary_test('x & y', example))
+    setattr(BinaryOperationTestCase, 'test_xor_%s' % datatype, _binary_test('x ^ y', example))
+    setattr(BinaryOperationTestCase, 'test_or_%s' % datatype, _binary_test('x | y', example))
+
+
+class InplaceOperationTestCase:
+    format = ''
+    y = 3
+
+    def assertInplaceOperation(self, **kwargs):
+        self.assertCodeExecution("""
+            x = %(x)s
+            y = %(y)s
+            %(operation)s
+            print(%(format)sx)
+            """ % kwargs)
+
+
+def _inplace_test(operation, value):
+    def func(self):
+        self.assertInplaceOperation(x=self.x, y=value, operation=operation, format=self.format)
+    return func
+
+for datatype, example in SAMPLE_DATA:
+    setattr(InplaceOperationTestCase, 'test_add_%s' % datatype, _inplace_test('x += y', example))
+    setattr(InplaceOperationTestCase, 'test_subtract_%s' % datatype, _inplace_test('x -= y', example))
+    setattr(InplaceOperationTestCase, 'test_multiply_%s' % datatype, _inplace_test('x *= y', example))
+    setattr(InplaceOperationTestCase, 'test_floor_divide_%s' % datatype, _inplace_test('x //= y', example))
+    setattr(InplaceOperationTestCase, 'test_true_divide_%s' % datatype, _inplace_test('x /= y', example))
+    setattr(InplaceOperationTestCase, 'test_modulo_%s' % datatype, _inplace_test('x %= y', example))
+    setattr(InplaceOperationTestCase, 'test_power_%s' % datatype, _inplace_test('x **= y', example))
+    setattr(InplaceOperationTestCase, 'test_lshift_%s' % datatype, _inplace_test('x <<= y', example))
+    setattr(InplaceOperationTestCase, 'test_rshift_%s' % datatype, _inplace_test('x >>= y', example))
+    setattr(InplaceOperationTestCase, 'test_and_%s' % datatype, _inplace_test('x &= y', example))
+    setattr(InplaceOperationTestCase, 'test_xor_%s' % datatype, _inplace_test('x ^= y', example))
+    setattr(InplaceOperationTestCase, 'test_or_%s' % datatype, _inplace_test('x |= y', example))
