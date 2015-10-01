@@ -23,9 +23,8 @@ class ListTests(TranspileTestCase):
 
         # Positive index out of range
         self.assertCodeExecution("""
-            if __name__ == '__main__':
-                x = [1, 2, 3, 4, 5]
-                print(x[10])
+            x = [1, 2, 3, 4, 5]
+            print(x[10])
             """)
 
         # Negative index out of range
