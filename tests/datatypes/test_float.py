@@ -144,6 +144,11 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_set',
         'test_power_set',
         'test_subscr_set',
+        'test_lshift_set',
+        'test_rshift_set',
+        'test_and_set',
+        'test_xor_set',
+        'test_or_set',
 
         'test_add_str',
         'test_subtract_str',

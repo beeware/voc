@@ -2,6 +2,7 @@ import contextlib
 from io import StringIO, BytesIO
 import os
 import re
+import shutil
 import subprocess
 import sys
 import traceback
@@ -16,15 +17,21 @@ from voc.transpiler import Transpiler
 
 
 @contextlib.contextmanager
-def capture_output():
+def capture_output(redirect_stderr=True):
     oldout, olderr = sys.stdout, sys.stderr
     try:
         out = StringIO()
         sys.stdout = out
-        sys.stderr = out
+        if redirect_stderr:
+            sys.stderr = out
+        else:
+            sys.stderr = StringIO()
         yield out
     except:
-        traceback.print_exc()
+        if redirect_stderr:
+            traceback.print_exc()
+        else:
+            raise
     finally:
         sys.stdout, sys.stderr = oldout, olderr
 
@@ -32,33 +39,72 @@ def capture_output():
 def adjust(text):
     """Adjust a code sample to remove leading whitespace."""
     lines = text.split('\n')
+    if len(lines) == 1:
+        return text
+
     if lines[0].strip() == '':
         lines = lines[1:]
     first_line = lines[0].lstrip()
     n_spaces = len(lines[0]) - len(first_line)
+
     return '\n'.join(line[n_spaces:] for line in lines)
 
 
-def runAsJava(main_code, **extra):
-    """Run a block of Python code as a Java program."""
+def runAsPython(test_dir, main_code, extra_code=None):
+    """Run a block of Python code with the Python interpreter."""
+    # Output source code into test directory
+    with open(os.path.join(test_dir, 'test.py'), 'w') as py_source:
+        py_source.write(main_code)
 
-    transpiler = Transpiler()
-    with capture_output():
-        transpiler.transpile_string("test.py", main_code)
-
-        for name, code in extra.items():
-            transpiler.transpile_string("%s.py" % name, code)
-
-    transpiler.write(os.path.dirname(__file__), verbosity=0)
+    if extra_code:
+        for name, code in extra_code.items():
+            path = name.split('.')
+            path[-1] = path[-1] + '.py'
+            if len(path) != 1:
+                try:
+                    os.makedirs(os.path.join(test_dir, *path[:-1]))
+                except FileExistsError:
+                    pass
+            with open(os.path.join(test_dir, *path), 'w') as py_source:
+                py_source.write(adjust(code))
 
     proc = subprocess.Popen(
-        ["java", "-classpath", "../python.jar:.", "-XX:-UseSplitVerifier", "python.test"],
+        ["python", "test.py"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        cwd=os.path.dirname(__file__),
+        cwd=test_dir,
     )
     out = proc.communicate()
+
+    return out[0].decode('utf8')
+
+
+def runAsJava(test_dir, main_code, extra_code=None):
+    """Run a block of Python code as a Java program."""
+    # Output source code into test directory
+    transpiler = Transpiler()
+
+    # Don't redirect stderr; we want to see any errors from the transpiler
+    # as top level test failures.
+    with capture_output(redirect_stderr=False):
+        transpiler.transpile_string("test.py", main_code)
+
+        if extra_code:
+            for name, code in extra_code.items():
+                transpiler.transpile_string("%s.py" % name, code)
+
+    transpiler.write(test_dir, verbosity=0)
+
+    proc = subprocess.Popen(
+        ["java", "-classpath", "../../python.jar:.", "-XX:-UseSplitVerifier", "python.test"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=test_dir,
+    )
+    out = proc.communicate()
+
     return out[0].decode('utf8')
 
 
@@ -113,16 +159,27 @@ class TranspileTestCase(TestCase):
         java = adjust(java)
         self.assertEqual(debug.getvalue(), java[1:])
 
-    def assertCodeExecution(self, code, message=None):
+    def assertCodeExecution(self, code, message=None, extra_code=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
         code = adjust(code)
 
-        java_out = runAsJava(code)
+        try:
+            # Create the temp directory into which code will be placed
+            test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+            try:
+                os.mkdir(test_dir)
+            except FileExistsError:
+                pass
 
-        with capture_output() as py_out:
-            exec(code, {'__name__': '__main__'}, {})
-        py_out = py_out.getvalue()
+            # Run the code as Python and as Java.
+            py_out = runAsPython(test_dir, code, extra_code)
+            java_out = runAsJava(test_dir, code, extra_code)
+        except Exception as e:
+            self.fail(e)
+        finally:
+            # Clean up the test directory where the class file was written.
+            shutil.rmtree(test_dir)
 
         # Cleanse the Python and Java output, producing a simple
         # normalized format for exceptions, floats etc.
