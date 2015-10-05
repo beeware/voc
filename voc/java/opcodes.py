@@ -272,12 +272,20 @@ class ARETURN(Opcode):
 
 
 class ARRAYLENGTH(Opcode):
+    # Get the length of an array
+    # arrayref → length
     code = 0xbe
 
     def __init__(self):
         super(ARRAYLENGTH, self).__init__()
-# arrayref → length
-# Get the length of an array
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ASTORE(Opcode):
@@ -1954,6 +1962,9 @@ class IINC(Opcode):
     def __len__(self):
         return 3
 
+    def __arg_repr__(self):
+        return ' %s %s' % (self.index, self.const)
+
     @classmethod
     def read_extra(cls, reader, dump=None):
         index = reader.read_u1()
@@ -1962,7 +1973,7 @@ class IINC(Opcode):
 
     def write_extra(self, writer):
         writer.write_u1(self.index)
-        writer.write_u1(self.value)
+        writer.write_u1(self.const)
 
     @property
     def produce_count(self):
@@ -1974,49 +1985,104 @@ class IINC(Opcode):
 
 
 class ILOAD(Opcode):
+    # Load an int value from a local variable #index
+    # Args(1): index
+    # Stack: → value
     code = 0x15
 
-    def __init__(self):
+    def __init__(self, var):
         super(ILOAD, self).__init__()
-# 1: index
-# → value
-# Load an int value from a local variable #index
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ILOAD_0(Opcode):
+    # Load a reference onto the stack from local variable 0
+    # Stack: → value
     code = 0x1a
 
     def __init__(self):
         super(ILOAD_0, self).__init__()
-# → value
-# Load an int value from local variable 0
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ILOAD_1(Opcode):
+    # Load a reference onto the stack from local variable 1
+    # Stack: → value
     code = 0x1b
 
     def __init__(self):
         super(ILOAD_1, self).__init__()
-# → value
-# Load an int value from local variable 1
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ILOAD_2(Opcode):
+    # Load a reference onto the stack from local variable 2
+    # Stack: → value
     code = 0x1c
 
     def __init__(self):
         super(ILOAD_2, self).__init__()
-# → value
-# Load an int value from local variable 2
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class ILOAD_3(Opcode):
+    # Load a reference onto the stack from local variable 3
+    # Stack: → value
     code = 0x1d
 
     def __init__(self):
         super(ILOAD_3, self).__init__()
-# → value
-# Load an int value from local variable 3
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class IMPDEP1(Opcode):
@@ -2340,57 +2406,120 @@ class ISHR(Opcode):
 
 
 class ISTORE(Opcode):
+    # Store a reference into a local variable #index
+    # Args(1): index
+    # Stack: objectref →
     code = 0x36
 
-    def __init__(self):
+    def __init__(self, var):
         super(ISTORE, self).__init__()
-# 1: index
-# value →
-# Store int value into variable #index
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ISTORE_0(Opcode):
+    # Store int value into variable 0
+    # Stack: value →
     code = 0x3b
 
     def __init__(self):
         super(ISTORE_0, self).__init__()
-# value →
-# Store int value into variable 0
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ISTORE_1(Opcode):
+    # Store int value into variable 1
+    # Stack: value →
     code = 0x3c
 
     def __init__(self):
         super(ISTORE_1, self).__init__()
-# value →
-# Store int value into variable 1
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ISTORE_2(Opcode):
+    # Store int value into variable 2
+    # Stack: value →
     code = 0x3d
 
     def __init__(self):
         super(ISTORE_2, self).__init__()
-# value →
-# Store int value into variable 2
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ISTORE_3(Opcode):
+    # Store int value into variable 3
+    # Stack: value →
     code = 0x3e
 
     def __init__(self):
         super(ISTORE_3, self).__init__()
-# value →
-# Store int value into variable 3
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ISUB(Opcode):
+# value1, value2 → result int subtract
     code = 0x64
 
     def __init__(self):
         super(ISUB, self).__init__()
-# value1, value2 → result int subtract
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IUSHR(Opcode):
@@ -2548,11 +2677,9 @@ class LDC(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         const = reader.read_u1()
-        print("READ LDC CONSTANT", const, reader.constant_pool[const])
         return cls(reader.constant_pool[const])
 
     def write_extra(self, writer):
-        print("WRITE LDC CONSTANT", writer.constant_pool.index(self.const))
         writer.write_u1(writer.constant_pool.index(self.const))
 
     def resolve(self, constant_pool):

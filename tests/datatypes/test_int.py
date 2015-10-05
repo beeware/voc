@@ -145,9 +145,13 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_xor_list',
         'test_or_list',
 
+        'test_add_set',
+        'test_subtract_set',
+        'test_multiply_set',
         'test_floor_divide_set',
         'test_true_divide_set',
         'test_modulo_set',
+        'test_power_set',
         'test_subscr_set',
         'test_lshift_set',
         'test_rshift_set',

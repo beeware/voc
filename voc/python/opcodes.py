@@ -569,7 +569,7 @@ DELETED = object()
 
 
 def ALOAD_name(context, name):
-    """Generate the opcode to load a variable with the given name onto the stack.
+    """Generate the opcode to load an object variable with the given name onto the stack.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
@@ -592,7 +592,7 @@ def ALOAD_name(context, name):
 
 
 def ASTORE_name(context, name):
-    """Generate the opcode to store a variable with the given name.
+    """Generate the opcode to store an object variable with the given name.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
@@ -660,6 +660,71 @@ def ICONST_val(value):
             return JavaOpcodes.SIPUSH(value)
     else:
         raise RuntimeError("%s is not an integer constant" % value)
+
+
+def ILOAD_name(context, name):
+    """Generate the opcode to load an integer variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    i = context.localvars[name]
+    if i == DELETED:
+        raise KeyError(name)
+
+    if i == 0:
+        return JavaOpcodes.ILOAD_0()
+    elif i == 1:
+        return JavaOpcodes.ILOAD_1()
+    elif i == 2:
+        return JavaOpcodes.ILOAD_2()
+    elif i == 3:
+        return JavaOpcodes.ILOAD_3()
+    else:
+        return JavaOpcodes.ILOAD(i)
+
+
+def ISTORE_name(context, name):
+    """Generate the opcode to store a variable with the given name.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    try:
+        i = context.localvars[name]
+        if i == DELETED:
+            context.localvars[name] = i
+    except KeyError:
+        i = len(context.localvars)
+        context.localvars[name] = i
+
+    if i == 0:
+        return JavaOpcodes.ISTORE_0()
+    elif i == 1:
+        return JavaOpcodes.ISTORE_1()
+    elif i == 2:
+        return JavaOpcodes.ISTORE_2()
+    elif i == 3:
+        return JavaOpcodes.ISTORE_3()
+    else:
+        return JavaOpcodes.ISTORE(i)
+
+
+def IINC_name(context, name, value):
+    """Generate the opcode to increment an integer variable with the given name
+    by the provided value.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    i = context.localvars[name]
+    if i == DELETED:
+        raise KeyError(name)
+
+    return JavaOpcodes.IINC(i, value)
 
 
 class Ref:
@@ -1155,7 +1220,24 @@ class RETURN_VALUE(Opcode):
         context.add_opcodes(JavaOpcodes.ARETURN())
 
 
-# class IMPORT_STAR(Opcode):
+class IMPORT_STAR(Opcode):
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.add_opcodes(
+            ASTORE_name(context, '##module##'),
+        )
+
+        # Find exported symbols (__all__, or everything but _)
+        # Add each one to current context
+
+
 # class YIELD_VALUE(Opcode):
 
 
@@ -1660,12 +1742,12 @@ class COMPARE_OP(Opcode):
 
 
 class IMPORT_NAME(Opcode):
-    def __init__(self, target, python_offset, starts_line, is_jump_target):
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.target = target
+        self.name = name
 
     def __arg_repr__(self):
-        return str(self.target)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -1676,27 +1758,130 @@ class IMPORT_NAME(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        pass  # FIXME
+        # Arg 0 is the level
+        # Arg 1 is the list of symbols to import.
+        # Ignore Arg 1 for the moment...
+        context.add_opcodes(
+            ICONST_val(arguments[0].operation.const),
+            ISTORE_name(context, '##level##'),
+        )
+
+        # Create an array containing the module path.
+        parts = self.name.split('.')
+
+        # If the package name isn't clearly identifiable as a java package path,
+        # put it in the python namespace.
+        if parts[0] not in ('java', 'org', 'com', 'edu', 'net', 'android'):
+            parts.insert(0, 'python')
+
+        # Construct an array that contains each of the parts
+        # of the final import path we're going to use.
+        context.add_opcodes(
+            ICONST_val(len(parts)),
+            JavaOpcodes.ANEWARRAY('java/lang/String'),
+        )
+
+        for i, part in enumerate(parts):
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                    JavaOpcodes.LDC_W(part),
+                    JavaOpcodes.AASTORE(),
+            )
+
+        # Construct a string that contains all except the
+        # last "level"th elements. i.e., if level == 0, return
+        # the whole string; if level == 1, return all but
+        # the last element in the namespace, etc.
+        for_loop = START_LOOP()
+
+        context.add_opcodes(
+            ASTORE_name(context, '##module-parts##'),
+
+            JavaOpcodes.NEW('java/lang/StringBuilder'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/lang/StringBuilder', '<init>', '()V'),
+
+            ASTORE_name(context, '##module##'),
+
+            ICONST_val(0),
+            ISTORE_name(context, '##module-part##'),
+
+            for_loop,
+                IF(
+                    [
+                        ILOAD_name(context, '##module-part##'),
+
+                        ALOAD_name(context, '##module-parts##'),
+                        JavaOpcodes.ARRAYLENGTH(),
+                        ILOAD_name(context, '##level##'),
+                        JavaOpcodes.ISUB(),
+                    ],
+                    JavaOpcodes.IF_ICMPGE
+                ),
+                    IF(
+                        [
+                            ILOAD_name(context, '##module-part##'),
+                        ],
+                        JavaOpcodes.IFLE
+                    ),
+                        ALOAD_name(context, '##module##'),
+                        JavaOpcodes.LDC('.'),
+                        JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/String;)Ljava/lang/StringBuilder;'),
+                        JavaOpcodes.POP(),
+                    END_IF(),
+
+                    ALOAD_name(context, '##module##'),
+                    ALOAD_name(context, '##module-parts##'),
+                    ILOAD_name(context, '##module-part##'),
+
+                    JavaOpcodes.AALOAD(),
+
+                    JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'append', '(Ljava/lang/String;)Ljava/lang/StringBuilder;'),
+                    JavaOpcodes.POP(),
+                    IINC_name(context, '##module-part##', 1),
+                    jump(JavaOpcodes.GOTO(0), context, for_loop, Opcode.START),
+                END_IF(),
+                jump(JavaOpcodes.GOTO(0), context, for_loop, Opcode.NEXT),
+            END_LOOP(),
+
+            # Wrap the Java class as a Python class definition
+            JavaOpcodes.NEW('org/python/types/Class'),
+            JavaOpcodes.DUP(),
+
+            # Wrap the class so that it can be referenced as a Python object.
+            ALOAD_name(context, '##module##'),
+            JavaOpcodes.INVOKEVIRTUAL('java/lang/StringBuilder', 'toString', '()Ljava/lang/String;'),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Class', '<init>', '(Ljava/lang/Class;)V')
+        )
 
 
 class IMPORT_FROM(Opcode):
-    def __init__(self, target, python_offset, starts_line, is_jump_target):
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.target = target
+        self.name = name
 
     def __arg_repr__(self):
-        return str(self.target)
+        return str(self.name)
 
     @property
     def consume_count(self):
-        return 0
+        return 1
 
     @property
     def product_count(self):
-        return 1
+        return 2
 
     def convert(self, context, arguments):
-        pass
+        context.add_opcodes(
+            ASTORE_name(context, '##module##'),
+            context.add_opcodes(JavaOpcodes.LDC_W(self.name)),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            ALOAD_name(context, '##module##'),
+            JavaOpcodes.SWAP(),
+        )
 
 
 class JUMP_FORWARD(Opcode):
