@@ -54,7 +54,7 @@ def runAsPython(test_dir, main_code, extra_code=None):
     """Run a block of Python code with the Python interpreter."""
     # Output source code into test directory
     with open(os.path.join(test_dir, 'test.py'), 'w') as py_source:
-        py_source.write(main_code)
+        py_source.write(adjust(main_code))
 
     if extra_code:
         for name, code in extra_code.items():
@@ -88,11 +88,11 @@ def runAsJava(test_dir, main_code, extra_code=None):
     # Don't redirect stderr; we want to see any errors from the transpiler
     # as top level test failures.
     with capture_output(redirect_stderr=False):
-        transpiler.transpile_string("test.py", main_code)
+        transpiler.transpile_string("test.py", adjust(main_code))
 
         if extra_code:
             for name, code in extra_code.items():
-                transpiler.transpile_string("%s.py" % name, code)
+                transpiler.transpile_string("%s.py" % name, adjust(code))
 
     transpiler.write(test_dir, verbosity=0)
 
@@ -162,8 +162,6 @@ class TranspileTestCase(TestCase):
     def assertCodeExecution(self, code, message=None, extra_code=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
-        code = adjust(code)
-
         try:
             # Create the temp directory into which code will be placed
             test_dir = os.path.join(os.path.dirname(__file__), 'temp')

@@ -9,3 +9,5 @@ _build
 distribute-*
 *.class
 *.jar
+tests/temp
+org

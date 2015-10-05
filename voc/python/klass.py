@@ -194,7 +194,7 @@ class Class(Block):
         constructor_found = False
         for method in self.methods:
             classfile.methods.append(method)
-            if method.name == '<init>':
+            if method.name.string == '<init>':
                 constructor_found = True
 
         # If there's no constructor explicitly defined, add a default one.
@@ -202,11 +202,11 @@ class Class(Block):
             classfile.methods.append(
                 JavaMethod(
                     '<init>',
-                    '()V',
+                    '([Lorg/python/Object;Ljava/util/Hashtable;)V',
                     attributes=[
                         JavaCode(
                             max_stack=1,
-                            max_locals=1,
+                            max_locals=3,
                             code=[
                                 JavaOpcodes.ALOAD_0(),
                                 JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '()V'),

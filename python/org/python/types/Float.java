@@ -103,7 +103,27 @@ public class Float extends org.python.types.Object {
     }
 
     public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__truediv__() has not been implemented.");
+        if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val == 0) {
+                throw new org.python.exceptions.ZeroDivisionError("float division by zero");
+            }
+            return new org.python.types.Float(this.value / ((double) other_val));
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            if (other_val == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("float division by zero");
+            }
+            return new org.python.types.Float(this.value / ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Float(this.value);
+            }
+            else {
+                throw new org.python.exceptions.ZeroDivisionError("float division by zero");
+            }
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.getPythonName() + "'");
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {

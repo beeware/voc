@@ -93,6 +93,8 @@ ALL_FILES=\
 	python/org/python/types/Str.class \
 	python/org/python/types/Tuple.class \
 	python/org/python/types/Type.class \
+	python/python/sys.class \
+	python/python/time.class \
 
 .PHONY: all clean
 
@@ -103,7 +105,7 @@ clean:
 	find python -name "*.class" -exec rm {} \;
 
 python.jar: $(ALL_FILES)
-	cd python && jar -cf ../$@ $(subst python/org,org,$(ALL_FILES))
+	cd python && jar -cf ../$@ $(subst python/python,python,$(subst python/org,org,$(ALL_FILES)))
 
 %.class: %.java
 	javac  -Xlint:unchecked -classpath python $<
