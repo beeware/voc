@@ -14,10 +14,6 @@ Quickstart
 
 Run away. :-)
 
-Documentation
--------------
-
-Documentation for VOC can be found on `Read The Docs`_.
 
 Why "VOC"?
 ----------
