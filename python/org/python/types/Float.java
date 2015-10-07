@@ -6,7 +6,7 @@ public class Float extends org.python.types.Object {
     /**
      * Return the python name for this class.
      */
-    public java.lang.String getPythonName() {
+    public static java.lang.String getPythonName() {
         return "float";
     }
 
@@ -47,7 +47,21 @@ public class Float extends org.python.types.Object {
     }
 
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__lt__() has not been implemented.");
+        if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            return new org.python.types.Bool(this.value < ((double) other_val));
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            return new org.python.types.Bool(this.value < other_val);
+        } else if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Bool(this.value < 1.0);
+            }
+            else {
+                return new org.python.types.Bool(this.value < 0.0);
+            }
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: float() < " + org.Python.pythonClassName(other) + "()");
     }
 
     public org.python.Object __le__(org.python.Object other) {
@@ -114,7 +128,7 @@ public class Float extends org.python.types.Object {
             if (other_val == 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
-            return new org.python.types.Float(this.value / ((org.python.types.Float) other).value);
+            return new org.python.types.Float(this.value / other_val);
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Float(this.value);
@@ -123,7 +137,7 @@ public class Float extends org.python.types.Object {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + org.Python.pythonClassName(other) + "'");
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {

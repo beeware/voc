@@ -97,11 +97,17 @@ class TimeModuleTests(TranspileTestCase):
 
     #######################################################
     # clock
-    @expectedFailure
     def test_clock(self):
+        # Since we can't know exactly what CPU time will be used,
+        # and CPU time will vary between implementations,
+        # this test validates that clock returns a float < 0.01s
         self.assertCodeExecution("""
             import time
-            print(time.clock())
+            time.clock()
+            time.sleep(1)
+            result = time.clock()
+            print(type(result))
+            print(result < 0.1)
             print('Done.')
             """)
 
@@ -197,7 +203,6 @@ class TimeModuleTests(TranspileTestCase):
 
     #######################################################
     # sleep
-    @expectedFailure
     def test_sleep(self):
         self.assertCodeExecution("""
             import time

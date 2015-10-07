@@ -4,13 +4,6 @@ public class Dict extends org.python.types.Object {
     public java.util.Map<java.lang.String, org.python.Object> value;
 
     /**
-     * Return the python name for this class.
-     */
-    public java.lang.String getPythonName() {
-        return "dict";
-    }
-
-    /**
      * A utility method to update the internal value of this object.
      *
      * Used by __i*__ operations to do an in-place operation.

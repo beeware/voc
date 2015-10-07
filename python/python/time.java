@@ -3,6 +3,16 @@ package python;
 
 public class time extends org.python.types.Module {
 
+    static {
+        vm_start_time = System.currentTimeMillis();
+
+        java.lang.management.ThreadMXBean tmxb = java.lang.management.ManagementFactory.getThreadMXBean();
+        last_clock_time = tmxb.getCurrentThreadCpuTime();
+    }
+
+    private static long vm_start_time;
+    private static long last_clock_time;
+
     public static org.python.types.Str _STRUCT_TM_ITEMS;
     public static org.python.types.Str __doc__;
     public static org.python.types.Str __file__;
@@ -14,57 +24,84 @@ public class time extends org.python.types.Module {
     public static org.python.types.Int altzone;
 
     public static void asctime(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.asctime has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.asctime() has not been implemented.");
     }
 
-    public static void clock(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("tclockime. has not been implemented.");
+    public static org.python.types.Float clock(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("clock() takes no keyword arguments");
+        }
+        if (args.length == 0) {
+            //
+            java.lang.management.ThreadMXBean tmxb = java.lang.management.ManagementFactory.getThreadMXBean();
+            long current_time = tmxb.getCurrentThreadCpuTime();
+            long delta = current_time - last_clock_time;
+
+            last_clock_time = current_time;
+            // thread time is in nanoseconds; convert to seconds.
+            return new org.python.types.Float(delta / 1000000000.0);
+        } else {
+            throw new org.python.exceptions.TypeError("clock() takes no arguments (" + args.length + " given)");
+        }
     }
 
     public static void ctime(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("tctimeime. has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.ctime() has not been implemented.");
     }
 
     public static org.python.types.Int daylight;
 
     public static void get_clock_info(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.get_clock_info has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.get_clock_info() has not been implemented.");
     }
 
     public static void gmtime(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.gmtime has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.gmtime() has not been implemented.");
     }
 
     public static void localtime(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.localtime has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.localtime() has not been implemented.");
     }
 
     public static void mktime(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.mktime has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.mktime() has not been implemented.");
     }
 
     public static void monotonic(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.monotonic has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.monotonic() has not been implemented.");
     }
 
     public static void perf_counter(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.perf_counter has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.perf_counter() has not been implemented.");
     }
 
     public static void process_time(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.process_time has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.process_time() has not been implemented.");
     }
 
     public static void sleep(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("tsleepime. has not been implemented.");
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("sleep() takes no keyword arguments");
+        }
+        if (args.length == 1) {
+            try {
+                java.lang.Thread.sleep((int) (org.Python.float_cast(args, kwargs).value * 1000.0));
+            } catch(ClassCastException e) {
+                throw new org.python.exceptions.TypeError("a float is required");
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("sleep() takes exactly 1 argument (" + args.length + " given)");
+        }
     }
 
     public static void strftime(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.strftime has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.strftime() has not been implemented.");
     }
 
     public static void strptime(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("time.strptime has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.strptime() has not been implemented.");
     }
 
     // public static void struct_time;
@@ -78,6 +115,6 @@ public class time extends org.python.types.Module {
     public static org.python.types.Tuple tzname;
 
     public static void tzset(org.python.Object [] args, java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("ttzsetime. has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("time.tzset() has not been implemented.");
     }
 }

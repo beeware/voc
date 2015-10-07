@@ -1,24 +1,27 @@
-class MyClass:
-    def __init__(self, val):
-        print("VAL: ", val)
-        self.value = val
+# class MyClass:
+#     def __init__(self, val):
+#         print("VAL: ", val)
+#         self.value = val
 
-    def stuff(self, delta):
-        print("DELTA: ", delta)
-        return self.value + delta
+#     def stuff(self, delta):
+#         print("DELTA: ", delta)
+#         return self.value + delta
 
-obj = MyClass(4)
-obj.stuff(5)
+# obj = MyClass(4)
+# obj.stuff(5)
 
-print('Done.')
+# print('Done.')
 
 # class MyClass:
 #     pass
 
 # from time import *
-# import time, sys
+import time, sys
 
-# print("time is", time.time())
+print("clock is", time.clock())
+print("time is", time.sleep(1))
+print("clock is", time.clock())
+
 # print("switch interval is", sys.getswitchinterval())
 
 # obj = MyClass()
@@ -72,6 +75,12 @@ print('Done.')
 
 
 # if __name__ == '__main__':
+
+#     import sys
+
+#     def innermethod(msg):
+#         print(msg, sys.time())
+
 #     print("Hello, world")
 #     x = 3.14159
 #     print("Pi is ", x)

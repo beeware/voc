@@ -6,7 +6,7 @@ public class Class extends org.python.types.Object {
     /**
      * Return the python name for this class.
      */
-    public java.lang.String getPythonName() {
+    public static java.lang.String getPythonName() {
         return "class";
     }
 
@@ -26,10 +26,11 @@ public class Class extends org.python.types.Object {
 
         // Iterate over all methods, adding the static ones as class attributes
         for (java.lang.reflect.Method method: value.getMethods()) {
-            if (java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
-                attrs.put(method.getName(), new org.python.types.Function(method, false));
-            }
+            attrs.put(method.getName(), new org.python.types.Method(method, java.lang.reflect.Modifier.isStatic(method.getModifiers())));
         }
     }
 
+    public org.python.types.Str __repr__() {
+        return new org.python.types.Str(String.format("<class '%s'>", org.Python.pythonClassName(this.value)));
+    }
 }
