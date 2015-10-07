@@ -65,12 +65,12 @@ run on any Java 1.7+ VM.
 
 Next step - you need to compile the Python support libraries:
 
-    $ make
+    $ ant
 
-This will compile `python.jar`. You will need to make sure that the python.jar
-support file is in your classpath::
+This will create a `dist` directory that contains `python.jar`. You will need to
+make sure that this `python.jar` support file is in your classpath::
 
-    $ java -XX:-UseSplitVerifier -classpath python.jar:. python.example
+    $ java -XX:-UseSplitVerifier -classpath dist/python.jar:. python.example
     Hello, World
 
 The ``-CC:-UseSplitVerifier`` argument is necessary to turn off stack map

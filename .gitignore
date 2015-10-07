@@ -5,9 +5,6 @@
 dist
 build
 local
-_build
 distribute-*
-*.class
-*.jar
 tests/temp
 org
