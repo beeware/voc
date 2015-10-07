@@ -1,44 +1,22 @@
-<project name="MyProject" default="dist" basedir=".">
+<project name="python" default="all" basedir=".">
   <description>
     Build Python support libraries for voc
   </description>
 
-  <!-- set global properties for this build -->
-  <property name="src" location="python"/>
   <property name="build" location="build"/>
   <property name="dist" location="dist"/>
 
-  <target name="compile-android" description="Compile the Android-specific source">
-    <mkdir dir="${build}/android"/>
-    <javac includeantruntime="false" destdir="${build}/android">
-      <src path="${src}/common" />
-      <src path="${src}/android" />
-    </javac>
+  <target name="java">
+    <ant antfile="build-java.xml" target="dist"/>
   </target>
 
-  <target name="compile-oracle" description="Compile the Oracle-specific source">
-    <mkdir dir="${build}/oracle"/>
-    <javac includeantruntime="false" destdir="${build}/oracle">
-      <src path="${src}/common" />
-      <src path="${src}/oracle" />
-    </javac>
+  <target name="android">
+    <ant antfile="build-android.xml" target="dist"/>
   </target>
 
-  <target name="dist-android" depends="compile-android" description="Generate Android jar file">
-    <mkdir dir="${dist}"/>
+  <target name="all" depends="java, android" />
 
-    <jar jarfile="${dist}/python-android.jar" basedir="${build}/android"/>
-  </target>
-
-  <target name="dist-oracle" depends="compile-oracle" description="Generate Oracle jar file">
-    <mkdir dir="${dist}"/>
-
-    <jar jarfile="${dist}/python.jar" basedir="${build}/oracle"/>
-  </target>
-
-  <target name="dist" depends="dist-android,dist-oracle" description="Generate all jar files"/>
-
-  <target name="clean" description="clean up">
+  <target name="clean" description="Clean up">
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
   </target>

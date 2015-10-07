@@ -5,6 +5,7 @@
 dist
 build
 local
+local.properties
 distribute-*
 tests/temp
 org

@@ -1,0 +1,29 @@
+<project name="python" default="dist" basedir=".">
+  <description>
+    Build Python support libraries for voc
+  </description>
+
+  <!-- set global properties for this build -->
+  <property name="src" location="python"/>
+  <property name="build" location="build"/>
+  <property name="dist" location="dist"/>
+
+  <target name="compile" description="Compile the Oracle-specific source">
+    <mkdir dir="${build}/java"/>
+    <javac includeantruntime="false" destdir="${build}/java">
+      <src path="${src}/common" />
+      <src path="${src}/java" />
+    </javac>
+  </target>
+
+  <target name="dist" depends="compile" description="Generate Oracle jar file">
+    <mkdir dir="${dist}"/>
+
+    <jar jarfile="${dist}/python-java.jar" basedir="${build}/java"/>
+  </target>
+
+  <target name="clean" description="Clean up">
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>

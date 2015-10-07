@@ -97,7 +97,7 @@ def runAsJava(test_dir, main_code, extra_code=None):
     transpiler.write(test_dir, verbosity=0)
 
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../dist/python.jar:.", "-XX:-UseSplitVerifier", "python.test"],
+        ["java", "-classpath", "../../dist/python-java.jar:.", "-XX:-UseSplitVerifier", "python.test"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
