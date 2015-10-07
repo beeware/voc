@@ -11,7 +11,7 @@ public class platform extends org.python.types.Module {
         java.lang.Class platform_class;
 
         if (vendor.equals("Oracle Corporation")) {
-            platform_class_name = "python.OraclePlatform";
+            platform_class_name = "python.JavaPlatform";
         } else if (vendor.equals("The Android Project")) {
             platform_class_name = "python.AndroidPlatform";
         } else {
