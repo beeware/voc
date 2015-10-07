@@ -4,13 +4,6 @@ public class Bool extends org.python.types.Object {
     public boolean value;
 
     /**
-     * Return the python name for this class.
-     */
-    public java.lang.String getPythonName() {
-        return "bool";
-    }
-
-    /**
      * A utility method to update the internal value of this object.
      *
      * Used by __i*__ operations to do an in-place operation.

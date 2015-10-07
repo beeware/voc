@@ -5,13 +5,6 @@ public class Object implements org.python.Object {
     public java.util.Hashtable<java.lang.String, org.python.Object> attrs;
 
     /**
-     * Return the python name for this class.
-     */
-    public java.lang.String getPythonName() {
-        return this.getClass().getName();
-    }
-
-    /**
      * A utility method to update the internal value of this object.
      *
      * Used by __i*__ operations to do an in-place operation.
@@ -19,7 +12,7 @@ public class Object implements org.python.Object {
      * to provide the relevant assignment info.
      */
     void setValue(org.python.Object obj) {
-        throw new org.python.exceptions.RuntimeError("'" + this.getPythonName() + "' object cannot be updated.");
+        throw new org.python.exceptions.RuntimeError("'" + org.Python.pythonClassName(this) + "' object cannot be updated.");
     }
 
     public Object() {
@@ -70,19 +63,19 @@ public class Object implements org.python.Object {
      * Section 3.3.1 - Basic customization
      */
     // public void __new__() {
-    //     throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__new__'");
+    //     throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__new__'");
     // }
 
     // public void __init__() {
-    //     throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__init__'");
+    //     throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__init__'");
     // }
 
     public void __del__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__del__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__del__'");
     }
 
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<%s object at %x>", this.getPythonName(), this.hashCode()));
+        return new org.python.types.Str(String.format("<%s object at %x>", org.Python.pythonClassName(this), this.hashCode()));
     }
 
     public org.python.types.Str __str__() {
@@ -90,11 +83,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.Bytes __bytes__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__bytes__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__bytes__'");
     }
 
     public org.python.types.Str __format__() {
-        throw new org.python.exceptions.NotImplementedError("'" + this.getPythonName() + ".__format__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__format__' has not been implemented");
     }
 
 
@@ -111,7 +104,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.getPythonName() + ".__lt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__lt__' has not been implemented");
     }
 
 
@@ -128,7 +121,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.getPythonName() + ".__le__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__le__' has not been implemented");
     }
 
 
@@ -145,7 +138,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.getPythonName() + ".__eq__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__eq__' has not been implemented");
     }
 
 
@@ -162,7 +155,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.getPythonName() + ".__ne__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__ne__' has not been implemented");
     }
 
     public org.python.Object __gt__(org.python.Object [] args, java.util.Hashtable kwargs) {
@@ -178,7 +171,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.getPythonName() + ".__gt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__gt__' has not been implemented");
     }
 
     public org.python.Object __ge__(org.python.Object [] args, java.util.Hashtable kwargs) {
@@ -194,7 +187,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.getPythonName() + ".__ge__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__ge__' has not been implemented");
     }
 
     public org.python.types.Int __hash__() {
@@ -202,7 +195,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.Bool __bool__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__bool__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__bool__'");
     }
 
 
@@ -273,14 +266,14 @@ public class Object implements org.python.Object {
                 java.util.Map<java.lang.String, org.python.Object> classattrs = (java.util.Map<java.lang.String, org.python.Object>) classattrs_field.get(this);
                 value = classattrs.get(name);
                 if (value == null) {
-                    throw new org.python.exceptions.AttributeError("'" + this.getClass().getName() + "' object has no attribute '" + name + "'");
+                    throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "'");
                 }
             } catch (ClassCastException e) {
-                throw new org.python.exceptions.AttributeError("'" + this.getClass().getName() + "' object has no attribute '" + name + "' (Python class attributes not stored corrrectly)");
+                throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "' (Python class attributes not stored corrrectly)");
             } catch (IllegalAccessException e) {
-                throw new org.python.exceptions.AttributeError("'" + this.getClass().getName() + "' object has no attribute '" + name + "' (illegal Java access)");
+                throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "' (illegal Java access)");
             } catch (NoSuchFieldException e) {
-                throw new org.python.exceptions.AttributeError("'" + this.getClass().getName() + "' object has no attribute '" + name + "' (no Python class attributes)");
+                throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "' (no Python class attributes)");
             }
         }
         return value;
@@ -314,7 +307,7 @@ public class Object implements org.python.Object {
         // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {
             if (this.attrs.get(name) == null) {
-                throw new org.python.exceptions.AttributeError("'" + this.getClass().getName() + "' object has no attribute '" + name + "'");
+                throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "'");
             }
         }
         attrs.put(name, value);
@@ -347,12 +340,12 @@ public class Object implements org.python.Object {
     public void __delattr__(java.lang.String name) {
         org.python.Object result = attrs.remove(name);
         if (result == null) {
-            throw new org.python.exceptions.AttributeError("'" + this.getClass().getName() + "' object has no attribute '" + name + "'");
+            throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "'");
         }
     }
 
     public org.python.types.List __dir__() {
-        throw new org.python.exceptions.NotImplementedError("'" + this.getPythonName() + ".__dir__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__dir__' has not been implemented");
     }
 
 
@@ -360,11 +353,11 @@ public class Object implements org.python.Object {
      * Section 3.3.4 - Customizing instance and subclass checks
      */
     public org.python.Object __instancecheck__(org.python.Object instance) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__instancecheck__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__instancecheck__'");
     }
 
     public org.python.Object __subclasscheck__(org.python.Object subclass) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__subclasscheck__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__subclasscheck__'");
     }
 
 
@@ -372,7 +365,7 @@ public class Object implements org.python.Object {
      * Section 3.3.5 - Emulating callable objects
      */
     public org.python.Object __call__(org.python.Object... args) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__call__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__call__'");
     }
 
 
@@ -381,11 +374,11 @@ public class Object implements org.python.Object {
      */
 
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__len__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__len__'");
     }
 
     public org.python.types.Int __length_hint__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__length_hint__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__length_hint__'");
     }
 
 
@@ -402,7 +395,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __getitem__(org.python.Object index) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__getitem__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__getitem__'");
     }
 
     public org.python.Object __getitem__(int index) {
@@ -411,7 +404,7 @@ public class Object implements org.python.Object {
 
 
     public org.python.Object __missing__(org.python.Object key) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__missing__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__missing__'");
     }
 
 
@@ -428,7 +421,7 @@ public class Object implements org.python.Object {
     }
 
     public void __setitem__(org.python.Object index, org.python.Object value) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__setitem__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__setitem__'");
     }
 
     public void __setitem__(int index, org.python.Object value) {
@@ -449,7 +442,7 @@ public class Object implements org.python.Object {
     }
 
     public void __delitem__(org.python.Object index) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__delitem__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__delitem__'");
     }
 
     public void __delitem__(int index) {
@@ -458,15 +451,15 @@ public class Object implements org.python.Object {
 
 
     public org.python.Iterable __iter__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__iter__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__iter__'");
     }
 
     public org.python.Iterable __reversed__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__reversed__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__reversed__'");
     }
 
     public org.python.types.Bool __contains__(org.python.Object item) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__contains__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__contains__'");
     }
 
 
@@ -487,7 +480,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -504,7 +497,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __sub__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -521,7 +514,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -538,7 +531,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -555,7 +548,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -572,7 +565,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -589,7 +582,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__divmod__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__divmod__'");
     }
 
 
@@ -606,7 +599,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __pow__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -623,7 +616,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -640,7 +633,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -657,7 +650,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -674,7 +667,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __xor__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -691,7 +684,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __or__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
     }
 
 
@@ -932,7 +925,7 @@ public class Object implements org.python.Object {
         try {
             this.setValue(this.__add__(other));
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + this.getPythonName() + "' and '" + other.getPythonName() + "'");
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
         }
     }
 
@@ -950,7 +943,7 @@ public class Object implements org.python.Object {
     }
 
     public void __isub__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__isub__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__isub__'");
     }
 
 
@@ -967,7 +960,7 @@ public class Object implements org.python.Object {
     }
 
     public void __imul__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__imul__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__imul__'");
     }
 
 
@@ -984,7 +977,7 @@ public class Object implements org.python.Object {
     }
 
     public void __itruediv__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__itruediv__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__itruediv__'");
     }
 
 
@@ -1001,7 +994,7 @@ public class Object implements org.python.Object {
     }
 
     public void __ifloordiv__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__ifloordiv__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ifloordiv__'");
     }
 
 
@@ -1018,7 +1011,7 @@ public class Object implements org.python.Object {
     }
 
     public void __imod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__imod__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__imod__'");
     }
 
 
@@ -1035,7 +1028,7 @@ public class Object implements org.python.Object {
     }
 
     public void __ipow__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__ipow__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ipow__'");
     }
 
 
@@ -1052,7 +1045,7 @@ public class Object implements org.python.Object {
     }
 
     public void __ilshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__ilshift__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ilshift__'");
     }
 
 
@@ -1069,7 +1062,7 @@ public class Object implements org.python.Object {
     }
 
     public void __irshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__irshift__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__irshift__'");
     }
 
 
@@ -1086,7 +1079,7 @@ public class Object implements org.python.Object {
     }
 
     public void __iand__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__iand__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__iand__'");
     }
 
 
@@ -1103,7 +1096,7 @@ public class Object implements org.python.Object {
     }
 
     public void __ixor__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__ixor__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ixor__'");
     }
 
 
@@ -1120,24 +1113,24 @@ public class Object implements org.python.Object {
     }
 
     public void __ior__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__ior__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ior__'");
     }
 
 
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__neg__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__neg__'");
     }
 
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__pos__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__pos__'");
     }
 
     public org.python.Object __abs__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__abs__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__abs__'");
     }
 
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__invert__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__invert__'");
     }
 
 
@@ -1146,20 +1139,20 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __complex__(org.python.Object [] args, java.util.Hashtable kwargs) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__complex__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__complex__'");
     }
 
 
     public org.python.types.Int __int__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__int__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__int__'");
     }
 
     public org.python.types.Float __float__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__float__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__float__'");
     }
 
     public org.python.Object __round__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__round__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__round__'");
     }
 
 
@@ -1167,11 +1160,11 @@ public class Object implements org.python.Object {
      * Section 3.3.8 - With statement context
      */
     public org.python.Object __enter__() {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__enter__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__enter__'");
     }
 
     public org.python.Object __exit__(org.python.Object exc_type, org.python.Object exc_value, org.python.Object traceback) {
-        throw new org.python.exceptions.AttributeError(this.getPythonName() + " has no attribute '__exit__'");
+        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__exit__'");
     }
 
 }

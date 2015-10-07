@@ -17,11 +17,23 @@ public class Python {
                     builtins.put("int", new org.python.types.Function(method, false));
                 } else if (method.getName() == "float_cast") {
                     builtins.put("float", new org.python.types.Function(method, false));
-                } else {
+                } else if (!method.getName().startsWith("python")) {
                     builtins.put(method.getName(), new org.python.types.Function(method, false));
                 }
             }
         }
+    }
+
+    public static java.lang.String pythonClassName(java.lang.Class cls) {
+        java.lang.String class_name = cls.getName();
+        if (class_name.startsWith("org.python.types.")) {
+            return class_name.substring(17).toLowerCase();
+        }
+        return class_name;
+    }
+
+    public static java.lang.String pythonClassName(org.python.Object obj) {
+        return pythonClassName(obj.getClass());
     }
 
     /**
@@ -1299,10 +1311,19 @@ public class Python {
      * type(object) -> the object's type
      * type(name, bases, dict) -> a new type
      */
-    public static org.python.types.Type type(
+    public static org.python.types.Class type(
                 org.python.Object [] args,
                 java.util.Hashtable<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'type' not implemented");
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
+        }
+        if (args.length == 1) {
+            return new org.python.types.Class(args[0].getClass());
+        } else if (args.length == 3) {
+            throw new org.python.exceptions.NotImplementedError("3-argument form of builtin function 'type' not implemented");
+        } else {
+            throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
+        }
     }
 
     /**

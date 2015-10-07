@@ -3,11 +3,6 @@ package org.python;
 public interface Object {
 
     /**
-     * Return the python name for this class.
-     */
-    public java.lang.String getPythonName();
-
-    /**
      * Python interface compatibility
      * Section 3.3.1 - Basic customization
      */

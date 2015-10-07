@@ -17,7 +17,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
             //     System.out.println("  " + arg);
             // }
             if (this.is_static) {
-                return (org.python.Object) this.value.invoke(null, args, kwargs);
+                return (org.python.Object) this.value.invoke(null, java.util.Arrays.copyOfRange(args, 1, args.length), kwargs);
             } else {
                 return (org.python.Object) this.value.invoke(args[0], args, kwargs);
             }

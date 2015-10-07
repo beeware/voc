@@ -1729,9 +1729,9 @@ class COMPARE_OP(Opcode):
 
         comparator = {
             '<': '__lt__',
-            '<=': '__lte__',
+            '<=': '__le__',
             '>': '__gt__',
-            '>=': '__gte__',
+            '>=': '__ge__',
             '==': '__eq__',
             'exception match': '__eq__',
         }[self.comparison]
@@ -1761,6 +1761,11 @@ class IMPORT_NAME(Opcode):
         # Arg 0 is the level
         # Arg 1 is the list of symbols to import.
         # Ignore Arg 1 for the moment...
+
+        # The line of code for the import is recorded
+        # against the first argument.
+        context.next_opcode_starts_line = arguments[0].operation.starts_line
+
         context.add_opcodes(
             ICONST_val(arguments[0].operation.const),
             ISTORE_name(context, '##level##'),
