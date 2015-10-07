@@ -97,7 +97,7 @@ def runAsJava(test_dir, main_code, extra_code=None):
     transpiler.write(test_dir, verbosity=0)
 
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../python.jar:.", "-XX:-UseSplitVerifier", "python.test"],
+        ["java", "-classpath", "../../dist/python.jar:.", "-XX:-UseSplitVerifier", "python.test"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -283,7 +283,6 @@ class BinaryOperationTestCase:
         vars()['test_ge_%s' % datatype] = _binary_test('test_ge_%s' % datatype, 'x >= y', examples)
         vars()['test_eq_%s' % datatype] = _binary_test('test_eq_%s' % datatype, 'x == y', examples)
         vars()['test_ne_%s' % datatype] = _binary_test('test_ne_%s' % datatype, 'x != y', examples)
-
 
 
 def _inplace_test(test_name, operation, examples):
