@@ -5,9 +5,7 @@ public class time extends org.python.types.Module {
 
     static {
         vm_start_time = System.currentTimeMillis();
-
-        java.lang.management.ThreadMXBean tmxb = java.lang.management.ManagementFactory.getThreadMXBean();
-        last_clock_time = tmxb.getCurrentThreadCpuTime();
+        last_clock_time = python.platform.impl.clock();
     }
 
     private static long vm_start_time;
@@ -33,8 +31,7 @@ public class time extends org.python.types.Module {
         }
         if (args.length == 0) {
             //
-            java.lang.management.ThreadMXBean tmxb = java.lang.management.ManagementFactory.getThreadMXBean();
-            long current_time = tmxb.getCurrentThreadCpuTime();
+            long current_time = python.platform.impl.clock();
             long delta = current_time - last_clock_time;
 
             last_clock_time = current_time;

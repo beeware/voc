@@ -2,36 +2,43 @@
   <description>
     Build Python support libraries for voc
   </description>
+
   <!-- set global properties for this build -->
   <property name="src" location="python"/>
   <property name="build" location="build"/>
   <property name="dist" location="dist"/>
 
-  <target name="init">
-    <!-- Create the time stamp -->
-    <tstamp/>
-    <!-- Create the build directory structure used by compile -->
-    <mkdir dir="${build}"/>
+  <target name="compile-android" description="Compile the Android-specific source">
+    <mkdir dir="${build}/android"/>
+    <javac includeantruntime="false" destdir="${build}/android">
+      <src path="${src}/common" />
+      <src path="${src}/android" />
+    </javac>
   </target>
 
-  <target name="compile" depends="init"
-        description="compile the source">
-    <!-- Compile the java code from ${src} into ${build} -->
-    <javac includeantruntime="false" srcdir="${src}" destdir="${build}"/>
+  <target name="compile-oracle" description="Compile the Oracle-specific source">
+    <mkdir dir="${build}/oracle"/>
+    <javac includeantruntime="false" destdir="${build}/oracle">
+      <src path="${src}/common" />
+      <src path="${src}/oracle" />
+    </javac>
   </target>
 
-  <target name="dist" depends="compile"
-        description="generate the distribution">
-    <!-- Create the distribution directory -->
+  <target name="dist-android" depends="compile-android" description="Generate Android jar file">
     <mkdir dir="${dist}"/>
 
-    <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-    <jar jarfile="${dist}/python.jar" basedir="${build}"/>
+    <jar jarfile="${dist}/python-android.jar" basedir="${build}/android"/>
   </target>
 
-  <target name="clean"
-        description="clean up">
-    <!-- Delete the ${build} and ${dist} directory trees -->
+  <target name="dist-oracle" depends="compile-oracle" description="Generate Oracle jar file">
+    <mkdir dir="${dist}"/>
+
+    <jar jarfile="${dist}/python.jar" basedir="${build}/oracle"/>
+  </target>
+
+  <target name="dist" depends="dist-android,dist-oracle" description="Generate all jar files"/>
+
+  <target name="clean" description="clean up">
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
   </target>
