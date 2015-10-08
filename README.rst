@@ -52,7 +52,7 @@ and development effort.
 Quickstart
 ----------
 
-Using Python 3.4, install `voc`, then run the example script::
+Using Python 3.4, install ``voc``, then run the example script::
 
     $ pip install voc
     $ python -m voc tests/example.py
@@ -60,17 +60,14 @@ Using Python 3.4, install `voc`, then run the example script::
     Writing example.class...
     Done.
 
-This will produce an `example.class`, in the `python` namespace, that you can
-run on any Java 1.7+ VM.
+This will produce an ``example.class``, in the ``python`` namespace, that you can
+run on any Java 1.7+ VM. To run the classfile, you'll need the Python support
+libraries. These will eventually be available as a download; for now, you'll
+need to compile them. See below for compilation instructions.
 
-Next step - you need to compile the Python support libraries:
-
-    $ ant java
-
-This will create a `dist` directory that contains `python-java.jar`.
-
-You can then run the example.class that was generated, ensuring that
-the `python-java.jar` support file is in your classpath::
+Once you've got the support Jarfile, you can run the example.class ensuring that
+the support jarfile is in your classpath. For example, using the Oracle Java VM,
+you would run::
 
     $ java -XX:-UseSplitVerifier -classpath dist/python-java.jar:. python.example
     Hello, World
@@ -79,6 +76,18 @@ The ``-CC:-UseSplitVerifier`` argument is necessary to turn off stack map
 verification in Java 7. This could be addressed by computing stack maps
 for generated code.
 
+Compiling the support library
+-----------------------------
+
+Oracle Java
+~~~~~~~~~~~
+
+To compile the Python support libraries for Java (the Oracle JVM)::
+
+    $ ant java
+
+This will create a ``dist`` directory that contains ``python-java.jar``.
+
 Android
 ~~~~~~~
 
@@ -86,16 +95,16 @@ To compile for Android, you'll need to `download the Android SDK`_. You only
 need the standalone SDK (see "Other install options") - you don't have to
 download the fully Android Studio if you don't want to.
 
-Once you've downloaded and installed the SDK, create a `local.properties`
-in the top level `voc` project directory, containing a single line::
+Once you've downloaded and installed the SDK, create a ``local.properties``
+in the top level ``voc`` project directory, containing a single line::
 
     sdk.dir=<path to SDK>/sdk
 
-You can then run `ant` to compile `dist/python-android.jar`::
+You can then run ``ant`` to compile ``dist/python-android.jar``::
 
     $ ant android
 
-You can then add `dist/python-android.jar` to your Android project.
+You can then add ``dist/python-android.jar`` to your Android project.
 
 .. _download the Android SDK: https://developer.android.com/sdk/index.html
 
