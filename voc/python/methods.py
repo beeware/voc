@@ -57,6 +57,10 @@ class Method(Block):
     def has_void_return(self):
         return self.returns.get('annotation', object()) is None
 
+    @property
+    def can_ignore_empty(self):
+        return False
+
     def add_return(self):
         if self.has_void_return:
             self.add_opcodes(JavaOpcodes.RETURN())
@@ -89,6 +93,7 @@ class Method(Block):
         from .klass import AnonymousInnerClass
         callable = AnonymousInnerClass(
             parent=self.parent,
+            closure_var_names=code.co_names,
             super_name='org/python/types/Object',
             interfaces=['org/python/Callable'],
             public=False,
@@ -96,14 +101,23 @@ class Method(Block):
         )
 
         method = ClosureMethod(callable, 'invoke', extract_parameters(code))
+
         method.extract(code)
         callable.methods.append(method.transpile())
+
+        #
+        callable.methods.append(AnonymousInitMethod(callable).transpile())
+
+        callable.fields = dict(
+            (name, 'Lorg/python/Object;')
+            for name in code.co_names
+        )
 
         self.parent.classes.append(callable.transpile())
 
         return method
 
-    def tweak(self):
+    def _insert_parameters(self):
         # Load all the arguments into locals
         setup = []
         for i, arg in enumerate(self.parameters):
@@ -113,13 +127,24 @@ class Method(Block):
                 JavaOpcodes.AALOAD(),
                 ASTORE_name(self, arg['name']),
             ])
-
-        # Then run the code as normal.
         self.code = setup + self.code
 
-        # If the method has a void return, clean up the final opcodes.
+    def _insert_closure_vars(self):
+        pass
+
+    def _insert_super_call(self):
+        pass
+
+    def tweak(self):
+        self._insert_parameters()
+        self._insert_closure_vars()
+        self._insert_super_call()
+
         if self.has_void_return:
             self.void_return()
+
+        if self.can_ignore_empty:
+            self.ignore_empty()
 
     def transpile(self):
         code = super().transpile()
@@ -162,18 +187,18 @@ class InitMethod(Method):
     def module(self):
         return self.klass.module
 
+    @property
+    def has_void_return(self):
+        return True
+
+    @property
+    def can_ignore_empty(self):
+        return True
+
     def add_self(self):
         self.localvars['self'] = len(self.localvars)
 
-    def tweak(self):
-        # If the block is an init method, make sure it invokes super().<init>
-        super_found = False
-        # FIXME: Search for existing calls on <init>
-        # for opcode in code:
-        #     if isinstance(opcode, JavaOpcodes.INVOKESPECIAL) and opcode.method.name == '<init>':
-        #         super_found = True
-        #         break
-
+    def _insert_parameters(self):
         # Load all the arguments into locals
         setup = []
         for i, arg in enumerate(self.parameters):
@@ -183,16 +208,43 @@ class InitMethod(Method):
                 JavaOpcodes.AALOAD(),
                 ASTORE_name(self, arg['name']),
             ])
+        self.code = setup + self.code
 
+    def _insert_closure_vars(self):
+        pass
+
+    def _insert_super_call(self):
+        # If the block is an init method, make sure it invokes super().<init>
+        super_found = False
+        # FIXME: Search for existing calls on <init>
+        # for opcode in code:
+        #     if isinstance(opcode, JavaOpcodes.INVOKESPECIAL) and opcode.method.name == '<init>':
+        #         super_found = True
+        #         break
+        setup = []
         if not super_found:
             setup.extend([
                 JavaOpcodes.ALOAD_0(),
                 JavaOpcodes.INVOKESPECIAL(self.klass.super_name, '<init>', '()V'),
             ])
-
         self.code = setup + self.code
-        self.void_return()
-        self.ignore_empty()
+
+
+class AnonymousInitMethod(InitMethod):
+    def __init__(self, parent):
+        super().__init__(parent, parameters=[None])
+
+    def _insert_closure_vars(self):
+        setup = []
+        for i, closure_var_name in enumerate(self.parent.closure_var_names):
+            setup.extend([
+                ALOAD_name(self, 'self'),
+                ALOAD_name(self, '##__args__##'),
+                ICONST_val(i),
+                JavaOpcodes.AALOAD(),
+                JavaOpcodes.PUTFIELD(self.parent.descriptor, closure_var_name, 'Lorg/python/Object;'),
+            ])
+        self.code = setup + self.code
 
 
 class InstanceMethod(Method):
@@ -253,9 +305,16 @@ class MainMethod(Method):
     def signature(self):
         return '([Ljava/lang/String;)V'
 
-    def tweak(self):
-        self.void_return()
-        self.ignore_empty()
+    @property
+    def has_void_return(self):
+        return True
+
+    @property
+    def can_ignore_empty(self):
+        return True
+
+    def _insert_parameters(self):
+        pass
 
 
 class ClosureMethod(Method):
@@ -269,11 +328,13 @@ class ClosureMethod(Method):
         )
 
     def __repr__(self):
-        return '<ClosureMethod %s (%s parameters>' % (self.name, len(self.parameters))
+        return '<ClosureMethod %s (%s parameters, %s closure vars)>' % (
+            self.name, len(self.parameters), len(self.parent.closure_var_names)
+        )
 
     @property
     def is_instancemethod(self):
-        return True
+        return False
 
     @property
     def is_closuremethod(self):
@@ -283,8 +344,23 @@ class ClosureMethod(Method):
     def callable(self):
         return self.parent.descriptor
 
+    @property
+    def globals_source(self):
+        return self.module.parent.descriptor
+
     def add_self(self):
         self.localvars['self'] = len(self.localvars)
+
+    def _insert_closure_vars(self):
+        # Load all the arguments into locals
+        setup = []
+        for i, closure_var_name in enumerate(self.parent.closure_var_names):
+            setup.extend([
+                ALOAD_name(self, 'self'),
+                JavaOpcodes.GETFIELD(self.callable, closure_var_name, 'Lorg/python/Object;'),
+                ASTORE_name(self, closure_var_name),
+            ])
+        self.code = setup + self.code
 
 
 def extract_parameters(code):

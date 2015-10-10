@@ -2220,13 +2220,13 @@ class CALL_FUNCTION(Opcode):
             if arguments[0].operation.opname == 'LOAD_ATTR':
                 final_args += 1
                 first_arg = 1
-            elif arguments[0].operation.opname == 'MAKE_FUNCTION':
-                final_args += 1
-                first_arg = 1
-                context.add_opcodes(
-                    ASTORE_name(context, '##comprehension##'),
-                    ALOAD_name(context, '##comprehension##')
-                )
+            # elif arguments[0].operation.opname == 'MAKE_FUNCTION':
+            #     final_args += 1
+            #     first_arg = 1
+            #     context.add_opcodes(
+            #         ASTORE_name(context, '##comprehension##'),
+            #         ALOAD_name(context, '##comprehension##')
+            #     )
 
             context.add_opcodes(
                 # Create an array to pass in arguments to invoke()
@@ -2243,16 +2243,16 @@ class CALL_FUNCTION(Opcode):
                 )
                 arguments[0].arguments[0].operation.transpile(context, arguments[0].arguments[0].arguments)
                 context.add_opcodes(JavaOpcodes.AASTORE())
-            elif arguments[0].operation.opname == 'MAKE_FUNCTION':
-                context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    ICONST_val(0),
-                )
+            # elif arguments[0].operation.opname == 'MAKE_FUNCTION':
+            #     context.add_opcodes(
+            #         JavaOpcodes.DUP(),
+            #         ICONST_val(0),
+            #     )
 
-                context.add_opcodes(
-                    ALOAD_name(context, '##comprehension##'),
-                    JavaOpcodes.AASTORE()
-                )
+            #     context.add_opcodes(
+            #         ALOAD_name(context, '##comprehension##'),
+            #         JavaOpcodes.AASTORE()
+            #     )
 
             # Push all the arguments into an array
             for i, argument in enumerate(arguments[1:self.args+1]):
@@ -2324,11 +2324,31 @@ class MAKE_FUNCTION(Opcode):
         if method.is_constructor:
             pass
             # Nothing needed on stack; class construction is self contained.
+
         elif method.is_closuremethod:
             context.add_opcodes(
                 JavaOpcodes.NEW(method.callable),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL(method.callable, '<init>', '()V'),
+                ICONST_val(len(method.parent.closure_var_names)),
+                JavaOpcodes.ANEWARRAY('org/python/Object'),
+            )
+            # Pass in all the closure variables as arguments to the
+            # constructor of the closure.
+            for i, closure_var_name in enumerate(method.parent.closure_var_names):
+                context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                )
+                context.load_name(closure_var_name)
+                context.add_opcodes(
+                    JavaOpcodes.AASTORE(),
+                )
+
+            context.add_opcodes(
+                JavaOpcodes.NEW('java/util/Hashtable'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
+                JavaOpcodes.INVOKESPECIAL(method.callable, '<init>', '([Lorg/python/Object;Ljava/util/Hashtable;)V'),
             )
         else:
             # Push a callable onto the stack so that it can be stored

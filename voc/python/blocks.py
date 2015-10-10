@@ -36,6 +36,10 @@ class Block:
     def module(self):
         return self.parent
 
+    @property
+    def globals_source(self):
+        return self.module.descriptor
+
     def store_name(self, name, allow_locals=True):
         if allow_locals:
             self.add_opcodes(
@@ -63,7 +67,7 @@ class Block:
         except KeyError:
             self.add_opcodes(
                 # If there isn't a local, look for a global
-                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.GETSTATIC(self.globals_source, 'globals', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
 
@@ -107,7 +111,7 @@ class Block:
         except KeyError:
             self.add_opcodes(
                 # If there isn't a local, look for a global
-                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+                JavaOpcodes.GETSTATIC(self.globals_source, 'globals', 'Ljava/util/Hashtable;'),
                 JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             )

@@ -142,7 +142,7 @@ class ClassBlock(Block):
 
 
 class Class(Block):
-    def __init__(self, module, name, namespace=None, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, module, name, namespace=None, super_name=None, interfaces=None, public=True, final=False, methods=None, fields=None, init=None):
         super().__init__(module)
         self.name = name
         self.super_name = super_name if super_name else 'org/python/types/Object'
@@ -150,6 +150,7 @@ class Class(Block):
         self.public = public
         self.final = final
         self.methods = methods if methods else []
+        self.fields = fields if fields else {}
         self.init = init
         if namespace is None:
             self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
@@ -184,6 +185,12 @@ class Class(Block):
         classfile.fields.append(
             JavaField('classattrs', 'Ljava/util/Hashtable;', public=True, static=True)
         )
+
+        # Add any manually defined fields
+        classfile.fields.extend([
+            JavaField(name, descriptor)
+            for name, descriptor in self.fields.items()
+        ])
 
         if body:
             # If we have block content, add a static block to the class
@@ -240,7 +247,8 @@ class InnerClass(Class):
 
 
 class AnonymousInnerClass(Class):
-    def __init__(self, parent, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, parent, closure_var_names, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+        self.closure_var_names = closure_var_names
         if isinstance(parent, Class):
             module = parent.module
         else:
