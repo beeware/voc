@@ -1,4 +1,6 @@
-from .constants import Utf8, Classref, NameAndType
+from collections import OrderedDict
+
+from .constants import Utf8, Classref, NameAndType, Float, Integer
 from .opcodes import Opcode
 from .signatures import method_descriptor
 
@@ -1162,7 +1164,7 @@ class UninitializedVariableInfo(VerificationTypeInfo):
     @staticmethod
     def read_info(reader):
         offset = reader.read_u2()
-        return ObjectVariableInfo(offset)
+        return UninitializedVariableInfo(offset)
 
     def write_info(self, writer):
         writer.write_u2(self.offset)
@@ -2121,7 +2123,10 @@ class Annotation:
         self.element_value_pairs = element_value_pairs
 
     def __len__(self):
-        return 2 + sum((2 + len(element_value)) for element_name, element_value in self.element_value_pairs)
+        return 2 + 2 + sum(
+            (2 + len(element_value))
+            for element_name, element_value in self.element_value_pairs.items()
+        )
 
     @property
     def num_element_value_pairs(self):
@@ -2142,30 +2147,30 @@ class Annotation:
         num_element_value_pairs = reader.read_u2()
 
         if dump is not None:
-            reader.debug("    " * dump, 'Annotations (%s pairs):' % num_element_value_pairs)
+            reader.debug("    " * dump, '%s (%s pairs):' % (type_name, num_element_value_pairs))
 
-        element_value_pairs = []
+        element_value_pairs = OrderedDict()
         for i in range(0, num_element_value_pairs):
             element_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
             value = ElementValue.read(reader)
             if dump is not None:
-                reader.debug("    " * dump, '%s: %s' % (element_name, value))
+                reader.debug("    " * (dump + 1), '%s: %s' % (element_name, value))
 
-            element_value_pairs.append((element_name, value))
+            element_value_pairs[element_name] = value
 
         return Annotation(type_name, element_value_pairs)
 
     def write(self, writer):
         writer.write_u2(writer.constant_pool.index(self.type_name))
         writer.write_u2(self.num_element_value_pairs)
-        for element_name, value in self.element_value_pairs:
-            writer.write_u2(writer.constant_pool.index(self.type_name))
+        for element_name, value in self.element_value_pairs.items():
+            writer.write_u2(writer.constant_pool.index(Utf8(element_name)))
             value.write(writer)
 
     def resolve(self, constant_pool):
         constant_pool.add(self.type_name)
-        for element_name, value in self.element_value_pairs:
-            constant_pool.add(element_name)
+        for element_name, value in self.element_value_pairs.items():
+            constant_pool.add(Utf8(element_name))
             value.resolve(constant_pool)
 
 
@@ -2221,7 +2226,9 @@ class ElementValue:
 
         tag = chr(reader.read_u1())
 
-        # The value item represents the value of this annotation element. This item is a union. The tag item, above, determines which item of the union is to be used:
+        # The value item represents the value of this annotation element. This
+        # item is a union. The tag item, above, determines which item of the
+        # union is to be used:
 
         if tag in ('B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z', 's'):
             value = ConstantElementValue.read(reader)
@@ -2249,24 +2256,54 @@ class ConstantElementValue:
         # constant_pool table. The constant_pool entry at that index must be of
         # the correct entry type for the field type designated by the tag item,
         # as specified in Table 4.9.
-        self.value = value
+        # if isinstance(value, str):
+        #     self.tag = 'B'
+        #     self.value = Utf8(value)
+        # elif isinstance(value, str) and len(value) == 1:
+        #     self.tag = 'C'
+        #     self.value = Utf8(value)
+        if isinstance(value, float):
+            self.tag = 'D'
+            self.value = Float(value)
+        # elif isinstance(value, str):
+        #     self.tag = 'F'
+        #     self.value = Utf8(value)
+        elif isinstance(value, int):
+            self.tag = 'I'
+            self.value = Integer(value)
+        # elif isinstance(value, str):
+        #     self.tag = 'J'
+        #     self.value = Utf8(value)
+        # elif isinstance(value, str):
+        #     self.tag = 'S'
+        #     self.value = Utf8(value)
+        # elif isinstance(value, bool):
+        #     self.tag = 'Z'
+        #     self.value = Boolean(value)
+        elif isinstance(value, str):
+            self.tag = 's'
+            self.value = Utf8(value)
+        else:
+
+            raise Exception("Unknown constant type", type(value))
 
     def __len__(self):
-        return 2
+        return 1 + 2
 
     def __str__(self):
         return str(self.value)
 
     @staticmethod
     def read(reader):
-        value = reader.constant_pool[reader.read_u2()]
-        return ConstantElementValue(value)
+        constant = reader.constant_pool[reader.read_u2()]
+        return ConstantElementValue(constant.value)
 
     def write(self, writer):
+        writer.write_u1(ord(self.tag))
         writer.write_u2(writer.constant_pool.index(self.value))
 
     def resolve(self, constant_pool):
-        constant_pool.add(self.value)
+        self.value.resolve(constant_pool)
 
 
 class EnumConstantElementValue:
@@ -2290,7 +2327,7 @@ class EnumConstantElementValue:
         self.const_name = Utf8(const_name)
 
     def __len__(self):
-        return 2 + 2
+        return 1 + 2 + 2
 
     def __str__(self):
         return "%s = %s" % (self.type_name, self.const_name)
@@ -2302,6 +2339,7 @@ class EnumConstantElementValue:
         return EnumConstantElementValue(type_name, const_name)
 
     def write(self, writer):
+        writer.write_u1('e')
         writer.write_u2(writer.constant_pool.index(self.type_name))
         writer.write_u2(writer.constant_pool.index(self.const_name))
 
@@ -2326,7 +2364,7 @@ class ClassElementValue:
         self.klass = Classref(class_name)
 
     def __len__(self):
-        return 2
+        return 1 + 2
 
     def __str__(self):
         return str(self.value)
@@ -2337,6 +2375,7 @@ class ClassElementValue:
         return ClassElementValue(class_name)
 
     def write(self, writer):
+        writer.write_u1('c')
         writer.write_u2(writer.constant_pool.index(self.klass))
 
     def resolve(self, constant_pool):
@@ -2353,7 +2392,7 @@ class AnnotationElementValue:
         self.annotation = annotation
 
     def __len__(self):
-        return len(self.annotation)
+        return 1 + len(self.annotation)
 
     def __str__(self):
         return str(self.annotation)
@@ -2364,6 +2403,7 @@ class AnnotationElementValue:
         return AnnotationElementValue(annotation)
 
     def write(self, writer):
+        writer.write_u1('@')
         self.annotation.write(writer)
 
     def resolve(self, constant_pool):
@@ -2380,7 +2420,7 @@ class ArrayElementValue:
         self.values = values
 
     def __len__(self):
-        return 2 + sum(len(v) for v in self.values)
+        return 1 + 2 + sum(len(v) for v in self.values)
 
     @property
     def num_values(self):
@@ -2404,6 +2444,7 @@ class ArrayElementValue:
         return ArrayElementValue(values)
 
     def write(self, writer):
+        writer.write_u1('[')
         writer.write_u2(self.num_values)
         for value in self.values:
             value.write(writer)

@@ -2,7 +2,7 @@ package org.python.types;
 
 
 public class Object implements org.python.Object {
-    public java.util.Hashtable<java.lang.String, org.python.Object> attrs;
+    public java.util.Map<java.lang.String, org.python.Object> attrs;
 
     /**
      * A utility method to update the internal value of this object.
@@ -12,17 +12,32 @@ public class Object implements org.python.Object {
      * to provide the relevant assignment info.
      */
     void setValue(org.python.Object obj) {
-        throw new org.python.exceptions.RuntimeError("'" + org.Python.pythonClassName(this) + "' object cannot be updated.");
+        throw new org.python.exceptions.RuntimeError("'" + org.Python.pythonTypeName(this) + "' object cannot be updated.");
+    }
+
+    /**
+     * Construct a new object instance.
+     *
+     * The argument `empty` is used to flag placeholder objects. These are
+     * transient objects that exist during instantiation of other objects;
+     * as a result, they don't have attributes or any of the other usual
+     * infrastructure of a Python object.
+     */
+    protected Object(boolean empty) {
+        if (!empty) {
+            this.attrs = new java.util.HashMap<java.lang.String, org.python.Object>();
+            org.python.types.Type cls = org.python.types.Type.pythonType(this.getClass());
+            this.__new__(cls);
+        }
     }
 
     public Object() {
-        attrs = new java.util.Hashtable<java.lang.String, org.python.Object>();
+        this(false);
     }
 
     /**
      * Proxy Java object methods onto their Python counterparts.
      */
-
     public boolean equals(java.lang.Object other) {
         try {
             return ((org.python.types.Bool) __eq__((org.python.types.Object) other)).value;
@@ -62,20 +77,54 @@ public class Object implements org.python.Object {
      * Python interface compatibility
      * Section 3.3.1 - Basic customization
      */
-    // public void __new__() {
-    //     throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__new__'");
-    // }
+    @org.python.Method(
+        __doc__ = "Create and return a new object.  See help(type) for accurate signature."
+    )
+    public org.python.types.Type __new__(org.python.types.Type cls) {
+        this.attrs.put("__class__", cls);
+        if (cls.is_placeholder()) {
+            cls.add_reference(this);
+        }
+        return cls;
+    }
+
 
     // public void __init__() {
-    //     throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__init__'");
+    //     throw new org.python.exceptions.AttributeError(this, "__init__");
     // }
 
     public void __del__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__del__'");
+        throw new org.python.exceptions.AttributeError(this, "__del__");
+    }
+
+    @org.python.Method(
+        __doc__ = "Return repr(self)."
+    )
+    public org.python.Object __repr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("wrapper __lt__ doesn't take keyword arguments");
+        }
+        if (args.length != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+        }
+        return this.__repr__();
     }
 
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<%s object at %x>", org.Python.pythonClassName(this), this.hashCode()));
+        return new org.python.types.Str(String.format("<%s object at 0x%x>", org.Python.pythonTypeName(this), this.hashCode()));
+    }
+
+    @org.python.Method(
+        __doc__ = "Return str(self)."
+    )
+    public org.python.Object __str__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("wrapper __lt__ doesn't take keyword arguments");
+        }
+        if (args.length != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+        }
+        return this.__str__();
     }
 
     public org.python.types.Str __str__() {
@@ -83,15 +132,14 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.Bytes __bytes__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__bytes__'");
+        throw new org.python.exceptions.AttributeError(this, "__bytes__");
     }
 
-    public org.python.types.Str __format__() {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__format__' has not been implemented");
+    public org.python.types.Str __format__(org.python.Object format_spec) {
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__format__' has not been implemented");
     }
 
-
-    public org.python.Object __lt__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __lt__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __lt__ doesn't take keyword arguments");
         }
@@ -104,11 +152,13 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__lt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__lt__' has not been implemented");
     }
 
-
-    public org.python.Object __le__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __le__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __le__ doesn't take keyword arguments");
         }
@@ -121,11 +171,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__le__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__le__' has not been implemented");
     }
 
 
-    public org.python.Object __eq__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __eq__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __eq__ doesn't take keyword arguments");
         }
@@ -138,11 +188,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__eq__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__eq__' has not been implemented");
     }
 
 
-    public org.python.Object __ne__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __ne__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ne__ doesn't take keyword arguments");
         }
@@ -155,10 +205,10 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__ne__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__ne__' has not been implemented");
     }
 
-    public org.python.Object __gt__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __gt__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __gt__ doesn't take keyword arguments");
         }
@@ -171,10 +221,10 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__gt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__gt__' has not been implemented");
     }
 
-    public org.python.Object __ge__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __ge__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ge__ doesn't take keyword arguments");
         }
@@ -187,7 +237,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__ge__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__ge__' has not been implemented");
     }
 
     public org.python.types.Int __hash__() {
@@ -195,7 +245,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.Bool __bool__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__bool__'");
+        throw new org.python.exceptions.AttributeError(this, "__bool__");
     }
 
 
@@ -203,7 +253,7 @@ public class Object implements org.python.Object {
      * Section 3.3.2 - Emulating container types
      */
 
-    public org.python.Object __getattr__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __getattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __getattr__ doesn't take keyword arguments");
         }
@@ -228,10 +278,10 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __getattr__(java.lang.String name) {
-        return this.__getattribute__(name);
+        throw new org.python.exceptions.AttributeError(this, "__getattr__");
     }
 
-    public org.python.Object __getattribute__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __getattribute__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __getattribute__ doesn't take keyword arguments");
         }
@@ -258,28 +308,43 @@ public class Object implements org.python.Object {
     @SuppressWarnings("unchecked")
     public org.python.Object __getattribute__(java.lang.String name) {
         // Look for local instance attributes first
+        // System.out.println("ATTRS " + this.attrs);
         org.python.Object value = this.attrs.get(name);
         if (value == null) {
             try {
-                // No instance attribute; look for a class global.
-                java.lang.reflect.Field classattrs_field = this.getClass().getField("classattrs");
-                java.util.Map<java.lang.String, org.python.Object> classattrs = (java.util.Map<java.lang.String, org.python.Object>) classattrs_field.get(this);
-                value = classattrs.get(name);
+                // No instance attribute; look for a class attribute.
+                org.python.types.Type klass = (org.python.types.Type) this.attrs.get("__class__");
+                // System.out.println("CLASS ATTRS " + klass.attrs);
+                value = klass.attrs.get(name);
+
                 if (value == null) {
-                    throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "'");
+                    // No class attribute; Try the __getattr__ helper.
+                    value = this.__getattr__(name);
                 }
-            } catch (ClassCastException e) {
-                throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "' (Python class attributes not stored corrrectly)");
-            } catch (IllegalAccessException e) {
-                throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "' (illegal Java access)");
-            } catch (NoSuchFieldException e) {
-                throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "' (no Python class attributes)");
+            } catch (org.python.exceptions.AttributeError e) {
+                throw new org.python.exceptions.AttributeError(this, name);
             }
         }
-        return value;
+
+        return value.__get__(this, org.python.types.Type.pythonType(this.getClass()));
     }
 
-    public void __setattr__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __get__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.RuntimeError("Descriptor method __get__ does not accept keyword arguments.");
+        }
+        if (args.length == 2) {
+            return this.__get__(args[0], (org.python.types.Type) args[1]);
+        } else {
+            throw new org.python.exceptions.RuntimeError("Descriptor method __get__ takes exactly 2 arguments (" + args.length + " given).");
+        }
+    }
+
+    public org.python.Object __get__(org.python.Object instance, org.python.types.Type klass) {
+        return this;
+    }
+
+    public void __setattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __setattr__ doesn't take keyword arguments");
         }
@@ -307,13 +372,13 @@ public class Object implements org.python.Object {
         // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {
             if (this.attrs.get(name) == null) {
-                throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "'");
+                throw new org.python.exceptions.AttributeError(this, name);
             }
         }
         attrs.put(name, value);
     }
 
-    public void __delattr__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __delattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __delattr__ doesn't take keyword arguments");
         }
@@ -340,12 +405,12 @@ public class Object implements org.python.Object {
     public void __delattr__(java.lang.String name) {
         org.python.Object result = attrs.remove(name);
         if (result == null) {
-            throw new org.python.exceptions.AttributeError("'" + org.Python.pythonClassName(this) + "' object has no attribute '" + name + "'");
+            throw new org.python.exceptions.AttributeError(this, name);
         }
     }
 
     public org.python.types.List __dir__() {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonClassName(this) + ".__dir__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__dir__' has not been implemented");
     }
 
 
@@ -353,11 +418,11 @@ public class Object implements org.python.Object {
      * Section 3.3.4 - Customizing instance and subclass checks
      */
     public org.python.Object __instancecheck__(org.python.Object instance) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__instancecheck__'");
+        throw new org.python.exceptions.AttributeError(this, "__instancecheck__");
     }
 
     public org.python.Object __subclasscheck__(org.python.Object subclass) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__subclasscheck__'");
+        throw new org.python.exceptions.AttributeError(this, "__subclasscheck__");
     }
 
 
@@ -365,7 +430,7 @@ public class Object implements org.python.Object {
      * Section 3.3.5 - Emulating callable objects
      */
     public org.python.Object __call__(org.python.Object... args) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__call__'");
+        throw new org.python.exceptions.AttributeError(this, "__call__");
     }
 
 
@@ -374,15 +439,15 @@ public class Object implements org.python.Object {
      */
 
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__len__'");
+        throw new org.python.exceptions.AttributeError(this, "__len__");
     }
 
     public org.python.types.Int __length_hint__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__length_hint__'");
+        throw new org.python.exceptions.AttributeError(this, "__length_hint__");
     }
 
 
-    public org.python.Object __getitem__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __getitem__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __getitem__ doesn't take keyword arguments");
         }
@@ -395,20 +460,16 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __getitem__(org.python.Object index) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__getitem__'");
-    }
-
-    public org.python.Object __getitem__(int index) {
-        return this.__getitem__(new org.python.types.Int(index));
+        throw new org.python.exceptions.AttributeError(this, "__getitem__");
     }
 
 
     public org.python.Object __missing__(org.python.Object key) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__missing__'");
+        throw new org.python.exceptions.AttributeError(this, "__missing__");
     }
 
 
-    public void __setitem__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __setitem__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __setitem__ doesn't take keyword arguments");
         }
@@ -421,7 +482,7 @@ public class Object implements org.python.Object {
     }
 
     public void __setitem__(org.python.Object index, org.python.Object value) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__setitem__'");
+        throw new org.python.exceptions.AttributeError(this, "__setitem__");
     }
 
     public void __setitem__(int index, org.python.Object value) {
@@ -429,7 +490,7 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __delitem__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __delitem__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __delitem__ doesn't take keyword arguments");
         }
@@ -442,7 +503,7 @@ public class Object implements org.python.Object {
     }
 
     public void __delitem__(org.python.Object index) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__delitem__'");
+        throw new org.python.exceptions.AttributeError(this, "__delitem__");
     }
 
     public void __delitem__(int index) {
@@ -451,15 +512,15 @@ public class Object implements org.python.Object {
 
 
     public org.python.Iterable __iter__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__iter__'");
+        throw new org.python.exceptions.AttributeError(this, "__iter__");
     }
 
     public org.python.Iterable __reversed__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__reversed__'");
+        throw new org.python.exceptions.AttributeError(this, "__reversed__");
     }
 
     public org.python.types.Bool __contains__(org.python.Object item) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__contains__'");
+        throw new org.python.exceptions.AttributeError(this, "__contains__");
     }
 
 
@@ -467,7 +528,7 @@ public class Object implements org.python.Object {
      * Section 3.3.7 - Emulating numeric types
      */
 
-    public org.python.Object __add__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __add__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __add__ doesn't take keyword arguments");
         }
@@ -480,11 +541,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __sub__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __sub__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __sub__ doesn't take keyword arguments");
         }
@@ -497,11 +558,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __sub__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __mul__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __mul__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __mul__ doesn't take keyword arguments");
         }
@@ -514,11 +575,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __truediv__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __truediv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __truediv__ doesn't take keyword arguments");
         }
@@ -531,11 +592,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __floordiv__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __floordiv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __floordiv__ doesn't take keyword arguments");
         }
@@ -548,11 +609,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __mod__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __mod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __mod__ doesn't take keyword arguments");
         }
@@ -565,11 +626,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __divmod__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __divmod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __divmod__ doesn't take keyword arguments");
         }
@@ -582,11 +643,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__divmod__'");
+        throw new org.python.exceptions.AttributeError(this, "__divmod__");
     }
 
 
-    public org.python.Object __pow__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __pow__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __pow__ doesn't take keyword arguments");
         }
@@ -599,11 +660,15 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __pow__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+    }
+
+    public org.python.Object __pow__(org.python.Object other, org.python.Object modulus) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.pythonTypeName(this) + "', '" + org.Python.pythonTypeName(other) + "', '" + org.Python.pythonTypeName(modulus) + "'");
     }
 
 
-    public org.python.Object __lshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __lshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __lshift__ doesn't take keyword arguments");
         }
@@ -616,11 +681,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __rshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rshift__ doesn't take keyword arguments");
         }
@@ -633,11 +698,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __and__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __and__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __and__ doesn't take keyword arguments");
         }
@@ -650,11 +715,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __xor__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __xor__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __xor__ doesn't take keyword arguments");
         }
@@ -667,11 +732,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __xor__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __or__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __or__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __or__ doesn't take keyword arguments");
         }
@@ -684,11 +749,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __or__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
 
-    public org.python.Object __radd__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __radd__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __radd__ doesn't take keyword arguments");
         }
@@ -701,11 +766,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __radd__(org.python.Object other) {
-        return other.__add__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for + (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rsub__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rsub__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rsub__ doesn't take keyword arguments");
         }
@@ -718,11 +783,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rsub__(org.python.Object other) {
-        return other.__sub__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for - (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rmul__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rmul__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rmul__ doesn't take keyword arguments");
         }
@@ -735,11 +800,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rmul__(org.python.Object other) {
-        return other.__mul__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for * (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rtruediv__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rtruediv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rtruediv__ doesn't take keyword arguments");
         }
@@ -752,11 +817,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rtruediv__(org.python.Object other) {
-        return other.__truediv__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for / (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rfloordiv__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rfloordiv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rfloordiv__ doesn't take keyword arguments");
         }
@@ -769,11 +834,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rfloordiv__(org.python.Object other) {
-        return other.__floordiv__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for // (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rmod__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rmod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rmod__ doesn't take keyword arguments");
         }
@@ -786,11 +851,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rmod__(org.python.Object other) {
-        return other.__mod__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for % (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rdivmod__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rdivmod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rdivmod__ doesn't take keyword arguments");
         }
@@ -803,11 +868,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rdivmod__(org.python.Object other) {
-        return other.__divmod__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rpow__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rpow__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rpow__ doesn't take keyword arguments");
         }
@@ -820,11 +885,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rpow__(org.python.Object other) {
-        return other.__pow__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ or pow() (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rlshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rlshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rlshift__ doesn't take keyword arguments");
         }
@@ -837,11 +902,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rlshift__(org.python.Object other) {
-        return other.__lshift__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for << (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rrshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rrshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rrshift__ doesn't take keyword arguments");
         }
@@ -854,11 +919,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rrshift__(org.python.Object other) {
-        return other.__rshift__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >> (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rand__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rand__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rand__ doesn't take keyword arguments");
         }
@@ -871,11 +936,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rand__(org.python.Object other) {
-        return other.__and__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for & (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __rxor__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __rxor__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rxor__ doesn't take keyword arguments");
         }
@@ -888,11 +953,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rxor__(org.python.Object other) {
-        return other.__xor__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public org.python.Object __ror__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public org.python.Object __ror__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ror__ doesn't take keyword arguments");
         }
@@ -905,11 +970,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __ror__(org.python.Object other) {
-        return other.__or__(this);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for | (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
     }
 
 
-    public void __iadd__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __iadd__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __iadd__ doesn't take keyword arguments");
         }
@@ -925,12 +990,12 @@ public class Object implements org.python.Object {
         try {
             this.setValue(this.__add__(other));
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + org.Python.pythonClassName(this) + "' and '" + org.Python.pythonClassName(other) + "'");
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
         }
     }
 
 
-    public void __isub__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __isub__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __isub__ doesn't take keyword arguments");
         }
@@ -943,11 +1008,11 @@ public class Object implements org.python.Object {
     }
 
     public void __isub__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__isub__'");
+        throw new org.python.exceptions.AttributeError(this, "__isub__");
     }
 
 
-    public void __imul__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __imul__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __imul__ doesn't take keyword arguments");
         }
@@ -960,11 +1025,11 @@ public class Object implements org.python.Object {
     }
 
     public void __imul__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__imul__'");
+        throw new org.python.exceptions.AttributeError(this, "__imul__");
     }
 
 
-    public void __itruediv__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __itruediv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __itruediv__ doesn't take keyword arguments");
         }
@@ -977,11 +1042,11 @@ public class Object implements org.python.Object {
     }
 
     public void __itruediv__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__itruediv__'");
+        throw new org.python.exceptions.AttributeError(this, "__itruediv__");
     }
 
 
-    public void __ifloordiv__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __ifloordiv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ifloordiv__ doesn't take keyword arguments");
         }
@@ -994,11 +1059,11 @@ public class Object implements org.python.Object {
     }
 
     public void __ifloordiv__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ifloordiv__'");
+        throw new org.python.exceptions.AttributeError(this, "__ifloordiv__");
     }
 
 
-    public void __imod__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __imod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __imod__ doesn't take keyword arguments");
         }
@@ -1011,11 +1076,11 @@ public class Object implements org.python.Object {
     }
 
     public void __imod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__imod__'");
+        throw new org.python.exceptions.AttributeError(this, "__imod__");
     }
 
 
-    public void __ipow__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __ipow__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ipow__ doesn't take keyword arguments");
         }
@@ -1028,11 +1093,11 @@ public class Object implements org.python.Object {
     }
 
     public void __ipow__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ipow__'");
+        throw new org.python.exceptions.AttributeError(this, "__ipow__");
     }
 
 
-    public void __ilshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __ilshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ilshift__ doesn't take keyword arguments");
         }
@@ -1045,11 +1110,11 @@ public class Object implements org.python.Object {
     }
 
     public void __ilshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ilshift__'");
+        throw new org.python.exceptions.AttributeError(this, "__ilshift__");
     }
 
 
-    public void __irshift__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __irshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __irshift__ doesn't take keyword arguments");
         }
@@ -1062,11 +1127,11 @@ public class Object implements org.python.Object {
     }
 
     public void __irshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__irshift__'");
+        throw new org.python.exceptions.AttributeError(this, "__irshift__");
     }
 
 
-    public void __iand__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __iand__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __iand__ doesn't take keyword arguments");
         }
@@ -1079,11 +1144,11 @@ public class Object implements org.python.Object {
     }
 
     public void __iand__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__iand__'");
+        throw new org.python.exceptions.AttributeError(this, "__iand__");
     }
 
 
-    public void __ixor__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    public void __ixor__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ixor__ doesn't take keyword arguments");
         }
@@ -1096,11 +1161,14 @@ public class Object implements org.python.Object {
     }
 
     public void __ixor__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ixor__'");
+        throw new org.python.exceptions.AttributeError(this, "__ixor__");
     }
 
 
-    public void __ior__(org.python.Object [] args, java.util.Hashtable kwargs) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public void __ior__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ior__ doesn't take keyword arguments");
         }
@@ -1113,24 +1181,24 @@ public class Object implements org.python.Object {
     }
 
     public void __ior__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__ior__'");
+        throw new org.python.exceptions.AttributeError(this, "__ior__");
     }
 
 
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__neg__'");
+        throw new org.python.exceptions.AttributeError(this, "__neg__");
     }
 
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__pos__'");
+        throw new org.python.exceptions.AttributeError(this, "__pos__");
     }
 
     public org.python.Object __abs__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__abs__'");
+        throw new org.python.exceptions.AttributeError(this, "__abs__");
     }
 
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__invert__'");
+        throw new org.python.exceptions.AttributeError(this, "__invert__");
     }
 
 
@@ -1138,21 +1206,29 @@ public class Object implements org.python.Object {
         return new org.python.types.Bool(!this.__bool__().value);
     }
 
-    public org.python.Object __complex__(org.python.Object [] args, java.util.Hashtable kwargs) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__complex__'");
+    public org.python.Object __complex__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.AttributeError(this, "__complex__");
+    }
+
+    public org.python.Object __complex__(org.python.Object real, org.python.Object imag) {
+        throw new org.python.exceptions.AttributeError(this, "__complex__");
     }
 
 
     public org.python.types.Int __int__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__int__'");
+        throw new org.python.exceptions.AttributeError(this, "__int__");
     }
 
     public org.python.types.Float __float__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__float__'");
+        throw new org.python.exceptions.AttributeError(this, "__float__");
     }
 
     public org.python.Object __round__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__round__'");
+        throw new org.python.exceptions.AttributeError(this, "__round__");
+    }
+
+    public org.python.Object __round__(org.python.Object ndigits) {
+        throw new org.python.exceptions.AttributeError(this, "__round__");
     }
 
 
@@ -1160,11 +1236,11 @@ public class Object implements org.python.Object {
      * Section 3.3.8 - With statement context
      */
     public org.python.Object __enter__() {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__enter__'");
+        throw new org.python.exceptions.AttributeError(this, "__enter__");
     }
 
     public org.python.Object __exit__(org.python.Object exc_type, org.python.Object exc_value, org.python.Object traceback) {
-        throw new org.python.exceptions.AttributeError(org.Python.pythonClassName(this) + " has no attribute '__exit__'");
+        throw new org.python.exceptions.AttributeError(this, "__exit__");
     }
 
 }

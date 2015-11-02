@@ -80,53 +80,66 @@ public class List extends org.python.types.Object {
 
     public org.python.Object __getitem__(org.python.Object index) {
         try {
-            return this.__getitem__((int)((org.python.types.Int) index).value);
+            int idx = (int)((org.python.types.Int) index).value;
+            if (idx < 0) {
+                if (-idx > this.value.size()) {
+                    throw new org.python.exceptions.IndexError("list index out of range");
+                } else {
+                    return this.value.get(this.value.size() + idx);
+                }
+            } else {
+                if (idx >= this.value.size()) {
+                    throw new org.python.exceptions.IndexError("list index out of range");
+                } else {
+                    return this.value.get(idx);
+                }
+            }
         } catch (ClassCastException e) {
             throw new org.python.exceptions.TypeError("list indices must be integers, not str");
         }
     }
 
-    public org.python.Object __getitem__(int index) {
-        if (index < 0) {
-            if (-index > this.value.size()) {
-                throw new org.python.exceptions.IndexError("list index out of range");
-            } else {
-                return this.value.get(this.value.size() + index);
-            }
-        } else {
-            if (index >= this.value.size()) {
-                throw new org.python.exceptions.IndexError("list index out of range");
-            } else {
-                return this.value.get(index);
-            }
-        }
-    }
-
     public void __setitem__(org.python.Object index, org.python.Object value) {
         try {
-            this.__setitem__((int) ((org.python.types.Int) index).value, value);
+            int idx = (int) ((org.python.types.Int) index).value;
+            if (idx < 0) {
+                if (-idx > this.value.size()) {
+                    throw new org.python.exceptions.IndexError("list index out of range");
+                } else {
+                    this.value.set(this.value.size() + idx, value);
+                }
+            } else {
+                if (idx >= this.value.size()) {
+                    throw new org.python.exceptions.IndexError("list index out of range");
+                } else {
+                    this.value.set(idx, value);
+                }
+            }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.pythonClassName(index));
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.pythonTypeName(index));
         }
     }
-
-    public void __setitem__(int index, org.python.Object value) {
-        this.value.set(index, value);
-    }
-
 
     public void __delitem__(org.python.Object index) {
         try {
-            this.__delitem__((int) ((org.python.types.Int) index).value);
+            int idx = (int) ((org.python.types.Int) index).value;
+            if (idx < 0) {
+                if (-idx > this.value.size()) {
+                    throw new org.python.exceptions.IndexError("list index out of range");
+                } else {
+                    this.value.remove(this.value.size() + idx);
+                }
+            } else {
+                if (idx >= this.value.size()) {
+                    throw new org.python.exceptions.IndexError("list index out of range");
+                } else {
+                    this.value.remove(idx);
+                }
+            }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.pythonClassName(index));
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.pythonTypeName(index));
         }
     }
-
-    public void __delitem__(int index) {
-        this.value.remove(index);
-    }
-
 
     public org.python.Iterable __iter__() {
         return new org.python.types.Iterator(this);

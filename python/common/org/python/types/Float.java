@@ -4,13 +4,6 @@ public class Float extends org.python.types.Object {
     public double value;
 
     /**
-     * Return the python name for this class.
-     */
-    public static java.lang.String getPythonName() {
-        return "float";
-    }
-
-    /**
      * A utility method to update the internal value of this object.
      *
      * Used by __i*__ operations to do an in-place operation.
@@ -61,7 +54,7 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Bool(this.value < 0.0);
             }
         }
-        throw new org.python.exceptions.TypeError("unorderable types: float() < " + org.Python.pythonClassName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: float() < " + org.Python.pythonTypeName(other) + "()");
     }
 
     public org.python.Object __le__(org.python.Object other) {
@@ -137,7 +130,7 @@ public class Float extends org.python.types.Object {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + org.Python.pythonClassName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {

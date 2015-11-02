@@ -8,4 +8,4 @@ local
 local.properties
 distribute-*
 tests/temp
-org
+/org

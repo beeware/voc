@@ -34,8 +34,8 @@ public class Bool extends org.python.types.Object {
         }
     }
 
-    public org.python.types.Str __format__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__format__() has not been implemented.");
+    public org.python.types.Str __format__(org.python.Object format_spec) {
+        throw new org.python.exceptions.NotImplementedError("bool.__format__ has not been implemented.");
     }
 
     public org.python.Object __lt__(org.python.Object other) {

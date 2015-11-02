@@ -1,10 +1,13 @@
 from ..java import (
     Method as JavaMethod,
     opcodes as JavaOpcodes,
+    RuntimeVisibleAnnotations,
+    Annotation,
+    ConstantElementValue,
 )
 
 from .blocks import Block
-from .opcodes import ALOAD_name, ASTORE_name, ICONST_val
+from .opcodes import ALOAD_name, ASTORE_name, free_name, ICONST_val
 
 
 POSITIONAL_OR_KEYWORD = 1
@@ -27,31 +30,72 @@ class Method(Block):
         else:
             self.returns = returns
 
-        # Load args and kwargs, but don't expose those names into the localvars.
-        self.add_self()
-        self.localvars['##__args__##'] = len(self.localvars)
-        self.localvars['##__kwargs__##'] = len(self.localvars)
+        # Load args and kwargs, but don't expose those names into the local_vars.
+        self.add_arguments()
 
         # Then reserve space for all the *actual* arguments.
         for i, arg in enumerate(self.parameters):
-            self.localvars[arg['name']] = len(self.localvars)
+            self.local_vars[arg['name']] = len(self.local_vars)
 
         self.static = static
 
     def __repr__(self):
-        return '<Method %s (%s parameters>' % (self.name, len(self.parameters))
+        return '<Method %s (%s parameters)>' % (self.name, len(self.parameters))
 
     @property
     def is_constructor(self):
         return False
 
     @property
-    def is_instancemethod(self):
+    def is_closuremethod(self):
         return False
 
     @property
-    def is_closuremethod(self):
-        return False
+    def globals_module(self):
+        return self.module
+
+    def store_name(self, name, use_locals):
+        if use_locals:
+            self.add_opcodes(
+                ASTORE_name(self, name)
+            )
+        else:
+            self.add_opcodes(
+                ASTORE_name(self, '#value'),
+                JavaOpcodes.LDC_W(self.globals_module.descriptor),
+                JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name(self, '#value'),
+
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            )
+            free_name(self, '#value')
+
+    def load_name(self, name, use_locals):
+        if use_locals:
+            try:
+                self.add_opcodes(
+                    ALOAD_name(self, name)
+                )
+                return
+            except KeyError:
+                pass
+
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.globals_module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
+    def delete_name(self, name):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.globals_module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
 
     @property
     def has_void_return(self):
@@ -68,16 +112,13 @@ class Method(Block):
             self.add_opcodes(JavaOpcodes.ARETURN())
 
     @property
-    def callable(self):
-        return 'org/python/types/Function'
-
-    @property
     def signature(self):
         return_descriptor = 'V' if self.has_void_return else 'Lorg/python/Object;'
-        return '([Lorg/python/Object;Ljava/util/Hashtable;)%s' % return_descriptor
+        return '([Lorg/python/Object;Ljava/util/Map;)%s' % return_descriptor
 
-    def add_self(self):
-        pass
+    def add_arguments(self):
+        self.local_vars['##__args__##'] = len(self.local_vars)
+        self.local_vars['##__kwargs__##'] = len(self.local_vars)
 
     @property
     def method_name(self):
@@ -94,57 +135,49 @@ class Method(Block):
         callable = AnonymousInnerClass(
             parent=self.parent,
             closure_var_names=code.co_names,
-            super_name='org/python/types/Object',
+            super_name='org/python/types/Closure',
             interfaces=['org/python/Callable'],
-            public=False,
+            public=True,
             final=True,
         )
 
         method = ClosureMethod(callable, 'invoke', extract_parameters(code))
-
         method.extract(code)
-        callable.methods.append(method.transpile())
+        callable.methods.append(method)
 
         #
-        callable.methods.append(AnonymousInitMethod(callable).transpile())
+        callable.methods.append(AnonymousInitMethod(callable))
 
         callable.fields = dict(
             (name, 'Lorg/python/Object;')
             for name in code.co_names
         )
 
-        self.parent.classes.append(callable.transpile())
+        self.parent.classes.append(callable)
 
         return method
 
-    def _insert_parameters(self):
+    def transpile_setup(self):
         # Load all the arguments into locals
-        setup = []
         for i, arg in enumerate(self.parameters):
-            setup.extend([
+            self.add_opcodes(
                 ALOAD_name(self, '##__args__##'),
-                ICONST_val(i + 1 if self.is_instancemethod else 0),
+                ICONST_val(i),
                 JavaOpcodes.AALOAD(),
                 ASTORE_name(self, arg['name']),
+            )
+
+    def method_attributes(self):
+        return [
+            RuntimeVisibleAnnotations([
+                Annotation(
+                    'Lorg/python/Method;',
+                    {
+                        '__doc__': ConstantElementValue("Python method (insert docs here)")
+                    }
+                )
             ])
-        self.code = setup + self.code
-
-    def _insert_closure_vars(self):
-        pass
-
-    def _insert_super_call(self):
-        pass
-
-    def tweak(self):
-        self._insert_parameters()
-        self._insert_closure_vars()
-        self._insert_super_call()
-
-        if self.has_void_return:
-            self.void_return()
-
-        if self.can_ignore_empty:
-            self.ignore_empty()
+        ]
 
     def transpile(self):
         code = super().transpile()
@@ -153,9 +186,7 @@ class Method(Block):
             self.method_name,
             self.signature,
             static=self.static,
-            attributes=[
-                code
-            ]
+            attributes=[code] + self.method_attributes()
         )
 
 
@@ -169,7 +200,7 @@ class InitMethod(Method):
         )
 
     def __repr__(self):
-        return '<Constructor %s (%s parameters>' % (self.klass.name, len(self.parameters))
+        return '<Constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
 
     @property
     def is_constructor(self):
@@ -195,56 +226,54 @@ class InitMethod(Method):
     def can_ignore_empty(self):
         return True
 
-    def add_self(self):
-        self.localvars['self'] = len(self.localvars)
+    def add_arguments(self):
+        self.local_vars['self'] = len(self.local_vars)
+        self.local_vars['##__args__##'] = len(self.local_vars)
+        self.local_vars['##__kwargs__##'] = len(self.local_vars)
 
-    def _insert_parameters(self):
+    def transpile_setup(self):
         # Load all the arguments into locals
-        setup = []
         for i, arg in enumerate(self.parameters):
-            setup.extend([
+            self.add_opcodes(
                 ALOAD_name(self, '##__args__##'),
                 ICONST_val(i),
                 JavaOpcodes.AALOAD(),
                 ASTORE_name(self, arg['name']),
-            ])
-        self.code = setup + self.code
+            )
 
-    def _insert_closure_vars(self):
-        pass
-
-    def _insert_super_call(self):
-        # If the block is an init method, make sure it invokes super().<init>
+        # Make sure the method it invokes super().<init>
         super_found = False
         # FIXME: Search for existing calls on <init>
         # for opcode in code:
         #     if isinstance(opcode, JavaOpcodes.INVOKESPECIAL) and opcode.method.name == '<init>':
         #         super_found = True
         #         break
-        setup = []
         if not super_found:
-            setup.extend([
+            self.add_opcodes(
                 JavaOpcodes.ALOAD_0(),
                 JavaOpcodes.INVOKESPECIAL(self.klass.super_name, '<init>', '()V'),
-            ])
-        self.code = setup + self.code
+            )
+
+    def method_attributes(self):
+        return [
+        ]
 
 
 class AnonymousInitMethod(InitMethod):
     def __init__(self, parent):
         super().__init__(parent, parameters=[None])
 
-    def _insert_closure_vars(self):
-        setup = []
-        for i, closure_var_name in enumerate(self.parent.closure_var_names):
-            setup.extend([
-                ALOAD_name(self, 'self'),
-                ALOAD_name(self, '##__args__##'),
-                ICONST_val(i),
-                JavaOpcodes.AALOAD(),
-                JavaOpcodes.PUTFIELD(self.parent.descriptor, closure_var_name, 'Lorg/python/Object;'),
-            ])
-        self.code = setup + self.code
+    # def _insert_closure_vars(self):
+    #     setup = []
+    #     for i, closure_var_name in enumerate(self.parent.closure_var_names):
+    #         setup.extend([
+    #             ALOAD_name(self, 'self'),
+    #             ALOAD_name(self, '##__args__##'),
+    #             ICONST_val(i),
+    #             JavaOpcodes.AALOAD(),
+    #             JavaOpcodes.PUTFIELD(self.parent.descriptor, closure_var_name, 'Lorg/python/Object;'),
+    #         ])
+    #     self.code = setup + self.code
 
 
 class InstanceMethod(Method):
@@ -258,15 +287,7 @@ class InstanceMethod(Method):
         )
 
     def __repr__(self):
-        return '<InstanceMethod %s.%s (%s parameters>' % (self.klass.name, self.name, len(self.parameters))
-
-    @property
-    def is_instancemethod(self):
-        return True
-
-    @property
-    def callable(self):
-        return 'org/python/types/Method'
+        return '<InstanceMethod %s.%s (%s parameters)>' % (self.klass.name, self.name, len(self.parameters))
 
     @property
     def klass(self):
@@ -276,8 +297,10 @@ class InstanceMethod(Method):
     def module(self):
         return self.klass.module
 
-    def add_self(self):
-        self.localvars['self'] = len(self.localvars)
+    def add_arguments(self):
+        self.local_vars['self'] = len(self.local_vars)
+        self.local_vars['##__args__##'] = len(self.local_vars)
+        self.local_vars['##__kwargs__##'] = len(self.local_vars)
 
 
 class MainMethod(Method):
@@ -291,7 +314,7 @@ class MainMethod(Method):
         )
 
     def __repr__(self):
-        return '<MainMethod %s' % self.module.name
+        return '<MainMethod %s>' % self.module.name
 
     @property
     def method_name(self):
@@ -313,8 +336,31 @@ class MainMethod(Method):
     def can_ignore_empty(self):
         return True
 
-    def _insert_parameters(self):
+    @property
+    def globals_module(self):
+        return self.module
+
+    def add_arguments(self):
         pass
+
+    def transpile_setup(self):
+        self.add_opcodes(
+            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W('__main__'),
+
+            JavaOpcodes.NEW('org/python/types/Module'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.module.descriptor.replace('/', '.')),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', '(Ljava/lang/Class;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.POP(),
+        )
+
+    def method_attributes(self):
+        return [
+        ]
 
 
 class ClosureMethod(Method):
@@ -333,34 +379,28 @@ class ClosureMethod(Method):
         )
 
     @property
-    def is_instancemethod(self):
-        return False
-
-    @property
     def is_closuremethod(self):
         return True
 
     @property
-    def callable(self):
-        return self.parent.descriptor
+    def globals_module(self):
+        return self.module.parent
 
-    @property
-    def globals_source(self):
-        return self.module.parent.descriptor
+    def add_arguments(self):
+        self.local_vars['self'] = len(self.local_vars)
+        self.local_vars['##__args__##'] = len(self.local_vars)
+        self.local_vars['##__kwargs__##'] = len(self.local_vars)
 
-    def add_self(self):
-        self.localvars['self'] = len(self.localvars)
-
-    def _insert_closure_vars(self):
-        # Load all the arguments into locals
-        setup = []
-        for i, closure_var_name in enumerate(self.parent.closure_var_names):
-            setup.extend([
-                ALOAD_name(self, 'self'),
-                JavaOpcodes.GETFIELD(self.callable, closure_var_name, 'Lorg/python/Object;'),
-                ASTORE_name(self, closure_var_name),
-            ])
-        self.code = setup + self.code
+    # def _insert_closure_vars(self):
+    #     # Load all the arguments into locals
+    #     setup = []
+    #     for i, closure_var_name in enumerate(self.parent.closure_var_names):
+    #         setup.extend([
+    #             ALOAD_name(self, 'self'),
+    #             JavaOpcodes.GETFIELD('org/python/types/Function', closure_var_name, 'Lorg/python/Object;'),
+    #             ASTORE_name(self, closure_var_name),
+    #         ])
+    #     self.code = setup + self.code
 
 
 def extract_parameters(code):
