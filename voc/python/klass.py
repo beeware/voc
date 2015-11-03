@@ -116,7 +116,21 @@ class Class(Block):
             public=self.public,
             final=self.final
         )
-        classfile.attributes.append(SourceFile(os.path.basename(self.module.sourcefile)))
+
+        classfile.attributes.append(
+            SourceFile(os.path.basename(self.module.sourcefile))
+        )
+
+        classfile.attributes.append(
+            RuntimeVisibleAnnotations([
+                Annotation(
+                    'Lorg/python/Method;',
+                    {
+                        '__doc__': ConstantElementValue("Python Class (insert docs here)")
+                    }
+                )
+            ])
+        )
 
         body = ClassBlock(self, self.commands).transpile()
 
