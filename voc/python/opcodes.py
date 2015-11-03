@@ -32,7 +32,7 @@ class START_LOOP:
         context.next_resolve_list.append((self, 'start_op'))
 
         # Record this loop.
-        context.blocks.append(self)
+        context.loops.append(self)
 
         # This opcode isn't for the final output.
         return False
@@ -57,7 +57,7 @@ class END_LOOP:
     def process(self, context):
         # Find the most recent if block on the stack that hasn't been
         # ended. That's the block that the elif applies to.
-        for loop in context.blocks[::-1]:
+        for loop in context.loops[::-1]:
             if loop.end_op is None:
                 loop.end_op = RESOLVE
                 break
@@ -841,6 +841,7 @@ class Opcode:
             argument.operation.materialize(context, argument.arguments)
 
     def transpile(self, context, arguments):
+        # print ("TRANSPILE", self)
         # If the Python opcode marks the start of a line of code,
         # transfer that relationship to the first opcode in the
         # generated Java code.
@@ -1240,7 +1241,26 @@ class INPLACE_OR(InplaceOpcode):
     __method__ = '__ior__'
 
 
-# class BREAK_LOOP(Opcode):
+class BREAK_LOOP(Opcode):
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        for loop in context.loops[::-1]:
+            if loop.end_op is None:
+                current_loop = loop
+                break
+
+        context.add_opcodes(
+            jump(JavaOpcodes.GOTO(0), context, current_loop, Opcode.NEXT)
+        )
+
+
 # class WITH_CLEANUP(Opcode):
 
 class RETURN_VALUE(Opcode):
@@ -1902,8 +1922,54 @@ class JUMP_FORWARD(Opcode):
         )
 
 
-# class JUMP_IF_FALSE_OR_POP(Opcode):
-# class JUMP_IF_TRUE_OR_POP(Opcode):
+class JUMP_IF_FALSE_OR_POP(Opcode):
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.target = target
+
+    def __arg_repr__(self):
+        return str(self.target)
+
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.add_opcodes(
+            jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START)
+        )
+
+
+class JUMP_IF_TRUE_OR_POP(Opcode):
+    def __init__(self, target, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.target = target
+
+    def __arg_repr__(self):
+        return str(self.target)
+
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.add_opcodes(
+            IF([
+                    JavaOpcodes.INVOKEINTERFACE('__bool__', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+                    ], JavaOpcodes.IFEQ),
+                jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START),
+            ELSE(),
+                JavaOpcodes.POP(),
+            END_IF()
+        )
 
 
 class JUMP_ABSOLUTE(Opcode):
@@ -2008,7 +2074,24 @@ class LOAD_GLOBAL(Opcode):
         context.load_name(self.name, use_locals=False)
 
 
-# class CONTINUE_LOOP(Opcode):
+class CONTINUE_LOOP(Opcode):
+    @property
+    def consume_count(self):
+        return 0
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        for loop in context.loops[::-1]:
+            if loop.end_op is None:
+                current_loop = loop
+                break
+
+        context.add_opcodes(
+            jump(JavaOpcodes.GOTO(0), context, Ref(context, current_loop), Opcode.START)
+        )
 
 
 class SETUP_LOOP(Opcode):
@@ -2163,6 +2246,9 @@ class CALL_FUNCTION(Opcode):
             self.klass = Class(context.parent, class_name, super_name=super_name)
             self.klass.extract(code)
             context.parent.classes.append(self.klass)
+        else:
+            if arguments[0].operation.opname == 'MAKE_FUNCTION':
+                arguments[0].operation.materialize(context, arguments[0].arguments)
 
     def convert(self, context, arguments):
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
@@ -2326,12 +2412,18 @@ class MAKE_FUNCTION(Opcode):
     def materialize(self, context, arguments):
         # Add a new method definition to the context class/module
         code = arguments[-2].operation.const
-        full_method_name = arguments[-1].operation.const
+        try:
+            full_method_name = arguments[-1].operation.const
+        except AttributeError:
+            full_method_name = '<listcomp>'
 
         self.method = context.add_method(full_method_name, code)
 
     def convert(self, context, arguments):
-        full_method_name = arguments[-1].operation.const
+        try:
+            full_method_name = arguments[-1].operation.const
+        except AttributeError:
+            full_method_name = '<listcomp>'
 
         if self.method.is_constructor:
             pass
@@ -2386,7 +2478,7 @@ def add_callable(context, method, full_method_name):
                 'getMethod',
                 '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'
             ),
-            ASTORE_name(context, '#METHOD#'),
+            ASTORE_name(context, '#method'),
 
             # Then wrap that Method into a Callable.
             JavaOpcodes.NEW('org/python/types/Function'),
@@ -2418,7 +2510,7 @@ def add_callable(context, method, full_method_name):
             # org.python.types.Tuple co_varnames
             # JavaOpcodes.INVOKESPECIAL('Lorg.python.types.Code;', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
 
-            ALOAD_name(context, '#METHOD#'),
+            ALOAD_name(context, '#method'),
 
             # globals
             # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),

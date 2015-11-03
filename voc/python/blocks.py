@@ -27,6 +27,7 @@ class Block:
         self.try_catches = []
         self.blocks = []
         self.jumps = []
+        self.loops = []
         self.jump_targets = {}
         self.unknown_jump_targets = {}
 

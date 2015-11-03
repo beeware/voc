@@ -200,7 +200,9 @@ class TryExcept:
                         ]),
                 )
                 if handler.var_name:
-                    context.store_name(handler.var_name, use_locals=True)
+                    context.add_opcodes(
+                        opcodes.ASTORE_name(context, handler.var_name)
+                    )
                 else:
                     # No named exception, but there is still an exception
                     # on the stack. Pop it off.
@@ -212,7 +214,9 @@ class TryExcept:
                     opcodes.CATCH('org/python/exceptions/%s' % handler.exceptions[0]),
                 )
                 if handler.var_name:
-                    context.store_name(handler.var_name, use_locals=True)
+                    context.add_opcodes(
+                        opcodes.ASTORE_name(context, handler.var_name)
+                    )
                 else:
                     # No named exception, but there is still an exception
                     # on the stack. Pop it off.
@@ -393,7 +397,7 @@ class ElseBlock:
 
 
 class ForLoop:
-    def __init__(self, start, loop, varname, end, start_offset, loop_offset, end_offset, starts_line):
+    def __init__(self, start, loop, varname, end, start_offset, for_offset, loop_offset, end_offset, starts_line):
         self.start = start
         self.loop = loop
         self.end = end
@@ -401,6 +405,7 @@ class ForLoop:
         self.varname = varname
 
         self.start_offset = start_offset
+        self.for_offset = for_offset
         self.loop_offset = loop_offset
         self.end_offset = end_offset
 
@@ -484,9 +489,7 @@ class ForLoop:
         pass
 
     def post_loop(self, context):
-        context.add_opcodes(
-            JavaOpcodes.POP(),
-        )
+        pass
 
     def materialize(self, context):
         for command in self.loop_commands:
@@ -496,6 +499,7 @@ class ForLoop:
             command.materialize(context)
 
     def transpile(self, context):
+        # print ("TRANSPILE LOOP", self.start_offset, self.for_offset, self.loop_offset, self.end_offset)
         context.next_opcode_starts_line = self.starts_line
 
         self.pre_loop(context)
@@ -504,6 +508,7 @@ class ForLoop:
             command.transpile(context)
 
         loop = opcodes.START_LOOP()
+        context.jump_targets[self.for_offset] = loop
 
         context.add_opcodes(
             opcodes.ASTORE_name(context, '#for-iter-%x' % id(self)),
@@ -512,48 +517,47 @@ class ForLoop:
                     opcodes.ALOAD_name(context, '#for-iter-%x' % id(self)),
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
         )
-        self.pre_iteration(context)
         context.add_opcodes(
                     JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;'),
                 opcodes.CATCH('org/python/exceptions/StopIteration'),
-        )
-        self.post_loop(context)
-        context.add_opcodes(
+                    JavaOpcodes.POP(),
                     opcodes.jump(JavaOpcodes.GOTO(0), context, loop, opcodes.Opcode.NEXT),
                 opcodes.END_TRY(),
+            opcodes.ASTORE_name(context, self.varname)
         )
 
-        context.store_name(self.varname, use_locals=True)
-
+        self.pre_iteration(context)
         for command in self.commands:
             command.transpile(context)
 
         context.add_opcodes(opcodes.END_LOOP())
+
+        self.post_loop(context)
 
         # Clean up
         opcodes.free_name(context, '#for-iter-%x' % id(self)),
 
 
 class ComprehensionForLoop(ForLoop):
-    def __init__(self, start, loop, varname, end, start_offset, loop_offset, end_offset, starts_line):
-        super().__init__(start, loop, varname, end, start_offset, loop_offset, end_offset, starts_line)
+    def __init__(self, start, loop, varname, end, start_offset, for_offset, loop_offset, end_offset, starts_line):
+        super().__init__(start, loop, varname, end, start_offset, for_offset, loop_offset, end_offset, starts_line)
 
     def pre_loop(self, context):
-        context.store_name('#for-%x' % id(self)),
-        context.load_name('#for-%x' % id(self)),
+        context.add_opcodes(
+            opcodes.ASTORE_name(context, '#for-%x' % id(self)),
+            opcodes.ALOAD_name(context, '.0'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
+        )
 
     def pre_iteration(self, context):
         context.add_opcodes(
-            JavaOpcodes.DUP(),
+            opcodes.ALOAD_name(context, '#for-%x' % id(self)),
         )
-        context.load_name('.0'),
 
     def post_loop(self, context):
         context.add_opcodes(
-            JavaOpcodes.POP(),
-            context.load_name('#for-%x' % id(self)),
+            opcodes.ALOAD_name(context, '#for-%x' % id(self)),
         )
-        context.free_name('#for-%x' % id(self))
 
 
 class WhileLoop:
@@ -623,6 +627,7 @@ class WhileLoop:
             command.materialize(context)
 
     def transpile(self, context):
+        context.loops.append(self)
         context.next_opcode_starts_line = self.starts_line
         context.add_opcodes(opcodes.START_LOOP())
 
@@ -633,6 +638,7 @@ class WhileLoop:
         context.add_opcodes(end_loop)
 
         context.jump_targets[self.end_offset] = end_loop
+        context.loops.pop()
 
 
 def find_try_except(offset_index, instructions, i):
@@ -755,7 +761,7 @@ def find_blocks(instructions):
     offset_index = {}
     # print(">>>>>" * 10)
     for i, instruction in enumerate(instructions):
-        # print("%4d:%4d %s %s" % (i, instruction.offset, instruction.opname, instruction.argval if instruction.argval is not None else ''))
+        # print("%s%4d:%4d %s %s" % ("> " if instruction.is_jump_target else "  ", i, instruction.offset, instruction.opname, instruction.argval if instruction.argval is not None else ''))
         offset_index[instruction.offset] = i
     # print(">>>>>" * 10)
 
@@ -842,6 +848,7 @@ def find_blocks(instructions):
                     varname=instructions[loop_index - 1].argval,
                     end=end_index,
                     start_offset=instructions[start_index].offset,
+                    for_offset=instructions[loop_index-2].offset,
                     loop_offset=loop_offset,
                     end_offset=end_offset,
                     starts_line=instruction.starts_line
@@ -886,6 +893,7 @@ def find_blocks(instructions):
                 varname=instructions[loop_index - 1].argval,
                 end=end_index,
                 start_offset=instructions[start_index].offset,
+                for_offset=instruction.offset,
                 loop_offset=loop_offset,
                 end_offset=end_offset,
                 starts_line=instruction.starts_line
