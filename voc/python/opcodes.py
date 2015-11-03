@@ -2250,6 +2250,12 @@ class CALL_FUNCTION(Opcode):
             if arguments[0].operation.opname == 'MAKE_FUNCTION':
                 arguments[0].operation.materialize(context, arguments[0].arguments)
 
+            for i, argument in enumerate(arguments[1:self.args+1]):
+                argument.operation.materialize(context, argument.arguments)
+
+            for i, (name, argument) in enumerate(zip(arguments[self.args+1::2], arguments[self.args+2::2])):
+                argument.operation.materialize(context, argument.arguments)
+
     def convert(self, context, arguments):
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # print("DESCRIPTOR", klass.descriptor)
@@ -2412,18 +2418,14 @@ class MAKE_FUNCTION(Opcode):
     def materialize(self, context, arguments):
         # Add a new method definition to the context class/module
         code = arguments[-2].operation.const
-        try:
-            full_method_name = arguments[-1].operation.const
-        except AttributeError:
-            full_method_name = '<listcomp>'
+        full_method_name = arguments[-1].operation.const
 
+        if full_method_name == '<listcomp>':
+            full_method_name = 'listcomp_%x' % id(self)
         self.method = context.add_method(full_method_name, code)
 
     def convert(self, context, arguments):
-        try:
-            full_method_name = arguments[-1].operation.const
-        except AttributeError:
-            full_method_name = '<listcomp>'
+        full_method_name = arguments[-1].operation.const
 
         if self.method.is_constructor:
             pass
