@@ -28,7 +28,7 @@ print('Done.')
 """))
 
 
-class JavanNormalizationTests(unittest.TestCase):
+class JavaNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
         self.assertEqual(cleanse_java(adjust(actual)), adjust(expected))
 
