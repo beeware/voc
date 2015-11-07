@@ -51,9 +51,9 @@ public class Method extends org.python.types.Object implements org.python.Callab
                 // If the Java method raised an Python exception, re-raise that
                 // exception as-is. If it wasn't a Python exception, wrap it
                 // as one and continue.
-                throw (org.python.exceptions.BaseException) e.getTargetException();
+                throw (org.python.exceptions.BaseException) e.getCause();
             } catch (ClassCastException java_e) {
-                throw new org.python.exceptions.RuntimeError(e.getTargetException().toString());
+                throw new org.python.exceptions.RuntimeError(e.getCause().toString());
             }
         } finally {
         //     System.out.println("INVOKE METHOD DONE");

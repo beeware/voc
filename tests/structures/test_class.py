@@ -10,7 +10,7 @@ class ClassTests(TranspileTestCase):
             obj = MyClass()
 
             print('Done.')
-            """)
+            """, run_in_function=False)
 
     def test_simple(self):
         self.assertCodeExecution("""
@@ -27,4 +27,4 @@ class ClassTests(TranspileTestCase):
             obj.stuff(5)
 
             print('Done.')
-            """)
+            """, run_in_function=False)

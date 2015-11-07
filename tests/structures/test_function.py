@@ -25,7 +25,7 @@ class FunctionTests(TranspileTestCase):
         self.assertCodeExecution("""
             if __name__ == '__main__':
                 print("Hello, world")
-            """)
+            """, run_in_function=False)
 
     def test_inner_function(self):
         self.assertCodeExecution("""
@@ -41,7 +41,7 @@ class FunctionTests(TranspileTestCase):
 
             print("outer =", myfunc(5))
             print('Done.')
-            """)
+            """, run_in_function=False)
 
 
     # def test_closure(self):

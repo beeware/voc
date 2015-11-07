@@ -510,11 +510,13 @@ class ForLoop:
         loop = opcodes.START_LOOP()
         context.jump_targets[self.for_offset] = loop
 
+        context.store_name('#for-iter-%x' % id(self), True)
         context.add_opcodes(
-            opcodes.ASTORE_name(context, '#for-iter-%x' % id(self)),
             loop,
                 opcodes.TRY(),
-                    opcodes.ALOAD_name(context, '#for-iter-%x' % id(self)),
+        )
+        context.load_name('#for-iter-%x' % id(self), True)
+        context.add_opcodes(
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
         )
         context.add_opcodes(
@@ -523,8 +525,8 @@ class ForLoop:
                     JavaOpcodes.POP(),
                     opcodes.jump(JavaOpcodes.GOTO(0), context, loop, opcodes.Opcode.NEXT),
                 opcodes.END_TRY(),
-            opcodes.ASTORE_name(context, self.varname)
         )
+        context.store_name(self.varname, True)
 
         self.pre_iteration(context)
         for command in self.commands:
@@ -535,7 +537,7 @@ class ForLoop:
         self.post_loop(context)
 
         # Clean up
-        opcodes.free_name(context, '#for-iter-%x' % id(self)),
+        # opcodes.free_name(context, '#for-iter-%x' % id(self)),
 
 
 class ComprehensionForLoop(ForLoop):
@@ -695,11 +697,13 @@ def find_try_except(offset_index, instructions, i):
                 except_start_index = i + 2
                 # print("EXCEPT START", except_start_index)
 
-            elif instructions[i].opname == 'STORE_NAME':
+            elif instructions[i].opname in ('STORE_NAME', 'STORE_FAST'):
                 var_name = instructions[i].argval
 
                 except_start_index = i + 3
                 # print("EXCEPT START e", except_start_index)
+            else:
+                raise Exception("Unexpected instruction: %s" % instructions[i].opname)
 
         else:
             i = i + 3

@@ -462,7 +462,6 @@ class TryExceptFinallyTests(TranspileTestCase):
             try:
                 obj = int('asdf')
                 print('OK')
-                print
             finally:
                 print("Do final cleanup")
             print('Done.')

@@ -104,6 +104,50 @@ class JavaNormalizationTests(unittest.TestCase):
             """
         )
 
+    def test_nested_exception(self):
+        self.maxDiff = None
+        self.assertNormalized(
+            """
+            Do final cleanup
+            org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
+                at org.python.types.Str.__int__(Str.java:44)
+                at org.Python.int_cast(Python.java:680)
+                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+                at java.lang.reflect.Method.invoke(Method.java:606)
+                at org.python.types.Function.invoke(Function.java:93)
+                at python.example.foo(example.py:81)
+                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+                at java.lang.reflect.Method.invoke(Method.java:606)
+                at org.python.types.Method.invoke(Method.java:45)
+                at python.example.<clinit>(example.py:87)
+            Exception in thread "main" java.lang.ExceptionInInitializerError
+            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
+                at org.python.types.Str.__int__(Str.java:44)
+                at org.Python.int_cast(Python.java:680)
+                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+                at java.lang.reflect.Method.invoke(Method.java:606)
+                at org.python.types.Function.invoke(Function.java:93)
+                at python.example.foo(example.py:81)
+                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+                at java.lang.reflect.Method.invoke(Method.java:606)
+                at org.python.types.Method.invoke(Method.java:45)
+                at python.example.<clinit>(example.py:87)
+            """,
+            """
+            Do final cleanup
+            ### EXCEPTION ###
+            ValueError: invalid literal for int() with base 10: 'asdf'
+            """
+        )
+
     def test_float(self):
         self.assertNormalized('7.950899459780156E-6', '7.950899459780156e-6')
 
@@ -112,7 +156,7 @@ class PythonNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
         self.assertEqual(cleanse_python(adjust(actual)), adjust(expected))
 
-    def assert_no_exception(self):
+    def test_no_exception(self):
         self.assertNormalized(
             """
             Hello, world.
@@ -122,35 +166,33 @@ class PythonNormalizationTests(unittest.TestCase):
             """
         )
 
-    def assert_exception(self):
+    def test_exception(self):
         self.assertNormalized(
             """
             Traceback (most recent call last):
-              File "/Users/rkm/projects/beeware/voc/tests/utils.py", line 107, in assertCodeExecution
-                exec(code, {}, {})
-              File "<string>", line 2, in <module>
-            IndexError: list index out of range
+              File "test.py", line 3, in <module>
+                print(x & y)
+            TypeError: unsupported operand type(s) for &: 'float' and 'bool'
             """,
             """
             ### EXCEPTION ###
-            IndexError: list index out of range
+            TypeError: unsupported operand type(s) for &: 'float' and 'bool'
             """
         )
 
-    def assert_exception_with_other_text(self):
+    def test_exception_with_other_text(self):
         self.assertNormalized(
             """
             Hello, world.
             Traceback (most recent call last):
-              File "/Users/rkm/projects/beeware/voc/tests/utils.py", line 107, in assertCodeExecution
-                exec(code, {}, {})
-              File "<string>", line 2, in <module>
-            IndexError: list index out of range
+              File "test.py", line 3, in <module>
+                print(x & y)
+            TypeError: unsupported operand type(s) for &: 'float' and 'bool'
             """,
             """
             Hello, world.
             ### EXCEPTION ###
-            IndexError: list index out of range
+            TypeError: unsupported operand type(s) for &: 'float' and 'bool'
             """
         )
 
