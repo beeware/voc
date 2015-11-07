@@ -938,7 +938,7 @@ class Utf8(Constant):
         #
         # For more information regarding the standard UTF-8 format, see Section
         # 3.9 Unicode Encoding Forms of The Unicode Standard, Version 6.0.0.
-        self.string = string
+        self.value = string
         self._bytes = string.encode('utf8')
 
     def __repr__(self):

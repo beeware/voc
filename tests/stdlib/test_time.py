@@ -206,7 +206,7 @@ class TimeModuleTests(TranspileTestCase):
     def test_sleep(self):
         self.assertCodeExecution("""
             import time
-            print(time.sleep())
+            print(time.sleep(1))
             print('Done.')
             """)
 

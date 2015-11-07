@@ -5,19 +5,20 @@ from ..utils import TranspileTestCase
 
 class ImportTests(TranspileTestCase):
 
-    # def test_import_java_module(self):
-    #     "You can import a native Java class as a Python module"
-    #     self.assertCodeExecution(
-    #         """
-    #         import java.lang
-    #
-    #         buffer = java.lang.StringBuilder()
-    #         buffer.append('Hello, ')
-    #         buffer.append('World')
-    #         print(buffer.toString())
-    #
-    #         print("Done.")
-    #         """)
+    @expectedFailure
+    def test_import_java_module(self):
+        "You can import a native Java class as a Python module"
+        self.assertCodeExecution(
+            """
+            import java.lang
+
+            buffer = java.lang.StringBuilder()
+            buffer.append('Hello, ')
+            buffer.append('World')
+            print(buffer.toString())
+
+            print("Done.")
+            """)
 
     def test_import_stdlib_module(self):
         "You can import a Python module implemented in Java (a native stdlib shim)"
@@ -100,7 +101,6 @@ class ImportTests(TranspileTestCase):
                     """
             })
 
-    @expectedFailure
     def test_symbol_import(self):
         self.assertCodeExecution(
             """
@@ -120,7 +120,6 @@ class ImportTests(TranspileTestCase):
                     """
             })
 
-    @expectedFailure
     def test_multiple_symbol_import(self):
         self.assertCodeExecution(
             """

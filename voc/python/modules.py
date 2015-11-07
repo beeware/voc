@@ -2,90 +2,68 @@ import os
 
 from ..java import (
     Class as JavaClass,
-    Field as JavaField,
-    Method as JavaMethod,
     Code as JavaCode,
+    Method as JavaMethod,
     opcodes as JavaOpcodes,
     SourceFile,
-    Signature,
-    # LineNumberTable
 )
 from .blocks import Block, IgnoreBlock
 from .methods import MainMethod, Method, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
+from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 
 class StaticBlock(Block):
-    def tweak(self):
-        self.code = [
-            # Set up the globals dictionary for the module
-            JavaOpcodes.NEW('java/util/Hashtable'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
-            JavaOpcodes.PUTSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
 
-            # Load the Python builtins into the globals.
-            JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC_W('__builtins__'),
-            JavaOpcodes.NEW('org/python/types/Dict'),
+    @property
+    def has_void_return(self):
+        return True
+
+    def transpile_setup(self):
+        self.add_opcodes(
+            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.module.descriptor),
+
+            JavaOpcodes.NEW('org/python/types/Module'),
             JavaOpcodes.DUP(),
-            JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '(Ljava/util/Map;)V'),
-            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.LDC_W(self.module.descriptor.replace('/', '.')),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', '(Ljava/lang/Class;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
-        ] + self.code
-        self.void_return()
-
-    def store_name(self, name, allow_locals=True):
-        self.add_opcodes(
-            ASTORE_name(self, '#TEMP#'),
-            JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC_W(name),
-            ALOAD_name(self, '#TEMP#'),
-            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-            JavaOpcodes.POP(),
         )
 
-    def load_name(self, name, allow_locals=True):
+    @property
+    def use_registers(self):
+        return False
+
+    def store_name(self, name, use_locals):
         self.add_opcodes(
-            # look for a global var.
-            JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+            ASTORE_name(self, '#value'),
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            ALOAD_name(self, '#value'),
 
-            # If there's nothing in the globals, then look for a builtin.
-            IF(
-                [JavaOpcodes.DUP()],
-                JavaOpcodes.IFNONNULL
-            ),
-                JavaOpcodes.POP(),
-                JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+        )
+        free_name(self, '#value')
 
-                # If we still don't have something, throw a NameError.
-                IF(
-                    [JavaOpcodes.DUP()],
-                    JavaOpcodes.IFNONNULL
-                ),
-                    JavaOpcodes.POP(),
-                    JavaOpcodes.NEW('org/python/exceptions/NameError'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W(name),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
-                    JavaOpcodes.ATHROW(),
-                END_IF(),
-            END_IF(),
-            # Make sure we actually have a Python object
-            JavaOpcodes.CHECKCAST('org/python/Object')
+    def load_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-    def delete_name(self, name, allow_locals=True):
+    def delete_name(self, name, use_locals):
         self.add_opcodes(
-            # look for a global var.
-            JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
     @property
@@ -99,7 +77,7 @@ class StaticBlock(Block):
     def add_method(self, method_name, code):
         method = Method(self.module, method_name, extract_parameters(code), static=True)
         method.extract(code)
-        self.module.methods.append(method.transpile())
+        self.module.methods.append(method)
         return method
 
 
@@ -142,7 +120,7 @@ class Module(Block):
                         # The last command in the main block is a jump.
                         # Not sure why it is required, but we can ignore
                         # it for transpilation purposes.
-                        main = MainMethod(self, main_commands[:-1]).transpile()
+                        main = MainMethod(self, main_commands[:-1])
                     except IgnoreBlock:
                         pass
                 else:
@@ -175,19 +153,6 @@ class Module(Block):
         classfile = JavaClass(self.descriptor, supername='org/python/types/Module')
         classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
 
-        # Add a globals dictionary to the module.
-        classfile.fields.append(
-            JavaField(
-                'globals',
-                'Ljava/util/Hashtable;',
-                public=True,
-                static=True,
-                attributes=[
-                    Signature('Ljava/util/Hashtable<Ljava/lang/String;Lorg/python/types/Object;>;')
-                ]
-            )
-        )
-
         # Add a static method to the module.
         static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
         static_init.attributes.append(body)
@@ -195,31 +160,38 @@ class Module(Block):
 
         if main is None:
             print("Adding default main method...")
-            main = JavaMethod(
-                'main',
-                '([Ljava/lang/String;)V',
-                public=True,
-                static=True,
+            main = MainMethod(self, [])
+
+        classfile.methods.append(main.transpile())
+
+        # Add a dummy init method.
+        classfile.methods.append(
+            JavaMethod(
+                '<init>',
+                '()V',
                 attributes=[
                     JavaCode(
-                        max_stack=0,
+                        max_stack=1,
                         max_locals=1,
-                        code=[JavaOpcodes.RETURN()]
-                    )
+                        code=[
+                            JavaOpcodes.ALOAD_0(),
+                            JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', '()V'),
+                            JavaOpcodes.RETURN(),
+                        ],
+                    ),
                 ]
             )
-
-        classfile.methods.append(main)
+        )
 
         # Add any static methods defined in the module
         for method in self.methods:
-            classfile.methods.append(method)
+            classfile.methods.append(method.transpile())
 
         # The list of classfiles that will be returned will contain
         # at least one entry - the class for the module itself.
         classfiles = [(self.namespace, self.name, classfile)]
         # Also output any classes defined in this module.
-        for namespace, class_name, classfile in self.classes:
-            classfiles.append((namespace, class_name, classfile))
+        for klass in self.classes:
+            classfiles.append(klass.transpile())
 
         return classfiles

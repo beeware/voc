@@ -36,7 +36,7 @@ def capture_output(redirect_stderr=True):
         sys.stdout, sys.stderr = oldout, olderr
 
 
-def adjust(text):
+def adjust(text, run_in_function=False):
     """Adjust a code sample to remove leading whitespace."""
     lines = text.split('\n')
     if len(lines) == 1:
@@ -47,14 +47,27 @@ def adjust(text):
     first_line = lines[0].lstrip()
     n_spaces = len(lines[0]) - len(first_line)
 
-    return '\n'.join(line[n_spaces:] for line in lines)
+    if run_in_function:
+        n_spaces = n_spaces - 4
+
+    final_lines = [line[n_spaces:] for line in lines]
+
+    if run_in_function:
+        final_lines = [
+            "def test_function():",
+        ] + final_lines + [
+            "test_function()",
+            "print('Function done.')"
+        ]
+
+    return '\n'.join(final_lines)
 
 
-def runAsPython(test_dir, main_code, extra_code=None):
+def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False):
     """Run a block of Python code with the Python interpreter."""
     # Output source code into test directory
     with open(os.path.join(test_dir, 'test.py'), 'w') as py_source:
-        py_source.write(adjust(main_code))
+        py_source.write(adjust(main_code, run_in_function=run_in_function))
 
     if extra_code:
         for name, code in extra_code.items():
@@ -80,7 +93,7 @@ def runAsPython(test_dir, main_code, extra_code=None):
     return out[0].decode('utf8')
 
 
-def runAsJava(test_dir, main_code, extra_code=None):
+def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False):
     """Run a block of Python code as a Java program."""
     # Output source code into test directory
     transpiler = Transpiler()
@@ -88,7 +101,7 @@ def runAsJava(test_dir, main_code, extra_code=None):
     # Don't redirect stderr; we want to see any errors from the transpiler
     # as top level test failures.
     with capture_output(redirect_stderr=False):
-        transpiler.transpile_string("test.py", adjust(main_code))
+        transpiler.transpile_string("test.py", adjust(main_code, run_in_function=run_in_function))
 
         if extra_code:
             for name, code in extra_code.items():
@@ -108,20 +121,32 @@ def runAsJava(test_dir, main_code, extra_code=None):
     return out[0].decode('utf8')
 
 
-JAVA_EXCEPTION = re.compile('^Exception in thread "main" ([^\n]+\nCaused by: )?org\.python\.exceptions\.([\w]+): ([^\n]+)\n([^\n]+\n)+', re.MULTILINE)
+JAVA_EXCEPTION = re.compile(
+    '(org\.python\.exceptions\.([\w]+): ([^\n]+)\n' +
+    '(\s+at .+\((((.*):(\d+))|(Native Method))\)\n)+)?' +
+    '((Exception in thread "\w+" org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\n]+))|' +
+    '(Exception in thread "\w+" [^\n]+\n' +
+    'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\n]+)))\n' +
+    '(\s+at .+\((((?P<file>.*):(?P<line>\d+))|(Native Method))\))+'
+)
 JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 
-PYTHON_EXCEPTION = re.compile('^Traceback \(most recent call last\):\n(  .*\n)+(.*): (.*)\n', re.MULTILINE)
+# PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
+
+PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n)+(?P<exception>.*?): (?P<message>.*\n)')
 PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
 
 
 def cleanse_java(input):
-    out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\2: \\3\n', input)
+    try:
+        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception2>: \\g<message2>', input)
+    except:
+        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception1>: \\g<message1>', input)
     return JAVA_FLOAT.sub('\\1e\\2\\3', out)
 
 
 def cleanse_python(input):
-    out = PYTHON_EXCEPTION.sub('### EXCEPTION ###\n\\2: \\3\n', input)
+    out = PYTHON_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception>: \\g<message>', input)
     return PYTHON_FLOAT.sub('\\1e\\2\\3', out)
 
 
@@ -159,33 +184,66 @@ class TranspileTestCase(TestCase):
         java = adjust(java)
         self.assertEqual(debug.getvalue(), java[1:])
 
-    def assertCodeExecution(self, code, message=None, extra_code=None):
+    def assertCodeExecution(self, code, message=None, extra_code=None, run_in_global=True, run_in_function=True):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
-        try:
-            # Create the temp directory into which code will be placed
-            test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+        #==================================================
+        # Pass 1 - run the code in the global context
+        #==================================================
+        if run_in_global:
             try:
-                os.mkdir(test_dir)
-            except FileExistsError:
-                pass
+                # Create the temp directory into which code will be placed
+                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+                try:
+                    os.mkdir(test_dir)
+                except FileExistsError:
+                    pass
 
-            # Run the code as Python and as Java.
-            py_out = runAsPython(test_dir, code, extra_code)
-            java_out = runAsJava(test_dir, code, extra_code)
-        except Exception as e:
-            self.fail(e)
-        finally:
-            # Clean up the test directory where the class file was written.
-            shutil.rmtree(test_dir)
+                # Run the code as Python and as Java.
+                py_out = runAsPython(test_dir, code, extra_code, False)
+                java_out = runAsJava(test_dir, code, extra_code, False)
+            except Exception as e:
+                self.fail(e)
+            finally:
+                # Clean up the test directory where the class file was written.
+                shutil.rmtree(test_dir)
 
-        # Cleanse the Python and Java output, producing a simple
-        # normalized format for exceptions, floats etc.
-        java_out = cleanse_java(java_out)
-        py_out = cleanse_python(py_out)
+            # Cleanse the Python and Java output, producing a simple
+            # normalized format for exceptions, floats etc.
+            java_out = cleanse_java(java_out)
+            py_out = cleanse_python(py_out)
 
-        # Confirm that the output of the Java code is the same as the Python code.
-        self.assertEqual(java_out, py_out, message)
+            # Confirm that the output of the Java code is the same as the Python code.
+            self.assertEqual(java_out, py_out, 'Global context: %s' % message)
+
+        #==================================================
+        # Pass 2 - run the code in a function's context
+        #==================================================
+        if run_in_function:
+            try:
+                # Create the temp directory into which code will be placed
+                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+                try:
+                    os.mkdir(test_dir)
+                except FileExistsError:
+                    pass
+
+                # Run the code as Python and as Java.
+                py_out = runAsPython(test_dir, code, extra_code, True)
+                java_out = runAsJava(test_dir, code, extra_code, True)
+            except Exception as e:
+                self.fail(e)
+            finally:
+                # Clean up the test directory where the class file was written.
+                shutil.rmtree(test_dir)
+
+            # Cleanse the Python and Java output, producing a simple
+            # normalized format for exceptions, floats etc.
+            java_out = cleanse_java(java_out)
+            py_out = cleanse_python(py_out)
+
+            # Confirm that the output of the Java code is the same as the Python code.
+            self.assertEqual(java_out, py_out, 'Function context: %s' % message)
 
 
 def _unary_test(test_name, operation):

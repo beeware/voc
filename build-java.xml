@@ -10,7 +10,11 @@
 
   <target name="compile" description="Compile the Oracle-specific source">
     <mkdir dir="${build}/java"/>
-    <javac includeantruntime="false" destdir="${build}/java">
+    <javac
+        debug="true"
+        debuglevel="lines,vars,source"
+        includeantruntime="false"
+        destdir="${build}/java">
       <src path="${src}/common" />
       <src path="${src}/java" />
     </javac>

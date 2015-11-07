@@ -462,7 +462,6 @@ class TryExceptFinallyTests(TranspileTestCase):
             try:
                 obj = int('asdf')
                 print('OK')
-                print
             finally:
                 print("Do final cleanup")
             print('Done.')
@@ -733,7 +732,7 @@ class TryExceptElseTests(TranspileTestCase):
 
 
 class TryExceptElseFinallyTests(TranspileTestCase):
-    def test_try_except_else(self):
+    def test_try_except_else_finally(self):
         # No exception
         self.assertCodeExecution("""
             try:
@@ -762,7 +761,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             print('Done.')
             """)
 
-    def test_try_except_unnamed_else(self):
+    def test_try_except_unnamed_else_finally(self):
         # No exception
         self.assertCodeExecution("""
             try:
@@ -805,7 +804,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             print('Done.')
             """)
 
-    def test_try_multiple_except_else(self):
+    def test_try_multiple_except_else_finally(self):
         # No exception
         self.assertCodeExecution("""
             try:

@@ -1,4 +1,6 @@
-from .constants import Utf8, Classref, NameAndType
+from collections import OrderedDict
+
+from .constants import Utf8, Classref, NameAndType, Float, Integer
 from .opcodes import Opcode
 from .signatures import method_descriptor
 
@@ -1162,7 +1164,7 @@ class UninitializedVariableInfo(VerificationTypeInfo):
     @staticmethod
     def read_info(reader):
         offset = reader.read_u2()
-        return ObjectVariableInfo(offset)
+        return UninitializedVariableInfo(offset)
 
     def write_info(self, writer):
         writer.write_u2(self.offset)
@@ -1787,58 +1789,148 @@ class LineNumberTable(Attribute):
             writer.write_u2(start_pc)
             writer.write_u2(line_number)
 
+
 # ------------------------------------------------------------------------
 # 4.7.13. The LocalVariableTable Attribute
 # ------------------------------------------------------------------------
 
-# The LocalVariableTable attribute is an optional variable-length attribute in the attributes table of a Code (§4.7.3) attribute. It may be used by debuggers to determine the value of a given local variable during the execution of a method.
+# The LocalVariableTable attribute is an optional variable-length attribute in
+# the attributes table of a Code (§4.7.3) attribute. It may be used by debuggers
+# to determine the value of a given local variable during the execution of a
+# method.
 
-# If LocalVariableTable attributes are present in the attributes table of a given Code attribute, then they may appear in any order. There may be no more than one LocalVariableTable attribute per local variable in the Code attribute.
+# If LocalVariableTable attributes are present in the attributes table of a
+# given Code attribute, then they may appear in any order. There may be no more
+# than one LocalVariableTable attribute per local variable in the Code
+# attribute.
 
 # The LocalVariableTable attribute has the following format:
 
-# LocalVariableTable_attribute {
-#     u2 attribute_name_index;
-#     u4 attribute_length;
-#     u2 local_variable_table_length;
-#     {   u2 start_pc;
-#         u2 length;
-#         u2 name_index;
-#         u2 descriptor_index;
-#         u2 index;
-#     } local_variable_table[local_variable_table_length];
-# }
-# The items of the LocalVariableTable_attribute structure are as follows:
+class LocalVariableTable(Attribute):
+    # u2 attribute_name_index;
+    # u4 attribute_length;
+    # u2 local_variable_table_length;
+    # {   u2 start_pc;
+    #     u2 length;
+    #     u2 name_index;
+    #     u2 descriptor_index;
+    #     u2 index;
+    # } local_variable_table[local_variable_table_length];
 
-# attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "LocalVariableTable".
+    def __init__(self, local_variables):
+        # Each entry in the local_variable_table array indicates a range of code
+        # array offsets within which a local variable has a value. It also
+        # indicates the index into the local variable array of the current frame
+        # at which that local variable can be found.
+        self.local_variables = local_variables
 
-# attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+    def __len__(self):
+        return 2 + sum(len(v) for v in self.local_variables)
 
-# local_variable_table_length
-# The value of the local_variable_table_length item indicates the number of entries in the local_variable_table array.
+    @property
+    def local_variable_table_length(self):
+        """The value of the local_variable_table_length item indicates the number of
+        entries in the line_number_table array.
+        """
+        return len(self.line_number_table)
 
-# local_variable_table[]
-# Each entry in the local_variable_table array indicates a range of code array offsets within which a local variable has a value. It also indicates the index into the local variable array of the current frame at which that local variable can be found. Each entry must contain the following five items:
+    @staticmethod
+    def read_info(reader, dump=None):
+        local_variable_table_length = reader.read_u2()
 
-# start_pc, length
-# The given local variable must have a value at indices into the code array in the interval [start_pc, start_pc + length), that is, between start_pc inclusive and start_pc + length exclusive.
+        if dump is not None:
+            reader.debug("    " * dump, 'Local variables (%s total):' % local_variable_table_length)
 
-# The value of start_pc must be a valid index into the code array of this Code attribute and must be the index of the opcode of an instruction.
+        local_variables = []
+        for i in range(0, local_variable_table_length):
+            local_var = LocalVariable.read(reader)
+            if dump is not None:
+                reader.debug("    " * (dump + 1), '%s' % local_var)
+            local_variables.append(local_var)
 
-# The value of start_pc + length must either be a valid index into the code array of this Code attribute and be the index of the opcode of an instruction, or it must be the first index beyond the end of that code array.
+        return LineNumberTable(local_variables)
 
-# name_index
-# The value of the name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must contain a CONSTANT_Utf8_info (§4.4.7) structure representing a valid unqualified name (§4.2.2) denoting a local variable.
+    def write_info(self, writer):
+        writer.write_u2(self.local_variable_table_length)
+        for local_variable in self.local_variables:
+            local_variable.write(writer)
 
-# descriptor_index
-# The value of the descriptor_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must contain a CONSTANT_Utf8_info structure (§4.4.7) representing a field descriptor (§4.3.2) encoding the type of a local variable in the source program.
 
-# index
-# The given local variable must be at index in the local variable array of the current frame.
+class LocalVariable:
+    def __init__(self, start_pc, length, name, descriptor, index):
+        # Each entry in the local_variable_table array indicates a range of code
+        # array offsets within which a local variable has a value. It also
+        # indicates the index into the local variable array of the current frame
+        # at which that local variable can be found. Each entry must contain the
+        # following five items:
+        #
+        # The given local variable must have a value at indices into the code
+        # array in the interval [start_pc, start_pc + length), that is, between
+        # start_pc inclusive and start_pc + length exclusive.
 
-# If the local variable at index is of type double or long, it occupies both index and index + 1.
+        # The value of start_pc must be a valid index into the code array of
+        # this Code attribute and must be the index of the opcode of an
+        # instruction.
+
+        # The value of start_pc + length must either be a valid index into the
+        # code array of this Code attribute and be the index of the opcode of an
+        # instruction, or it must be the first index beyond the end of that code
+        # array.
+        self.start_pc = start_pc
+        self.length = length
+
+        # The value of the name_index item must be a valid index into the
+        # constant_pool table. The constant_pool entry at that index must
+        # contain a CONSTANT_Utf8_info (§4.4.7) structure representing a valid
+        # unqualified name (§4.2.2) denoting a local variable.
+        self.name = Utf8(name)
+
+        # The value of the descriptor_index item must be a valid index into the
+        # constant_pool table. The constant_pool entry at that index must
+        # contain a CONSTANT_Utf8_info structure (§4.4.7) representing a field
+        # descriptor (§4.3.2) encoding the type of a local variable in the
+        # source program.
+        self.descriptor = descriptor
+
+        # The given local variable must be at index in the local variable
+        # array of the current frame.
+        #
+        # If the local variable at index is of type double or long, it
+        # occupies both index and index + 1.
+        self.index = index
+
+    def __len__(self):
+        return 2 + 2 + 2 + 2 + 2
+
+    def __str__(self):
+        return "[%s:%s) %s: %s %s" % (
+            self.start_pc,
+            self.start_pc + self.length,
+            self.index,
+            self.descriptor,
+            self.name
+        )
+
+    @staticmethod
+    def read(reader, dump=None):
+        start_pc = reader.read_u2()
+        length = reader.read_u2()
+        name = reader.constant_pool[reader.read_u2()].bytes.decode('utf-8')
+        descriptor = reader.constant_pool[reader.read_u2()].bytes.decode('utf-8')
+        index = reader.read_u2()
+
+        return LocalVariable(start_pc, length, name, descriptor, index)
+
+    def write(self, writer):
+        writer.write_u2(self.start_pc)
+        writer.write_u2(self.length)
+        writer.write_u2(writer.constant_pool[self.name])
+        writer.write_u2(writer.constant_pool[self.descriptor])
+        writer.write_u2(self.index)
+
+    def resolve(self, constant_pool):
+        constant_pool.add(self.name)
+        constant_pool.add(self.descriptor)
 
 # ------------------------------------------------------------------------
 # 4.7.14. The LocalVariableTypeTable Attribute
@@ -1921,185 +2013,521 @@ class LineNumberTable(Attribute):
 # 4.7.16. The RuntimeVisibleAnnotations attribute
 # ------------------------------------------------------------------------
 
-# The RuntimeVisibleAnnotations attribute is a variable-length attribute in the attributes table of a ClassFile, field_info, or method_info structure (§4.1, §4.5, §4.6). The RuntimeVisibleAnnotations attribute records run-time-visible Java programming language annotations on the corresponding class, field, or method.
+# The RuntimeVisibleAnnotations attribute is a variable-length attribute in the
+# attributes table of a ClassFile, field_info, or method_info structure (§4.1,
+# §4.5, §4.6). The RuntimeVisibleAnnotations attribute records run-time-visible
+# Java programming language annotations on the corresponding class, field, or
+# method.
 
-# Each ClassFile, field_info, and method_info structure may contain at most one RuntimeVisibleAnnotations attribute, which records all the run-time-visible Java programming language annotations on the corresponding program element. The Java Virtual Machine must make these annotations available so they can be returned by the appropriate reflective APIs.
+# Each ClassFile, field_info, and method_info structure may contain at most one
+# RuntimeVisibleAnnotations attribute, which records all the run-time-visible
+# Java programming language annotations on the corresponding program element.
+# The Java Virtual Machine must make these annotations available so they can be
+# returned by the appropriate reflective APIs.
 
 # The RuntimeVisibleAnnotations attribute has the following format:
 
-# RuntimeVisibleAnnotations_attribute {
-#     u2         attribute_name_index;
-#     u4         attribute_length;
-#     u2         num_annotations;
-#     annotation annotations[num_annotations];
-# }
-# The items of the RuntimeVisibleAnnotations_attribute structure are as follows:
 
-# attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "RuntimeVisibleAnnotations".
+class RuntimeVisibleAnnotations(Attribute):
+    # u2 attribute_name_index;
+    # u4 attribute_length;
+    # u2 num_annotations;
+    # annotation annotations[num_annotations];
 
-# attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+    def __init__(self, annotations):
+        super(RuntimeVisibleAnnotations, self).__init__()
 
-# The value of the attribute_length item is thus dependent on the number of run-time-visible annotations represented by the structure, and their values.
+        # Each value of the annotations table represents a single run-time-
+        # visible annotation on a program element.
 
-# num_annotations
-# The value of the num_annotations item gives the number of run-time-visible annotations represented by the structure.
+        self.annotations = annotations
 
-# Note that a maximum of 65535 run-time-visible Java programming language annotations may be directly attached to a program element.
+    def __len__(self):
+        return 2 + sum(len(annotation) for annotation in self.annotations)
 
-# annotations
-# Each value of the annotations table represents a single run-time-visible annotation on a program element. The annotation structure has the following format:
+    @property
+    def num_annotations(self):
+        """The value of the num_annotations item gives the number of run-time-
+        visible annotations represented by the structure.
 
-# annotation {
-#     u2 type_index;
-#     u2 num_element_value_pairs;
-#     {   u2            element_name_index;
-#         element_value value;
-#     } element_value_pairs[num_element_value_pairs];
-# }
+        Note that a maximum of 65535 run-time-visible Java programming
+        language annotations may be directly attached to a program element.
+        """
+        return len(self.annotations)
 
-# The items of the annotation structure are as follows:
+    @staticmethod
+    def read_info(reader, dump=None):
+        num_annotations = reader.read_u2()
 
-# type_index
-# The value of the type_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing a field descriptor representing the annotation type corresponding to the annotation represented by this annotation structure.
+        if dump is not None:
+            reader.debug("    " * dump, 'RuntimeVisibleAnnotations (%s total):' % num_annotations)
 
-# num_element_value_pairs
-# The value of the num_element_value_pairs item gives the number of element-value pairs of the annotation represented by this annotation structure.
+        annotations = []
+        for i in range(0, num_annotations):
+            annotations.append(Annotation.read(reader, dump=dump + 1 if dump is not None else dump))
 
-# Note that a maximum of 65535 element-value pairs may be contained in a single annotation.
+        return RuntimeVisibleAnnotations(annotations)
 
-# element_value_pairs
-# Each value of the element_value_pairs table represents a single element-value pair in the annotation represented by this annotation structure. Each element_value_pairs entry contains the following two items:
+    def write_info(self, writer):
+        writer.write_u2(self.num_annotations)
+        for annotation in self.annotations:
+            annotation.write(writer)
 
-# element_name_index
-# The value of the element_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) representing a valid field descriptor (§4.3.2) that denotes the name of the annotation type element represented by this element_value_pairs entry.
+    def resolve_info(self, constant_pool):
+        for annotation in self.annotations:
+            annotation.resolve(constant_pool)
 
-# value
-# The value of the value item represents the value of the element-value pair represented by this element_value_pairs entry.
+
+# The annotation structure has the following format:
+
+class Annotation:
+    # u2 type_index;
+    # u2 num_element_value_pairs;
+    # {
+    #       u2 element_name_index;
+    #       element_value value;
+    # } element_value_pairs[num_element_value_pairs];
+
+    def __init__(self, type_name, element_value_pairs):
+
+        # The value of the type_index item must be a valid index into the
+        # constant_pool table. The constant_pool entry at that index must be a
+        # CONSTANT_Utf8_info (§4.4.7) structure representing a field descriptor
+        # representing the annotation type corresponding to the annotation
+        # represented by this annotation structure.
+
+        self.type_name = Utf8(type_name)
+
+        # element_value_pairs
+
+        # Each value of the element_value_pairs table represents a single
+        # element-value pair in the annotation represented by this annotation
+        # structure. Each element_value_pairs entry contains the following two
+        # items:
+        #
+        #   element_name_index
+        #
+        #       The value of the element_name_index item must be a valid index
+        #       into the constant_pool table. The constant_pool entry at that
+        #       index must be a CONSTANT_Utf8_info structure (§4.4.7)
+        #       representing a valid field descriptor (§4.3.2) that denotes the
+        #       name of the annotation type element represented by this
+        #       element_value_pairs entry.
+        #
+        #   value
+        #
+        #       The value of the value item represents the value of the
+        #       element-value pair represented by this element_value_pairs
+        #       entry.
+
+        self.element_value_pairs = element_value_pairs
+
+    def __len__(self):
+        return 2 + 2 + sum(
+            (2 + len(element_value))
+            for element_name, element_value in self.element_value_pairs.items()
+        )
+
+    @property
+    def num_element_value_pairs(self):
+        """The value of the num_element_value_pairs item gives the number of
+        element-value pairs of the annotation represented by this annotation
+        structure.
+
+        Note that a maximum of 65535 element-value pairs may be contained in a
+        single annotation.
+
+        """
+        return len(self.element_value_pairs)
+
+    @staticmethod
+    def read(reader, dump=None):
+        type_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+
+        num_element_value_pairs = reader.read_u2()
+
+        if dump is not None:
+            reader.debug("    " * dump, '%s (%s pairs):' % (type_name, num_element_value_pairs))
+
+        element_value_pairs = OrderedDict()
+        for i in range(0, num_element_value_pairs):
+            element_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+            value = ElementValue.read(reader)
+            if dump is not None:
+                reader.debug("    " * (dump + 1), '%s: %s' % (element_name, value))
+
+            element_value_pairs[element_name] = value
+
+        return Annotation(type_name, element_value_pairs)
+
+    def write(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.type_name))
+        writer.write_u2(self.num_element_value_pairs)
+        for element_name, value in self.element_value_pairs.items():
+            writer.write_u2(writer.constant_pool.index(Utf8(element_name)))
+            value.write(writer)
+
+    def resolve(self, constant_pool):
+        constant_pool.add(self.type_name)
+        for element_name, value in self.element_value_pairs.items():
+            constant_pool.add(Utf8(element_name))
+            value.resolve(constant_pool)
+
 
 # ------------------------------------------------------------------------
 # 4.7.16.1. The element_value structure
 # ------------------------------------------------------------------------
 
-# The element_value structure is a discriminated union representing the value of an element-value pair. It is used to represent element values in all attributes that describe annotations (RuntimeVisibleAnnotations, RuntimeInvisibleAnnotations, RuntimeVisibleParameterAnnotations, and RuntimeInvisibleParameterAnnotations).
+# The element_value structure is a discriminated union representing the value of
+# an element-value pair. It is used to represent element values in all
+# attributes that describe annotations (RuntimeVisibleAnnotations,
+# RuntimeInvisibleAnnotations, RuntimeVisibleParameterAnnotations, and
+# RuntimeInvisibleParameterAnnotations).
 
 # The element_value structure has the following format:
 
-# element_value {
-#     u1 tag;
-#     union {
-#         u2 const_value_index;
+class ElementValue:
+    # u1 tag;
+    # union {
+    #     u2 const_value_index;
 
-#         {   u2 type_name_index;
-#             u2 const_name_index;
-#         } enum_const_value;
+    #     {   u2 type_name_index;
+    #         u2 const_name_index;
+    #     } enum_const_value;
 
-#         u2 class_info_index;
+    #     u2 class_info_index;
 
-#         annotation annotation_value;
+    #     annotation annotation_value;
 
-#         {   u2            num_values;
-#             element_value values[num_values];
-#         } array_value;
-#     } value;
-# }
-# The items of the element_value structure are as follows:
+    #     {   u2            num_values;
+    #         element_value values[num_values];
+    #     } array_value;
+    # } value;
 
-# tag
-# The tag item indicates the type of this annotation element-value pair.
+    @staticmethod
+    def read(reader):
+        # The tag item indicates the type of this annotation element-value pair.
 
-# The letters B, C, D, F, I, J, S, and Z indicate a primitive type. These letters are interpreted as if they were field descriptors (§4.3.2).
+        # The letters B, C, D, F, I, J, S, and Z indicate a primitive type.
+        # These letters are interpreted as if they were field descriptors
+        # (§4.3.2).
 
-# The other legal values for tag are listed with their interpretations in Table 4.9.
+        # The other legal values for tag are listed with their interpretations
+        # in Table 4.9.
 
-# Table 4.9. Interpretation of additional tag values
+        # Table 4.9. Interpretation of additional tag values
 
-# tag Value   Element Type
-# s   String
-# e   enum constant
-# c   class
-# @   annotation type
-# [   array
-# value
-# The value item represents the value of this annotation element. This item is a union. The tag item, above, determines which item of the union is to be used:
+        # tag Value   Element Type
+        #   s           String
+        #   e           enum constant
+        #   c           class
+        #   @           annotation type
+        #   [           array
 
-# const_value_index
-# The const_value_index item is used if the tag item is one of B, C, D, F, I, J, S, Z, or s.
+        tag = chr(reader.read_u1())
 
-# The value of the const_value_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be of the correct entry type for the field type designated by the tag item, as specified in Table 4.9.
+        # The value item represents the value of this annotation element. This
+        # item is a union. The tag item, above, determines which item of the
+        # union is to be used:
 
-# enum_const_value
-# The enum_const_value item is used if the tag item is e.
+        if tag in ('B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z', 's'):
+            value = ConstantElementValue.read(reader)
+        elif tag == 'e':  # enum constant
+            value = EnumConstantElementValue.read(reader)
+        elif tag == 'c':  # class
+            value = ClassElementValue.read(reader)
+        elif tag == '@':  # annotation
+            value = AnnotationElementValue.read(reader)
+        elif tag == '[':  # array
+            # value = ArrayElementValue.read(reader)
+            raise NotImplementedError("ElementValue tag '[' not yet implemented")
+        else:
+            raise Exception("Unknown tag '%s'" % tag)
 
-# The enum_const_value item consists of the following two items:
+        return value
 
-# type_name_index
-# The value of the type_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) representing a valid field descriptor (§4.3.2) that denotes the internal form of the binary name (§4.2.1) of the type of the enum constant represented by this element_value structure.
 
-# const_name_index
-# The value of the const_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) representing the simple name of the enum constant represented by this element_value structure.
+class ConstantElementValue:
 
-# class_info_index
-# The class_info_index item is used if the tag item is c.
+    # The const_value_index item is used if the tag item is one of B, C, D, F, I, J, S, Z, or s.
 
-# The class_info_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the return descriptor (§4.3.3) of the type that is reified by the class represented by this element_value structure.
+    def __init__(self, value):
+        # The value of the const_value_index item must be a valid index into the
+        # constant_pool table. The constant_pool entry at that index must be of
+        # the correct entry type for the field type designated by the tag item,
+        # as specified in Table 4.9.
+        # if isinstance(value, str):
+        #     self.tag = 'B'
+        #     self.value = Utf8(value)
+        # elif isinstance(value, str) and len(value) == 1:
+        #     self.tag = 'C'
+        #     self.value = Utf8(value)
+        if isinstance(value, float):
+            self.tag = 'D'
+            self.value = Float(value)
+        # elif isinstance(value, str):
+        #     self.tag = 'F'
+        #     self.value = Utf8(value)
+        elif isinstance(value, int):
+            self.tag = 'I'
+            self.value = Integer(value)
+        # elif isinstance(value, str):
+        #     self.tag = 'J'
+        #     self.value = Utf8(value)
+        # elif isinstance(value, str):
+        #     self.tag = 'S'
+        #     self.value = Utf8(value)
+        # elif isinstance(value, bool):
+        #     self.tag = 'Z'
+        #     self.value = Boolean(value)
+        elif isinstance(value, str):
+            self.tag = 's'
+            self.value = Utf8(value)
+        else:
 
-# For example, V for Void.class, Ljava/lang/Object; for Object, etc.
+            raise Exception("Unknown constant type", type(value))
 
-# annotation_value
-# The annotation_value item is used if the tag item is @.
+    def __len__(self):
+        return 1 + 2
 
-# The element_value structure represents a "nested" annotation.
+    def __str__(self):
+        return str(self.value)
 
-# array_value
-# The array_value item is used if the tag item is [.
+    @staticmethod
+    def read(reader):
+        constant = reader.constant_pool[reader.read_u2()]
+        return ConstantElementValue(constant.value)
 
-# The array_value item consists of the following two items:
+    def write(self, writer):
+        writer.write_u1(ord(self.tag))
+        writer.write_u2(writer.constant_pool.index(self.value))
 
-# num_values
-# The value of the num_values item gives the number of elements in the array-typed value represented by this element_value structure.
+    def resolve(self, constant_pool):
+        self.value.resolve(constant_pool)
 
-# Note that a maximum of 65535 elements are permitted in an array-typed element value.
 
-# values
-# Each value of the values table gives the value of an element of the array-typed value represented by this element_value structure.
+class EnumConstantElementValue:
+
+    # The enum_const_value item is used if the tag item is e.
+
+    def __init__(self, type_name, const_name):
+
+        # The value of the type_name_index item must be a valid index into the
+        # constant_pool table. The constant_pool entry at that index must be a
+        # CONSTANT_Utf8_info structure (§4.4.7) representing a valid field
+        # descriptor (§4.3.2) that denotes the internal form of the binary name
+        # (§4.2.1) of the type of the enum constant represented by this
+        # element_value structure.
+        self.type_name = Utf8(type_name)
+
+        # The value of the const_name_index item must be a valid index into the
+        # constant_pool table. The constant_pool entry at that index must be a
+        # CONSTANT_Utf8_info structure (§4.4.7) representing the simple name of
+        # the enum constant represented by this element_value structure.
+        self.const_name = Utf8(const_name)
+
+    def __len__(self):
+        return 1 + 2 + 2
+
+    def __str__(self):
+        return "%s = %s" % (self.type_name, self.const_name)
+
+    @staticmethod
+    def read(reader):
+        type_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf-8')
+        const_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf-8')
+        return EnumConstantElementValue(type_name, const_name)
+
+    def write(self, writer):
+        writer.write_u1('e')
+        writer.write_u2(writer.constant_pool.index(self.type_name))
+        writer.write_u2(writer.constant_pool.index(self.const_name))
+
+    def resolve(self, constant_pool):
+        constant_pool.add(self.type_name)
+        constant_pool.add(self.const_name)
+
+
+class ClassElementValue:
+
+    # The class_info_index item is used if the tag item is c.
+
+    def __init__(self, class_name):
+        # The class_info_index item must be a valid index into the constant_pool
+        # table. The constant_pool entry at that index must be a
+        # CONSTANT_Utf8_info (§4.4.7) structure representing the return
+        # descriptor (§4.3.3) of the type that is reified by the class
+        # represented by this element_value structure.
+
+        # For example, V for Void.class, Ljava/lang/Object; for Object, etc.
+
+        self.klass = Classref(class_name)
+
+    def __len__(self):
+        return 1 + 2
+
+    def __str__(self):
+        return str(self.value)
+
+    @staticmethod
+    def read(reader, dump=None):
+        class_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf-8')
+        return ClassElementValue(class_name)
+
+    def write(self, writer):
+        writer.write_u1('c')
+        writer.write_u2(writer.constant_pool.index(self.klass))
+
+    def resolve(self, constant_pool):
+        constant_pool.add(self.klass)
+
+
+class AnnotationElementValue:
+
+    # The annotation_value item is used if the tag item is @.
+
+    def __init__(self, annotation):
+        # The element_value structure represents a "nested" annotation.
+
+        self.annotation = annotation
+
+    def __len__(self):
+        return 1 + len(self.annotation)
+
+    def __str__(self):
+        return str(self.annotation)
+
+    @staticmethod
+    def read(reader, dump=None):
+        annotation = Annotation.read(reader, dump=dump + 1 if dump is not None else dump)
+        return AnnotationElementValue(annotation)
+
+    def write(self, writer):
+        writer.write_u1('@')
+        self.annotation.write(writer)
+
+    def resolve(self, constant_pool):
+        self.annotation.resolve(constant_pool)
+
+
+class ArrayElementValue:
+
+    # The array_value item is used if the tag item is [.
+
+    def __init__(self, values):
+        # Each value of the values table gives the value of an element of the
+        # array-typed value represented by this element_value structure.
+        self.values = values
+
+    def __len__(self):
+        return 1 + 2 + sum(len(v) for v in self.values)
+
+    @property
+    def num_values(self):
+        """The value of the num_values item gives the number of elements in the
+        array-typed value represented by this element_value structure.
+
+        Note that a maximum of 65535 elements are permitted in an array-typed
+        element value.
+        """
+        return len(self.values)
+
+    @staticmethod
+    def read(reader, dump=None):
+        num_values = reader.read_u2()
+
+        values = []
+        for i in range(0, num_values):
+            value = ElementValue.read(reader, dump=dump + 1 if dump is not None else dump)
+            values.append(value)
+
+        return ArrayElementValue(values)
+
+    def write(self, writer):
+        writer.write_u1('[')
+        writer.write_u2(self.num_values)
+        for value in self.values:
+            value.write(writer)
+
+    def resolve(self, constant_pool):
+        for value in self.values:
+            value.resolve(constant_pool)
+
 
 # ------------------------------------------------------------------------
 # 4.7.17. The RuntimeInvisibleAnnotations attribute
 # ------------------------------------------------------------------------
 
-# The RuntimeInvisibleAnnotations attribute is similar to the RuntimeVisibleAnnotations attribute, except that the annotations represented by a RuntimeInvisibleAnnotations attribute must not be made available for return by reflective APIs, unless the Java Virtual Machine has been instructed to retain these annotations via some implementation-specific mechanism such as a command line flag. In the absence of such instructions, the Java Virtual Machine ignores this attribute.
+# The RuntimeInvisibleAnnotations attribute is similar to the
+# RuntimeVisibleAnnotations attribute, except that the annotations represented
+# by a RuntimeInvisibleAnnotations attribute must not be made available for
+# return by reflective APIs, unless the Java Virtual Machine has been instructed
+# to retain these annotations via some implementation-specific mechanism such as
+# a command line flag. In the absence of such instructions, the Java Virtual
+# Machine ignores this attribute.
 
-# The RuntimeInvisibleAnnotations attribute is a variable-length attribute in the attributes table of a ClassFile, field_info, or method_info structure (§4.1, §4.5, §4.6). The RuntimeInvisibleAnnotations attribute records run-time-invisible Java programming language annotations on the corresponding class, method, or field.
+# The RuntimeInvisibleAnnotations attribute is a variable-length attribute in
+# the attributes table of a ClassFile, field_info, or method_info structure
+# (§4.1, §4.5, §4.6). The RuntimeInvisibleAnnotations attribute records run-
+# time-invisible Java programming language annotations on the corresponding
+# class, method, or field.
 
-# Each ClassFile, field_info, and method_info structure may contain at most one RuntimeInvisibleAnnotations attribute, which records all the run-time-invisible Java programming language annotations on the corresponding program element.
+# Each ClassFile, field_info, and method_info structure may contain at most one
+# RuntimeInvisibleAnnotations attribute, which records all the run-time-
+# invisible Java programming language annotations on the corresponding program
+# element.
 
 # The RuntimeInvisibleAnnotations attribute has the following format:
 
-# RuntimeInvisibleAnnotations_attribute {
-#     u2         attribute_name_index;
-#     u4         attribute_length;
-#     u2         num_annotations;
-#     annotation annotations[num_annotations];
-# }
-# The items of the RuntimeInvisibleAnnotations_attribute structure are as follows:
+class RuntimeInvisibleAnnotations(Attribute):
+    # u2 attribute_name_index;
+    # u4 attribute_length;
+    # u2 num_annotations;
+    # annotation annotations[num_annotations];
 
-# attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "RuntimeInvisibleAnnotations".
+    def __init__(self, annotations):
+        super(RuntimeInvisibleAnnotations, self).__init__()
 
-# attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+        # Each value of the annotations table represents a single run-time-
+        # visible annotation on a program element.
 
-# The value of the attribute_length item is thus dependent on the number of run-time-invisible annotations represented by the structure, and their values.
+        self.annotations = annotations
 
-# num_annotations
-# The value of the num_annotations item gives the number of run-time-invisible annotations represented by the structure.
+    def __len__(self):
+        return 2 + sum(len(annotation) for annotation in self.annotations)
 
-# Note that a maximum of 65535 run-time-invisible Java programming language annotations may be directly attached to a program element.
+    @property
+    def num_annotations(self):
+        """The value of the num_annotations item gives the number of run-time-
+        visible annotations represented by the structure.
 
-# annotations
-# Each value of the annotations table represents a single run-time-invisible annotation on a program element.
+        Note that a maximum of 65535 run-time-visible Java programming
+        language annotations may be directly attached to a program element.
+        """
+        return len(self.annotations)
+
+    @staticmethod
+    def read_info(reader, dump=None):
+        num_annotations = reader.read_u2()
+
+        if dump is not None:
+            reader.debug("    " * dump, 'RuntimeInvisibleAnnotations (%s total):' % num_annotations)
+
+        annotations = []
+        for i in range(0, num_annotations):
+            annotations.append(Annotation.read(reader, dump=dump + 1 if dump is not None else dump))
+
+        return RuntimeInvisibleAnnotations(annotations)
+
+    def write_info(self, writer):
+        writer.write_u2(self.num_annotations)
+        for annotation in self.annotations:
+            annotation.write(writer)
+
+    def resolve_info(self, constant_pool):
+        for annotation in self.annotations:
+            annotation.resolve(constant_pool)
+
 
 # ------------------------------------------------------------------------
 # 4.7.18. The RuntimeVisibleParameterAnnotations attribute

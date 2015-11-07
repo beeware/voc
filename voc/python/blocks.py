@@ -8,7 +8,7 @@ from ..java import (
 )
 
 from .utils import extract_command, find_blocks
-from .opcodes import ASTORE_name, ALOAD_name, ADELETE_name, IF, END_IF, resolve_jump
+from .opcodes import resolve_jump
 
 
 class IgnoreBlock(Exception):
@@ -20,12 +20,14 @@ class Block:
     def __init__(self, parent=None, commands=None):
         self.parent = parent
         self.commands = commands if commands else []
-        self.localvars = {}
+        self.local_vars = {}
+        self.deleted_vars = set()
 
         self.code = []
         self.try_catches = []
         self.blocks = []
         self.jumps = []
+        self.loops = []
         self.jump_targets = {}
         self.unknown_jump_targets = {}
 
@@ -36,81 +38,14 @@ class Block:
     def module(self):
         return self.parent
 
-    def store_name(self, name, allow_locals=True):
-        if allow_locals:
-            self.add_opcodes(
-                ASTORE_name(self, name)
-            )
-        else:
-            self.add_opcodes(
-                ASTORE_name(self, '#TEMP#'),
-                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'attrs', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC_W(name),
-                ALOAD_name(self, '#TEMP#'),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-                JavaOpcodes.POP(),
-            )
+    def store_name(self, name, use_locals):
+        raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
-    def load_name(self, name, allow_locals=True):
-        try:
-            # Look for a local first.
-            if allow_locals:
-                self.add_opcodes(
-                    ALOAD_name(self, name)
-                )
-            else:
-                raise KeyError('Not scanning locals')
-        except KeyError:
-            self.add_opcodes(
-                # If there isn't a local, look for a global
-                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+    def load_name(self, name, use_locals):
+        raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
-                # If there's nothing in the globals, then look for a builtin.
-                IF(
-                    [JavaOpcodes.DUP()],
-                    JavaOpcodes.IFNONNULL
-                ),
-                    JavaOpcodes.POP(),
-                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-                    JavaOpcodes.LDC_W(name),
-                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-
-                    # If we still don't have something, throw a NameError.
-                    IF(
-                        [JavaOpcodes.DUP()],
-                        JavaOpcodes.IFNONNULL
-                    ),
-                        JavaOpcodes.POP(),
-                        JavaOpcodes.NEW('org/python/exceptions/NameError'),
-                        JavaOpcodes.DUP(),
-                        JavaOpcodes.LDC_W(name),
-                        JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
-                        JavaOpcodes.ATHROW(),
-                    END_IF(),
-
-                END_IF(),
-                # Make sure we actually have a Python object
-                JavaOpcodes.CHECKCAST('org/python/Object')
-            )
-
-    def delete_name(self, name, allow_locals=True):
-        try:
-            # Look for a local first.
-            if allow_locals:
-                self.add_opcodes(
-                    ADELETE_name(self, name)
-                )
-            else:
-                raise KeyError('Not scanning locals')
-        except KeyError:
-            self.add_opcodes(
-                # If there isn't a local, look for a global
-                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-            )
+    def delete_name(self, name, use_locals):
+        raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
     def extract(self, code, debug=False):
         """Break a code object into the parts it defines, populating the
@@ -140,9 +75,21 @@ class Block:
         # Append the extracted commands to any pre-existing ones.
         self.commands.extend(commands)
 
-    def tweak(self):
+    def transpile_setup(self):
         """Tweak the bytecode generated for this block."""
         pass
+
+    def transpile_teardown(self):
+        """Tweak the bytecode generated for this block."""
+        pass
+
+    @property
+    def can_ignore_empty(self):
+        return False
+
+    @property
+    def has_void_return(self):
+        return False
 
     def add_opcodes(self, *opcodes):
         # Add the opcodes to the code list and process them.
@@ -174,12 +121,6 @@ class Block:
             if depth > max_depth:
                 max_depth = depth
         return max_depth
-
-    def ignore_empty(self):
-        if len(self.code) == 1 and isinstance(self.code[0], JavaOpcodes.RETURN):
-            raise IgnoreBlock()
-        elif len(self.code) == 2 and isinstance(self.code[1], JavaOpcodes.ARETURN):
-            raise IgnoreBlock()
 
     def void_return(self):
         """Ensure that end of the code sequence is a Java-style return of void.
@@ -217,11 +158,26 @@ class Block:
 
         May raise ``IgnoreBlock`` if the block should be ignored.
         """
+
+        # Most opcodes need no preparation, but MAKE_FUNCTION,
+        # CALL_FUNCTION/LOAD_BUILD_CLASS, and MAKE_CLOSURE all create
+        # blocks of code that might be referenced elsewhere, so they
+        # need to be handled first, and materialized into actual class
+        # definitions.
+        for cmd in self.commands:
+            cmd.materialize(self)
+
+        # Insert content that needs to occur before the main block commands
+        self.transpile_setup()
+
         # Convert the sequence of commands into instructions.
         # Most of the instructions will be opcodes. However, some will
         # be instructions to add exception blocks, line number references, etc
         for cmd in self.commands:
             cmd.transpile(self)
+
+        # Insert content that needs to occur after the main block commands
+        self.transpile_teardown()
 
         # Java requires that every body of code finishes with a return.
         # Make sure there is one.
@@ -236,17 +192,24 @@ class Block:
             for opcode, position in references:
                 resolve_jump(opcode, self, target, position)
 
-        # Provide any tweaks that are needed because of the context in which
-        # the block is being used.
-        # print('>>>>> Tweak opcodes')
-        self.tweak()
+        # If the block has no content in it, and the block allows,
+        # ignore this block.
+        if self.can_ignore_empty:
+            if len(self.code) == 1 and isinstance(self.code[0], JavaOpcodes.RETURN):
+                raise IgnoreBlock()
+            elif len(self.code) == 2 and isinstance(self.code[1], JavaOpcodes.ARETURN):
+                raise IgnoreBlock()
+
+        # If the block has a void return, make sure that is honored.
+        if self.has_void_return:
+            self.void_return()
 
         # Now that we have a complete opcode list, postprocess the list
         # with the known offsets.
         offset = 0
-        # print('>>>>> set offsets')
+        # print('>>>>> set offsets', self)
         for index, instruction in enumerate(self.code):
-            # print("%4d:%4d (%s) %s" % (index, offset, id(instruction), instruction))
+            # print("%4d:%4d (0x%x) %s" % (index, offset, id(instruction), instruction))
             instruction.java_index = index
             instruction.java_offset = offset
             offset += len(instruction)
@@ -316,7 +279,7 @@ class Block:
 
         return JavaCode(
             max_stack=self.stack_depth() + len(exceptions),
-            max_locals=len(self.localvars),
+            max_locals=len(self.local_vars) + len(self.deleted_vars),
             code=self.code,
             exceptions=exceptions,
             attributes=[

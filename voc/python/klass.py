@@ -7,112 +7,21 @@ from ..java import (
     Method as JavaMethod,
     opcodes as JavaOpcodes,
     SourceFile,
+    RuntimeVisibleAnnotations,
+    Annotation,
+    ConstantElementValue,
     # LineNumberTable
 )
 
 from .blocks import Block
 from .methods import InitMethod, InstanceMethod, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, IF, END_IF
+from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 
 class ClassBlock(Block):
-    def tweak(self):
-        self.code = [
-            # Set up the class attributes dictionary for the class
-            JavaOpcodes.NEW('java/util/Hashtable'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/Hashtable', '<init>', '()V'),
-            JavaOpcodes.PUTSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-
-            # # Set the __name__ atribute to the name of the parent module.
-            JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC_W('__name__'),
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.descriptor.replace('/', '.')),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-            JavaOpcodes.POP()
-        ] + self.code
-        self.void_return()
-
-    def store_name(self, name, allow_locals=True):
-        # Ignore a request to store __init__ - replace with the constructor
-        if name == '__init__':
-            return
-
-        self.add_opcodes(
-            ASTORE_name(self, '#TEMP#'),
-            JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-            JavaOpcodes.LDC_W(name),
-            ALOAD_name(self, '#TEMP#'),
-            JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-            JavaOpcodes.POP(),
-        )
-
-    def load_name(self, name, allow_locals=True):
-        if allow_locals:
-            self.add_opcodes(
-                # look for a class attribute.
-                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-            )
-
-        self.add_opcodes(
-            # Look for a global var.
-            IF(
-                [JavaOpcodes.DUP()],
-                JavaOpcodes.IFNONNULL
-            ),
-                JavaOpcodes.POP(),
-                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-
-                # If there's nothing in the globals, then look for a builtin.
-                IF(
-                    [JavaOpcodes.DUP()],
-                    JavaOpcodes.IFNONNULL
-                ),
-                    JavaOpcodes.POP(),
-                    JavaOpcodes.GETSTATIC('org/Python', 'builtins', 'Ljava/util/Hashtable;'),
-                    JavaOpcodes.LDC_W(name),
-                    JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-
-                    # If we still don't have something, throw a NameError.
-                    IF(
-                        [JavaOpcodes.DUP()],
-                        JavaOpcodes.IFNONNULL
-                    ),
-                        JavaOpcodes.POP(),
-                        JavaOpcodes.NEW('org/python/exceptions/NameError'),
-                        JavaOpcodes.DUP(),
-                        JavaOpcodes.LDC_W(name),
-                        JavaOpcodes.INVOKESPECIAL('org/python/exceptions/NameError', '<init>', '(Ljava/lang/String;)V'),
-                        JavaOpcodes.ATHROW(),
-                    END_IF(),
-                END_IF(),
-            END_IF(),
-            # Make sure we actually have a Python object
-            JavaOpcodes.CHECKCAST('org/python/Object')
-        )
-
-    def delete_name(self, name, allow_locals=True):
-        if allow_locals:
-            self.add_opcodes(
-                # look for a class attribute.
-                JavaOpcodes.GETSTATIC(self.klass.descriptor, 'classattrs', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-            )
-        else:
-            self.add_opcodes(
-                # look for a global var.
-                JavaOpcodes.GETSTATIC(self.module.descriptor, 'globals', 'Ljava/util/Hashtable;'),
-                JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKEVIRTUAL('java/util/Hashtable', 'remove', '(Ljava/lang/Object;)Ljava/lang/Object;'),
-            )
+    @property
+    def has_void_return(self):
+        return True
 
     @property
     def descriptor(self):
@@ -124,7 +33,37 @@ class ClassBlock(Block):
 
     @property
     def module(self):
-        return self.parent.parent
+        return self.klass.module
+
+    def store_name(self, name, use_locals):
+        if name != '__init__':
+            self.add_opcodes(
+                ASTORE_name(self, '#value'),
+                JavaOpcodes.LDC_W(self.klass.descriptor),
+                JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name(self, '#value'),
+
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            )
+            free_name(self, '#value')
+
+    def load_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
+    def delete_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
 
     def add_method(self, full_method_name, code):
         class_name, method_name = full_method_name.split('.')
@@ -136,13 +75,13 @@ class ClassBlock(Block):
             method = InstanceMethod(self.klass, method_name, extract_parameters(code))
 
         method.extract(code)
-        self.klass.methods.append(method.transpile())
+        self.klass.methods.append(method)
 
         return method
 
 
 class Class(Block):
-    def __init__(self, module, name, namespace=None, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, module, name, namespace=None, super_name=None, interfaces=None, public=True, final=False, methods=None, fields=None, init=None):
         super().__init__(module)
         self.name = name
         self.super_name = super_name if super_name else 'org/python/types/Object'
@@ -150,6 +89,7 @@ class Class(Block):
         self.public = public
         self.final = final
         self.methods = methods if methods else []
+        self.fields = fields if fields else {}
         self.init = init
         if namespace is None:
             self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
@@ -176,14 +116,29 @@ class Class(Block):
             public=self.public,
             final=self.final
         )
-        classfile.attributes.append(SourceFile(os.path.basename(self.module.sourcefile)))
+
+        classfile.attributes.append(
+            SourceFile(os.path.basename(self.module.sourcefile))
+        )
+
+        classfile.attributes.append(
+            RuntimeVisibleAnnotations([
+                Annotation(
+                    'Lorg/python/Method;',
+                    {
+                        '__doc__': ConstantElementValue("Python Class (insert docs here)")
+                    }
+                )
+            ])
+        )
 
         body = ClassBlock(self, self.commands).transpile()
 
-        # Add a class attributes dictionary to the class.
-        classfile.fields.append(
-            JavaField('classattrs', 'Ljava/util/Hashtable;', public=True, static=True)
-        )
+        # Add any manually defined fields
+        classfile.fields.extend([
+            JavaField(name, descriptor)
+            for name, descriptor in self.fields.items()
+        ])
 
         if body:
             # If we have block content, add a static block to the class
@@ -193,8 +148,8 @@ class Class(Block):
 
         constructor_found = False
         for method in self.methods:
-            classfile.methods.append(method)
-            if method.name.string == '<init>':
+            classfile.methods.append(method.transpile())
+            if method.name == '__init__':
                 constructor_found = True
 
         # If there's no constructor explicitly defined, add a default one.
@@ -202,7 +157,7 @@ class Class(Block):
             classfile.methods.append(
                 JavaMethod(
                     '<init>',
-                    '([Lorg/python/Object;Ljava/util/Hashtable;)V',
+                    '([Lorg/python/Object;Ljava/util/Map;)V',
                     attributes=[
                         JavaCode(
                             max_stack=1,
@@ -212,7 +167,7 @@ class Class(Block):
                                 JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '()V'),
                                 JavaOpcodes.RETURN(),
                             ],
-                        )
+                        ),
                     ]
                 )
             )
@@ -240,7 +195,8 @@ class InnerClass(Class):
 
 
 class AnonymousInnerClass(Class):
-    def __init__(self, parent, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, parent, closure_var_names, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+        # self.closure_var_names = closure_var_names
         if isinstance(parent, Class):
             module = parent.module
         else:
