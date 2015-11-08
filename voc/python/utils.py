@@ -629,7 +629,6 @@ class WhileLoop:
             command.materialize(context)
 
     def transpile(self, context):
-        context.loops.append(self)
         context.next_opcode_starts_line = self.starts_line
         context.add_opcodes(opcodes.START_LOOP())
 
@@ -640,7 +639,6 @@ class WhileLoop:
         context.add_opcodes(end_loop)
 
         context.jump_targets[self.end_offset] = end_loop
-        context.loops.pop()
 
 
 def find_try_except(offset_index, instructions, i):

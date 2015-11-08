@@ -22,7 +22,7 @@ class WhileLoopTests(TranspileTestCase):
                     print(i, i % 5)
                     if i % 5 == 0:
                         break
-                    print ("after")
+                    print("after")
                 print("Done")
             """)
 
@@ -35,6 +35,21 @@ class WhileLoopTests(TranspileTestCase):
                     print(i, i % 5)
                     if i % 5 == 0:
                         continue
-                    print ("after")
+                    print("after")
+                print("Done")
+            """)
+
+    def test_nested(self):
+        self.assertCodeExecution(
+            code="""
+                i = 1
+                j = 10
+                while i < j:
+                    k = 0
+                    while k < i:
+                        print(i, j)
+                        k = k + 1
+                    print("While done")
+                    i = i + 1
                 print("Done")
             """)
