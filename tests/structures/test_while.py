@@ -53,3 +53,15 @@ class WhileLoopTests(TranspileTestCase):
                     i = i + 1
                 print("Done")
             """)
+
+    def test_while_forever(self):
+        self.assertCodeExecution(
+            code="""
+                i = 0
+                while 1:
+                    print("Loop", i)
+                    i = i + 1
+                    if i == 10:
+                        break
+                print("Done")
+            """)

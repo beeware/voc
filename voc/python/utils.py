@@ -822,19 +822,19 @@ def find_blocks(instructions):
             i = i + 1
             start_index = i
 
-            while instructions[i].opname not in ('FOR_ITER', 'POP_JUMP_IF_FALSE'):
-                i = i + 1
-
             # Find the end of the entire loop block.
             # Ignore the final instruction to jump back to the start.
-            end_offset = instructions[i].argval
-            end_index = offset_index[end_offset] - 1
+            end_index = offset_index[instructions[i-1].argval] - 1
+            end_offset = instructions[end_index].offset
 
             # print("START INDEX", start_index)
             # print("START OFFSET", instructions[start_index].offset)
 
             # print("END INDEX", end_index)
             # print("END OFFSET", end_offset)
+
+            while instructions[i].opname not in ('FOR_ITER', 'POP_JUMP_IF_FALSE'):
+                i = i + 1
 
             if instructions[i].opname == 'FOR_ITER':
                 loop_offset = instructions[i + 2].offset
@@ -864,7 +864,7 @@ def find_blocks(instructions):
                     starts_line=instruction.starts_line,
                 )
 
-            blocks[end_index + 1] = block
+            blocks[end_index] = block
             i = i + 1
 
         elif instruction.opname == 'FOR_ITER':
