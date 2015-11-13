@@ -240,7 +240,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_str',
 
         'test_add_tuple',
-        'test_multiply_tuple',
         'test_lt_tuple',
         'test_le_tuple',
         'test_eq_tuple',

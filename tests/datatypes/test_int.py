@@ -175,7 +175,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_xor_int',
         'test_or_int',
 
-        'test_multiply_list',
         'test_floor_divide_list',
         'test_true_divide_list',
         'test_subscr_list',
