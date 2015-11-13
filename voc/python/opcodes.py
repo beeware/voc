@@ -62,7 +62,7 @@ class END_LOOP:
                 loop.end_op = RESOLVE
                 break
 
-        # A jump back to the start of the loop for another iteration
+        # A jump14 back to the start of the loop for another iteration
         context.add_opcodes(jump(JavaOpcodes.GOTO(0), context, loop, Opcode.START))
 
         # The next opcode is outside the LOOP block.
@@ -212,7 +212,6 @@ class ELIF:
         # ended. That's the block that the elif applies to.
         for if_block in context.blocks[::-1]:
             if if_block.end_op is None:
-                if_block.end_op = RESOLVE
                 break
 
         # If this is the first elif, add a GOTO and use it as the
@@ -739,8 +738,12 @@ def ICONST_val(value):
             return JavaOpcodes.ICONST_5()
         elif value == -1:
             return JavaOpcodes.ICONST_M1()
-        else:
+        elif -32768 <= value <= 32767:
             return JavaOpcodes.SIPUSH(value)
+        elif -2147483648 <= value <= 2147483647:
+            return JavaOpcodes.LDC(value)
+        else:
+            return JavaOpcodes.LDC_W(value)
     else:
         raise RuntimeError("%s is not an integer constant" % value)
 
@@ -1543,11 +1546,10 @@ class LOAD_CONST(Opcode):
         return 1
 
     def _convert(self, context, arguments, const):
-        # A None value has it's own opcode.
-        # If the constant is a byte or a short, we can
-        # cut a value out of the constant pool.
         if const is None:
-            context.add_opcodes(JavaOpcodes.ACONST_NULL())
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+            )
             return
         else:
             if isinstance(const, bool):
@@ -1821,21 +1823,57 @@ class COMPARE_OP(Opcode):
     def convert(self, context, arguments):
         # Add the operand which will be the left side, and thus the
         # target of the comparator operator.
+        const_comparison = False
         for argument in arguments:
+            if argument.operation.opname == 'LOAD_CONST':
+                if argument.operation.const is not None:
+                    const_comparison = True
             argument.operation.transpile(context, argument.arguments)
 
-        comparator = {
-            '<': '__lt__',
-            '<=': '__le__',
-            '>': '__gt__',
-            '>=': '__ge__',
-            '==': '__eq__',
-            'exception match': '__eq__',
-        }[self.comparison]
+        if self.comparison == 'is not' and not const_comparison:
+            context.add_opcodes(
+                IF([], JavaOpcodes.IF_ACMPEQ),
+                    JavaOpcodes.NEW('org/python/types/Bool'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.ICONST_1(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                ELSE(),
+                    JavaOpcodes.NEW('org/python/types/Bool'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.ICONST_0(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                END_IF(),
+            )
+        elif self.comparison == 'is' and not const_comparison:
+            context.add_opcodes(
+                IF([], JavaOpcodes.IF_ACMPNE),
+                    JavaOpcodes.NEW('org/python/types/Bool'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.ICONST_1(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                ELSE(),
+                    JavaOpcodes.NEW('org/python/types/Bool'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.ICONST_0(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                END_IF(),
+            )
+        else:
+            comparator = {
+                '<': '__lt__',
+                '<=': '__le__',
+                '>': '__gt__',
+                '>=': '__ge__',
+                '==': '__eq__',
+                '!=': '__ne__',
+                'is': '__eq__',
+                'is not': '__ne__',
+                'exception match': '__eq__',
+            }[self.comparison]
 
-        context.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', comparator, '(Lorg/python/Object;)Lorg/python/Object;')
-        )
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', comparator, '(Lorg/python/Object;)Lorg/python/Object;')
+            )
 
 
 class IMPORT_NAME(Opcode):
@@ -2162,7 +2200,16 @@ class LOAD_FAST(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        context.add_opcodes(ALOAD_name(context, self.name))
+        try:
+            context.add_opcodes(ALOAD_name(context, self.name))
+        except KeyError:
+            context.add_opcodes(
+                JavaOpcodes.NEW('org/python/exceptions/UnboundLocalError'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(self.name),
+                JavaOpcodes.INVOKESPECIAL('org/python/exceptions/UnboundLocalError', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.ATHROW()
+            )
 
 
 class STORE_FAST(Opcode):

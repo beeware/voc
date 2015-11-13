@@ -54,6 +54,7 @@ class JavaNormalizationTests(unittest.TestCase):
             """
             ### EXCEPTION ###
             IndexError: list index out of range
+                test.py:2
             """
         )
 
@@ -71,6 +72,7 @@ class JavaNormalizationTests(unittest.TestCase):
             Hello, world.
             ### EXCEPTION ###
             IndexError: list index out of range
+                test.py:2
             """
         )
 
@@ -85,6 +87,7 @@ class JavaNormalizationTests(unittest.TestCase):
             """
             ### EXCEPTION ###
             IndexError: list index out of range
+                test.py:3
             """
         )
 
@@ -101,6 +104,7 @@ class JavaNormalizationTests(unittest.TestCase):
             Hello, world.
             ### EXCEPTION ###
             IndexError: list index out of range
+                test.py:3
             """
         )
 
@@ -145,6 +149,8 @@ class JavaNormalizationTests(unittest.TestCase):
             Do final cleanup
             ### EXCEPTION ###
             ValueError: invalid literal for int() with base 10: 'asdf'
+                example.py:87
+                example.py:81
             """
         )
 
@@ -177,6 +183,7 @@ class PythonNormalizationTests(unittest.TestCase):
             """
             ### EXCEPTION ###
             TypeError: unsupported operand type(s) for &: 'float' and 'bool'
+                test.py:3
             """
         )
 
@@ -193,6 +200,7 @@ class PythonNormalizationTests(unittest.TestCase):
             Hello, world.
             ### EXCEPTION ###
             TypeError: unsupported operand type(s) for &: 'float' and 'bool'
+                test.py:3
             """
         )
 

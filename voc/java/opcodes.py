@@ -237,7 +237,7 @@ class ANEWARRAY(Opcode):
     @classmethod
     def read_extra(cls, reader, dump=None):
         klass = reader.read_u2()
-        return cls(reader.constant_pool[klass].name.bytes.decode('utf8'))
+        return cls(reader.constant_pool[klass].name.bytes.decode('mutf-8'))
 
     def write_extra(self, writer):
         writer.write_u2(writer.constant_pool.index(self.klass))
@@ -503,7 +503,7 @@ class CHECKCAST(Opcode):
 
     @classmethod
     def read_extra(cls, reader, dump=None):
-        class_name = reader.constant_pool[reader.read_u2()].name.bytes.decode('utf8')
+        class_name = reader.constant_pool[reader.read_u2()].name.bytes.decode('mutf-8')
         return cls(class_name)
 
     def write_extra(self, writer):
@@ -1080,7 +1080,7 @@ class GETFIELD(Opcode):
         return cls(
             field.class_name,
             field.name,
-            field.name_and_type.descriptor.bytes.decode('utf8')
+            field.name_and_type.descriptor.bytes.decode('mutf-8')
         )
 
     def write_extra(self, writer):
@@ -1121,7 +1121,7 @@ class GETSTATIC(Opcode):
         return cls(
             field.class_name,
             field.name,
-            field.name_and_type.descriptor.bytes.decode('utf8')
+            field.name_and_type.descriptor.bytes.decode('mutf-8')
         )
 
     def write_extra(self, writer):
@@ -2155,9 +2155,9 @@ class INVOKEDYNAMIC(Opcode):
         method = reader.constant_pool[reader.read_u2()]
         reader.read_u2()
         return cls(
-            method.klass.name.bytes.decode('utf8'),
-            method.name_and_type.name.bytes.decode('utf8'),
-            method.name_and_type.descriptor.bytes.decode('utf8')
+            method.klass.name.bytes.decode('mutf-8'),
+            method.name_and_type.name.bytes.decode('mutf-8'),
+            method.name_and_type.descriptor.bytes.decode('mutf-8')
         )
 
     def write_extra(self, writer):
@@ -2202,7 +2202,7 @@ class INVOKEINTERFACE(Opcode):
         return cls(
             method.class_name,
             method.name,
-            method.name_and_type.descriptor.bytes.decode('utf8'),
+            method.name_and_type.descriptor.bytes.decode('mutf-8'),
         )
 
     def write_extra(self, writer):
@@ -2256,9 +2256,9 @@ class INVOKESPECIAL(Opcode):
     def read_extra(cls, reader, dump=None):
         method = reader.constant_pool[reader.read_u2()]
         return cls(
-            method.klass.name.bytes.decode('utf8'),
-            method.name_and_type.name.bytes.decode('utf8'),
-            method.name_and_type.descriptor.bytes.decode('utf8')
+            method.klass.name.bytes.decode('mutf-8'),
+            method.name_and_type.name.bytes.decode('mutf-8'),
+            method.name_and_type.descriptor.bytes.decode('mutf-8')
         )
 
     def write_extra(self, writer):
@@ -2298,9 +2298,9 @@ class INVOKESTATIC(Opcode):
     def read_extra(cls, reader, dump=None):
         method = reader.constant_pool[reader.read_u2()]
         return cls(
-            method.klass.name.bytes.decode('utf8'),
-            method.name_and_type.name.bytes.decode('utf8'),
-            method.name_and_type.descriptor.bytes.decode('utf8')
+            method.klass.name.bytes.decode('mutf-8'),
+            method.name_and_type.name.bytes.decode('mutf-8'),
+            method.name_and_type.descriptor.bytes.decode('mutf-8')
         )
 
     def write_extra(self, writer):
@@ -2340,9 +2340,9 @@ class INVOKEVIRTUAL(Opcode):
     def read_extra(cls, reader, dump=None):
         method = reader.constant_pool[reader.read_u2()]
         return cls(
-            method.klass.name.bytes.decode('utf8'),
-            method.name_and_type.name.bytes.decode('utf8'),
-            method.name_and_type.descriptor.bytes.decode('utf8')
+            method.klass.name.bytes.decode('mutf-8'),
+            method.name_and_type.name.bytes.decode('mutf-8'),
+            method.name_and_type.descriptor.bytes.decode('mutf-8')
         )
 
     def write_extra(self, writer):
@@ -3038,7 +3038,7 @@ class NEW(Opcode):
     def read_extra(cls, reader, dump=None):
         classref = reader.constant_pool[reader.read_u2()]
         return cls(
-            classref.name.bytes.decode('utf8'),
+            classref.name.bytes.decode('mutf-8'),
         )
 
     def write_extra(self, writer):
@@ -3132,7 +3132,7 @@ class PUTFIELD(Opcode):
         return cls(
             field.class_name,
             field.name,
-            field.name_and_type.descriptor.bytes.decode('utf8')
+            field.name_and_type.descriptor.bytes.decode('mutf-8')
         )
 
     def write_extra(self, writer):
@@ -3173,7 +3173,7 @@ class PUTSTATIC(Opcode):
         return cls(
             field.class_name,
             field.name,
-            field.name_and_type.descriptor.bytes.decode('utf8')
+            field.name_and_type.descriptor.bytes.decode('mutf-8')
         )
 
     def write_extra(self, writer):

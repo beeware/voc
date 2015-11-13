@@ -127,26 +127,50 @@ JAVA_EXCEPTION = re.compile(
     '((Exception in thread "\w+" org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\n]+))|' +
     '(Exception in thread "\w+" [^\n]+\n' +
     'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\n]+)))\n' +
-    '(\s+at .+\((((?P<file>.*):(?P<line>\d+))|(Native Method))\))+'
+    '(?P<trace>(\s+at .+\((((.*):(\d+))|(Native Method))\)\n)+)'
 )
+JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*):(?P<line>\d+))|(Native Method))\)')
 JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 
 # PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
 
 PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n)+(?P<exception>.*?): (?P<message>.*\n)')
+PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n')
 PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
 
 
 def cleanse_java(input):
     try:
-        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception2>: \\g<message2>', input)
+        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception2>: \\g<message2>\n\\g<trace>', input)
     except:
-        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception1>: \\g<message1>', input)
+        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception1>: \\g<message1>\n\\g<trace>', input)
+    stack = JAVA_STACK.findall(out)
+    out = JAVA_STACK.sub('', out)
+    out = '%s%s%s' % (
+        out,
+        '\n'.join([
+            "    %s:%s" % (s[3], s[4])
+            for s in stack[::-1]
+            if s[0].startswith('python.')
+        ]),
+        '\n' if stack else ''
+    )
     return JAVA_FLOAT.sub('\\1e\\2\\3', out)
 
 
 def cleanse_python(input):
     out = PYTHON_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception>: \\g<message>', input)
+    stack = PYTHON_STACK.findall(input)
+    out = '%s%s%s' % (
+        out,
+        '\n'.join(
+            [
+                "    %s:%s" % (s[0], s[1])
+                for s in stack
+            ]
+        ),
+        '\n' if stack else ''
+    )
     return PYTHON_FLOAT.sub('\\1e\\2\\3', out)
 
 

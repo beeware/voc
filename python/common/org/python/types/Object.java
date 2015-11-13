@@ -463,7 +463,6 @@ public class Object implements org.python.Object {
         throw new org.python.exceptions.AttributeError(this, "__getitem__");
     }
 
-
     public org.python.Object __missing__(org.python.Object key) {
         throw new org.python.exceptions.AttributeError(this, "__missing__");
     }

@@ -41,6 +41,9 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         // value = attrs;
     }
 
+    @org.python.Method(
+        __doc__ = "Implement iter(self)."
+    )
     public org.python.Iterable __iter__() {
         return this;
     }
@@ -54,6 +57,24 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
 
         org.python.Object result = new org.python.types.Int(this.index);
         this.index += this.step;
+        return result;
+    }
+
+    public org.python.Object __getitem__(org.python.Object index) {
+        long idx = ((org.python.types.Int)index).value;
+        long value;
+        if (idx >= 0) {
+            value = this.start + idx * this.step;
+        } else {
+            value = this.stop + idx * this.step;
+        }
+
+        if (this.step > 0 && value >= this.stop) {
+            throw new org.python.exceptions.IndexError("range object index out of range");
+        } else if (this.step < 0 && value <= this.stop) {
+            throw new org.python.exceptions.IndexError("range object index out of range");
+        }
+        org.python.Object result = new org.python.types.Int(value);
         return result;
     }
 

@@ -169,3 +169,54 @@ class IfElifElseTests(TranspileTestCase):
                 print('Large x')
             print('Done.')
             """)
+
+    def test_multiple_if(self):
+        # Make sure the most recent if block
+        # is correctly identified.
+        self.assertCodeExecution("""
+            x = 1
+            if x < 5:
+                print('Small x')
+            elif x < 50:
+                print('Medium x')
+            else:
+                print('Large x')
+            print('Done 1.')
+
+            x = 10
+            if x < 5:
+                print('Small x')
+            elif x < 50:
+                print('Medium x')
+            else:
+                print('Large x')
+            print('Done 2.')
+
+            x = 100
+            if x < 5:
+                print('Small x')
+            elif x < 50:
+                print('Medium x')
+            else:
+                print('Large x')
+
+            print('Done 3.')
+            """)
+
+    def test_multiple_if_is_comparison(self):
+        # Make sure the most recent if block
+        # is correctly identified.
+        self.assertCodeExecution("""
+            x = None
+            if x is None:
+                print('1: is none')
+            else:
+                print('1: is not none')
+            print('Done 1.')
+
+            if x is not None:
+                print('2: is not none')
+            else:
+                print('2: is none')
+            print('Done 2.')
+            """)

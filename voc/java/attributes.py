@@ -27,7 +27,7 @@ class Attribute:
 
     @staticmethod
     def read(reader, dump=None):
-        name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+        name = reader.constant_pool[reader.read_u2()].bytes.decode('mutf-8')
         size = reader.read_u4()
         if dump is not None:
             reader.debug("    " * dump, '%s (%s bytes)' % (name, size))
@@ -266,7 +266,7 @@ class ExceptionInfo:
         handler_pc = reader.read_u2()
         item = reader.read_u2()
         if item != 0:
-            catch_type = reader.constant_pool[item].name.bytes.decode('utf8')
+            catch_type = reader.constant_pool[item].name.bytes.decode('mutf-8')
         else:
             catch_type = None
 
@@ -1135,7 +1135,7 @@ class ObjectVariableInfo(VerificationTypeInfo):
     @staticmethod
     def read_info(reader):
         val = reader.read_u2()
-        klass = reader.constant_pool[val].name.bytes.decode('utf8')
+        klass = reader.constant_pool[val].name.bytes.decode('mutf-8')
         return ObjectVariableInfo(klass)
 
     def write_info(self, writer):
@@ -1524,9 +1524,9 @@ class EnclosingMethod(Attribute):
             ))
 
         return EnclosingMethod(
-            reader.constant_pool[klass].name.bytes.decode('utf8'),
-            reader.constant_pool[name_and_type].name.bytes.decode('utf8'),
-            reader.constant_pool[name_and_type].descriptor.bytes.decode('utf8'),
+            reader.constant_pool[klass].name.bytes.decode('mutf-8'),
+            reader.constant_pool[name_and_type].name.bytes.decode('mutf-8'),
+            reader.constant_pool[name_and_type].descriptor.bytes.decode('mutf-8'),
         )
 
     def write_info(self, writer):
@@ -1617,7 +1617,7 @@ class Signature(Attribute):
 
     @staticmethod
     def read_info(reader, dump=None):
-        signature = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+        signature = reader.constant_pool[reader.read_u2()].bytes.decode('mutf-8')
 
         if dump is not None:
             reader.debug("    " * dump, 'Signature: %s' % signature)
@@ -1669,7 +1669,7 @@ class SourceFile(Attribute):
 
     @staticmethod
     def read_info(reader, dump=None):
-        sourcefile_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+        sourcefile_name = reader.constant_pool[reader.read_u2()].bytes.decode('mutf-8')
 
         if dump is not None:
             reader.debug("    " * dump, 'Source file: %s' % sourcefile_name)
@@ -2142,7 +2142,7 @@ class Annotation:
 
     @staticmethod
     def read(reader, dump=None):
-        type_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+        type_name = reader.constant_pool[reader.read_u2()].bytes.decode('mutf-8')
 
         num_element_value_pairs = reader.read_u2()
 
@@ -2151,7 +2151,7 @@ class Annotation:
 
         element_value_pairs = OrderedDict()
         for i in range(0, num_element_value_pairs):
-            element_name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+            element_name = reader.constant_pool[reader.read_u2()].bytes.decode('mutf-8')
             value = ElementValue.read(reader)
             if dump is not None:
                 reader.debug("    " * (dump + 1), '%s: %s' % (element_name, value))

@@ -300,9 +300,9 @@ class BaseClass:
 
         access_flags = reader.read_u2()
         val = reader.read_u2()
-        this_class = reader.constant_pool[val].name.bytes.decode('utf8')
+        this_class = reader.constant_pool[val].name.bytes.decode('mutf-8')
         val = reader.read_u2()
-        super_class = reader.constant_pool[val].name.bytes.decode('utf8')
+        super_class = reader.constant_pool[val].name.bytes.decode('mutf-8')
 
         if dump is not None:
             reader.debug("    " * dump, 'Class %s' % this_class)

@@ -144,8 +144,8 @@ class Method:
     def read(reader, dump=None):
         access_flags = reader.read_u2()
 
-        name = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
-        descriptor = reader.constant_pool[reader.read_u2()].bytes.decode('utf8')
+        name = reader.constant_pool[reader.read_u2()].bytes.decode('mutf-8')
+        descriptor = reader.constant_pool[reader.read_u2()].bytes.decode('mutf-8')
         attributes_count = reader.read_u2()
 
         if dump is not None:

@@ -129,7 +129,10 @@ class Block:
         RETURN NULL. Replace "SET NULL" "ARETURN" pair with "RETURN".
         """
 
-        if len(self.code) >= 2 and isinstance(self.code[-2], JavaOpcodes.ACONST_NULL) and isinstance(self.code[-1], JavaOpcodes.ARETURN):
+        if (len(self.code) >= 2
+                and isinstance(self.code[-2], JavaOpcodes.GETSTATIC)
+                and self.code[-2].field.class_name == 'org/python/types/NoneType'
+                and isinstance(self.code[-1], JavaOpcodes.ARETURN)):
             return_opcode = JavaOpcodes.RETURN()
 
             # Update the jump operation to point at the new return opcode.
