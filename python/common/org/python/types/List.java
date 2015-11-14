@@ -80,18 +80,55 @@ public class List extends org.python.types.Object {
 
     public org.python.Object __getitem__(org.python.Object index) {
         try {
-            int idx = (int)((org.python.types.Int) index).value;
-            if (idx < 0) {
-                if (-idx > this.value.size()) {
-                    throw new org.python.exceptions.IndexError("list index out of range");
-                } else {
-                    return this.value.get(this.value.size() + idx);
+            if (index instanceof org.python.types.Slice) {
+                org.python.types.Slice slice = (org.python.types.Slice) index;
+                java.util.ArrayList<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
+
+                if (slice.start == null && slice.stop == null && slice.step == null) {
+                    sliced.addAll(this.value);
                 }
+                else {
+                    long start;
+                    if (slice.start != null) {
+                        start = slice.start.value;
+                    } else {
+                        start = 0;
+                    }
+
+                    long stop;
+                    if (slice.stop != null) {
+                        stop = slice.stop.value;
+                    } else {
+                        stop = this.value.size();
+                    }
+
+                    long step;
+                    if (slice.step != null) {
+                        step = slice.step.value;
+                    } else {
+                        step = 1;
+                    }
+
+                    for (long i = start; i < stop; i += step) {
+                        sliced.add(this.value.get((int)i));
+                    }
+                }
+                return new org.python.types.List(sliced);
+
             } else {
-                if (idx >= this.value.size()) {
-                    throw new org.python.exceptions.IndexError("list index out of range");
+                int idx = (int)((org.python.types.Int) index).value;
+                if (idx < 0) {
+                    if (-idx > this.value.size()) {
+                        throw new org.python.exceptions.IndexError("list index out of range");
+                    } else {
+                        return this.value.get(this.value.size() + idx);
+                    }
                 } else {
-                    return this.value.get(idx);
+                    if (idx >= this.value.size()) {
+                        throw new org.python.exceptions.IndexError("list index out of range");
+                    } else {
+                        return this.value.get(idx);
+                    }
                 }
             }
         } catch (ClassCastException e) {

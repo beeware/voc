@@ -2601,8 +2601,26 @@ class BUILD_SLICE(Opcode):
         return 1
 
     def convert(self, context, arguments):
+        context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Slice'),
+            JavaOpcodes.DUP(),
+        )
+
         for argument in arguments:
             argument.operation.transpile(context, argument.arguments)
+
+        if self.argc == 1:
+            method_signature = '(Lorg/python/Object;)V'
+        elif self.argc == 2:
+            method_signature = '(Lorg/python/Object;Lorg/python/Object;)V'
+        elif self.argc == 3:
+            method_signature = '(Lorg/python/Object;Lorg/python/Object;Lorg/python/Object;)V'
+        else:
+            raise Exception("Unknown number of slice arguments")
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Slice', '<init>', method_signature),
+        )
 
 
 class MAKE_CLOSURE(Opcode):

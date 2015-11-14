@@ -79,9 +79,9 @@ BoolGlob = FALSE
 Char1Glob = '\0'
 Char2Glob = '\0'
 Array1Glob = [0]*51
-# Array2Glob = [x[:] for x in [Array1Glob]*51]
-# PtrGlb = None
-# PtrGlbNext = None
+Array2Glob = [x[:] for x in [Array1Glob]*51]
+PtrGlb = None
+PtrGlbNext = None
 
 # def Proc0(loops=LOOPS):
 #     global IntGlob

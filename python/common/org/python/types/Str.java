@@ -17,6 +17,10 @@ public class Str extends org.python.types.Object {
         this.value = str;
     }
 
+    public Str(char chr) {
+        this.value = new java.lang.String(new char [] {chr});
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("str.__new__() has not been implemented.");
     // }
@@ -98,7 +102,67 @@ public class Str extends org.python.types.Object {
     }
 
     public org.python.Object __getitem__(org.python.Object index) {
-        throw new org.python.exceptions.NotImplementedError("str.__getitem__() has not been implemented.");
+        try {
+            if (index instanceof org.python.types.Slice) {
+                org.python.types.Slice slice = (org.python.types.Slice) index;
+                java.lang.String sliced;
+
+                if (slice.start == null && slice.stop == null && slice.step == null) {
+                    sliced = this.value;
+                }
+                else {
+                    long start;
+                    if (slice.start != null) {
+                        start = slice.start.value;
+                    } else {
+                        start = 0;
+                    }
+
+                    long stop;
+                    if (slice.stop != null) {
+                        stop = slice.stop.value;
+                    } else {
+                        stop = this.value.length();
+                    }
+
+                    long step;
+                    if (slice.step != null) {
+                        step = slice.step.value;
+                    } else {
+                        step = 1;
+                    }
+
+                    if (step == 1) {
+                        sliced = this.value.substring((int) start, (int) stop);
+                    } else {
+                        java.lang.StringBuffer buffer = new java.lang.StringBuffer();
+                        for (long i = start; i < stop; i += step) {
+                            buffer.append(this.value.charAt((int)i));
+                        }
+                        sliced = buffer.toString();
+                    }
+                }
+                return new org.python.types.Str(sliced);
+
+            } else {
+                int idx = (int)((org.python.types.Int) index).value;
+                if (idx < 0) {
+                    if (-idx > this.value.length()) {
+                        throw new org.python.exceptions.IndexError("string index out of range");
+                    } else {
+                        return new org.python.types.Str(this.value.charAt(this.value.length() + idx));
+                    }
+                } else {
+                    if (idx >= this.value.length()) {
+                        throw new org.python.exceptions.IndexError("string index out of range");
+                    } else {
+                        return new org.python.types.Str(this.value.charAt(idx));
+                    }
+                }
+            }
+        } catch (ClassCastException e) {
+            throw new org.python.exceptions.TypeError("string indices must be integers, not " + org.Python.pythonTypeName(index));
+        }
     }
 
     public org.python.Iterable __iter__() {

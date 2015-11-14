@@ -460,6 +460,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __getitem__(org.python.Object index) {
+        System.out.println("GETITEM " + this);
         throw new org.python.exceptions.AttributeError(this, "__getitem__");
     }
 
