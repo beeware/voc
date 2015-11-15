@@ -210,7 +210,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_set',
 
         'test_subtract_str',
-        'test_multiply_str',
         'test_floor_divide_str',
         'test_true_divide_str',
         'test_subscr_str',

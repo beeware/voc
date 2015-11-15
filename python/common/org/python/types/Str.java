@@ -114,6 +114,17 @@ public class Str extends org.python.types.Object {
     }
 
     public org.python.Object __mul__(org.python.Object other) {
+        if (other instanceof org.python.types.Int) {
+            long other_int = ((org.python.types.Int)other).value;
+            if (other_int < 1) {
+                return new Str("");
+            }
+            java.lang.StringBuffer res = new java.lang.StringBuffer(value.length() * (int)other_int);
+            for (int i = 0; i < other_int; i++) {
+                res.append(value);
+            }
+            return new Str(res.toString());
+        }
         throw new org.python.exceptions.NotImplementedError("str.__mul__() has not been implemented.");
     }
 
