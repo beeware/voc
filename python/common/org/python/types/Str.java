@@ -110,7 +110,16 @@ public class Str extends org.python.types.Object {
     }
 
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__add__() has not been implemented.");
+        if (other instanceof org.python.types.Str) {
+            Str other_str = (Str)other;
+            if (0 == other_str.value.length()) {
+                return this;
+            }
+            java.lang.StringBuffer sb = new java.lang.StringBuffer(value);
+            sb.append(other_str.value);
+            return new Str(sb.toString());
+        }
+        throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.pythonTypeName(other) + "' object to str implicitly");
     }
 
     public org.python.Object __mul__(org.python.Object other) {
