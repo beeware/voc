@@ -16,7 +16,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
     values = ['""', '"This is a string"']
 
     not_implemented = [
-        'test_add_bool',
         'test_multiply_bool',
         'test_modulo_bool',
         'test_subscr_bool',
@@ -27,7 +26,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_bool',
         'test_ge_bool',
 
-        'test_add_bytearray',
         'test_subtract_bytearray',
         'test_multiply_bytearray',
         'test_floor_divide_bytearray',
@@ -67,7 +65,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_bytes',
         'test_ge_bytes',
 
-        'test_add_class',
         'test_subtract_class',
         'test_multiply_class',
         'test_floor_divide_class',
@@ -87,7 +84,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_class',
         'test_ge_class',
 
-        'test_add_complex',
         'test_subtract_complex',
         'test_multiply_complex',
         'test_floor_divide_complex',
@@ -127,7 +123,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_dict',
         'test_ge_dict',
 
-        'test_add_float',
         'test_multiply_float',
         'test_modulo_float',
         'test_subscr_float',
@@ -138,7 +133,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_float',
         'test_ge_float',
 
-        'test_add_frozenset',
         'test_subtract_frozenset',
         'test_multiply_frozenset',
         'test_floor_divide_frozenset',
@@ -158,8 +152,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_frozenset',
         'test_ge_frozenset',
 
-        'test_add_int',
-        'test_multiply_int',
         'test_modulo_int',
         'test_subscr_int',
         'test_lt_int',
@@ -169,7 +161,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_int',
         'test_ge_int',
 
-        'test_add_list',
         'test_multiply_list',
         'test_modulo_list',
         'test_subscr_list',
@@ -200,7 +191,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_set',
         'test_ge_set',
 
-        'test_add_str',
         'test_multiply_str',
         'test_modulo_str',
         'test_subscr_str',
@@ -211,7 +201,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_str',
         'test_ge_str',
 
-        'test_add_tuple',
         'test_multiply_tuple',
         'test_modulo_tuple',
         'test_subscr_tuple',

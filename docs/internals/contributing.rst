@@ -20,17 +20,31 @@ to run::
     $ git clone git@github.com:pybee/voc.git
     $ cd voc
     $ mkvirtualenv voc
+    # or if you use python2 by default
+    # mkvirtualenv -p /usr/bin/python3 voc
 
-VOC uses ``unittest`` (or ``unittest2`` for Python < 2.7) for its own test
+VOC uses ``unittest`` for its own test
 suite as well as additional helper modules for testing. To install all the
 requirements for VOC, you have to run the following commands within your
 virutal envrionment::
 
     $ pip install -e .
-    $ pip install -r requirements_dev.txt
-
-In case you are running a python version ``< 2.7`` please use the
-``requirements_dev.py26.txt`` instead because ``unittest2`` is not part
-of the standard library for these version.
 
 Now you are ready to start hacking! Have fun!
+
+Java
+----
+
+Java 7 is needed to run the tests because java 8 removed the option
+    
+    -XX:-UseSplitVerifier
+
+You can use java 8 if you have to. In that case go into the
+tests/utils.py and edit replace 
+
+    -XX:-UseSplitVerifier
+
+with
+
+    -noverify
+
