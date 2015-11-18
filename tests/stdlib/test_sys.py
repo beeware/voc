@@ -205,13 +205,18 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # argv
-    @expectedFailure
     def test_argv(self):
         self.assertCodeExecution("""
             import sys
-            print(sys.argv)
+            print('ARGS =', sys.argv)
             print('Done.')
-            """)
+            """, run_in_global=False)
+
+        self.assertCodeExecution("""
+            import sys
+            print('ARGS =', sys.argv)
+            print('Done.')
+            """, run_in_global=False, args=['1', 'asdf', '3'])
 
     ############################################################
     # base_exec_prefix
@@ -345,13 +350,33 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # exit
-    @expectedFailure
     def test_exit(self):
+        # Exit from static block
         self.assertCodeExecution("""
             import sys
             print(sys.exit())
             print('Done.')
             """)
+
+        # From inside main
+        self.assertCodeExecution("""
+            import sys
+            if __name__ == '__main__':
+                print(sys.exit())
+                print('Done.')
+            """, run_in_function=False)
+
+        # From inside main
+        self.assertCodeExecution("""
+            import sys
+
+            def foo():
+                print(sys.exit())
+
+            if __name__ == '__main__':
+                foo()
+                print('Done.')
+            """, run_in_function=False)
 
     ############################################################
     # flags
