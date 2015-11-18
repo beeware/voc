@@ -75,7 +75,7 @@ public class List extends org.python.types.Object {
     }
 
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.NotImplementedError("list.__len__() has not been implemented.");
+        return new org.python.types.Int(this.value.size());
     }
 
     public org.python.Object __getitem__(org.python.Object index) {
