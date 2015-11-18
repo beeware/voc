@@ -63,7 +63,7 @@ def adjust(text, run_in_function=False):
     return '\n'.join(final_lines)
 
 
-def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False):
+def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
     """Run a block of Python code with the Python interpreter."""
     # Output source code into test directory
     with open(os.path.join(test_dir, 'test.py'), 'w') as py_source:
@@ -81,8 +81,11 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False):
             with open(os.path.join(test_dir, *path), 'w') as py_source:
                 py_source.write(adjust(code))
 
+    if args is None:
+        args = []
+
     proc = subprocess.Popen(
-        ["python", "test.py"],
+        ["python", "test.py"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -93,7 +96,7 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False):
     return out[0].decode('utf8')
 
 
-def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False):
+def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
     """Run a block of Python code as a Java program."""
     # Output source code into test directory
     transpiler = Transpiler()
@@ -109,8 +112,11 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False):
 
     transpiler.write(test_dir, verbosity=0)
 
+    if args is None:
+        args = []
+
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../dist/python-java.jar:.", "-XX:-UseSplitVerifier", "python.test"],
+        ["java", "-classpath", "../../dist/python-java.jar:.", "-XX:-UseSplitVerifier", "python.test"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -133,7 +139,6 @@ JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*):(?P<line>\d+))|(Na
 JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 
 # PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
-
 PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n)+(?P<exception>.*?): (?P<message>.*\n)')
 PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n')
 PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
@@ -155,7 +160,7 @@ def cleanse_java(input):
         ]),
         '\n' if stack else ''
     )
-    return JAVA_FLOAT.sub('\\1e\\2\\3', out)
+    return JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test'", '***EXECUTABLE***')
 
 
 def cleanse_python(input):
@@ -171,7 +176,7 @@ def cleanse_python(input):
         ),
         '\n' if stack else ''
     )
-    return PYTHON_FLOAT.sub('\\1e\\2\\3', out)
+    return PYTHON_FLOAT.sub('\\1e\\2\\3', out).replace("'test.py'", '***EXECUTABLE***')
 
 
 class TranspileTestCase(TestCase):
@@ -208,7 +213,7 @@ class TranspileTestCase(TestCase):
         java = adjust(java)
         self.assertEqual(debug.getvalue(), java[1:])
 
-    def assertCodeExecution(self, code, message=None, extra_code=None, run_in_global=True, run_in_function=True):
+    def assertCodeExecution(self, code, message=None, extra_code=None, run_in_global=True, run_in_function=True, args=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
         #==================================================
@@ -224,8 +229,8 @@ class TranspileTestCase(TestCase):
                     pass
 
                 # Run the code as Python and as Java.
-                py_out = runAsPython(test_dir, code, extra_code, False)
-                java_out = runAsJava(test_dir, code, extra_code, False)
+                py_out = runAsPython(test_dir, code, extra_code, False, args=args)
+                java_out = runAsJava(test_dir, code, extra_code, False, args=args)
             except Exception as e:
                 self.fail(e)
             finally:
@@ -253,8 +258,8 @@ class TranspileTestCase(TestCase):
                     pass
 
                 # Run the code as Python and as Java.
-                py_out = runAsPython(test_dir, code, extra_code, True)
-                java_out = runAsJava(test_dir, code, extra_code, True)
+                py_out = runAsPython(test_dir, code, extra_code, True, args=args)
+                java_out = runAsJava(test_dir, code, extra_code, True, args=args)
             except Exception as e:
                 self.fail(e)
             finally:

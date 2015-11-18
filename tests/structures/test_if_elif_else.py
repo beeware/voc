@@ -220,3 +220,30 @@ class IfElifElseTests(TranspileTestCase):
                 print('2: is none')
             print('Done 2.')
             """)
+
+    def test_end_of_block(self):
+        # Ensure that the jump target at the end of a block
+        # is correctly identified
+        self.assertCodeExecution("""
+            x = 100
+            if x == 0:
+                y = 42
+            else:
+                y = 37
+            z = (x, y)
+            print(z)
+            print('Done')
+            """)
+
+    def test_end_of_block_in_main(self):
+        # Ensure that the jump target at the end of a block
+        # is correctly identified in a main loop
+        self.assertCodeExecution("""
+            print('Hello, World')
+            if __name__ == '__main__':
+                x = 100
+                if x == 0:
+                    y = 42
+                else:
+                    y = 37
+            """, run_in_function=False)

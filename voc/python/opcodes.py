@@ -62,7 +62,7 @@ class END_LOOP:
                 loop.end_op = RESOLVE
                 break
 
-        # A jump14 back to the start of the loop for another iteration
+        # A jump back to the start of the loop for another iteration
         context.add_opcodes(jump(JavaOpcodes.GOTO(0), context, loop, Opcode.START))
 
         # The next opcode is outside the LOOP block.
@@ -810,7 +810,7 @@ def resolve_jump(opcode, context, target, position):
         opcode.jump_op = target.next_op
     else:
         raise Exception("Unknown opcode position")
-
+    # print("JUMP OP IS", opcode.jump_op)
     context.jumps.append(opcode)
     opcode.jump_op.references.append(opcode)
 
@@ -820,6 +820,15 @@ def resolve_jump(opcode, context, target, position):
 ##########################################################################
 
 class Opcode:
+    # A prefaced operation is one that has arguments, and
+    # those arguments may be the target of a jump, but *this*
+    # opcode needs to issue commands before the arguments
+    # are processed - which means that if the argument is
+    # a jump target, the Java target offset needs to be
+    # adjusted. The value of prefaced is the argument index
+    # that needs to be prefaced.
+    prefaced = None
+
     START = 10
     END = 20
     NEXT = 30
@@ -844,7 +853,7 @@ class Opcode:
             argument.operation.materialize(context, argument.arguments)
 
     def transpile(self, context, arguments):
-        # print ("TRANSPILE", self)
+        # print ("TRANSPILE", self.python_offset, self)
         # If the Python opcode marks the start of a line of code,
         # transfer that relationship to the first opcode in the
         # generated Java code.
@@ -863,8 +872,17 @@ class Opcode:
             self.end_op = context.code[-1]
         context.next_resolve_list.append((self, 'next_op'))
 
-        # Save the code offset for the jump operation.
-        context.jump_targets[self.python_offset] = self
+        context.jump_targets[self.jump_target(arguments)] = self
+
+    def jump_target(self, arguments):
+        # Get the code offset for the jump operation, taking
+        # prefacing into account.
+        try:
+            arg = arguments[self.prefaced]
+            target = arg.operation.jump_target(arg.arguments)
+        except (TypeError, IndexError):
+            target = self.python_offset
+        return target
 
 
 class UnaryOpcode(Opcode):
@@ -967,6 +985,9 @@ class ROT_TWO(Opcode):
         return 2
 
     def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
         context.add_opcodes(JavaOpcodes.SWAP())
 
 
@@ -983,6 +1004,9 @@ class DUP_TOP(Opcode):
         return 2
 
     def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
         context.add_opcodes(JavaOpcodes.DUP())
 
 
@@ -996,6 +1020,9 @@ class DUP_TOP_TWO(Opcode):
         return 4
 
     def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
         context.add_opcodes(JavaOpcodes.DUP2())
 
 
@@ -1009,6 +1036,9 @@ class NOP(Opcode):
         return 0
 
     def convert(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
         context.add_opcodes(JavaOpcodes.NOP())
 
 
@@ -1088,6 +1118,8 @@ class INPLACE_MODULO(InplaceOpcode):
 
 
 class STORE_SUBSCR(Opcode):
+    prefaced = 0
+
     @property
     def consume_count(self):
         return 1
@@ -1130,7 +1162,9 @@ class DELETE_SUBSCR(Opcode):
         return 1
 
     def convert(self, context, arguments):
-        arguments[0].operation.transpile(context, arguments[0].arguments)
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
         context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__delitem__', '(Lorg/python/Object;)V'),
         )
@@ -1333,7 +1367,6 @@ class POP_EXCEPT(Opcode):
         return 0
 
     def convert(self, context, arguments):
-        # print("convert POP_EXCEPT", len(arguments))
         for argument in arguments:
             argument.operation.transpile(context, argument.arguments)
 
@@ -1649,6 +1682,8 @@ class LOAD_NAME(Opcode):
 
 
 class BUILD_TUPLE(Opcode):
+    prefaced = 0
+
     def __init__(self, count, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.count = count
@@ -1693,6 +1728,8 @@ class BUILD_TUPLE(Opcode):
 
 
 class BUILD_LIST(Opcode):
+    prefaced = 0
+
     def __init__(self, count, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.count = count
@@ -1877,6 +1914,8 @@ class COMPARE_OP(Opcode):
 
 
 class IMPORT_NAME(Opcode):
+    prefaced = 0
+
     def __init__(self, name, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.name = name
@@ -2001,12 +2040,12 @@ class JUMP_IF_TRUE_OR_POP(Opcode):
     def convert(self, context, arguments):
         context.add_opcodes(
             IF([
-                    JavaOpcodes.INVOKEINTERFACE('__bool__', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
                     ], JavaOpcodes.IFEQ),
                 jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START),
-            ELSE(),
-                JavaOpcodes.POP(),
-            END_IF()
+            END_IF(),
         )
 
 
@@ -2282,7 +2321,6 @@ class CALL_FUNCTION(Opcode):
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # Construct a class.
             from .klass import Class
-
             code = arguments[1].arguments[0].operation.const
             class_name = arguments[1].arguments[1].operation.const
             if len(arguments) == 4:
@@ -2355,6 +2393,7 @@ class CALL_FUNCTION(Opcode):
                 context.next_opcode_starts_line = arguments[0].arguments[0].operation.starts_line
 
             # Retrive the function
+            self.prefaced = 0
             arguments[0].operation.transpile(context, arguments[0].arguments)
 
             context.add_opcodes(
@@ -2436,6 +2475,8 @@ class CALL_FUNCTION(Opcode):
 
 
 class MAKE_FUNCTION(Opcode):
+    prefaced = 0
+
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.argc = argc
@@ -2585,6 +2626,8 @@ def add_callable(context, method, full_method_name):
 
 
 class BUILD_SLICE(Opcode):
+    prefaced = 0
+
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.argc = argc
@@ -2733,6 +2776,8 @@ class DELETE_DEREF(Opcode):
 
 
 class LIST_APPEND(Opcode):
+    prefaced = 0
+
     def __init__(self, index, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
         self.index = index
