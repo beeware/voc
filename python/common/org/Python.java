@@ -1083,13 +1083,13 @@ public class Python {
         org.python.Object end = kwargs.get("end");
         org.python.Object flush = kwargs.get("flush");
 
+        if (file == null) {
+            // file = sys.stdout
+        }
+
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
-            if (args[i] == null) {
-                buffer.append("None");
-            } else {
-                buffer.append(args[i]);
-            }
+            buffer.append(args[i]);
             if (i != args.length - 1) {
                 if (sep == null) {
                     buffer.append(" ");
@@ -1104,6 +1104,7 @@ public class Python {
             buffer.append(end);
         }
         System.out.print(buffer.toString());
+        // file.write(buffer.toString());
     }
 
     @org.python.Method(

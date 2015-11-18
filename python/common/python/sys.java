@@ -322,11 +322,14 @@ public class sys extends org.python.types.Module {
         throw new org.python.exceptions.NotImplementedError("sys.settrace() has not been implemented.");
     }
 
-    // stderr <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object stderr;
 
-    // stdin <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object stdin;
 
-    // stdout <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object stdout;
 
     // thread_info <class 'sys.thread_info'>
 

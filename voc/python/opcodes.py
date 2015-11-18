@@ -2447,7 +2447,7 @@ class CALL_FUNCTION(Opcode):
             for i, (name, argument) in enumerate(zip(arguments[self.args+1::2], arguments[self.args+2::2])):
                 context.add_opcodes(
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W(name),
+                    JavaOpcodes.LDC_W(name.operation.const),
                     ALOAD_name(context, '#kwarg-%d-%x' % (i, id(self))),
                     JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                     JavaOpcodes.POP()
