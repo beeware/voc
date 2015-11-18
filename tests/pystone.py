@@ -176,7 +176,7 @@ def Proc3(PtrParOut):
         PtrParOut = PtrGlb.PtrComp
     else:
         IntGlob = 100
-    # PtrGlb.IntComp = Proc7(10, IntGlob) ## FIX
+    PtrGlb.IntComp = Proc7(10, IntGlob) ## FIX
     return PtrParOut
 
 def Proc4():
