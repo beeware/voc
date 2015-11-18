@@ -159,7 +159,6 @@ def Proc1(PtrParIn):
 
 def Proc2(IntParIO):
     IntLoc = IntParIO + 10
-    EnumLoc = -1  ## FIX
     while 1:
         if Char1Glob == 'A':
             IntLoc = IntLoc - 1
@@ -176,7 +175,7 @@ def Proc3(PtrParOut):
         PtrParOut = PtrGlb.PtrComp
     else:
         IntGlob = 100
-    PtrGlb.IntComp = Proc7(10, IntGlob) ## FIX
+    PtrGlb.IntComp = Proc7(10, IntGlob)  ## FIX
     return PtrParOut
 
 def Proc4():
@@ -239,7 +238,6 @@ def Func1(CharPar1, CharPar2):
         return Ident2
 
 def Func2(StrParI1, StrParI2):
-    CharLoc = '\0'  ## FIX
     IntLoc = 1
     while IntLoc <= 1:
         if Func1(StrParI1[IntLoc], StrParI2[IntLoc+1]) == Ident1:

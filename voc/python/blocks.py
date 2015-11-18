@@ -199,6 +199,31 @@ class Block:
         if len(self.code) == 0 or not isinstance(self.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
             self.add_return()
 
+        # Make sure every local variable slot has been initialized
+        # as an object. This is needed because Python allows a variable
+        # to be instantiated in a sub-block, and used outside that block.
+        # The JVM doesn't, and raises a verify error if you try. By
+        # initializing all variables, we can trick the verifier.
+        # TODO: Ideally, we'd only initialize the variables that are ambiguous.
+        init_vars = []
+        for i in range(0, len(self.local_vars) + len(self.deleted_vars)):
+            if i == 0:
+                opcode = JavaOpcodes.ASTORE_0()
+            elif i == 1:
+                opcode = JavaOpcodes.ASTORE_1()
+            elif i == 2:
+                opcode = JavaOpcodes.ASTORE_2()
+            elif i == 3:
+                opcode = JavaOpcodes.ASTORE_3()
+            else:
+                opcode = JavaOpcodes.ASTORE(i)
+            init_vars.extend([
+                JavaOpcodes.ACONST_NULL(),
+                opcode
+            ])
+
+        self.code = init_vars + self.code
+
         # Since we've processed all the Python opcodes, we can now resolve
         # all the unknown jump targets.
         # print('>>>>> Resolve references')
