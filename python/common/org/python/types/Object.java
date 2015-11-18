@@ -376,6 +376,16 @@ public class Object implements org.python.Object {
             }
         }
         attrs.put(name, value);
+
+        // If there is a native field of the same name, set it.
+        try {
+            java.lang.reflect.Field field = this.getClass().getField(name);
+            field.set(this, value);
+        } catch (NoSuchFieldException e) {
+            // System.out.println("Not a native field");
+        } catch (IllegalAccessException e) {
+            throw new org.python.exceptions.RuntimeError("Illegal access to native field " + name);
+        }
     }
 
     public void __delattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
