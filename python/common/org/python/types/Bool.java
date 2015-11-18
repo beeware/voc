@@ -18,6 +18,11 @@ public class Bool extends org.python.types.Object {
         this.value = bool;
     }
 
+    public Bool(long int_val) {
+        super();
+        this.value = int_val != 0;
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("bool.__new__() has not been implemented.");
     // }

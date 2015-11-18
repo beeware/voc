@@ -144,7 +144,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_float',
         'test_xor_float',
         'test_or_float',
-        'test_ne_float',
 
         'test_add_frozenset',
         'test_subtract_frozenset',
@@ -175,9 +174,7 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_int',
         'test_xor_int',
         'test_or_int',
-        'test_ne_int',
 
-        'test_multiply_list',
         'test_floor_divide_list',
         'test_true_divide_list',
         'test_subscr_list',

@@ -17,7 +17,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_add_bool',
-        'test_subtract_bool',
         'test_multiply_bool',
         'test_floor_divide_bool',
         'test_modulo_bool',
@@ -130,7 +129,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_dict',
 
         'test_add_float',
-        'test_subtract_float',
         'test_multiply_float',
         'test_floor_divide_float',
         'test_modulo_float',
@@ -163,7 +161,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_frozenset',
 
         'test_add_int',
-        'test_subtract_int',
         'test_multiply_int',
         'test_floor_divide_int',
         'test_modulo_int',

@@ -2,6 +2,23 @@ package python;
 
 
 public class sys extends org.python.types.Module {
+    @org.python.Method(
+        __doc__ = "Create and return a new object.  See help(type) for accurate signature."
+    )
+    public org.python.types.Type __new__(org.python.types.Type cls) {
+        super.__new__(cls);
+
+        // Initialize sys.argv using command line arguments from environment
+        // java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("(\"[^\"]*\"|[^\"]+)(\\s+|$)");
+        java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("\\s+");
+        java.lang.String [] args = cmdline_pattern.split(System.getProperty("sun.java.command"));
+        java.util.ArrayList<org.python.Object> arg_list = new java.util.ArrayList<org.python.Object>();
+        for (String arg: args) {
+            arg_list.add(new org.python.types.Str(arg));
+        }
+        cls.__setattr__("argv", new org.python.types.List(arg_list));
+        return cls;
+    }
 
     @org.python.Method(
         __doc__ = ""
@@ -73,6 +90,7 @@ public class sys extends org.python.types.Module {
 
     public static org.python.types.Int api_version;
 
+    @org.python.Attribute()
     public static org.python.types.List argv;
 
     public static org.python.types.Str base_exec_prefix;
@@ -120,7 +138,16 @@ public class sys extends org.python.types.Module {
         __doc__ = ""
     )
     public static org.python.Object exit(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("sys.exit() has not been implemented.");
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("ex() takes no keyword arguments");
+        }
+        if (args.length == 0) {
+            throw new org.python.exceptions.SystemExit();
+        } else if (args.length == 1) {
+            throw new org.python.exceptions.SystemExit((int) (((org.python.types.Int) args[0]).value));
+        } else {
+            throw new org.python.exceptions.TypeError("exit() expected at most 1 arguments, got " + args.length);
+        }
     }
 
     // flags <class 'sys.flags'>
@@ -295,11 +322,14 @@ public class sys extends org.python.types.Module {
         throw new org.python.exceptions.NotImplementedError("sys.settrace() has not been implemented.");
     }
 
-    // stderr <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object stderr;
 
-    // stdin <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object stdin;
 
-    // stdout <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object stdout;
 
     // thread_info <class 'sys.thread_info'>
 

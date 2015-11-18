@@ -7,8 +7,11 @@ from ..java import (
 )
 
 from .blocks import Block
-from .opcodes import ALOAD_name, ASTORE_name, free_name, ICONST_val
-
+from .opcodes import (
+    ALOAD_name, ASTORE_name, free_name,
+    ICONST_val,
+    Opcode, TRY, CATCH, END_TRY
+)
 
 POSITIONAL_OR_KEYWORD = 1
 VAR_POSITIONAL = 2
@@ -304,7 +307,7 @@ class InstanceMethod(Method):
 
 
 class MainMethod(Method):
-    def __init__(self, parent, commands=None):
+    def __init__(self, parent, commands=None, end_offset=None):
         super().__init__(
             parent, '__main__',
             parameters=[{'name': 'args', 'annotation': 'argv'}],
@@ -312,6 +315,7 @@ class MainMethod(Method):
             static=True,
             commands=commands
         )
+        self.end_offset = end_offset
 
     def __repr__(self):
         return '<MainMethod %s>' % self.module.name
@@ -341,10 +345,25 @@ class MainMethod(Method):
         return self.module
 
     def add_arguments(self):
-        pass
+        self.local_vars['##__args__##'] = len(self.local_vars)
+
+    def add_return(self):
+        # Main method is a special case - it always returns Null,
+        # but the code doesn't contain this return, so the jump
+        # target doesn't exist. Fake a jump target for the return
+        if self.end_offset:
+            python_op = Opcode(self.end_offset, None, True)
+            java_op = JavaOpcodes.RETURN()
+            python_op.start_op = java_op
+            self.jump_targets[self.end_offset] = python_op
+        else:
+            java_op = JavaOpcodes.RETURN()
+
+        self.add_opcodes(java_op)
 
     def transpile_setup(self):
         self.add_opcodes(
+            # Register this module as being __main__
             JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
             JavaOpcodes.LDC_W('__main__'),
 
@@ -357,6 +376,24 @@ class MainMethod(Method):
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP(),
         )
+
+        # If there are any commands in this main method,
+        # add a TRY-CATCH for SystemExit
+        if self.commands:
+            self.add_opcodes(
+                TRY()
+            )
+
+    def transpile_teardown(self):
+        # If there are any commands in this main method,
+        # finish the TRY-CATCH for SystemExit
+        if self.commands:
+            self.add_opcodes(
+                CATCH('org/python/exceptions/SystemExit'),
+                    JavaOpcodes.GETFIELD('org/python/exceptions/SystemExit', 'return_code', 'I'),
+                    JavaOpcodes.INVOKESTATIC('java/lang/System', 'exit', '(I)V'),
+                END_TRY()
+            )
 
     def method_attributes(self):
         return [

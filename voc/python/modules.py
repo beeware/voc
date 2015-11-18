@@ -9,7 +9,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import MainMethod, Method, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, free_name
+from .opcodes import ASTORE_name, ALOAD_name, free_name, TRY, CATCH, END_TRY
 
 
 class StaticBlock(Block):
@@ -32,6 +32,23 @@ class StaticBlock(Block):
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
         )
+        # If there are any commands in this main method,
+        # add a TRY-CATCH for SystemExit
+        if self.commands:
+            self.add_opcodes(
+                TRY()
+            )
+
+    def transpile_teardown(self):
+        # If there are any commands in this main method,
+        # finish the TRY-CATCH for SystemExit
+        if self.commands:
+            self.add_opcodes(
+                CATCH('org/python/exceptions/SystemExit'),
+                    JavaOpcodes.GETFIELD('org/python/exceptions/SystemExit', 'return_code', 'I'),
+                    JavaOpcodes.INVOKESTATIC('java/lang/System', 'exit', '(I)V'),
+                END_TRY()
+            )
 
     @property
     def use_registers(self):
@@ -55,7 +72,8 @@ class StaticBlock(Block):
             JavaOpcodes.LDC_W(self.module.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            # JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
     def delete_name(self, name, use_locals):
@@ -115,14 +133,11 @@ class Module(Block):
             if main_end is not None:
                 # Marker for the end of the main block:
                 if cmd.is_main_end(main_end):
-                    main_end = None
                     try:
-                        # The last command in the main block is a jump.
-                        # Not sure why it is required, but we can ignore
-                        # it for transpilation purposes.
-                        main = MainMethod(self, main_commands[:-1])
+                        main = MainMethod(self, main_commands, end_offset=main_end)
                     except IgnoreBlock:
                         pass
+                    main_end = None
                 else:
                     main_commands.append(cmd)
             else:

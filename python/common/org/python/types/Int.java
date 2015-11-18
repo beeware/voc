@@ -105,7 +105,7 @@ public class Int extends org.python.types.Object {
     }
 
     public org.python.types.Bool __bool__() {
-        throw new org.python.exceptions.NotImplementedError("int.__bool__() has not been implemented");
+        return new org.python.types.Bool(this.value);
     }
 
     public org.python.Object __getattribute__(java.lang.String name) {

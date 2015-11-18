@@ -376,6 +376,16 @@ public class Object implements org.python.Object {
             }
         }
         attrs.put(name, value);
+
+        // If there is a native field of the same name, set it.
+        try {
+            java.lang.reflect.Field field = this.getClass().getField(name);
+            field.set(this, value);
+        } catch (NoSuchFieldException e) {
+            // System.out.println("Not a native field");
+        } catch (IllegalAccessException e) {
+            throw new org.python.exceptions.RuntimeError("Illegal access to native field " + name);
+        }
     }
 
     public void __delattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
@@ -460,9 +470,9 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __getitem__(org.python.Object index) {
+        System.out.println("GETITEM " + this);
         throw new org.python.exceptions.AttributeError(this, "__getitem__");
     }
-
 
     public org.python.Object __missing__(org.python.Object key) {
         throw new org.python.exceptions.AttributeError(this, "__missing__");

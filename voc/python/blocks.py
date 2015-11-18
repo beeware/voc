@@ -126,29 +126,44 @@ class Block:
         """Ensure that end of the code sequence is a Java-style return of void.
 
         Java has a separate opcode for VOID returns, which is different to
-        RETURN NULL. Replace "SET NULL" "ARETURN" pair with "RETURN".
+        RETURN NULL. Replace all "SET NULL" "ARETURN" pairs with "RETURN".
         """
 
-        if len(self.code) >= 2 and isinstance(self.code[-2], JavaOpcodes.ACONST_NULL) and isinstance(self.code[-1], JavaOpcodes.ARETURN):
-            return_opcode = JavaOpcodes.RETURN()
+        if len(self.code) >= 2:
+            new_code = []
+            i = 0
+            while i < len(self.code):
+                if (isinstance(self.code[i], JavaOpcodes.GETSTATIC)
+                        and self.code[i].field.class_name == 'org/python/types/NoneType'):
 
-            # Update the jump operation to point at the new return opcode.
-            for opcode in self.code[-1].references:
-                opcode.jump_op = return_opcode
-                return_opcode.references.append(opcode)
+                    if isinstance(self.code[i + 1], JavaOpcodes.ARETURN):
+                        return_opcode = JavaOpcodes.RETURN()
 
-            for opcode in self.code[-2].references:
-                opcode.jump_op = return_opcode
-                return_opcode.references.append(opcode)
+                        # Update the jump operation to point at the new return opcode.
+                        for opcode in self.code[-1].references:
+                            opcode.jump_op = return_opcode
+                            return_opcode.references.append(opcode)
 
-            # Then, check to see if either opcode had a line number association.
-            # if so, preserve the first one.
-            if self.code[-2].starts_line is not None:
-                return_opcode.starts_line = self.code[-2].starts_line
-            elif self.code[-1].starts_line is not None:
-                return_opcode.starts_line = self.code[-1].starts_line
+                        for opcode in self.code[-2].references:
+                            opcode.jump_op = return_opcode
+                            return_opcode.references.append(opcode)
 
-            self.code = self.code[:-2] + [return_opcode]
+                        # Then, check to see if either opcode had a line number association.
+                        # if so, preserve the first one.
+                        if self.code[-2].starts_line is not None:
+                            return_opcode.starts_line = self.code[-2].starts_line
+                        elif self.code[-1].starts_line is not None:
+                            return_opcode.starts_line = self.code[-1].starts_line
+
+                        new_code.append(return_opcode)
+                        i += 1
+                    else:
+                        new_code.append(self.code[i])
+                else:
+                    new_code.append(self.code[i])
+                i += 1
+
+            self.code = new_code
 
     def add_return(self):
         self.add_opcodes(JavaOpcodes.RETURN())
@@ -183,6 +198,31 @@ class Block:
         # Make sure there is one.
         if len(self.code) == 0 or not isinstance(self.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
             self.add_return()
+
+        # Make sure every local variable slot has been initialized
+        # as an object. This is needed because Python allows a variable
+        # to be instantiated in a sub-block, and used outside that block.
+        # The JVM doesn't, and raises a verify error if you try. By
+        # initializing all variables, we can trick the verifier.
+        # TODO: Ideally, we'd only initialize the variables that are ambiguous.
+        init_vars = []
+        for i in range(0, len(self.local_vars) + len(self.deleted_vars)):
+            if i == 0:
+                opcode = JavaOpcodes.ASTORE_0()
+            elif i == 1:
+                opcode = JavaOpcodes.ASTORE_1()
+            elif i == 2:
+                opcode = JavaOpcodes.ASTORE_2()
+            elif i == 3:
+                opcode = JavaOpcodes.ASTORE_3()
+            else:
+                opcode = JavaOpcodes.ASTORE(i)
+            init_vars.extend([
+                JavaOpcodes.ACONST_NULL(),
+                opcode
+            ])
+
+        self.code = init_vars + self.code
 
         # Since we've processed all the Python opcodes, we can now resolve
         # all the unknown jump targets.
@@ -262,7 +302,7 @@ class Block:
         # Update any jump instructions
         # print ("There are %s jumps" % len(self.jumps))
         for jump in self.jumps:
-            # print ("JUMP", id(jump), jump, jump.java_offset, jump.jump_op, id(jump.jump_op))
+            # print ("JUMP", hex(id(jump)), jump, jump.java_offset, jump.jump_op, hex(id(jump.jump_op)))
 
             try:
                 jump.offset = jump.jump_op.java_offset - jump.java_offset

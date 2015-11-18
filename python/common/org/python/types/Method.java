@@ -47,7 +47,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
             throw new org.python.exceptions.RuntimeError("Illegal access to Java instance method " + this.im_func);
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
-                e.getTargetException().printStackTrace();
+                // e.getTargetException().printStackTrace();
                 // If the Java method raised an Python exception, re-raise that
                 // exception as-is. If it wasn't a Python exception, wrap it
                 // as one and continue.

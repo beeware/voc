@@ -47,7 +47,7 @@ def read_ref_attr(index, attr):
             pool[index - 1] = value
         else:
             value = entry
-        return getattr(value, attr).bytes.decode('utf8')
+        return getattr(value, attr).bytes.decode('mutf-8')
     return resolver
 
 
@@ -59,7 +59,7 @@ def read_utf8(index):
             pool[index - 1] = value
         else:
             value = entry
-        return value.bytes.decode('utf8')
+        return value.bytes.decode('mutf-8')
     return resolver
 
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
@@ -939,18 +939,18 @@ class Utf8(Constant):
         # For more information regarding the standard UTF-8 format, see Section
         # 3.9 Unicode Encoding Forms of The Unicode Standard, Version 6.0.0.
         self.value = string
-        self._bytes = string.encode('utf8')
+        self._bytes = string.encode('mutf-8')
 
     def __repr__(self):
-        return "b'%s'" % self._bytes.decode('utf8')
+        return "b'%s'" % self._bytes.decode('mutf-8')
 
     def __str__(self):
-        return self._bytes.decode('utf8')
+        return self.value
 
     @staticmethod
     def read_info(reader):
         length = reader.read_u2()
-        string = reader.read_bytes(length).decode('utf8')
+        string = reader.read_bytes(length).decode('mutf-8')
         return Utf8, (string,)
 
     def write_info(self, writer):

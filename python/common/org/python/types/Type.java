@@ -71,9 +71,23 @@ public class Type extends org.python.types.Object {
                     );
                 }
             }
+
+            // Iterate over every field in the class. If the
+            // field is annotated for inclusion in the Python class,
+            // add a function wrapper to the type definition.
+            for (java.lang.reflect.Field field: klass.getFields()) {
+                // System.out.println("Found field " + field + " on type " + klass);
+                java.lang.annotation.Annotation annotation = field.getAnnotation(org.python.Attribute.class);
+                if (annotation != null) {
+                    // System.out.println("Add field " + field + " to type " + klass);
+                    this.attrs.put(
+                        field.getName(),
+                        org.python.types.NoneType.NONE
+                    );
+                }
+            }
             // System.out.println("Methods added for type " + klass);
         }
-
     }
 
     Type(java.lang.Class klass) {

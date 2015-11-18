@@ -16,7 +16,6 @@ public class Module extends org.python.types.Object {
 
     @SuppressWarnings("unchecked")
     public org.python.Object __getattribute__(java.lang.String name) {
-        // System.out.println("GETATTR (module) " + this.klass + " " + name);
         org.python.Object value;
         try {
             // First try the normal approach attribute
@@ -32,7 +31,6 @@ public class Module extends org.python.types.Object {
 
         return value;
     }
-
 }
 
 

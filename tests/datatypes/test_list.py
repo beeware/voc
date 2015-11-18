@@ -57,7 +57,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_add_bool',
-        'test_multiply_bool',
         'test_subscr_bool',
         'test_lt_bool',
         'test_le_bool',
@@ -167,8 +166,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_dict',
 
         'test_add_float',
-        'test_multiply_float',
-        'test_subscr_float',
         'test_lt_float',
         'test_le_float',
         'test_eq_float',
@@ -197,7 +194,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_frozenset',
 
         'test_add_int',
-        'test_multiply_int',
         'test_lt_int',
         'test_le_int',
         'test_eq_int',
@@ -206,8 +202,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_int',
 
         'test_add_list',
-        'test_multiply_list',
-        'test_subscr_list',
         'test_lt_list',
         'test_le_list',
         'test_eq_list',
@@ -236,7 +230,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_set',
 
         'test_add_str',
-        'test_multiply_str',
         'test_lt_str',
         'test_le_str',
         'test_eq_str',
@@ -245,8 +238,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_str',
 
         'test_add_tuple',
-        'test_multiply_tuple',
-        'test_subscr_tuple',
         'test_lt_tuple',
         'test_le_tuple',
         'test_eq_tuple',
