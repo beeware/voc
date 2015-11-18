@@ -860,7 +860,6 @@ class Opcode:
         if self.starts_line:
             context.next_opcode_starts_line = self.starts_line
 
-        context.next_resolve_list.append((self, 'start_op'))
         n_ops = len(context.code)
 
         # Actually convert the opcode. This is recursive down the Command sequence.
@@ -873,6 +872,15 @@ class Opcode:
         context.next_resolve_list.append((self, 'next_op'))
 
         context.jump_targets[self.jump_target(arguments)] = self
+
+    def convert_args(self, context, arguments):
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
+
+    def convert(self, context, arguments):
+        self.convert_args(context, arguments)
+        context.next_resolve_list.append((self, 'start_op'))
+        self.convert_opcode(context, arguments)
 
     def jump_target(self, arguments):
         # Get the code offset for the jump operation, taking
@@ -894,10 +902,7 @@ class UnaryOpcode(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
@@ -916,10 +921,7 @@ class BinaryOpcode(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
@@ -945,6 +947,7 @@ class InplaceOpcode(Opcode):
         for argument in arguments[1:]:
             argument.operation.transpile(context, argument.arguments)
 
+        context.next_resolve_list.append((self, 'start_op'))
         context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
@@ -967,10 +970,7 @@ class POP_TOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         # Ignore the top of the stack.
         context.add_opcodes(JavaOpcodes.POP())
 
@@ -984,10 +984,7 @@ class ROT_TWO(Opcode):
     def product_count(self):
         return 2
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(JavaOpcodes.SWAP())
 
 
@@ -1003,10 +1000,7 @@ class DUP_TOP(Opcode):
     def product_count(self):
         return 2
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(JavaOpcodes.DUP())
 
 
@@ -1019,10 +1013,7 @@ class DUP_TOP_TWO(Opcode):
     def product_count(self):
         return 4
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(JavaOpcodes.DUP2())
 
 
@@ -1035,10 +1026,7 @@ class NOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(JavaOpcodes.NOP())
 
 
@@ -1129,6 +1117,7 @@ class STORE_SUBSCR(Opcode):
         return 1
 
     def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
         # At the time STORE_SUBSCR is called, the top two elements
         # on the stack will be the value to store, and the subject
         # of the store operation.
@@ -1161,10 +1150,7 @@ class DELETE_SUBSCR(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__delitem__', '(Lorg/python/Object;)V'),
         )
@@ -1203,11 +1189,7 @@ class GET_ITER(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
-
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             ASTORE_name(context, '#temp-%x' % id(self)),
 
@@ -1287,7 +1269,7 @@ class BREAK_LOOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         for loop in context.loops[::-1]:
             if loop.end_op is None:
                 current_loop = loop
@@ -1309,10 +1291,7 @@ class RETURN_VALUE(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(JavaOpcodes.ARETURN())
 
 
@@ -1325,7 +1304,7 @@ class IMPORT_STAR(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             ASTORE_name(context, '##module##'),
         )
@@ -1366,9 +1345,8 @@ class POP_EXCEPT(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
+    def convert_opcode(self, context, arguments):
+        pass
 
 
 class STORE_NAME(Opcode):
@@ -1387,10 +1365,7 @@ class STORE_NAME(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         # Depending on context, this might mean writing to local
         # variables or an attributes dictionary.
         context.store_name(self.name, use_locals=True)
@@ -1412,10 +1387,7 @@ class DELETE_NAME(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         # Depending on context, this might mean deleting from local
         # variables, class attributes, or the global context.
         context.delete_name(self.name, use_locals=True)
@@ -1437,10 +1409,7 @@ class UNPACK_SEQUENCE(Opcode):
     def product_count(self):
         return self.count
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             ASTORE_name(context, '#index-%x' % id(self))
         )
@@ -1494,6 +1463,7 @@ class STORE_ATTR(Opcode):
         return 0
 
     def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
         arguments[1].operation.transpile(context, arguments[1].arguments)
         context.add_opcodes(
             ASTORE_name(context, '#object-%x' % id(self))
@@ -1532,10 +1502,7 @@ class STORE_GLOBAL(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.store_name(self.name, use_locals=False)
 
 
@@ -1555,10 +1522,7 @@ class DELETE_GLOBAL(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.delete_name(self.name, use_locals=False)
 
 
@@ -1652,7 +1616,7 @@ class LOAD_CONST(Opcode):
             else:
                 raise RuntimeError("Unknown constant type %s" % type(const))
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         self._convert(context, arguments, self.const)
 
 
@@ -1672,10 +1636,7 @@ class LOAD_NAME(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         # Depending on context, this might mean loading from local
         # variables, class attributes, or the global context.
         context.load_name(self.name, use_locals=True)
@@ -1700,6 +1661,7 @@ class BUILD_TUPLE(Opcode):
         return 1
 
     def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
         context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Tuple'),
             JavaOpcodes.DUP(),
@@ -1746,6 +1708,7 @@ class BUILD_LIST(Opcode):
         return 1
 
     def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
         context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/List'),
             JavaOpcodes.DUP(),
@@ -1789,7 +1752,7 @@ class BUILD_SET(Opcode):
     def product_count(self):
         return 1
 
-    # def convert(self, context, arguments):
+    # def convert_opcode(self, context, arguments):
     #     code = []
     #     return code
 
@@ -1810,7 +1773,7 @@ class BUILD_MAP(Opcode):
     def product_count(self):
         return 1
 
-    # def convert(self, context, arguments):
+    # def convert_opcode(self, context, arguments):
     #     code = []
     #     return code
 
@@ -1833,6 +1796,7 @@ class LOAD_ATTR(Opcode):
 
     def convert(self, context, arguments):
         # print("LOAD_ATTR", context, arguments)
+        context.next_resolve_list.append((self, 'start_op'))
         arguments[0].operation.transpile(context, arguments[0].arguments)
         context.add_opcodes(JavaOpcodes.LDC_W(self.name))
 
@@ -1858,6 +1822,7 @@ class COMPARE_OP(Opcode):
         return 1
 
     def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
         # Add the operand which will be the left side, and thus the
         # target of the comparator operator.
         const_comparison = False
@@ -1939,6 +1904,7 @@ class IMPORT_NAME(Opcode):
         # The line of code for the import is recorded
         # against the first argument.
         context.next_opcode_starts_line = arguments[0].operation.starts_line
+        context.next_resolve_list.append((self, 'start_op'))
 
         context.add_opcodes(
             JavaOpcodes.LDC_W(self.name),
@@ -1964,12 +1930,9 @@ class IMPORT_FROM(Opcode):
     def product_count(self):
         return 2
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         # Add the operand which will be the left side, and thus the
         # target of the comparator operator.
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
         context.add_opcodes(
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.name),
@@ -1993,7 +1956,7 @@ class JUMP_FORWARD(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START)
         )
@@ -2015,9 +1978,17 @@ class JUMP_IF_FALSE_OR_POP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
-            jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START)
+            IF([
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                    ], JavaOpcodes.IFNE),
+                jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START),
+            ELSE(),
+                JavaOpcodes.POP(),
+            END_IF(),
         )
 
 
@@ -2037,7 +2008,7 @@ class JUMP_IF_TRUE_OR_POP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             IF([
                     JavaOpcodes.DUP(),
@@ -2045,6 +2016,8 @@ class JUMP_IF_TRUE_OR_POP(Opcode):
                     JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
                     ], JavaOpcodes.IFEQ),
                 jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START),
+            ELSE(),
+                JavaOpcodes.POP(),
             END_IF(),
         )
 
@@ -2065,7 +2038,7 @@ class JUMP_ABSOLUTE(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START)
         )
@@ -2087,10 +2060,7 @@ class POP_JUMP_IF_FALSE(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             # (bool) TOS.value
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
@@ -2114,10 +2084,7 @@ class POP_JUMP_IF_TRUE(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             # (bool) TOS.value
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
@@ -2144,10 +2111,7 @@ class LOAD_GLOBAL(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.load_name(self.name, use_locals=False)
 
 
@@ -2160,7 +2124,7 @@ class CONTINUE_LOOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         for loop in context.loops[::-1]:
             if loop.end_op is None:
                 current_loop = loop
@@ -2184,7 +2148,7 @@ class SETUP_LOOP(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         pass
 
 
@@ -2238,7 +2202,7 @@ class LOAD_FAST(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         try:
             context.add_opcodes(ALOAD_name(context, self.name))
         except KeyError:
@@ -2267,10 +2231,7 @@ class STORE_FAST(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(ASTORE_name(context, self.name))
 
 
@@ -2290,7 +2251,7 @@ class DELETE_FAST(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         free_name(self.name)
 
 
@@ -2342,6 +2303,7 @@ class CALL_FUNCTION(Opcode):
                 argument.operation.materialize(context, argument.arguments)
 
     def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # print("DESCRIPTOR", klass.descriptor)
             # Push a callable onto the stack so that it can be stored
@@ -2514,6 +2476,7 @@ class MAKE_FUNCTION(Opcode):
 
     def convert(self, context, arguments):
         full_method_name = arguments[-1].operation.const
+        context.next_resolve_list.append((self, 'start_op'))
 
         if self.method.is_constructor:
             pass
@@ -2643,14 +2606,11 @@ class BUILD_SLICE(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
+    def convert_opcode(self, context, arguments):
         context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Slice'),
             JavaOpcodes.DUP(),
         )
-
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
 
         if self.argc == 1:
             method_signature = '(Lorg/python/Object;)V'
@@ -2699,7 +2659,7 @@ class LOAD_CLOSURE(Opcode):
     def product_count(self):
         return 1
 
-    # def convert(self, context, arguments):
+    # def convert_opcode(self, context, arguments):
     #     return []
 
 
@@ -2719,10 +2679,7 @@ class LOAD_DEREF(Opcode):
     def product_count(self):
         return 1
 
-    def convert(self, context, arguments):
-        # print("LOAD_ATTR", context, arguments)
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
+    def convert_opcode(self, context, arguments):
         pass
 
 
@@ -2742,9 +2699,7 @@ class STORE_DEREF(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
+    def convert_opcode(self, context, arguments):
         pass
 
 
@@ -2764,10 +2719,8 @@ class DELETE_DEREF(Opcode):
     def product_count(self):
         return 0
 
-    def convert(self, context, arguments):
-        for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
-
+    def convert_opcode(self, context, arguments):
+        pass
 
 # class CALL_FUNCTION_KW(Opcode):
 # class CALL_FUNCTION_VAR_KW(Opcode):
@@ -2794,6 +2747,7 @@ class LIST_APPEND(Opcode):
         return 0
 
     def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
 
         if self.index == 2:
             context.add_opcodes(
