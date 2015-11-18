@@ -178,7 +178,6 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_add_float',
         'test_multiply_float',
-        'test_subscr_float',
         'test_lt_float',
         'test_le_float',
         'test_eq_float',
@@ -217,7 +216,6 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_add_list',
         'test_multiply_list',
-        'test_subscr_list',
         'test_lt_list',
         'test_le_list',
         'test_eq_list',
@@ -256,7 +254,6 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_add_tuple',
         'test_multiply_tuple',
-        'test_subscr_tuple',
         'test_lt_tuple',
         'test_le_tuple',
         'test_eq_tuple',

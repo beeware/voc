@@ -166,7 +166,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_dict',
 
         'test_add_float',
-        'test_subscr_float',
         'test_lt_float',
         'test_le_float',
         'test_eq_float',
@@ -203,7 +202,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_int',
 
         'test_add_list',
-        'test_subscr_list',
         'test_lt_list',
         'test_le_list',
         'test_eq_list',
