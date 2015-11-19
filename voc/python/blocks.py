@@ -173,6 +173,8 @@ class Block:
 
         May raise ``IgnoreBlock`` if the block should be ignored.
         """
+        #
+        argument_vars = len(self.local_vars)
 
         # Most opcodes need no preparation, but MAKE_FUNCTION,
         # CALL_FUNCTION/LOAD_BUILD_CLASS, and MAKE_CLOSURE all create
@@ -206,7 +208,7 @@ class Block:
         # initializing all variables, we can trick the verifier.
         # TODO: Ideally, we'd only initialize the variables that are ambiguous.
         init_vars = []
-        for i in range(0, len(self.local_vars) + len(self.deleted_vars)):
+        for i in range(argument_vars, len(self.local_vars) + len(self.deleted_vars)):
             if i == 0:
                 opcode = JavaOpcodes.ASTORE_0()
             elif i == 1:
