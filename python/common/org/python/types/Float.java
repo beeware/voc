@@ -62,7 +62,17 @@ public class Float extends org.python.types.Object {
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__eq__() has not been implemented.");
+        if (other instanceof org.python.types.Int) {
+            return new org.python.types.Bool(this.value == ((double)((org.python.types.Int) other).value));
+        } else if (other instanceof Float) {
+            return new org.python.types.Bool(this.value == ((org.python.types.Float) other).value);
+        } else if (other instanceof Bool) {
+            return new org.python.types.Bool(
+                (this.value == 0.0 && !((org.python.types.Bool) other).value)
+                || (this.value != 0.0 && ((org.python.types.Bool) other).value)
+            );
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: float() == " + org.Python.pythonTypeName(other) + "()");
     }
 
     public org.python.Object __ne__(org.python.Object other) {
