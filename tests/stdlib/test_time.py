@@ -103,11 +103,12 @@ class TimeModuleTests(TranspileTestCase):
         # this test validates that clock returns a float < 0.01s
         self.assertCodeExecution("""
             import time
-            time.clock()
+            start = time.clock()
             time.sleep(1)
-            result = time.clock()
-            print(type(result))
-            print(result < 0.1)
+            end = time.clock()
+            diff = end - start
+            print(type(diff))
+            print(diff < 0.1)
             print('Done.')
             """)
 
