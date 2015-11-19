@@ -175,8 +175,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_xor_int',
         'test_or_int',
 
-        'test_floor_divide_list',
-        'test_true_divide_list',
         'test_subscr_list',
         'test_lshift_list',
         'test_rshift_list',
@@ -207,8 +205,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_set',
 
         'test_subtract_str',
-        'test_floor_divide_str',
-        'test_true_divide_str',
         'test_subscr_str',
         'test_lshift_str',
         'test_rshift_str',
@@ -219,8 +215,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_str',
 
         'test_multiply_tuple',
-        'test_floor_divide_tuple',
-        'test_true_divide_tuple',
         'test_subscr_tuple',
         'test_lshift_tuple',
         'test_rshift_tuple',

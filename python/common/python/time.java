@@ -4,12 +4,10 @@ package python;
 public class time extends org.python.types.Module {
 
     static {
-        vm_start_time = System.currentTimeMillis();
-        last_clock_time = python.platform.impl.clock();
+        vm_start_time = python.platform.impl.clock();
     }
 
     private static long vm_start_time;
-    private static long last_clock_time;
 
     public static org.python.types.Str _STRUCT_TM_ITEMS;
     public static org.python.types.Str __doc__;
@@ -24,25 +22,22 @@ public class time extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static void asctime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object asctime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.asctime() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.types.Float clock(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object clock(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("clock() takes no keyword arguments");
         }
         if (args.length == 0) {
-            //
-            long current_time = python.platform.impl.clock();
-            long delta = current_time - last_clock_time;
+            long current_time = python.platform.impl.clock() - vm_start_time;
 
-            last_clock_time = current_time;
             // thread time is in nanoseconds; convert to seconds.
-            return new org.python.types.Float(delta / 1000000000.0);
+            return new org.python.types.Float(current_time / 1000000000.0);
         } else {
             throw new org.python.exceptions.TypeError("clock() takes no arguments (" + args.length + " given)");
         }
@@ -51,7 +46,7 @@ public class time extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static void ctime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object ctime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.ctime() has not been implemented.");
     }
 
@@ -60,56 +55,56 @@ public class time extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static void get_clock_info(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object get_clock_info(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.get_clock_info() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void gmtime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object gmtime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.gmtime() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void localtime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object localtime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.localtime() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void mktime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object mktime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.mktime() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void monotonic(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object monotonic(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.monotonic() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void perf_counter(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object perf_counter(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.perf_counter() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void process_time(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object process_time(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.process_time() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void sleep(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object sleep(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("sleep() takes no keyword arguments");
         }
@@ -124,23 +119,24 @@ public class time extends org.python.types.Module {
         } else {
             throw new org.python.exceptions.TypeError("sleep() takes exactly 1 argument (" + args.length + " given)");
         }
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void strftime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object strftime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.strftime() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static void strptime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object strptime(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.strptime() has not been implemented.");
     }
 
-    // public static void struct_time;
+    // public static org.python.Object struct_time;
 
     @org.python.Method(
         __doc__ = ""
@@ -156,7 +152,7 @@ public class time extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static void tzset(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object tzset(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("time.tzset() has not been implemented.");
     }
 }

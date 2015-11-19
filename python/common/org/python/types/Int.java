@@ -160,11 +160,21 @@ public class Int extends org.python.types.Object {
     }
 
     public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("int.__truediv__() has not been implemented");
+        if (other instanceof org.python.types.Int) {
+            return new org.python.types.Float(this.value / ((double)((org.python.types.Int) other).value));
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float(this.value / ((org.python.types.Float) other).value);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'int' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("int.__floordiv__() has not been implemented");
+        if (other instanceof org.python.types.Int) {
+            return new org.python.types.Int(this.value / ((org.python.types.Int) other).value);
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Int(this.value / ((long) ((org.python.types.Float) other).value));
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'int' and '" + org.Python.pythonTypeName(other) + "'");
     }
 
     public org.python.Object __mod__(org.python.Object other) {
