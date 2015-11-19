@@ -2606,11 +2606,16 @@ class BUILD_SLICE(Opcode):
     def product_count(self):
         return 1
 
-    def convert_opcode(self, context, arguments):
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+
         context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Slice'),
             JavaOpcodes.DUP(),
         )
+
+        for argument in arguments:
+            argument.operation.transpile(context, argument.arguments)
 
         if self.argc == 1:
             method_signature = '(Lorg/python/Object;)V'
