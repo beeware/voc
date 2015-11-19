@@ -108,52 +108,6 @@ class JavaNormalizationTests(unittest.TestCase):
             """
         )
 
-    def test_nested_exception(self):
-        self.maxDiff = None
-        self.assertNormalized(
-            """
-            Do final cleanup
-            org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:44)
-                at org.Python.int_cast(Python.java:680)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:93)
-                at python.example.foo(example.py:81)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Method.invoke(Method.java:45)
-                at python.example.<clinit>(example.py:87)
-            Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:44)
-                at org.Python.int_cast(Python.java:680)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:93)
-                at python.example.foo(example.py:81)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Method.invoke(Method.java:45)
-                at python.example.<clinit>(example.py:87)
-            """,
-            """
-            Do final cleanup
-            ### EXCEPTION ###
-            ValueError: invalid literal for int() with base 10: 'asdf'
-                example.py:87
-                example.py:81
-            """
-        )
-
     def test_float(self):
         self.assertNormalized('7.950899459780156E-6', '7.950899459780156e-6')
 

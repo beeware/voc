@@ -128,8 +128,6 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
 
 
 JAVA_EXCEPTION = re.compile(
-    '(org\.python\.exceptions\.([\w]+): ([^\n]+)\n' +
-    '(\s+at .+\((((.*):(\d+))|(Native Method))\)\n)+)?' +
     '((Exception in thread "\w+" org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\n]+))|' +
     '(Exception in thread "\w+" [^\n]+\n' +
     'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\n]+)))\n' +
