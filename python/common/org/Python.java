@@ -25,7 +25,9 @@ public class Python {
     public static java.lang.String pythonTypeName(java.lang.Class cls) {
         try {
             java.lang.String class_name = cls.getName();
-            if (class_name.startsWith("org.python.types.")) {
+            if (class_name == "org.python.types.NoneType") {
+                return "NoneType";
+            } if (class_name.startsWith("org.python.types.")) {
                 return class_name.substring(17).toLowerCase();
             } else if (class_name.startsWith("python.")) {
                 return class_name.substring(7);
@@ -1090,6 +1092,7 @@ public class Python {
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             buffer.append(args[i]);
+
             if (i != args.length - 1) {
                 if (sep == null) {
                     buffer.append(" ");

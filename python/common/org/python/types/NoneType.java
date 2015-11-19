@@ -9,7 +9,4 @@ public class NoneType extends org.python.types.Object {
         return new org.python.types.Str("None");
     }
 
-    public org.python.types.Str __str__() {
-        return new org.python.types.Str("");
-    }
 }
