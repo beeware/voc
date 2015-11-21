@@ -157,7 +157,7 @@ class Class(Block):
             classfile.methods.append(
                 JavaMethod(
                     '<init>',
-                    '([Lorg/python/Object;Ljava/util/Map;)V',
+                    '(Ljava/util/List;Ljava/util/Map;)V',
                     attributes=[
                         JavaCode(
                             max_stack=1,

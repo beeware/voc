@@ -1193,13 +1193,14 @@ class GET_ITER(Opcode):
         context.add_opcodes(
             ASTORE_name(context, '#temp-%x' % id(self)),
 
-            JavaOpcodes.ICONST_1(),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
+            JavaOpcodes.NEW('java/util/ArrayList'),
             JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_0(),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
 
+            JavaOpcodes.DUP(),
             ALOAD_name(context, '#temp-%x' % id(self)),
-            JavaOpcodes.AASTORE(),
+            JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+            JavaOpcodes.POP(),
 
             JavaOpcodes.NEW('java/util/HashMap'),
             JavaOpcodes.DUP(),
@@ -1208,7 +1209,7 @@ class GET_ITER(Opcode):
             JavaOpcodes.INVOKESTATIC(
                 'org/Python',
                 'iter',
-                '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Iterable;'
+                '(Ljava/util/List;Ljava/util/Map;)Lorg/python/Iterable;'
             ),
 
             JavaOpcodes.CHECKCAST('org/python/Iterable'),
@@ -1605,12 +1606,12 @@ class LOAD_CONST(Opcode):
                     )
                     self._convert(context, arguments, val)
                     context.add_opcodes(
-                        JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                        JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
                         JavaOpcodes.POP()
                     )
 
                 context.add_opcodes(
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/ArrayList;)V'),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
                 )
 
             else:
@@ -1680,12 +1681,12 @@ class BUILD_TUPLE(Opcode):
             argument.operation.transpile(context, argument.arguments)
 
             context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
                 JavaOpcodes.POP(),
             )
 
         context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/ArrayList;)V')
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V')
         )
 
 
@@ -1727,12 +1728,12 @@ class BUILD_LIST(Opcode):
             argument.operation.transpile(context, argument.arguments)
 
             context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
                 JavaOpcodes.POP(),
             )
 
         context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', '(Ljava/util/ArrayList;)V')
+            JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', '(Ljava/util/List;)V')
         )
 
 
@@ -2316,7 +2317,7 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.ANEWARRAY('java/lang/Class'),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_0(),
-                    JavaOpcodes.LDC_W(Classref('[Lorg/python/Object;')),
+                    JavaOpcodes.LDC_W(Classref('java/util/List')),
                     JavaOpcodes.AASTORE(),
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_1(),
@@ -2333,7 +2334,18 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.NEW('org/python/types/Constructor'),
                     JavaOpcodes.DUP(),
                     ALOAD_name(context, '#CONSTRUCTOR'),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
+
+                    # Default args
+                    JavaOpcodes.NEW('java/util/ArrayList'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+
+                    # Default kwargs
+                    JavaOpcodes.NEW('java/util/HashMap'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;Ljava/util/List;Ljava/util/Map;)V'),
 
                 CATCH('java/lang/NoSuchMethodError'),
                     ASTORE_name(context, '#EXCEPTION'),
@@ -2372,16 +2384,17 @@ class CALL_FUNCTION(Opcode):
 
             # Create and populate the array of arguments to pass to invoke()
             context.add_opcodes(
-                ICONST_val(self.args),
-                JavaOpcodes.ANEWARRAY('org/python/Object'),
+                JavaOpcodes.NEW('java/util/ArrayList'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
             )
             for i, argument in enumerate(arguments[1:self.args+1]):
                 context.add_opcodes(
                     JavaOpcodes.DUP(),
-                    ICONST_val(i),
 
                     ALOAD_name(context, '#arg-%d-%x' % (i, id(self))),
-                    JavaOpcodes.AASTORE(),
+                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+                    JavaOpcodes.POP(),
 
                 )
                 # Clean up temporary storage for arg.
@@ -2427,7 +2440,7 @@ class CALL_FUNCTION(Opcode):
                 ALOAD_name(context, '#args-%x' % id(self)),
                 ALOAD_name(context, '#kwargs-%x' % id(self)),
 
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '(Ljava/util/List;Ljava/util/Map;)Lorg/python/Object;'),
             )
 
             # Clean up temporary storage.
@@ -2490,7 +2503,7 @@ class MAKE_FUNCTION(Opcode):
             argument.operation.transpile(context, argument.arguments)
 
             context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
                 JavaOpcodes.POP(),
             )
         context.add_opcodes(
@@ -2533,12 +2546,15 @@ class MAKE_FUNCTION(Opcode):
             context.add_opcodes(
                 JavaOpcodes.NEW(self.method.parent.descriptor),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.ICONST_0(),
-                JavaOpcodes.ANEWARRAY('org/python/Object'),
+
+                JavaOpcodes.NEW('java/util/ArrayList'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+
                 JavaOpcodes.NEW('java/util/HashMap'),
                 JavaOpcodes.DUP(),
                 JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
-                JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+                JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '(Ljava/util/List;Ljava/util/Map;)V'),
 
                 JavaOpcodes.LDC_W(self.method.name),
                 JavaOpcodes.INVOKEVIRTUAL(self.method.parent.descriptor, '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;')
@@ -2548,7 +2564,7 @@ class MAKE_FUNCTION(Opcode):
             #     JavaOpcodes.NEW('java/util/HashMap'),
             #     JavaOpcodes.DUP(),
             #     JavaOpcodes.INVOKESPECIAL('java/util/Map', '<init>', '()V'),
-            #     JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+            #     JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Ljava/util/List;Ljava/util/Map;)V'),
             # )
         else:
             # Push a callable onto the stack so that it can be stored
@@ -2564,15 +2580,17 @@ def add_callable(context, method, full_method_name):
             JavaOpcodes.LDC_W(method.name),
             JavaOpcodes.ICONST_2(),
             JavaOpcodes.ANEWARRAY('java/lang/Class'),
+
             JavaOpcodes.DUP(),
             JavaOpcodes.ICONST_0(),
-            JavaOpcodes.LDC_W(Classref('[Lorg/python/Object;')),
+            JavaOpcodes.LDC_W(Classref('Ljava/util/List;')),
             JavaOpcodes.AASTORE(),
+
             JavaOpcodes.DUP(),
             JavaOpcodes.ICONST_1(),
-
             JavaOpcodes.LDC_W(Classref('Ljava/util/Map;')),
             JavaOpcodes.AASTORE(),
+
             JavaOpcodes.INVOKEVIRTUAL(
                 'java/lang/Class',
                 'getMethod',
@@ -2634,7 +2652,7 @@ def add_callable(context, method, full_method_name):
 
             JavaOpcodes.ACONST_NULL(),  # closure
 
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/ArrayList;Ljava/util/Map;Ljava/util/ArrayList;)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;Ljava/util/List;)V'),
 
         CATCH('java/lang/NoSuchMethodError'),
             ASTORE_name(context, '#EXCEPTION#'),
@@ -2815,14 +2833,14 @@ class LIST_APPEND(Opcode):
 
         if self.index == 2:
             context.add_opcodes(
-                JavaOpcodes.GETFIELD('org/python/types/List', 'value', 'Ljava/util/ArrayList;'),
+                JavaOpcodes.GETFIELD('org/python/types/List', 'value', 'Ljava/util/List;'),
             )
 
             for argument in arguments:
                 argument.operation.transpile(context, argument.arguments)
 
             context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
                 JavaOpcodes.POP(),
             )
         else:

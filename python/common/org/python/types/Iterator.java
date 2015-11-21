@@ -14,12 +14,12 @@ class Iterator extends org.python.types.Object implements org.python.Iterable {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Iterable __iter__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Iterable __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("__iter__ doesn't take keyword arguments");
         }
-        if (args.length != 0) {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+        if (args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
         }
         return this.__iter__();
     }
@@ -31,12 +31,12 @@ class Iterator extends org.python.types.Object implements org.python.Iterable {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __next__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __next__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("__next__ doesn't take keyword arguments");
         }
-        if (args.length != 0) {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+        if (args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
         }
         return this.__next__();
     }

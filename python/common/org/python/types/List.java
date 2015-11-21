@@ -1,7 +1,7 @@
 package org.python.types;
 
 public class List extends org.python.types.Object {
-    public java.util.ArrayList<org.python.Object> value;
+    public java.util.List<org.python.Object> value;
 
     /**
      * A utility method to update the internal value of this object.
@@ -18,7 +18,7 @@ public class List extends org.python.types.Object {
         this.value = new java.util.ArrayList<org.python.Object>();
     }
 
-    public List(java.util.ArrayList<org.python.Object> list) {
+    public List(java.util.List<org.python.Object> list) {
         super();
         this.value = list;
     }
@@ -82,7 +82,7 @@ public class List extends org.python.types.Object {
         try {
             if (index instanceof org.python.types.Slice) {
                 org.python.types.Slice slice = (org.python.types.Slice) index;
-                java.util.ArrayList<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
+                java.util.List<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
 
                 if (slice.start == null && slice.stop == null && slice.step == null) {
                     sliced.addAll(this.value);
@@ -218,15 +218,15 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.__rmul__() has not been implemented.");
     }
 
-    public void append(org.python.Object [] args, java.util.HashMap kwargs) {
+    public void append(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("append() takes no keyword arguments");
         }
-        if (args.length == 1) {
-            this.append(args[0]);
+        if (args.size() == 1) {
+            this.append(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("append() takes exactly 1 argument (" + args.length + " given)");
+            throw new org.python.exceptions.TypeError("append() takes exactly 1 argument (" + args.size() + " given)");
         }
     }
 
@@ -234,7 +234,7 @@ public class List extends org.python.types.Object {
         this.value.add(value);
     }
 
-    public void clear(org.python.Object [] args, java.util.HashMap kwargs) {
+    public void clear(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.clear() has not been implemented.");
     }
 
@@ -242,7 +242,7 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.clear() has not been implemented.");
     }
 
-    public org.python.Object copy(org.python.Object [] args, java.util.HashMap kwargs) {
+    public org.python.Object copy(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.copy() has not been implemented.");
     }
 
@@ -250,7 +250,7 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.copy() has not been implemented.");
     }
 
-    public org.python.Object count(org.python.Object [] args, java.util.HashMap kwargs) {
+    public org.python.Object count(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.count() has not been implemented.");
     }
 
@@ -258,7 +258,7 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.count() has not been implemented.");
     }
 
-    public org.python.Object extend(org.python.Object [] args, java.util.HashMap kwargs) {
+    public org.python.Object extend(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.extend() has not been implemented.");
     }
 
@@ -266,7 +266,7 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.extend() has not been implemented.");
     }
 
-    public org.python.Object index(org.python.Object [] args, java.util.HashMap kwargs) {
+    public org.python.Object index(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.index() has not been implemented.");
     }
 
@@ -290,7 +290,7 @@ public class List extends org.python.types.Object {
         return this.index(value, 0, -1);
     }
 
-    public org.python.Object insert(org.python.Object [] args, java.util.HashMap kwargs) {
+    public org.python.Object insert(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.insert() has not been implemented.");
     }
 
@@ -298,7 +298,7 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.insert() has not been implemented.");
     }
 
-    public org.python.Object pop(org.python.Object [] args, java.util.HashMap kwargs) {
+    public org.python.Object pop(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.pop() has not been implemented.");
     }
 
@@ -314,7 +314,7 @@ public class List extends org.python.types.Object {
         return this.pop(-1);
     }
 
-    public void remove(org.python.Object [] args, java.util.HashMap kwargs) {
+    public void remove(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.remove() has not been implemented.");
     }
 
@@ -322,7 +322,7 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.remove() has not been implemented.");
     }
 
-    public void reverse(org.python.Object [] args, java.util.HashMap kwargs) {
+    public void reverse(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.reverse() has not been implemented.");
     }
 
@@ -330,7 +330,7 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.reverse() has not been implemented.");
     }
 
-    public org.python.Object sort(org.python.Object [] args, java.util.HashMap kwargs) {
+    public org.python.Object sort(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
         throw new org.python.exceptions.NotImplementedError("list.sort() has not been implemented.");
     }
 

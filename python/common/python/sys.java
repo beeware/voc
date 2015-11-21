@@ -12,7 +12,7 @@ public class sys extends org.python.types.Module {
         // java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("(\"[^\"]*\"|[^\"]+)(\\s+|$)");
         java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("\\s+");
         java.lang.String [] args = cmdline_pattern.split(System.getProperty("sun.java.command"));
-        java.util.ArrayList<org.python.Object> arg_list = new java.util.ArrayList<org.python.Object>();
+        java.util.List<org.python.Object> arg_list = new java.util.ArrayList<org.python.Object>();
         for (String arg: args) {
             arg_list.add(new org.python.types.Str(arg));
         }
@@ -23,7 +23,7 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object __displayhook__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object __displayhook__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.__displayhook__() has not been implemented.");
     }
 
@@ -34,7 +34,7 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object __excepthook__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object __excepthook__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.__excepthook__() has not been implemented.");
     }
 
@@ -57,28 +57,28 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object _clear_type_cache(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object _clear_type_cache(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys._clear_type_cache() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object _current_frames(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object _current_frames(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys._current_frames() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object _debugmallocstats(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object _debugmallocstats(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys._debugmallocstats() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object _getframe(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object _getframe(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys._getframe() has not been implemented.");
     }
 
@@ -104,14 +104,14 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object call_tracing(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object call_tracing(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.call_tracing() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object callstats(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object callstats(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.callstats() has not been implemented.");
     }
 
@@ -124,7 +124,7 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object exc_info(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object exc_info(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.exc_info() has not been implemented.");
     }
 
@@ -137,16 +137,16 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object exit(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object exit(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("ex() takes no keyword arguments");
         }
-        if (args.length == 0) {
+        if (args.size() == 0) {
             throw new org.python.exceptions.SystemExit();
-        } else if (args.length == 1) {
-            throw new org.python.exceptions.SystemExit((int) (((org.python.types.Int) args[0]).value));
+        } else if (args.size() == 1) {
+            throw new org.python.exceptions.SystemExit((int) (((org.python.types.Int) args.get(0)).value));
         } else {
-            throw new org.python.exceptions.TypeError("exit() expected at most 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("exit() expected at most 1 arguments, got " + args.size());
         }
     }
 
@@ -159,77 +159,77 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getallocatedblocks(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getallocatedblocks(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getallocatedblocks() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getcheckinterval(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getcheckinterval(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getcheckinterval() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getdefaultencoding(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getdefaultencoding(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getdefaultencoding() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getdlopenflags(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getdlopenflags(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getdlopenflags() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getfilesystemencoding(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getfilesystemencoding(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getfilesystemencoding() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getprofile(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getprofile(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getprofile() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getrecursionlimit(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getrecursionlimit(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getrecursionlimit() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getrefcount(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getrefcount(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getrefcount() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object getsizeof(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object getsizeof(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.getsizeof() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.types.Float getswitchinterval(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.types.Float getswitchinterval(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return new org.python.types.Float(0.005);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object gettrace(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object gettrace(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.gettrace() has not been implemented.");
     }
 
@@ -244,7 +244,7 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object intern(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object intern(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.intern() has not been implemented.");
     }
 
@@ -283,42 +283,42 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object setcheckinterval(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object setcheckinterval(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.setcheckinterval() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object setdlopenflags(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object setdlopenflags(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.setdlopenflags() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object setprofile(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object setprofile(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.setprofile() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object setrecursionlimit(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object setrecursionlimit(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.setrecursionlimit() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object setswitchinterval(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object setswitchinterval(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.setswitchinterval() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public static org.python.Object settrace(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public static org.python.Object settrace(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("sys.settrace() has not been implemented.");
     }
 

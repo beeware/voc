@@ -81,15 +81,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return repr(self)."
     )
-    public org.python.Object __repr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __repr__ doesn't take keyword arguments");
         }
-        if (args.length == 0) {
+        if (args.size() == 0) {
             return this.__repr__();
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
         }
     }
 
@@ -100,15 +100,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return str(self)."
     )
-    public org.python.Object __str__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __str__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __str__ doesn't take keyword arguments");
         }
-        if (args.length == 0) {
+        if (args.size() == 0) {
             return this.__str__();
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
         }
     }
 
@@ -131,15 +131,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return self<value."
     )
-    public org.python.Object __lt__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __lt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __lt__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__lt__(args[0]);
+        if (args.size() == 1) {
+            return this.__lt__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -151,15 +151,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return self<=value."
     )
-    public org.python.Object __le__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __le__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __le__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__le__(args[0]);
+        if (args.size() == 1) {
+            return this.__le__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -170,15 +170,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return self==value."
     )
-    public org.python.Object __eq__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __eq__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __eq__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__eq__(args[0]);
+        if (args.size() == 1) {
+            return this.__eq__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -189,15 +189,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return self!=value."
     )
-    public org.python.Object __ne__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __ne__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ne__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__ne__(args[0]);
+        if (args.size() == 1) {
+            return this.__ne__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -208,15 +208,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return self>value."
     )
-    public org.python.Object __gt__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __gt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __gt__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__gt__(args[0]);
+        if (args.size() == 1) {
+            return this.__gt__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -227,15 +227,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return self>=value."
     )
-    public org.python.Object __ge__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __ge__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ge__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__ge__(args[0]);
+        if (args.size() == 1) {
+            return this.__ge__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -246,15 +246,15 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return hash(self)."
     )
-    public org.python.types.Int __hash__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.types.Int __hash__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __hash__ doesn't take keyword arguments");
         }
-        if (args.length == 0) {
+        if (args.size() == 0) {
             return this.__hash__();
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
         }
     }
 
@@ -274,20 +274,20 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Return getattr(self, name)."
     )
-    public org.python.Object __getattribute__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __getattribute__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __getattribute__ doesn't take keyword arguments");
         }
         org.python.Object value;
-        if (args.length == 1) {
-            if (args[0] instanceof org.python.types.Str) {
-                value = this.__getattribute__(((org.python.types.Str) args[0]).value);
+        if (args.size() == 1) {
+            if (args.get(0) instanceof org.python.types.Str) {
+                value = this.__getattribute__(((org.python.types.Str) args.get(0)).value);
             } else {
                 throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
             }
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
 
         return this.__get__(value, org.python.types.Type.pythonType(this.getClass()));
@@ -304,19 +304,19 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Implement setattr(self, name, value)."
     )
-    public void __setattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __setattr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __setattr__ doesn't take keyword arguments");
         }
-        if (args.length == 2) {
-            if (args[0] instanceof org.python.types.Str) {
-                this.__setattr__(((org.python.types.Str) args[0]).value, args[1]);
+        if (args.size() == 2) {
+            if (args.get(0) instanceof org.python.types.Str) {
+                this.__setattr__(((org.python.types.Str) args.get(0)).value, args.get(1));
             } else {
                 throw new org.python.exceptions.TypeError("delattr(): attribute name must be string");
             }
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 2 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 2 arguments, got " + args.size());
         }
     }
 
@@ -327,19 +327,19 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     @org.python.Method(
         __doc__ = "Implement delattr(self, name)."
     )
-    public void __delattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __delattr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __delattr__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            if (args[0] instanceof org.python.types.Str) {
-                this.__delattr__(((org.python.types.Str) args[0]).value);
+        if (args.size() == 1) {
+            if (args.get(0) instanceof org.python.types.Str) {
+                this.__delattr__(((org.python.types.Str) args.get(0)).value);
             } else {
                 throw new org.python.exceptions.TypeError("delattr(): attribute name must be string");
             }
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 

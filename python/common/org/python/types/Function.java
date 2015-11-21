@@ -5,9 +5,9 @@ public class Function extends org.python.types.Object implements org.python.Call
     org.python.types.Code code;
     java.lang.reflect.Method method;
     java.util.Map<java.lang.String, org.python.Object> globals;
-    java.util.ArrayList<org.python.Object> default_args;
+    java.util.List<org.python.Object> default_args;
     java.util.Map<java.lang.String, org.python.Object> default_kwargs;
-    java.util.ArrayList<org.python.Object> closure;
+    java.util.List<org.python.Object> closure;
 
     private void populateAttrs() {
         org.python.types.Str name = new org.python.types.Str(method.getName());
@@ -60,9 +60,9 @@ public class Function extends org.python.types.Object implements org.python.Call
             org.python.types.Code code,
             java.lang.reflect.Method method,
             java.util.Map<java.lang.String, org.python.Object> globals,
-            java.util.ArrayList<org.python.Object> default_args,
+            java.util.List<org.python.Object> default_args,
             java.util.Map<java.lang.String, org.python.Object> default_kwargs,
-            java.util.ArrayList<org.python.Object> closure) {
+            java.util.List<org.python.Object> closure) {
         super();
         this.name = name;
         this.code = code;
@@ -82,7 +82,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         return this;
     }
 
-    public org.python.Object invoke(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // System.out.println("Function:" + this.method);
             // System.out.println("ARGS:");

@@ -35,7 +35,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
         }
     }
 
-    public org.python.Object invoke(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // System.out.println("INVOKE METHOD:" + this.im_func + " " + this.im_self + " " + this.im_func.method);
             // System.out.println("PRE ARGS:");
@@ -60,10 +60,10 @@ public class Method extends org.python.types.Object implements org.python.Callab
             // // Add default args
             // int argcount = (int)((org.python.types.Int) this.im_func.code.attrs.get("co_argcount")).value;
             // int n_defaults = this.im_func.default_args.size();
-            // System.out.println("argcount = " + argcount + " ndefaults = " + n_defaults + " args " + args.length);
-            // if (args.length < argcount) {
+            // System.out.println("argcount = " + argcount + " ndefaults = " + n_defaults + " args " + args.size());
+            // if (args.size() < argcount) {
             //     org.python.Object[] full_args = java.util.Arrays.copyOf(args, argcount);
-            //     for (int i = args.length; i < argcount; i++) {
+            //     for (int i = args.size(); i < argcount; i++) {
             //         System.out.println(i + " = " + this.im_func.default_args.get(i - n_defaults));
             //         full_args[i] = this.im_func.default_args.get(i - n_defaults);
             //     }

@@ -117,7 +117,7 @@ class Method(Block):
     @property
     def signature(self):
         return_descriptor = 'V' if self.has_void_return else 'Lorg/python/Object;'
-        return '([Lorg/python/Object;Ljava/util/Map;)%s' % return_descriptor
+        return '(Ljava/util/List;Ljava/util/Map;)%s' % return_descriptor
 
     def add_arguments(self):
         self.local_vars['##__args__##'] = len(self.local_vars)
@@ -167,14 +167,14 @@ class Method(Block):
                 self.add_opcodes(
                     ALOAD_name(self, '##__args__##'),
                     ICONST_val(i),
-                    JavaOpcodes.AALOAD(),
+                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'get', '(I)Ljava/lang/Object;'),
                     ASTORE_name(self, param['name']),
                 )
             elif param['kind'] == VAR_POSITIONAL:
                 self.add_opcodes(
                     ALOAD_name(self, '##__args__##'),
                     ICONST_val(i),
-                    JavaOpcodes.AALOAD(),
+                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'get', '(I)Ljava/lang/Object;'),
                     ASTORE_name(self, param['name']),
                 )
             elif param['kind'] == KEYWORD_ONLY:
@@ -257,7 +257,7 @@ class InitMethod(Method):
             self.add_opcodes(
                 ALOAD_name(self, '##__args__##'),
                 ICONST_val(i),
-                JavaOpcodes.AALOAD(),
+                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'get', '(I)Ljava/lang/Object;'),
                 ASTORE_name(self, arg['name']),
             )
 
