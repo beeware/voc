@@ -27,10 +27,6 @@ public class Code extends org.python.types.Object {
         this.attrs.put("co_varnames", object.attrs.get("co_varnames"));
     }
 
-    public Code() {
-        super();
-    }
-
     public Code(
             org.python.types.Int co_argcount,
             org.python.types.Tuple co_cellvars,

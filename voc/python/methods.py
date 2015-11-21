@@ -162,13 +162,30 @@ class Method(Block):
 
     def transpile_setup(self):
         # Load all the arguments into locals
-        for i, arg in enumerate(self.parameters):
-            self.add_opcodes(
-                ALOAD_name(self, '##__args__##'),
-                ICONST_val(i),
-                JavaOpcodes.AALOAD(),
-                ASTORE_name(self, arg['name']),
-            )
+        for i, param in enumerate(self.parameters):
+            if param['kind'] == POSITIONAL_OR_KEYWORD:
+                self.add_opcodes(
+                    ALOAD_name(self, '##__args__##'),
+                    ICONST_val(i),
+                    JavaOpcodes.AALOAD(),
+                    ASTORE_name(self, param['name']),
+                )
+            elif param['kind'] == VAR_POSITIONAL:
+                self.add_opcodes(
+                    ALOAD_name(self, '##__args__##'),
+                    ICONST_val(i),
+                    JavaOpcodes.AALOAD(),
+                    ASTORE_name(self, param['name']),
+                )
+            elif param['kind'] == KEYWORD_ONLY:
+                self.add_opcodes(
+                    # ALOAD_name(self, '##__kwargs__##'),
+                    # JavaOpcodes.LDC_W(param['name']),
+                    # JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+                    # ASTORE_name(self, param['name']),
+                )
+            elif param['kind'] == VAR_KEYWORD:
+                pass
 
     def method_attributes(self):
         return [

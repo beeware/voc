@@ -5,8 +5,9 @@ public class Function extends org.python.types.Object implements org.python.Call
     org.python.types.Code code;
     java.lang.reflect.Method method;
     java.util.Map<java.lang.String, org.python.Object> globals;
-    java.util.Map<java.lang.String, org.python.Object> defaults;
-    java.util.ArrayList closure;
+    java.util.ArrayList<org.python.Object> default_args;
+    java.util.Map<java.lang.String, org.python.Object> default_kwargs;
+    java.util.ArrayList<org.python.Object> closure;
 
     private void populateAttrs() {
         org.python.types.Str name = new org.python.types.Str(method.getName());
@@ -45,6 +46,9 @@ public class Function extends org.python.types.Object implements org.python.Call
         this.name = new org.python.types.Str(method.getName());
         this.method = method;
 
+        this.default_args = new java.util.ArrayList<org.python.Object>();
+        this.default_kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
+
         populateAttrs();
     }
 
@@ -56,14 +60,16 @@ public class Function extends org.python.types.Object implements org.python.Call
             org.python.types.Code code,
             java.lang.reflect.Method method,
             java.util.Map<java.lang.String, org.python.Object> globals,
-            java.util.Map<java.lang.String, org.python.Object> defaults,
-            java.util.ArrayList closure) {
+            java.util.ArrayList<org.python.Object> default_args,
+            java.util.Map<java.lang.String, org.python.Object> default_kwargs,
+            java.util.ArrayList<org.python.Object> closure) {
         super();
         this.name = name;
         this.code = code;
         this.method = method;
         this.globals = globals;
-        this.defaults = defaults;
+        this.default_args = default_args;
+        this.default_kwargs = default_kwargs;
         this.closure = closure;
 
         populateAttrs();
@@ -82,6 +88,20 @@ public class Function extends org.python.types.Object implements org.python.Call
             // System.out.println("ARGS:");
             // for (org.python.Object arg: args) {
             //     System.out.println("  " + arg);
+            // }
+
+            // System.out.println("KWARGS:");
+            // for (java.lang.String argname: kwargs.keySet()) {
+            //     System.out.println("  " + argname + " = " + kwargs.get(argname));
+            // }
+
+            // System.out.println("DEFAULTS:");
+            // for (org.python.Object arg: this.default_args) {
+            //     System.out.println("  " + arg);
+            // }
+
+            // for (java.lang.String argname: this.default_kwargs.keySet()) {
+            //     System.out.println("  " + argname + " = " + this.default_kwargs.get(argname));
             // }
 
             // if this.attrs.__code__.co_flags & CO_GENERATOR:

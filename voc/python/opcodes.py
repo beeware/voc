@@ -2441,14 +2441,12 @@ class MAKE_FUNCTION(Opcode):
 
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.argc = argc
         self.default_args = argc & 0xff
         self.default_kwargs = ((argc >> 8) & 0xFF)
         self.annotations = (argc >> 16) & 0x7FFF
 
     def __arg_repr__(self):
-        return '%d %s default args, %s default kwargs, %s annotations' % (
-            self.argc,
+        return '%s default args, %s default kwargs, %s annotations' % (
             self.default_args,
             self.default_kwargs,
             self.annotations,
@@ -2478,6 +2476,55 @@ class MAKE_FUNCTION(Opcode):
         full_method_name = arguments[-1].operation.const
         context.next_resolve_list.append((self, 'start_op'))
 
+        context.add_opcodes(
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+        )
+
+        # Evaluate and store default args
+        for argument in arguments[:self.default_args]:
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+            argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+        context.add_opcodes(
+            ASTORE_name(context, '#default_args-%x' % id(self.method))
+        )
+
+        # Evaluate and store default kwargs
+        context.add_opcodes(
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+        )
+
+        for name, argument in zip(
+                        arguments[self.default_args:self.default_args + self.default_kwargs * 2:2],
+                        arguments[self.default_args + 1:self.default_args + self.default_kwargs * 2 + 1:2]):
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+
+            context.add_opcodes(
+                JavaOpcodes.LDC_W(name.operation.const),
+            )
+            argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.POP(),
+            )
+        context.add_opcodes(
+            ASTORE_name(context, '#default_kwargs-%x' % id(self.method))
+        )
+
+        # Build the callable to invoke the method
         if self.method.is_constructor:
             pass
             # Nothing needed on stack; class construction is self contained.
@@ -2511,7 +2558,7 @@ class MAKE_FUNCTION(Opcode):
 
 def add_callable(context, method, full_method_name):
     context.add_opcodes(
-        # Get a Method representing the new function
+        # # Get a Method representing the new function
         TRY(),
             JavaOpcodes.LDC_W(Classref(context.descriptor)),
             JavaOpcodes.LDC_W(method.name),
@@ -2544,38 +2591,50 @@ def add_callable(context, method, full_method_name):
 
             JavaOpcodes.NEW('org/python/types/Code'),
             JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '()V'),
 
-            # org.python.types.Int co_argcount,
-            # org.python.types.Tuple co_cellvars,
-            # org.python.types.Bytes co_code,
-            # org.python.types.Tuple co_consts,
-            # org.python.types.Str co_filename,
-            # org.python.types.Int co_firstlineno,
-            # org.python.types.Int co_flags,
-            # org.python.types.Tuple co_freevars,
-            # org.python.types.Int co_kwonlyargcount,
-            # org.python.types.Bytes co_lnotab,
-            # org.python.types.Str co_name,
-            # org.python.types.Tuple co_names,
-            # org.python.types.Int co_nlocals,
-            # org.python.types.Int co_stacksize,
-            # org.python.types.Tuple co_varnames
-            # JavaOpcodes.INVOKESPECIAL('Lorg.python.types.Code;', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
+            # code.co_argcount
+            JavaOpcodes.NEW('org/python/types/Int'),
+            JavaOpcodes.DUP(),
+            ICONST_val(len([p for p in method.parameters if p['kind'] == 1])),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+
+            JavaOpcodes.ACONST_NULL(),  # co_cellvars
+            JavaOpcodes.ACONST_NULL(),  # co_code
+            JavaOpcodes.ACONST_NULL(),  # co_consts
+            JavaOpcodes.ACONST_NULL(),  # co_filename
+            JavaOpcodes.ACONST_NULL(),  # co_firstlineno
+            JavaOpcodes.ACONST_NULL(),  # co_flags
+            JavaOpcodes.ACONST_NULL(),  # co_freevars
+
+            # code.co_kwonlyargcount
+            JavaOpcodes.NEW('org/python/types/Int'),
+            JavaOpcodes.DUP(),
+            ICONST_val(len([p for p in method.parameters if p['kind'] == 3])),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+
+            JavaOpcodes.ACONST_NULL(),  # co_lnotab
+            JavaOpcodes.ACONST_NULL(),  # co_name
+            JavaOpcodes.ACONST_NULL(),  # co_names
+            JavaOpcodes.ACONST_NULL(),  # co_nlocals
+            JavaOpcodes.ACONST_NULL(),  # co_stacksize
+            JavaOpcodes.ACONST_NULL(),  # co_varname
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
 
             ALOAD_name(context, '#method'),
 
-            # globals
-            # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            # JavaOpcodes.LDC_W(method.module.descriptor),
-            # JavaOpcodes.GETSTATIC(method.module.descriptor, 'attrs', 'Ljava/util/Map;'),
+        #     # globals
+        #     # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
+        #     # JavaOpcodes.LDC_W(method.module.descriptor),
+        #     # JavaOpcodes.GETSTATIC(method.module.descriptor, 'attrs', 'Ljava/util/Map;'),
             JavaOpcodes.ACONST_NULL(),  # globals
 
-            JavaOpcodes.ACONST_NULL(),  # defaults
+            ALOAD_name(context, '#default_args-%x' % id(method)),
+
+            ALOAD_name(context, '#default_kwargs-%x' % id(method)),
 
             JavaOpcodes.ACONST_NULL(),  # closure
 
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/Map;Ljava/util/ArrayList;)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/ArrayList;Ljava/util/Map;Ljava/util/ArrayList;)V'),
 
         CATCH('java/lang/NoSuchMethodError'),
             ASTORE_name(context, '#EXCEPTION#'),
