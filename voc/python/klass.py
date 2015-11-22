@@ -70,9 +70,9 @@ class ClassBlock(Block):
         if class_name != self.klass.name:
             raise Exception("Method %s being added to %s!" % (full_method_name, self.klass.name))
         if method_name == '__init__':
-            method = InitMethod(self.klass, extract_parameters(code))
+            method = InitMethod(self.klass, extract_parameters(code), code=code)
         else:
-            method = InstanceMethod(self.klass, method_name, extract_parameters(code))
+            method = InstanceMethod(self.klass, method_name, extract_parameters(code), code=code)
 
         method.extract(code)
         self.klass.methods.append(method)

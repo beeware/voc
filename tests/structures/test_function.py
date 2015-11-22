@@ -135,4 +135,3 @@ class FunctionTests(TranspileTestCase):
             myfunc(z=99, y=42, x=37)
             print('Done.')
             """, run_in_function=False)
-

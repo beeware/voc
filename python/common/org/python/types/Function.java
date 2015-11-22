@@ -1,6 +1,14 @@
 package org.python.types;
 
 public class Function extends org.python.types.Object implements org.python.Callable {
+    static final int CO_OPTIMIZED = 0x1;
+    static final int CO_NEWLOCALS = 0x2;
+    static final int CO_VARARGS = 0x4;
+    static final int CO_VARKEYWORDS = 0x8;
+    static final int CO_NESTED = 0x10;
+    static final int CO_GENERATOR = 0x20;
+    static final int CO_NOFREE = 0x40;
+
     org.python.types.Str name;
     org.python.types.Code code;
     java.lang.reflect.Method method;

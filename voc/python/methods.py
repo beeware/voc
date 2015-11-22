@@ -23,7 +23,7 @@ CO_VARKEYWORDS = 0x0008
 
 
 class Method(Block):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
         super().__init__(parent, commands=commands)
         self.name = name
         self.parameters = parameters
@@ -41,6 +41,7 @@ class Method(Block):
             self.local_vars[arg['name']] = len(self.local_vars)
 
         self.static = static
+        self.code_obj = code
 
     def __repr__(self):
         return '<Method %s (%s parameters)>' % (self.name, len(self.parameters))
@@ -144,7 +145,7 @@ class Method(Block):
             final=True,
         )
 
-        method = ClosureMethod(callable, 'invoke', extract_parameters(code))
+        method = ClosureMethod(callable, 'invoke', extract_parameters(code), code=code)
         method.extract(code)
         callable.methods.append(method)
 
@@ -211,12 +212,13 @@ class Method(Block):
 
 
 class InitMethod(Method):
-    def __init__(self, parent, parameters, commands=None):
+    def __init__(self, parent, parameters, commands=None, code=None):
         super().__init__(
             parent, '__init__',
             parameters=parameters[1:],
             returns={'annotation': None},
-            commands=commands
+            commands=commands,
+            code=code
         )
 
     def __repr__(self):
@@ -297,13 +299,14 @@ class AnonymousInitMethod(InitMethod):
 
 
 class InstanceMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
         super().__init__(
             parent, name,
             parameters=parameters[1:],
             returns=returns,
             static=static,
-            commands=commands
+            commands=commands,
+            code=code
         )
 
     def __repr__(self):
@@ -324,13 +327,14 @@ class InstanceMethod(Method):
 
 
 class MainMethod(Method):
-    def __init__(self, parent, commands=None, end_offset=None):
+    def __init__(self, parent, commands=None, code=None, end_offset=None):
         super().__init__(
             parent, '__main__',
             parameters=[{'name': 'args', 'annotation': 'argv'}],
             returns={'annotation': None},
             static=True,
-            commands=commands
+            commands=commands,
+            code=code
         )
         self.end_offset = end_offset
 
@@ -418,13 +422,14 @@ class MainMethod(Method):
 
 
 class ClosureMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
         super().__init__(
             parent, name,
             parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands
+            commands=commands,
+            code=code
         )
 
     def __repr__(self):

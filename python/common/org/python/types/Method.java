@@ -37,7 +37,8 @@ public class Method extends org.python.types.Object implements org.python.Callab
 
     public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("INVOKE METHOD:" + this.im_func + " " + this.im_self + " " + this.im_func.method);
+            // System.out.println("INVOKE METHOD:" + this.im_func + " " + this.im_self + " " + this.im_func.method + " " + this.im_func.code.attrs.get("co_varnames"));
+
             // System.out.println("PRE ARGS:");
             // for (org.python.Object arg: args) {
             //     System.out.println("  " + arg);
@@ -57,31 +58,54 @@ public class Method extends org.python.types.Object implements org.python.Callab
             //     System.out.println("  " + argname + " = " + this.im_func.default_kwargs.get(argname));
             // }
 
-            // // Add default args
-            // int argcount = (int)((org.python.types.Int) this.im_func.code.attrs.get("co_argcount")).value;
-            // int n_defaults = this.im_func.default_args.size();
-            // System.out.println("argcount = " + argcount + " ndefaults = " + n_defaults + " args " + args.size());
-            // if (args.size() < argcount) {
-            //     org.python.Object[] full_args = java.util.Arrays.copyOf(args, argcount);
-            //     for (int i = args.size(); i < argcount; i++) {
-            //         System.out.println(i + " = " + this.im_func.default_args.get(i - n_defaults));
-            //         full_args[i] = this.im_func.default_args.get(i - n_defaults);
-            //     }
-            //     args = full_args;
-            // }
+            int pos_count = (int)((org.python.types.Int) this.im_func.code.attrs.get("co_argcount")).value;
+            java.util.List<org.python.Object> arg_names = ((org.python.types.Tuple) this.im_func.code.attrs.get("co_varnames")).value;
+
+            // Iterate over all the positional arguments provided; check that
+            // we have enough of them. If we don't, populate them from kwargs,
+            // or if there's no kwargs, from defaults.
+            for (int a = 0; a < pos_count; a++) {
+                java.lang.String arg_name = ((org.python.types.Str) arg_names.get(a)).value;
+                if (a >= args.size()) {
+                    // This argument wasn't provided as a positional; check to
+                    // see if it was provided as a keyword.
+                    org.python.Object value = kwargs.remove(arg_name);
+
+                    // If it wasn't provided as a kwarg, use the
+                    // defaults list.
+                    if (value == null) {
+                        value = this.im_func.default_args.get(a - (pos_count - this.im_func.default_args.size()));
+                    }
+
+                    // Add the value to the full args list.
+                    args.add(value);
+                } else {
+                    // We've been given a position argument at this index; check that
+                    // it isn't also provided as a kwarg.
+                    if (kwargs.containsKey(arg_name)) {
+                        throw new org.python.exceptions.TypeError(this.im_func.name + "() for multiple values for argument '" + arg_name + "'");
+                    }
+                }
+            }
+
+            // If this function provides VARARGS, extract them and add them as
+            // a Python list as the last positional argument.
+            int co_flags = (int)((org.python.types.Int) this.im_func.code.attrs.get("co_flags")).value;
+            if ((co_flags & org.python.types.Function.CO_VARARGS) != 0) {
+                java.util.List<org.python.Object> var_args;
+                if (args.size() > pos_count) {
+                    var_args = args.subList(pos_count, args.size());
+                    args = new java.util.ArrayList<org.python.Object>(args.subList(0, pos_count));
+                } else {
+                    // No positional arguments - add an empty list.
+                    var_args = new java.util.ArrayList<org.python.Object>();
+                }
+                args.add(new org.python.types.List(var_args));
+            }
 
             // System.out.println("POST ARGS:");
             // for (org.python.Object arg: args) {
             //     System.out.println("  " + arg);
-            // }
-
-            // // Add default kwargs
-            // for (java.lang.String argname: this.im_func.default_kwargs.keySet()) {
-            //     System.out.println("Check for " + argname);
-            //     if (!kwargs.containsKey(argname)) {
-            //         System.out.println("Add default " + this.im_func.default_kwargs.get(argname));
-            //         kwargs.put(argname, this.im_func.default_kwargs.get(argname));
-            //     }
             // }
 
             // System.out.println("POST KWARGS:");

@@ -2572,6 +2572,100 @@ class MAKE_FUNCTION(Opcode):
             add_callable(context, self.method, full_method_name)
 
 
+def add_tuple(context, data):
+    context.add_opcodes(
+        JavaOpcodes.NEW('org/python/types/Tuple'),
+        JavaOpcodes.DUP(),
+
+        JavaOpcodes.NEW('java/util/ArrayList'),
+        JavaOpcodes.DUP(),
+        JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+    )
+
+    for value in data:
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+        )
+
+        if value is None:
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+            )
+        else:
+            if isinstance(value, bool):
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Bool'),
+                    JavaOpcodes.DUP(),
+                    ICONST_val(value),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                )
+
+            elif isinstance(value, int):
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
+                    ICONST_val(value),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+                )
+
+            elif isinstance(value, float):
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Float'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC2_W(value),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
+                )
+
+            elif isinstance(value, str):
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Str'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W(value),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                )
+
+            # elif isinstance(value, bytes):
+            #     context.add_opcodes(
+            #         JavaOpcodes.NEW('org/python/types/Bytes'),
+            #         JavaOpcodes.DUP(),
+            #         JavaOpcodes.LDC_W(value),
+            #         JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
+            #     )
+
+            elif isinstance(value, tuple):
+                add_tuple(value)
+
+            else:
+                raise RuntimeError("Unknown constant type %s" % type(value))
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+            JavaOpcodes.POP()
+        )
+
+    context.add_opcodes(
+        JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
+    )
+
+
+def add_str(context, value):
+    context.add_opcodes(
+        JavaOpcodes.NEW('org/python/types/Str'),
+        JavaOpcodes.DUP(),
+        JavaOpcodes.LDC_W(value),
+        JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+    )
+
+
+def add_int(context, value):
+    context.add_opcodes(
+        JavaOpcodes.NEW('org/python/types/Int'),
+        JavaOpcodes.DUP(),
+        ICONST_val(value),
+        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+    )
+
+
 def add_callable(context, method, full_method_name):
     context.add_opcodes(
         # # Get a Method representing the new function
@@ -2601,41 +2695,41 @@ def add_callable(context, method, full_method_name):
             # Then wrap that Method into a Callable.
             JavaOpcodes.NEW('org/python/types/Function'),
             JavaOpcodes.DUP(),
+    )
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(full_method_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+    add_str(context, full_method_name)
 
+    # Add the code object
+    context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Code'),
             JavaOpcodes.DUP(),
+    )
 
-            # code.co_argcount
-            JavaOpcodes.NEW('org/python/types/Int'),
-            JavaOpcodes.DUP(),
-            ICONST_val(len([p for p in method.parameters if p['kind'] == 1])),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+    add_int(context, method.code_obj.co_argcount)
+    add_tuple(context, method.code_obj.co_cellvars)
 
-            JavaOpcodes.ACONST_NULL(),  # co_cellvars
+    context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # co_code
-            JavaOpcodes.ACONST_NULL(),  # co_consts
-            JavaOpcodes.ACONST_NULL(),  # co_filename
-            JavaOpcodes.ACONST_NULL(),  # co_firstlineno
-            JavaOpcodes.ACONST_NULL(),  # co_flags
-            JavaOpcodes.ACONST_NULL(),  # co_freevars
+    )
 
-            # code.co_kwonlyargcount
-            JavaOpcodes.NEW('org/python/types/Int'),
-            JavaOpcodes.DUP(),
-            ICONST_val(len([p for p in method.parameters if p['kind'] == 3])),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+    add_tuple(context, method.code_obj.co_consts)
+    add_str(context, method.code_obj.co_filename)
+    add_int(context, method.code_obj.co_firstlineno)
+    add_int(context, method.code_obj.co_flags)
+    add_tuple(context, method.code_obj.co_freevars)
+    add_int(context, method.code_obj.co_kwonlyargcount)
 
+    context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # co_lnotab
-            JavaOpcodes.ACONST_NULL(),  # co_name
-            JavaOpcodes.ACONST_NULL(),  # co_names
-            JavaOpcodes.ACONST_NULL(),  # co_nlocals
-            JavaOpcodes.ACONST_NULL(),  # co_stacksize
-            JavaOpcodes.ACONST_NULL(),  # co_varname
+    )
+
+    add_str(context, method.code_obj.co_name)
+    add_tuple(context, method.code_obj.co_names)
+    add_int(context, method.code_obj.co_nlocals)
+    add_int(context, method.code_obj.co_stacksize)
+    add_tuple(context, method.code_obj.co_varnames)
+
+    context.add_opcodes(
             JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
 
             ALOAD_name(context, '#method'),
