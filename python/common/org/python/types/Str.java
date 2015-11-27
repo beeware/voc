@@ -161,7 +161,7 @@ public class Str extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("string indices must be integers, not " + org.Python.pythonTypeName(index));
+            throw new org.python.exceptions.TypeError("string indices must be integers, not " + org.Python.typeName(index));
         }
     }
 
@@ -183,7 +183,7 @@ public class Str extends org.python.types.Object {
             sb.append(other_str.value);
             return new Str(sb.toString());
         }
-        throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.pythonTypeName(other) + "' object to str implicitly");
+        throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.typeName(other) + "' object to str implicitly");
     }
 
     public org.python.Object __mul__(org.python.Object other) {
@@ -202,7 +202,8 @@ public class Str extends org.python.types.Object {
     }
 
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__mod__() has not been implemented.");
+        // FIXME - this is a minimum viable implementation
+        return new org.python.types.Str(this.value + " (" + other + ")");
     }
 
     public org.python.Object __rmul__(org.python.Object other) {

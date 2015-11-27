@@ -11,7 +11,7 @@ public class Module extends org.python.types.Object {
     }
 
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<module '%s' from '%s'>", org.Python.pythonTypeName(this.getClass()), this.getClass()));
+        return new org.python.types.Str(String.format("<module '%s' from '%s'>", org.Python.typeName(this.getClass()), this.getClass()));
     }
 
     @SuppressWarnings("unchecked")

@@ -1,7 +1,7 @@
 package org.python.types;
 
 public class Bytes extends org.python.types.Object {
-    public byte[] value;
+    public byte [] value;
 
     /**
      * A utility method to update the internal value of this object.
@@ -13,7 +13,7 @@ public class Bytes extends org.python.types.Object {
         this.value = ((org.python.types.Bytes) obj).value;
     }
 
-    public Bytes(byte[] value) {
+    public Bytes(byte [] value) {
         this.value = value;
     }
 

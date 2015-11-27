@@ -1465,24 +1465,18 @@ class STORE_ATTR(Opcode):
 
     def convert(self, context, arguments):
         context.next_resolve_list.append((self, 'start_op'))
+
+        print (arguments)
         arguments[1].operation.transpile(context, arguments[1].arguments)
-        context.add_opcodes(
-            ASTORE_name(context, '#object-%x' % id(self))
-        )
-
-        arguments[0].operation.transpile(context, arguments[0].arguments)
-        context.add_opcodes(
-            ASTORE_name(context, '#value-%x' % id(self)),
-        )
 
         context.add_opcodes(
-            ALOAD_name(context, '#object-%x' % id(self)),
             JavaOpcodes.LDC_W(self.name),
-            ALOAD_name(context, '#value-%x' % id(self)),
+        )
+        arguments[0].operation.transpile(context, arguments[0].arguments)
+
+        context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
         )
-        free_name(context, '#object-%x' % id(self))
-        free_name(context, '#value-%x' % id(self))
 
 
 # class DELETE_ATTR(Opcode):
@@ -2313,16 +2307,20 @@ class CALL_FUNCTION(Opcode):
                 # Get a Method representing the new function
                 TRY(),
                     JavaOpcodes.LDC_W(Classref(self.klass.descriptor)),
+
                     JavaOpcodes.ICONST_2(),
                     JavaOpcodes.ANEWARRAY('java/lang/Class'),
+
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_0(),
                     JavaOpcodes.LDC_W(Classref('java/util/List')),
                     JavaOpcodes.AASTORE(),
+
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_1(),
                     JavaOpcodes.LDC_W(Classref('java/util/Map')),
                     JavaOpcodes.AASTORE(),
+
                     JavaOpcodes.INVOKEVIRTUAL(
                         'java/lang/Class',
                         'getConstructor',
@@ -2330,22 +2328,12 @@ class CALL_FUNCTION(Opcode):
                     ),
                     ASTORE_name(context, '#CONSTRUCTOR'),
 
-                    # # Then wrap that Constructor into a Callable.
+                    # Then wrap that Constructor into a Callable.
                     JavaOpcodes.NEW('org/python/types/Constructor'),
                     JavaOpcodes.DUP(),
                     ALOAD_name(context, '#CONSTRUCTOR'),
 
-                    # Default args
-                    JavaOpcodes.NEW('java/util/ArrayList'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
-
-                    # Default kwargs
-                    JavaOpcodes.NEW('java/util/HashMap'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
-
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;Ljava/util/List;Ljava/util/Map;)V'),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
 
                 CATCH('java/lang/NoSuchMethodError'),
                     ASTORE_name(context, '#EXCEPTION'),
@@ -2547,13 +2535,9 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.NEW(self.method.parent.descriptor),
                 JavaOpcodes.DUP(),
 
-                JavaOpcodes.NEW('java/util/ArrayList'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+                ALOAD_name(context, '#default_args-%x' % id(self.method)),
+                ALOAD_name(context, '#default_kwargs-%x' % id(self.method)),
 
-                JavaOpcodes.NEW('java/util/HashMap'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
                 JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '(Ljava/util/List;Ljava/util/Map;)V'),
 
                 JavaOpcodes.LDC_W(self.method.name),
@@ -2672,7 +2656,7 @@ def add_callable(context, method, full_method_name):
         TRY(),
             JavaOpcodes.LDC_W(Classref(context.descriptor)),
             JavaOpcodes.LDC_W(method.name),
-            JavaOpcodes.ICONST_2(),
+            ICONST_val(4),
             JavaOpcodes.ANEWARRAY('java/lang/Class'),
 
             JavaOpcodes.DUP(),
@@ -2682,6 +2666,16 @@ def add_callable(context, method, full_method_name):
 
             JavaOpcodes.DUP(),
             JavaOpcodes.ICONST_1(),
+            JavaOpcodes.LDC_W(Classref('Ljava/util/Map;')),
+            JavaOpcodes.AASTORE(),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.ICONST_2(),
+            JavaOpcodes.LDC_W(Classref('Ljava/util/List;')),
+            JavaOpcodes.AASTORE(),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.ICONST_3(),
             JavaOpcodes.LDC_W(Classref('Ljava/util/Map;')),
             JavaOpcodes.AASTORE(),
 
@@ -2712,7 +2706,11 @@ def add_callable(context, method, full_method_name):
             JavaOpcodes.ACONST_NULL(),  # co_code
     )
 
-    add_tuple(context, method.code_obj.co_consts)
+    # add_tuple(context, method.code_obj.co_consts)
+    context.add_opcodes(
+            JavaOpcodes.ACONST_NULL(),  # co_consts
+    )
+
     add_str(context, method.code_obj.co_filename)
     add_int(context, method.code_obj.co_firstlineno)
     add_int(context, method.code_obj.co_flags)

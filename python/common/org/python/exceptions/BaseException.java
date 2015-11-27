@@ -121,11 +121,11 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.types.Str __format__(org.python.Object value) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__format__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__format__' has not been implemented");
     }
 
     public org.python.types.Str __format__(org.python.Object value, org.python.Object format_spec) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__format__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__format__' has not been implemented");
     }
 
     @org.python.Method(
@@ -144,7 +144,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__lt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__lt__' has not been implemented");
     }
 
 
@@ -164,7 +164,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__le__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__le__' has not been implemented");
     }
 
     @org.python.Method(
@@ -183,7 +183,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__eq__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__eq__' has not been implemented");
     }
 
     @org.python.Method(
@@ -202,7 +202,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__ne__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__ne__' has not been implemented");
     }
 
     @org.python.Method(
@@ -221,7 +221,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__gt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__gt__' has not been implemented");
     }
 
     @org.python.Method(
@@ -240,7 +240,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__ge__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__ge__' has not been implemented");
     }
 
     @org.python.Method(
@@ -294,7 +294,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.Object __getattribute__(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__getattribute__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__getattribute__' has not been implemented");
     }
 
     public org.python.Object __get__(org.python.Object instance, org.python.types.Type klass) {
@@ -321,7 +321,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public void __setattr__(java.lang.String name, org.python.Object value) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__setattr__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__setattr__' has not been implemented");
     }
 
     @org.python.Method(
@@ -344,11 +344,11 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public void __delattr__(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__delattr__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__delattr__' has not been implemented");
     }
 
     public org.python.types.List __dir__() {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__dir__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__dir__' has not been implemented");
     }
 
     /**
@@ -436,7 +436,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulus) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.pythonTypeName(this) + "', '" + org.Python.pythonTypeName(other) + "', '" + org.Python.pythonTypeName(modulus) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.typeName(this) + "', '" + org.Python.typeName(other) + "', '" + org.Python.typeName(modulus) + "'");
     }
 
     public org.python.Object __lshift__(org.python.Object other) {

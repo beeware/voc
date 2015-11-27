@@ -36,18 +36,17 @@ class ClassBlock(Block):
         return self.klass.module
 
     def store_name(self, name, use_locals):
-        if name != '__init__':
-            self.add_opcodes(
-                ASTORE_name(self, '#value'),
-                JavaOpcodes.LDC_W(self.klass.descriptor),
-                JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+        self.add_opcodes(
+            ASTORE_name(self, '#value'),
+            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
-                JavaOpcodes.LDC_W(name),
-                ALOAD_name(self, '#value'),
+            JavaOpcodes.LDC_W(name),
+            ALOAD_name(self, '#value'),
 
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
-            )
-            free_name(self, '#value')
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+        )
+        free_name(self, '#value')
 
     def load_name(self, name, use_locals):
         self.add_opcodes(
@@ -69,11 +68,8 @@ class ClassBlock(Block):
         class_name, method_name = full_method_name.split('.')
         if class_name != self.klass.name:
             raise Exception("Method %s being added to %s!" % (full_method_name, self.klass.name))
-        if method_name == '__init__':
-            method = InitMethod(self.klass, extract_parameters(code), code=code)
-        else:
-            method = InstanceMethod(self.klass, method_name, extract_parameters(code), code=code)
 
+        method = InstanceMethod(self.klass, method_name, extract_parameters(code), code=code)
         method.extract(code)
         self.klass.methods.append(method)
 
@@ -96,6 +92,9 @@ class Class(Block):
         else:
             self.namespace = namespace
         self.anonymous_inner_class_count = 0
+
+        # Add a constructor
+        self.add_method(InitMethod(self))
 
     @property
     def descriptor(self):
@@ -146,31 +145,8 @@ class Class(Block):
             static_init.attributes.append(body)
             classfile.methods.append(static_init)
 
-        constructor_found = False
         for method in self.methods:
             classfile.methods.append(method.transpile())
-            if method.name == '__init__':
-                constructor_found = True
-
-        # If there's no constructor explicitly defined, add a default one.
-        if not constructor_found:
-            classfile.methods.append(
-                JavaMethod(
-                    '<init>',
-                    '(Ljava/util/List;Ljava/util/Map;)V',
-                    attributes=[
-                        JavaCode(
-                            max_stack=1,
-                            max_locals=3,
-                            code=[
-                                JavaOpcodes.ALOAD_0(),
-                                JavaOpcodes.INVOKESPECIAL('org/python/types/Object', '<init>', '()V'),
-                                JavaOpcodes.RETURN(),
-                            ],
-                        ),
-                    ]
-                )
-            )
 
         return self.namespace, self.name, classfile
 
@@ -196,7 +172,7 @@ class InnerClass(Class):
 
 class AnonymousInnerClass(Class):
     def __init__(self, parent, closure_var_names, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
-        # self.closure_var_names = closure_var_names
+        self.closure_var_names = closure_var_names
         if isinstance(parent, Class):
             module = parent.module
         else:

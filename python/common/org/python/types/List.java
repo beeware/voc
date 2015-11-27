@@ -132,7 +132,7 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.pythonTypeName(index));
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.typeName(index));
         }
     }
 
@@ -153,7 +153,7 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.pythonTypeName(index));
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.typeName(index));
         }
     }
 
@@ -174,7 +174,7 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.pythonTypeName(index));
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.typeName(index));
         }
     }
 
@@ -211,7 +211,7 @@ public class List extends org.python.types.Object {
             }
             return result;
         }
-        throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __rmul__(org.python.Object other) {

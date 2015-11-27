@@ -26,6 +26,8 @@ What it does:
 
   * Some mathematical operations
 
+  * Some operations and methods on primitive types
+
   * Exception handling
 
   * for/while/if constructs
@@ -36,13 +38,15 @@ What it does:
 
   * List comprehensions
 
+  * Keyword arguments
+
+  * `import` statements
+
 It *doesn't* currently support:
 
-* Keyword arguments
+* `from X import Y` statements
 
 * Generators
-
-* Import statements
 
 * ``exec()``/``eval()``
 

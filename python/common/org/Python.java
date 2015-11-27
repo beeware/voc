@@ -22,7 +22,7 @@ public class Python {
         }
     }
 
-    public static java.lang.String pythonTypeName(java.lang.Class cls) {
+    public static java.lang.String typeName(java.lang.Class cls) {
         try {
             java.lang.String class_name = cls.getName();
             if (class_name == "org.python.types.NoneType") {
@@ -38,9 +38,78 @@ public class Python {
         }
     }
 
-    public static java.lang.String pythonTypeName(org.python.Object obj) {
-        return pythonTypeName(obj.getClass());
+    public static java.lang.String typeName(org.python.Object obj) {
+        return typeName(obj.getClass());
     }
+
+    public static void debug(java.lang.Object msg) {
+        System.out.println("DEBUG: " + msg);
+    }
+
+    public static void adjustArguments(
+                                java.lang.String func_name,
+                                java.util.List<org.python.Object> args,
+                                java.util.Map<java.lang.String, org.python.Object> kwargs,
+                                java.lang.String [] arg_names,
+                                java.util.List<org.python.Object> default_args,
+                                java.util.Map<java.lang.String, org.python.Object> default_kwargs,
+                                int pos_count,
+                                int flags) {
+
+        // System.out.println("ADJUST " + func_name);
+        // System.out.println("              args: " + args);
+        // System.out.println("            kwargs: " + kwargs);
+        // System.out.print("         arg_names: [");
+        // for (java.lang.String arg: arg_names) {
+        //     System.out.print(arg + ", ");
+        // }
+        // System.out.println("]");
+        // System.out.println("      default_args: " + default_args);
+        // System.out.println("    default_kwargs: " + default_kwargs);
+        // System.out.println("         pos_count: " + pos_count);
+
+        // Iterate over all the positional arguments provided; check that
+        // we have enough of them. If we don't, populate them from kwargs,
+        // or if there's no kwargs, from defaults.
+        for (int a = 0; a < pos_count; a++) {
+            // System.out.println("arg " + a + " = " + arg_names[a]);
+            if (a >= args.size()) {
+                // This argument wasn't provided as a positional; check to
+                // see if it was provided as a keyword.
+                org.python.Object value = kwargs.remove(arg_names[a]);
+
+                // If it wasn't provided as a kwarg, use the
+                // defaults list.
+                if (value == null) {
+                    value = default_args.get(a - (pos_count - default_args.size()));
+                }
+
+                // Add the value to the full args list.
+                args.add(value);
+            } else {
+                // We've been given a position argument at this index; check that
+                // it isn't also provided as a kwarg.
+                if (kwargs.containsKey(arg_names[a])) {
+                    throw new org.python.exceptions.TypeError(func_name + "() for multiple values for argument '" + arg_names[a] + "'");
+                }
+            }
+        }
+
+        // If this function provides VARARGS, extract them and add them as
+        // a Python list as the last positional argument.
+        if ((flags & org.python.types.Function.CO_VARARGS) != 0) {
+            java.util.List<org.python.Object> var_args;
+            if (args.size() > pos_count) {
+                var_args = args.subList(pos_count, args.size());
+                args = new java.util.ArrayList<org.python.Object>(args.subList(0, pos_count));
+            } else {
+                // No positional arguments - add an empty list.
+                var_args = new java.util.ArrayList<org.python.Object>();
+            }
+            args.add(new org.python.types.List(var_args));
+        }
+    }
+
 
     @org.python.Method(
         __doc__ = "__import__(name, globals=None, locals=None, fromlist=(), level=0) -> module" +

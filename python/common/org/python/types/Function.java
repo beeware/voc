@@ -1,13 +1,13 @@
 package org.python.types;
 
 public class Function extends org.python.types.Object implements org.python.Callable {
-    static final int CO_OPTIMIZED = 0x1;
-    static final int CO_NEWLOCALS = 0x2;
-    static final int CO_VARARGS = 0x4;
-    static final int CO_VARKEYWORDS = 0x8;
-    static final int CO_NESTED = 0x10;
-    static final int CO_GENERATOR = 0x20;
-    static final int CO_NOFREE = 0x40;
+    public static final int CO_OPTIMIZED = 0x1;
+    public static final int CO_NEWLOCALS = 0x2;
+    public static final int CO_VARARGS = 0x4;
+    public static final int CO_VARKEYWORDS = 0x8;
+    public static final int CO_NESTED = 0x10;
+    public static final int CO_GENERATOR = 0x20;
+    public static final int CO_NOFREE = 0x40;
 
     org.python.types.Str name;
     org.python.types.Code code;
@@ -53,10 +53,25 @@ public class Function extends org.python.types.Object implements org.python.Call
         super();
         this.name = new org.python.types.Str(method.getName());
         this.method = method;
+        // System.out.println("CREATE FUNCTION 1" + this.name);
 
-        this.default_args = new java.util.ArrayList<org.python.Object>();
-        this.default_kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
-
+        // this.code = new org.python.types.Code(
+        //     new org.python.types.Int(),  // co_argcount
+        //     new org.python.types.Tuple(),  // co_cellvars
+        //     new org.python.types.Bytes(),  // co_code
+        //     new org.python.types.Tuple(),  // co_consts
+        //     new org.python.types.Str(),  // co_filename
+        //     new org.python.types.Int(),  // co_firstlineno
+        //     new org.python.types.Int(),  // co_flags
+        //     new org.python.types.Tuple(),  // co_freevars
+        //     new org.python.types.Int(),  // co_kwonlyargcount
+        //     new org.python.types.Bytes(),  // co_lnotab
+        //     new org.python.types.Str(),  // co_name
+        //     new org.python.types.Tuple(),  // co_names
+        //     new org.python.types.Int(),  // co_nlocals
+        //     new org.python.types.Int(),  // co_stacksize
+        //     new org.python.types.Tuple(),  // co_varnames
+        // );
         populateAttrs();
     }
 
@@ -93,24 +108,10 @@ public class Function extends org.python.types.Object implements org.python.Call
     public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // System.out.println("Function:" + this.method);
-            // System.out.println("ARGS:");
-            // for (org.python.Object arg: args) {
-            //     System.out.println("  " + arg);
-            // }
-
-            // System.out.println("KWARGS:");
-            // for (java.lang.String argname: kwargs.keySet()) {
-            //     System.out.println("  " + argname + " = " + kwargs.get(argname));
-            // }
-
-            // System.out.println("DEFAULTS:");
-            // for (org.python.Object arg: this.default_args) {
-            //     System.out.println("  " + arg);
-            // }
-
-            // for (java.lang.String argname: this.default_kwargs.keySet()) {
-            //     System.out.println("  " + argname + " = " + this.default_kwargs.get(argname));
-            // }
+            // System.out.println("           args:" + args);
+            // System.out.println("         kwargs:" + kwargs);
+            // System.out.println("   default args: " + this.default_args);
+            // System.out.println(" default kwargs: " + this.default_kwargs);
 
             // if this.attrs.__code__.co_flags & CO_GENERATOR:
             //     gen = Generator(frame, self._vm)
@@ -118,7 +119,11 @@ public class Function extends org.python.types.Object implements org.python.Call
             //     retval = gen
             // else:
 
-           return (org.python.Object) this.method.invoke(null, args, kwargs);
+            if (this.default_args != null) {
+                return (org.python.Object) this.method.invoke(null, args, kwargs, this.default_args, this.default_kwargs);
+            } else {
+                return (org.python.Object) this.method.invoke(null, args, kwargs);
+            }
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java function " + this.method);
         } catch (java.lang.reflect.InvocationTargetException e) {

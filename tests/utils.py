@@ -131,9 +131,9 @@ JAVA_EXCEPTION = re.compile(
     '((Exception in thread "\w+" org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\n]+))|' +
     '(Exception in thread "\w+" [^\n]+\n' +
     'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\n]+)))\n' +
-    '(?P<trace>(\s+at .+\((((.*):(\d+))|(Native Method))\)\n)+)'
+    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\n)+)'
 )
-JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*):(?P<line>\d+))|(Native Method))\)')
+JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)')
 JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 
 # PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
@@ -152,9 +152,9 @@ def cleanse_java(input):
     out = '%s%s%s' % (
         out,
         '\n'.join([
-            "    %s:%s" % (s[3], s[4])
+            "    %s:%s" % (s[3], s[5])
             for s in stack[::-1]
-            if s[0].startswith('python.')
+            if s[0].startswith('python.') and not s[0].endswith('.<init>')
         ]),
         '\n' if stack else ''
     )

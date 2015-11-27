@@ -3,18 +3,10 @@ package org.python.types;
 
 public class Constructor extends org.python.types.Object implements org.python.Callable {
     java.lang.reflect.Constructor constructor;
-    java.util.List<org.python.Object> default_args;
-    java.util.Map<java.lang.String, org.python.Object> default_kwargs;
 
-    public Constructor(
-                java.lang.reflect.Constructor constructor,
-                java.util.List<org.python.Object> default_args,
-                java.util.Map<java.lang.String, org.python.Object> default_kwargs
-            ) {
+    public Constructor(java.lang.reflect.Constructor constructor) {
         super();
         this.constructor = constructor;
-        this.default_args = default_args;
-        this.default_kwargs = default_kwargs;
     }
 
     public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
@@ -28,15 +20,6 @@ public class Constructor extends org.python.types.Object implements org.python.C
             // System.out.println("KWARGS:");
             // for (java.lang.String argname: kwargs.keySet()) {
             //     System.out.println("  " + argname + " = " + kwargs.get(argname));
-            // }
-
-            // System.out.println("DEFAULTS:");
-            // for (org.python.Object arg: this.default_args) {
-            //     System.out.println("  " + arg);
-            // }
-
-            // for (java.lang.String argname: this.default_kwargs.keySet()) {
-            //     System.out.println("  " + argname + " = " + this.default_kwargs.get(argname));
             // }
 
             return (org.python.Object) this.constructor.newInstance(args, kwargs);
