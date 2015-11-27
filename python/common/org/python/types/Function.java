@@ -53,7 +53,9 @@ public class Function extends org.python.types.Object implements org.python.Call
         super();
         this.name = new org.python.types.Str(method.getName());
         this.method = method;
-        // System.out.println("CREATE FUNCTION 1" + this.name);
+
+        // System.out.println("CREATE FUNCTION 1 " + this.name);
+        // java.lang.Thread.currentThread().dumpStack();
 
         // this.code = new org.python.types.Code(
         //     new org.python.types.Int(),  // co_argcount
@@ -87,6 +89,10 @@ public class Function extends org.python.types.Object implements org.python.Call
             java.util.Map<java.lang.String, org.python.Object> default_kwargs,
             java.util.List<org.python.Object> closure) {
         super();
+
+        // System.out.println("Create function 2 " + name);
+        // java.lang.Thread.currentThread().dumpStack();
+
         this.name = name;
         this.code = code;
         this.method = method;
@@ -99,7 +105,7 @@ public class Function extends org.python.types.Object implements org.python.Call
     }
 
     public org.python.Object __get__(org.python.Object instance, org.python.types.Type klass) {
-        if (instance != null) {
+        if (instance != null && !(instance instanceof org.python.types.Module)) {
             return new Method(instance, klass, this);
         }
         return this;
@@ -128,6 +134,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             throw new org.python.exceptions.RuntimeError("Illegal access to Java function " + this.method);
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
+                // e.getTargetException().printStackTrace();
                 // If the Java method raised an Python exception, re-raise that
                 // exception as-is. If it wasn"t a Python exception, wrap it
                 // as one and continue.

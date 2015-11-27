@@ -102,10 +102,8 @@ class Method(Block):
 
     def add_argument_variables(self, parameters):
         for param in parameters:
-            print ("ADD PARAM", param, )
             self.parameters.append(param)
             if len(self.parameters) >= self.self_offset:
-                print ("   CREATE LOCAL ", len(self.local_vars))
                 self.local_vars[param['name']] = len(self.local_vars)
 
     @property
@@ -144,9 +142,10 @@ class Method(Block):
     def add_method(self, method_name, code):
         # If a method is added to a method, it is added as an anonymous
         # inner class.
-        from .klass import AnonymousInnerClass
-        callable = AnonymousInnerClass(
+        from .klass import ClosureClass
+        callable = ClosureClass(
             parent=self.parent,
+            name='%s$%s' % (self.parent.name, method_name.replace('.<locals>.', '$')),
             closure_var_names=code.co_names,
             super_name='org/python/types/Closure',
             interfaces=['org/python/Callable'],
@@ -202,10 +201,8 @@ class Method(Block):
                 '(Ljava/lang/String;Ljava/util/List;Ljava/util/Map;[Ljava/lang/String;Ljava/util/List;Ljava/util/Map;II)V'
             ),
         )
-        print(self.name, self.parameters, self.local_vars)
         for i in range(self.self_offset, len(self.parameters)):
             param = self.parameters[i]
-            print (i, param)
             if param['kind'] == POSITIONAL_OR_KEYWORD:
                 self.add_opcodes(
                     ALOAD_name(self, '##__args__##'),
@@ -516,36 +513,17 @@ class ClosureMethod(Method):
 def extract_parameters(code):
     pos_count = code.co_argcount
     arg_names = code.co_varnames
-    positional = arg_names[0: pos_count]
     keyword_only_count = code.co_kwonlyargcount
-    keyword_only = arg_names[pos_count:pos_count + keyword_only_count]
     annotations = {}  # func.__annotations__
-    defs = None  # func.__defaults__
-    kwdefaults = None  # func.__kwdefaults__
-
-    if defs:
-        pos_default_count = len(defs)
-    else:
-        pos_default_count = 0
 
     parameters = []
 
-    # Non-keyword-only parameters w/o defaults.
-    non_default_count = pos_count - pos_default_count
-    for name in positional[0: non_default_count]:
-        parameters.append({
-            'name': name,
-            'annotation': annotations.get(name),
-            'kind': POSITIONAL_OR_KEYWORD
-        })
-
-    # ... w/ defaults.
-    for offset, name in enumerate(positional[non_default_count: len(positional)]):
+    # Non-keyword-only parameters.
+    for offset, name in enumerate(arg_names[0:pos_count]):
         parameters.append({
             'name': name,
             'annotation': annotations.get(name),
             'kind': POSITIONAL_OR_KEYWORD,
-            'default': defs[offset]
         })
 
     # *args
@@ -559,16 +537,11 @@ def extract_parameters(code):
         })
 
     # Keyword-only parameters.
-    for name in keyword_only:
-        default = None
-        if kwdefaults is not None:
-            default = kwdefaults.get(name)
-
+    for name in arg_names[pos_count:pos_count + keyword_only_count]:
         parameters.append({
             'name': name,
             'annotation': annotations.get(name),
             'kind': KEYWORD_ONLY,
-            'default': default
         })
 
     # **kwargs

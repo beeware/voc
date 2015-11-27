@@ -4,6 +4,9 @@ package python;
 public class time extends org.python.types.Module {
 
     static {
+        org.python.types.Type cls = org.python.types.Type.pythonType(python.time.class);
+        org.Python.initializeModule(python.time.class, cls.attrs);
+
         vm_start_time = python.platform.impl.clock();
     }
 

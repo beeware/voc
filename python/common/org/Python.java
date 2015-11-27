@@ -7,17 +7,25 @@ public class Python {
     static {
         // Load all the builtins into the dictionary as callables
         builtins = new java.util.HashMap<java.lang.String, org.python.Object>();
+        org.Python.initializeModule(org.Python.class, builtins);
+    }
 
-        // Iterate over all methods, adding the static ones to builtins
-        for (java.lang.reflect.Method method: Python.class.getMethods()) {
-            if (java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
-                if (method.getName() == "int_cast") {
-                    builtins.put("int", new org.python.types.Function(method));
-                } else if (method.getName() == "float_cast") {
-                    builtins.put("float", new org.python.types.Function(method));
-                } else if (!method.getName().startsWith("python")) {
-                    builtins.put(method.getName(), new org.python.types.Function(method));
+    public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
+        // Iterate over every method in the class, and if the
+        // method is annotated for inclusion in the Python class,
+        // add a function wrapper to the type definition.
+        for (java.lang.reflect.Method method: cls.getMethods()) {
+            org.python.Method annotation = method.getAnnotation(org.python.Method.class);
+            if (annotation != null) {
+                java.lang.String method_name;
+
+                // Check for any explicitly set names
+                if (annotation.name().equals("*")) {
+                    method_name = method.getName();
+                } else {
+                    method_name = annotation.name();
                 }
+                attrs.put(method_name, new org.python.types.Function(method));
             }
         }
     }
@@ -727,6 +735,7 @@ public class Python {
     }
 
     @org.python.Method(
+        name = "int",
         __doc__ = "int(x=0) -> integer" +
             "int(x, base=10) -> integer\n" +
             "\n" +

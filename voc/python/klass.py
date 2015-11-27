@@ -2,7 +2,6 @@ import os
 
 from ..java import (
     Class as JavaClass,
-    Code as JavaCode,
     Field as JavaField,
     Method as JavaMethod,
     opcodes as JavaOpcodes,
@@ -10,10 +9,9 @@ from ..java import (
     RuntimeVisibleAnnotations,
     Annotation,
     ConstantElementValue,
-    # LineNumberTable
 )
 
-from .blocks import Block
+from .blocks import Block, IgnoreBlock
 from .methods import InitMethod, InstanceMethod, extract_parameters
 from .opcodes import ASTORE_name, ALOAD_name, free_name
 
@@ -131,7 +129,13 @@ class Class(Block):
             ])
         )
 
-        body = ClassBlock(self, self.commands).transpile()
+        try:
+            # If we have block content, add a static block to the class
+            static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
+            static_init.attributes.append(ClassBlock(self, self.commands).transpile())
+            classfile.methods.append(static_init)
+        except IgnoreBlock:
+            pass
 
         # Add any manually defined fields
         classfile.fields.extend([
@@ -139,12 +143,7 @@ class Class(Block):
             for name, descriptor in self.fields.items()
         ])
 
-        if body:
-            # If we have block content, add a static block to the class
-            static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
-            static_init.attributes.append(body)
-            classfile.methods.append(static_init)
-
+        # Add any methods
         for method in self.methods:
             classfile.methods.append(method.transpile())
 
@@ -170,18 +169,19 @@ class InnerClass(Class):
         )
 
 
-class AnonymousInnerClass(Class):
-    def __init__(self, parent, closure_var_names, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+class ClosureClass(Class):
+    def __init__(self, parent, closure_var_names, name=None, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
         self.closure_var_names = closure_var_names
         if isinstance(parent, Class):
             module = parent.module
         else:
             module = parent
-        parent.anonymous_inner_class_count += 1
-        counter = parent.anonymous_inner_class_count
+        if name is None:
+            parent.anonymous_inner_class_count += 1
+            name = "%s$%d" % (parent.name, parent.anonymous_inner_class_count)
         super().__init__(
             module=module,
-            name="%s$%d" % (parent.name, counter),
+            name=name,
             namespace=parent.namespace,
             super_name=super_name,
             interfaces=interfaces,

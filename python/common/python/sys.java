@@ -2,6 +2,11 @@ package python;
 
 
 public class sys extends org.python.types.Module {
+    static {
+        org.python.types.Type cls = org.python.types.Type.pythonType(python.sys.class);
+        org.Python.initializeModule(python.sys.class, cls.attrs);
+    }
+
     @org.python.Method(
         __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )

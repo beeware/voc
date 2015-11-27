@@ -10,6 +10,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
         this.im_self = instance;
         this.im_class = klass;
         this.im_func = function;
+        // System.out.println("Create method " + function.name);
     }
 
     public org.python.types.Str __repr__() {
@@ -45,25 +46,8 @@ public class Method extends org.python.types.Object implements org.python.Callab
             // System.out.println("   default args: " + this.im_func.default_args);
             // System.out.println(" default kwargs: " + this.im_func.default_kwargs);
 
-            java.util.List<org.python.Object> default_args;
-            java.util.Map<java.lang.String, org.python.Object> default_kwargs;
-
             if (this.im_func.default_args != null) {
-                default_args = this.im_func.default_args;
-                default_kwargs = this.im_func.default_kwargs;
-            } else {
-                try {
-                    org.python.types.Closure closure = (org.python.types.Closure) this.im_self;
-                    default_args = closure.default_args;
-                    default_kwargs = closure.default_kwargs;
-                } catch (ClassCastException e) {
-                    default_args = null;
-                    default_kwargs = null;
-                }
-            }
-
-            if (default_args != null) {
-                return (org.python.Object) this.im_func.method.invoke(this.im_self, args, kwargs, default_args, default_kwargs);
+                return (org.python.Object) this.im_func.method.invoke(this.im_self, args, kwargs, this.im_func.default_args, this.im_func.default_kwargs);
             } else {
                 return (org.python.Object) this.im_func.method.invoke(this.im_self, args, kwargs);
             }

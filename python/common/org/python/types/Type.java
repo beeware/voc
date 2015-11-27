@@ -57,20 +57,6 @@ public class Type extends org.python.types.Object {
             // this.attrs.put("__module__", );
             // this.attrs.put("__qualname__", );
 
-            // Iterate over every method in the class, and if the
-            // method is annotated for inclusion in the Python class,
-            // add a function wrapper to the type definition.
-            for (java.lang.reflect.Method method: klass.getMethods()) {
-                // System.out.println("Found method " + method + " on type " + klass);
-                java.lang.annotation.Annotation annotation = method.getAnnotation(org.python.Method.class);
-                if (annotation != null) {
-                    this.attrs.put(
-                        method.getName(),
-                        new org.python.types.Function(method)
-                    );
-                }
-            }
-
             // Iterate over every field in the class. If the
             // field is annotated for inclusion in the Python class,
             // add a function wrapper to the type definition.
