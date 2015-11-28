@@ -15,6 +15,10 @@ public class Object implements org.python.Object {
         throw new org.python.exceptions.RuntimeError("'" + org.Python.typeName(this) + "' object cannot be updated.");
     }
 
+    public java.lang.Object toValue() {
+        return this;
+    }
+
     /**
      * Construct a new object instance.
      *

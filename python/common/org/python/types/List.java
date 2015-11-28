@@ -13,6 +13,10 @@ public class List extends org.python.types.Object {
         this.value = ((org.python.types.List) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public List() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();

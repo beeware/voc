@@ -13,6 +13,10 @@ public class Tuple extends org.python.types.Object {
         this.value = ((org.python.types.Tuple) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Tuple() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();

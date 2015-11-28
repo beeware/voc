@@ -13,6 +13,10 @@ public class Float extends org.python.types.Object {
         this.value = ((org.python.types.Float) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Float(float value) {
         super();
         this.value = (double) value;

@@ -2,6 +2,8 @@ package org.python;
 
 public interface Object {
 
+    public java.lang.Object toValue();
+
     /**
      * Python interface compatibility
      * Section 3.3.1 - Basic customization

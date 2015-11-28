@@ -13,6 +13,10 @@ public class Str extends org.python.types.Object {
         this.value = ((org.python.types.Str) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Str(java.lang.String str) {
         this.value = str;
     }
@@ -232,21 +236,19 @@ public class Str extends org.python.types.Object {
     }
 
     public org.python.Object __mod__(org.python.Object other) {
-        java.util.List<java.lang.String> args = new java.util.ArrayList<java.lang.String>();
+        java.util.List<java.lang.Object> args = new java.util.ArrayList<java.lang.Object>();
         if (other instanceof org.python.types.List) {
             org.python.types.List oth = (org.python.types.List) other;
             for (org.python.Object obj: oth.value) {
-                args.add(obj.toString());
+                args.add(obj.toValue());
             }
         } else if (other instanceof org.python.types.Tuple) {
             org.python.types.Tuple oth = (org.python.types.Tuple) other;
             for (org.python.Object obj: oth.value) {
-                args.add(obj.toString());
+                args.add(obj.toValue());
             }
-        } else if (other instanceof org.python.types.Str) {
-            args.add(((org.python.types.Str) other).value);
         } else {
-            args.add(other.toString());
+            args.add(other.toValue());
         }
 
         return new org.python.types.Str(String.format(this.value, args.toArray()));

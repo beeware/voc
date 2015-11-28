@@ -13,6 +13,10 @@ public class Set extends org.python.types.Object {
         this.value = ((org.python.types.Set) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Set() {
         super();
         this.value = new java.util.HashSet<org.python.Object>();

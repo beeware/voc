@@ -143,7 +143,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_int',
 
         'test_multiply_list',
-        'test_modulo_list',
         'test_subscr_list',
 
         'test_add_set',
