@@ -13,6 +13,10 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         super(msg);
     }
 
+    public java.lang.Object toValue() {
+        return this;
+    }
+
     /**
      * Proxy Java object methods onto their Python counterparts.
      */
