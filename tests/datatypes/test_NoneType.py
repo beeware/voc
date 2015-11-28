@@ -1,8 +1,24 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
-class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = ['""', '"This is a string"']
+class NoneAttributeTests(TranspileTestCase):
+    def test_set_attribute_of_none(self):
+        self.assertCodeExecution("""
+            x = None
+            x.thing = 42
+            print('Done.')
+            """)
+
+    def test_get_attribute_of_none(self):
+        self.assertCodeExecution("""
+            x = None
+            y = x.thing
+            print('Done.')
+            """)
+
+
+class UnaryNoneOperationTests(UnaryOperationTestCase, TranspileTestCase):
+    values = [None]
 
     not_implemented = [
         'test_unary_positive',
@@ -12,14 +28,19 @@ class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     ]
 
 
-class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['""', '"This is a string"']
+class BinaryNoneOperationTests(BinaryOperationTestCase, TranspileTestCase):
+    values = [None]
 
     not_implemented = [
-        'test_multiply_bool',
-        'test_modulo_bool',
         'test_subscr_bool',
+        'test_lt_bool',
+        'test_le_bool',
+        'test_eq_bool',
+        'test_ne_bool',
+        'test_gt_bool',
+        'test_ge_bool',
 
+        'test_add_bytearray',
         'test_subtract_bytearray',
         'test_multiply_bytearray',
         'test_floor_divide_bytearray',
@@ -59,6 +80,7 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_bytes',
         'test_ge_bytes',
 
+        'test_add_class',
         'test_subtract_class',
         'test_multiply_class',
         'test_floor_divide_class',
@@ -78,6 +100,7 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_class',
         'test_ge_class',
 
+        'test_add_complex',
         'test_subtract_complex',
         'test_multiply_complex',
         'test_floor_divide_complex',
@@ -117,10 +140,15 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_dict',
         'test_ge_dict',
 
-        'test_multiply_float',
-        'test_modulo_float',
         'test_subscr_float',
+        'test_lt_float',
+        'test_le_float',
+        'test_eq_float',
+        'test_ne_float',
+        'test_gt_float',
+        'test_ge_float',
 
+        'test_add_frozenset',
         'test_subtract_frozenset',
         'test_multiply_frozenset',
         'test_floor_divide_frozenset',
@@ -140,11 +168,22 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_frozenset',
         'test_ge_frozenset',
 
-        'test_modulo_int',
+        'test_subscr_int',
+        'test_lt_int',
+        'test_le_int',
+        'test_eq_int',
+        'test_ne_int',
+        'test_gt_int',
+        'test_ge_int',
 
         'test_multiply_list',
-        'test_modulo_list',
         'test_subscr_list',
+        'test_lt_list',
+        'test_le_list',
+        'test_eq_list',
+        'test_ne_list',
+        'test_gt_list',
+        'test_ge_list',
 
         'test_add_set',
         'test_subtract_set',
@@ -167,20 +206,29 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_set',
 
         'test_multiply_str',
-        'test_modulo_str',
         'test_subscr_str',
+        'test_lt_str',
+        'test_le_str',
+        'test_eq_str',
+        'test_ne_str',
+        'test_gt_str',
+        'test_ge_str',
 
         'test_multiply_tuple',
-        'test_modulo_tuple',
         'test_subscr_tuple',
+        'test_lt_tuple',
+        'test_le_tuple',
+        'test_eq_tuple',
+        'test_ne_tuple',
+        'test_gt_tuple',
+        'test_ge_tuple',
     ]
 
 
-class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = ['""', '"This is a string"']
+class InplaceNoneOperationTests(InplaceOperationTestCase, TranspileTestCase):
+    values = [None]
 
     not_implemented = [
-        'test_add_bool',
         'test_subtract_bool',
         'test_multiply_bool',
         'test_floor_divide_bool',
@@ -206,7 +254,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_bytearray',
         'test_or_bytearray',
 
-        'test_add_bytes',
         'test_subtract_bytes',
         'test_multiply_bytes',
         'test_floor_divide_bytes',
@@ -245,7 +292,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_complex',
         'test_or_complex',
 
-        'test_add_dict',
         'test_subtract_dict',
         'test_multiply_dict',
         'test_floor_divide_dict',
@@ -258,7 +304,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_dict',
         'test_or_dict',
 
-        'test_add_float',
         'test_subtract_float',
         'test_multiply_float',
         'test_floor_divide_float',
@@ -284,7 +329,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_frozenset',
         'test_or_frozenset',
 
-        'test_add_int',
         'test_subtract_int',
         'test_multiply_int',
         'test_floor_divide_int',
@@ -297,7 +341,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_int',
         'test_or_int',
 
-        'test_add_list',
         'test_subtract_list',
         'test_multiply_list',
         'test_floor_divide_list',
@@ -310,7 +353,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_list',
         'test_or_list',
 
-        'test_add_set',
         'test_subtract_set',
         'test_multiply_set',
         'test_floor_divide_set',
@@ -323,7 +365,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_set',
         'test_or_set',
 
-        'test_add_str',
         'test_subtract_str',
         'test_multiply_str',
         'test_floor_divide_str',
@@ -336,7 +377,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_xor_str',
         'test_or_str',
 
-        'test_add_tuple',
         'test_subtract_tuple',
         'test_multiply_tuple',
         'test_floor_divide_tuple',

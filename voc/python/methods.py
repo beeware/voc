@@ -428,6 +428,36 @@ class MainMethod(Method):
 
         self.add_opcodes(java_op)
 
+    def store_name(self, name, use_locals):
+        self.add_opcodes(
+            ASTORE_name(self, '#value'),
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+
+            JavaOpcodes.LDC_W(name),
+            ALOAD_name(self, '#value'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+        )
+        free_name(self, '#value')
+
+    def load_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            # JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
+    def delete_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
     def transpile_setup(self):
         self.add_opcodes(
             # Register this module as being __main__

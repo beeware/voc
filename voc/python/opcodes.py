@@ -1120,10 +1120,11 @@ class STORE_SUBSCR(Opcode):
         context.next_resolve_list.append((self, 'start_op'))
         # At the time STORE_SUBSCR is called, the top two elements
         # on the stack will be the value to store, and the subject
-        # of the store operation.
+        # of the store operation. Pop them off and store in reverse
+        # order.
         context.add_opcodes(
-            ASTORE_name(context, '#value-%x' % id(self)),
             ASTORE_name(context, '#subject-%x' % id(self)),
+            ASTORE_name(context, '#value-%x' % id(self)),
         )
 
         # Compute the arguments of the store, giving the store index:
@@ -1466,16 +1467,19 @@ class STORE_ATTR(Opcode):
     def convert(self, context, arguments):
         context.next_resolve_list.append((self, 'start_op'))
 
+        arguments[0].operation.transpile(context, arguments[0].arguments)
+        context.add_opcodes(
+            ASTORE_name(context, '#value-%x' % id(self)),
+        )
+
         arguments[1].operation.transpile(context, arguments[1].arguments)
 
         context.add_opcodes(
             JavaOpcodes.LDC_W(self.name),
-        )
-        arguments[0].operation.transpile(context, arguments[0].arguments)
-
-        context.add_opcodes(
+            ALOAD_name(context, '#value-%x' % id(self)),
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
         )
+        free_name(context, '#value-%x' % id(self))
 
 
 # class DELETE_ATTR(Opcode):

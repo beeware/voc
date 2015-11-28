@@ -302,7 +302,19 @@ public class Python {
     public static org.python.types.Str chr(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'callable' not implemented");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("chr() takes exactly one argument (" + args.size() + " given)");
+        }
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("chr() takes no keyword arguments");
+        }
+
+        try {
+            long value = ((org.python.types.Int) args.get(0)).value;
+            return new org.python.types.Str(Character.toChars((int) value).toString());
+        } catch (ClassCastException e) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + org.Python.typeName(args.get(0).getClass()) + " found");
+        }
     }
 
     @org.python.Method(
@@ -1108,13 +1120,13 @@ public class Python {
 
         try {
             int length = ((org.python.types.Str) args.get(0)).value.length();
-            if (length != 1) {
+            if (length == 1) {
                 return new org.python.types.Int((int) (str(args, kwargs).value).charAt(0));
             } else {
                 throw new org.python.exceptions.TypeError("ord() expected string of length 1, but string of length " + length + " found");
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("ord() expected string of length 1, but " + args.get(0).getClass().getName() + " found");
+            throw new org.python.exceptions.TypeError("ord() expected string of length 1, but " + org.Python.typeName(args.get(0).getClass()) + " found");
         }
     }
 
