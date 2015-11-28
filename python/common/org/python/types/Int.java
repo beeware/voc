@@ -13,6 +13,10 @@ public class Int extends org.python.types.Object {
         this.value = ((org.python.types.Int) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Int(byte value) {
         this.value = (long) value;
     }
@@ -51,7 +55,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) < ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() < " + org.Python.pythonTypeName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() < " + org.Python.typeName(other) + "()");
     }
 
     public org.python.Object __le__(org.python.Object other) {
@@ -60,7 +64,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) <= ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() <= " + org.Python.pythonTypeName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() <= " + org.Python.typeName(other) + "()");
     }
 
     public org.python.Object __eq__(org.python.Object other) {
@@ -74,7 +78,7 @@ public class Int extends org.python.types.Object {
                 || (this.value != 0 && ((org.python.types.Bool) other).value)
             );
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() == " + org.Python.pythonTypeName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() == " + org.Python.typeName(other) + "()");
     }
 
     public org.python.Object __ne__(org.python.Object other) {
@@ -83,7 +87,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) != ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() != " + org.Python.pythonTypeName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() != " + org.Python.typeName(other) + "()");
     }
 
     public org.python.Object __gt__(org.python.Object other) {
@@ -92,7 +96,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) > ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() > " + org.Python.pythonTypeName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() > " + org.Python.typeName(other) + "()");
     }
 
     public org.python.Object __ge__(org.python.Object other) {
@@ -101,7 +105,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) >= ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() >= " + org.Python.pythonTypeName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: int() >= " + org.Python.typeName(other) + "()");
     }
 
     public org.python.types.Bool __bool__() {
@@ -130,7 +134,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) + ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __sub__(org.python.Object other) {
@@ -141,7 +145,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) - ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'int' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'int' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __mul__(org.python.Object other) {
@@ -156,7 +160,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Tuple) {
             return other.__mul__(this);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'int' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'int' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __truediv__(org.python.Object other) {
@@ -165,7 +169,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(this.value / ((org.python.types.Float) other).value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'int' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'int' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {
@@ -174,7 +178,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Int(this.value / ((long) ((org.python.types.Float) other).value));
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'int' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'int' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __mod__(org.python.Object other) {
@@ -199,9 +203,9 @@ public class Int extends org.python.types.Object {
                 return new org.python.types.Float(((double) this.value) % other_val);
             }
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + org.Python.pythonTypeName(other) + "'");
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + org.Python.typeName(other) + "'");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __divmod__(org.python.Object other) {
@@ -235,7 +239,7 @@ public class Int extends org.python.types.Object {
             }
             return new org.python.types.Float(java.lang.Math.pow((double) this.value, other_val));
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'int' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'int' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __lshift__(org.python.Object other) {

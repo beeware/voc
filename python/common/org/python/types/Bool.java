@@ -13,6 +13,10 @@ public class Bool extends org.python.types.Object {
         this.value = ((org.python.types.Bool) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Bool(boolean bool) {
         super();
         this.value = bool;

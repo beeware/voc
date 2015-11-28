@@ -21,21 +21,21 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         if (start instanceof org.python.types.Int) {
             this.start = ((org.python.types.Int) start).value;
         } else {
-            throw new org.python.exceptions.TypeError("'" + org.Python.pythonTypeName(start) + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + org.Python.typeName(start) + "' object cannot be interpreted as an integer");
         }
         attrs.put("start", start);
 
         if (stop instanceof org.python.types.Int) {
             this.stop = ((org.python.types.Int) stop).value;
         } else {
-            throw new org.python.exceptions.TypeError("'" + org.Python.pythonTypeName(stop) + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + org.Python.typeName(stop) + "' object cannot be interpreted as an integer");
         }
         attrs.put("stop", stop);
 
         if (step instanceof org.python.types.Int) {
             this.step = ((org.python.types.Int) step).value;
         } else {
-            throw new org.python.exceptions.TypeError("'" + org.Python.pythonTypeName(step) + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + org.Python.typeName(step) + "' object cannot be interpreted as an integer");
         }
         attrs.put("step", step);
 
@@ -97,7 +97,7 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
                 return result;
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.pythonTypeName(index));
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + org.Python.typeName(index));
         }
     }
 

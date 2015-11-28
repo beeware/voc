@@ -13,6 +13,10 @@ public class Str extends org.python.types.Object {
         this.value = ((org.python.types.Str) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Str(java.lang.String str) {
         this.value = str;
     }
@@ -58,27 +62,57 @@ public class Str extends org.python.types.Object {
     }
 
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__lt__() has not been implemented.");
+        if (other instanceof org.python.types.Str) {
+            java.lang.String value = ((org.python.types.Str) other).value;
+            return new org.python.types.Bool(this.value.compareTo(value) < 0);
+        } else {
+            throw new org.python.exceptions.TypeError("unorderable types: " + org.Python.typeName(this) + "() < " + org.Python.typeName(other) + "()");
+        }
     }
 
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__le__() has not been implemented.");
+        if (other instanceof org.python.types.Str) {
+            java.lang.String value = ((org.python.types.Str) other).value;
+            return new org.python.types.Bool(this.value.compareTo(value) <= 0);
+        } else {
+            throw new org.python.exceptions.TypeError("unorderable types: " + org.Python.typeName(this) + "() <= " + org.Python.typeName(other) + "()");
+        }
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__eq__() has not been implemented.");
+        if (other instanceof org.python.types.Str) {
+            java.lang.String value = ((org.python.types.Str) other).value;
+            return new org.python.types.Bool(this.value.equals(value));
+        } else {
+            return new org.python.types.Bool(false);
+        }
     }
 
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__ne__() has not been implemented.");
+        if (other instanceof org.python.types.Str) {
+            java.lang.String value = ((org.python.types.Str) other).value;
+            return new org.python.types.Bool(!this.value.equals(value));
+        } else {
+            return new org.python.types.Bool(true);
+        }
     }
 
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__gt__() has not been implemented.");
+        if (other instanceof org.python.types.Str) {
+            java.lang.String value = ((org.python.types.Str) other).value;
+            return new org.python.types.Bool(this.value.compareTo(value) > 0);
+        } else {
+            throw new org.python.exceptions.TypeError("unorderable types: " + org.Python.typeName(this) + "() > " + org.Python.typeName(other) + "()");
+        }
     }
 
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__ge__() has not been implemented.");
+        if (other instanceof org.python.types.Str) {
+            java.lang.String value = ((org.python.types.Str) other).value;
+            return new org.python.types.Bool(this.value.compareTo(value) >= 0);
+        } else {
+            throw new org.python.exceptions.TypeError("unorderable types: " + org.Python.typeName(this) + "() >= " + org.Python.typeName(other) + "()");
+        }
     }
 
     public org.python.Object __getattribute__(java.lang.String name) {
@@ -161,7 +195,7 @@ public class Str extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("string indices must be integers, not " + org.Python.pythonTypeName(index));
+            throw new org.python.exceptions.TypeError("string indices must be integers, not " + org.Python.typeName(index));
         }
     }
 
@@ -183,7 +217,7 @@ public class Str extends org.python.types.Object {
             sb.append(other_str.value);
             return new Str(sb.toString());
         }
-        throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.pythonTypeName(other) + "' object to str implicitly");
+        throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.typeName(other) + "' object to str implicitly");
     }
 
     public org.python.Object __mul__(org.python.Object other) {
@@ -202,7 +236,22 @@ public class Str extends org.python.types.Object {
     }
 
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__mod__() has not been implemented.");
+        java.util.List<java.lang.Object> args = new java.util.ArrayList<java.lang.Object>();
+        if (other instanceof org.python.types.List) {
+            org.python.types.List oth = (org.python.types.List) other;
+            for (org.python.Object obj: oth.value) {
+                args.add(obj.toValue());
+            }
+        } else if (other instanceof org.python.types.Tuple) {
+            org.python.types.Tuple oth = (org.python.types.Tuple) other;
+            for (org.python.Object obj: oth.value) {
+                args.add(obj.toValue());
+            }
+        } else {
+            args.add(other.toValue());
+        }
+
+        return new org.python.types.Str(String.format(this.value, args.toArray()));
     }
 
     public org.python.Object __rmul__(org.python.Object other) {

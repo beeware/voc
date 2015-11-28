@@ -26,6 +26,8 @@ What it does:
 
   * Some mathematical operations
 
+  * Some operations and methods on primitive types
+
   * Exception handling
 
   * for/while/if constructs
@@ -36,26 +38,32 @@ What it does:
 
   * List comprehensions
 
+  * Keyword arguments
+
+  * `import` statements
+
 It *doesn't* currently support:
 
-* Keyword arguments
+* `from X import Y` statements
 
 * Generators
 
-* Import statements
+* with statements
+
+* Dict and Set constants
 
 * ``exec()``/``eval()``
 
-These things should all be *possible* - it's just a matter of time
+These things are all *possible* - it's just a matter of time
 and development effort.
 
 Quickstart
 ----------
 
-Using Python 3.4, install ``voc``, then run the example script::
+Using Python 3.4, install ``voc``, then run it over your python script::
 
     $ pip install voc
-    $ python -m voc tests/example.py
+    $ python -m voc path/to/your/example.py
     Creating class 'example'...
     Writing example.class...
     Done.

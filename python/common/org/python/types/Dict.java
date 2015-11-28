@@ -13,6 +13,10 @@ public class Dict extends org.python.types.Object {
         this.value = ((org.python.types.Dict) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Dict() {
         super();
         this.value = new java.util.HashMap<java.lang.String, org.python.Object>();

@@ -93,7 +93,7 @@ class StaticBlock(Block):
         return self.parent
 
     def add_method(self, method_name, code):
-        method = Method(self.module, method_name, extract_parameters(code), static=True)
+        method = Method(self.module, method_name, extract_parameters(code), static=True, code=code)
         method.extract(code)
         self.module.methods.append(method)
         return method

@@ -23,7 +23,7 @@ CO_VARKEYWORDS = 0x0008
 
 
 class Method(Block):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
         super().__init__(parent, commands=commands)
         self.name = name
         self.parameters = parameters
@@ -35,12 +35,12 @@ class Method(Block):
 
         # Load args and kwargs, but don't expose those names into the local_vars.
         self.add_arguments()
-
-        # Then reserve space for all the *actual* arguments.
-        for i, arg in enumerate(self.parameters):
-            self.local_vars[arg['name']] = len(self.local_vars)
+        for i in range(self.self_offset, len(self.parameters)):
+            param = self.parameters[i]
+            self.local_vars[param['name']] = len(self.local_vars)
 
         self.static = static
+        self.code_obj = code
 
     def __repr__(self):
         return '<Method %s (%s parameters)>' % (self.name, len(self.parameters))
@@ -100,9 +100,15 @@ class Method(Block):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
+    def add_argument_variables(self, parameters):
+        for param in parameters:
+            self.parameters.append(param)
+            if len(self.parameters) >= self.self_offset:
+                self.local_vars[param['name']] = len(self.local_vars)
+
     @property
     def has_void_return(self):
-        return self.returns.get('annotation', object()) is None
+        return self.returns.get('annotation', object()) is None or self.name == '__init__'
 
     @property
     def can_ignore_empty(self):
@@ -117,11 +123,13 @@ class Method(Block):
     @property
     def signature(self):
         return_descriptor = 'V' if self.has_void_return else 'Lorg/python/Object;'
-        return '([Lorg/python/Object;Ljava/util/Map;)%s' % return_descriptor
+        return '(Ljava/util/List;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;)%s' % return_descriptor
 
     def add_arguments(self):
         self.local_vars['##__args__##'] = len(self.local_vars)
         self.local_vars['##__kwargs__##'] = len(self.local_vars)
+        self.local_vars['##__default_args__##'] = len(self.local_vars)
+        self.local_vars['##__default_kwargs__##'] = len(self.local_vars)
 
     @property
     def method_name(self):
@@ -134,9 +142,10 @@ class Method(Block):
     def add_method(self, method_name, code):
         # If a method is added to a method, it is added as an anonymous
         # inner class.
-        from .klass import AnonymousInnerClass
-        callable = AnonymousInnerClass(
+        from .klass import ClosureClass
+        callable = ClosureClass(
             parent=self.parent,
+            name='%s$%s' % (self.parent.name, method_name.replace('.<locals>.', '$')),
             closure_var_names=code.co_names,
             super_name='org/python/types/Closure',
             interfaces=['org/python/Callable'],
@@ -144,12 +153,9 @@ class Method(Block):
             final=True,
         )
 
-        method = ClosureMethod(callable, 'invoke', extract_parameters(code))
+        method = ClosureMethod(callable, 'invoke', extract_parameters(code), code=code)
         method.extract(code)
         callable.methods.append(method)
-
-        #
-        callable.methods.append(AnonymousInitMethod(callable))
 
         callable.fields = dict(
             (name, 'Lorg/python/Object;')
@@ -160,15 +166,74 @@ class Method(Block):
 
         return method
 
-    def transpile_setup(self):
-        # Load all the arguments into locals
-        for i, arg in enumerate(self.parameters):
+    @property
+    def self_offset(self):
+        return 0
+
+    def transpile_args(self):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.code_obj.co_name),  # func_name
+            ALOAD_name(self, '##__args__##'),  # args
+            ALOAD_name(self, '##__kwargs__##'),  # kwargs
+
+            # argnames
+            ICONST_val(len(self.parameters) - self.self_offset),
+            JavaOpcodes.ANEWARRAY('java/lang/String'),
+        )
+
+        for a in range(self.self_offset, len(self.parameters)):
             self.add_opcodes(
-                ALOAD_name(self, '##__args__##'),
-                ICONST_val(i),
-                JavaOpcodes.AALOAD(),
-                ASTORE_name(self, arg['name']),
+                JavaOpcodes.DUP(),
+                ICONST_val(a - self.self_offset),
+                JavaOpcodes.LDC_W(self.code_obj.co_varnames[a]),
+                JavaOpcodes.AASTORE(),
             )
+
+        self.add_opcodes(
+            ALOAD_name(self, '##__default_args__##'),
+            ALOAD_name(self, '##__default_kwargs__##'),
+            ICONST_val(self.code_obj.co_argcount - self.self_offset),
+            ICONST_val(self.code_obj.co_flags),
+
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'adjustArguments',
+                '(Ljava/lang/String;Ljava/util/List;Ljava/util/Map;[Ljava/lang/String;Ljava/util/List;Ljava/util/Map;II)V'
+            ),
+        )
+        for i in range(self.self_offset, len(self.parameters)):
+            param = self.parameters[i]
+            if param['kind'] == POSITIONAL_OR_KEYWORD:
+                self.add_opcodes(
+                    ALOAD_name(self, '##__args__##'),
+                    ICONST_val(i - self.self_offset),
+                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'get', '(I)Ljava/lang/Object;'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif param['kind'] == VAR_POSITIONAL:
+                self.add_opcodes(
+                    ALOAD_name(self, '##__args__##'),
+                    ICONST_val(i - self.self_offset),
+                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'get', '(I)Ljava/lang/Object;'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif param['kind'] == KEYWORD_ONLY:
+                self.add_opcodes(
+                    ALOAD_name(self, '##__kwargs__##'),
+                    JavaOpcodes.LDC_W(param['name']),
+                    JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif param['kind'] == VAR_KEYWORD:
+                self.add_opcodes(
+                    ALOAD_name(self, '##__kwargs__##'),
+                    JavaOpcodes.LDC_W(param['name']),
+                    JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+                    ASTORE_name(self, param['name']),
+                )
+
+    def transpile_setup(self):
+        self.transpile_args()
 
     def method_attributes(self):
         return [
@@ -194,24 +259,26 @@ class Method(Block):
 
 
 class InitMethod(Method):
-    def __init__(self, parent, parameters, commands=None):
+    def __init__(self, parent):
         super().__init__(
-            parent, '__init__',
-            parameters=parameters[1:],
+            parent, '<init>',
+            parameters=[{
+                'name': 'self',
+                'kind': POSITIONAL_OR_KEYWORD
+            }],
             returns={'annotation': None},
-            commands=commands
         )
 
     def __repr__(self):
         return '<Constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
 
     @property
-    def is_constructor(self):
-        return True
+    def signature(self):
+        return '(Ljava/util/List;Ljava/util/Map;)V'
 
     @property
-    def method_name(self):
-        return '<init>'
+    def is_constructor(self):
+        return True
 
     @property
     def klass(self):
@@ -227,7 +294,11 @@ class InitMethod(Method):
 
     @property
     def can_ignore_empty(self):
-        return True
+        return False
+
+    @property
+    def self_offset(self):
+        return 1
 
     def add_arguments(self):
         self.local_vars['self'] = len(self.local_vars)
@@ -235,58 +306,47 @@ class InitMethod(Method):
         self.local_vars['##__kwargs__##'] = len(self.local_vars)
 
     def transpile_setup(self):
-        # Load all the arguments into locals
-        for i, arg in enumerate(self.parameters):
-            self.add_opcodes(
-                ALOAD_name(self, '##__args__##'),
-                ICONST_val(i),
-                JavaOpcodes.AALOAD(),
-                ASTORE_name(self, arg['name']),
-            )
-
-        # Make sure the method it invokes super().<init>
-        super_found = False
-        # FIXME: Search for existing calls on <init>
-        # for opcode in code:
-        #     if isinstance(opcode, JavaOpcodes.INVOKESPECIAL) and opcode.method.name == '<init>':
-        #         super_found = True
-        #         break
-        if not super_found:
+        if self.klass.super_name == 'org/python/types/Object':
             self.add_opcodes(
                 JavaOpcodes.ALOAD_0(),
                 JavaOpcodes.INVOKESPECIAL(self.klass.super_name, '<init>', '()V'),
             )
+        else:
+            self.add_opcodes(
+                JavaOpcodes.ALOAD_0(),
+                ALOAD_name(self, '##__args__##'),
+                ALOAD_name(self, '##__kwargs__##'),
+                JavaOpcodes.INVOKESPECIAL(self.klass.super_name, '<init>', '(Ljava/util/List;Ljava/util/Map;)V'),
+            )
+
+        self.add_opcodes(
+            TRY(),
+                JavaOpcodes.ALOAD_0(),
+                JavaOpcodes.LDC_W('__init__'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+
+                ALOAD_name(self, '##__args__##'),
+                ALOAD_name(self, '##__kwargs__##'),
+
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '(Ljava/util/List;Ljava/util/Map;)Lorg/python/Object;'),
+            CATCH('org/python/exceptions/AttributeError'),
+            END_TRY(),
+        )
 
     def method_attributes(self):
         return [
         ]
 
 
-class AnonymousInitMethod(InitMethod):
-    def __init__(self, parent):
-        super().__init__(parent, parameters=[None])
-
-    # def _insert_closure_vars(self):
-    #     setup = []
-    #     for i, closure_var_name in enumerate(self.parent.closure_var_names):
-    #         setup.extend([
-    #             ALOAD_name(self, 'self'),
-    #             ALOAD_name(self, '##__args__##'),
-    #             ICONST_val(i),
-    #             JavaOpcodes.AALOAD(),
-    #             JavaOpcodes.PUTFIELD(self.parent.descriptor, closure_var_name, 'Lorg/python/Object;'),
-    #         ])
-    #     self.code = setup + self.code
-
-
 class InstanceMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
         super().__init__(
             parent, name,
-            parameters=parameters[1:],
+            parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands
+            commands=commands,
+            code=code
         )
 
     def __repr__(self):
@@ -300,20 +360,27 @@ class InstanceMethod(Method):
     def module(self):
         return self.klass.module
 
+    @property
+    def self_offset(self):
+        return 1
+
     def add_arguments(self):
         self.local_vars['self'] = len(self.local_vars)
         self.local_vars['##__args__##'] = len(self.local_vars)
         self.local_vars['##__kwargs__##'] = len(self.local_vars)
+        self.local_vars['##__default_args__##'] = len(self.local_vars)
+        self.local_vars['##__default_kwargs__##'] = len(self.local_vars)
 
 
 class MainMethod(Method):
-    def __init__(self, parent, commands=None, end_offset=None):
+    def __init__(self, parent, commands=None, code=None, end_offset=None):
         super().__init__(
             parent, '__main__',
             parameters=[{'name': 'args', 'annotation': 'argv'}],
             returns={'annotation': None},
             static=True,
-            commands=commands
+            commands=commands,
+            code=code
         )
         self.end_offset = end_offset
 
@@ -361,6 +428,36 @@ class MainMethod(Method):
 
         self.add_opcodes(java_op)
 
+    def store_name(self, name, use_locals):
+        self.add_opcodes(
+            ASTORE_name(self, '#value'),
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+
+            JavaOpcodes.LDC_W(name),
+            ALOAD_name(self, '#value'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+        )
+        free_name(self, '#value')
+
+    def load_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            # JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
+    def delete_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
     def transpile_setup(self):
         self.add_opcodes(
             # Register this module as being __main__
@@ -401,13 +498,14 @@ class MainMethod(Method):
 
 
 class ClosureMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
         super().__init__(
             parent, name,
             parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands
+            commands=commands,
+            code=code
         )
 
     def __repr__(self):
@@ -427,6 +525,8 @@ class ClosureMethod(Method):
         self.local_vars['self'] = len(self.local_vars)
         self.local_vars['##__args__##'] = len(self.local_vars)
         self.local_vars['##__kwargs__##'] = len(self.local_vars)
+        self.local_vars['##__default_args__##'] = len(self.local_vars)
+        self.local_vars['##__default_kwargs__##'] = len(self.local_vars)
 
     # def _insert_closure_vars(self):
     #     # Load all the arguments into locals
@@ -443,36 +543,17 @@ class ClosureMethod(Method):
 def extract_parameters(code):
     pos_count = code.co_argcount
     arg_names = code.co_varnames
-    positional = arg_names[0: pos_count]
     keyword_only_count = code.co_kwonlyargcount
-    keyword_only = arg_names[pos_count:pos_count + keyword_only_count]
     annotations = {}  # func.__annotations__
-    defs = None  # func.__defaults__
-    kwdefaults = None  # func.__kwdefaults__
-
-    if defs:
-        pos_default_count = len(defs)
-    else:
-        pos_default_count = 0
 
     parameters = []
 
-    # Non-keyword-only parameters w/o defaults.
-    non_default_count = pos_count - pos_default_count
-    for name in positional[0: non_default_count]:
-        parameters.append({
-            'name': name,
-            'annotation': annotations.get(name),
-            'kind': POSITIONAL_OR_KEYWORD
-        })
-
-    # ... w/ defaults.
-    for offset, name in enumerate(positional[non_default_count: len(positional)]):
+    # Non-keyword-only parameters.
+    for offset, name in enumerate(arg_names[0:pos_count]):
         parameters.append({
             'name': name,
             'annotation': annotations.get(name),
             'kind': POSITIONAL_OR_KEYWORD,
-            'default': defs[offset]
         })
 
     # *args
@@ -486,16 +567,11 @@ def extract_parameters(code):
         })
 
     # Keyword-only parameters.
-    for name in keyword_only:
-        default = None
-        if kwdefaults is not None:
-            default = kwdefaults.get(name)
-
+    for name in arg_names[pos_count:pos_count + keyword_only_count]:
         parameters.append({
             'name': name,
             'annotation': annotations.get(name),
             'kind': KEYWORD_ONLY,
-            'default': default
         })
 
     # **kwargs

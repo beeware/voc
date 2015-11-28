@@ -108,49 +108,30 @@ class JavaNormalizationTests(unittest.TestCase):
             """
         )
 
-    def test_nested_exception(self):
-        self.maxDiff = None
+    def test_exception_in_constructor(self):
         self.assertNormalized(
             """
-            Do final cleanup
-            org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:44)
-                at org.Python.int_cast(Python.java:680)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:93)
-                at python.example.foo(example.py:81)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Method.invoke(Method.java:45)
-                at python.example.<clinit>(example.py:87)
             Exception in thread "main" java.lang.ExceptionInInitializerError
-            Caused by: org.python.exceptions.ValueError: invalid literal for int() with base 10: 'asdf'
-                at org.python.types.Str.__int__(Str.java:44)
-                at org.Python.int_cast(Python.java:680)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Function.invoke(Function.java:93)
-                at python.example.foo(example.py:81)
-                at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-                at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
-                at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-                at java.lang.reflect.Method.invoke(Method.java:606)
-                at org.python.types.Method.invoke(Method.java:45)
-                at python.example.<clinit>(example.py:87)
+            Caused by: org.python.exceptions.UnboundLocalError: local variable 'x' referenced before assignment
+              at python.example.Foo.__init__(example.py:44)
+              at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+              at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+              at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+              at java.lang.reflect.Method.invoke(Method.java:606)
+              at org.python.types.Method.invoke(Method.java:66)
+              at python.example.Foo.<init>(example.py)
+              at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+              at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:57)
+              at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+              at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+              at org.python.types.Constructor.invoke(Constructor.java:25)
+              at python.example.<clinit>(example.py:51)
             """,
             """
-            Do final cleanup
             ### EXCEPTION ###
-            ValueError: invalid literal for int() with base 10: 'asdf'
-                example.py:87
-                example.py:81
+            UnboundLocalError: local variable 'x' referenced before assignment
+                example.py:51
+                example.py:44
             """
         )
 

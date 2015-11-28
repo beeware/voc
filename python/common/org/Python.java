@@ -7,22 +7,30 @@ public class Python {
     static {
         // Load all the builtins into the dictionary as callables
         builtins = new java.util.HashMap<java.lang.String, org.python.Object>();
+        org.Python.initializeModule(org.Python.class, builtins);
+    }
 
-        // Iterate over all methods, adding the static ones to builtins
-        for (java.lang.reflect.Method method: Python.class.getMethods()) {
-            if (java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
-                if (method.getName() == "int_cast") {
-                    builtins.put("int", new org.python.types.Function(method));
-                } else if (method.getName() == "float_cast") {
-                    builtins.put("float", new org.python.types.Function(method));
-                } else if (!method.getName().startsWith("python")) {
-                    builtins.put(method.getName(), new org.python.types.Function(method));
+    public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
+        // Iterate over every method in the class, and if the
+        // method is annotated for inclusion in the Python class,
+        // add a function wrapper to the type definition.
+        for (java.lang.reflect.Method method: cls.getMethods()) {
+            org.python.Method annotation = method.getAnnotation(org.python.Method.class);
+            if (annotation != null) {
+                java.lang.String method_name;
+
+                // Check for any explicitly set names
+                if (annotation.name().equals("*")) {
+                    method_name = method.getName();
+                } else {
+                    method_name = annotation.name();
                 }
+                attrs.put(method_name, new org.python.types.Function(method));
             }
         }
     }
 
-    public static java.lang.String pythonTypeName(java.lang.Class cls) {
+    public static java.lang.String typeName(java.lang.Class cls) {
         try {
             java.lang.String class_name = cls.getName();
             if (class_name == "org.python.types.NoneType") {
@@ -38,9 +46,78 @@ public class Python {
         }
     }
 
-    public static java.lang.String pythonTypeName(org.python.Object obj) {
-        return pythonTypeName(obj.getClass());
+    public static java.lang.String typeName(org.python.Object obj) {
+        return typeName(obj.getClass());
     }
+
+    public static void debug(java.lang.Object msg) {
+        System.out.println("DEBUG: " + msg);
+    }
+
+    public static void adjustArguments(
+                                java.lang.String func_name,
+                                java.util.List<org.python.Object> args,
+                                java.util.Map<java.lang.String, org.python.Object> kwargs,
+                                java.lang.String [] arg_names,
+                                java.util.List<org.python.Object> default_args,
+                                java.util.Map<java.lang.String, org.python.Object> default_kwargs,
+                                int pos_count,
+                                int flags) {
+
+        // System.out.println("ADJUST " + func_name);
+        // System.out.println("              args: " + args);
+        // System.out.println("            kwargs: " + kwargs);
+        // System.out.print("         arg_names: [");
+        // for (java.lang.String arg: arg_names) {
+        //     System.out.print(arg + ", ");
+        // }
+        // System.out.println("]");
+        // System.out.println("      default_args: " + default_args);
+        // System.out.println("    default_kwargs: " + default_kwargs);
+        // System.out.println("         pos_count: " + pos_count);
+
+        // Iterate over all the positional arguments provided; check that
+        // we have enough of them. If we don't, populate them from kwargs,
+        // or if there's no kwargs, from defaults.
+        for (int a = 0; a < pos_count; a++) {
+            // System.out.println("arg " + a + " = " + arg_names[a]);
+            if (a >= args.size()) {
+                // This argument wasn't provided as a positional; check to
+                // see if it was provided as a keyword.
+                org.python.Object value = kwargs.remove(arg_names[a]);
+
+                // If it wasn't provided as a kwarg, use the
+                // defaults list.
+                if (value == null) {
+                    value = default_args.get(a - (pos_count - default_args.size()));
+                }
+
+                // Add the value to the full args list.
+                args.add(value);
+            } else {
+                // We've been given a position argument at this index; check that
+                // it isn't also provided as a kwarg.
+                if (kwargs.containsKey(arg_names[a])) {
+                    throw new org.python.exceptions.TypeError(func_name + "() for multiple values for argument '" + arg_names[a] + "'");
+                }
+            }
+        }
+
+        // If this function provides VARARGS, extract them and add them as
+        // a Python list as the last positional argument.
+        if ((flags & org.python.types.Function.CO_VARARGS) != 0) {
+            java.util.List<org.python.Object> var_args;
+            if (args.size() > pos_count) {
+                var_args = args.subList(pos_count, args.size());
+                args = new java.util.ArrayList<org.python.Object>(args.subList(0, pos_count));
+            } else {
+                // No positional arguments - add an empty list.
+                var_args = new java.util.ArrayList<org.python.Object>();
+            }
+            args.add(new org.python.types.List(var_args));
+        }
+    }
+
 
     @org.python.Method(
         __doc__ = "__import__(name, globals=None, locals=None, fromlist=(), level=0) -> module" +
@@ -60,7 +137,7 @@ public class Python {
             "is the number of parent directories to search relative to the current module.\n"
     )
     public static org.python.Object __import__(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function '__import__' not implemented");
     }
@@ -71,15 +148,15 @@ public class Python {
             "Return the absolute value of the argument.\n"
     )
     public static org.python.Object abs(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("abs() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("abs() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("abs() takes no keyword arguments");
         }
-        return args[0].__abs__();
+        return args.get(0).__abs__();
     }
 
     @org.python.Method(
@@ -89,7 +166,7 @@ public class Python {
             "If the iterable is empty, return True.\n"
     )
     public static org.python.types.Bool all(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'all' not implemented");
     }
@@ -101,7 +178,7 @@ public class Python {
             "If the iterable is empty, return False.\n"
     )
     public static org.python.types.Bool any(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'any' not implemented");
     }
@@ -115,7 +192,7 @@ public class Python {
             "to that returned by repr() in Python 2.\n"
     )
     public static org.python.types.Str ascii(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'ascii' not implemented");
     }
@@ -129,10 +206,10 @@ public class Python {
             "  '0b1010101010101010101010'\n"
     )
     public static org.python.types.Str bin(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("bin() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("bin() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("bin() takes no keyword arguments");
@@ -148,15 +225,15 @@ public class Python {
             "The class bool is a subclass of the class int, and cannot be subclassed.\n"
     )
     public static org.python.types.Bool bool(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("bool() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("bool() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("bool() takes no keyword arguments");
         }
-        return args[0].__bool__();
+        return args.get(0).__bool__();
     }
 
     @org.python.Method(
@@ -174,7 +251,7 @@ public class Python {
             " - an integer\n"
     )
     public static org.python.types.ByteArray bytearray(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
     }
@@ -193,7 +270,7 @@ public class Python {
             " - an integer\n"
     )
     public static org.python.types.Bytes bytes(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'bytes' not implemented");
     }
@@ -206,15 +283,15 @@ public class Python {
             "__call__() method.\n"
     )
     public static org.python.types.Bool callable(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("callable() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("callable() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("callable() takes no keyword arguments");
         }
-        return new org.python.types.Bool(org.python.Callable.class.isAssignableFrom(args[0].getClass()));
+        return new org.python.types.Bool(org.python.Callable.class.isAssignableFrom(args.get(0).getClass()));
     }
 
     @org.python.Method(
@@ -223,9 +300,21 @@ public class Python {
             "Return a Unicode string of one character with ordinal i; 0 <= i <= 0x10ffff.\n"
     )
     public static org.python.types.Str chr(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'callable' not implemented");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("chr() takes exactly one argument (" + args.size() + " given)");
+        }
+        if (kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("chr() takes no keyword arguments");
+        }
+
+        try {
+            long value = ((org.python.types.Int) args.get(0)).value;
+            return new org.python.types.Str(Character.toChars((int) value).toString());
+        } catch (ClassCastException e) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + org.Python.typeName(args.get(0).getClass()) + " found");
+        }
     }
 
     @org.python.Method(
@@ -250,7 +339,7 @@ public class Python {
             "If you want those, see the staticmethod builtin.\n"
     )
     public static org.python.Object classmethod(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'classmethod' not implemented");
     }
@@ -271,7 +360,7 @@ public class Python {
             "in addition to any features explicitly specified.\n"
     )
     public static org.python.Object compile(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'compile' not implemented");
     }
@@ -283,7 +372,7 @@ public class Python {
             "This is equivalent to (real + imag*1j) where imag defaults to 0.\n"
     )
     public static org.python.types.Complex complex(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'complex' not implemented");
     }
@@ -293,7 +382,7 @@ public class Python {
             "contributors and the copyright notice.\n"
     )
     public static org.python.types.Str copyright(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return new org.python.types.Str(
             "Copyright (c) 2015 Russell Keith-Magee.\n" +
@@ -318,7 +407,7 @@ public class Python {
             "contributors and the copyright notice.\n"
     )
     public static org.python.Object credits(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return new org.python.types.Str(
             "voc is a BeeWare project. See pybee.org/voc for more information.\n" +
@@ -335,7 +424,7 @@ public class Python {
             "``del x.y''.\n"
     )
     public static org.python.Object delattr(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'delattr' not implemented");
     }
@@ -352,13 +441,13 @@ public class Python {
             "    in the keyword argument list.  For example:  dict(one=1, two=2)\n"
     )
     public static org.python.types.Dict dict(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'dict' not implemented");
     }
 
     // public static org.python.Object dict(**
-    //        org.python.Object [] args,
+    //        java.util.List<org.python.Object> args,
     //        java.util.Map<java.lang.String, org.python.Object> kwargs) {
     //     throw new org.python.exceptions.NotImplementedError("Builtin function 'dict' not implemented");
     // }
@@ -378,17 +467,17 @@ public class Python {
             "    recursively the attributes of its class's base classes.\n"
     )
     public static org.python.types.List dir(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("dir() takes no keyword arguments");
         }
-        if (args.length == 0) {
+        if (args.size() == 0) {
             throw new org.python.exceptions.NotImplementedError("builting function 'dir' with no arguments not implemented");
-        } else if (args.length == 1) {
-            return args[0].__dir__();
+        } else if (args.size() == 1) {
+            return args.get(0).__dir__();
         } else {
-            throw new org.python.exceptions.TypeError("dir() takes exactly one argument (" + args.length + " given)");
+            throw new org.python.exceptions.TypeError("dir() takes exactly one argument (" + args.size() + " given)");
         }
     }
 
@@ -398,7 +487,7 @@ public class Python {
             "Return the tuple ((x-x%y)/y, x%y).  Invariant: div*y + mod == x.\n"
     )
     public static org.python.types.Tuple divmod(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'divmod' not implemented");
     }
@@ -413,7 +502,7 @@ public class Python {
             "       (0, seq[0]), (1, seq[1]), (2, seq[2]), ...\n"
     )
     public static org.python.Iterable enumerate(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'enumerate' not implemented");
     }
@@ -429,7 +518,7 @@ public class Python {
             "If only globals is given, locals defaults to it.\n"
     )
     public static org.python.Object eval(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'eval' not implemented");
     }
@@ -443,7 +532,7 @@ public class Python {
             "globals and locals.  If only globals is given, locals defaults to it.\n"
     )
     public static org.python.Object exec(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'exec' not implemented");
     }
@@ -455,7 +544,7 @@ public class Python {
             "is true. If function is None, return the items that are true.\n"
     )
     public static org.python.Object filter(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'filter' not implemented");
     }
@@ -466,15 +555,15 @@ public class Python {
             "Convert a string or number to a floating point number, if possible.\n"
     )
     public static org.python.types.Float float_cast(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("float() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("float() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("float() takes no keyword arguments");
         }
-        return args[0].__float__();
+        return args.get(0).__float__();
     }
 
     @org.python.Method(
@@ -484,19 +573,19 @@ public class Python {
             "format_spec defaults to ''\n"
     )
     public static org.python.types.Str format(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("format() takes no keyword arguments");
         }
-        if (args.length < 1) {
-            throw new org.python.exceptions.TypeError("format() takes at least 1 argument (" + args.length + " given)");
-        } else if (args.length == 1) {
-            return args[0].__str__();
-        } else if (args.length == 2) {
-            return args[0].__format__(args[1]);
+        if (args.size() < 1) {
+            throw new org.python.exceptions.TypeError("format() takes at least 1 argument (" + args.size() + " given)");
+        } else if (args.size() == 1) {
+            return args.get(0).__str__();
+        } else if (args.size() == 2) {
+            return args.get(0).__format__(args.get(1));
         } else {
-            throw new org.python.exceptions.TypeError("format() takes at most 2 arguments (" + args.length + " given)");
+            throw new org.python.exceptions.TypeError("format() takes at most 2 arguments (" + args.size() + " given)");
         }
     }
 
@@ -507,19 +596,19 @@ public class Python {
             "Build an immutable unordered collection of unique elements.\n"
     )
     public static org.python.types.FrozenSet frozenset(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'frozenset' not implemented");
         // if (kwargs.size() != 0) {
         //     throw new org.python.exceptions.TypeError("frozenset() does not take keyword arguments");
         // }
-        // if (args.length == 0) {
+        // if (args.size() == 0) {
         //     return new org.python.types.Set();
-        // } else if (args.length == 1) {
-        //     // return new org.python.types.Set(args[0]);
+        // } else if (args.size() == 1) {
+        //     // return new org.python.types.Set(args.get(0));
         //     throw new org.python.exceptions.NotImplementedError("Builtin function 'frozenset' with iterator not implemented");
         // } else {
-        //     throw new org.python.exceptions.TypeError("frozenset() expected at most 1 arguments ( got " + args.length + ")");
+        //     throw new org.python.exceptions.TypeError("frozenset() expected at most 1 arguments ( got " + args.size() + ")");
         // }
     }
 
@@ -531,7 +620,7 @@ public class Python {
             "exist; without it, an exception is raised in that case.\n"
     )
     public static org.python.Object getattr(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'getattr' not implemented");
     }
@@ -542,7 +631,7 @@ public class Python {
             "Return the dictionary containing the current scope's global variables.\n"
     )
     public static org.python.types.Dict globals(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'globals' not implemented");
     }
@@ -554,7 +643,7 @@ public class Python {
             "(This is done by calling getattr(object, name) and catching AttributeError.)\n"
     )
     public static org.python.types.Bool hasattr(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'hasattr' not implemented");
     }
@@ -566,15 +655,15 @@ public class Python {
             "the same hash value.  The reverse is not necessarily true, but likely.\n"
     )
     public static org.python.types.Int hash(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("hash() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("hash() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("hash() takes no keyword arguments");
         }
-        return args[0].__hash__();
+        return args.get(0).__hash__();
     }
 
     @org.python.Method(
@@ -582,7 +671,7 @@ public class Python {
             "This is a wrapper around pydoc.help (with a twist).\n"
     )
     public static org.python.Object help(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'help' not implemented");
     }
@@ -596,10 +685,10 @@ public class Python {
             "  '0xdeadbeef'\n"
     )
     public static org.python.types.Str hex(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("hex() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("hex() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("hex() takes no keyword arguments");
@@ -614,15 +703,15 @@ public class Python {
             "simultaneously existing objects.\n"
     )
     public static org.python.types.Int id(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("id() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("id() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("id() takes no keyword arguments");
         }
-        return new org.python.types.Int(System.identityHashCode(args[0]));
+        return new org.python.types.Int(System.identityHashCode(args.get(0)));
     }
 
     @org.python.Method(
@@ -634,10 +723,10 @@ public class Python {
             "is printed without a trailing newline before reading.\n"
     )
     public static org.python.types.Str input(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length > 1) {
-            throw new org.python.exceptions.TypeError("input() expected at most one arguments ( got " + args.length + ")");
+        if (args.size() > 1) {
+            throw new org.python.exceptions.TypeError("input() expected at most one arguments ( got " + args.size() + ")");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("bin() takes no keyword arguments");
@@ -645,8 +734,8 @@ public class Python {
 
         java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
 
-        if (args.length == 1) {
-            System.out.print(args[0]);
+        if (args.size() == 1) {
+            System.out.print(args.get(0));
             System.out.flush();
         }
 
@@ -658,6 +747,7 @@ public class Python {
     }
 
     @org.python.Method(
+        name = "int",
         __doc__ = "int(x=0) -> integer" +
             "int(x, base=10) -> integer\n" +
             "\n" +
@@ -675,15 +765,15 @@ public class Python {
             "  4\n"
     )
     public static org.python.types.Int int_cast(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() == 0) {
-            if (args.length == 1) {
-                return args[0].__int__();
-            } else if (args.length == 2) {
+            if (args.size() == 1) {
+                return args.get(0).__int__();
+            } else if (args.size() == 2) {
                 throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
             } else {
-                throw new org.python.exceptions.TypeError("int() takes at most 2 arguments, got got " + args.length);
+                throw new org.python.exceptions.TypeError("int() takes at most 2 arguments, got got " + args.size());
             }
         } else {
             throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
@@ -699,7 +789,7 @@ public class Python {
             "isinstance(x, A) or isinstance(x, B) or ... (etc.).\n"
     )
     public static org.python.types.Bool isinstance(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'isinstance' not implemented");
     }
@@ -712,7 +802,7 @@ public class Python {
             "is a shortcut for issubclass(X, A) or issubclass(X, B) or ... (etc.).\n"
     )
     public static org.python.types.Bool issubclass(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'issubclass' not implemented");
     }
@@ -726,19 +816,19 @@ public class Python {
             "In the second form, the callable is called until it returns the sentinel.\n"
     )
     public static org.python.Iterable iter(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("iter() takes no keyword arguments");
         }
-        if (args.length < 1) {
-            throw new org.python.exceptions.TypeError("iter() expects at least argument, got " + args.length);
-        } else if (args.length == 1) {
-            return args[0].__iter__();
-        } else if (args.length == 2) {
+        if (args.size() < 1) {
+            throw new org.python.exceptions.TypeError("iter() expects at least argument, got " + args.size());
+        } else if (args.size() == 1) {
+            return args.get(0).__iter__();
+        } else if (args.size() == 2) {
             throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with callable/sentinel not implemented");
         } else {
-            throw new org.python.exceptions.TypeError("iter() takes exactly one argument (" + args.length + " given)");
+            throw new org.python.exceptions.TypeError("iter() takes exactly one argument (" + args.size() + " given)");
         }
     }
 
@@ -748,15 +838,15 @@ public class Python {
             "Return the number of items of a sequence or collection.\n"
     )
     public static org.python.types.Int len(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("len() takes no keyword arguments");
         }
-        return args[0].__len__();
+        return args.get(0).__len__();
     }
 
     @org.python.Method(
@@ -764,7 +854,7 @@ public class Python {
             "contributors and the copyright notice.\n"
     )
     public static org.python.Object license(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'license' not implemented");
     }
@@ -774,7 +864,7 @@ public class Python {
             "list(iterable) -> new list initialized from iterable's items\n"
     )
     public static org.python.types.List list(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'list' not implemented");
     }
@@ -785,7 +875,7 @@ public class Python {
             "Update and return a dictionary containing the current scope's local variables.\n"
     )
     public static org.python.types.Dict locals(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'locals' not implemented");
     }
@@ -797,7 +887,7 @@ public class Python {
             "each of the iterables.  Stops when the shortest iterable is exhausted.\n"
     )
     public static org.python.Object map(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
     }
@@ -812,7 +902,7 @@ public class Python {
             "With two or more arguments, return the largest argument.\n"
     )
     public static org.python.Object max(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'max' not implemented");
     }
@@ -823,7 +913,7 @@ public class Python {
             "Create a new memoryview object which references the given object.\n"
     )
     public static org.python.types.MemoryView memoryview(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'memoryview' not implemented");
     }
@@ -838,7 +928,7 @@ public class Python {
             "With two or more arguments, return the smallest argument.\n"
     )
     public static org.python.Object min(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'min' not implemented");
     }
@@ -850,7 +940,7 @@ public class Python {
             "is exhausted, it is returned instead of raising StopIteration.\n"
     )
     public static org.python.Object next(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'next' not implemented");
     }
@@ -859,7 +949,7 @@ public class Python {
         __doc__ = "The most base type"
     )
     public static org.python.types.Object object(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'object' not implemented");
     }
@@ -873,10 +963,10 @@ public class Python {
             "  '0o1234567'\n"
     )
     public static org.python.types.Str oct(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("oct() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("oct() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("oct() takes no keyword arguments");
@@ -1008,7 +1098,7 @@ public class Python {
             "opened in a binary mode.\n"
     )
     public static org.python.Object open(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'open' not implemented");
     }
@@ -1019,24 +1109,24 @@ public class Python {
             "Return the integer ordinal of a one-character string.\n"
     )
     public static org.python.types.Int ord(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("org() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("org() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("ord() takes no keyword arguments");
         }
 
         try {
-            int length = ((org.python.types.Str) args[0]).value.length();
-            if (length != 1) {
+            int length = ((org.python.types.Str) args.get(0)).value.length();
+            if (length == 1) {
                 return new org.python.types.Int((int) (str(args, kwargs).value).charAt(0));
             } else {
                 throw new org.python.exceptions.TypeError("ord() expected string of length 1, but string of length " + length + " found");
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("ord() expected string of length 1, but " + args[0].getClass().getName() + " found");
+            throw new org.python.exceptions.TypeError("ord() expected string of length 1, but " + org.Python.typeName(args.get(0).getClass()) + " found");
         }
     }
 
@@ -1047,23 +1137,23 @@ public class Python {
             "equivalent to (x**y) % z, but may be more efficient (e.g. for ints).\n"
     )
     public static org.python.Object pow(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length < 2) {
-            throw new org.python.exceptions.TypeError("pow() expected at least 2 arguments, got " + args.length);
+        if (args.size() < 2) {
+            throw new org.python.exceptions.TypeError("pow() expected at least 2 arguments, got " + args.size());
         }
-        if (args.length > 3) {
-            throw new org.python.exceptions.TypeError("pow() expected at most 3 arguments, got " + args.length);
+        if (args.size() > 3) {
+            throw new org.python.exceptions.TypeError("pow() expected at most 3 arguments, got " + args.size());
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("pow() takes no keyword arguments");
         }
 
-        if (args.length == 3) {
+        if (args.size() == 3) {
             throw new org.python.exceptions.NotImplementedError("pow() with mod not supported");
-            // return args[0].__pow__(args[1], args[2]);
+            // return args.get(0).__pow__(args.get(1), args.get(2));
         } else {
-            return args[0].__pow__(args[1]);
+            return args.get(0).__pow__(args.get(1));
         }
     }
 
@@ -1078,7 +1168,7 @@ public class Python {
             "flush: whether to forcibly flush the stream.\n"
     )
     public static void print(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         org.python.Object file = kwargs.get("file");
         org.python.Object sep = kwargs.get("sep");
@@ -1090,10 +1180,10 @@ public class Python {
         }
 
         StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            buffer.append(args[i]);
+        for (int i = 0; i < args.size(); i++) {
+            buffer.append(args.get(i));
 
-            if (i != args.length - 1) {
+            if (i != args.size() - 1) {
                 if (sep == null) {
                     buffer.append(" ");
                 } else {
@@ -1138,7 +1228,7 @@ public class Python {
             "        del self._x\n"
     )
     public static org.python.Object property(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'property' not implemented");
     }
@@ -1150,18 +1240,18 @@ public class Python {
             "Return a virtual sequence of numbers from start to stop by step.\n"
     )
     public static org.python.types.Range range(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length == 1) {
-            return new org.python.types.Range(args[0]);
-        } else if (args.length == 2) {
-            return new org.python.types.Range(args[0], args[1]);
-        } else if (args.length == 3) {
-            return new org.python.types.Range(args[0], args[1], args[2]);
-        } else if (args.length == 0) {
-            throw new org.python.exceptions.TypeError("range expected 1 arguments, got " + args.length);
+        if (args.size() == 1) {
+            return new org.python.types.Range(args.get(0));
+        } else if (args.size() == 2) {
+            return new org.python.types.Range(args.get(0), args.get(1));
+        } else if (args.size() == 3) {
+            return new org.python.types.Range(args.get(0), args.get(1), args.get(2));
+        } else if (args.size() == 0) {
+            throw new org.python.exceptions.TypeError("range expected 1 arguments, got " + args.size());
         } else {
-            throw new org.python.exceptions.TypeError("range expected at most 3 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("range expected at most 3 arguments, got " + args.size());
         }
     }
 
@@ -1172,15 +1262,15 @@ public class Python {
             "For most object types, eval(repr(object)) == object.\n"
     )
     public static org.python.types.Str repr(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("repr() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("repr() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("repr() takes no keyword arguments");
         }
-        return args[0].__repr__();
+        return args.get(0).__repr__();
     }
 
     @org.python.Method(
@@ -1189,15 +1279,15 @@ public class Python {
             "Return a reverse iterator\n"
     )
     public static org.python.Iterable reversed(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("reversed() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("reversed() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("reversed() takes no keyword arguments");
         }
-        return args[0].__reversed__();
+        return args.get(0).__reversed__();
     }
 
     @org.python.Method(
@@ -1208,19 +1298,19 @@ public class Python {
             "same type as the number. ndigits may be negative.\n"
     )
     public static org.python.Object round(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("round() takes no keyword arguments");
         }
-        if (args.length == 0) {
+        if (args.size() == 0) {
             throw new org.python.exceptions.TypeError("Required argument 'number' (pos 1) not found");
-        } else if (args.length == 1) {
-            return args[0].__round__();
-        } else if (args.length == 2) {
-            return args[0].__round__(args[1]);
+        } else if (args.size() == 1) {
+            return args.get(0).__round__();
+        } else if (args.size() == 2) {
+            return args.get(0).__round__(args.get(1));
         } else {
-            throw new org.python.exceptions.TypeError("round() takes at most 2 arguments (" + args.length + " given)");
+            throw new org.python.exceptions.TypeError("round() takes at most 2 arguments (" + args.size() + " given)");
         }
     }
 
@@ -1231,18 +1321,18 @@ public class Python {
             "Build an unordered collection of unique elements.\n"
     )
     public static org.python.types.Set set(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("set() does not take keyword arguments");
         }
-        if (args.length == 0) {
+        if (args.size() == 0) {
             return new org.python.types.Set();
-        } else if (args.length == 1) {
-            // return new org.python.types.Set(args[0]);
+        } else if (args.size() == 1) {
+            // return new org.python.types.Set(args.get(0));
             throw new org.python.exceptions.NotImplementedError("Builtin function 'set' with iterator not implemented");
         } else {
-            throw new org.python.exceptions.TypeError("set() expected at most 1 arguments ( got " + args.length + ")");
+            throw new org.python.exceptions.TypeError("set() expected at most 1 arguments ( got " + args.size() + ")");
         }
     }
 
@@ -1253,7 +1343,7 @@ public class Python {
             "``x.y = v''.\n"
     )
     public static org.python.Object setattr(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'setattr' not implemented");
     }
@@ -1265,7 +1355,7 @@ public class Python {
             "Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).\n"
     )
     public static org.python.Object slice(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
     }
@@ -1274,7 +1364,7 @@ public class Python {
         __doc__ = "sorted(iterable, key=None, reverse=False) --> new sorted list"
     )
     public static org.python.types.List sorted(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'sorted' not implemented");
     }
@@ -1298,7 +1388,7 @@ public class Python {
             "For a more advanced concept, see the classmethod builtin.\n"
     )
     public static org.python.Object staticmethod(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'staticmethod' not implemented");
     }
@@ -1316,15 +1406,15 @@ public class Python {
             "errors defaults to 'strict'.\n"
     )
     public static org.python.types.Str str(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.length != 1) {
-            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.length + " given)");
+        if (args.size() != 1) {
+            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.size() + " given)");
         }
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("len() takes no keyword arguments");
         }
-        return args[0].__str__();
+        return args.get(0).__str__();
     }
 
     @org.python.Method(
@@ -1335,7 +1425,7 @@ public class Python {
             "empty, return start.\n"
     )
     public static org.python.Object sum(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'sum' not implemented");
     }
@@ -1356,7 +1446,7 @@ public class Python {
             "   super().cmeth(arg)\n"
     )
     public static org.python.Object super_call(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'super' not implemented");
     }
@@ -1368,7 +1458,7 @@ public class Python {
             "If the argument is a tuple, the return value is the same object.\n"
     )
     public static org.python.types.Tuple tuple(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
     }
@@ -1379,14 +1469,14 @@ public class Python {
             "type(name, bases, dict) -> a new type\n"
     )
     public static org.python.types.Type type(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
         }
-        if (args.length == 1) {
-            return org.python.types.Type.pythonType(args[0].getClass());
-        } else if (args.length == 3) {
+        if (args.size() == 1) {
+            return org.python.types.Type.pythonType(args.get(0).getClass());
+        } else if (args.size() == 3) {
             throw new org.python.exceptions.NotImplementedError("3-argument form of builtin function 'type' not implemented");
         } else {
             throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
@@ -1400,7 +1490,7 @@ public class Python {
             "With an argument, equivalent to object.__dict__.\n"
     )
     public static org.python.types.Dict vars(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'vars' not implemented");
     }
@@ -1414,7 +1504,7 @@ public class Python {
             "is exhausted and then it raises StopIteration.\n"
     )
     public static org.python.Object zip(
-                org.python.Object [] args,
+                java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'zip' not implemented");
     }

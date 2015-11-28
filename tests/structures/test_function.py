@@ -43,7 +43,6 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
-
     # def test_closure(self):
     #     self.assertCodeExecution("""
     #         def myfunc(value):
@@ -59,3 +58,80 @@ class FunctionTests(TranspileTestCase):
     #         print("outer =", myfunc(5))
     #         print('Done.')
     #         """)
+
+    def test_default_args(self):
+        self.assertCodeExecution("""
+            def myfunc(x, y=1, z=2):
+                print("x =", x)
+                print("y =", y)
+                print("z =", z)
+
+            myfunc(37)
+            print('Done.')
+            """, run_in_function=False)
+
+    def test_override_some_default_args(self):
+        self.assertCodeExecution("""
+            def myfunc(x, y=1, z=2):
+                print("x =", x)
+                print("y =", y)
+                print("z =", z)
+
+            myfunc(37, 42)
+            print('Done.')
+            """, run_in_function=False)
+
+    def test_overide_all_default_args(self):
+        self.assertCodeExecution("""
+            def myfunc(x, y=1, z=2):
+                print("x =", x)
+                print("y =", y)
+                print("z =", z)
+
+            myfunc(37, 42, 99)
+            print('Done.')
+            """, run_in_function=False)
+
+    def test_use_kwargs(self):
+        self.assertCodeExecution("""
+            def myfunc(x, y=1, z=2):
+                print("x =", x)
+                print("y =", y)
+                print("z =", z)
+
+            myfunc(37, y=42)
+            print('Done.')
+            """, run_in_function=False)
+
+    def test_use_kwargs_non_sequential(self):
+        self.assertCodeExecution("""
+            def myfunc(x, y=1, z=2):
+                print("x =", x)
+                print("y =", y)
+                print("z =", z)
+
+            myfunc(37, z=42)
+            print('Done.')
+            """, run_in_function=False)
+
+    def test_use_all_kwargs(self):
+        self.assertCodeExecution("""
+            def myfunc(x, y=1, z=2):
+                print("x =", x)
+                print("y =", y)
+                print("z =", z)
+
+            myfunc(x=37, y=42, z=99)
+            print('Done.')
+            """, run_in_function=False)
+
+    def test_use_all_kwargs_different_order(self):
+        self.assertCodeExecution("""
+            def myfunc(x, y=1, z=2):
+                print("x =", x)
+                print("y =", y)
+                print("z =", z)
+
+            myfunc(z=99, y=42, x=37)
+            print('Done.')
+            """, run_in_function=False)

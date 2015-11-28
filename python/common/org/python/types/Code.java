@@ -27,10 +27,6 @@ public class Code extends org.python.types.Object {
         this.attrs.put("co_varnames", object.attrs.get("co_varnames"));
     }
 
-    public Code() {
-        super();
-    }
-
     public Code(
             org.python.types.Int co_argcount,
             org.python.types.Tuple co_cellvars,
@@ -70,7 +66,7 @@ public class Code extends org.python.types.Object {
     public org.python.types.Str __repr__() {
         return new org.python.types.Str(
             String.format("<%s object at %x, file \"%s\", line %s>",
-                org.Python.pythonTypeName(this),
+                org.Python.typeName(this),
                 this.hashCode(),
                 this.attrs.get("co_filename"),
                 this.attrs.get("co_firstlineno")

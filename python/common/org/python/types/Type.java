@@ -57,21 +57,6 @@ public class Type extends org.python.types.Object {
             // this.attrs.put("__module__", );
             // this.attrs.put("__qualname__", );
 
-            // Iterate over every method in the class, and if the
-            // method is annotated for inclusion in the Python class,
-            // add a function wrapper to the type definition.
-            for (java.lang.reflect.Method method: klass.getMethods()) {
-                // System.out.println("Found method " + method + " on type " + klass);
-                java.lang.annotation.Annotation annotation = method.getAnnotation(org.python.Method.class);
-                if (annotation != null) {
-                    // System.out.println("Add method " + method + " to type " + klass);
-                    this.attrs.put(
-                        method.getName(),
-                        new org.python.types.Function(method)
-                    );
-                }
-            }
-
             // Iterate over every field in the class. If the
             // field is annotated for inclusion in the Python class,
             // add a function wrapper to the type definition.
@@ -103,7 +88,7 @@ public class Type extends org.python.types.Object {
     }
 
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<class '%s'>", org.Python.pythonTypeName(this.klass)));
+        return new org.python.types.Str(String.format("<class '%s'>", org.Python.typeName(this.klass)));
     }
 }
 

@@ -13,6 +13,10 @@ public class Float extends org.python.types.Object {
         this.value = ((org.python.types.Float) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Float(float value) {
         super();
         this.value = (double) value;
@@ -54,7 +58,7 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Bool(this.value < 0.0);
             }
         }
-        throw new org.python.exceptions.TypeError("unorderable types: float() < " + org.Python.pythonTypeName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: float() < " + org.Python.typeName(other) + "()");
     }
 
     public org.python.Object __le__(org.python.Object other) {
@@ -72,7 +76,7 @@ public class Float extends org.python.types.Object {
                 || (this.value != 0.0 && ((org.python.types.Bool) other).value)
             );
         }
-        throw new org.python.exceptions.TypeError("unorderable types: float() == " + org.Python.pythonTypeName(other) + "()");
+        throw new org.python.exceptions.TypeError("unorderable types: float() == " + org.Python.typeName(other) + "()");
     }
 
     public org.python.Object __ne__(org.python.Object other) {
@@ -124,7 +128,7 @@ public class Float extends org.python.types.Object {
             }
             return new org.python.types.Float(this.value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __mul__(org.python.Object other) {
@@ -152,7 +156,7 @@ public class Float extends org.python.types.Object {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {

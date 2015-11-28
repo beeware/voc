@@ -1,7 +1,7 @@
 package org.python.types;
 
 public class Tuple extends org.python.types.Object {
-    public java.util.ArrayList<org.python.Object> value;
+    public java.util.List<org.python.Object> value;
 
     /**
      * A utility method to update the internal value of this object.
@@ -13,12 +13,16 @@ public class Tuple extends org.python.types.Object {
         this.value = ((org.python.types.Tuple) obj).value;
     }
 
+    public java.lang.Object toValue() {
+        return this.value;
+    }
+
     public Tuple() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();
     }
 
-    public Tuple(java.util.ArrayList<org.python.Object> tuple) {
+    public Tuple(java.util.List<org.python.Object> tuple) {
         super();
         this.value = tuple;
     }
@@ -98,7 +102,7 @@ public class Tuple extends org.python.types.Object {
         try {
             if (index instanceof org.python.types.Slice) {
                 org.python.types.Slice slice = (org.python.types.Slice) index;
-                java.util.ArrayList<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
+                java.util.List<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
 
                 if (slice.start == null && slice.stop == null && slice.step == null) {
                     sliced.addAll(this.value);
@@ -148,7 +152,7 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + org.Python.pythonTypeName(index));
+            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + org.Python.typeName(index));
         }
     }
 
@@ -169,7 +173,7 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + org.Python.pythonTypeName(index));
+            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + org.Python.typeName(index));
         }
     }
 

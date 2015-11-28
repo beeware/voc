@@ -12,7 +12,11 @@ public class Object implements org.python.Object {
      * to provide the relevant assignment info.
      */
     void setValue(org.python.Object obj) {
-        throw new org.python.exceptions.RuntimeError("'" + org.Python.pythonTypeName(this) + "' object cannot be updated.");
+        throw new org.python.exceptions.RuntimeError("'" + org.Python.typeName(this) + "' object cannot be updated.");
+    }
+
+    public java.lang.Object toValue() {
+        return this;
     }
 
     /**
@@ -100,29 +104,29 @@ public class Object implements org.python.Object {
     @org.python.Method(
         __doc__ = "Return repr(self)."
     )
-    public org.python.Object __repr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __lt__ doesn't take keyword arguments");
         }
-        if (args.length != 0) {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+        if (args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
         }
         return this.__repr__();
     }
 
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<%s object at 0x%x>", org.Python.pythonTypeName(this), this.hashCode()));
+        return new org.python.types.Str(String.format("<%s object at 0x%x>", org.Python.typeName(this), this.hashCode()));
     }
 
     @org.python.Method(
         __doc__ = "Return str(self)."
     )
-    public org.python.Object __str__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __str__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __lt__ doesn't take keyword arguments");
         }
-        if (args.length != 0) {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.length);
+        if (args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
         }
         return this.__str__();
     }
@@ -136,108 +140,108 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.Str __format__(org.python.Object format_spec) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__format__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__format__' has not been implemented");
     }
 
-    public org.python.Object __lt__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __lt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __lt__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__lt__(args[0]);
+        if (args.size() == 1) {
+            return this.__lt__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__lt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__lt__' has not been implemented");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __le__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __le__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __le__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__le__(args[0]);
+        if (args.size() == 1) {
+            return this.__le__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__le__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__le__' has not been implemented");
     }
 
 
-    public org.python.Object __eq__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __eq__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __eq__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__eq__(args[0]);
+        if (args.size() == 1) {
+            return this.__eq__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__eq__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__eq__' has not been implemented");
     }
 
 
-    public org.python.Object __ne__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __ne__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ne__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__ne__(args[0]);
+        if (args.size() == 1) {
+            return this.__ne__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__ne__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__ne__' has not been implemented");
     }
 
-    public org.python.Object __gt__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __gt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __gt__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__gt__(args[0]);
+        if (args.size() == 1) {
+            return this.__gt__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__gt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__gt__' has not been implemented");
     }
 
-    public org.python.Object __ge__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __ge__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ge__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__ge__(args[0]);
+        if (args.size() == 1) {
+            return this.__ge__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__ge__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__ge__' has not been implemented");
     }
 
     public org.python.types.Int __hash__() {
@@ -253,19 +257,19 @@ public class Object implements org.python.Object {
      * Section 3.3.2 - Emulating container types
      */
 
-    public org.python.Object __getattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __getattr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __getattr__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            if (args[0] instanceof org.python.types.Str) {
-                return this.__getattr__(((org.python.types.Str) args[0]).value);
+        if (args.size() == 1) {
+            if (args.get(0) instanceof org.python.types.Str) {
+                return this.__getattr__(((org.python.types.Str) args.get(0)).value);
             } else {
                 throw new org.python.exceptions.TypeError("getattr(): attribute name must be string");
             }
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -281,19 +285,19 @@ public class Object implements org.python.Object {
         throw new org.python.exceptions.AttributeError(this, "__getattr__");
     }
 
-    public org.python.Object __getattribute__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __getattribute__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __getattribute__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            if (args[0] instanceof org.python.types.Str) {
-                return this.__getattribute__(((org.python.types.Str) args[0]).value);
+        if (args.size() == 1) {
+            if (args.get(0) instanceof org.python.types.Str) {
+                return this.__getattribute__(((org.python.types.Str) args.get(0)).value);
             } else {
                 throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
             }
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -329,14 +333,14 @@ public class Object implements org.python.Object {
         return value.__get__(this, org.python.types.Type.pythonType(this.getClass()));
     }
 
-    public org.python.Object __get__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __get__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.RuntimeError("Descriptor method __get__ does not accept keyword arguments.");
         }
-        if (args.length == 2) {
-            return this.__get__(args[0], (org.python.types.Type) args[1]);
+        if (args.size() == 2) {
+            return this.__get__(args.get(0), (org.python.types.Type) args.get(1));
         } else {
-            throw new org.python.exceptions.RuntimeError("Descriptor method __get__ takes exactly 2 arguments (" + args.length + " given).");
+            throw new org.python.exceptions.RuntimeError("Descriptor method __get__ takes exactly 2 arguments (" + args.size() + " given).");
         }
     }
 
@@ -344,19 +348,19 @@ public class Object implements org.python.Object {
         return this;
     }
 
-    public void __setattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __setattr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __setattr__ doesn't take keyword arguments");
         }
-        if (args.length == 2) {
-            if (args[0] instanceof org.python.types.Str) {
-                this.__setattr__(((org.python.types.Str) args[0]).value, args[1]);
+        if (args.size() == 2) {
+            if (args.get(0) instanceof org.python.types.Str) {
+                this.__setattr__(((org.python.types.Str) args.get(0)).value, args.get(1));
             } else {
                 throw new org.python.exceptions.TypeError("setattr(): attribute name must be string");
             }
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 2 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 2 arguments, got " + args.size());
         }
     }
 
@@ -388,19 +392,19 @@ public class Object implements org.python.Object {
         }
     }
 
-    public void __delattr__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __delattr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __delattr__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            if (args[0] instanceof org.python.types.Str) {
-                this.__delattr__(((org.python.types.Str) args[0]).value);
+        if (args.size() == 1) {
+            if (args.get(0) instanceof org.python.types.Str) {
+                this.__delattr__(((org.python.types.Str) args.get(0)).value);
             } else {
                 throw new org.python.exceptions.TypeError("delattr(): attribute name must be string");
             }
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -420,7 +424,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.List __dir__() {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.pythonTypeName(this) + ".__dir__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__dir__' has not been implemented");
     }
 
 
@@ -457,15 +461,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public org.python.Object __getitem__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __getitem__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __getitem__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__getitem__(args[0]);
+        if (args.size() == 1) {
+            return this.__getitem__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -479,15 +483,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __setitem__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __setitem__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __setitem__ doesn't take keyword arguments");
         }
-        if (args.length == 2) {
-            this.__setitem__(args[0], args[1]);
+        if (args.size() == 2) {
+            this.__setitem__(args.get(0), args.get(1));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 2 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 2 arguments, got " + args.size());
         }
     }
 
@@ -500,15 +504,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __delitem__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __delitem__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __delitem__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__delitem__(args[0]);
+        if (args.size() == 1) {
+            this.__delitem__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -538,117 +542,117 @@ public class Object implements org.python.Object {
      * Section 3.3.7 - Emulating numeric types
      */
 
-    public org.python.Object __add__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __add__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __add__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__add__(args[0]);
+        if (args.size() == 1) {
+            return this.__add__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __sub__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __sub__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __sub__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__sub__(args[0]);
+        if (args.size() == 1) {
+            return this.__sub__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __sub__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __mul__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __mul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __mul__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__mul__(args[0]);
+        if (args.size() == 1) {
+            return this.__mul__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __truediv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __truediv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __truediv__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__truediv__(args[0]);
+        if (args.size() == 1) {
+            return this.__truediv__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __floordiv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __floordiv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __floordiv__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__floordiv__(args[0]);
+        if (args.size() == 1) {
+            return this.__floordiv__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __mod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __mod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __mod__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__mod__(args[0]);
+        if (args.size() == 1) {
+            return this.__mod__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __divmod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __divmod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __divmod__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__divmod__(args[0]);
+        if (args.size() == 1) {
+            return this.__divmod__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -657,342 +661,342 @@ public class Object implements org.python.Object {
     }
 
 
-    public org.python.Object __pow__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __pow__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __pow__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__pow__(args[0]);
+        if (args.size() == 1) {
+            return this.__pow__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __pow__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulus) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.pythonTypeName(this) + "', '" + org.Python.pythonTypeName(other) + "', '" + org.Python.pythonTypeName(modulus) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.typeName(this) + "', '" + org.Python.typeName(other) + "', '" + org.Python.typeName(modulus) + "'");
     }
 
 
-    public org.python.Object __lshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __lshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __lshift__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__lshift__(args[0]);
+        if (args.size() == 1) {
+            return this.__lshift__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __rshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rshift__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rshift__(args[0]);
+        if (args.size() == 1) {
+            return this.__rshift__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __and__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __and__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __and__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__and__(args[0]);
+        if (args.size() == 1) {
+            return this.__and__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __xor__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __xor__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __xor__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__xor__(args[0]);
+        if (args.size() == 1) {
+            return this.__xor__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __xor__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __or__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __or__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __or__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__or__(args[0]);
+        if (args.size() == 1) {
+            return this.__or__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __or__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
     }
 
 
-    public org.python.Object __radd__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __radd__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __radd__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__radd__(args[0]);
+        if (args.size() == 1) {
+            return this.__radd__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __radd__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for + (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for + (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rsub__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rsub__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rsub__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rsub__(args[0]);
+        if (args.size() == 1) {
+            return this.__rsub__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rsub__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for - (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for - (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rmul__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rmul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rmul__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rmul__(args[0]);
+        if (args.size() == 1) {
+            return this.__rmul__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rmul__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for * (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for * (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rtruediv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rtruediv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rtruediv__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rtruediv__(args[0]);
+        if (args.size() == 1) {
+            return this.__rtruediv__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rtruediv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for / (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for / (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rfloordiv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rfloordiv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rfloordiv__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rfloordiv__(args[0]);
+        if (args.size() == 1) {
+            return this.__rfloordiv__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rfloordiv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for // (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for // (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rmod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rmod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rmod__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rmod__(args[0]);
+        if (args.size() == 1) {
+            return this.__rmod__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rmod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for % (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for % (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rdivmod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rdivmod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rdivmod__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rdivmod__(args[0]);
+        if (args.size() == 1) {
+            return this.__rdivmod__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rdivmod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rpow__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rpow__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rpow__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rpow__(args[0]);
+        if (args.size() == 1) {
+            return this.__rpow__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rpow__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ or pow() (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ or pow() (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rlshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rlshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rlshift__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rlshift__(args[0]);
+        if (args.size() == 1) {
+            return this.__rlshift__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rlshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for << (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for << (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rrshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rrshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rrshift__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rrshift__(args[0]);
+        if (args.size() == 1) {
+            return this.__rrshift__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rrshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >> (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >> (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rand__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rand__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rand__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rand__(args[0]);
+        if (args.size() == 1) {
+            return this.__rand__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rand__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for & (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for & (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __rxor__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __rxor__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __rxor__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__rxor__(args[0]);
+        if (args.size() == 1) {
+            return this.__rxor__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __rxor__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public org.python.Object __ror__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __ror__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ror__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            return this.__ror__(args[0]);
+        if (args.size() == 1) {
+            return this.__ror__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
     public org.python.Object __ror__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for | (reversed): '" + org.Python.pythonTypeName(other) + "' and '" + org.Python.pythonTypeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for | (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
     }
 
 
-    public void __iadd__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __iadd__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __iadd__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__iadd__(args[0]);
+        if (args.size() == 1) {
+            this.__iadd__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1000,20 +1004,20 @@ public class Object implements org.python.Object {
         try {
             this.setValue(this.__add__(other));
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + org.Python.pythonTypeName(this) + "' and '" + org.Python.pythonTypeName(other) + "'");
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
         }
     }
 
 
-    public void __isub__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __isub__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __isub__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__isub__(args[0]);
+        if (args.size() == 1) {
+            this.__isub__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1022,15 +1026,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __imul__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __imul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __imul__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__imul__(args[0]);
+        if (args.size() == 1) {
+            this.__imul__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1039,15 +1043,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __itruediv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __itruediv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __itruediv__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__itruediv__(args[0]);
+        if (args.size() == 1) {
+            this.__itruediv__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1056,15 +1060,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __ifloordiv__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __ifloordiv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ifloordiv__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__ifloordiv__(args[0]);
+        if (args.size() == 1) {
+            this.__ifloordiv__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1073,15 +1077,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __imod__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __imod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __imod__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__imod__(args[0]);
+        if (args.size() == 1) {
+            this.__imod__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1090,15 +1094,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __ipow__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __ipow__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ipow__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__ipow__(args[0]);
+        if (args.size() == 1) {
+            this.__ipow__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1107,15 +1111,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __ilshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __ilshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ilshift__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__ilshift__(args[0]);
+        if (args.size() == 1) {
+            this.__ilshift__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1124,15 +1128,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __irshift__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __irshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __irshift__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__irshift__(args[0]);
+        if (args.size() == 1) {
+            this.__irshift__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1141,15 +1145,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __iand__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __iand__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __iand__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__iand__(args[0]);
+        if (args.size() == 1) {
+            this.__iand__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1158,15 +1162,15 @@ public class Object implements org.python.Object {
     }
 
 
-    public void __ixor__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __ixor__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ixor__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__ixor__(args[0]);
+        if (args.size() == 1) {
+            this.__ixor__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1178,15 +1182,15 @@ public class Object implements org.python.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public void __ior__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public void __ior__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("wrapper __ior__ doesn't take keyword arguments");
         }
-        if (args.length == 1) {
-            this.__ior__(args[0]);
+        if (args.size() == 1) {
+            this.__ior__(args.get(0));
         }
         else {
-            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.length);
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
 
@@ -1216,7 +1220,7 @@ public class Object implements org.python.Object {
         return new org.python.types.Bool(!this.__bool__().value);
     }
 
-    public org.python.Object __complex__(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object __complex__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.AttributeError(this, "__complex__");
     }
 
