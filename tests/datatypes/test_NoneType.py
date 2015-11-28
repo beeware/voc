@@ -1,7 +1,7 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
-class NoneAttributeTests(TranspileTestCase):
+class NoneTypeAttributeTests(TranspileTestCase):
     def test_set_attribute_of_none(self):
         self.assertCodeExecution("""
             x = None
@@ -17,7 +17,7 @@ class NoneAttributeTests(TranspileTestCase):
             """)
 
 
-class UnaryNoneOperationTests(UnaryOperationTestCase, TranspileTestCase):
+class UnaryNoneTypeOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = [None]
 
     not_implemented = [
@@ -28,7 +28,7 @@ class UnaryNoneOperationTests(UnaryOperationTestCase, TranspileTestCase):
     ]
 
 
-class BinaryNoneOperationTests(BinaryOperationTestCase, TranspileTestCase):
+class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     values = [None]
 
     not_implemented = [
@@ -225,7 +225,7 @@ class BinaryNoneOperationTests(BinaryOperationTestCase, TranspileTestCase):
     ]
 
 
-class InplaceNoneOperationTests(InplaceOperationTestCase, TranspileTestCase):
+class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase):
     values = [None]
 
     not_implemented = [
