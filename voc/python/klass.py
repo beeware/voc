@@ -46,6 +46,19 @@ class ClassBlock(Block):
         )
         free_name(self, '#value')
 
+    def store_dynamic(self):
+        self.add_opcodes(
+            ASTORE_name(self, '#value'),
+            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.GETFIELD('org/python/types/Type', 'attrs', 'Ljava/util/Map;'),
+            ALOAD_name(self, '#value'),
+
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', '(Ljava/util/Map;)V'),
+        )
+        free_name(self, '#value')
+
     def load_name(self, name, use_locals):
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.klass.descriptor),

@@ -177,7 +177,6 @@ class ImportTests(TranspileTestCase):
                     """
             })
 
-    @expectedFailure
     def test_import_star(self):
         self.assertCodeExecution(
             """
@@ -209,9 +208,8 @@ class ImportTests(TranspileTestCase):
                         print("Now we're calling a third module method")
 
                     """
-            })
+            }, run_in_function=False)
 
-    @expectedFailure
     def test_import_star_with_all(self):
         self.assertCodeExecution(
             """
@@ -248,4 +246,4 @@ class ImportTests(TranspileTestCase):
                         print("This shouldn't be called")
 
                     """
-            })
+            }, run_in_function=False)

@@ -1203,9 +1203,8 @@ class GET_ITER(Opcode):
             JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
             JavaOpcodes.POP(),
 
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+            # No kwargs needed.
+            JavaOpcodes.ACONST_NULL(),
 
             JavaOpcodes.INVOKESTATIC(
                 'org/Python',
@@ -1307,12 +1306,12 @@ class IMPORT_STAR(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
+        # Find exported symbols (__all__, or everything but private "_" symbols)
         context.add_opcodes(
-            ASTORE_name(context, '##module##'),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'importAll', '(Lorg/python/types/Module;)Ljava/util/Map;')
         )
-
-        # Find exported symbols (__all__, or everything but _)
-        # Add each one to current context
+        # Add all the exported sympbols to the currrent context
+        context.store_dynamic()
 
 
 # class YIELD_VALUE(Opcode):
@@ -2538,13 +2537,11 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.NEW(self.method.parent.descriptor),
                 JavaOpcodes.DUP(),
 
-                JavaOpcodes.NEW('java/util/ArrayList'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+                # No args needed.
+                JavaOpcodes.ACONST_NULL(),
 
-                JavaOpcodes.NEW('java/util/HashMap'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+                # No kwargs needed.
+                JavaOpcodes.ACONST_NULL(),
 
                 JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '(Ljava/util/List;Ljava/util/Map;)V'),
             )

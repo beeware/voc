@@ -57,8 +57,10 @@ class StaticBlock(Block):
     def store_name(self, name, use_locals):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
+            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
             JavaOpcodes.LDC_W(self.module.descriptor),
-            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
             JavaOpcodes.LDC_W(name),
             ALOAD_name(self, '#value'),
@@ -67,10 +69,25 @@ class StaticBlock(Block):
         )
         free_name(self, '#value')
 
+    def store_dynamic(self):
+        self.add_opcodes(
+            ASTORE_name(self, '#value'),
+            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.GETFIELD('org/python/types/Type', 'attrs', 'Ljava/util/Map;'),
+
+            ALOAD_name(self, '#value'),
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', '(Ljava/util/Map;)V'),
+        )
+        free_name(self, '#value')
+
     def load_name(self, name, use_locals):
         self.add_opcodes(
+            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
             JavaOpcodes.LDC_W(self.module.descriptor),
-            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
             JavaOpcodes.LDC_W(name),
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
             # JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
@@ -78,8 +95,10 @@ class StaticBlock(Block):
 
     def delete_name(self, name, use_locals):
         self.add_opcodes(
+            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
             JavaOpcodes.LDC_W(self.module.descriptor),
-            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'getModule', '(Ljava/lang/String;)Lorg/python/types/Module;'),
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
             JavaOpcodes.LDC_W(name),
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
