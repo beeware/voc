@@ -510,8 +510,7 @@ public class Object implements org.python.Object {
         }
         if (args != null && args.size() == 1) {
             this.__delitem__(args.get(0));
-        }
-        else {
+        } else {
             throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
         }
     }
@@ -533,8 +532,23 @@ public class Object implements org.python.Object {
         throw new org.python.exceptions.AttributeError(this, "__reversed__");
     }
 
-    public org.python.types.Bool __contains__(org.python.Object item) {
+    public org.python.Object __contains__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("wrapper __contains__ doesn't take keyword arguments");
+        }
+        if (args != null && args.size() == 1) {
+            return this.__contains__(args.get(0));
+        } else {
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
+        }
+    }
+
+    public org.python.Object __contains__(org.python.Object item) {
         throw new org.python.exceptions.AttributeError(this, "__contains__");
+    }
+
+    public org.python.Object __not_contains__(org.python.Object item) {
+        throw new org.python.exceptions.AttributeError(this, "__not_contains__");
     }
 
 

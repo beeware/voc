@@ -402,6 +402,13 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         throw new org.python.exceptions.AttributeError(this, "__reversed__");
     }
 
+    public org.python.Object __contains__(org.python.Object item) {
+        throw new org.python.exceptions.AttributeError(this, "__contains__");
+    }
+
+    public org.python.Object __not_contains__(org.python.Object item) {
+        throw new org.python.exceptions.AttributeError(this, "__not_contains__");
+    }
 
     /**
      * Section 3.3.7 - Emulating numeric types

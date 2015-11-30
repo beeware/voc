@@ -17,6 +17,10 @@ public class Set extends org.python.types.Object {
         return this.value;
     }
 
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
     public Set() {
         super();
         this.value = new java.util.HashSet<org.python.Object>();
@@ -152,6 +156,82 @@ public class Set extends org.python.types.Object {
 
     public org.python.Object __ior__() {
         throw new org.python.exceptions.NotImplementedError("set.__ior__() has not been implemented");
+    }
+
+    public org.python.Object add(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.add() has not been implemented.");
+    }
+
+    public org.python.Object clear(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.clear() has not been implemented.");
+    }
+
+    public org.python.Object clear() {
+        throw new org.python.exceptions.NotImplementedError("set.clear() has not been implemented.");
+    }
+
+    public org.python.Object copy(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.copy() has not been implemented.");
+    }
+
+    public org.python.Object copy() {
+        throw new org.python.exceptions.NotImplementedError("set.copy() has not been implemented.");
+    }
+
+    public org.python.Object difference(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.difference() has not been implemented.");
+    }
+
+    public org.python.Object difference_update(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.difference_update() has not been implemented.");
+    }
+
+    public org.python.Object discard(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.discard() has not been implemented.");
+    }
+
+    public org.python.Object intersection(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.intersection() has not been implemented.");
+    }
+
+    public org.python.Object intersection_update(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.intersection_update() has not been implemented.");
+    }
+
+    public org.python.Object isdisjoint(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.isdisjoint() has not been implemented.");
+    }
+
+    public org.python.Object issubset(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.issubset() has not been implemented.");
+    }
+
+    public org.python.Object issuperset(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.issuperset() has not been implemented.");
+    }
+
+    public org.python.Object pop(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.pop() has not been implemented.");
+    }
+
+    public org.python.Object remove(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.remove() has not been implemented.");
+    }
+
+    public org.python.Object symmetric_difference(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.symmetric_difference() has not been implemented.");
+    }
+
+    public org.python.Object symmetric_difference_update(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.symmetric_difference_update() has not been implemented.");
+    }
+
+    public org.python.Object union(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.union() has not been implemented.");
+    }
+
+    public org.python.Object update(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("set.update() has not been implemented.");
     }
 
 

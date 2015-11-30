@@ -3,6 +3,12 @@ from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationT
 
 class ListTests(TranspileTestCase):
     def test_creation(self):
+        # Empty list
+        self.assertCodeExecution("""
+            x = []
+            print(x)
+            """)
+
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
             print(x)

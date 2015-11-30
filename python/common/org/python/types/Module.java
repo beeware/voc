@@ -4,6 +4,10 @@ public class Module extends org.python.types.Object {
 
     public java.lang.Class klass;
 
+    public int hashCode() {
+        return this.klass.hashCode();
+    }
+
     protected Module() {
         this.klass = this.getClass();
     }

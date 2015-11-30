@@ -17,6 +17,10 @@ public class Str extends org.python.types.Object {
         return this.value;
     }
 
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
     public Str(java.lang.String str) {
         this.value = str;
     }
@@ -203,7 +207,7 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("str.__iter__() has not been implemented.");
     }
 
-    public org.python.types.Bool __contains__() {
+    public org.python.types.Int __contains__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("str.__contains__() has not been implemented.");
     }
 

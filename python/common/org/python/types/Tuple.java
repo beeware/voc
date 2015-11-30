@@ -17,6 +17,10 @@ public class Tuple extends org.python.types.Object {
         return this.value;
     }
 
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
     public Tuple() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();
@@ -186,7 +190,7 @@ public class Tuple extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("tuple.__iter__() has not been implemented.");
     }
 
-    public org.python.types.Bool __contains__(org.python.Object other) {
+    public org.python.Object __contains__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("tuple.__contains__() has not been implemented.");
     }
 

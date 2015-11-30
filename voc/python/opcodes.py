@@ -1086,7 +1086,36 @@ class INPLACE_TRUE_DIVIDE(InplaceOpcode):
     __method__ = '__itruediv__'
 
 
-# class STORE_MAP(Opcode):
+class STORE_MAP(Opcode):
+    @property
+    def consume_count(self):
+        return 3
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert_opcode(self, context, arguments):
+        # At the time STORE_SUBSCR is called, the top three elements
+        # on the stack will be the key under which to store, the value
+        # to store, and the subject of the store operation. Pop them off
+        # and store in reverse order.
+
+        context.add_opcodes(
+            ASTORE_name(context, '#key-%x' % id(self)),
+            ASTORE_name(context, '#value-%x' % id(self)),
+        )
+
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+            ALOAD_name(context, '#key-%x' % id(self)),
+            ALOAD_name(context, '#value-%x' % id(self)),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+        )
+
+        # Clean up
+        free_name(context, '#key-%x' % id(self))
+        free_name(context, '#value-%x' % id(self))
 
 
 class INPLACE_ADD(InplaceOpcode):
@@ -1770,9 +1799,32 @@ class BUILD_MAP(Opcode):
     def product_count(self):
         return 1
 
-    # def convert_opcode(self, context, arguments):
-    #     code = []
-    #     return code
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+        context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Dict'),
+            JavaOpcodes.DUP(),
+
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V')
+        )
+
+        for argument in arguments:
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+
+            argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.POP(),
+            )
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '(Ljava/util/Map;)V')
+        )
 
 
 class LOAD_ATTR(Opcode):
@@ -1868,7 +1920,16 @@ class COMPARE_OP(Opcode):
                 'is': '__eq__',
                 'is not': '__ne__',
                 'exception match': '__eq__',
+                'in': '__contains__',
+                'not in': '__contains__',
+                'not in': '__not_contains__',
             }[self.comparison]
+
+            # Some operators take their operands in reverse order:
+            if self.comparison in ('in', 'not in'):
+                context.add_opcodes(
+                    JavaOpcodes.SWAP()
+                )
 
             context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', comparator, '(Lorg/python/Object;)Lorg/python/Object;')

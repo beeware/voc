@@ -71,7 +71,7 @@ public interface Object {
 
     public org.python.Iterable __reversed__();
 
-    // public org.python.types.Bool __contains__(org.python.Object item);
+    public org.python.Object __contains__(org.python.Object item);
 
     /**
      * Section 3.3.7 - Emulating numeric types
@@ -105,6 +105,7 @@ public interface Object {
     public org.python.Object __invert__();
 
     public org.python.Object __not__();
+    public org.python.Object __not_contains__(org.python.Object item);
 
     public org.python.Object __complex__(org.python.Object real, org.python.Object imag);
     public org.python.types.Int __int__();
