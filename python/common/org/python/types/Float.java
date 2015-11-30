@@ -17,6 +17,10 @@ public class Float extends org.python.types.Object {
         return this.value;
     }
 
+    public int hashCode() {
+        return new java.lang.Double(this.value).hashCode();
+    }
+
     public Float(float value) {
         super();
         this.value = (double) value;

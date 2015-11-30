@@ -13,6 +13,10 @@ public class Bytes extends org.python.types.Object {
         this.value = ((org.python.types.Bytes) obj).value;
     }
 
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
     public Bytes(byte [] value) {
         this.value = value;
     }

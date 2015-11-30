@@ -17,6 +17,10 @@ public class List extends org.python.types.Object {
         return this.value;
     }
 
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
     public List() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();
@@ -190,7 +194,7 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.__reversed__() has not been implemented.");
     }
 
-    public org.python.types.Bool __contains__() {
+    public org.python.Object __contains__(org.python.Object item) {
         throw new org.python.exceptions.NotImplementedError("list.__contains__() has not been implemented.");
     }
 
@@ -222,28 +226,38 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.__rmul__() has not been implemented.");
     }
 
-    public void append(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
-        if (kwargs.size() != 0) {
+    public org.python.Object append(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("append() takes no keyword arguments");
         }
-        if (args.size() == 1) {
+        if (args != null && args.size() == 1) {
             this.append(args.get(0));
         }
         else {
             throw new org.python.exceptions.TypeError("append() takes exactly 1 argument (" + args.size() + " given)");
         }
+        return org.python.types.NoneType.NONE;
     }
 
-    public void append(org.python.Object value) {
+    public org.python.Object append(org.python.Object value) {
         this.value.add(value);
+        return org.python.types.NoneType.NONE;
     }
 
-    public void clear(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
-        throw new org.python.exceptions.NotImplementedError("list.clear() has not been implemented.");
+    public org.python.Object clear(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
+        if (kwargs != null || kwargs.size() > 0) {
+            throw new org.python.exceptions.TypeError("clear() takes no keyword arguments");
+        }
+        if (args != null || args.size() > 0) {
+            throw new org.python.exceptions.TypeError("clear() takes no arguments (" + args.size() + " given)");
+        }
+        this.clear();
+        return org.python.types.NoneType.NONE;
     }
 
-    public void clear() {
-        throw new org.python.exceptions.NotImplementedError("list.clear() has not been implemented.");
+    public org.python.Object clear() {
+        this.value.clear();
+        return org.python.types.NoneType.NONE;
     }
 
     public org.python.Object copy(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {

@@ -3,6 +3,12 @@ from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationT
 
 class ListTests(TranspileTestCase):
     def test_creation(self):
+        # Empty list
+        self.assertCodeExecution("""
+            x = []
+            print(x)
+            """)
+
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
             print(x)
@@ -32,13 +38,6 @@ class ListTests(TranspileTestCase):
             x = [1, 2, 3, 4, 5]
             print(x[-10])
             """)
-
-    # def test_list_comprehensions(self):
-    #     self.assertCodeExecution("""
-    #         x = [1, 2, 3]
-    #         y = [v**2 for v in x]
-    #         print(y)
-    #         """)
 
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
@@ -210,18 +209,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_list',
 
         'test_add_set',
-        'test_subtract_set',
-        'test_multiply_set',
-        'test_floor_divide_set',
-        'test_true_divide_set',
-        'test_modulo_set',
-        'test_power_set',
-        'test_subscr_set',
-        'test_lshift_set',
-        'test_rshift_set',
-        'test_and_set',
-        'test_xor_set',
-        'test_or_set',
         'test_lt_set',
         'test_le_set',
         'test_eq_set',

@@ -150,11 +150,11 @@ public class Python {
     public static org.python.Object abs(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("abs() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("abs() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("abs() takes exactly one argument (" + args.size() + " given)");
         }
         return args.get(0).__abs__();
     }
@@ -208,11 +208,11 @@ public class Python {
     public static org.python.types.Str bin(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("bin() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("bin() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("bin() takes exactly one argument (" + args.size() + " given)");
         }
         return new org.python.types.Str(java.lang.String.format("0b%b", int_cast(args, kwargs).value));
     }
@@ -227,11 +227,11 @@ public class Python {
     public static org.python.types.Bool bool(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("bool() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("bool() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("bool() takes exactly one argument (" + args.size() + " given)");
         }
         return args.get(0).__bool__();
     }
@@ -285,11 +285,11 @@ public class Python {
     public static org.python.types.Bool callable(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("callable() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("callable() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("callable() takes exactly one argument (" + args.size() + " given)");
         }
         return new org.python.types.Bool(org.python.Callable.class.isAssignableFrom(args.get(0).getClass()));
     }
@@ -302,11 +302,11 @@ public class Python {
     public static org.python.types.Str chr(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("chr() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("chr() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("chr() takes exactly one argument (" + args.size() + " given)");
         }
 
         try {
@@ -472,7 +472,7 @@ public class Python {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("dir() takes no keyword arguments");
         }
-        if (args.size() == 0) {
+        if (args == null || args.size() == 0) {
             throw new org.python.exceptions.NotImplementedError("builting function 'dir' with no arguments not implemented");
         } else if (args.size() == 1) {
             return args.get(0).__dir__();
@@ -557,11 +557,11 @@ public class Python {
     public static org.python.types.Float float_cast(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("float() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("float() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("float() takes exactly one argument (" + args.size() + " given)");
         }
         return args.get(0).__float__();
     }
@@ -578,7 +578,7 @@ public class Python {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("format() takes no keyword arguments");
         }
-        if (args.size() < 1) {
+        if (args == null || args.size() == 0) {
             throw new org.python.exceptions.TypeError("format() takes at least 1 argument (" + args.size() + " given)");
         } else if (args.size() == 1) {
             return args.get(0).__str__();
@@ -657,11 +657,11 @@ public class Python {
     public static org.python.types.Int hash(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("hash() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("hash() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("hash() takes exactly one argument (" + args.size() + " given)");
         }
         return args.get(0).__hash__();
     }
@@ -687,11 +687,11 @@ public class Python {
     public static org.python.types.Str hex(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("hex() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("hex() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("hex() takes exactly one argument (" + args.size() + " given)");
         }
         return new org.python.types.Str(String.format("0x%x", int_cast(args, kwargs)));
     }
@@ -705,11 +705,11 @@ public class Python {
     public static org.python.types.Int id(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("id() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("id() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("id() takes exactly one argument (" + args.size() + " given)");
         }
         return new org.python.types.Int(System.identityHashCode(args.get(0)));
     }
@@ -725,16 +725,16 @@ public class Python {
     public static org.python.types.Str input(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() > 1) {
-            throw new org.python.exceptions.TypeError("input() expected at most one arguments ( got " + args.size() + ")");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("bin() takes no keyword arguments");
+        }
+        if (args.size() > 1) {
+            throw new org.python.exceptions.TypeError("input() expected at most one arguments ( got " + args.size() + ")");
         }
 
         java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
 
-        if (args.size() == 1) {
+        if (args != null && args.size() == 1) {
             System.out.print(args.get(0));
             System.out.flush();
         }
@@ -767,8 +767,10 @@ public class Python {
     public static org.python.types.Int int_cast(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs.size() == 0) {
-            if (args.size() == 1) {
+        if (kwargs != null && kwargs.size() == 0) {
+            if (args == null || args.size() == 0) {
+                return new org.python.types.Int(0);
+            } else if (args.size() == 1) {
                 return args.get(0).__int__();
             } else if (args.size() == 2) {
                 throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
@@ -821,7 +823,7 @@ public class Python {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("iter() takes no keyword arguments");
         }
-        if (args.size() < 1) {
+        if (args == null || args.size() == 0) {
             throw new org.python.exceptions.TypeError("iter() expects at least argument, got " + args.size());
         } else if (args.size() == 1) {
             return args.get(0).__iter__();
@@ -840,11 +842,11 @@ public class Python {
     public static org.python.types.Int len(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("len() takes no keyword arguments");
+        }
+        if (args != null && args.size() != 1) {
+            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.size() + " given)");
         }
         return args.get(0).__len__();
     }
@@ -869,7 +871,9 @@ public class Python {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("list() takes no keyword arguments");
         }
-        if (args.size() == 1) {
+        if (args == null || args.size() == 0) {
+            return new org.python.types.List();
+        } else if (args.size() == 1) {
             if (args.get(0) instanceof org.python.types.List) {
                 return new org.python.types.List(
                     new java.util.ArrayList(
@@ -889,8 +893,6 @@ public class Python {
             } else {
                 throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(args.get(0).getClass()) + "' object is not iterable");
             }
-        } else if (args.size() == 0) {
-            return new org.python.types.List();
         } else {
             throw new org.python.exceptions.TypeError("list() takes at most 1 argument (" + args.size() + " given)");
         }
@@ -992,11 +994,11 @@ public class Python {
     public static org.python.types.Str oct(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("oct() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("oct() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("oct() takes exactly one argument (" + args.size() + " given)");
         }
         return new org.python.types.Str(String.format("0o%o", int_cast(args, kwargs).value));
     }
@@ -1138,11 +1140,11 @@ public class Python {
     public static org.python.types.Int ord(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("org() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("ord() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("org() takes exactly one argument (" + args.size() + " given)");
         }
 
         try {
@@ -1166,14 +1168,15 @@ public class Python {
     public static org.python.Object pow(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() < 2) {
-            throw new org.python.exceptions.TypeError("pow() expected at least 2 arguments, got " + args.size());
-        }
-        if (args.size() > 3) {
-            throw new org.python.exceptions.TypeError("pow() expected at most 3 arguments, got " + args.size());
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("pow() takes no keyword arguments");
+        }
+        if (args == null) {
+            throw new org.python.exceptions.TypeError("pow() expected at least 2 arguments, got 0");
+        } else if (args.size() < 2) {
+            throw new org.python.exceptions.TypeError("pow() expected at least 2 arguments, got " + args.size());
+        } else if (args.size() > 3) {
+            throw new org.python.exceptions.TypeError("pow() expected at most 3 arguments, got " + args.size());
         }
 
         if (args.size() == 3) {
@@ -1269,14 +1272,14 @@ public class Python {
     public static org.python.types.Range range(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() == 1) {
+        if (args == null || args.size() == 0) {
+            throw new org.python.exceptions.TypeError("range expected 1 arguments, got " + args.size());
+        } else if (args.size() == 1) {
             return new org.python.types.Range(args.get(0));
         } else if (args.size() == 2) {
             return new org.python.types.Range(args.get(0), args.get(1));
         } else if (args.size() == 3) {
             return new org.python.types.Range(args.get(0), args.get(1), args.get(2));
-        } else if (args.size() == 0) {
-            throw new org.python.exceptions.TypeError("range expected 1 arguments, got " + args.size());
         } else {
             throw new org.python.exceptions.TypeError("range expected at most 3 arguments, got " + args.size());
         }
@@ -1291,11 +1294,11 @@ public class Python {
     public static org.python.types.Str repr(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("repr() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("repr() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("repr() takes exactly one argument (" + args.size() + " given)");
         }
         return args.get(0).__repr__();
     }
@@ -1308,11 +1311,11 @@ public class Python {
     public static org.python.Iterable reversed(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("reversed() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("reversed() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("reversed() takes exactly one argument (" + args.size() + " given)");
         }
         return args.get(0).__reversed__();
     }
@@ -1330,7 +1333,7 @@ public class Python {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("round() takes no keyword arguments");
         }
-        if (args.size() == 0) {
+        if (args == null || args.size() == 0) {
             throw new org.python.exceptions.TypeError("Required argument 'number' (pos 1) not found");
         } else if (args.size() == 1) {
             return args.get(0).__round__();
@@ -1353,11 +1356,20 @@ public class Python {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("set() does not take keyword arguments");
         }
-        if (args.size() == 0) {
+        if (args == null || args.size() == 0) {
             return new org.python.types.Set();
         } else if (args.size() == 1) {
-            // return new org.python.types.Set(args.get(0));
-            throw new org.python.exceptions.NotImplementedError("Builtin function 'set' with iterator not implemented");
+            try {
+                // If the object is iterable, the underlying value should be
+                // a Java Collection.
+                return new org.python.types.Set(
+                    new java.util.HashSet<org.python.Object>(
+                        (java.util.Collection) args.get(0).toValue()
+                    )
+                );
+            } catch (java.lang.ClassCastException e) {
+                throw new org.python.exceptions.TypeError("'" + org.Python.typeName(args.get(0).getClass()) + "' object is not iterable");
+            }
         } else {
             throw new org.python.exceptions.TypeError("set() expected at most 1 arguments ( got " + args.size() + ")");
         }
@@ -1435,11 +1447,11 @@ public class Python {
     public static org.python.types.Str str(
                 java.util.List<org.python.Object> args,
                 java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args.size() != 1) {
-            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.size() + " given)");
-        }
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("len() takes no keyword arguments");
+        }
+        if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.size() + " given)");
         }
         return args.get(0).__str__();
     }
@@ -1501,13 +1513,14 @@ public class Python {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
         }
-        if (args.size() == 1) {
-            return org.python.types.Type.pythonType(args.get(0).getClass());
-        } else if (args.size() == 3) {
-            throw new org.python.exceptions.NotImplementedError("3-argument form of builtin function 'type' not implemented");
-        } else {
-            throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
+        if (args != null) {
+            if (args.size() == 1) {
+                return org.python.types.Type.pythonType(args.get(0).getClass());
+            } else if (args.size() == 3) {
+                throw new org.python.exceptions.NotImplementedError("3-argument form of builtin function 'type' not implemented");
+            }
         }
+        throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
     }
 
     @org.python.Method(

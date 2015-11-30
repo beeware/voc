@@ -44,8 +44,6 @@ What it does:
 
 It *doesn't* currently support:
 
-* Dict and Set constants
-
 * Importing and using native Java APIs
 
 * Extending native java classes and interfaces.

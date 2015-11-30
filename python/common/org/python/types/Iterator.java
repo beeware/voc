@@ -3,6 +3,10 @@ package org.python.types;
 class Iterator extends org.python.types.Object implements org.python.Iterable {
     java.util.Iterator<org.python.Object> iterator;
 
+    public int hashCode() {
+        return this.iterator.hashCode();
+    }
+
     public Iterator(org.python.types.List list) {
         this.iterator = list.value.iterator();
     }
