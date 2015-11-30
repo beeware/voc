@@ -223,10 +223,10 @@ public class List extends org.python.types.Object {
     }
 
     public void append(java.util.List<org.python.Object> args, java.util.HashMap kwargs) {
-        if (kwargs.size() != 0) {
+        if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("append() takes no keyword arguments");
         }
-        if (args.size() == 1) {
+        if (args != null && args.size() == 1) {
             this.append(args.get(0));
         }
         else {

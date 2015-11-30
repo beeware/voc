@@ -33,13 +33,6 @@ class ListTests(TranspileTestCase):
             print(x[-10])
             """)
 
-    # def test_list_comprehensions(self):
-    #     self.assertCodeExecution("""
-    #         x = [1, 2, 3]
-    #         y = [v**2 for v in x]
-    #         print(y)
-    #         """)
-
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['[]', '[1, 2, 3, 4, 5]']
