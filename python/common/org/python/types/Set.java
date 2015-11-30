@@ -40,6 +40,11 @@ public class Set extends org.python.types.Object {
     // }
 
     public org.python.types.Str __repr__() {
+        // Representation of an empty set is different
+        if (this.value.size() == 0) {
+            return new org.python.types.Str("set()");
+        }
+
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("{");
         boolean first = true;
         for (org.python.Object obj: this.value) {
@@ -106,8 +111,12 @@ public class Set extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("set.__iter__() has not been implemented");
     }
 
-    public org.python.Object __contains__() {
-        throw new org.python.exceptions.NotImplementedError("set.__contains__() has not been implemented");
+    public org.python.Object __contains__(org.python.Object item) {
+        return new org.python.types.Bool(this.value.contains(item));
+    }
+
+    public org.python.Object __not_contains__(org.python.Object item) {
+        return new org.python.types.Bool(!this.value.contains(item));
     }
 
     public org.python.Object __sub__() {
@@ -163,11 +172,19 @@ public class Set extends org.python.types.Object {
     }
 
     public org.python.Object clear(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("set.clear() has not been implemented.");
+        if (kwargs != null || kwargs.size() > 0) {
+            throw new org.python.exceptions.TypeError("clear() takes no keyword arguments");
+        }
+        if (args != null || args.size() > 0) {
+            throw new org.python.exceptions.TypeError("clear() takes no arguments (" + args.size() + " given)");
+        }
+        this.clear();
+        return org.python.types.NoneType.NONE;
     }
 
     public org.python.Object clear() {
-        throw new org.python.exceptions.NotImplementedError("set.clear() has not been implemented.");
+        this.value.clear();
+        return org.python.types.NoneType.NONE;
     }
 
     public org.python.Object copy(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {

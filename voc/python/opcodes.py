@@ -1778,9 +1778,32 @@ class BUILD_SET(Opcode):
     def product_count(self):
         return 1
 
-    # def convert_opcode(self, context, arguments):
-    #     code = []
-    #     return code
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+        context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Set'),
+            JavaOpcodes.DUP(),
+
+            JavaOpcodes.NEW('java/util/HashSet'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashSet', '<init>', '()V')
+        )
+
+        for argument in arguments:
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+
+            argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/Set', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Set', '<init>', '(Ljava/util/Set;)V')
+        )
 
 
 class BUILD_MAP(Opcode):

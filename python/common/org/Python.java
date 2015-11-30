@@ -1359,8 +1359,17 @@ public class Python {
         if (args == null || args.size() == 0) {
             return new org.python.types.Set();
         } else if (args.size() == 1) {
-            // return new org.python.types.Set(args.get(0));
-            throw new org.python.exceptions.NotImplementedError("Builtin function 'set' with iterator not implemented");
+            try {
+                // If the object is iterable, the underlying value should be
+                // a Java Collection.
+                return new org.python.types.Set(
+                    new java.util.HashSet<org.python.Object>(
+                        (java.util.Collection) args.get(0).toValue()
+                    )
+                );
+            } catch (java.lang.ClassCastException e) {
+                throw new org.python.exceptions.TypeError("'" + org.Python.typeName(args.get(0).getClass()) + "' object is not iterable");
+            }
         } else {
             throw new org.python.exceptions.TypeError("set() expected at most 1 arguments ( got " + args.size() + ")");
         }
