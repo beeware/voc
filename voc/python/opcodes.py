@@ -1203,9 +1203,8 @@ class GET_ITER(Opcode):
             JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
             JavaOpcodes.POP(),
 
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+            # No kwargs needed.
+            JavaOpcodes.ACONST_NULL(),
 
             JavaOpcodes.INVOKESTATIC(
                 'org/Python',
@@ -2538,13 +2537,11 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.NEW(self.method.parent.descriptor),
                 JavaOpcodes.DUP(),
 
-                JavaOpcodes.NEW('java/util/ArrayList'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+                # No args needed.
+                JavaOpcodes.ACONST_NULL(),
 
-                JavaOpcodes.NEW('java/util/HashMap'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+                # No kwargs needed.
+                JavaOpcodes.ACONST_NULL(),
 
                 JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '(Ljava/util/List;Ljava/util/Map;)V'),
             )

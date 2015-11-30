@@ -55,10 +55,6 @@ public class ImportLib {
         return python_module;
     }
 
-    public static org.python.types.Module getModule(java.lang.String java_name) {
-        return modules.get(java_name);
-    }
-
     /**
      * Develop a map of exported symbols for a module.
      *
