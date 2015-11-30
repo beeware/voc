@@ -156,7 +156,7 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + org.Python.typeName(index));
+            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + index.typeName());
         }
     }
 
@@ -177,7 +177,7 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + org.Python.typeName(index));
+            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + index.typeName());
         }
     }
 

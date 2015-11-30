@@ -22,7 +22,7 @@ public class Slice extends org.python.types.Object {
         } else if (start instanceof org.python.types.NoneType) {
             attrs.put("start", start);
         } else {
-            throw new org.python.exceptions.TypeError("'" + org.Python.typeName(start) + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
         }
 
         if (stop instanceof org.python.types.Int) {
@@ -31,7 +31,7 @@ public class Slice extends org.python.types.Object {
         } else if (stop instanceof org.python.types.NoneType) {
             attrs.put("stop", stop);
         } else {
-            throw new org.python.exceptions.TypeError("'" + org.Python.typeName(stop) + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + stop.typeName() + "' object cannot be interpreted as an integer");
         }
 
         if (step instanceof org.python.types.Int) {
@@ -40,7 +40,7 @@ public class Slice extends org.python.types.Object {
         } else if (step instanceof org.python.types.NoneType) {
             attrs.put("step", step);
         } else {
-            throw new org.python.exceptions.TypeError("'" + org.Python.typeName(step) + "' object cannot be interpreted as an integer");
+            throw new org.python.exceptions.TypeError("'" + step.typeName() + "' object cannot be interpreted as an integer");
         }
 
     }

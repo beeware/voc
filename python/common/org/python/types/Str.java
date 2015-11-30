@@ -70,7 +70,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) < 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + org.Python.typeName(this) + "() < " + org.Python.typeName(other) + "()");
+            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() < " + other.typeName() + "()");
         }
     }
 
@@ -79,7 +79,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) <= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + org.Python.typeName(this) + "() <= " + org.Python.typeName(other) + "()");
+            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() <= " + other.typeName() + "()");
         }
     }
 
@@ -106,7 +106,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) > 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + org.Python.typeName(this) + "() > " + org.Python.typeName(other) + "()");
+            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() > " + other.typeName() + "()");
         }
     }
 
@@ -115,7 +115,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) >= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + org.Python.typeName(this) + "() >= " + org.Python.typeName(other) + "()");
+            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() >= " + other.typeName() + "()");
         }
     }
 
@@ -199,7 +199,7 @@ public class Str extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("string indices must be integers, not " + org.Python.typeName(index));
+            throw new org.python.exceptions.TypeError("string indices must be integers, not " + index.typeName());
         }
     }
 
@@ -221,7 +221,7 @@ public class Str extends org.python.types.Object {
             sb.append(other_str.value);
             return new Str(sb.toString());
         }
-        throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.typeName(other) + "' object to str implicitly");
+        throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
     }
 
     public org.python.Object __mul__(org.python.Object other) {

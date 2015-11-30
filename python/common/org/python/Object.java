@@ -2,7 +2,16 @@ package org.python;
 
 public interface Object {
 
+    /**
+     * Extract a Java object that is the underlying representation
+     * of this object (e.g., the java.util.Map behind a Python dict())
+     */
     public java.lang.Object toValue();
+
+    /**
+     * Return the Python type name for this object.
+     */
+    public java.lang.String typeName();
 
     /**
      * Python interface compatibility

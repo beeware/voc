@@ -3,6 +3,10 @@ package org.python.types;
 public class NoneType extends org.python.types.Object {
     public static org.python.Object NONE = new org.python.types.NoneType();
 
+    public java.lang.String typeName() {
+        return "NoneType";
+    }
+
     NoneType() {}
 
     public org.python.types.Str __repr__() {

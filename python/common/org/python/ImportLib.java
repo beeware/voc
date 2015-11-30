@@ -13,6 +13,7 @@ public class ImportLib {
         // If the package name isn't clearly identifiable as a java package path,
         // put it in the python namespace.
         if (       python_name.startsWith("java.")
+                || python_name.startsWith("javax.")
                 || python_name.startsWith("org.")
                 || python_name.startsWith("com.")
                 || python_name.startsWith("edu.")
