@@ -40,22 +40,25 @@ What it does:
 
   * Keyword arguments
 
-  * `import` statements
+  * `import`, `from X import Y` and `from X import *` statements for Python code
 
 It *doesn't* currently support:
 
-* `from X import Y` statements
+* Dict and Set constants
+
+* Importing and using native Java APIs
+
+* Extending native java classes and interfaces.
 
 * Generators
 
 * with statements
 
-* Dict and Set constants
-
 * ``exec()``/``eval()``
 
 These things are all *possible* - it's just a matter of time
-and development effort.
+and development effort. The order listed here is a rough indicator of
+development priorities.
 
 Quickstart
 ----------

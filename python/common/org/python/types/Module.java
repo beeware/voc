@@ -30,7 +30,6 @@ public class Module extends org.python.types.Object {
             if (value == null) {
                 throw new org.python.exceptions.AttributeError(this, name);
             }
-
         } catch (org.python.exceptions.AttributeError e) {
             // System.out.println("MODULE NO ATTRIBUTE");
             value = org.Python.builtins.get(name);

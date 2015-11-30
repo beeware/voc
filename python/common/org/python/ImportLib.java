@@ -59,4 +59,41 @@ public class ImportLib {
         return modules.get(java_name);
     }
 
+    /**
+     * Develop a map of exported symbols for a module.
+     *
+     * Implements the semantics of "from X import *". Honors the "__all__"
+     * attribute if it exists; otherwise, exports all symbols that don't start
+     * with an underscore (i.e., all public symbols).
+     *
+     * @param module_instance the *instance* of the module to interrogate.
+     *
+     * @return A map of attribute names to Python Objects, representing the
+     *         symbols to be exported as part of an "import *" from this
+     *         module.
+     */
+    public static java.util.Map importAll(org.python.types.Module module_instance) {
+        java.util.Map<java.lang.String, org.python.Object> exports = new java.util.HashMap<java.lang.String, org.python.Object>();
+        org.python.types.Type module = org.python.types.Type.pythonType(module_instance.getClass());
+
+        org.python.Object all_obj = module.attrs.get("__all__");
+        if (all_obj == null) {
+            for (java.lang.String name: module.attrs.keySet()) {
+                if (!name.startsWith("_")) {
+                    exports.put(name, module.attrs.get(name));
+                }
+            }
+        } else {
+            java.util.List args = new java.util.ArrayList();
+            args.add(all_obj);
+            org.python.types.List all = org.Python.list(args, null);
+
+            for (org.python.Object name: all.value) {
+                exports.put(name.toString(), module.attrs.get(name.toString()));
+            }
+        }
+        // System.out.println("exports" +  exports);
+
+        return exports;
+    }
 }

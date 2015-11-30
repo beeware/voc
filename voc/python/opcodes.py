@@ -1307,12 +1307,12 @@ class IMPORT_STAR(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
+        # Find exported symbols (__all__, or everything but private "_" symbols)
         context.add_opcodes(
-            ASTORE_name(context, '##module##'),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'importAll', '(Lorg/python/types/Module;)Ljava/util/Map;')
         )
-
-        # Find exported symbols (__all__, or everything but _)
-        # Add each one to current context
+        # Add all the exported sympbols to the currrent context
+        context.store_dynamic()
 
 
 # class YIELD_VALUE(Opcode):
