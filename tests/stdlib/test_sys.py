@@ -350,7 +350,8 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # exit
-    def test_exit(self):
+    @expectedFailure
+    def test_exit_from_static(self):
         # Exit from static block
         self.assertCodeExecution("""
             import sys
@@ -358,6 +359,7 @@ class SysModuleTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_exit(self):
         # From inside main
         self.assertCodeExecution("""
             import sys
@@ -366,7 +368,7 @@ class SysModuleTests(TranspileTestCase):
                 print('Done.')
             """, run_in_function=False)
 
-        # From inside main
+        # From a method called from inside main
         self.assertCodeExecution("""
             import sys
 
