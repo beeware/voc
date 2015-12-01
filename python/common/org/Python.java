@@ -30,26 +30,6 @@ public class Python {
         }
     }
 
-    public static java.lang.String typeName(java.lang.Class cls) {
-        try {
-            java.lang.String class_name = cls.getName();
-            if (class_name == "org.python.types.NoneType") {
-                return "NoneType";
-            } if (class_name.startsWith("org.python.types.")) {
-                return class_name.substring(17).toLowerCase();
-            } else if (class_name.startsWith("python.")) {
-                return class_name.substring(7);
-            }
-            return class_name;
-        } catch (java.lang.NullPointerException e) {
-            return "**unknown**";
-        }
-    }
-
-    public static java.lang.String typeName(org.python.Object obj) {
-        return typeName(obj.getClass());
-    }
-
     public static void debug(java.lang.Object msg) {
         System.out.println("DEBUG: " + msg);
     }
@@ -313,7 +293,7 @@ public class Python {
             long value = ((org.python.types.Int) args.get(0)).value;
             return new org.python.types.Str(Character.toChars((int) value).toString());
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("integer argument expected, got " + org.Python.typeName(args.get(0).getClass()) + " found");
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + args.get(0).typeName() + " found");
         }
     }
 
@@ -1155,7 +1135,7 @@ public class Python {
                 throw new org.python.exceptions.TypeError("ord() expected string of length 1, but string of length " + length + " found");
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("ord() expected string of length 1, but " + org.Python.typeName(args.get(0).getClass()) + " found");
+            throw new org.python.exceptions.TypeError("ord() expected string of length 1, but " + args.get(0).typeName() + " found");
         }
     }
 
@@ -1368,7 +1348,7 @@ public class Python {
                     )
                 );
             } catch (java.lang.ClassCastException e) {
-                throw new org.python.exceptions.TypeError("'" + org.Python.typeName(args.get(0).getClass()) + "' object is not iterable");
+                throw new org.python.exceptions.TypeError("'" + args.get(0).typeName() + "' object is not iterable");
             }
         } else {
             throw new org.python.exceptions.TypeError("set() expected at most 1 arguments ( got " + args.size() + ")");

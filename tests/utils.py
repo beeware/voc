@@ -108,7 +108,7 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
 
         if extra_code:
             for name, code in extra_code.items():
-                transpiler.transpile_string("%s.py" % name, adjust(code))
+                transpiler.transpile_string("%s.py" % name.replace('.', os.path.sep), adjust(code))
 
     transpiler.write(test_dir, verbosity=0)
 
@@ -234,6 +234,8 @@ class TranspileTestCase(TestCase):
             finally:
                 # Clean up the test directory where the class file was written.
                 shutil.rmtree(test_dir)
+                # print(java_out)
+
 
             # Cleanse the Python and Java output, producing a simple
             # normalized format for exceptions, floats etc.
@@ -263,6 +265,7 @@ class TranspileTestCase(TestCase):
             finally:
                 # Clean up the test directory where the class file was written.
                 shutil.rmtree(test_dir)
+                # print(java_out)
 
             # Cleanse the Python and Java output, producing a simple
             # normalized format for exceptions, floats etc.

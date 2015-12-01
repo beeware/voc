@@ -12,11 +12,21 @@ public class Object implements org.python.Object {
      * to provide the relevant assignment info.
      */
     void setValue(org.python.Object obj) {
-        throw new org.python.exceptions.RuntimeError("'" + org.Python.typeName(this) + "' object cannot be updated.");
+        throw new org.python.exceptions.RuntimeError("'" + this.typeName() + "' object cannot be updated.");
     }
 
     public java.lang.Object toValue() {
         return this;
+    }
+
+    public java.lang.String typeName() {
+        java.lang.String class_name = this.getClass().getName();
+        if (class_name.startsWith("org.python.types.")) {
+            return class_name.substring(17).toLowerCase();
+        } else if (class_name.startsWith("python.")) {
+            return class_name.substring(7);
+        }
+        return class_name;
     }
 
     /**
@@ -115,7 +125,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<%s object at 0x%x>", org.Python.typeName(this), this.hashCode()));
+        return new org.python.types.Str(String.format("<%s object at 0x%x>", this.typeName(), this.hashCode()));
     }
 
     @org.python.Method(
@@ -140,7 +150,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.Str __format__(org.python.Object format_spec) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__format__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__format__' has not been implemented");
     }
 
     public org.python.Object __lt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
@@ -156,7 +166,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__lt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__lt__' has not been implemented");
     }
 
     @org.python.Method(
@@ -175,7 +185,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__le__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__le__' has not been implemented");
     }
 
 
@@ -192,7 +202,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__eq__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__eq__' has not been implemented");
     }
 
 
@@ -209,7 +219,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__ne__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__ne__' has not been implemented");
     }
 
     public org.python.Object __gt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
@@ -225,7 +235,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__gt__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__gt__' has not been implemented");
     }
 
     public org.python.Object __ge__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
@@ -241,7 +251,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__ge__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__ge__' has not been implemented");
     }
 
     public org.python.types.Int __hash__() {
@@ -424,7 +434,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.types.List __dir__() {
-        throw new org.python.exceptions.NotImplementedError("'" + org.Python.typeName(this) + ".__dir__' has not been implemented");
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__dir__' has not been implemented");
     }
 
 
@@ -569,7 +579,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -586,7 +596,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __sub__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -603,7 +613,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -620,7 +630,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -637,7 +647,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -654,7 +664,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -688,11 +698,11 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __pow__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulus) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + org.Python.typeName(this) + "', '" + org.Python.typeName(other) + "', '" + org.Python.typeName(modulus) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + this.typeName() + "', '" + other.typeName() + "', '" + modulus.typeName() + "'");
     }
 
 
@@ -709,7 +719,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -726,7 +736,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -743,7 +753,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -760,7 +770,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __xor__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -777,7 +787,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __or__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
 
@@ -794,7 +804,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __radd__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for + (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for + (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -811,7 +821,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rsub__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for - (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for - (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -828,7 +838,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rmul__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for * (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for * (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -845,7 +855,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rtruediv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for / (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for / (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -862,7 +872,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rfloordiv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for // (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for // (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -879,7 +889,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rmod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for % (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for % (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -896,7 +906,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rdivmod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -913,7 +923,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rpow__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ or pow() (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ or pow() (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -930,7 +940,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rlshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for << (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for << (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -947,7 +957,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rrshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >> (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >> (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -964,7 +974,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rand__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for & (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for & (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -981,7 +991,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __rxor__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^ (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -998,7 +1008,7 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __ror__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for | (reversed): '" + org.Python.typeName(other) + "' and '" + org.Python.typeName(this) + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for | (reversed): '" + other.typeName() + "' and '" + this.typeName() + "'");
     }
 
 
@@ -1018,7 +1028,7 @@ public class Object implements org.python.Object {
         try {
             this.setValue(this.__add__(other));
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + org.Python.typeName(this) + "' and '" + org.Python.typeName(other) + "'");
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
 

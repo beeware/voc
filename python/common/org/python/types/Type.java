@@ -88,7 +88,7 @@ public class Type extends org.python.types.Object {
     }
 
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<class '%s'>", org.Python.typeName(this.klass)));
+        return new org.python.types.Str(String.format("<class '%s'>", this.typeName()));
     }
 }
 
