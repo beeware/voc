@@ -10,9 +10,9 @@ class ImportTests(TranspileTestCase):
         "You can import a native Java class as a Python module"
         self.assertCodeExecution(
             """
-            import java.lang
+            from java import lang as java_lang
 
-            buffer = java.lang.StringBuilder()
+            buffer = java_lang.StringBuilder()
             buffer.append('Hello, ')
             buffer.append('World')
             print(buffer.toString())
@@ -80,8 +80,7 @@ class ImportTests(TranspileTestCase):
                     """
             })
 
-    @expectedFailure
-    def test_dotted_path(self):
+    def test_full_dotted_path(self):
         self.assertCodeExecution(
             """
             import example.submodule
@@ -91,13 +90,176 @@ class ImportTests(TranspileTestCase):
             print("Done.")
             """,
             extra_code={
-                'example.__init__': "",
+                'example.__init__':
+                    """
+                    print("Initializing the example module")
+                    """,
                 'example.submodule':
                     """
-                    print("Now we're in the example module")
+                    print("Now we're in example.submodule")
 
                     def some_method():
-                        print("Now we're calling a module method")
+                        print("Now we're calling a submodule method")
+                    """
+            })
+
+    def test_module_from_dotted_path(self):
+        self.assertCodeExecution(
+            """
+            from example import submodule
+
+            submodule.some_method()
+
+            print("Done.")
+            """,
+            extra_code={
+                'example.__init__':
+                    """
+                    print("Initializing the example module")
+                    """,
+                'example.submodule':
+                    """
+                    print("Now we're in example.submodule")
+
+                    def some_method():
+                        print("Now we're calling a submodule method")
+                    """
+            })
+
+    def test_symbol_from_dotted_path(self):
+        self.assertCodeExecution(
+            """
+            from example.submodule import some_method
+
+            some_method()
+
+            print("Done.")
+            """,
+            extra_code={
+                'example.__init__':
+                    """
+                    print("Initializing the example module")
+                    """,
+                'example.submodule':
+                    """
+                    print("Now we're in example.submodule")
+
+                    def some_method():
+                        print("Now we're calling a submodule method")
+                    """
+            })
+
+    def test_full_deep_dotted_path(self):
+        self.assertCodeExecution(
+            """
+            import example.submodule.subsubmodule.another
+
+            example.submodule.subsubmodule.another.another_method()
+
+            print("Done.")
+            """,
+            extra_code={
+                'example.__init__':
+                    """
+                    print("Initializing the example module")
+                    """,
+                'example.submodule.__init__':
+                    """
+                    print("Now we're in example.submodule.__init__")
+                    """,
+                'example.submodule.other':
+                    """
+                    print("Now we're in example.submodule.other")
+
+                    def other_method():
+                        print("Now we're calling a submodule method")
+                    """,
+                'example.submodule.subsubmodule.__init__':
+                    """
+                    print("Now we're in example.submodule.subsubmodule.__init__")
+                    """,
+                'example.submodule.subsubmodule.another':
+                    """
+                    print("Now we're in example.submodule.subsubmodule.another")
+
+                    def another_method():
+                        print("Now we're calling a subsubmodule method")
+                    """
+            })
+
+    def test_module_from_deep_dotted_path(self):
+        self.assertCodeExecution(
+            """
+            from example.submodule.subsubmodule import another
+
+            another.another_method()
+
+            print("Done.")
+            """,
+            extra_code={
+                'example.__init__':
+                    """
+                    print("Initializing the example module")
+                    """,
+                'example.submodule.__init__':
+                    """
+                    print("Now we're in example.submodule.__init__")
+                    """,
+                'example.submodule.other':
+                    """
+                    print("Now we're in example.submodule.other")
+
+                    def other_method():
+                        print("Now we're calling a submodule method")
+                    """,
+                'example.submodule.subsubmodule.__init__':
+                    """
+                    print("Now we're in example.submodule.subsubmodule.__init__")
+                    """,
+                'example.submodule.subsubmodule.another':
+                    """
+                    print("Now we're in example.submodule.subsubmodule.another")
+
+                    def another_method():
+                        print("Now we're calling a subsubmodule method")
+                    """
+            })
+
+    def test_symbol_from_deep_dotted_path(self):
+        self.assertCodeExecution(
+            """
+            from example.submodule.subsubmodule.another import another_method
+
+            another_method()
+
+            print("Done.")
+            """,
+            extra_code={
+                'example.__init__':
+                    """
+                    print("Initializing the example module")
+                    """,
+                'example.submodule.__init__':
+                    """
+                    print("Now we're in example.submodule.__init__")
+                    """,
+                'example.submodule.other':
+                    """
+                    print("Now we're in example.submodule.other")
+
+                    def other_method():
+                        print("Now we're calling a submodule method")
+                    """,
+                'example.submodule.subsubmodule.__init__':
+                    """
+                    print("Now we're in example.submodule.subsubmodule.__init__")
+                    """,
+                'example.submodule.subsubmodule.another':
+                    """
+                    print("Now we're in example.submodule.subsubmodule.another")
+
+                    def another_method():
+                        print("Now we're calling a subsubmodule method")
                     """
             })
 
@@ -153,27 +315,6 @@ class ImportTests(TranspileTestCase):
                     def third_method():
                         print("This shouldn't be called")
 
-                    """
-            })
-
-    @expectedFailure
-    def test_submodule_symbol_import(self):
-        self.assertCodeExecution(
-            """
-            from example import submodule
-
-            submodule.some_method()
-
-            print("Done.")
-            """,
-            extra_code={
-                'example.__init__': "",
-                'example.submodule':
-                    """
-                    print("Now we're in the example module")
-
-                    def some_method():
-                        print("Now we're calling a module method")
                     """
             })
 

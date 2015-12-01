@@ -9,7 +9,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import MainMethod, Method, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, free_name, TRY, CATCH, END_TRY
+from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 
 class StaticBlock(Block):
@@ -32,27 +32,6 @@ class StaticBlock(Block):
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
         )
-        # If there are any commands in this main method,
-        # add a TRY-CATCH for SystemExit
-        if self.commands:
-            self.add_opcodes(
-                TRY()
-            )
-
-    def transpile_teardown(self):
-        # If there are any commands in this main method,
-        # finish the TRY-CATCH for SystemExit
-        if self.commands:
-            self.add_opcodes(
-                CATCH('org/python/exceptions/SystemExit'),
-                    JavaOpcodes.GETFIELD('org/python/exceptions/SystemExit', 'return_code', 'I'),
-                    JavaOpcodes.INVOKESTATIC('java/lang/System', 'exit', '(I)V'),
-                END_TRY()
-            )
-
-    @property
-    def use_registers(self):
-        return False
 
     def store_name(self, name, use_locals):
         self.add_opcodes(
@@ -121,9 +100,23 @@ class StaticBlock(Block):
 class Module(Block):
     def __init__(self, namespace, sourcefile):
         super().__init__()
-        self.namespace = namespace
         self.sourcefile = sourcefile
-        self.name = os.path.splitext(os.path.basename(sourcefile))[0]
+
+        parts = os.path.splitext(sourcefile)[0].split(os.path.sep)
+        # The __init__ module is collapsed up one level to be the
+        # static block in the "parent" class.
+        if parts[-1] == '__init__':
+            parts.pop()
+
+        # If the sourcefile started with a /, the first part will
+        # be an empty string; replace that with the namespace.
+        # Otherwise, prepend the namespace to the parts.
+        if parts[0] == '':
+            parts[0] = namespace
+        else:
+            parts = [namespace] + parts
+        self.namespace = '.'.join(parts[:-1])
+        self.name = parts[-1]
 
         self.methods = []
         self.classes = []

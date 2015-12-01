@@ -6,12 +6,12 @@ import py_compile
 from .python.modules import Module
 
 
-def transpile(filename, outdir=None):
+def transpile(filename, srcdir='.', outdir=None):
     print("Compiling %s ..." % filename)
     py_compile.compile(filename)
 
     transpiler = Transpiler()
-    transpiler.transpile(filename)
+    transpiler.transpile(filename, srcdir)
     transpiler.write(outdir)
 
 
@@ -38,12 +38,13 @@ class Transpiler:
 
             if verbosity:
                 print("Writing %s ..." % classfilename)
+
             with open(classfilename, 'wb') as out:
                 javaclassfile.write(out)
         if verbosity:
             print("Done.")
 
-    def transpile(self, filename):
+    def transpile(self, filename, srcdir):
         "Transpile a Python source file into class files"
         with open(importlib.util.cache_from_source(filename), 'rb') as compiled:
             # Read off the magic from the start of the PYC file.
@@ -52,7 +53,14 @@ class Transpiler:
             # Decompile the code object.
             code = marshal.load(compiled)
 
-            self.transpile_code(filename, code)
+            # Determine what portion of the filename is part of the
+            # common source directory, and which is namespace.
+            common = os.path.commonprefix([
+                os.path.abspath(srcdir),
+                os.path.abspath(filename)
+            ])
+
+            self.transpile_code(os.path.abspath(filename)[len(common):], code)
 
     def transpile_string(self, filename, code_string):
         "Transpile a string containing Python code into class files"

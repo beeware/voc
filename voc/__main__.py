@@ -3,18 +3,23 @@ from .transpiler import transpile
 
 
 def main():
-    if len(sys.argv) not in (2, 3):
-        print("Usage: voc <path to .py file> [<output dir>]")
+    if len(sys.argv) == 2:
+        srcdir = None
+        outdir = None
+    elif len(sys.argv) == 3:
+        srcdir = sys.argv[2]
+        outdir = None
+    elif len(sys.argv) == 4:
+        srcdir = sys.argv[3]
+        outdir = sys.argv[2]
+    else:
+        print("Usage: voc <path to .py file> [<input dir>] [<output dir>]")
         print()
-        print('  e.g.: voc tests/example.py out')
+        print('  e.g.: voc tests/example.py src out')
         sys.exit(1)
 
-    if len(sys.argv) == 2:
-        outdir = None
-    else:
-        outdir = sys.argv[2]
+    transpile(sys.argv[1], srcdir=srcdir, outdir=outdir)
 
-    transpile(sys.argv[1], outdir=outdir)
 
 if __name__ == "__main__":
     main()

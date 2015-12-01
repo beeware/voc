@@ -1980,7 +1980,6 @@ class IMPORT_NAME(Opcode):
     def convert(self, context, arguments):
         # Arg 0 is the level
         # Arg 1 is the list of symbols to import.
-        # Ignore Arg 1 for the moment...
 
         # The line of code for the import is recorded
         # against the first argument.
@@ -1989,9 +1988,28 @@ class IMPORT_NAME(Opcode):
 
         context.add_opcodes(
             JavaOpcodes.LDC_W(self.name),
-            ICONST_val(arguments[0].operation.const),
+        )
 
-            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;I)Lorg/python/types/Module;')
+        if arguments[1].operation.const is None:
+            context.add_opcodes(
+                JavaOpcodes.ACONST_NULL()
+            )
+        else:
+            context.add_opcodes(
+                ICONST_val(len(arguments[1].operation.const)),
+                JavaOpcodes.ANEWARRAY('java/lang/String'),
+            )
+            for i, name in enumerate(arguments[1].operation.const):
+                context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                    JavaOpcodes.LDC_W(name),
+                    JavaOpcodes.AASTORE(),
+                )
+
+        context.add_opcodes(
+            ICONST_val(arguments[0].operation.const),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;[Ljava/lang/String;I)Lorg/python/types/Module;')
         )
 
 

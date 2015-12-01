@@ -20,7 +20,6 @@ public class Module extends org.python.types.Object {
         return new org.python.types.Str(String.format("<module '%s' from '%s'>", this.typeName(), this.getClass()));
     }
 
-    @SuppressWarnings("unchecked")
     public org.python.Object __getattribute__(java.lang.String name) {
         // System.out.println("GETATTRIBUTE MODULE " + this + " " + name);
         org.python.Object value;
