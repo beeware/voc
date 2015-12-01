@@ -31,7 +31,6 @@ public class ImportLib {
         org.python.types.Module parent_module = null;
         org.python.types.Module return_module = null;
 
-
         // Iterate down the full dotted path, making sure that each module
         // along the way has been imported.
         for (java.lang.String name: path) {
@@ -42,7 +41,11 @@ public class ImportLib {
 
             python_module = modules.get(java_name.toString());
             if (python_module == null) {
-                python_module = importModule(java_name.toString(), true);
+                try {
+                    python_module = importModule(java_name.toString());
+                } catch (java.lang.ClassNotFoundException e) {
+                    throw new org.python.exceptions.ImportError("No module named '" + python_name + "'");
+                }
 
                 // If we are multiple steps into an import chain, tell the
                 // parent module of this new module.
@@ -62,37 +65,39 @@ public class ImportLib {
             parent_module = python_module;
         }
 
-        if (from_list == null) {
-            // No from_list; return the first module in the chain.
-            return return_module;
-        } else {
-            // from_list provided; import all the provided symbols
+        if (from_list != null) {
+            // from_list provided; import all the provided symbols,
+            // unless the symbol is *, in which case we know it exists.
             return_module = python_module;
             java_name.append("/");
             for (java.lang.String name: from_list) {
-                python_module = importModule(java_name.toString() + name, false);
-                if (python_module != null) {
-                    parent_module.__setattr__(name, python_module);
+                if (!name.equals("*")) {
+                    try {
+                        python_module = importModule(java_name.toString() + name);
+                        parent_module.__setattr__(name, python_module);
+                    } catch (java.lang.ClassNotFoundException e) {
+                        // `name` doesn't exist as a submodule; it might be
+                        // an exportable symbol in the parent module.
+                        try {
+                            parent_module.__getattribute__(name);
+                        } catch (org.python.exceptions.NameError ne) {
+                            throw new org.python.exceptions.ImportError("No module named '" + python_name + "'");
+                        }
+                    }
                 }
             }
-
-            return return_module;
         }
+        return return_module;
     }
 
-    private static org.python.types.Module importModule(java.lang.String java_name, boolean require_class) {
+    private static org.python.types.Module importModule(java.lang.String java_name)
+            throws java.lang.ClassNotFoundException {
         org.python.types.Module python_module;
         try {
             java.lang.Class java_class = java.lang.Class.forName(java_name.toString().replace("/", "."));
             java.lang.reflect.Constructor constructor = java_class.getConstructor();
             python_module = (org.python.types.Module) constructor.newInstance();
             modules.put(java_name.toString(), python_module);
-        } catch (java.lang.ClassNotFoundException e) {
-            if (require_class) {
-                throw new org.python.exceptions.ImportError("No module named '" + java_name + "'");
-            } else {
-                python_module = null;
-            }
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to constructor for module " + java_name);
         } catch (java.lang.NoSuchMethodException e) {
