@@ -88,14 +88,7 @@ public class Type extends org.python.types.Object {
     }
 
     public org.python.types.Str __repr__() {
-        // FIXME: This should defer to the class itself...
-        java.lang.String class_name = this.klass.getName();
-        if (class_name.startsWith("org.python.types.")) {
-            class_name = class_name.substring(17).toLowerCase();
-        } else if (class_name.startsWith("python.")) {
-            class_name = class_name.substring(7);
-        }
-        return new org.python.types.Str(String.format("<class '%s'>", class_name));
+        return new org.python.types.Str(String.format("<class '%s'>", org.Python.typeName(this.klass)));
     }
 }
 

@@ -18,7 +18,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public java.lang.String typeName() {
-        return this.getClass().getName().substring(22);
+        return org.Python.typeName(this.getClass());
     }
 
     /**

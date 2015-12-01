@@ -20,13 +20,7 @@ public class Object implements org.python.Object {
     }
 
     public java.lang.String typeName() {
-        java.lang.String class_name = this.getClass().getName();
-        if (class_name.startsWith("org.python.types.")) {
-            return class_name.substring(17).toLowerCase();
-        } else if (class_name.startsWith("python.")) {
-            return class_name.substring(7);
-        }
-        return class_name;
+        return org.Python.typeName(this.getClass());
     }
 
     /**
