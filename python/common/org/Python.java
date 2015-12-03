@@ -1367,7 +1367,7 @@ public class Python {
                 // a Java Collection.
                 return new org.python.types.Set(
                     new java.util.HashSet<org.python.Object>(
-                        (java.util.Collection) args.get(0).toValue()
+                        (java.util.Collection) args.get(0).toJava()
                     )
                 );
             } catch (java.lang.ClassCastException e) {

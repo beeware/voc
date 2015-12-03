@@ -3,6 +3,7 @@ package org.python.types;
 
 public class Object implements org.python.Object {
     public java.util.Map<java.lang.String, org.python.Object> attrs;
+    public org.python.types.Type.Origin origin;
 
     /**
      * A utility method to update the internal value of this object.
@@ -15,7 +16,7 @@ public class Object implements org.python.Object {
         throw new org.python.exceptions.RuntimeError("'" + this.typeName() + "' object cannot be updated.");
     }
 
-    public java.lang.Object toValue() {
+    public java.lang.Object toJava() {
         return this;
     }
 
@@ -31,8 +32,8 @@ public class Object implements org.python.Object {
      * as a result, they don't have attributes or any of the other usual
      * infrastructure of a Python object.
      */
-    protected Object(boolean empty) {
-        if (!empty) {
+    protected Object(org.python.types.Type.Origin origin) {
+        if (origin != org.python.types.Type.Origin.PLACEHOLDER) {
             this.attrs = new java.util.HashMap<java.lang.String, org.python.Object>();
             org.python.types.Type cls = org.python.types.Type.pythonType(this.getClass());
             this.__new__(cls);
@@ -40,7 +41,7 @@ public class Object implements org.python.Object {
     }
 
     public Object() {
-        this(false);
+        this(org.python.types.Type.Origin.PYTHON);
     }
 
     /**
@@ -90,7 +91,7 @@ public class Object implements org.python.Object {
     )
     public org.python.types.Type __new__(org.python.types.Type cls) {
         this.attrs.put("__class__", cls);
-        if (cls.is_placeholder()) {
+        if (cls.origin == org.python.types.Type.Origin.PLACEHOLDER) {
             cls.add_reference(this);
         }
         return cls;

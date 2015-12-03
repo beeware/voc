@@ -57,7 +57,6 @@ def adjust(text, run_in_function=False):
             "def test_function():",
         ] + final_lines + [
             "test_function()",
-            "print('Function done.')"
         ]
 
     return '\n'.join(final_lines)
@@ -211,7 +210,7 @@ class TranspileTestCase(TestCase):
         java = adjust(java)
         self.assertEqual(debug.getvalue(), java[1:])
 
-    def assertCodeExecution(self, code, message=None, extra_code=None, run_in_global=True, run_in_function=True, args=None):
+    def assertCodeExecution(self, code, extra_code=None, run_in_global=True, run_in_function=True, args=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
         #==================================================
@@ -243,7 +242,7 @@ class TranspileTestCase(TestCase):
             py_out = cleanse_python(py_out)
 
             # Confirm that the output of the Java code is the same as the Python code.
-            self.assertEqual(java_out, py_out, 'Global context: %s' % message)
+            self.assertEqual(java_out, py_out, 'Global context')
 
         #==================================================
         # Pass 2 - run the code in a function's context
@@ -273,7 +272,69 @@ class TranspileTestCase(TestCase):
             py_out = cleanse_python(py_out)
 
             # Confirm that the output of the Java code is the same as the Python code.
-            self.assertEqual(java_out, py_out, 'Function context: %s' % message)
+            self.assertEqual(java_out, py_out, 'Function context')
+
+    def assertJavaExecution(self, code, py_out, extra_code=None, run_in_global=True, run_in_function=True, args=None):
+        "Run code under Java and check the output is as expected"
+        self.maxDiff = None
+        #==================================================
+        # Pass 1 - run the code in the global context
+        #==================================================
+        if run_in_global:
+            try:
+                # Create the temp directory into which code will be placed
+                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+                try:
+                    os.mkdir(test_dir)
+                except FileExistsError:
+                    pass
+
+                # Run the code as Java.
+                java_out = runAsJava(test_dir, code, extra_code, False, args=args)
+            except Exception as e:
+                self.fail(e)
+            finally:
+                # Clean up the test directory where the class file was written.
+                shutil.rmtree(test_dir)
+                # print(java_out)
+
+
+            # Cleanse the Python and Java output, producing a simple
+            # normalized format for exceptions, floats etc.
+            java_out = cleanse_java(java_out)
+            py_out = adjust(py_out)
+
+            # Confirm that the output of the Java code is the same as the Python code.
+            self.assertEqual(java_out, py_out, 'Global context')
+
+        #==================================================
+        # Pass 2 - run the code in a function's context
+        #==================================================
+        if run_in_function:
+            try:
+                # Create the temp directory into which code will be placed
+                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+                try:
+                    os.mkdir(test_dir)
+                except FileExistsError:
+                    pass
+
+                # Run the code as Java.
+                java_out = runAsJava(test_dir, code, extra_code, True, args=args)
+            except Exception as e:
+                self.fail(e)
+            finally:
+                # Clean up the test directory where the class file was written.
+                shutil.rmtree(test_dir)
+                # print(java_out)
+
+            # Cleanse the Python and Java output, producing a simple
+            # normalized format for exceptions, floats etc.
+            java_out = cleanse_java(java_out)
+            py_out = adjust(py_out)
+
+            # Confirm that the output of the Java code is the same as the Python code.
+            self.assertEqual(java_out, py_out, 'Function context')
 
 
 def _unary_test(test_name, operation):

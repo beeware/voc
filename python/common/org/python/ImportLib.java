@@ -21,7 +21,6 @@ public class ImportLib {
                 || path[0].equals("net")
                 || path[0].equals("android")) {
             native_import = true;
-            throw new org.python.exceptions.ImportError("Cannot import native Java classes (yet!)");
         } else {
             java_name.append("python");
             native_import = false;
@@ -42,7 +41,11 @@ public class ImportLib {
             python_module = modules.get(java_name.toString());
             if (python_module == null) {
                 try {
-                    python_module = importModule(java_name.toString());
+                    if (native_import) {
+                        python_module = importNativeModule(java_name.toString());
+                    } else {
+                        python_module = importPythonModule(java_name.toString());
+                    }
                 } catch (java.lang.ClassNotFoundException e) {
                     throw new org.python.exceptions.ImportError("No module named '" + python_name + "'");
                 }
@@ -60,6 +63,7 @@ public class ImportLib {
                 return_module = python_module;
             }
 
+            // System.out.println("MODULES: " + modules);
             // The module just imported will be the parent of the next import
             // in the chain.
             parent_module = python_module;
@@ -73,15 +77,22 @@ public class ImportLib {
             for (java.lang.String name: from_list) {
                 if (!name.equals("*")) {
                     try {
-                        python_module = importModule(java_name.toString() + name);
-                        parent_module.__setattr__(name, python_module);
+                        if (native_import) {
+                            java.lang.Class java_class = java.lang.Class.forName(java_name.toString().replace("/", ".") + name);
+                            parent_module.__setattr__(name, new org.python.java.Type(java_class));
+                        } else {
+                            python_module = importPythonModule(java_name.toString() + name);
+                            parent_module.__setattr__(name, python_module);
+                        }
                     } catch (java.lang.ClassNotFoundException e) {
                         // `name` doesn't exist as a submodule; it might be
                         // an exportable symbol in the parent module.
                         try {
                             parent_module.__getattribute__(name);
                         } catch (org.python.exceptions.NameError ne) {
-                            throw new org.python.exceptions.ImportError("No module named '" + python_name + "'");
+                            python_module = new org.python.java.Module(java_name.toString().replace("/", ".") + name);
+                            parent_module.__setattr__(name, python_module);
+                            modules.put(java_name.toString() + name, python_module);
                         }
                     }
                 }
@@ -90,14 +101,45 @@ public class ImportLib {
         return return_module;
     }
 
-    private static org.python.types.Module importModule(java.lang.String java_name)
+    private static org.python.types.Module importNativeModule(java.lang.String java_name)
             throws java.lang.ClassNotFoundException {
         org.python.types.Module python_module;
         try {
-            java.lang.Class java_class = java.lang.Class.forName(java_name.toString().replace("/", "."));
+            java.lang.Class java_class = java.lang.Class.forName(java_name.replace("/", "."));
+            // python_module = new org.python.java.NativeType(java_class);
+            python_module = null;
+        } catch (java.lang.ClassNotFoundException e) {
+            python_module = new org.python.java.Module(java_name.replace("/", "."));
+            modules.put(java_name, python_module);
+        // } catch (java.lang.IllegalAccessException e) {
+        //     throw new org.python.exceptions.RuntimeError("Illegal access to constructor for module " + java_name);
+        // } catch (java.lang.NoSuchMethodException e) {
+        //     throw new org.python.exceptions.RuntimeError("Couldn't find constructor for module " + java_name);
+        // } catch (java.lang.reflect.InvocationTargetException e) {
+        //     try {
+        //         // If the Java method raised an Python exception, re-raise that
+        //         // exception as-is. If it wasn't a Python exception, wrap it
+        //         // as one and continue.
+        //         throw (org.python.exceptions.BaseException) e.getCause();
+        //     } catch (ClassCastException java_e) {
+        //         throw new org.python.exceptions.RuntimeError(e.getCause().getMessage());
+        //     }
+        // } catch (java.lang.InstantiationException e) {
+        //     throw new org.python.exceptions.RuntimeError(e.getCause().toString());
+        } finally {
+        // //     System.out.println("CONSTRUCTOR DONE");
+        }
+        return python_module;
+    }
+
+    private static org.python.types.Module importPythonModule(java.lang.String java_name)
+            throws java.lang.ClassNotFoundException {
+        org.python.types.Module python_module;
+        try {
+            java.lang.Class java_class = java.lang.Class.forName(java_name.replace("/", "."));
             java.lang.reflect.Constructor constructor = java_class.getConstructor();
             python_module = (org.python.types.Module) constructor.newInstance();
-            modules.put(java_name.toString(), python_module);
+            modules.put(java_name, python_module);
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to constructor for module " + java_name);
         } catch (java.lang.NoSuchMethodException e) {
@@ -118,7 +160,6 @@ public class ImportLib {
         }
         return python_module;
     }
-
 
     /**
      * Develop a map of exported symbols for a module.

@@ -13,7 +13,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         super(msg);
     }
 
-    public java.lang.Object toValue() {
+    public java.lang.Object toJava() {
         return this;
     }
 
