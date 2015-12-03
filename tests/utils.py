@@ -210,7 +210,7 @@ class TranspileTestCase(TestCase):
         java = adjust(java)
         self.assertEqual(debug.getvalue(), java[1:])
 
-    def assertCodeExecution(self, code, extra_code=None, run_in_global=True, run_in_function=True, args=None):
+    def assertCodeExecution(self, code, message=None, extra_code=None, run_in_global=True, run_in_function=True, args=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
         #==================================================
@@ -242,7 +242,11 @@ class TranspileTestCase(TestCase):
             py_out = cleanse_python(py_out)
 
             # Confirm that the output of the Java code is the same as the Python code.
-            self.assertEqual(java_out, py_out, 'Global context')
+            if message:
+                context = 'Global context: %s' % message
+            else:
+                context = 'Global context'
+            self.assertEqual(java_out, py_out, context)
 
         #==================================================
         # Pass 2 - run the code in a function's context
@@ -272,7 +276,11 @@ class TranspileTestCase(TestCase):
             py_out = cleanse_python(py_out)
 
             # Confirm that the output of the Java code is the same as the Python code.
-            self.assertEqual(java_out, py_out, 'Function context')
+            if message:
+                context = 'Function context: %s' % message
+            else:
+                context = 'Function context'
+            self.assertEqual(java_out, py_out, context)
 
     def assertJavaExecution(self, code, py_out, extra_code=None, run_in_global=True, run_in_function=True, args=None):
         "Run code under Java and check the output is as expected"
