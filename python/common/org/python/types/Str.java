@@ -13,7 +13,7 @@ public class Str extends org.python.types.Object {
         this.value = ((org.python.types.Str) obj).value;
     }
 
-    public java.lang.Object toValue() {
+    public java.lang.Object toJava() {
         return this.value;
     }
 
@@ -244,15 +244,15 @@ public class Str extends org.python.types.Object {
         if (other instanceof org.python.types.List) {
             org.python.types.List oth = (org.python.types.List) other;
             for (org.python.Object obj: oth.value) {
-                args.add(obj.toValue());
+                args.add(obj.toJava());
             }
         } else if (other instanceof org.python.types.Tuple) {
             org.python.types.Tuple oth = (org.python.types.Tuple) other;
             for (org.python.Object obj: oth.value) {
-                args.add(obj.toValue());
+                args.add(obj.toJava());
             }
         } else {
-            args.add(other.toValue());
+            args.add(other.toJava());
         }
 
         return new org.python.types.Str(String.format(this.value, args.toArray()));

@@ -5,19 +5,40 @@ from ..utils import TranspileTestCase
 
 class ImportTests(TranspileTestCase):
 
-    @expectedFailure
     def test_import_java_module(self):
-        "You can import a native Java class as a Python module"
-        self.assertCodeExecution(
+        "You can import a native Java namespace as a Python module"
+        self.assertJavaExecution(
             """
-            from java import lang as java_lang
+            from java import lang
 
-            buffer = java_lang.StringBuilder()
-            buffer.append('Hello, ')
-            buffer.append('World')
-            print(buffer.toString())
+            buf = lang.StringBuilder()
+            buf.append('Hello, ')
+            buf.append('World')
+            print(buf.toString())
 
             print("Done.")
+            """,
+            """
+            Hello, World
+            Done.
+            """)
+
+    def test_import_java_class(self):
+        "You can import a native Java class as a Python module"
+        self.assertJavaExecution(
+            """
+            from java.lang import StringBuilder
+
+            buf = StringBuilder()
+            buf.append('Hello, ')
+            buf.append('World')
+            print(buf.toString())
+
+            print("Done.")
+            """,
+            """
+            Hello, World
+            Done.
             """)
 
     def test_import_stdlib_module(self):

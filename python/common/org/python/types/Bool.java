@@ -13,7 +13,7 @@ public class Bool extends org.python.types.Object {
         this.value = ((org.python.types.Bool) obj).value;
     }
 
-    public java.lang.Object toValue() {
+    public java.lang.Object toJava() {
         return this.value;
     }
 

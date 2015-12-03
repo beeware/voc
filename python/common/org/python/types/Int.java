@@ -13,7 +13,7 @@ public class Int extends org.python.types.Object {
         this.value = ((org.python.types.Int) obj).value;
     }
 
-    public java.lang.Object toValue() {
+    public java.lang.Object toJava() {
         return this.value;
     }
 

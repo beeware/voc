@@ -13,7 +13,7 @@ public class List extends org.python.types.Object {
         this.value = ((org.python.types.List) obj).value;
     }
 
-    public java.lang.Object toValue() {
+    public java.lang.Object toJava() {
         return this.value;
     }
 

@@ -13,7 +13,7 @@ public class Set extends org.python.types.Object {
         this.value = ((org.python.types.Set) obj).value;
     }
 
-    public java.lang.Object toValue() {
+    public java.lang.Object toJava() {
         return this.value;
     }
 

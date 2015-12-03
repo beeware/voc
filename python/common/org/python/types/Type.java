@@ -1,6 +1,8 @@
 package org.python.types;
 
 public class Type extends org.python.types.Object {
+    public enum Origin {PLACEHOLDER, PYTHON, JAVA};
+
     private static java.util.Map<java.lang.Class, org.python.types.Type> known_types = new java.util.HashMap<java.lang.Class, org.python.types.Type>();
 
     /**
@@ -16,7 +18,11 @@ public class Type extends org.python.types.Object {
             known_types.put(java_class, placeholder);
 
             // Construct the new type, and store it in the types table
-            python_type = new org.python.types.Type(java_class);
+            if (java_class.isAssignableFrom(org.python.Object.class)) {
+                python_type = new org.python.types.Type(java_class);
+            } else {
+                python_type = new org.python.java.Type(java_class);
+            }
             known_types.put(java_class, python_type);
 
             // Since we have a freshly created type, resolve
@@ -36,7 +42,37 @@ public class Type extends org.python.types.Object {
         }
     }
 
+    public static org.python.Object toPython(java.lang.Object value) {
+        if (value.getClass().isAssignableFrom(org.python.Object.class)) {
+            try {
+                org.python.types.Type python_type = org.python.types.Type.pythonType(value.getClass());
+                java.lang.reflect.Constructor constructor = python_type.klass.getConstructor(value.getClass());
+                return (org.python.Object) constructor.newInstance(value);
+            } catch (java.lang.NoSuchMethodException e) {
+                throw new org.python.exceptions.RuntimeError("Couldn't find toPython() compatible constructor for " + value);
+            } catch (java.lang.IllegalAccessException e) {
+                throw new org.python.exceptions.RuntimeError("Invalid access to toPython() compatible constructor for " + value);
+            } catch (java.lang.reflect.InvocationTargetException e) {
+                try {
+                    // e.getTargetException().printStackTrace();
+                    // If the Java method raised an Python exception, re-raise that
+                    // exception as-is. If it wasn"t a Python exception, wrap it
+                    // as one and continue.
+                    throw (org.python.exceptions.BaseException) e.getCause();
+                } catch (ClassCastException java_e) {
+                    throw new org.python.exceptions.RuntimeError(e.getCause().getMessage());
+                }
+            } catch (java.lang.InstantiationException e) {
+                throw new org.python.exceptions.RuntimeError("Couldn't instantiate Python() compatible constructor for " + value);
+            }
+        } else {
+            return new org.python.java.Object(value);
+        }
+    }
+
+
     public java.lang.Class klass;
+    public Origin origin;
 
     /**
      * A utility method to update the internal value of this object.
@@ -48,9 +84,9 @@ public class Type extends org.python.types.Object {
         this.klass = ((org.python.types.Type) obj).klass;
     }
 
-    Type(java.lang.Class klass, boolean empty) {
-        super(empty);
-        if (!empty) {
+    public Type(java.lang.Class klass, Origin origin) {
+        super(origin);
+        if (origin != Origin.PLACEHOLDER) {
             this.klass = klass;
 
             this.attrs.put("__name__", new org.python.types.Str(this.klass.getName()));
@@ -75,12 +111,8 @@ public class Type extends org.python.types.Object {
         }
     }
 
-    Type(java.lang.Class klass) {
-        this(klass, false);
-    }
-
-    public boolean is_placeholder() {
-        return false;
+    public Type(java.lang.Class klass) {
+        this(klass, Origin.PYTHON);
     }
 
     public void add_reference(org.python.Object instance) {
@@ -88,14 +120,7 @@ public class Type extends org.python.types.Object {
     }
 
     public org.python.types.Str __repr__() {
-        // FIXME: This should defer to the class itself...
-        java.lang.String class_name = this.klass.getName();
-        if (class_name.startsWith("org.python.types.")) {
-            class_name = class_name.substring(17).toLowerCase();
-        } else if (class_name.startsWith("python.")) {
-            class_name = class_name.substring(7);
-        }
-        return new org.python.types.Str(String.format("<class '%s'>", class_name));
+        return new org.python.types.Str(String.format("<class '%s'>", org.Python.typeName(this.klass)));
     }
 }
 
@@ -104,11 +129,7 @@ class PlaceholderType extends org.python.types.Type {
     private java.util.ArrayList<org.python.Object> instances = new java.util.ArrayList<org.python.Object>();
 
     PlaceholderType(java.lang.Class klass) {
-        super(klass, true);
-    }
-
-    public boolean is_placeholder() {
-        return true;
+        super(klass, org.python.types.Type.Origin.PLACEHOLDER);
     }
 
     public void add_reference(org.python.Object instance) {

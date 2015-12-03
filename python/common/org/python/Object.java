@@ -6,7 +6,7 @@ public interface Object {
      * Extract a Java object that is the underlying representation
      * of this object (e.g., the java.util.Map behind a Python dict())
      */
-    public java.lang.Object toValue();
+    public java.lang.Object toJava();
 
     /**
      * Return the Python type name for this object.

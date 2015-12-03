@@ -13,12 +13,12 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         super(msg);
     }
 
-    public java.lang.Object toValue() {
+    public java.lang.Object toJava() {
         return this;
     }
 
     public java.lang.String typeName() {
-        return this.getClass().getName().substring(22);
+        return org.Python.typeName(this.getClass());
     }
 
     /**

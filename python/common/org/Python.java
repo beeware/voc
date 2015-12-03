@@ -30,6 +30,29 @@ public class Python {
         }
     }
 
+    public static java.lang.String typeName(java.lang.Class cls) {
+        try {
+            java.lang.reflect.Field field = cls.getField("PYTHON_TYPE_NAME");
+            return (java.lang.String) field.get(cls);
+        } catch (java.lang.NoSuchFieldException e) {
+            java.lang.String class_name = cls.getName();
+            if (class_name.startsWith("org.python.types.")) {
+                return class_name.substring(17).toLowerCase();
+            } else if (class_name.startsWith("org.python.exceptions.")) {
+                return class_name.substring(22);
+            } else if (class_name.startsWith("python.")) {
+                return class_name.substring(7);
+            }
+            return class_name;
+        } catch (java.lang.IllegalAccessException e) {
+            return "*UNKNOWABLE*";
+        } catch (java.lang.SecurityException e) {
+            return "*UNKNOWABLE*";
+        } catch (java.lang.NullPointerException e) {
+            return "**UNKNOWN**";
+        }
+    }
+
     public static void debug(java.lang.Object msg) {
         System.out.println("DEBUG: " + msg);
     }
@@ -1344,7 +1367,7 @@ public class Python {
                 // a Java Collection.
                 return new org.python.types.Set(
                     new java.util.HashSet<org.python.Object>(
-                        (java.util.Collection) args.get(0).toValue()
+                        (java.util.Collection) args.get(0).toJava()
                     )
                 );
             } catch (java.lang.ClassCastException e) {
