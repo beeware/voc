@@ -31,6 +31,25 @@ class DictTests(TranspileTestCase):
             print(x['c'])
             """)
 
+    def test_clear(self):
+        # Clear a dictionary
+        self.assertCodeExecution("""
+            x = {'a': 1, 'b': 2}
+            print('a' in x)
+            print(x.clear())
+            print('a' not in x)
+            print(x)
+            """)
+
+        # Clear an already empty dict
+        self.assertCodeExecution("""
+            x = {}
+            print('a' not in x)
+            print(x.clear())
+            print('a' not in x)
+            print(x)
+            """)
+
 
 class UnaryDictOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ["{}", "{'a': 1, 'b': 'value', 'c': 1.2345}"]

@@ -1,5 +1,6 @@
 package org.python.types;
 
+
 public class Function extends org.python.types.Object implements org.python.Callable {
     public static final int CO_OPTIMIZED = 0x1;
     public static final int CO_NEWLOCALS = 0x2;

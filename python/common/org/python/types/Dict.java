@@ -1,5 +1,6 @@
 package org.python.types;
 
+
 public class Dict extends org.python.types.Object {
     public java.util.Map<org.python.Object, org.python.Object> value;
 
@@ -81,18 +82,6 @@ public class Dict extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("dict.__ge__() has not been implemented.");
     }
 
-    public org.python.Object __getattribute__(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("dict.__getattribute__() has not been implemented.");
-    }
-
-    public void __setattr__(java.lang.String name, org.python.Object value) {
-        throw new org.python.exceptions.NotImplementedError("dict.__setattr__() has not been implemented.");
-    }
-
-    public void __delattr__(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("dict.__delattr__() has not been implemented.");
-    }
-
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("dict.__dir__() has not been implemented.");
     }
@@ -125,11 +114,14 @@ public class Dict extends org.python.types.Object {
         return new org.python.types.Bool(this.value.get(key) == null);
     }
 
+    @org.python.Method(
+        __doc__ = "D.clear() -> None.  Remove all items from D."
+    )
     public org.python.Object clear(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null || kwargs.size() > 0) {
+        if (kwargs != null && kwargs.size() > 0) {
             throw new org.python.exceptions.TypeError("clear() takes no keyword arguments");
         }
-        if (args != null || args.size() > 0) {
+        if (args != null && args.size() > 0) {
             throw new org.python.exceptions.TypeError("clear() takes no arguments (" + args.size() + " given)");
         }
         this.clear();

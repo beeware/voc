@@ -1,5 +1,6 @@
 package org.python.types;
 
+
 public class Method extends org.python.types.Object implements org.python.Callable {
     org.python.Object im_self;
     org.python.types.Type im_class;

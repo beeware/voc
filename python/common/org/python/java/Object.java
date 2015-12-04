@@ -1,5 +1,6 @@
 package org.python.java;
 
+
 public class Object extends org.python.types.Object {
     static
     // public static org.python.Object convert(java.lang.Object java) {
