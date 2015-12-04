@@ -1,9 +1,41 @@
-from unittest import expectedFailure
+import os
 
 from ..utils import TranspileTestCase
 
 
 class ImportTests(TranspileTestCase):
+
+    def test_import_java_module_static_method(self):
+        "You can invoke a static method from a native Java namespace"
+        self.assertJavaExecution(
+            """
+            from java import lang
+
+            props = lang.System.getProperties()
+            print(props.get("file.separator"))
+
+            print("Done.")
+            """,
+            """
+            %s
+            Done.
+            """ % os.path.sep)
+
+    def test_import_java_class_static_method(self):
+        "You can invoke a static method from a native Java class"
+        self.assertJavaExecution(
+            """
+            from java.lang import System
+
+            props = System.getProperties()
+            print(props.get("file.separator"))
+
+            print("Done.")
+            """,
+            """
+            %s
+            Done.
+            """ % os.path.sep)
 
     def test_import_java_module(self):
         "You can import a native Java namespace as a Python module"

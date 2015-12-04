@@ -37,34 +37,6 @@ public class Method extends org.python.types.Object implements org.python.Callab
     }
 
     public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        try {
-            // System.out.println("INVOKE METHOD: " + this.im_func);
-            // System.out.println("         method: " + this.im_func.method);
-            // System.out.println("           self: " + this.im_self);
-            // System.out.println("           args: " + args);
-            // System.out.println("         kwargs: " + kwargs);
-            // System.out.println("   default args: " + this.im_func.default_args);
-            // System.out.println(" default kwargs: " + this.im_func.default_kwargs);
-
-            if (this.im_func.default_args != null) {
-                return (org.python.Object) this.im_func.method.invoke(this.im_self, args, kwargs, this.im_func.default_args, this.im_func.default_kwargs);
-            } else {
-                return (org.python.Object) this.im_func.method.invoke(this.im_self, args, kwargs);
-            }
-        } catch (java.lang.IllegalAccessException e) {
-            throw new org.python.exceptions.RuntimeError("Illegal access to Java instance method " + this.im_func);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            try {
-                // e.getTargetException().printStackTrace();
-                // If the Java method raised an Python exception, re-raise that
-                // exception as-is. If it wasn't a Python exception, wrap it
-                // as one and continue.
-                throw (org.python.exceptions.BaseException) e.getCause();
-            } catch (ClassCastException java_e) {
-                throw new org.python.exceptions.RuntimeError(e.getCause().toString());
-            }
-        } finally {
-        //     System.out.println("INVOKE METHOD DONE");
-        }
+        return this.im_func.invoke(this.im_self, args, kwargs);
     }
 }

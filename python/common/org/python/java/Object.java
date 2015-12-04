@@ -21,7 +21,7 @@ public class Object extends org.python.types.Object {
     }
 
     public Object(java.lang.Object object) {
-        super();
+        super(org.python.types.Type.Origin.JAVA, object.getClass());
         this.object = object;
     }
 
@@ -41,38 +41,10 @@ public class Object extends org.python.types.Object {
         if (value == null) {
             // Look for a cached class-level attribute.
             org.python.types.Type klass = (org.python.types.Type) this.attrs.get("__class__");
-            // System.out.println("CLASS ATTRS " + klass.attrs);
-            org.python.Object attr = klass.attrs.get(name);
-
-            if (attr == null) {
-                // java.lang.Map doesn't differentiate between "doesn't exist"
-                // and "value is null"; so since we know the value is null, check
-                // to see if it is an explicit null (i.e., attribute doesn't exist)
-                if (klass.attrs.containsKey(name)) {
-                    throw new org.python.exceptions.AttributeError(this, name);
-                } else {
-                    try {
-                        attr = new org.python.java.Function(this.object.getClass(), name);
-                        klass.attrs.put(name, attr);
-                        value = attr.__get__(this, org.python.types.Type.pythonType(this.getClass()));
-                        this.attrs.put(name, value);
-                    } catch (org.python.exceptions.AttributeError fe) {
-                        try {
-                            attr = new org.python.java.Attribute(this.object.getClass(), name);
-                            klass.attrs.put(name, attr);
-                            value = attr;
-                        } catch (org.python.exceptions.AttributeError ae) {
-                            // Field does not exist. Record this fact,
-                            // and raise an AttributError.
-                            klass.attrs.put(name, null);
-                            throw new org.python.exceptions.AttributeError(this, name);
-                        }
-                    }
-                }
-            }
+            value = klass.__getattribute__(name).__get__(this, klass);
         }
 
-        return value.__get__(this, org.python.types.Type.pythonType(this.getClass()));
+        return value;
     }
 
     public void __setattr__(java.lang.String name, org.python.Object value) {
