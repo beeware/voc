@@ -27,21 +27,28 @@ public class Object implements org.python.Object {
     /**
      * Construct a new object instance.
      *
-     * The argument `empty` is used to flag placeholder objects. These are
-     * transient objects that exist during instantiation of other objects;
-     * as a result, they don't have attributes or any of the other usual
-     * infrastructure of a Python object.
+     * The argument `origin` is used to describe where the object is defined -
+     * Python or Java. It can also be "PLACEHOLDER" - these are transient objects
+     * that exist during instantiation of other objects. As a result, they don't
+     * have attributes or any of the other usual infrastructure of a Python object.
+     *
+     * klass is the underlying java class being represented by this object.
+     * In the case of a Python object, the klass is the Java manifestation of
+     * the object; when wrapping Java objects, the native class of the object is used.
      */
-    protected Object(org.python.types.Type.Origin origin) {
+    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass) {
         if (origin != org.python.types.Type.Origin.PLACEHOLDER) {
             this.attrs = new java.util.HashMap<java.lang.String, org.python.Object>();
-            org.python.types.Type cls = org.python.types.Type.pythonType(this.getClass());
+            if (klass == null) {
+                klass = this.getClass();
+            }
+            org.python.types.Type cls = org.python.types.Type.pythonType(klass);
             this.__new__(cls);
         }
     }
 
     public Object() {
-        this(org.python.types.Type.Origin.PYTHON);
+        this(org.python.types.Type.Origin.PYTHON, null);
     }
 
     /**

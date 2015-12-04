@@ -1,5 +1,6 @@
 package org.python.types;
 
+
 public class Function extends org.python.types.Object implements org.python.Callable {
     public static final int CO_OPTIMIZED = 0x1;
     public static final int CO_NEWLOCALS = 0x2;
@@ -112,6 +113,10 @@ public class Function extends org.python.types.Object implements org.python.Call
     }
 
     public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        return this.invoke(null, args, kwargs);
+    }
+
+    public org.python.Object invoke(org.python.Object instance, java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // System.out.println("Function:" + this.method);
             // System.out.println("           args:" + args);
@@ -126,12 +131,12 @@ public class Function extends org.python.types.Object implements org.python.Call
             // else:
 
             if (this.default_args != null) {
-                return (org.python.Object) this.method.invoke(null, args, kwargs, this.default_args, this.default_kwargs);
+                return (org.python.Object) this.method.invoke(instance, args, kwargs, this.default_args, this.default_kwargs);
             } else {
-                return (org.python.Object) this.method.invoke(null, args, kwargs);
+                return (org.python.Object) this.method.invoke(instance, args, kwargs);
             }
         } catch (java.lang.IllegalAccessException e) {
-            throw new org.python.exceptions.RuntimeError("Illegal access to Java function " + this.method);
+            throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.method);
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
                 // e.getTargetException().printStackTrace();

@@ -1,5 +1,6 @@
 package org.python;
 
+
 public interface Object {
 
     /**

@@ -1,10 +1,14 @@
 package org.python.java;
 
-public class Function extends org.python.types.Object {
+public class Function extends org.python.types.Object implements org.python.Callable {
     java.lang.String name;
     java.util.Map<java.lang.String, java.lang.reflect.Method> methods;
 
-    static java.lang.String descriptor(java.lang.Class klass) {
+    static java.lang.String descriptor(java.lang.Class klass, boolean weak) {
+        if (klass.getName().startsWith("[")) {
+            return klass.getName();
+        }
+
         switch (klass.getName()) {
             case "boolean":
             case "java.lang.Boolean":
@@ -39,7 +43,11 @@ public class Function extends org.python.types.Object {
                 return "D";
 
             default:
-                return "L" + klass.getName().replace('.', '/') + ";";
+                if (weak) {
+                    return "Ljava/lang/Object;";
+                } else {
+                    return "L" + klass.getName().replace('.', '/') + ";";
+                }
         }
     }
 
@@ -53,7 +61,7 @@ public class Function extends org.python.types.Object {
             if (method.getName().equals(name)) {
 
                 for (java.lang.Class c: method.getParameterTypes()) {
-                    signature.append(org.python.java.Function.descriptor(c));
+                    signature.append(org.python.java.Function.descriptor(c, false));
                 }
 
                 this.methods.put(
@@ -79,12 +87,30 @@ public class Function extends org.python.types.Object {
     }
 
     java.lang.reflect.Method selectMethod(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        // System.out.println("Options " + this.methods);
         java.lang.reflect.Method method;
         java.lang.StringBuilder signature = new java.lang.StringBuilder();
         for (org.python.Object arg: args) {
-            signature.append(org.python.java.Function.descriptor(arg.toJava().getClass()));
+            signature.append(org.python.java.Function.descriptor(arg.toJava().getClass(), false));
         }
-        return this.methods.get(signature.toString());
+        // System.out.println("Signature " + signature.toString());
+        method = this.methods.get(signature.toString());
+
+        // No match - need to try alternatives for signature.
+        if (method == null) {
+            signature = new java.lang.StringBuilder();
+            for (org.python.Object arg: args) {
+                signature.append(org.python.java.Function.descriptor(arg.toJava().getClass(), true));
+            }
+            // System.out.println("Signature " + signature.toString());
+            method = this.methods.get(signature.toString());
+        }
+
+        // If there is still no match, raise an error.
+        if (method == null) {
+            throw new org.python.exceptions.RuntimeError(String.format("Parameter mismatch calling native Java method '%s'", this.name));
+        }
+        return method;
     }
 
     java.lang.Object [] adjustArguments(java.lang.reflect.Method method, java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
@@ -100,13 +126,15 @@ public class Function extends org.python.types.Object {
         return adjusted;
     }
 
+    public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        return this.invoke(null, args, kwargs);
+    }
+
     public org.python.Object invoke(java.lang.Object instance, java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("Function:" + this.method);
+            // System.out.println("Native Function:" + this.name);
             // System.out.println("           args:" + args);
             // System.out.println("         kwargs:" + kwargs);
-            // System.out.println("   default args: " + this.default_args);
-            // System.out.println(" default kwargs: " + this.default_kwargs);
 
             java.lang.reflect.Method method = selectMethod(args, kwargs);
 

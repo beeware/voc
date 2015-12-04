@@ -17,8 +17,10 @@ public class Type extends org.python.types.Object {
             PlaceholderType placeholder = new PlaceholderType(java_class);
             known_types.put(java_class, placeholder);
 
-            // Construct the new type, and store it in the types table
-            if (java_class.isAssignableFrom(org.python.Object.class)) {
+            // Construct the new type, and store it in the types table.
+            // Any type implementing org.python.Object is a Python type;
+            // otherwise, wrap it as a native Java type.
+            if (org.python.Object.class.isAssignableFrom(java_class)) {
                 python_type = new org.python.types.Type(java_class);
             } else {
                 python_type = new org.python.java.Type(java_class);
@@ -43,7 +45,7 @@ public class Type extends org.python.types.Object {
     }
 
     public static org.python.Object toPython(java.lang.Object value) {
-        if (value.getClass().isAssignableFrom(org.python.Object.class)) {
+        if (org.python.Object.class.isAssignableFrom(value.getClass())) {
             try {
                 org.python.types.Type python_type = org.python.types.Type.pythonType(value.getClass());
                 java.lang.reflect.Constructor constructor = python_type.klass.getConstructor(value.getClass());
@@ -85,29 +87,15 @@ public class Type extends org.python.types.Object {
     }
 
     public Type(java.lang.Class klass, Origin origin) {
-        super(origin);
+        super(origin, null);
         if (origin != Origin.PLACEHOLDER) {
             this.klass = klass;
 
             this.attrs.put("__name__", new org.python.types.Str(this.klass.getName()));
+            this.attrs.put("__qualname__", new org.python.types.Str(this.klass.getName()));
             // this.attrs.put("__module__", );
-            // this.attrs.put("__qualname__", );
 
-            // Iterate over every field in the class. If the
-            // field is annotated for inclusion in the Python class,
-            // add a function wrapper to the type definition.
-            for (java.lang.reflect.Field field: klass.getFields()) {
-                // System.out.println("Found field " + field + " on type " + klass);
-                java.lang.annotation.Annotation annotation = field.getAnnotation(org.python.Attribute.class);
-                if (annotation != null) {
-                    // System.out.println("Add field " + field + " to type " + klass);
-                    this.attrs.put(
-                        field.getName(),
-                        org.python.types.NoneType.NONE
-                    );
-                }
-            }
-            // System.out.println("Methods added for type " + klass);
+            org.Python.initializeModule(this.klass, this.attrs);
         }
     }
 

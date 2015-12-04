@@ -6,51 +6,50 @@ public class Type extends org.python.types.Type implements org.python.Callable {
         super(klass, org.python.types.Type.Origin.JAVA);
     }
 
-    // public org.python.Object __getattribute__(java.lang.String name) {
-    //     System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + name);
-    //     return super.
-    //     // org.python.Object value;
-    //     // try {
-    //     //     // First try the normal approach attribute
-    //     //     org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
-    //     //     // System.out.println("instance attrs = " + this.attrs);
-    //     //     // System.out.println("class attrs = " + cls.attrs);
-    //     //     value = cls.attrs.get(name);
+    public org.python.Object __getattribute__(java.lang.String name) {
+        // System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + name);
+        // System.out.println("CLASS ATTRS " + this.attrs);
+        org.python.Object value = this.attrs.get(name);
 
-    //     //     if (value == null) {
-    //     //         throw new org.python.exceptions.AttributeError(this, name);
-    //     //     }
-    //     // } catch (org.python.exceptions.AttributeError e) {
-    //     //     // System.out.println("TYPE NO ATTRIBUTE");
-    //     //     value = org.Python.builtins.get(name);
+        // On a native type, attrs is a cache of lookups on actual functions.
+        // If there's no hit, then we need to reflect on the underyling class
+        // and populate the cache.
+        if (value == null) {
+            // java.lang.Map doesn't differentiate between "doesn't exist"
+            // and "value is null"; so since we know the value is null, check
+            // to see if it is an explicit null (i.e., attribute doesn't exist)
+            if (this.attrs.containsKey(name)) {
+                throw new org.python.exceptions.AttributeError(this, name);
+            } else {
+                try {
+                    value = new org.python.java.Function(this.klass, name);
+                    this.attrs.put(name, value);
+                } catch (org.python.exceptions.AttributeError fe) {
+                    // No function; look for an attribute with the same name.
+                    try {
+                        value = new org.python.java.Attribute(this.klass, name);
+                        this.attrs.put(name, value);
+                    } catch (org.python.exceptions.AttributeError ae) {
+                        // Field does not exist. Record this fact,
+                        // and raise an AttributError.
+                        this.attrs.put(name, null);
+                        throw new org.python.exceptions.AttributeError(this, name);
+                    }
+                }
+            }
+        }
+        return value;
+    }
 
-    //     //     if (value == null) {
-    //             throw new org.python.exceptions.NameError(name);
-    //     //     }
-    //     // }
+    public void __setattr__(java.lang.String name, org.python.Object value) {
+        // The base object can't have attribute set on it unless the attribute already exists.
+        // System.out.println("SETATTRIBUTE TYPE " + this + " " + name + " = " + value);
+        org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
+        // System.out.println("instance attrs = " + this.attrs);
+        // System.out.println("class attrs = " + cls.attrs);
 
-    //     // return value;
-    // }
-
-    // public void __setattr__(java.lang.String name, org.python.Object value) {
-    //     // The base object can't have attribute set on it unless the attribute already exists.
-    //     System.out.println("SETATTRIBUTE TYPE " + this + " " + name + " = " + value);
-    //     org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
-    //     System.out.println("instance attrs = " + this.attrs);
-    //     System.out.println("class attrs = " + cls.attrs);
-
-    //     cls.attrs.put(name, value);
-
-    //     // // If there is a native field of the same name, set it.
-    //     // try {
-    //     //     java.lang.reflect.Field field = this.getClass().getField(name);
-    //     //     field.set(this, value);
-    //     // } catch (NoSuchFieldException e) {
-    //     //     // System.out.println("Not a native field");
-    //     // } catch (IllegalAccessException e) {
-    //         // throw new org.python.exceptions.RuntimeError("Illegal access to native field " + name);
-    //     // }
-    // }
+        cls.attrs.put(name, value);
+    }
 
     public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {

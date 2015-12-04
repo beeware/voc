@@ -1,5 +1,6 @@
 package org.python.java;
 
+
 public class Attribute extends org.python.types.Object {
     java.lang.reflect.Field field;
 
