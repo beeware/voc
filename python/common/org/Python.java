@@ -236,7 +236,7 @@ public class Python {
         if (args == null || args.size() != 1) {
             throw new org.python.exceptions.TypeError("bool() takes exactly one argument (" + args.size() + " given)");
         }
-        return args.get(0).__bool__();
+        return (org.python.types.Bool) args.get(0).__bool__();
     }
 
     @org.python.Method(
@@ -478,7 +478,7 @@ public class Python {
         if (args == null || args.size() == 0) {
             throw new org.python.exceptions.NotImplementedError("builting function 'dir' with no arguments not implemented");
         } else if (args.size() == 1) {
-            return args.get(0).__dir__();
+            return (org.python.types.List) args.get(0).__dir__();
         } else {
             throw new org.python.exceptions.TypeError("dir() takes exactly one argument (" + args.size() + " given)");
         }
@@ -566,7 +566,7 @@ public class Python {
         if (args == null || args.size() != 1) {
             throw new org.python.exceptions.TypeError("float() takes exactly one argument (" + args.size() + " given)");
         }
-        return args.get(0).__float__();
+        return (org.python.types.Float) args.get(0).__float__();
     }
 
     @org.python.Method(
@@ -584,9 +584,9 @@ public class Python {
         if (args == null || args.size() == 0) {
             throw new org.python.exceptions.TypeError("format() takes at least 1 argument (" + args.size() + " given)");
         } else if (args.size() == 1) {
-            return args.get(0).__str__();
+            return (org.python.types.Str) args.get(0).__str__();
         } else if (args.size() == 2) {
-            return args.get(0).__format__(args.get(1));
+            return (org.python.types.Str) args.get(0).__format__(args.get(1));
         } else {
             throw new org.python.exceptions.TypeError("format() takes at most 2 arguments (" + args.size() + " given)");
         }
@@ -666,7 +666,7 @@ public class Python {
         if (args == null || args.size() != 1) {
             throw new org.python.exceptions.TypeError("hash() takes exactly one argument (" + args.size() + " given)");
         }
-        return args.get(0).__hash__();
+        return (org.python.types.Int) args.get(0).__hash__();
     }
 
     @org.python.Method(
@@ -774,7 +774,7 @@ public class Python {
             if (args == null || args.size() == 0) {
                 return new org.python.types.Int(0);
             } else if (args.size() == 1) {
-                return args.get(0).__int__();
+                return (org.python.types.Int) args.get(0).__int__();
             } else if (args.size() == 2) {
                 throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
             } else {
@@ -851,7 +851,7 @@ public class Python {
         if (args != null && args.size() != 1) {
             throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.size() + " given)");
         }
-        return args.get(0).__len__();
+        return (org.python.types.Int) args.get(0).__len__();
     }
 
     @org.python.Method(
@@ -1153,7 +1153,7 @@ public class Python {
         try {
             int length = ((org.python.types.Str) args.get(0)).value.length();
             if (length == 1) {
-                return new org.python.types.Int((int) (str(args, kwargs).value).charAt(0));
+                return new org.python.types.Int((int) (org.Python.str(args, kwargs).value).charAt(0));
             } else {
                 throw new org.python.exceptions.TypeError("ord() expected string of length 1, but string of length " + length + " found");
             }
@@ -1303,7 +1303,7 @@ public class Python {
         if (args == null || args.size() != 1) {
             throw new org.python.exceptions.TypeError("repr() takes exactly one argument (" + args.size() + " given)");
         }
-        return args.get(0).__repr__();
+        return (org.python.types.Str) args.get(0).__repr__();
     }
 
     @org.python.Method(
@@ -1456,7 +1456,7 @@ public class Python {
         if (args == null || args.size() != 1) {
             throw new org.python.exceptions.TypeError("len() takes exactly one argument (" + args.size() + " given)");
         }
-        return args.get(0).__str__();
+        return (org.python.types.Str) args.get(0).__str__();
     }
 
     @org.python.Method(

@@ -2081,7 +2081,8 @@ class JUMP_IF_FALSE_OR_POP(Opcode):
         context.add_opcodes(
             IF([
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
                     JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
                     ], JavaOpcodes.IFNE),
                 jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START),
@@ -2111,7 +2112,8 @@ class JUMP_IF_TRUE_OR_POP(Opcode):
         context.add_opcodes(
             IF([
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
                     JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
                     ], JavaOpcodes.IFEQ),
                 jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START),
@@ -2162,7 +2164,8 @@ class POP_JUMP_IF_FALSE(Opcode):
     def convert_opcode(self, context, arguments):
         context.add_opcodes(
             # (bool) TOS.value
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Bool'),
             JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
 
             # Jump if false
@@ -2186,7 +2189,8 @@ class POP_JUMP_IF_TRUE(Opcode):
     def convert_opcode(self, context, arguments):
         context.add_opcodes(
             # (bool) TOS.value
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Bool'),
             JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
 
             # Jump if not false

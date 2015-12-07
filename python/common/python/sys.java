@@ -4,23 +4,25 @@ package python;
 public class sys extends org.python.types.Module {
     static {
         org.python.types.Type cls = org.python.types.Type.pythonType(python.sys.class);
+        org.Python.initializeModule(python.sys.class, cls.attrs);
     }
 
     @org.python.Method(
         __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
-    public org.python.types.Type __new__(org.python.types.Type cls) {
-        super.__new__(cls);
+    public org.python.types.Type __new__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        super.__new__(args, kwargs, default_args, default_kwargs);
 
         // Initialize sys.argv using command line arguments from environment
         // java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("(\"[^\"]*\"|[^\"]+)(\\s+|$)");
         java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("\\s+");
-        java.lang.String [] args = cmdline_pattern.split(System.getProperty("sun.java.command"));
+        java.lang.String [] cmdline_args = cmdline_pattern.split(System.getProperty("sun.java.command"));
         java.util.List<org.python.Object> arg_list = new java.util.ArrayList<org.python.Object>();
-        for (String arg: args) {
+        for (String arg: cmdline_args) {
             arg_list.add(new org.python.types.Str(arg));
         }
-        cls.__setattr__("argv", new org.python.types.List(arg_list));
+        org.python.types.Type cls = (org.python.types.Type) args.get(0);
+        cls.attrs.put("argv", new org.python.types.List(arg_list));
         return cls;
     }
 
