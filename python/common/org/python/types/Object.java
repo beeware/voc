@@ -381,11 +381,11 @@ public class Object implements org.python.Object {
         if (value == null) {
             try {
                 // No instance attribute; look for a class attribute.
-                org.python.types.Type klass = (org.python.types.Type) this.attrs.get("__class__");
-                // System.out.println("CLASS ATTRS " + klass.attrs);
-                value = klass.attrs.get(name);
+                try {
 
-                if (value == null) {
+                    org.python.types.Type klass = (org.python.types.Type) this.attrs.get("__class__");
+                    value = klass.__getattribute__(args, kwargs, default_args, default_kwargs);
+                } catch (org.python.exceptions.AttributeError e) {
                     // No class attribute; Try the __getattr__ helper.
                     value = this.__getattr__(name);
                 }

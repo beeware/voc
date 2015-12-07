@@ -76,7 +76,6 @@ public class Type extends org.python.types.Object {
         }
     }
 
-
     public java.lang.Class klass;
     public Origin origin;
 
@@ -113,6 +112,9 @@ public class Type extends org.python.types.Object {
         throw new java.lang.RuntimeException("Can't add reference to normal type");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Str __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("__repr__ doesn't take keyword arguments");
@@ -121,6 +123,54 @@ public class Type extends org.python.types.Object {
         }
 
         return new org.python.types.Str(String.format("<class '%s'>", org.Python.typeName(this.klass)));
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __getattribute__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("__getattribute__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
+        } else if (!(args.get(0) instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
+        }
+
+        java.lang.String name = ((org.python.types.Str) args.get(0)).value;
+
+        // System.out.println("GETATTRIBUTE CLASS " + this + " " + name);
+        // System.out.println("CLASS ATTRS " + this.attrs);
+        org.python.Object value = this.attrs.get(name);
+        if (value == null) {
+            throw new org.python.exceptions.AttributeError(this.klass, name);
+        }
+
+        return value;
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public void __setattr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("__setattribute__() doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
+        } else if (!(args.get(0) instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("__setattribute__(): attribute name must be string");
+        }
+
+        java.lang.String name = ((org.python.types.Str) args.get(0)).value;
+        org.python.Object value = args.get(1);
+
+        // The base object can't have attribute set on it unless the attribute already exists.
+        // System.out.println("SETATTRIBUTE TYPE " + this + " " + name + " = " + value);
+        org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
+        // System.out.println("instance attrs = " + this.attrs);
+        // System.out.println("class attrs = " + cls.attrs);
+
+        cls.attrs.put(name, value);
     }
 }
 
