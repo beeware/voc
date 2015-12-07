@@ -25,7 +25,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         if (this.name != null) {
             this.attrs.put("__qualname__", this.name);
         } else {
-            org.python.Object co_name = this.code.__getattribute__("co_consts");
+            org.python.Object co_name = this.code.attrs.get("co_consts");
             this.attrs.put("__qualname__", co_name);
         }
 

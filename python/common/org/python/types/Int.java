@@ -46,15 +46,37 @@ public class Int extends org.python.types.Object {
     //     throw new org.python.exceptions.NotImplementedError("int.__init__() has not been implemented");
     // }
 
-    public org.python.types.Str __repr__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Str __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__repr__ doesn't take keyword arguments");
+        } else if (args != null && args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
+        }
+
         return new org.python.types.Str(java.lang.Long.toString(this.value));
     }
 
-    public org.python.types.Str __format__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Str __format__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__format__() has not been implemented");
     }
 
-    public org.python.Object __lt__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __lt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__lt__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value < ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
@@ -63,7 +85,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unorderable types: int() < " + other.typeName() + "()");
     }
 
-    public org.python.Object __le__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __le__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__le__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value <= ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
@@ -72,7 +104,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unorderable types: int() <= " + other.typeName() + "()");
     }
 
-    public org.python.Object __eq__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __eq__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__eq__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value == ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
@@ -86,7 +128,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unorderable types: int() == " + other.typeName() + "()");
     }
 
-    public org.python.Object __ne__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __ne__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__ne__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value != ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
@@ -95,7 +147,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unorderable types: int() != " + other.typeName() + "()");
     }
 
-    public org.python.Object __gt__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __gt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__gt__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value > ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
@@ -104,7 +166,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unorderable types: int() > " + other.typeName() + "()");
     }
 
-    public org.python.Object __ge__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __ge__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__ge__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value >= ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
@@ -113,10 +185,16 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unorderable types: int() >= " + other.typeName() + "()");
     }
 
-    public org.python.types.Bool __bool__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Bool __bool__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         return new org.python.types.Bool(this.value);
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __getattribute__(java.lang.String name) {
         throw new org.python.exceptions.NotImplementedError("int.__getattribute__() has not been implemented");
     }
@@ -129,11 +207,24 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("int.__delattr__() has not been implemented");
     }
 
-    public org.python.types.List __dir__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.List __dir__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__dir__() has not been implemented");
     }
 
-    public org.python.Object __add__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __add__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__add__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Int(this.value + ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
@@ -142,7 +233,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + other.typeName() + "'");
     }
 
-    public org.python.Object __sub__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __sub__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__sub_ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Str) {
             return other.__sub__(this);
         } else if (other instanceof org.python.types.Int) {
@@ -153,7 +254,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'int' and '" + other.typeName() + "'");
     }
 
-    public org.python.Object __mul__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __mul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__mul__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Str) {
             return other.__mul__(this);
         } else if (other instanceof org.python.types.Int) {
@@ -168,7 +279,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'int' and '" + other.typeName() + "'");
     }
 
-    public org.python.Object __truediv__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __truediv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__truediv__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Float(this.value / ((double)((org.python.types.Int) other).value));
         } else if (other instanceof org.python.types.Float) {
@@ -177,7 +298,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'int' and '" + other.typeName() + "'");
     }
 
-    public org.python.Object __floordiv__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __floordiv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__floordiv__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Int(this.value / ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
@@ -186,7 +317,17 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'int' and '" + other.typeName() + "'");
     }
 
-    public org.python.Object __mod__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __mod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__mod__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         try {
             if (other instanceof org.python.types.Bool) {
                 if (((org.python.types.Bool) other).value) {
@@ -213,11 +354,24 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.typeName() + "'");
     }
 
-    public org.python.Object __divmod__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __divmod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__divmod__() has not been implemented");
     }
 
-    public org.python.Object __pow__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __pow__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__pow__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
+        }
+
+        org.python.Object other = args.get(0);
         if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
             if (other_val < 0) {
@@ -247,87 +401,156 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'int' and '" + other.typeName() + "'");
     }
 
-    public org.python.Object __lshift__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __lshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__lshift__() has not been implemented");
     }
 
-    public org.python.Object __rshift__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rshift__() has not been implemented");
     }
 
-    public org.python.Object __and__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __and__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__and__() has not been implemented");
     }
 
-    public org.python.Object __xor__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __xor__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__xor__() has not been implemented");
     }
 
-    public org.python.Object __or__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __or__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__or__() has not been implemented");
     }
 
-    public org.python.Object __radd__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __radd__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__radd__() has not been implemented");
     }
 
-    public org.python.Object __rsub__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rsub__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rsub__() has not been implemented");
     }
 
-    public org.python.Object __rmul__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rmul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rmul__() has not been implemented");
     }
 
-    public org.python.Object __rtruediv__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rtruediv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rtruediv__() has not been implemented");
     }
 
-    public org.python.Object __rfloordiv__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rfloordiv__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rfloordiv__() has not been implemented");
     }
 
-    public org.python.Object __rmod__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rmod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rmod__() has not been implemented");
     }
 
-    public org.python.Object __rdivmod__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rdivmod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rdivmod__() has not been implemented");
     }
 
-    public org.python.Object __rpow__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rpow__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rpow__() has not been implemented");
     }
 
-    public org.python.Object __rlshift__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rlshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rlshift__() has not been implemented");
     }
 
-    public org.python.Object __rrshift__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rrshift__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rrshift__() has not been implemented");
     }
 
-    public org.python.Object __rand__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rand__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rand__() has not been implemented");
     }
 
-    public org.python.Object __rxor__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __rxor__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__rxor__() has not been implemented");
     }
 
-    public org.python.Object __ror__(org.python.Object other) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __ror__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__ror__() has not been implemented");
     }
 
-    public org.python.Object __neg__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __neg__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__neg__() has not been implemented");
     }
 
-    public org.python.Object __pos__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __pos__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__pos__() has not been implemented");
     }
 
-    public org.python.Object __abs__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __abs__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__abs__ doesn't take keyword arguments");
+        } else if (args != null && args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 argument, got " + args.size());
+        }
+
         if (this.value < 0) {
             return new org.python.types.Int(-this.value);
         } else {
@@ -335,21 +558,44 @@ public class Int extends org.python.types.Object {
         }
     }
 
-    public org.python.Object __invert__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __invert__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__invert__() has not been implemented");
     }
 
-    public org.python.types.Int __int__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Int __int__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__int__ doesn't take keyword arguments");
+        } else if (args != null && args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 argument, got " + args.size());
+        }
+
         return new org.python.types.Int(this.value);
     }
 
-    public org.python.types.Float __float__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Float __float__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("int.__float__ doesn't take keyword arguments");
+        } else if (args != null && args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 argument, got " + args.size());
+        }
+
         return new org.python.types.Float((float) this.value);
     }
 
-    public org.python.Object __round__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("int.__round__() has not been implemented");
     }
-
 
 }

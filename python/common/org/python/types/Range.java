@@ -43,7 +43,13 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         // value = attrs;
     }
 
-    public org.python.types.Str __repr__() {
+    public org.python.types.Str __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("__repr__ doesn't take keyword arguments");
+        } else if (args != null && args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
+        }
+
         if (this.step == 1) {
             return new org.python.types.Str(String.format("range(%d, %d)", this.start, this.stop));
         } else {
@@ -54,11 +60,30 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     @org.python.Method(
         __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Iterable __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("__repr__ doesn't take keyword arguments");
+        } else if (args != null && args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
+        }
+
         return this;
     }
 
-    public org.python.Object __next__() {
+    public org.python.Iterable __iter__() {
+        return this.__iter__(null, null, null, null);
+    }
+
+    @org.python.Method(
+        __doc__ = "Implement iter(self)."
+    )
+    public org.python.Object __next__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("__repr__ doesn't take keyword arguments");
+        } else if (args != null && args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
+        }
+
         if (this.step > 0 && this.index >= this.stop) {
             throw new org.python.exceptions.StopIteration();
         } else if (this.step < 0 && this.index <= this.stop) {
@@ -70,7 +95,18 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         return result;
     }
 
-    public org.python.Object __getitem__(org.python.Object index) {
+    public org.python.Object __next__() {
+        return this.__next__(null, null, null, null);
+    }
+
+    public org.python.Object __getitem__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("__getitem__ doesn't take keyword arguments");
+        } else if (args == null || args.size() != 1) {
+            throw new org.python.exceptions.TypeError("Expected 1 arguments, got " + args.size());
+        }
+
+        org.python.Object index = args.get(0);
         try {
             if (index instanceof org.python.types.Slice) {
                 org.python.types.Slice slice = (org.python.types.Slice) index;

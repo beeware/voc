@@ -1,7 +1,7 @@
 package org.python.types;
 
 public class Type extends org.python.types.Object {
-    public enum Origin {PLACEHOLDER, PYTHON, JAVA};
+    public enum Origin {PLACEHOLDER, BUILTIN, PYTHON, JAVA};
 
     private static java.util.Map<java.lang.Class, org.python.types.Type> known_types = new java.util.HashMap<java.lang.Class, org.python.types.Type>();
 
@@ -21,7 +21,11 @@ public class Type extends org.python.types.Object {
             // Any type implementing org.python.Object is a Python type;
             // otherwise, wrap it as a native Java type.
             if (org.python.Object.class.isAssignableFrom(java_class)) {
-                python_type = new org.python.types.Type(java_class);
+                if (java_class.getName().startsWith("org.python.types.")) {
+                    python_type = new org.python.types.Type(java_class, Origin.BUILTIN);
+                } else {
+                    python_type = new org.python.types.Type(java_class, Origin.PYTHON);
+                }
             } else {
                 python_type = new org.python.java.Type(java_class);
             }
@@ -94,8 +98,10 @@ public class Type extends org.python.types.Object {
             this.attrs.put("__name__", new org.python.types.Str(this.klass.getName()));
             this.attrs.put("__qualname__", new org.python.types.Str(this.klass.getName()));
             // this.attrs.put("__module__", );
+        }
 
-            org.Python.initializeModule(this.klass, this.attrs);
+        if (origin == Origin.BUILTIN) {
+            org.Python.initializeModule(klass, this.attrs);
         }
     }
 
@@ -107,7 +113,13 @@ public class Type extends org.python.types.Object {
         throw new java.lang.RuntimeException("Can't add reference to normal type");
     }
 
-    public org.python.types.Str __repr__() {
+    public org.python.types.Str __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        if (kwargs != null && kwargs.size() != 0) {
+            throw new org.python.exceptions.TypeError("__repr__ doesn't take keyword arguments");
+        } else if (args != null && args.size() != 0) {
+            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
+        }
+
         return new org.python.types.Str(String.format("<class '%s'>", org.Python.typeName(this.klass)));
     }
 }
