@@ -10,8 +10,8 @@ public class sys extends org.python.types.Module {
     @org.python.Method(
         __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
-    public org.python.types.Type __new__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        super.__new__(args, kwargs, default_args, default_kwargs);
+    public org.python.Object __new__(org.python.Object klass) {
+        org.python.types.Type cls = (org.python.types.Type) super.__new__(klass);
 
         // Initialize sys.argv using command line arguments from environment
         // java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("(\"[^\"]*\"|[^\"]+)(\\s+|$)");
@@ -21,7 +21,7 @@ public class sys extends org.python.types.Module {
         for (String arg: cmdline_args) {
             arg_list.add(new org.python.types.Str(arg));
         }
-        org.python.types.Type cls = (org.python.types.Type) args.get(0);
+
         cls.attrs.put("argv", new org.python.types.List(arg_list));
         return cls;
     }
@@ -141,18 +141,20 @@ public class sys extends org.python.types.Module {
     public static org.python.types.Str executable;
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "exit([status])\n" +
+            "\n" +
+            "Exit the interpreter by raising SystemExit(status).\n" +
+            "If the status is omitted or None, it defaults to zero (i.e., success).\n" +
+            "If the status is an integer, it will be used as the system exit status.\n" +
+            "If it is another kind of object, it will be printed and the systemn\n" +
+            "exit status will be one (i.e., failure).\n",
+        default_args = {"status"}
     )
-    public static org.python.Object exit(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("ex() takes no keyword arguments");
-        }
-        if (args.size() == 0) {
+    public static org.python.Object exit(org.python.Object status) {
+        if (status == null) {
             throw new org.python.exceptions.SystemExit();
-        } else if (args.size() == 1) {
-            throw new org.python.exceptions.SystemExit((int) (((org.python.types.Int) args.get(0)).value));
         } else {
-            throw new org.python.exceptions.TypeError("exit() expected at most 1 arguments, got " + args.size());
+            throw new org.python.exceptions.SystemExit(status);
         }
     }
 

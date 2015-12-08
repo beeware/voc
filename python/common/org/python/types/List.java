@@ -42,13 +42,7 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("list.__repr__ doesn't take keyword arguments");
-        } else if (args != null && args.size() != 0) {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
-        }
-
+    public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("[");
         boolean first = true;
         for (org.python.Object obj: this.value) {
@@ -66,70 +60,105 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __format__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.types.Str __format__() {
         throw new org.python.exceptions.NotImplementedError("list.__format__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __lt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __lt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__lt__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __le__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __le__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__le__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __eq__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __eq__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__eq__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __ne__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __ne__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__ne__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __gt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __gt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__gt__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __ge__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __ge__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__ge__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Int __len__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __getattribute__(org.python.Object attr) {
+        java.lang.String name;
+        try {
+            name = ((org.python.types.Str) attr).value;
+        } catch (java.lang.ClassCastException e) {
+            throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
+        }
+
+        throw new org.python.exceptions.NotImplementedError("int.__getattribute__() has not been implemented");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public void __setattr__(org.python.Object attr, org.python.Object value) {
+        java.lang.String name;
+        try {
+            name = ((org.python.types.Str) attr).value;
+        } catch (java.lang.ClassCastException e) {
+            throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
+        }
+
+        throw new org.python.exceptions.NotImplementedError("int.__setattr__() has not been implemented");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public void __delattr__(org.python.Object attr) {
+        java.lang.String name;
+        try {
+            name = ((org.python.types.Str) attr).value;
+        } catch (java.lang.ClassCastException e) {
+            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
+        }
+
+        throw new org.python.exceptions.NotImplementedError("int.__delattr__() has not been implemented");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __getitem__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("__getitem__() doesn't take keyword arguments");
-        } else if (args == null && args.size() != 1) {
-            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
-        }
-
-        org.python.Object index = args.get(0);
+    public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
                 org.python.types.Slice slice = (org.python.types.Slice) index;
@@ -190,17 +219,8 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public void __setitem__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("__getitem__() doesn't take keyword arguments");
-        } else if (args == null && args.size() != 2) {
-            throw new org.python.exceptions.TypeError("Expected 2 arguments, got " + args.size());
-        }
-
-        org.python.Object index = args.get(0);
-        org.python.Object value = args.get(1);
+    public void __setitem__(org.python.Object index, org.python.Object value) {
         try {
-
             int idx = (int) ((org.python.types.Int) index).value;
             if (idx < 0) {
                 if (-idx > this.value.size()) {
@@ -223,16 +243,8 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public void __delitem__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("__getitem__() doesn't take keyword arguments");
-        } else if (args == null && args.size() != 1) {
-            throw new org.python.exceptions.TypeError("Expected 1 argument, got " + args.size());
-        }
-
-        org.python.Object index = args.get(0);
+    public void __setitem__(org.python.Object index) {
         try {
-
             int idx = (int) ((org.python.types.Int) index).value;
             if (idx < 0) {
                 if (-idx > this.value.size()) {
@@ -255,42 +267,35 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Iterable __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Iterable __iter__() {
         return new org.python.types.Iterator(this);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Iterable __reversed__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Iterable __reversed__() {
         throw new org.python.exceptions.NotImplementedError("list.__reversed__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __contains__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __contains__(org.python.Object item) {
         throw new org.python.exceptions.NotImplementedError("list.__contains__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __add__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __add__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__add__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __mul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("__mul__() takes no keyword arguments");
-        } else if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("__mul__() takes exactly 1 argument (" + args.size() + " given)");
-        }
-
-        org.python.Object other = args.get(0);
+    public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             long count = ((org.python.types.Int) other).value;
             org.python.types.List result = new org.python.types.List();
@@ -313,34 +318,22 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __rmul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object append(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("append() takes no keyword arguments");
-        } else if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("append() takes exactly 1 argument (" + args.size() + " given)");
-        }
-
-        this.value.add(args.get(0));
+    public org.python.Object append(org.python.Object item) {
+        this.value.add(item);
         return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object clear(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null || kwargs.size() > 0) {
-            throw new org.python.exceptions.TypeError("clear() takes no keyword arguments");
-        } else if (args != null || args.size() > 0) {
-            throw new org.python.exceptions.TypeError("clear() takes no arguments (" + args.size() + " given)");
-        }
-
+    public org.python.Object clear() {
         this.value.clear();
         return org.python.types.NoneType.NONE;
     }
@@ -348,42 +341,34 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object copy(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object copy() {
         throw new org.python.exceptions.NotImplementedError("list.copy() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object count(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object count() {
         throw new org.python.exceptions.NotImplementedError("list.count() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object extend(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("list.extend() has not been implemented.");
+    public org.python.Object extend(org.python.Object other) {
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object index(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("list.index() takes no keyword arguments");
-        } else if (args == null || args.size() == 0) {
-            throw new org.python.exceptions.TypeError("descriptor 'index' of 'list' object needs an argument");
-        } else if (args.size() > 3) {
-            throw new org.python.exceptions.NotImplementedError("list.index() with > 2 arguments indices has not been implemented.");
+    public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
+        if (start != null && !(start instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + start.typeName());
         }
 
-        if (args.size() >= 1 && !(args.get(1) instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + args.get(0).typeName());
-        }
-
-        if (args.size() == 3 && !(args.get(2) instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + args.get(1).typeName());
+        if (end != null && !(end instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("list indices must be integers, not " + end.typeName());
         }
 
         throw new org.python.exceptions.NotImplementedError("list.index() has not been implemented.");
@@ -392,18 +377,18 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object pop(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object pop(org.python.Object item) {
         throw new org.python.exceptions.NotImplementedError("list.pop() has not been implemented.");
     }
 
-    public void remove(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public void remove(org.python.Object item) {
         throw new org.python.exceptions.NotImplementedError("list.remove() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object sort(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object sort() {
         throw new org.python.exceptions.NotImplementedError("list.sort() has not been implemented.");
     }
 

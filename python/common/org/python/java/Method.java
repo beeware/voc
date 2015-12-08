@@ -29,7 +29,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
         }
     }
 
-    public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return this.function.invoke(this.instance, args, kwargs);
     }
 

@@ -1,10 +1,10 @@
 package org.python.java;
 
 
-public class Attribute extends org.python.types.Object {
+public class Field extends org.python.types.Object {
     java.lang.reflect.Field field;
 
-    public Attribute(java.lang.Class klass, java.lang.String name) {
+    public Field(java.lang.Class klass, java.lang.String name) {
         super();
         try {
             this.field = klass.getField(name);
@@ -21,9 +21,9 @@ public class Attribute extends org.python.types.Object {
         );
     }
 
-    public org.python.Object __get__(org.python.Object instance, org.python.types.Type klass) {
+    public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         try {
-            return new org.python.java.Object(this.field.get(instance.toJava()));
+            return (org.python.Object) this.field.get(instance.toJava());
         } catch (IllegalAccessException iae) {
             throw new org.python.exceptions.RuntimeError("Illegal access to native field " + this.field.getName());
         }
@@ -31,7 +31,7 @@ public class Attribute extends org.python.types.Object {
 
     public void __set__(org.python.Object instance, org.python.Object value) {
         try {
-            this.field.set(instance.toJava(), value.toJava());
+            this.field.set(instance.toJava(), value);
         } catch (IllegalAccessException iae) {
             throw new org.python.exceptions.RuntimeError("Illegal access to native field " + this.field.getName());
         }

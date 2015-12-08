@@ -39,10 +39,13 @@ class ClassBlock(Block):
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
             ALOAD_name(self, '#value'),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
         )
         free_name(self, '#value')
 
@@ -63,16 +66,22 @@ class ClassBlock(Block):
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
         )
 
     def delete_name(self, name, use_locals):
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Lorg/python/Object;)Lorg/python/Object;'),
         )
 
     def add_method(self, full_method_name, code):
@@ -82,7 +91,7 @@ class ClassBlock(Block):
 
         method = InstanceMethod(self.klass, method_name, extract_parameters(code), code=code)
         method.extract(code)
-        self.klass.methods.append(method)
+        self.klass.add_method(method)
 
         return method
 
@@ -104,7 +113,9 @@ class Class(Block):
             self.namespace = namespace
         self.anonymous_inner_class_count = 0
 
-        # Add a constructor
+        # Track constructors when they are added
+        self.init_method = None
+        # Make sure there is a default constructor
         self.add_method(InitMethod(self))
 
     @property
@@ -117,6 +128,21 @@ class Class(Block):
 
     def add_method(self, method):
         self.methods.append(method)
+        if method.name == '__init__':
+            if self.init_method is not None:
+                raise Exception("Multiple __init__ methods defined")
+            self.init_method = method
+
+    def materialize(self):
+        # Create the body of the class
+        self.body = ClassBlock(self, self.commands)
+
+        # Materialize the body of the class
+        self.body.materialize()
+
+        # Materialize any methods in the class
+        for method in self.methods:
+            method.materialize()
 
     def transpile(self):
         classfile = JavaClass(
@@ -145,7 +171,7 @@ class Class(Block):
         try:
             # If we have block content, add a static block to the class
             static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
-            static_init.attributes.append(ClassBlock(self, self.commands).transpile())
+            static_init.attributes.append(self.body.transpile())
             classfile.methods.append(static_init)
         except IgnoreBlock:
             pass

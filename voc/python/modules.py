@@ -41,10 +41,14 @@ class StaticBlock(Block):
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
             ALOAD_name(self, '#value'),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
         )
         free_name(self, '#value')
 
@@ -67,9 +71,11 @@ class StaticBlock(Block):
             JavaOpcodes.LDC_W(self.module.descriptor),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
-            # JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
         )
 
     def delete_name(self, name, use_locals):
@@ -78,8 +84,11 @@ class StaticBlock(Block):
             JavaOpcodes.LDC_W(self.module.descriptor),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Lorg/python/Object;)Lorg/python/Object;'),
         )
 
     @property
@@ -126,15 +135,8 @@ class Module(Block):
     def descriptor(self):
         return '/'.join(self.namespace.split('.') + [self.name])
 
-    def transpile(self):
-        """Convert a Python code block into a list of Java Classfile definitions.
-
-        Returns a list of triples:
-            (namespace, class_name, javaclassfile)
-
-        The list contains the classfile for the module, plus and classes
-        defined in the module.
-        """
+    def materialize(self):
+        "Convert a collection of commands into a full Python code definition"
         main_commands = []
         body_commands = []
         main_end = None
@@ -173,23 +175,44 @@ class Module(Block):
                 else:
                     body_commands.append(cmd)
 
-        body = StaticBlock(self, body_commands).transpile()
-
-        # If there is any static content, generate a classfile
-        # for this module
-        classfile = JavaClass(self.descriptor, supername='org/python/types/Module')
-        classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
-
-        # Add a static method to the module.
-        static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
-        static_init.attributes.append(body)
-        classfile.methods.append(static_init)
+        # Create the body of the module definition
+        self.body = StaticBlock(self, body_commands)
 
         if main is None:
             print("Adding default main method...")
             main = MainMethod(self, [])
 
-        classfile.methods.append(main.transpile())
+        self.methods.append(main)
+
+        # Having constructed all the parts of the module, materialize them.
+        self.body.materialize()
+
+        for method in self.methods:
+            method.materialize()
+
+        for klass in self.classes:
+            klass.materialize()
+
+    def transpile(self):
+        """Convert a materialized Python code definition into a list of Java
+        Classfile definitions.
+
+        Returns a list of triples:
+            (namespace, class_name, javaclassfile)
+
+        The list contains the classfile for the module, plus and classes
+        defined in the module.
+        """
+        # If there is any static content, generate a classfile
+        # for this module
+        classfile = JavaClass(self.descriptor, supername='org/python/types/Module')
+        classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
+
+        # Add a static method to the module, populated with the
+        # body content of the module.
+        static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
+        static_init.attributes.append(self.body.transpile())
+        classfile.methods.append(static_init)
 
         # Add a dummy init method.
         classfile.methods.append(

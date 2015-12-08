@@ -8,8 +8,8 @@ public class SystemExit extends org.python.exceptions.BaseException {
         return_code = 0;
     }
 
-    public SystemExit(int val) {
-        super(java.lang.String.format("%s", val));
-        this.return_code = val;
+    public SystemExit(org.python.Object val) {
+        super(java.lang.String.format("%s", org.Python.int_cast(val, null)));
+        this.return_code = (int) org.Python.int_cast(val, null).value;
     }
 }

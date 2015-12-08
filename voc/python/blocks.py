@@ -171,21 +171,16 @@ class Block:
     def add_return(self):
         self.add_opcodes(JavaOpcodes.RETURN())
 
+    def materialize(self):
+        for cmd in self.commands:
+            cmd.materialize(self)
+
     def transpile(self):
         """Create a JavaCode object representing the commands stored in the block
 
         May raise ``IgnoreBlock`` if the block should be ignored.
         """
-        #
         argument_vars = len(self.local_vars)
-
-        # Most opcodes need no preparation, but MAKE_FUNCTION,
-        # CALL_FUNCTION/LOAD_BUILD_CLASS, and MAKE_CLOSURE all create
-        # blocks of code that might be referenced elsewhere, so they
-        # need to be handled first, and materialized into actual class
-        # definitions.
-        for cmd in self.commands:
-            cmd.materialize(self)
 
         # Insert content that needs to occur before the main block commands
         self.transpile_setup()
