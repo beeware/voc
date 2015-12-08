@@ -81,31 +81,18 @@ public class Function extends org.python.types.Object implements org.python.Call
     @org.python.Method(
         __doc__ = "Implement str(self)."
     )
-    public org.python.types.Str __str__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("__str__ doesn't take keyword arguments");
-        } else if (args != null && args.size() != 0) {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
-        }
-
+    public org.python.types.Str __str__() {
         return new org.python.types.Str(this.name + "()");
     }
 
     @org.python.Method(
         __doc__ = "Implement __get__(self)."
     )
-    public org.python.Object __get__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("__get__ doesn't take keyword arguments");
-        } else if (args == null && args.size() != 2) {
-            throw new org.python.exceptions.TypeError("Expected 2 arguments, got " + args.size());
-        }
-
-        org.python.Object instance = args.get(0);
+    public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         return new org.python.java.Method(instance.toJava(), this);
     }
 
-    java.lang.reflect.Method selectMethod(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    java.lang.reflect.Method selectMethod(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         // System.out.println("Options " + this.methods);
         java.lang.reflect.Method method;
         java.lang.StringBuilder signature = new java.lang.StringBuilder();
@@ -132,24 +119,24 @@ public class Function extends org.python.types.Object implements org.python.Call
         return method;
     }
 
-    java.lang.Object [] adjustArguments(java.lang.reflect.Method method, java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    java.lang.Object [] adjustArguments(java.lang.reflect.Method method, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs.size() > 0) {
             // TODO: This doesn't have to be so - we *could* introspect argument names.
             throw new org.python.exceptions.RuntimeError("Cannot use kwargs to invoke a native Java method.");
         }
 
-        java.lang.Object [] adjusted = new java.lang.Object [args.size()];
-        for (int i = 0; i < args.size(); i++) {
-            adjusted[i] = args.get(i).toJava();
+        java.lang.Object [] adjusted = new java.lang.Object [args.length];
+        for (int i = 0; i < args.length; i++) {
+            adjusted[i] = args[i].toJava();
         }
         return adjusted;
     }
 
-    public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return this.invoke(null, args, kwargs);
     }
 
-    public org.python.Object invoke(java.lang.Object instance, java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(java.lang.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // System.out.println("Native Function:" + this.name);
             // System.out.println("           args:" + args);
@@ -159,7 +146,12 @@ public class Function extends org.python.types.Object implements org.python.Call
 
             java.lang.Object [] adjusted_args = adjustArguments(method, args, kwargs);
 
-            // System.out.println("Invoke method " + method + " with " + adjusted_args);
+            // System.out.println("Invoke method " + method + " with ");
+            // System.out.print("           args:");
+            // for (java.lang.Object arg: adjusted_args) {
+            //     System.out.print(arg + ", ");
+            // }
+            // System.out.println();
             return org.python.types.Type.toPython(method.invoke(instance, adjusted_args));
 
         } catch (java.lang.IllegalAccessException e) {

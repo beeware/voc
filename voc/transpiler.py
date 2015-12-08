@@ -75,6 +75,9 @@ class Transpiler:
         # Extract commands from the code block
         module.extract(code)
 
+        # Materialize the code structures
+        module.materialize()
+
         # Transpile the module code, adding any classfiles generated
         # to the list to be exported.
         self.classfiles.extend(module.transpile())

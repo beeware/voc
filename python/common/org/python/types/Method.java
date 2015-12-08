@@ -11,9 +11,12 @@ public class Method extends org.python.types.Object implements org.python.Callab
         this.im_self = instance;
         this.im_class = klass;
         this.im_func = function;
-        // System.out.println("Create method " + function.name);
+        // System.out.println("Create method " + function.name + " on " + instance);
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Str __repr__() {
         if (this.im_self == null) {
             return new org.python.types.Str(
@@ -37,7 +40,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
         }
     }
 
-    public org.python.Object invoke(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return this.im_func.invoke(this.im_self, args, kwargs);
     }
 }

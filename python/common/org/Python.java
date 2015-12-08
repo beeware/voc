@@ -18,14 +18,39 @@ public class Python {
             org.python.Method annotation = method.getAnnotation(org.python.Method.class);
             if (annotation != null) {
                 java.lang.String method_name;
+                java.lang.String varargs_name;
+                java.lang.String kwargs_name;
 
                 // Check for any explicitly set names
-                if (annotation.name().equals("*")) {
+                if (annotation.name().equals("")) {
                     method_name = method.getName();
                 } else {
                     method_name = annotation.name();
                 }
-                attrs.put(method_name, new org.python.types.Function(method));
+
+                if (annotation.varargs().equals("")) {
+                    varargs_name = null;
+                } else {
+                    varargs_name = annotation.varargs();
+                }
+
+                if (annotation.kwargs().equals("")) {
+                    kwargs_name = null;
+                } else {
+                    kwargs_name = annotation.kwargs();
+                }
+
+                attrs.put(
+                    method_name,
+                    new org.python.types.Function(
+                        method,
+                        annotation.args(),
+                        annotation.default_args(),
+                        varargs_name,
+                        annotation.kwonlyargs(),
+                        kwargs_name
+                    )
+                );
             }
         }
     }
@@ -208,16 +233,8 @@ public class Python {
             "  >>> bin(2796202)\n" +
             "  '0b1010101010101010101010'\n"
     )
-    public static org.python.types.Str bin(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("bin() takes no keyword arguments");
-        }
-        if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("bin() takes exactly one argument (" + args.size() + " given)");
-        }
-        return new org.python.types.Str(java.lang.String.format("0b%b", int_cast(args, kwargs).value));
+    public static org.python.types.Str bin(org.python.Object number) {
+        return new org.python.types.Str(java.lang.String.format("0b%b", int_cast(number, null).value));
     }
 
     @org.python.Method(
@@ -227,16 +244,8 @@ public class Python {
             "The builtins True and False are the only two instances of the class bool.\n" +
             "The class bool is a subclass of the class int, and cannot be subclassed.\n"
     )
-    public static org.python.types.Bool bool(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("bool() takes no keyword arguments");
-        }
-        if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("bool() takes exactly one argument (" + args.size() + " given)");
-        }
-        return (org.python.types.Bool) args.get(0).__bool__();
+    public static org.python.types.Bool bool(org.python.Object x) {
+        return (org.python.types.Bool) x.__bool__();
     }
 
     @org.python.Method(
@@ -557,16 +566,8 @@ public class Python {
             "\n" +
             "Convert a string or number to a floating point number, if possible.\n"
     )
-    public static org.python.types.Float float_cast(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("float() takes no keyword arguments");
-        }
-        if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("float() takes exactly one argument (" + args.size() + " given)");
-        }
-        return (org.python.types.Float) args.get(0).__float__();
+    public static org.python.types.Float float_cast(org.python.Object x) {
+        return (org.python.types.Float) x.__float__();
     }
 
     @org.python.Method(
@@ -687,16 +688,8 @@ public class Python {
             "  >>> hex(3735928559)\n" +
             "  '0xdeadbeef'\n"
     )
-    public static org.python.types.Str hex(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("hex() takes no keyword arguments");
-        }
-        if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("hex() takes exactly one argument (" + args.size() + " given)");
-        }
-        return new org.python.types.Str(String.format("0x%x", int_cast(args, kwargs)));
+    public static org.python.types.Str hex(org.python.Object number) {
+        return new org.python.types.Str(String.format("0x%x", int_cast(number, null).value));
     }
 
     @org.python.Method(
@@ -765,21 +758,14 @@ public class Python {
             "Base 0 means to interpret the base from the string as an integer literal.\n" +
             "\n" +
             "  >>> int('0b100', base=0)\n" +
-            "  4\n"
+            "  4\n",
+        default_args = {"x", "base"}
     )
-    public static org.python.types.Int int_cast(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() == 0) {
-            if (args == null || args.size() == 0) {
-                return new org.python.types.Int(0);
-            } else if (args.size() == 1) {
-                return (org.python.types.Int) args.get(0).__int__();
-            } else if (args.size() == 2) {
-                throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
-            } else {
-                throw new org.python.exceptions.TypeError("int() takes at most 2 arguments, got got " + args.size());
-            }
+    public static org.python.types.Int int_cast(org.python.Object x, org.python.Object base) {
+        if (x == null) {
+            return new org.python.types.Int(0);
+        } else if (base == null) {
+            return (org.python.types.Int) x.__int__();
         } else {
             throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
         }
@@ -866,38 +852,32 @@ public class Python {
 
     @org.python.Method(
         __doc__ = "list() -> new empty list" +
-            "list(iterable) -> new list initialized from iterable's items\n"
+            "list(iterable) -> new list initialized from iterable's items\n",
+        default_args = {"iterable"}
     )
-    public static org.python.types.List list(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("list() takes no keyword arguments");
-        }
-        if (args == null || args.size() == 0) {
+    public static org.python.types.List list(org.python.Object iterable) {
+        if (iterable == null) {
             return new org.python.types.List();
-        } else if (args.size() == 1) {
-            if (args.get(0) instanceof org.python.types.List) {
+        } else {
+            if (iterable instanceof org.python.types.List) {
                 return new org.python.types.List(
                     new java.util.ArrayList(
-                        ((org.python.types.List) args.get(0)).value
+                        ((org.python.types.List) iterable).value
                     )
                 );
-            } else if (args.get(0) instanceof org.python.types.Tuple) {
+            } else if (iterable instanceof org.python.types.Tuple) {
                 return new org.python.types.List(
                     new java.util.ArrayList(
-                        ((org.python.types.Tuple) args.get(0)).value
+                        ((org.python.types.Tuple) iterable).value
                     )
                 );
-            } else if (args.get(0) instanceof org.python.Iterable) {
+            } else if (iterable instanceof org.python.Iterable) {
                 throw new org.python.exceptions.NotImplementedError("Builtin function 'list' with iterator argument not implemented");
                 // org.python.types.List out = new org.python.types.List();
                 // return out;
             } else {
-                throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(args.get(0).getClass()) + "' object is not iterable");
+                throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
             }
-        } else {
-            throw new org.python.exceptions.TypeError("list() takes at most 1 argument (" + args.size() + " given)");
         }
     }
 
@@ -994,16 +974,8 @@ public class Python {
             "   >>> oct(342391)\n" +
             "  '0o1234567'\n"
     )
-    public static org.python.types.Str oct(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("oct() takes no keyword arguments");
-        }
-        if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("oct() takes exactly one argument (" + args.size() + " given)");
-        }
-        return new org.python.types.Str(String.format("0o%o", int_cast(args, kwargs).value));
+    public static org.python.types.Str oct(org.python.Object number) {
+        return new org.python.types.Str(String.format("0o%o", int_cast(number, null).value));
     }
 
     @org.python.Method(
@@ -1166,28 +1138,11 @@ public class Python {
         __doc__ = "pow(x, y[, z]) -> number" +
             "\n" +
             "With two arguments, equivalent to x**y.  With three arguments,\n" +
-            "equivalent to (x**y) % z, but may be more efficient (e.g. for ints).\n"
+            "equivalent to (x**y) % z, but may be more efficient (e.g. for ints).\n",
+        default_args={"z"}
     )
-    public static org.python.Object pow(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("pow() takes no keyword arguments");
-        }
-        if (args == null) {
-            throw new org.python.exceptions.TypeError("pow() expected at least 2 arguments, got 0");
-        } else if (args.size() < 2) {
-            throw new org.python.exceptions.TypeError("pow() expected at least 2 arguments, got " + args.size());
-        } else if (args.size() > 3) {
-            throw new org.python.exceptions.TypeError("pow() expected at most 3 arguments, got " + args.size());
-        }
-
-        if (args.size() == 3) {
-            throw new org.python.exceptions.NotImplementedError("pow() with mod not supported");
-            // return args.get(0).__pow__(args.get(1), args.get(2));
-        } else {
-            return args.get(0).__pow__(args.get(1));
-        }
+    public static org.python.Object pow(org.python.Object x, org.python.Object y, org.python.Object z) {
+        return x.__pow__(y, z);
     }
 
     @org.python.Method(
@@ -1198,25 +1153,21 @@ public class Python {
             "file:  a file-like object (stream); defaults to the current sys.stdout.\n" +
             "sep:   string inserted between values, default a space.\n" +
             "end:   string appended after the last value, default a newline.\n" +
-            "flush: whether to forcibly flush the stream.\n"
+            "flush: whether to forcibly flush the stream.\n",
+        varargs="value",
+        kwonlyargs={"file", "sep", "end", "flush"}
     )
-    public static void print(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        org.python.Object file = kwargs.get("file");
-        org.python.Object sep = kwargs.get("sep");
-        org.python.Object end = kwargs.get("end");
-        org.python.Object flush = kwargs.get("flush");
-
+    public static void print(org.python.Object [] value, org.python.Object file, org.python.Object sep, org.python.Object end, org.python.Object flush) {
         if (file == null) {
-            // file = sys.stdout
+            // file = System.out;
         }
 
         StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < args.size(); i++) {
-            buffer.append(args.get(i));
 
-            if (i != args.size() - 1) {
+        for (int i = 0; i < value.length; i++) {
+            buffer.append(value[i]);
+
+            if (i != value.length - 1) {
                 if (sep == null) {
                     buffer.append(" ");
                 } else {
@@ -1270,21 +1221,17 @@ public class Python {
         __doc__ = "range(stop) -> range object" +
             "range(start, stop[, step]) -> range object\n" +
             "\n" +
-            "Return a virtual sequence of numbers from start to stop by step.\n"
+            "Return a virtual sequence of numbers from start to stop by step.\n",
+        args = {"start_or_stop"},
+        default_args = {"stop", "step"}
     )
-    public static org.python.types.Range range(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args == null || args.size() == 0) {
-            throw new org.python.exceptions.TypeError("range expected 1 arguments, got " + args.size());
-        } else if (args.size() == 1) {
-            return new org.python.types.Range(args.get(0));
-        } else if (args.size() == 2) {
-            return new org.python.types.Range(args.get(0), args.get(1));
-        } else if (args.size() == 3) {
-            return new org.python.types.Range(args.get(0), args.get(1), args.get(2));
+    public static org.python.types.Range range(org.python.Object start_or_stop, org.python.Object stop, org.python.Object step) {
+        if (stop == null && step == null) {
+            return new org.python.types.Range(start_or_stop);
+        } else if (step == null) {
+            return new org.python.types.Range(start_or_stop, stop);
         } else {
-            throw new org.python.exceptions.TypeError("range expected at most 3 arguments, got " + args.size());
+            return new org.python.types.Range(start_or_stop, stop, step);
         }
     }
 
@@ -1292,18 +1239,11 @@ public class Python {
         __doc__ = "repr(object) -> string" +
             "\n" +
             "Return the canonical string representation of the object.\n" +
-            "For most object types, eval(repr(object)) == object.\n"
+            "For most object types, eval(repr(object)) == object.\n",
+        args = {"object"}
     )
-    public static org.python.types.Str repr(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("repr() takes no keyword arguments");
-        }
-        if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("repr() takes exactly one argument (" + args.size() + " given)");
-        }
-        return (org.python.types.Str) args.get(0).__repr__();
+    public static org.python.types.Str repr(org.python.Object object) {
+        return (org.python.types.Str) object.__repr__();
     }
 
     @org.python.Method(
@@ -1330,51 +1270,32 @@ public class Python {
             "This returns an int when called with one argument, otherwise the\n" +
             "same type as the number. ndigits may be negative.\n"
     )
-    public static org.python.Object round(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("round() takes no keyword arguments");
-        }
-        if (args == null || args.size() == 0) {
-            throw new org.python.exceptions.TypeError("Required argument 'number' (pos 1) not found");
-        } else if (args.size() == 1) {
-            return args.get(0).__round__();
-        } else if (args.size() == 2) {
-            return args.get(0).__round__(args.get(1));
-        } else {
-            throw new org.python.exceptions.TypeError("round() takes at most 2 arguments (" + args.size() + " given)");
-        }
+    public static org.python.Object round(org.python.Object number, org.python.Object ndigits) {
+        return number.__round__(ndigits);
     }
 
     @org.python.Method(
         __doc__ = "set() -> new empty set object" +
             "set(iterable) -> new set object\n" +
             "\n" +
-            "Build an unordered collection of unique elements.\n"
+            "Build an unordered collection of unique elements.\n",
+        default_args = {"iterable"}
     )
-    public static org.python.types.Set set(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("set() does not take keyword arguments");
-        }
-        if (args == null || args.size() == 0) {
+    public static org.python.types.Set set(org.python.Object iterable) {
+        if (iterable == null) {
             return new org.python.types.Set();
-        } else if (args.size() == 1) {
+        } else {
             try {
                 // If the object is iterable, the underlying value should be
                 // a Java Collection.
                 return new org.python.types.Set(
                     new java.util.HashSet<org.python.Object>(
-                        (java.util.Collection) args.get(0).toJava()
+                        (java.util.Collection) iterable.toJava()
                     )
                 );
             } catch (java.lang.ClassCastException e) {
-                throw new org.python.exceptions.TypeError("'" + args.get(0).typeName() + "' object is not iterable");
+                throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
             }
-        } else {
-            throw new org.python.exceptions.TypeError("set() expected at most 1 arguments ( got " + args.size() + ")");
         }
     }
 
@@ -1508,22 +1429,20 @@ public class Python {
     @org.python.Method(
         __doc__ = "type(object_or_name, bases, dict)" +
             "type(object) -> the object's type\n" +
-            "type(name, bases, dict) -> a new type\n"
+            "type(name, bases, dict) -> a new type\n",
+        args = {"object_or_name"},
+        default_args = {"bases", "dict"}
     )
-    public static org.python.types.Type type(
-                java.util.List<org.python.Object> args,
-                java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
+    public static org.python.types.Type type(org.python.Object object_or_name, org.python.Object bases, org.python.Object dict) {
+        if (bases == null && dict != null) {
             throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
         }
-        if (args != null) {
-            if (args.size() == 1) {
-                return org.python.types.Type.pythonType(args.get(0).getClass());
-            } else if (args.size() == 3) {
-                throw new org.python.exceptions.NotImplementedError("3-argument form of builtin function 'type' not implemented");
-            }
+
+        if (bases == null && dict == null) {
+            return org.python.types.Type.pythonType(object_or_name.getClass());
+        } else {
+            throw new org.python.exceptions.NotImplementedError("3-argument form of builtin function 'type' not implemented");
         }
-        throw new org.python.exceptions.TypeError("type() takes 1 or 3 arguments");
     }
 
     @org.python.Method(

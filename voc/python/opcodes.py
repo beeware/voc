@@ -1046,8 +1046,24 @@ class UNARY_INVERT(UnaryOpcode):
     __method__ = '__invert__'
 
 
-class BINARY_POWER(BinaryOpcode):
-    __method__ = '__pow__'
+class BINARY_POWER(Opcode):
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert_opcode(self, context, arguments):
+        context.add_opcodes(
+            JavaOpcodes.ACONST_NULL(),
+            JavaOpcodes.INVOKEINTERFACE(
+                'org/python/Object',
+                '__pow__',
+                '(Lorg/python/Object;Lorg/python/Object;)Lorg/python/Object;'
+            )
+        )
 
 
 class BINARY_MULTIPLY(BinaryOpcode):
@@ -1503,9 +1519,12 @@ class STORE_ATTR(Opcode):
         arguments[1].operation.transpile(context, arguments[1].arguments)
 
         context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
             ALOAD_name(context, '#value-%x' % id(self)),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
         )
         free_name(context, '#value-%x' % id(self))
 
@@ -1870,10 +1889,14 @@ class LOAD_ATTR(Opcode):
         # print("LOAD_ATTR", context, arguments)
         context.next_resolve_list.append((self, 'start_op'))
         arguments[0].operation.transpile(context, arguments[0].arguments)
-        context.add_opcodes(JavaOpcodes.LDC_W(self.name))
 
         context.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
         )
 
 
@@ -2034,8 +2057,11 @@ class IMPORT_FROM(Opcode):
         # target of the comparator operator.
         context.add_opcodes(
             JavaOpcodes.DUP(),
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.name),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
         )
 
 
@@ -2387,6 +2413,7 @@ class CALL_FUNCTION(Opcode):
             from .klass import Class
             code = arguments[1].arguments[0].operation.const
             class_name = arguments[1].arguments[1].operation.const
+
             if len(arguments) == 4:
                 super_name = arguments[2].operation.const
             else:
@@ -2395,6 +2422,7 @@ class CALL_FUNCTION(Opcode):
             self.klass = Class(context.parent, class_name, super_name=super_name)
             self.klass.extract(code)
             context.parent.classes.append(self.klass)
+
         else:
             if arguments[0].operation.opname == 'MAKE_FUNCTION':
                 arguments[0].operation.materialize(context, arguments[0].arguments)
@@ -2411,6 +2439,7 @@ class CALL_FUNCTION(Opcode):
             # print("DESCRIPTOR", klass.descriptor)
             # Push a callable onto the stack so that it can be stored
             # in globals and subsequently retrieved and run.
+
             context.add_opcodes(
                 # Get a Method representing the new function
                 TRY(),
@@ -2421,14 +2450,16 @@ class CALL_FUNCTION(Opcode):
 
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_0(),
-                    JavaOpcodes.LDC_W(Classref('java/util/List')),
+                    JavaOpcodes.LDC_W(Classref('[Lorg/python/Object;')),
                     JavaOpcodes.AASTORE(),
 
                     JavaOpcodes.DUP(),
                     JavaOpcodes.ICONST_1(),
                     JavaOpcodes.LDC_W(Classref('java/util/Map')),
                     JavaOpcodes.AASTORE(),
+                )
 
+            context.add_opcodes(
                     JavaOpcodes.INVOKEVIRTUAL(
                         'java/lang/Class',
                         'getConstructor',
@@ -2480,18 +2511,16 @@ class CALL_FUNCTION(Opcode):
 
             # Create and populate the array of arguments to pass to invoke()
             context.add_opcodes(
-                JavaOpcodes.NEW('java/util/ArrayList'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+                ICONST_val(self.args),
+                JavaOpcodes.ANEWARRAY('org/python/Object'),
             )
             for i, argument in enumerate(arguments[1:self.args+1]):
                 context.add_opcodes(
                     JavaOpcodes.DUP(),
 
+                    ICONST_val(i),
                     ALOAD_name(context, '#arg-%d-%x' % (i, id(self))),
-                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
-                    JavaOpcodes.POP(),
-
+                    JavaOpcodes.AASTORE(),
                 )
                 # Clean up temporary storage for arg.
                 free_name(context, '#arg-%d-%x' % (i, id(self)))
@@ -2536,7 +2565,7 @@ class CALL_FUNCTION(Opcode):
                 ALOAD_name(context, '#args-%x' % id(self)),
                 ALOAD_name(context, '#kwargs-%x' % id(self)),
 
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '(Ljava/util/List;Ljava/util/Map;)Lorg/python/Object;'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
             )
 
             # Clean up temporary storage.
@@ -2579,6 +2608,7 @@ class MAKE_FUNCTION(Opcode):
 
         if full_method_name == '<listcomp>':
             full_method_name = 'listcomp_%x' % id(self)
+
         self.method = context.add_method(full_method_name, code)
 
     def convert(self, context, arguments):
@@ -2643,13 +2673,11 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.NEW(self.method.parent.descriptor),
                 JavaOpcodes.DUP(),
 
-                # No args needed.
+                # These are the args and kwargs for the closure class
+                JavaOpcodes.ACONST_NULL(),
                 JavaOpcodes.ACONST_NULL(),
 
-                # No kwargs needed.
-                JavaOpcodes.ACONST_NULL(),
-
-                JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '(Ljava/util/List;Ljava/util/Map;)V'),
+                JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
             )
 
             add_callable(context, self.method, self.method.name)
@@ -2660,12 +2688,18 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.LDC_W(Classref(self.method.parent.descriptor)),
                 JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
 
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(self.method.name),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
                 ALOAD_name(context, '#closure-%x' % id(self.method)),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
 
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(self.method.name),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;')
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;')
             )
 
             free_name(context, '#closure-%x' % id(self.method))
@@ -2779,29 +2813,20 @@ def add_callable(context, method, full_method_name):
         TRY(),
             JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
             JavaOpcodes.LDC_W(method.name),
-            ICONST_val(4),
+
+            ICONST_val(len(method.parameters) - method.self_offset),
             JavaOpcodes.ANEWARRAY('java/lang/Class'),
+    )
 
+    for i, param in enumerate(method.parameters[method.self_offset:]):
+        context.add_opcodes(
             JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_0(),
-            JavaOpcodes.LDC_W(Classref('Ljava/util/List;')),
+            ICONST_val(i),
+            JavaOpcodes.LDC_W(Classref('Lorg/python/Object;')),
             JavaOpcodes.AASTORE(),
+        )
 
-            JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_1(),
-            JavaOpcodes.LDC_W(Classref('Ljava/util/Map;')),
-            JavaOpcodes.AASTORE(),
-
-            JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_2(),
-            JavaOpcodes.LDC_W(Classref('Ljava/util/List;')),
-            JavaOpcodes.AASTORE(),
-
-            JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_3(),
-            JavaOpcodes.LDC_W(Classref('Ljava/util/Map;')),
-            JavaOpcodes.AASTORE(),
-
+    context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL(
                 'java/lang/Class',
                 'getMethod',
@@ -2956,8 +2981,6 @@ class LOAD_CLOSURE(Opcode):
     def product_count(self):
         return 1
 
-    # def convert_opcode(self, context, arguments):
-    #     return []
 
 
 class LOAD_DEREF(Opcode):
