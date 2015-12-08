@@ -166,7 +166,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         //     // TODO: This doesn't have to be so - we *could* introspect argument names.
         //     throw new org.python.exceptions.RuntimeError("Cannot use kwargs to invoke a native Java method.");
         // }
-        // System.out.println("CODE " + this.code + " " + this.code.co_flags);
+        // System.out.println("CODE " + this.code + " ");
 
         int pos_count = (int) this.code.co_argcount.value;
         int keyword_only_count = (int) this.code.co_kwonlyargcount.value;

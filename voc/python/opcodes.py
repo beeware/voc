@@ -1237,31 +1237,15 @@ class GET_ITER(Opcode):
 
     def convert_opcode(self, context, arguments):
         context.add_opcodes(
-            ASTORE_name(context, '#temp-%x' % id(self)),
-
-            JavaOpcodes.NEW('java/util/ArrayList'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
-
-            JavaOpcodes.DUP(),
-            ALOAD_name(context, '#temp-%x' % id(self)),
-            JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
-            JavaOpcodes.POP(),
-
-            # No kwargs needed.
             JavaOpcodes.ACONST_NULL(),
-
             JavaOpcodes.INVOKESTATIC(
                 'org/Python',
                 'iter',
-                '(Ljava/util/List;Ljava/util/Map;)Lorg/python/Iterable;'
+                '(Lorg/python/Object;Lorg/python/Object;)Lorg/python/Iterable;'
             ),
 
             JavaOpcodes.CHECKCAST('org/python/Iterable'),
         )
-
-        # Clean up temp variable
-        free_name(context, '#temp-%x' % id(self)),
 
 
 class PRINT_EXPR(Opcode):
