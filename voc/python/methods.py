@@ -64,6 +64,7 @@ class Method(Block):
         else:
             self.add_opcodes(
                 ASTORE_name(self, '#value'),
+
                 JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
                 JavaOpcodes.LDC_W(self.globals_module.descriptor),
                 JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
@@ -98,10 +99,12 @@ class Method(Block):
             JavaOpcodes.LDC_W(self.globals_module.descriptor),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
             JavaOpcodes.NEW('org/python/types/Str'),
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
         )
 
@@ -114,10 +117,12 @@ class Method(Block):
                 JavaOpcodes.LDC_W(self.globals_module.descriptor),
                 JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
                 JavaOpcodes.NEW('org/python/types/Str'),
                 JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
                 JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Lorg/python/Object;)Lorg/python/Object;'),
             )
 
