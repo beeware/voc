@@ -222,7 +222,7 @@ public class Object implements org.python.Object {
             throw new org.python.exceptions.TypeError("__getattr__(): attribute name must be string");
         }
 
-        throw new org.python.exceptions.AttributeError(this, "__getattr__");
+        throw new org.python.exceptions.AttributeError(this, attr_name);
     }
 
     @org.python.Method(
