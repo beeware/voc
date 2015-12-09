@@ -56,96 +56,55 @@ public class Python {
     }
 
     public static java.lang.String typeName(java.lang.Class cls) {
-        try {
-            java.lang.reflect.Field field = cls.getField("PYTHON_TYPE_NAME");
-            return (java.lang.String) field.get(cls);
-        } catch (java.lang.NoSuchFieldException e) {
-            java.lang.String class_name = cls.getName();
-            if (class_name.startsWith("org.python.types.")) {
-                return class_name.substring(17).toLowerCase();
-            } else if (class_name.startsWith("org.python.exceptions.")) {
-                return class_name.substring(22);
-            } else if (class_name.startsWith("python.")) {
-                return class_name.substring(7);
-            }
-            return class_name;
-        } catch (java.lang.IllegalAccessException e) {
-            return "*UNKNOWABLE*";
-        } catch (java.lang.SecurityException e) {
-            return "*UNKNOWABLE*";
-        } catch (java.lang.NullPointerException e) {
-            return "**UNKNOWN**";
-        }
-    }
+        org.python.types.Type klass = org.python.types.Type.pythonType(cls);
+        java.lang.String name = null;
 
-    public static void debug(java.lang.Object msg) {
-        System.out.println("DEBUG: " + msg);
-    }
+        // First look to the Type for an instance variable holding a
+        // cached version of the type name.
+        if (klass.PYTHON_TYPE_NAME == null) {
+            try {
+                // If there's no pre-cached version, warm the cache.
 
-    public static void adjustArguments(
-                                java.lang.String func_name,
-                                java.util.List<org.python.Object> args,
-                                java.util.Map<java.lang.String, org.python.Object> kwargs,
-                                java.lang.String [] arg_names,
-                                java.util.List<org.python.Object> default_args,
-                                java.util.Map<java.lang.String, org.python.Object> default_kwargs,
-                                int pos_count,
-                                int flags) {
+                // Look to the class itself for a static field describing
+                // the type name.
+                java.lang.reflect.Field field = cls.getField("PYTHON_TYPE_NAME");
 
-        // System.out.println("ADJUST " + func_name);
-        // System.out.println("              args: " + args);
-        // System.out.println("            kwargs: " + kwargs);
-        // System.out.print("         arg_names: [");
-        // for (java.lang.String arg: arg_names) {
-        //     System.out.print(arg + ", ");
-        // }
-        // System.out.println("]");
-        // System.out.println("      default_args: " + default_args);
-        // System.out.println("    default_kwargs: " + default_kwargs);
-        // System.out.println("         pos_count: " + pos_count);
-
-        // Iterate over all the positional arguments provided; check that
-        // we have enough of them. If we don't, populate them from kwargs,
-        // or if there's no kwargs, from defaults.
-        for (int a = 0; a < pos_count; a++) {
-            // System.out.println("arg " + a + " = " + arg_names[a]);
-            if (a >= args.size()) {
-                // This argument wasn't provided as a positional; check to
-                // see if it was provided as a keyword.
-                org.python.Object value = kwargs.remove(arg_names[a]);
-
-                // If it wasn't provided as a kwarg, use the
-                // defaults list.
-                if (value == null) {
-                    value = default_args.get(a - (pos_count - default_args.size()));
+                // If a field exists, but it's not static, treat it as if
+                // the field didn't exist.
+                if ((field.getModifiers() & java.lang.reflect.Modifier.STATIC) != 0) {
+                    name = (java.lang.String) field.get(cls);
+                } else {
+                    throw new java.lang.NoSuchFieldException();
                 }
-
-                // Add the value to the full args list.
-                args.add(value);
-            } else {
-                // We've been given a position argument at this index; check that
-                // it isn't also provided as a kwarg.
-                if (kwargs.containsKey(arg_names[a])) {
-                    throw new org.python.exceptions.TypeError(func_name + "() for multiple values for argument '" + arg_names[a] + "'");
+            } catch (java.lang.NoSuchFieldException e) {
+                // No PYTHON_TYPE_NAME field found. Fall back to the default
+                // behaviour for Python type naming, stripping python-specific
+                // namespace prefixes.
+                name = cls.getName();
+                if (name.startsWith("org.python.types.")) {
+                    name = name.substring(17).toLowerCase();
+                } else if (name.startsWith("org.python.exceptions.")) {
+                    name = name.substring(22);
+                } else if (name.startsWith("python.")) {
+                    name = name.substring(7);
                 }
+            } catch (java.lang.IllegalAccessException e) {
+                return "**UNKNOWABLE**";
+            } catch (java.lang.SecurityException e) {
+                return "**UNKNOWABLE**";
+            } catch (java.lang.NullPointerException e) {
+                return "**UNKNOWN**";
             }
+
+            // Cache the name for next time.
+            klass.PYTHON_TYPE_NAME = name;
+        } else {
+            // Use the cached version.
+            name = klass.PYTHON_TYPE_NAME;
         }
 
-        // If this function provides VARARGS, extract them and add them as
-        // a Python list as the last positional argument.
-        if ((flags & org.python.types.Function.CO_VARARGS) != 0) {
-            java.util.List<org.python.Object> var_args;
-            if (args.size() > pos_count) {
-                var_args = args.subList(pos_count, args.size());
-                args = new java.util.ArrayList<org.python.Object>(args.subList(0, pos_count));
-            } else {
-                // No positional arguments - add an empty list.
-                var_args = new java.util.ArrayList<org.python.Object>();
-            }
-            args.add(new org.python.types.List(var_args));
-        }
+        return name;
     }
-
 
     @org.python.Method(
         __doc__ = "__import__(name, globals=None, locals=None, fromlist=(), level=0) -> module" +

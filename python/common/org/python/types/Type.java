@@ -2,7 +2,7 @@ package org.python.types;
 
 public class Type extends org.python.types.Object {
     public enum Origin {PLACEHOLDER, BUILTIN, PYTHON, JAVA};
-
+    public java.lang.String PYTHON_TYPE_NAME;
     private static java.util.Map<java.lang.Class, org.python.types.Type> known_types = new java.util.HashMap<java.lang.Class, org.python.types.Type>();
 
     /**
@@ -133,12 +133,23 @@ public class Type extends org.python.types.Object {
         // System.out.println("GETATTRIBUTE CLASS " + this + " " + name);
         // System.out.println("CLASS ATTRS " + this.attrs);
         org.python.Object value = this.attrs.get(attr_name);
-        org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
+
+        // If the type's attrs dict contains the key, then it's either a
+        // python local attribute, or there's a Java field backing it.
+        if (this.attrs.containsKey(attr_name)) {
+            value = this.attrs.get(attr_name);
+        } else {
+            try {
+                value = new org.python.java.Field(klass.getField(attr_name));
+            } catch (java.lang.NoSuchFieldException e) {
+                value = null;
+            }
+
+            this.attrs.put(attr_name, value);
+        }
 
         if (value == null) {
-            // Look for a native field with this name
-            value = new org.python.java.Field(cls.klass, attr_name);
-            this.attrs.put(attr_name, value);
+            throw new org.python.exceptions.AttributeError(this.attrs.get("__class__"), attr_name);
         }
 
         return value;

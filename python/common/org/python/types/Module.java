@@ -26,32 +26,28 @@ public class Module extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __getattribute__(org.python.Object attr) {
-        java.lang.String name;
+    public org.python.Object __getattribute__(org.python.Object name) {
+        java.lang.String attr_name;
         try {
-            name = ((org.python.types.Str) attr).value;
+            attr_name = ((org.python.types.Str) name).value;
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
         }
-        // System.out.println("GETATTRIBUTE MODULE " + this + " " + name);
+        // System.out.println("GETATTRIBUTE MODULE " + this + " " + attr_name);
         org.python.Object value;
-        try {
-            // First try the normal approach attribute
-            org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
-            // System.out.println("instance attrs = " + this.attrs);
-            // System.out.println("class attrs = " + cls.attrs);
-            value = cls.attrs.get(name);
 
-            if (value == null) {
-                throw new org.python.exceptions.AttributeError(this, name);
-            }
-        } catch (org.python.exceptions.AttributeError e) {
-            // System.out.println("MODULE NO ATTRIBUTE");
-            value = org.Python.builtins.get(name);
+        // First try the normal approach attribute
+        org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
+        // System.out.println("instance attrs = " + this.attrs);
+        // System.out.println("class attrs = " + cls.attrs);
+        value = cls.attrs.get(attr_name);
 
-            if (value == null) {
-                throw new org.python.exceptions.NameError(name);
-            }
+        if (value == null) {
+            value = org.Python.builtins.get(attr_name);
+        }
+
+        if (value == null) {
+            throw new org.python.exceptions.NameError(attr_name);
         }
 
         return value;
@@ -60,10 +56,10 @@ public class Module extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public void __setattr__(org.python.Object attr, org.python.Object value) {
-        java.lang.String name;
+    public void __setattr__(org.python.Object name, org.python.Object value) {
+        java.lang.String attr_name;
         try {
-            name = ((org.python.types.Str) attr).value;
+            attr_name = ((org.python.types.Str) name).value;
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
         }
@@ -74,11 +70,11 @@ public class Module extends org.python.types.Object {
         // System.out.println("instance attrs = " + this.attrs);
         // System.out.println("class attrs = " + cls.attrs);
 
-        cls.attrs.put(name, value);
+        cls.attrs.put(attr_name, value);
 
         // If there is a native field of the same name, set it.
         try {
-            java.lang.reflect.Field field = this.getClass().getField(name);
+            java.lang.reflect.Field field = this.getClass().getField(attr_name);
             field.set(this, value);
         } catch (NoSuchFieldException e) {
             // System.out.println("Not a native field");
