@@ -217,7 +217,7 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__setattr__' has not been implemented");
     }
 
-    public void __set__(org.python.Object instance, org.python.Object value) {
+    public void __set__(org.python.Object instance, org.python.Object klass, org.python.Object value) {
         throw new org.python.exceptions.AttributeError(this.getClass(), "");
     }
 

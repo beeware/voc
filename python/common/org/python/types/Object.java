@@ -251,7 +251,8 @@ public class Object implements org.python.Object {
                     value = this.__getattr__(name);
                 }
             } catch (org.python.exceptions.AttributeError e) {
-                throw new org.python.exceptions.AttributeError(this, attr_name);
+                // throw new org.python.exceptions.AttributeError(this, attr_name);
+                throw e;
             }
         }
 
@@ -296,7 +297,7 @@ public class Object implements org.python.Object {
         }
 
         try {
-            field.__set__(this, value);
+            field.__set__(this, cls, value);
         } catch (org.python.exceptions.AttributeError ae) {
             // System.out.println("Not a native field");
             this.attrs.put(attr_name, value);
@@ -309,7 +310,7 @@ public class Object implements org.python.Object {
     /**
      * Part of the interface for org.python.Object, but not a public method.
      */
-    public void __set__(org.python.Object instance, org.python.Object klass) {
+    public void __set__(org.python.Object instance, org.python.Object klass, org.python.Object value) {
         throw new org.python.exceptions.AttributeError(this, "");
     }
 

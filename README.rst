@@ -42,9 +42,11 @@ What it does:
 
   * `import`, `from X import Y` and `from X import *` statements for Python code
 
-It *doesn't* currently support:
+  * Importing and using native Java APIs
 
-* Importing and using native Java APIs
+It *doesn't* currently support (this list is incomplete):
+
+* Subclassing Python classes
 
 * Extending native java classes and interfaces.
 

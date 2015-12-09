@@ -1507,7 +1507,9 @@ class STORE_ATTR(Opcode):
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.name),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
             ALOAD_name(context, '#value-%x' % id(self)),
+
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
         )
         free_name(context, '#value-%x' % id(self))
@@ -2427,6 +2429,9 @@ class CALL_FUNCTION(Opcode):
             context.add_opcodes(
                 # Get a Method representing the new function
                 TRY(),
+                    JavaOpcodes.NEW('org/python/types/Constructor'),
+                    JavaOpcodes.DUP(),
+
                     JavaOpcodes.LDC_W(Classref(self.klass.descriptor)),
 
                     JavaOpcodes.ICONST_2(),
@@ -2441,20 +2446,12 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.ICONST_1(),
                     JavaOpcodes.LDC_W(Classref('java/util/Map')),
                     JavaOpcodes.AASTORE(),
-                )
 
-            context.add_opcodes(
                     JavaOpcodes.INVOKEVIRTUAL(
                         'java/lang/Class',
                         'getConstructor',
                         '([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;'
                     ),
-                    ASTORE_name(context, '#CONSTRUCTOR'),
-
-                    # Then wrap that Constructor into a Callable.
-                    JavaOpcodes.NEW('org/python/types/Constructor'),
-                    JavaOpcodes.DUP(),
-                    ALOAD_name(context, '#CONSTRUCTOR'),
 
                     JavaOpcodes.INVOKESPECIAL('org/python/types/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
 
@@ -2467,7 +2464,6 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.ATHROW(),
                 END_TRY()
             )
-            free_name(context, '#CONSTRUCTOR')
             free_name(context, '#EXCEPTION')
         else:
             if arguments[0].operation.opname == 'MAKE_FUNCTION':
@@ -2483,15 +2479,7 @@ class CALL_FUNCTION(Opcode):
 
             context.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/Callable'),
-                ASTORE_name(context, '#function-%x' % id(self)),
             )
-
-            # Evaluate all the arguments
-            for i, argument in enumerate(arguments[1:self.args+1]):
-                argument.operation.transpile(context, argument.arguments)
-                context.add_opcodes(
-                    ASTORE_name(context, '#arg-%d-%x' % (i, id(self)))
-                )
 
             # Create and populate the array of arguments to pass to invoke()
             context.add_opcodes(
@@ -2503,22 +2491,12 @@ class CALL_FUNCTION(Opcode):
                     JavaOpcodes.DUP(),
 
                     ICONST_val(i),
-                    ALOAD_name(context, '#arg-%d-%x' % (i, id(self))),
-                    JavaOpcodes.AASTORE(),
                 )
-                # Clean up temporary storage for arg.
-                free_name(context, '#arg-%d-%x' % (i, id(self)))
 
-            # Store the arguments for later.
-            context.add_opcodes(
-                ASTORE_name(context, '#args-%x' % id(self)),
-            )
-
-            # Evaluate all the keyword arguments
-            for i, (name, argument) in enumerate(zip(arguments[self.args+1::2], arguments[self.args+2::2])):
                 argument.operation.transpile(context, argument.arguments)
+
                 context.add_opcodes(
-                    ASTORE_name(context, '#kwarg-%d-%x' % (i, id(self)))
+                    JavaOpcodes.AASTORE(),
                 )
 
             # Create and populate the map of kwargs to pass to invoke().
@@ -2532,30 +2510,19 @@ class CALL_FUNCTION(Opcode):
                 context.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(name.operation.const),
-                    ALOAD_name(context, '#kwarg-%d-%x' % (i, id(self))),
+                )
+
+                argument.operation.transpile(context, argument.arguments)
+
+                context.add_opcodes(
                     JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                     JavaOpcodes.POP()
                 )
-                free_name(context, '#kwarg-%d-%x' % (i, id(self)))
-
-            # Store the keyword arguments for later.
-            context.add_opcodes(
-                ASTORE_name(context, '#kwargs-%x' % id(self)),
-            )
 
             # Set up the stack and invoke the callable
             context.add_opcodes(
-                ALOAD_name(context, '#function-%x' % id(self)),
-                ALOAD_name(context, '#args-%x' % id(self)),
-                ALOAD_name(context, '#kwargs-%x' % id(self)),
-
                 JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
             )
-
-            # Clean up temporary storage.
-            free_name(context, '#function-%x' % id(self))
-            free_name(context, '#args-%x' % id(self))
-            free_name(context, '#kwargs-%x' % id(self))
 
 
 class MAKE_FUNCTION(Opcode):
@@ -2599,54 +2566,6 @@ class MAKE_FUNCTION(Opcode):
         full_method_name = arguments[-1].operation.const
         context.next_resolve_list.append((self, 'start_op'))
 
-        context.add_opcodes(
-            JavaOpcodes.NEW('java/util/ArrayList'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
-        )
-
-        # Evaluate and store default args
-        for argument in arguments[:self.default_args]:
-            context.add_opcodes(
-                JavaOpcodes.DUP(),
-            )
-            argument.operation.transpile(context, argument.arguments)
-
-            context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
-                JavaOpcodes.POP(),
-            )
-        context.add_opcodes(
-            ASTORE_name(context, '#default_args-%x' % id(self.method))
-        )
-
-        # Evaluate and store default kwargs
-        context.add_opcodes(
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
-        )
-
-        for name, argument in zip(
-                        arguments[self.default_args:self.default_args + self.default_kwargs * 2:2],
-                        arguments[self.default_args + 1:self.default_args + self.default_kwargs * 2 + 1:2]):
-            context.add_opcodes(
-                JavaOpcodes.DUP(),
-            )
-
-            context.add_opcodes(
-                JavaOpcodes.LDC_W(name.operation.const),
-            )
-            argument.operation.transpile(context, argument.arguments)
-
-            context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-                JavaOpcodes.POP(),
-            )
-        context.add_opcodes(
-            ASTORE_name(context, '#default_kwargs-%x' % id(self.method))
-        )
-
         # Build the callable to invoke the method
         if self.method.is_constructor:
             pass
@@ -2662,12 +2581,6 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.ACONST_NULL(),
 
                 JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
-            )
-
-            add_callable(context, self.method, self.method.name)
-
-            context.add_opcodes(
-                ASTORE_name(context, '#closure-%x' % id(self.method)),
 
                 JavaOpcodes.LDC_W(Classref(self.method.parent.descriptor)),
                 JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
@@ -2676,7 +2589,12 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(self.method.name),
                 JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-                ALOAD_name(context, '#closure-%x' % id(self.method)),
+
+            )
+
+            add_callable(self, context, arguments, self.method.name)
+
+            context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
 
                 JavaOpcodes.NEW('org/python/types/Str'),
@@ -2686,15 +2604,10 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;')
             )
 
-            free_name(context, '#closure-%x' % id(self.method))
-
         else:
             # Push a callable onto the stack so that it can be stored
             # in globals and subsequently retrieved and run.
-            add_callable(context, self.method, full_method_name)
-
-        free_name(context, '#default_args-%x' % id(self.method)),
-        free_name(context, '#default_kwargs-%x' % id(self.method)),
+            add_callable(self, context, arguments, full_method_name)
 
 
 def add_tuple(context, data):
@@ -2791,34 +2704,12 @@ def add_int(context, value):
     )
 
 
-def add_callable(context, method, full_method_name):
+def add_callable(opcode, context, arguments, full_method_name):
+    method = opcode.method
+
     context.add_opcodes(
-        # # Get a Method representing the new function
         TRY(),
-            JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
-            JavaOpcodes.LDC_W(method.name),
-
-            ICONST_val(len(method.parameters) - method.self_offset),
-            JavaOpcodes.ANEWARRAY('java/lang/Class'),
-    )
-
-    for i, param in enumerate(method.parameters[method.self_offset:]):
-        context.add_opcodes(
-            JavaOpcodes.DUP(),
-            ICONST_val(i),
-            JavaOpcodes.LDC_W(Classref('Lorg/python/Object;')),
-            JavaOpcodes.AASTORE(),
-        )
-
-    context.add_opcodes(
-            JavaOpcodes.INVOKEVIRTUAL(
-                'java/lang/Class',
-                'getMethod',
-                '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'
-            ),
-            ASTORE_name(context, '#method'),
-
-            # Then wrap that Method into a Callable.
+            # Wrap that Method into a Callable.
             JavaOpcodes.NEW('org/python/types/Function'),
             JavaOpcodes.DUP(),
     )
@@ -2862,18 +2753,76 @@ def add_callable(context, method, full_method_name):
     context.add_opcodes(
             JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
 
-            ALOAD_name(context, '#method'),
+            # Get a Method representing the new function
+            JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
+            JavaOpcodes.LDC_W(method.name),
 
-        #     # globals
-        #     # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-        #     # JavaOpcodes.LDC_W(method.module.descriptor),
-        #     # JavaOpcodes.GETSTATIC(method.module.descriptor, 'attrs', 'Ljava/util/Map;'),
+            ICONST_val(len(method.parameters) - method.self_offset),
+            JavaOpcodes.ANEWARRAY('java/lang/Class'),
+    )
+
+    for i, param in enumerate(method.parameters[method.self_offset:]):
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+            ICONST_val(i),
+            JavaOpcodes.LDC_W(Classref('Lorg/python/Object;')),
+            JavaOpcodes.AASTORE(),
+        )
+
+    context.add_opcodes(
+            JavaOpcodes.INVOKEVIRTUAL(
+                'java/lang/Class',
+                'getMethod',
+                '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'
+            ),
+
+            # globals
+            # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
+            # JavaOpcodes.LDC_W(method.module.descriptor),
+            # JavaOpcodes.GETSTATIC(method.module.descriptor, 'attrs', 'Ljava/util/Map;'),
             JavaOpcodes.ACONST_NULL(),  # globals
 
-            ALOAD_name(context, '#default_args-%x' % id(method)),
+            # Default args
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+    )
 
-            ALOAD_name(context, '#default_kwargs-%x' % id(method)),
+    for argument in arguments[:opcode.default_args]:
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+        )
 
+        argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+            JavaOpcodes.POP(),
+        )
+
+    context.add_opcodes(
+            # Default kwargs
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+    )
+
+    for name, argument in zip(
+                    arguments[opcode.default_args:opcode.default_args + opcode.default_kwargs * 2:2],
+                    arguments[opcode.default_args + 1:opcode.default_args + opcode.default_kwargs * 2 + 1:2]):
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(name.operation.const),
+        )
+
+        argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.POP(),
+        )
+
+    context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # closure
 
             JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;Ljava/util/List;)V'),
