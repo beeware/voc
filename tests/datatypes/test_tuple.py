@@ -2,6 +2,20 @@ from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationT
 
 
 class TupleTests(TranspileTestCase):
+    def test_setattr(self):
+        self.assertCodeExecution("""
+            x = (1, 2, 3)
+            x.attr = 42
+            print('Done.')
+            """)
+
+    def test_getattr(self):
+        self.assertCodeExecution("""
+            x = (1, 2, 3)
+            print(x.attr)
+            print('Done.')
+            """)
+
     def test_creation(self):
         self.assertCodeExecution("""
             a = 1

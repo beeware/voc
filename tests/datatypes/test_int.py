@@ -1,6 +1,22 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
+class IntTests(TranspileTestCase):
+    def test_setattr(self):
+        self.assertCodeExecution("""
+            x = 37
+            x.attr = 42
+            print('Done.')
+            """)
+
+    def test_getattr(self):
+        self.assertCodeExecution("""
+            x = 37
+            print(x.attr)
+            print('Done.')
+            """)
+
+
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['42', '0']  # , '-37']
 

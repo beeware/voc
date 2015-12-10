@@ -57,9 +57,9 @@ public interface Object {
     // These four methods implement the internal interface to
     // attribute manipulation. This means they accept raw Java strings
     // as attribute names, and they raise exceptions on failure.
+    // These are the methods that are invoked by VOC-generated code.
     public org.python.Object __getattr__(java.lang.String name);
     public org.python.Object __getattribute__(java.lang.String name);
-    public void __set__(org.python.Object instance, org.python.Object value);
     public void __setattr__(java.lang.String name, org.python.Object value);
     public void __delattr__(java.lang.String name);
 
@@ -67,6 +67,7 @@ public interface Object {
     // manipulation. This means they take Python objects as attributes,
     // and raise exceptions on failure.
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
+    public void __set__(org.python.Object instance, org.python.Object value);
     public org.python.Object __getattr__(org.python.Object name);
     public org.python.Object __getattribute__(org.python.Object name);
     public void __setattr__(org.python.Object name, org.python.Object value);

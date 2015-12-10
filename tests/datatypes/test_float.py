@@ -1,6 +1,22 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
+class FloatTests(TranspileTestCase):
+    def test_setattr(self):
+        self.assertCodeExecution("""
+            x = 3.14159
+            x.attr = 42
+            print('Done.')
+            """)
+
+    def test_getattr(self):
+        self.assertCodeExecution("""
+            x = 3.14159
+            print(x.attr)
+            print('Done.')
+            """)
+
+
 class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
 

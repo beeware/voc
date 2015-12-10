@@ -2,6 +2,20 @@ from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationT
 
 
 class DictTests(TranspileTestCase):
+    def test_setattr(self):
+        self.assertCodeExecution("""
+            x = {}
+            x.attr = 42
+            print('Done.')
+            """)
+
+    def test_getattr(self):
+        self.assertCodeExecution("""
+            x = {}
+            print(x.attr)
+            print('Done.')
+            """)
+
     def test_creation(self):
         # Empty dict
         self.assertCodeExecution("""

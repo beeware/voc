@@ -106,6 +106,11 @@ public class Bool extends org.python.types.Object {
         return new org.python.types.Bool(this.value);
     }
 
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
+        // Builtin types can't have attributes set on them.
+        return false;
+    }
+
     @org.python.Method(
         __doc__ = ""
     )

@@ -1,15 +1,15 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
-class NoneTypeAttributeTests(TranspileTestCase):
-    def test_set_attribute_of_none(self):
+class NoneTypeTests(TranspileTestCase):
+    def test_setattr(self):
         self.assertCodeExecution("""
             x = None
             x.thing = 42
             print('Done.')
             """)
 
-    def test_get_attribute_of_none(self):
+    def test_getattr(self):
         self.assertCodeExecution("""
             x = None
             y = x.thing

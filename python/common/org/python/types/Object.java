@@ -304,12 +304,12 @@ public class Object implements org.python.Object {
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
-        // System.out.println("SETATTR " + name + " = " + value);
+        System.out.println("SETATTR " + name + " = " + value);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
 
         // If the attribute already exists, then it's OK to set it.
         org.python.Object attr = cls.__getattribute_null(name);
-
+        System.out.println("ATTR" + attr);
         // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {
             if (attr == null) {
@@ -320,15 +320,12 @@ public class Object implements org.python.Object {
         if (attr == null) {
             this.attrs.put(name, value);
         } else {
-            attr.__set(this, value);
+            attr.__set__(this, value);
         }
         return true;
     }
 
-    /**
-     * Part of the interface for org.python.Object, but not a public method.
-     */
-    public void __set(org.python.Object instance, org.python.Object value) {}
+    public void __set__(org.python.Object instance, org.python.Object value) {}
 
     @org.python.Method(
         __doc__ = "",
