@@ -6,7 +6,7 @@ public class Type extends org.python.types.Type implements org.python.Callable {
         super(klass, org.python.types.Type.Origin.JAVA);
     }
 
-    public org.python.Object __getattribute__(java.lang.String name) {
+    public org.python.Object __getattribute_null(java.lang.String name) {
         // System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + name);
         // System.out.println("CLASS ATTRS " + this.attrs);
         org.python.Object value = this.attrs.get(name);
@@ -18,35 +18,32 @@ public class Type extends org.python.types.Type implements org.python.Callable {
             // java.lang.Map doesn't differentiate between "doesn't exist"
             // and "value is null"; so since we know the value is null, check
             // to see if it is an explicit null (i.e., attribute doesn't exist)
-            if (this.attrs.containsKey(name)) {
-                throw new org.python.exceptions.AttributeError(this, name);
-            } else {
+            if (!this.attrs.containsKey(name)) {
                 try {
                     value = new org.python.java.Function(this.klass, name);
-                    this.attrs.put(name, value);
-                } catch (org.python.exceptions.AttributeError fe) {
+                } catch (org.python.exceptions.AttributeError ae) {
                     // No function; look for an attribute with the same name.
                     try {
                         value = new org.python.java.Field(klass.getField(name));
                     } catch (java.lang.NoSuchFieldException e) {
-                        // Field does not exist. Record this fact,
-                        // and raise an AttributError.
-                        throw new org.python.exceptions.AttributeError(this, name);
+                        // Field does not exist.
+                        value = null;
                     }
-                    this.attrs.put(name, value);
                 }
+                this.attrs.put(name, value);
             }
         }
         return value;
     }
 
-    public void __setattr__(java.lang.String name, org.python.Object value) {
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // System.out.println("SETATTRIBUTE NATIVE TYPE " + this + " " + name + " = " + value);
         org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
         // System.out.println("instance attrs = " + this.attrs);
         // System.out.println("class attrs = " + cls.attrs);
 
         cls.attrs.put(name, value);
+        return true;
     }
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {

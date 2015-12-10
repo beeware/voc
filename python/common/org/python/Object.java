@@ -45,12 +45,34 @@ public interface Object {
      * Section 3.3.2 - Emulating container types
      */
 
+    // These four methods are the internal implementations of
+    // attribute manipulation. They return null/false in case of
+    // failure; that failure is then interpreted by the public
+    // interface method.
+    public org.python.Object __getattr_null(java.lang.String name);
+    public org.python.Object __getattribute_null(java.lang.String name);
+    public boolean __setattr_null(java.lang.String name, org.python.Object value);
+    public boolean __delattr_null(java.lang.String name);
+
+    // These four methods implement the internal interface to
+    // attribute manipulation. This means they accept raw Java strings
+    // as attribute names, and they raise exceptions on failure.
+    public org.python.Object __getattr__(java.lang.String name);
     public org.python.Object __getattribute__(java.lang.String name);
-    public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
+    public void __set__(org.python.Object instance, org.python.Object value);
     public void __setattr__(java.lang.String name, org.python.Object value);
-    public void __set__(org.python.Object instance, org.python.Object klass, org.python.Object value);
     public void __delattr__(java.lang.String name);
 
+    // Lastly, these methods are the public inteface to attribute
+    // manipulation. This means they take Python objects as attributes,
+    // and raise exceptions on failure.
+    public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
+    public org.python.Object __getattr__(org.python.Object name);
+    public org.python.Object __getattribute__(org.python.Object name);
+    public void __setattr__(org.python.Object name, org.python.Object value);
+    public void __delattr__(org.python.Object name);
+
+    // Attribute name retrieval.
     public org.python.Object __dir__();
 
     /**

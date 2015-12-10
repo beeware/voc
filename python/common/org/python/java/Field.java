@@ -25,7 +25,7 @@ public class Field extends org.python.types.Object {
         }
     }
 
-    public void __set__(org.python.Object instance, org.python.Object klass, org.python.Object value) {
+    public void __set__(org.python.Object instance, org.python.Object value) {
         try {
             this.field.set(instance.toJava(), value);
         } catch (IllegalAccessException iae) {

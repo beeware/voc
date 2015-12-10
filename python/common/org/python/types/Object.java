@@ -223,7 +223,15 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __getattr__(java.lang.String name) {
-        throw new org.python.exceptions.AttributeError(this, name);
+        org.python.Object value = this.__getattr_null(name);
+        if (value == null) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        }
+        return value;
+    }
+
+    public org.python.Object __getattr_null(java.lang.String name) {
+        return null;
     }
 
     @org.python.Method(
@@ -239,25 +247,33 @@ public class Object implements org.python.Object {
     }
 
     public org.python.Object __getattribute__(java.lang.String name) {
+        org.python.Object value = this.__getattribute_null(name);
+        if (value == null) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        }
+        return value;
+    }
+
+    public org.python.Object __getattribute_null(java.lang.String name) {
         // Look for local instance attributes first
         // System.out.println("ATTRS " + this.attrs);
         org.python.Object value = this.attrs.get(name);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
+
         if (value == null) {
-            try {
-                // No instance attribute; look for a class attribute.
-                try {
-                    value = cls.__getattribute__(name);
-                } catch (org.python.exceptions.AttributeError e) {
-                    // No class attribute; Try the __getattr__ helper.
-                    value = this.__getattr__(name);
+            // Look to the class for an attribute
+            value = cls.__getattribute_null(name);
+            if (value == null) {
+                // Use the descriptor protocol
+                value = this.__getattr_null(name);
+                if (value == null) {
+                    // Still nothing - give up, and return a value
+                    // that can be interpreted as an exception.
+                    return null;
                 }
-            } catch (org.python.exceptions.AttributeError e) {
-                // throw new org.python.exceptions.AttributeError(this, name);
-                throw e;
             }
         }
-
+        // Post-process the value retrieved.
         return value.__get__(this, cls);
     }
 
@@ -282,40 +298,37 @@ public class Object implements org.python.Object {
     }
 
     public void __setattr__(java.lang.String name, org.python.Object value) {
-        // The base object can't have attribute set on it unless the attribute already exists.
+        if (!this.__setattr_null(name, value)) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        }
+    }
+
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // System.out.println("SETATTR " + name + " = " + value);
-        org.python.Object field = this.attrs.get(name);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
-        if (field == null) {
-            try {
-                field = cls.__getattribute__(name);
-            } catch (org.python.exceptions.AttributeError e) {
-            }
-        }
 
+        // If the attribute already exists, then it's OK to set it.
+        org.python.Object attr = cls.__getattribute_null(name);
+
+        // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {
-            if (field == null) {
-                throw new org.python.exceptions.AttributeError(this, name);
+            if (attr == null) {
+                return false;
             }
         }
 
-        try {
-            field.__set__(this, cls, value);
-        } catch (org.python.exceptions.AttributeError ae) {
-            // System.out.println("Not a native field");
+        if (attr == null) {
             this.attrs.put(name, value);
-        } catch (java.lang.NullPointerException npe) {
-            // System.out.println("Not a native field");
-            this.attrs.put(name, value);
+        } else {
+            attr.__set(this, value);
         }
+        return true;
     }
 
     /**
      * Part of the interface for org.python.Object, but not a public method.
      */
-    public void __set__(org.python.Object instance, org.python.Object klass, org.python.Object value) {
-        throw new org.python.exceptions.AttributeError(this, "");
-    }
+    public void __set(org.python.Object instance, org.python.Object value) {}
 
     @org.python.Method(
         __doc__ = "",
@@ -330,10 +343,14 @@ public class Object implements org.python.Object {
     }
 
     public void __delattr__(java.lang.String name) {
-        org.python.Object result = attrs.remove(name);
-        if (result == null) {
+        if (!this.__delattr_null(name)) {
             throw new org.python.exceptions.AttributeError(this, name);
         }
+    }
+
+    public boolean __delattr_null(java.lang.String name) {
+        org.python.Object result = attrs.remove(name);
+        return (result != null);
     }
 
     @org.python.Method(
