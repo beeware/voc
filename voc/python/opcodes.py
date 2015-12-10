@@ -1503,14 +1503,10 @@ class STORE_ATTR(Opcode):
         arguments[1].operation.transpile(context, arguments[1].arguments)
 
         context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
             ALOAD_name(context, '#value-%x' % id(self)),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
         )
         free_name(context, '#value-%x' % id(self))
 
@@ -1877,12 +1873,8 @@ class LOAD_ATTR(Opcode):
         arguments[0].operation.transpile(context, arguments[0].arguments)
 
         context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
 
@@ -2043,11 +2035,8 @@ class IMPORT_FROM(Opcode):
         # target of the comparator operator.
         context.add_opcodes(
             JavaOpcodes.DUP(),
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
 
@@ -2585,23 +2574,16 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.LDC_W(Classref(self.method.parent.descriptor)),
                 JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
 
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(self.method.name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
             )
 
             add_callable(self, context, arguments, self.method.name)
 
             context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
 
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(self.method.name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;')
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;')
             )
 
         else:

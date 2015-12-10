@@ -109,27 +109,6 @@ public class Tuple extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __getattribute__(org.python.Object name) {
-        throw new org.python.exceptions.NotImplementedError("__getattribute__() has not been implemented.");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __setattr__(org.python.Object name, org.python.Object value) {
-        throw new org.python.exceptions.NotImplementedError("__setattr__() has not been implemented.");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __delattr__(org.python.Object name) {
-        throw new org.python.exceptions.NotImplementedError("__delattr__() has not been implemented.");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented.");
     }

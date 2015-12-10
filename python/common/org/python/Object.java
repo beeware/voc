@@ -45,11 +45,11 @@ public interface Object {
      * Section 3.3.2 - Emulating container types
      */
 
-    public org.python.Object __getattribute__(org.python.Object name);
+    public org.python.Object __getattribute__(java.lang.String name);
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
-    public void __setattr__(org.python.Object name, org.python.Object value);
+    public void __setattr__(java.lang.String name, org.python.Object value);
     public void __set__(org.python.Object instance, org.python.Object klass, org.python.Object value);
-    public void __delattr__(org.python.Object name);
+    public void __delattr__(java.lang.String name);
 
     public org.python.Object __dir__();
 

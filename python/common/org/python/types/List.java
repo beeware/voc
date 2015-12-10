@@ -109,48 +109,6 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __getattribute__(org.python.Object attr) {
-        java.lang.String name;
-        try {
-            name = ((org.python.types.Str) attr).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("int.__getattribute__() has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __setattr__(org.python.Object attr, org.python.Object value) {
-        java.lang.String name;
-        try {
-            name = ((org.python.types.Str) attr).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("int.__setattr__() has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __delattr__(org.python.Object attr) {
-        java.lang.String name;
-        try {
-            name = ((org.python.types.Str) attr).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("int.__delattr__() has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }

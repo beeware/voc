@@ -114,48 +114,6 @@ public class Set extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __getattribute__(org.python.Object name) {
-        java.lang.String attr_name;
-        try {
-            attr_name = ((org.python.types.Str) name).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("set.__getattribute__() has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __setattr__(org.python.Object name, org.python.Object value) {
-        java.lang.String attr_name;
-        try {
-            attr_name = ((org.python.types.Str) name).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("set.__setattr__() has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __delattr__(org.python.Object name) {
-        java.lang.String attr_name;
-        try {
-            attr_name = ((org.python.types.Str) name).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("set.__delattr__() has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented");
     }
