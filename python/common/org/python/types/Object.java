@@ -111,9 +111,7 @@ public class Object implements org.python.Object {
     @org.python.Method(
         __doc__ = "Destroy an existing object. See help(type) for accurate signature."
     )
-    public void __del__() {
-        throw new org.python.exceptions.AttributeError(this, "__del__");
-    }
+    public void __del__() {}
 
     @org.python.Method(
         __doc__ = "Return repr(self)."
@@ -304,12 +302,11 @@ public class Object implements org.python.Object {
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
-        System.out.println("SETATTR " + name + " = " + value);
+        // System.out.println("SETATTR " + name + " = " + value);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
 
         // If the attribute already exists, then it's OK to set it.
         org.python.Object attr = cls.__getattribute_null(name);
-        System.out.println("ATTR" + attr);
         // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {
             if (attr == null) {

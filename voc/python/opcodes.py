@@ -2163,9 +2163,17 @@ class POP_JUMP_IF_FALSE(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
+        # Most common use of POP_JUMP_IF_FALSE is as part of an
+        # if statement, in which case the COMPARE_OP will have
+        # already produced a boolean. If that's the case, don't
+        # try to convert the top of stack into a bool; just use it.
+        if arguments[0].operation.opname != 'COMPARE_OP':
+            context.add_opcodes(
+                # (bool) TOS.value
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+            )
+
         context.add_opcodes(
-            # (bool) TOS.value
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Bool'),
             JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
 
@@ -2188,9 +2196,16 @@ class POP_JUMP_IF_TRUE(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
+        # Most common use of POP_JUMP_IF_FALSE is as part of an
+        # if statement, in which case the COMPARE_OP will have
+        # already produced a boolean. If that's the case, don't
+        # try to convert the top of stack into a bool; just use it.
+        if arguments[0].operation.opname != 'COMPARE_OP':
+            context.add_opcodes(
+                # (bool) TOS.value
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+            )
         context.add_opcodes(
-            # (bool) TOS.value
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Bool'),
             JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
 
