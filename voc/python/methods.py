@@ -70,14 +70,10 @@ class Method(Block):
                 JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
                 ALOAD_name(self, '#value'),
 
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
             )
             free_name(self, '#value')
 
@@ -100,12 +96,9 @@ class Method(Block):
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
     def delete_name(self, name):
@@ -118,12 +111,8 @@ class Method(Block):
                 JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Lorg/python/Object;)Lorg/python/Object;'),
+                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
             )
 
     @property
@@ -287,11 +276,8 @@ class InitMethod(Method):
         self.add_opcodes(
             TRY(),
                 JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W('__init__'),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
 
         )
 
@@ -405,13 +391,10 @@ class MainMethod(Method):
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
             ALOAD_name(self, '#value'),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
         )
         free_name(self, '#value')
 
@@ -434,11 +417,8 @@ class MainMethod(Method):
             JavaOpcodes.LDC_W(self.module.descriptor),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
     def delete_name(self, name, use_locals):
@@ -447,11 +427,8 @@ class MainMethod(Method):
             JavaOpcodes.LDC_W(self.module.descriptor),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Lorg/python/object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
     def transpile_setup(self):

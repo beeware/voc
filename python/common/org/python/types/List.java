@@ -106,46 +106,9 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.__ge__() has not been implemented.");
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __getattribute__(org.python.Object attr) {
-        java.lang.String name;
-        try {
-            name = ((org.python.types.Str) attr).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("int.__getattribute__() has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __setattr__(org.python.Object attr, org.python.Object value) {
-        java.lang.String name;
-        try {
-            name = ((org.python.types.Str) attr).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("int.__setattr__() has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __delattr__(org.python.Object attr) {
-        java.lang.String name;
-        try {
-            name = ((org.python.types.Str) attr).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
-        }
-
-        throw new org.python.exceptions.NotImplementedError("int.__delattr__() has not been implemented");
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
+        // Builtin types can't have attributes set on them.
+        return false;
     }
 
     @org.python.Method(

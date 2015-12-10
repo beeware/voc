@@ -39,13 +39,10 @@ class ClassBlock(Block):
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
             ALOAD_name(self, '#value'),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
         )
         free_name(self, '#value')
 
@@ -66,22 +63,16 @@ class ClassBlock(Block):
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__getattribute__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
     def delete_name(self, name, use_locals):
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
     def add_method(self, full_method_name, code):

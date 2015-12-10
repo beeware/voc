@@ -53,7 +53,7 @@ public class ImportLib {
                 // If we are multiple steps into an import chain, tell the
                 // parent module of this new module.
                 if (parent_module != null) {
-                    parent_module.__setattr__(new org.python.types.Str(name), python_module);
+                    parent_module.__setattr__(name, python_module);
                 }
             }
 
@@ -76,23 +76,22 @@ public class ImportLib {
             java_name.append("/");
             for (java.lang.String name: from_list) {
                 if (!name.equals("*")) {
-                    org.python.Object py_name = new org.python.types.Str(name);
                     try {
                         if (native_import) {
                             java.lang.Class java_class = java.lang.Class.forName(java_name.toString().replace("/", ".") + name);
-                            parent_module.__setattr__(py_name, new org.python.java.Type(java_class));
+                            parent_module.__setattr__(name, new org.python.java.Type(java_class));
                         } else {
                             python_module = importPythonModule(java_name.toString() + name);
-                            parent_module.__setattr__(py_name, python_module);
+                            parent_module.__setattr__(name, python_module);
                         }
                     } catch (java.lang.ClassNotFoundException e) {
                         // `name` doesn't exist as a submodule; it might be
                         // an exportable symbol in the parent module.
                         try {
-                            parent_module.__getattribute__(py_name);
+                            parent_module.__getattribute__(name);
                         } catch (org.python.exceptions.NameError ne) {
                             python_module = new org.python.java.Module(java_name.toString().replace("/", ".") + name);
-                            parent_module.__setattr__(py_name, python_module);
+                            parent_module.__setattr__(name, python_module);
                             modules.put(java_name.toString() + name, python_module);
                         }
                     }

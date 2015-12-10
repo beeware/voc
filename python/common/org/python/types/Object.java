@@ -215,14 +215,23 @@ public class Object implements org.python.Object {
         args = {"attr"}
     )
     public org.python.Object __getattr__(org.python.Object name) {
-        java.lang.String attr_name;
         try {
-            attr_name = ((org.python.types.Str) name).value;
+            return this.__getattr__(((org.python.types.Str) name).value);
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError("__getattr__(): attribute name must be string");
         }
+    }
 
-        throw new org.python.exceptions.AttributeError(this, attr_name);
+    public org.python.Object __getattr__(java.lang.String name) {
+        org.python.Object value = this.__getattr_null(name);
+        if (value == null) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        }
+        return value;
+    }
+
+    public org.python.Object __getattr_null(java.lang.String name) {
+        return null;
     }
 
     @org.python.Method(
@@ -230,32 +239,41 @@ public class Object implements org.python.Object {
         args = {"name"}
     )
     public org.python.Object __getattribute__(org.python.Object name) {
-        java.lang.String attr_name;
         try {
-            attr_name = ((org.python.types.Str) name).value;
+            return this.__getattribute__(((org.python.types.Str) name).value);
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
         }
+    }
 
+    public org.python.Object __getattribute__(java.lang.String name) {
+        org.python.Object value = this.__getattribute_null(name);
+        if (value == null) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        }
+        return value;
+    }
+
+    public org.python.Object __getattribute_null(java.lang.String name) {
         // Look for local instance attributes first
         // System.out.println("ATTRS " + this.attrs);
-        org.python.Object value = this.attrs.get(attr_name);
+        org.python.Object value = this.attrs.get(name);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
+
         if (value == null) {
-            try {
-                // No instance attribute; look for a class attribute.
-                try {
-                    value = cls.__getattribute__(name);
-                } catch (org.python.exceptions.AttributeError e) {
-                    // No class attribute; Try the __getattr__ helper.
-                    value = this.__getattr__(name);
+            // Look to the class for an attribute
+            value = cls.__getattribute_null(name);
+            if (value == null) {
+                // Use the descriptor protocol
+                value = this.__getattr_null(name);
+                if (value == null) {
+                    // Still nothing - give up, and return a value
+                    // that can be interpreted as an exception.
+                    return null;
                 }
-            } catch (org.python.exceptions.AttributeError e) {
-                // throw new org.python.exceptions.AttributeError(this, attr_name);
-                throw e;
             }
         }
-
+        // Post-process the value retrieved.
         return value.__get__(this, cls);
     }
 
@@ -272,64 +290,64 @@ public class Object implements org.python.Object {
         args = {"name", "value"}
     )
     public void __setattr__(org.python.Object name, org.python.Object value) {
-        java.lang.String attr_name;
         try {
-            attr_name = ((org.python.types.Str) name).value;
+            this.__setattr__(((org.python.types.Str) name).value, value);
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
         }
+    }
 
-        // The base object can't have attribute set on it unless the attribute already exists.
-        // System.out.println("SETATTR " + name + " = " + value);
-        org.python.Object field = this.attrs.get(attr_name);
+    public void __setattr__(java.lang.String name, org.python.Object value) {
+        if (!this.__setattr_null(name, value)) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        }
+    }
+
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
+        System.out.println("SETATTR " + name + " = " + value);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
-        if (field == null) {
-            try {
-                field = cls.__getattribute__(name);
-            } catch (org.python.exceptions.AttributeError e) {
-            }
-        }
 
+        // If the attribute already exists, then it's OK to set it.
+        org.python.Object attr = cls.__getattribute_null(name);
+        System.out.println("ATTR" + attr);
+        // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {
-            if (field == null) {
-                throw new org.python.exceptions.AttributeError(this, attr_name);
+            if (attr == null) {
+                return false;
             }
         }
 
-        try {
-            field.__set__(this, cls, value);
-        } catch (org.python.exceptions.AttributeError ae) {
-            // System.out.println("Not a native field");
-            this.attrs.put(attr_name, value);
-        } catch (java.lang.NullPointerException npe) {
-            // System.out.println("Not a native field");
-            this.attrs.put(attr_name, value);
+        if (attr == null) {
+            this.attrs.put(name, value);
+        } else {
+            attr.__set__(this, value);
         }
+        return true;
     }
 
-    /**
-     * Part of the interface for org.python.Object, but not a public method.
-     */
-    public void __set__(org.python.Object instance, org.python.Object klass, org.python.Object value) {
-        throw new org.python.exceptions.AttributeError(this, "");
-    }
+    public void __set__(org.python.Object instance, org.python.Object value) {}
 
     @org.python.Method(
         __doc__ = "",
         args = {"attr"}
     )
     public void __delattr__(org.python.Object name) {
-        java.lang.String attr_name;
         try {
-            attr_name = ((org.python.types.Str) name).value;
+            this.__delattr__(((org.python.types.Str) name).value);
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
         }
+    }
 
-        org.python.Object result = attrs.remove(attr_name);
-        if (result == null) {
-            throw new org.python.exceptions.AttributeError(this, attr_name);
+    public void __delattr__(java.lang.String name) {
+        if (!this.__delattr_null(name)) {
+            throw new org.python.exceptions.AttributeError(this, name);
         }
+    }
+
+    public boolean __delattr_null(java.lang.String name) {
+        org.python.Object result = attrs.remove(name);
+        return (result != null);
     }
 
     @org.python.Method(

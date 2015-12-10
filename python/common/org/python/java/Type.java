@@ -6,20 +6,10 @@ public class Type extends org.python.types.Type implements org.python.Callable {
         super(klass, org.python.types.Type.Origin.JAVA);
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __getattribute__(org.python.Object name) {
-        java.lang.String attr_name;
-        try {
-            attr_name = ((org.python.types.Str) name).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
-        }
-
-        // System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + attr_name);
+    public org.python.Object __getattribute_null(java.lang.String name) {
+        // System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + name);
         // System.out.println("CLASS ATTRS " + this.attrs);
-        org.python.Object value = this.attrs.get(attr_name);
+        org.python.Object value = this.attrs.get(name);
 
         // On a native type, attrs is a cache of lookups on actual functions.
         // If there's no hit, then we need to reflect on the underyling class
@@ -28,45 +18,32 @@ public class Type extends org.python.types.Type implements org.python.Callable {
             // java.lang.Map doesn't differentiate between "doesn't exist"
             // and "value is null"; so since we know the value is null, check
             // to see if it is an explicit null (i.e., attribute doesn't exist)
-            if (this.attrs.containsKey(attr_name)) {
-                throw new org.python.exceptions.AttributeError(this, attr_name);
-            } else {
+            if (!this.attrs.containsKey(name)) {
                 try {
-                    value = new org.python.java.Function(this.klass, attr_name);
-                    this.attrs.put(attr_name, value);
-                } catch (org.python.exceptions.AttributeError fe) {
+                    value = new org.python.java.Function(this.klass, name);
+                } catch (org.python.exceptions.AttributeError ae) {
                     // No function; look for an attribute with the same name.
                     try {
-                        value = new org.python.java.Field(klass.getField(attr_name));
+                        value = new org.python.java.Field(klass.getField(name));
                     } catch (java.lang.NoSuchFieldException e) {
-                        // Field does not exist. Record this fact,
-                        // and raise an AttributError.
-                        throw new org.python.exceptions.AttributeError(this, attr_name);
+                        // Field does not exist.
+                        value = null;
                     }
-                    this.attrs.put(attr_name, value);
                 }
+                this.attrs.put(name, value);
             }
         }
         return value;
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __setattr__(org.python.Object attr, org.python.Object value) {
-        java.lang.String name;
-        try {
-            name = ((org.python.types.Str) attr).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
-        }
-
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // System.out.println("SETATTRIBUTE NATIVE TYPE " + this + " " + name + " = " + value);
         org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
         // System.out.println("instance attrs = " + this.attrs);
         // System.out.println("class attrs = " + cls.attrs);
 
         cls.attrs.put(name, value);
+        return true;
     }
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {

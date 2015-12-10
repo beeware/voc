@@ -119,57 +119,47 @@ public class Type extends org.python.types.Object {
         return new org.python.types.Str(String.format("<class '%s'>", org.Python.typeName(this.klass)));
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __getattribute__(org.python.Object name) {
-        java.lang.String attr_name;
-        try {
-            attr_name = ((org.python.types.Str) name).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
-        }
-
+    public org.python.Object __getattribute_null(java.lang.String name) {
         // System.out.println("GETATTRIBUTE CLASS " + this + " " + name);
         // System.out.println("CLASS ATTRS " + this.attrs);
-        org.python.Object value = this.attrs.get(attr_name);
-
-        // If the type's attrs dict contains the key, then it's either a
-        // python local attribute, or there's a Java field backing it.
-        if (this.attrs.containsKey(attr_name)) {
-            value = this.attrs.get(attr_name);
-        } else {
-            try {
-                value = new org.python.java.Field(klass.getField(attr_name));
-            } catch (java.lang.NoSuchFieldException e) {
-                value = null;
-            }
-
-            this.attrs.put(attr_name, value);
-        }
+        org.python.Object value = this.attrs.get(name);
 
         if (value == null) {
-            throw new org.python.exceptions.AttributeError(this.attrs.get("__class__"), attr_name);
+            // The class attributes didn't contain the object. We must
+            // differentiate between "doesn't exist" and "value is null";
+            // If the key *doesn't* exist in the attributes dictionary,
+            // try to look it up. If it doesn't exist as a field, then
+            // store a null to represent this fact, so we won't look again.
+            if (!this.attrs.containsKey(name)) {
+                try {
+                    value = new org.python.java.Field(klass.getField(name));
+                } catch (java.lang.NoSuchFieldException e) {
+                    value = null;
+                }
+                // If the field doesn't exist, store a value of null
+                // so that we don't try to look up the field again.
+                this.attrs.put(name, value);
+            }
         }
-
         return value;
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __setattr__(org.python.Object name, org.python.Object value) {
-        java.lang.String attr_name;
-        try {
-            attr_name = ((org.python.types.Str) name).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
+    public void __setattr__(java.lang.String name, org.python.Object value) {
+        if (!this.__setattr_null(name, value)) {
+            throw new org.python.exceptions.TypeError("can't set attributes of built-in/extension type '" + org.Python.typeName(this.klass) + "'");
         }
+    }
 
-        // The base object can't have attribute set on it unless the attribute already exists.
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // System.out.println("SETATTRIBUTE TYPE " + this + " " + name + " = " + value);
         // System.out.println("class attrs = " + this.attrs);
 
-        this.attrs.put(attr_name, value);
+        // Can't set attributes of builtin types.
+        if (this.origin == Origin.BUILTIN) {
+            return false;
+        }
+
+        this.attrs.put(name, value);
+        return true;
     }
 }

@@ -114,6 +114,11 @@ public class Dict extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("dict.__ge__() has not been implemented.");
     }
 
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
+        // Builtin types can't have attributes set on them.
+        return false;
+    }
+
     @org.python.Method(
         __doc__ = ""
     )

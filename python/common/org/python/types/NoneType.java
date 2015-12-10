@@ -13,18 +13,7 @@ public class NoneType extends org.python.types.Object {
         return new org.python.types.Str("None");
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public void __setattr__(org.python.Object name, org.python.Object value) {
-        java.lang.String attr_name;
-        try {
-            attr_name = ((org.python.types.Str) name).value;
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__setattribute__(): attribute name must be string");
-        }
-
-        // None has no attributes.
-        throw new org.python.exceptions.AttributeError(this, attr_name);
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
+        return false;
     }
 }

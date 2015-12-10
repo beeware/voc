@@ -180,20 +180,50 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     /**
      * Section 3.3.2 - Emulating container types
      */
-
     @org.python.Method(
         __doc__ = "Return getattr(self, name)."
     )
-    public org.python.Object __getattribute__(org.python.Object name) {
-        java.lang.String attr_name;
+    public org.python.Object __getattr__(org.python.Object name) {
         try {
-            attr_name = ((org.python.types.Str) name).value;
+            return this.__getattr__(((org.python.types.Str) name).value);
         } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
+            throw new org.python.exceptions.TypeError("__getattr__(): attribute name must be string");
         }
+    }
 
+    public org.python.Object __getattr__(java.lang.String name) {
+        org.python.Object value = this.__getattr_null(name);
+        if (value == null) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        }
+        return value;
+    }
+
+    public org.python.Object __getattr_null(java.lang.String name) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__getattribute__' has not been implemented");
-        // return this.__get__(value, org.python.types.Type.pythonType(this.getClass()));
+    }
+
+    @org.python.Method(
+        __doc__ = "Return getattribute(self, name)."
+    )
+    public org.python.Object __getattribute__(org.python.Object name) {
+        try {
+            return this.__getattribute__(((org.python.types.Str) name).value);
+        } catch (java.lang.ClassCastException e) {
+            throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
+        }
+    }
+
+    public org.python.Object __getattribute__(java.lang.String name) {
+        org.python.Object value = this.__getattribute_null(name);
+        if (value == null) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        }
+        return value;
+    }
+
+    public org.python.Object __getattribute_null(java.lang.String name) {
+        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__getattribute__' has not been implemented");
     }
 
     @org.python.Method(
@@ -207,31 +237,43 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         __doc__ = "Implement setattr(self, name, value)."
     )
     public void __setattr__(org.python.Object name, org.python.Object value) {
-        java.lang.String attr_name;
         try {
-            attr_name = ((org.python.types.Str) name).value;
+            this.__setattr__(((org.python.types.Str) name).value, value);
         } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
+            throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
         }
+    }
 
+    public void __setattr__(java.lang.String name, org.python.Object value) {
+        if (!this.__setattr_null(name, value)) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        };
+    }
+
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__setattr__' has not been implemented");
     }
 
-    public void __set__(org.python.Object instance, org.python.Object klass, org.python.Object value) {
-        throw new org.python.exceptions.AttributeError(this.getClass(), "");
-    }
+    public void __set__(org.python.Object instance, org.python.Object value) {}
 
     @org.python.Method(
         __doc__ = "Implement delattr(self, name)."
     )
     public void __delattr__(org.python.Object name) {
-        java.lang.String attr_name;
         try {
-            attr_name = ((org.python.types.Str) name).value;
+            this.__delattr__(((org.python.types.Str) name).value);
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
         }
+    }
 
+    public void __delattr__(java.lang.String name) {
+        if (!this.__delattr_null(name)) {
+            throw new org.python.exceptions.AttributeError(this, name);
+        };
+    }
+
+    public boolean __delattr_null(java.lang.String name) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__delattr__' has not been implemented");
     }
 
