@@ -7,10 +7,12 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
 
     public BaseException() {
         super();
+        // System.out.println("EX: " + this);
     }
 
     public BaseException(String msg) {
         super(msg);
+        // System.out.println("EX: " + this);
     }
 
     public java.lang.Object toJava() {

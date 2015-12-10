@@ -1,6 +1,21 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
+class StrTests(TranspileTestCase):
+    def test_setattr(self):
+        self.assertCodeExecution("""
+            x = "Hello, world"
+            x.attr = 42
+            print('Done.')
+            """)
+
+    def test_getattr(self):
+        self.assertCodeExecution("""
+            x = "Hello, world"
+            print(x.attr)
+            print('Done.')
+            """)
+
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['""', '"This is a string"']
 
