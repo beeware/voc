@@ -8,7 +8,7 @@ from .python.modules import Module
 
 def transpile(filename, srcdir='.', outdir=None):
     print("Compiling %s ..." % filename)
-    py_compile.compile(filename)
+    py_compile.compile(filename, doraise=True)
 
     transpiler = Transpiler()
     transpiler.transpile(filename, srcdir)
