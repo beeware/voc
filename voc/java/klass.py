@@ -154,10 +154,10 @@ class BaseClass:
     ACC_ENUM = 0x4000  # Declared as an enum type.
 
     def __init__(
-                self, name, supername=None,
+                self, name, extends=None,
                 public=True, final=False, interface=False,
                 abstract=False, synthetic=False, annotation=False, enum=False,
-                interfaces=None
+                implements=None
             ):
 
         # Constructor properties.
@@ -204,10 +204,10 @@ class BaseClass:
         # (§4.4.1) representing an interface that is a direct superinterface of this
         # class or interface type, in the left-to-right order given in the source for
         # the type.
-        if interfaces is None:
+        if implements is None:
             self.interfaces = []
         else:
-            self.interfaces = [Classref(iface) for iface in interfaces]
+            self.interfaces = [Classref(iface) for iface in implements]
 
         # Each value in the fields table must be a field_info (§4.5) structure giving a
         # complete description of a field in this class or interface. The fields table
@@ -277,7 +277,7 @@ class BaseClass:
         # For an interface, the value of the super_class item must always be a valid
         # index into the constant_pool table. The constant_pool entry at that index must
         # be a CONSTANT_Class_info structure representing the class Object.
-        self.super_class = Classref(supername if supername else 'java/lang/Object')
+        self.super_class = Classref(extends if extends else 'java/lang/Object')
 
     def __repr__(self):
         return '<%s %s>' % (self.__class__.__name__, self.this_class.name)
@@ -358,7 +358,7 @@ class BaseClass:
 
         return klass(
             this_class,
-            supername=super_class,
+            extends=super_class,
             public=bool(access_flags & BaseClass.ACC_PUBLIC),
             final=bool(access_flags & BaseClass.ACC_FINAL),
             abstract=bool(access_flags & BaseClass.ACC_ABSTRACT),
@@ -502,15 +502,15 @@ class BaseClass:
 
 
 class Class(BaseClass):
-    def __init__(self, name, supername=None, interfaces=None, public=True, final=False, abstract=False):
-        super(Class, self).__init__(name, supername, interfaces=interfaces, public=public, final=final, abstract=abstract)
+    def __init__(self, name, extends=None, implements=None, public=True, final=False, abstract=False):
+        super(Class, self).__init__(name, extends, implements=implements, public=public, final=final, abstract=abstract)
 
 
 class Interface(BaseClass):
-    def __init__(self, name, supername=None, public=True, final=False, abstract=False):
-        super(Interface, self).__init__(name, supername, public=public, final=final, abstract=False, interface=True)
+    def __init__(self, name, extends=None, public=True, final=False, abstract=False):
+        super(Interface, self).__init__(name, extends, public=public, final=final, abstract=False, interface=True)
 
 
 class Enum(BaseClass):
-    def __init__(self, name, supername=None, public=True, final=False):
-        super(Enum, self).__init__(name, supername, public=public, final=final, enum=True)
+    def __init__(self, name, extends=None, public=True, final=False):
+        super(Enum, self).__init__(name, extends, public=public, final=final, enum=True)

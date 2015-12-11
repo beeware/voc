@@ -195,7 +195,7 @@ class Module(Block):
         """
         # If there is any static content, generate a classfile
         # for this module
-        classfile = JavaClass(self.descriptor, supername='org/python/types/Module')
+        classfile = JavaClass(self.descriptor, extends='org/python/types/Module')
         classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
 
         # Add a static method to the module, populated with the

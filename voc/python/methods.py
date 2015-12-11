@@ -160,8 +160,8 @@ class Method(Block):
             parent=self.parent,
             name='%s$%s' % (self.parent.name, method_name.replace('.<locals>.', '$')),
             closure_var_names=code.co_names,
-            super_name='org/python/types/Closure',
-            interfaces=['org/python/Callable'],
+            extends='org/python/types/Closure',
+            implements=['org/python/Callable'],
             public=True,
             final=True,
         )
@@ -270,7 +270,7 @@ class InitMethod(Method):
 
         self.add_opcodes(
             JavaOpcodes.ALOAD_0(),
-            JavaOpcodes.INVOKESPECIAL(self.klass.super_name, '<init>', '()V'),
+            JavaOpcodes.INVOKESPECIAL(self.klass.extends, '<init>', '()V'),
         )
 
         self.add_opcodes(

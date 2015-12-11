@@ -88,11 +88,12 @@ class ClassBlock(Block):
 
 
 class Class(Block):
-    def __init__(self, module, name, namespace=None, super_name=None, interfaces=None, public=True, final=False, methods=None, fields=None, init=None):
+    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None):
         super().__init__(module)
         self.name = name
-        self.super_name = super_name if super_name else 'org/python/types/Object'
-        self.interfaces = interfaces
+        self.bases = bases if bases else 'org/python/types/Object'
+        self.extends = extends if extends else 'org/python/types/Object'
+        self.implements = implements if implements else []
         self.public = public
         self.final = final
         self.methods = methods if methods else []
@@ -138,8 +139,8 @@ class Class(Block):
     def transpile(self):
         classfile = JavaClass(
             self.descriptor,
-            supername=self.super_name,
-            interfaces=self.interfaces,
+            extends=self.extends,
+            implements=self.implements,
             public=self.public,
             final=self.final
         )
@@ -181,7 +182,7 @@ class Class(Block):
 
 
 class InnerClass(Class):
-    def __init__(self, parent, name, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, parent, name, bases=None, extends=None, implements=None, public=True, final=False, methods=None, init=None):
         if isinstance(parent, Class):
             module = parent.module
         else:
@@ -190,8 +191,9 @@ class InnerClass(Class):
             module=module,
             name=name,
             namespace=parent.namespace,
-            super_name=super_name,
-            interfaces=interfaces,
+            bases=bases,
+            extends=extends,
+            implements=implements,
             public=public,
             final=final,
             methods=methods,
@@ -200,7 +202,7 @@ class InnerClass(Class):
 
 
 class ClosureClass(Class):
-    def __init__(self, parent, closure_var_names, name=None, super_name=None, interfaces=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, parent, closure_var_names, name=None, extends=None, bases=None, implements=None, public=True, final=False, methods=None, init=None):
         self.closure_var_names = closure_var_names
         if isinstance(parent, Class):
             module = parent.module
@@ -213,8 +215,9 @@ class ClosureClass(Class):
             module=module,
             name=name,
             namespace=parent.namespace,
-            super_name=super_name,
-            interfaces=interfaces,
+            bases=bases,
+            extends=extends,
+            implements=implements,
             public=public,
             final=final,
             methods=methods,

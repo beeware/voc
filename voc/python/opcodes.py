@@ -2376,6 +2376,22 @@ class DELETE_FAST(Opcode):
 
 # class RAISE_VARARGS(Opcode):
 
+def extract_constant(arg):
+    if arg.operation.opname == 'LOAD_CONST':
+        value = arg.operation.const
+    elif arg.operation.opname == 'LOAD_NAME':
+        value = arg.operation.name
+    elif arg.operation.opname in ('BUILD_LIST', 'BUILD_TUPLE'):
+        value = [
+            extract_constant(a)
+            for a in arg.arguments
+        ]
+    elif arg.operation.opname == 'LOAD_ATTR':
+        value = '.'.join([extract_constant(arg.arguments[0]), arg.operation.name])
+    else:
+        raise Exception("Don't know how to extract constant from " + arg.operation.opname)
+    return value
+
 
 class CALL_FUNCTION(Opcode):
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
@@ -2401,15 +2417,35 @@ class CALL_FUNCTION(Opcode):
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # Construct a class.
             from .klass import Class
-            code = arguments[1].arguments[0].operation.const
-            class_name = arguments[1].arguments[1].operation.const
+            code = extract_constant(arguments[1].arguments[0])
+            class_name = extract_constant(arguments[2])
 
-            if len(arguments) == 4:
-                super_name = arguments[2].operation.const
-            else:
-                super_name = None
+            print(arguments[3:self.args], 3, self.args+1)
+            bases = [
+                extract_constant(arg)
+                for arg in arguments[3:self.args+1]
+            ]
 
-            self.klass = Class(context.parent, class_name, super_name=super_name)
+            extends = None
+            implements = []
+
+            for key_arg, value_arg in zip(arguments[self.args+1::2], arguments[self.args+2::2]):
+                key = extract_constant(key_arg)
+                value = extract_constant(value_arg)
+
+                if key == "metaclass":
+                    raise Exception("Can't handle metaclasses")
+                elif key == "extends":
+                    extends = value
+                elif key == "implements":
+                    if isinstance(value, list):
+                        implements = value
+                    else:
+                        implements = [value]
+                else:
+                    raise Exception("Unknown meta keyword " + str(key))
+
+            self.klass = Class(context.parent, class_name, bases=bases, extends=extends, implements=implements)
             self.klass.extract(code)
             context.parent.classes.append(self.klass)
 
