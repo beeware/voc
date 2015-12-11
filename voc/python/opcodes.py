@@ -2420,9 +2420,8 @@ class CALL_FUNCTION(Opcode):
             code = extract_constant(arguments[1].arguments[0])
             class_name = extract_constant(arguments[2])
 
-            print(arguments[3:self.args], 3, self.args+1)
             bases = [
-                extract_constant(arg)
+                extract_constant(arg).replace('.', '/')
                 for arg in arguments[3:self.args+1]
             ]
 
@@ -2436,12 +2435,15 @@ class CALL_FUNCTION(Opcode):
                 if key == "metaclass":
                     raise Exception("Can't handle metaclasses")
                 elif key == "extends":
-                    extends = value
+                    extends = value.replace('.', '/')
                 elif key == "implements":
                     if isinstance(value, list):
-                        implements = value
+                        implements = [
+                            v.replace('.', '/')
+                            for v in value
+                        ]
                     else:
-                        implements = [value]
+                        implements = [value.replace('.', '/')]
                 else:
                     raise Exception("Unknown meta keyword " + str(key))
 
@@ -2570,9 +2572,14 @@ class MAKE_FUNCTION(Opcode):
 
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.default_args = argc & 0xff
         self.default_kwargs = ((argc >> 8) & 0xFF)
         self.annotations = (argc >> 16) & 0x7FFF
+        self.default_args = argc & 0xff - self.annotations
+
+        # if we have annotations, the value wil be one more
+        # than it should be.
+        if self.annotations:
+            self.annotations = self.annotations - 1
 
     def __arg_repr__(self):
         return '%s default args, %s default kwargs, %s annotations' % (
@@ -2584,7 +2591,7 @@ class MAKE_FUNCTION(Opcode):
     @property
     def consume_count(self):
         if self.annotations:
-            return 2 + self.annotations
+            return 3 + self.annotations + self.default_args + (2 * self.default_kwargs)
         else:
             return 2 + self.default_args + (2 * self.default_kwargs)
 
@@ -2855,6 +2862,15 @@ def add_callable(opcode, context, arguments, full_method_name):
             JavaOpcodes.POP(),
         )
 
+    # TODO... do something with this annotation information
+    if opcode.annotations:
+        values = []
+        for argument in arguments[opcode.default_args + opcode.default_kwargs * 2:opcode.default_args + opcode.default_kwargs * 2 + opcode.annotations]:
+            values.append(extract_constant(argument))
+
+        # keys = extract_constant(arguments[opcode.default_args + opcode.default_kwargs * 2 + opcode.annotations])
+        # print("ANNOTATE: ", dict(zip(keys, values)))
+
     context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # closure
 
@@ -2946,7 +2962,6 @@ class LOAD_CLOSURE(Opcode):
     @property
     def product_count(self):
         return 1
-
 
 
 class LOAD_DEREF(Opcode):
