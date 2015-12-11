@@ -14,10 +14,6 @@ from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 class StaticBlock(Block):
 
-    @property
-    def has_void_return(self):
-        return True
-
     def transpile_setup(self):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
@@ -31,6 +27,11 @@ class StaticBlock(Block):
 
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
+        )
+
+    def transpile_teardown(self):
+        self.add_opcodes(
+            JavaOpcodes.RETURN(),
         )
 
     def store_name(self, name, use_locals):

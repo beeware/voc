@@ -18,10 +18,6 @@ from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 class ClassBlock(Block):
     @property
-    def has_void_return(self):
-        return True
-
-    @property
     def descriptor(self):
         return self.parent.descriptor
 
@@ -92,6 +88,11 @@ class ClassBlock(Block):
         self.klass.add_method(method)
 
         return method
+
+    def transpile_teardown(self):
+        self.add_opcodes(
+            JavaOpcodes.RETURN()
+        )
 
 
 class Class(Block):

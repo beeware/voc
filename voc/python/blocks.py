@@ -30,7 +30,9 @@ class Block:
         self.loops = []
         self.jump_targets = {}
         self.unknown_jump_targets = {}
-
+        self.returns = {
+            'annotation': None
+        }
         self.next_resolve_list = []
         self.next_opcode_starts_line = None
 
@@ -90,10 +92,6 @@ class Block:
     def can_ignore_empty(self):
         return False
 
-    @property
-    def has_void_return(self):
-        return False
-
     def add_opcodes(self, *opcodes):
         # Add the opcodes to the code list and process them.
         for opcode in opcodes:
@@ -125,52 +123,6 @@ class Block:
                 max_depth = depth
         return max_depth
 
-    def void_return(self):
-        """Ensure that end of the code sequence is a Java-style return of void.
-
-        Java has a separate opcode for VOID returns, which is different to
-        RETURN NULL. Replace all "SET NULL" "ARETURN" pairs with "RETURN".
-        """
-
-        if len(self.code) >= 2:
-            new_code = []
-            i = 0
-            while i < len(self.code):
-                if (isinstance(self.code[i], JavaOpcodes.GETSTATIC)
-                        and self.code[i].field.class_name == 'org/python/types/NoneType'):
-
-                    if isinstance(self.code[i + 1], JavaOpcodes.ARETURN):
-                        return_opcode = JavaOpcodes.RETURN()
-
-                        # Update the jump operation to point at the new return opcode.
-                        for opcode in self.code[-1].references:
-                            opcode.jump_op = return_opcode
-                            return_opcode.references.append(opcode)
-
-                        for opcode in self.code[-2].references:
-                            opcode.jump_op = return_opcode
-                            return_opcode.references.append(opcode)
-
-                        # Then, check to see if either opcode had a line number association.
-                        # if so, preserve the first one.
-                        if self.code[-2].starts_line is not None:
-                            return_opcode.starts_line = self.code[-2].starts_line
-                        elif self.code[-1].starts_line is not None:
-                            return_opcode.starts_line = self.code[-1].starts_line
-
-                        new_code.append(return_opcode)
-                        i += 1
-                    else:
-                        new_code.append(self.code[i])
-                else:
-                    new_code.append(self.code[i])
-                i += 1
-
-            self.code = new_code
-
-    def add_return(self):
-        self.add_opcodes(JavaOpcodes.RETURN())
-
     def materialize(self):
         for cmd in self.commands:
             cmd.materialize(self)
@@ -193,11 +145,6 @@ class Block:
 
         # Insert content that needs to occur after the main block commands
         self.transpile_teardown()
-
-        # Java requires that every body of code finishes with a return.
-        # Make sure there is one.
-        if len(self.code) == 0 or not isinstance(self.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
-            self.add_return()
 
         # Make sure every local variable slot has been initialized
         # as an object. This is needed because Python allows a variable
@@ -240,9 +187,9 @@ class Block:
             elif len(self.code) == 2 and isinstance(self.code[1], JavaOpcodes.ARETURN):
                 raise IgnoreBlock()
 
-        # If the block has a void return, make sure that is honored.
-        if self.has_void_return:
-            self.void_return()
+        # # If the block has a void return, make sure that is honored.
+        # if self.has_void_return:
+        #     self.void_return()
 
         # Now that we have a complete opcode list, postprocess the list
         # with the known offsets.

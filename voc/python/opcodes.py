@@ -693,6 +693,78 @@ def IINC_name(context, name, value):
     return JavaOpcodes.IINC(index, value)
 
 
+def LLOAD_name(context, name):
+    """Generate the opcode to load a long variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD LVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.LLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.LLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.LLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.LLOAD_3()
+    else:
+        return JavaOpcodes.LLOAD(index)
+
+
+def FLOAD_name(context, name):
+    """Generate the opcode to load a float variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD FVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.FLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.FLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.FLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.FLOAD_3()
+    else:
+        return JavaOpcodes.FLOAD(index)
+
+
+def DLOAD_name(context, name):
+    """Generate the opcode to load a double variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD LVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.DLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.DLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.DLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.DLOAD_3()
+    else:
+        return JavaOpcodes.DLOAD(index)
+
+
 def free_name(context, name):
     """Remove a name from the local variable pool
     """
@@ -1322,7 +1394,78 @@ class RETURN_VALUE(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
-        context.add_opcodes(JavaOpcodes.ARETURN())
+        return_type = context.returns['annotation']
+
+        if return_type is None:
+            context.add_opcodes(
+                JavaOpcodes.RETURN()
+            )
+        elif return_type == 'bool':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+                JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'byte':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+                JavaOpcodes.L2I(),
+                JavaOpcodes.I2B(),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'char':
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
+                JavaOpcodes.CHECKCAST('java/lang/String'),
+                ICONST_val(0),
+                JavaOpcodes.INVOKEVIRTUAL('java/lang/String', 'charAt', '(I)C'),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'short':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+                JavaOpcodes.L2I(),
+                JavaOpcodes.I2S(),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'int':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+                JavaOpcodes.L2I(),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'long':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+                JavaOpcodes.LRETURN(),
+            )
+        elif return_type == 'float':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Float'),
+                JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
+                JavaOpcodes.DTOF(),
+                JavaOpcodes.FRETURN(),
+            )
+        elif return_type == 'double':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Float'),
+                JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
+                JavaOpcodes.DRETURN(),
+            )
+        elif return_type != 'org/python/Object':
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
+                JavaOpcodes.CHECKCAST(return_type.replace('.', '/')),
+                JavaOpcodes.ARETURN(),
+            )
+        else:
+            context.add_opcodes(
+                JavaOpcodes.ARETURN()
+            )
 
 
 class IMPORT_STAR(Opcode):
@@ -2815,7 +2958,49 @@ def add_callable(opcode, context, arguments, full_method_name):
         context.add_opcodes(
             JavaOpcodes.DUP(),
             ICONST_val(i),
-            JavaOpcodes.LDC_W(Classref('Lorg/python/Object;')),
+        )
+
+        annotation = param.get('annotation', 'org/python/Object')
+        if annotation is None:
+            raise Exception("Arguments cannot be void")
+        elif annotation == "bool":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Boolean', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "byte":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Byte', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == 'char':
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Char', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "short":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Short', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "int":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Integer', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "long":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Long', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "float":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Float', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "double":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Double', 'TYPE', 'Ljava/lang/Class;')
+            )
+        else:
+            context.add_opcodes(
+                JavaOpcodes.LDC_W(Classref("L%s;" % annotation)),
+            )
+
+        context.add_opcodes(
             JavaOpcodes.AASTORE(),
         )
 
