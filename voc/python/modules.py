@@ -89,8 +89,17 @@ class StaticBlock(Block):
     def module(self):
         return self.parent
 
-    def add_method(self, method_name, code):
-        method = Method(self.module, method_name, extract_parameters(code), static=True, code=code)
+    def add_method(self, method_name, code, annotations):
+        method = Method(
+            self.module,
+            name=method_name,
+            parameters=extract_parameters(code, annotations),
+            returns={
+                'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+            },
+            static=True,
+            code=code
+        )
         method.extract(code)
         self.module.methods.append(method)
         return method

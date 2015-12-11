@@ -75,12 +75,19 @@ class ClassBlock(Block):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-    def add_method(self, full_method_name, code):
+    def add_method(self, full_method_name, code, annotations):
         class_name, method_name = full_method_name.split('.')
         if class_name != self.klass.name:
             raise Exception("Method %s being added to %s!" % (full_method_name, self.klass.name))
 
-        method = InstanceMethod(self.klass, method_name, extract_parameters(code), code=code)
+        method = InstanceMethod(
+            self.klass,
+            name=method_name,
+            parameters=extract_parameters(code, annotations),
+            returns={
+                'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+            },
+            code=code)
         method.extract(code)
         self.klass.add_method(method)
 

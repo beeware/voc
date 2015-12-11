@@ -22,6 +22,29 @@ CO_VARARGS = 0x0004
 CO_VARKEYWORDS = 0x0008
 
 
+def descriptor(annotation):
+    if annotation == "bool":
+        return "Z"
+    elif annotation == "byte":
+        return "B"
+    elif annotation == 'char':
+        return "C"
+    elif annotation == "short":
+        return "S"
+    elif annotation == "int":
+        return "I"
+    elif annotation == "long":
+        return "J"
+    elif annotation == "float":
+        return "F"
+    elif annotation == "double":
+        return "D"
+    elif annotation is None:
+        return "V"
+    else:
+        return "L%s;" % annotation.replace('.', '/')
+
+
 class Method(Block):
     def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
         super().__init__(parent, commands=commands)
@@ -29,7 +52,9 @@ class Method(Block):
         self.parameters = parameters
 
         if returns is None:
-            self.returns = {}
+            self.returns = {
+                'annotation': 'org/python/Object'
+            }
         else:
             self.returns = returns
 
@@ -117,7 +142,7 @@ class Method(Block):
 
     @property
     def has_void_return(self):
-        return self.returns.get('annotation', object()) is None or self.name == '__init__'
+        return self.returns.get('annotation', object()) is None
 
     @property
     def can_ignore_empty(self):
@@ -131,9 +156,9 @@ class Method(Block):
 
     @property
     def signature(self):
-        return_descriptor = 'V' if self.has_void_return else 'Lorg/python/Object;'
+        return_descriptor = descriptor(self.returns.get('annotation'))
         return '(%s)%s' % (
-            ''.join('Lorg/python/Object;' for p in self.parameters[self.self_offset:]),
+            ''.join(descriptor(p['annotation']) for p in self.parameters[self.self_offset:]),
             return_descriptor
         )
 
@@ -152,7 +177,7 @@ class Method(Block):
     def add_self(self):
         pass
 
-    def add_method(self, method_name, code):
+    def add_method(self, method_name, code, annotations):
         # If a method is added to a method, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
@@ -166,7 +191,15 @@ class Method(Block):
             final=True,
         )
 
-        method = ClosureMethod(callable, 'invoke', extract_parameters(code), code=code)
+        method = ClosureMethod(
+            callable,
+            name='invoke',
+            parameters=extract_parameters(code, annotations),
+            returns={
+                'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+            },
+            code=code
+        )
         method.extract(code)
         callable.methods.append(method)
 
@@ -509,11 +542,10 @@ class ClosureMethod(Method):
     #     self.code = setup + self.code
 
 
-def extract_parameters(code):
+def extract_parameters(code, annotations):
     pos_count = code.co_argcount
     arg_names = code.co_varnames
     keyword_only_count = code.co_kwonlyargcount
-    annotations = {}  # func.__annotations__
 
     parameters = []
 
@@ -521,14 +553,14 @@ def extract_parameters(code):
     for offset, name in enumerate(arg_names[0:pos_count]):
         parameters.append({
             'name': name,
-            'annotation': annotations.get(name),
+            'annotation': annotations.get(name, 'org.python.Object'),
             'kind': POSITIONAL_OR_KEYWORD,
         })
 
     # *args
     if code.co_flags & CO_VARARGS:
         name = arg_names[pos_count + keyword_only_count]
-        annotation = annotations.get(name)
+        annotation = annotations.get(name, 'org.python.Object')
         parameters.append({
             'name': name,
             'annotation': annotation,
@@ -539,7 +571,7 @@ def extract_parameters(code):
     for name in arg_names[pos_count:pos_count + keyword_only_count]:
         parameters.append({
             'name': name,
-            'annotation': annotations.get(name),
+            'annotation': annotations.get(name, 'org.python.Object'),
             'kind': KEYWORD_ONLY,
         })
 
@@ -552,7 +584,7 @@ def extract_parameters(code):
         name = arg_names[index]
         parameters.append({
             'name': name,
-            'annotation': annotations.get(name),
+            'annotation': annotations.get(name, 'org.python.Object'),
             'kind': VAR_KEYWORD
         })
 

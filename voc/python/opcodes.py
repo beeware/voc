@@ -2607,7 +2607,17 @@ class MAKE_FUNCTION(Opcode):
         if full_method_name == '<listcomp>':
             full_method_name = 'listcomp_%x' % id(self)
 
-        self.method = context.add_method(full_method_name, code)
+        # TODO... do something with this annotation information
+        annotations = {}
+        if self.annotations:
+            values = []
+            for argument in arguments[self.default_args + self.default_kwargs * 2:self.default_args + self.default_kwargs * 2 + self.annotations]:
+                values.append(extract_constant(argument))
+
+            keys = extract_constant(arguments[self.default_args + self.default_kwargs * 2 + self.annotations])
+            annotations = dict(zip(keys, values))
+
+        self.method = context.add_method(full_method_name, code=code, annotations=annotations)
 
     def convert(self, context, arguments):
         full_method_name = arguments[-1].operation.const
@@ -2861,15 +2871,6 @@ def add_callable(opcode, context, arguments, full_method_name):
             JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP(),
         )
-
-    # TODO... do something with this annotation information
-    if opcode.annotations:
-        values = []
-        for argument in arguments[opcode.default_args + opcode.default_kwargs * 2:opcode.default_args + opcode.default_kwargs * 2 + opcode.annotations]:
-            values.append(extract_constant(argument))
-
-        # keys = extract_constant(arguments[opcode.default_args + opcode.default_kwargs * 2 + opcode.annotations])
-        # print("ANNOTATE: ", dict(zip(keys, values)))
 
     context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # closure
