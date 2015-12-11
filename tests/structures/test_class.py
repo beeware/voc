@@ -65,7 +65,7 @@ class ClassTests(TranspileTestCase):
                     self.y = y
 
                 def __str__(self):
-                    return "Myobject instance %s, %s" % (x, y)
+                    return "Myobject instance %s, %s" % (self.x, self.y)
 
                 def second(self):
                     return self.x * self.y
