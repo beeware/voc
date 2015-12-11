@@ -79,7 +79,7 @@ public class ImportLib {
                     try {
                         if (native_import) {
                             java.lang.Class java_class = java.lang.Class.forName(java_name.toString().replace("/", ".") + name);
-                            parent_module.__setattr__(name, new org.python.java.Type(java_class));
+                            parent_module.__setattr__(name, org.python.java.Type.pythonType(java_class));
                         } else {
                             python_module = importPythonModule(java_name.toString() + name);
                             parent_module.__setattr__(name, python_module);

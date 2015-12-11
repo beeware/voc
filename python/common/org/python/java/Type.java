@@ -1,9 +1,24 @@
 package org.python.java;
 
 public class Type extends org.python.types.Type implements org.python.Callable {
+    java.util.Map<java.lang.String, java.lang.reflect.Constructor> constructors;
 
     public Type(java.lang.Class klass) {
         super(klass, org.python.types.Type.Origin.JAVA);
+
+        this.constructors = new java.util.HashMap<java.lang.String, java.lang.reflect.Constructor>();
+        for (java.lang.reflect.Constructor constructor: klass.getConstructors()) {
+            java.lang.StringBuilder signature = new java.lang.StringBuilder();
+
+            for (java.lang.Class c: constructor.getParameterTypes()) {
+                signature.append(org.python.java.Function.descriptor(c, false));
+            }
+
+            this.constructors.put(
+                signature.toString(),
+                constructor
+            );
+        }
     }
 
     public org.python.Object __getattribute_null(java.lang.String name) {
@@ -59,14 +74,19 @@ public class Type extends org.python.types.Type implements org.python.Callable {
             //     System.out.println("  " + argname + " = " + kwargs.get(argname));
             // }
 
-            // FIXME: Get the constructor matching the args.
-            java.lang.reflect.Constructor constructor = this.klass.getConstructor();
+            java.lang.reflect.Constructor constructor = org.python.java.Function.selectMethod(this.constructors, args, kwargs);
 
-            return new org.python.java.Object(constructor.newInstance());
+            // If there is still no match, raise an error.
+            if (constructor == null) {
+                throw new org.python.exceptions.RuntimeError(String.format("Parameter mismatch calling native Java constructor."));
+            }
+
+            java.lang.Object [] adjusted_args = org.python.java.Function.adjustArguments(constructor, args, kwargs);
+
+            return new org.python.java.Object(constructor.newInstance(adjusted_args));
+
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to native Java constructor for " + this.klass);
-        } catch (java.lang.NoSuchMethodException e) {
-            throw new org.python.exceptions.RuntimeError("Couldn't find native Java constructor for " + this.klass);
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
                 // e.getTargetException().printStackTrace();
