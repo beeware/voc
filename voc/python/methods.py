@@ -9,8 +9,8 @@ from ..java import (
 from .blocks import Block
 from .opcodes import (
     ALOAD_name, ASTORE_name, free_name,
-    ICONST_val,
-    Opcode, TRY, CATCH, END_TRY, IF, END_IF
+    ILOAD_name, FLOAD_name, DLOAD_name,
+    Opcode, TRY, CATCH, END_TRY
 )
 
 POSITIONAL_OR_KEYWORD = 1
@@ -22,6 +22,29 @@ CO_VARARGS = 0x0004
 CO_VARKEYWORDS = 0x0008
 
 
+def descriptor(annotation):
+    if annotation == "bool":
+        return "Z"
+    elif annotation == "byte":
+        return "B"
+    elif annotation == 'char':
+        return "C"
+    elif annotation == "short":
+        return "S"
+    elif annotation == "int":
+        return "I"
+    elif annotation == "long":
+        return "J"
+    elif annotation == "float":
+        return "F"
+    elif annotation == "double":
+        return "D"
+    elif annotation is None:
+        return "V"
+    else:
+        return "L%s;" % annotation
+
+
 class Method(Block):
     def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
         super().__init__(parent, commands=commands)
@@ -29,7 +52,9 @@ class Method(Block):
         self.parameters = parameters
 
         if returns is None:
-            self.returns = {}
+            self.returns = {
+                'annotation': 'org/python/Object'
+            }
         else:
             self.returns = returns
 
@@ -112,28 +137,19 @@ class Method(Block):
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
                 JavaOpcodes.LDC_W(name),
+
                 JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
             )
-
-    @property
-    def has_void_return(self):
-        return self.returns.get('annotation', object()) is None or self.name == '__init__'
 
     @property
     def can_ignore_empty(self):
         return False
 
-    def add_return(self):
-        if self.has_void_return:
-            self.add_opcodes(JavaOpcodes.RETURN())
-        else:
-            self.add_opcodes(JavaOpcodes.ARETURN())
-
     @property
     def signature(self):
-        return_descriptor = 'V' if self.has_void_return else 'Lorg/python/Object;'
+        return_descriptor = descriptor(self.returns.get('annotation'))
         return '(%s)%s' % (
-            ''.join('Lorg/python/Object;' for p in self.parameters[self.self_offset:]),
+            ''.join(descriptor(p['annotation']) for p in self.parameters[self.self_offset:]),
             return_descriptor
         )
 
@@ -152,7 +168,7 @@ class Method(Block):
     def add_self(self):
         pass
 
-    def add_method(self, method_name, code):
+    def add_method(self, method_name, code, annotations):
         # If a method is added to a method, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
@@ -160,13 +176,21 @@ class Method(Block):
             parent=self.parent,
             name='%s$%s' % (self.parent.name, method_name.replace('.<locals>.', '$')),
             closure_var_names=code.co_names,
-            super_name='org/python/types/Closure',
-            interfaces=['org/python/Callable'],
+            extends='org/python/types/Closure',
+            implements=['org/python/Callable'],
             public=True,
             final=True,
         )
 
-        method = ClosureMethod(callable, 'invoke', extract_parameters(code), code=code)
+        method = ClosureMethod(
+            callable,
+            name='invoke',
+            parameters=extract_parameters(code, annotations),
+            returns={
+                'annotation': annotations.get('return', 'org/python/Object').replace('.', '/')
+            },
+            code=code
+        )
         method.extract(code)
         callable.methods.append(method)
 
@@ -181,12 +205,92 @@ class Method(Block):
 
     def transpile_args(self):
         for i, param in enumerate(self.parameters[self.self_offset:]):
-            self.add_opcodes(
-                ALOAD_name(self, param['name']),
-            )
+            annotation = param.get('annotation', 'org/python/Object')
+
+            if annotation is None:
+                raise Exception("Arguments can't be void")
+            elif annotation == "bool":
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Bool'),
+                    JavaOpcodes.DUP(),
+                    ILOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif annotation == "byte":
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
+                    ILOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(B)V'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif annotation == 'char':
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Str'),
+                    JavaOpcodes.DUP(),
+                    ILOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(C)V'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif annotation == "short":
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
+                    ILOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(S)V'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif annotation == "int":
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
+                    ILOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif annotation == "long":
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
+                    ILOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif annotation == "float":
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Float'),
+                    JavaOpcodes.DUP(),
+                    FLOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(F)V'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif annotation == "double":
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Float'),
+                    JavaOpcodes.DUP(),
+                    DLOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
+                    ASTORE_name(self, param['name']),
+                )
+            elif annotation != 'org/python/Object':
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/java/Object'),
+                    JavaOpcodes.DUP(),
+                    ALOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(F)V'),
+                    ASTORE_name(self, param['name']),
+                )
 
     def transpile_setup(self):
         self.transpile_args()
+
+    def transpile_teardown(self):
+        if len(self.code) == 0 or not isinstance(self.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
+            if self.returns.get('annotation') is None:
+                self.add_opcodes(JavaOpcodes.RETURN())
+            else:
+                self.add_opcodes(JavaOpcodes.ARETURN())
 
     def method_attributes(self):
         return [
@@ -248,10 +352,6 @@ class InitMethod(Method):
         return self.klass.module
 
     @property
-    def has_void_return(self):
-        return True
-
-    @property
     def can_ignore_empty(self):
         return False
 
@@ -267,10 +367,9 @@ class InitMethod(Method):
         self.local_vars['self'] = len(self.local_vars)
 
     def transpile_setup(self):
-
         self.add_opcodes(
             JavaOpcodes.ALOAD_0(),
-            JavaOpcodes.INVOKESPECIAL(self.klass.super_name, '<init>', '()V'),
+            JavaOpcodes.INVOKESPECIAL(self.klass.extends, '<init>', '()V'),
         )
 
         self.add_opcodes(
@@ -278,7 +377,6 @@ class InitMethod(Method):
                 JavaOpcodes.ALOAD_0(),
                 JavaOpcodes.LDC_W('__init__'),
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
-
         )
 
         for i, param in enumerate(self.parameters[self.self_offset:]):
@@ -292,9 +390,10 @@ class InitMethod(Method):
             END_TRY(),
         )
 
-    def method_attributes(self):
-        return [
-        ]
+    def transpile_teardown(self):
+        self.add_opcodes(
+            JavaOpcodes.RETURN()
+        )
 
 
 class InstanceMethod(Method):
@@ -355,10 +454,6 @@ class MainMethod(Method):
         return '([Ljava/lang/String;)V'
 
     @property
-    def has_void_return(self):
-        return True
-
-    @property
     def can_ignore_empty(self):
         return True
 
@@ -368,20 +463,6 @@ class MainMethod(Method):
 
     def add_self(self):
         pass
-
-    def add_return(self):
-        # Main method is a special case - it always returns Null,
-        # but the code doesn't contain this return, so the jump
-        # target doesn't exist. Fake a jump target for the return
-        if self.end_offset:
-            python_op = Opcode(self.end_offset, None, True)
-            java_op = JavaOpcodes.RETURN()
-            python_op.start_op = java_op
-            self.jump_targets[self.end_offset] = python_op
-        else:
-            java_op = JavaOpcodes.RETURN()
-
-        self.add_opcodes(java_op)
 
     def store_name(self, name, use_locals):
         self.add_opcodes(
@@ -455,6 +536,18 @@ class MainMethod(Method):
             )
 
     def transpile_teardown(self):
+        # Main method is a special case - it always returns Null,
+        # but the code doesn't contain this return, so the jump
+        # target doesn't exist. Fake a jump target for the return
+        java_op = JavaOpcodes.RETURN()
+
+        if self.end_offset:
+            python_op = Opcode(self.end_offset, None, True)
+            python_op.start_op = java_op
+            self.jump_targets[self.end_offset] = python_op
+
+        self.add_opcodes(java_op)
+
         # If there are any commands in this main method,
         # finish the TRY-CATCH for SystemExit
         if self.commands:
@@ -462,7 +555,8 @@ class MainMethod(Method):
                 CATCH('org/python/exceptions/SystemExit'),
                     JavaOpcodes.GETFIELD('org/python/exceptions/SystemExit', 'return_code', 'I'),
                     JavaOpcodes.INVOKESTATIC('java/lang/System', 'exit', '(I)V'),
-                END_TRY()
+                END_TRY(),
+                JavaOpcodes.RETURN()
             )
 
     def method_attributes(self):
@@ -509,11 +603,10 @@ class ClosureMethod(Method):
     #     self.code = setup + self.code
 
 
-def extract_parameters(code):
+def extract_parameters(code, annotations):
     pos_count = code.co_argcount
     arg_names = code.co_varnames
     keyword_only_count = code.co_kwonlyargcount
-    annotations = {}  # func.__annotations__
 
     parameters = []
 
@@ -521,14 +614,14 @@ def extract_parameters(code):
     for offset, name in enumerate(arg_names[0:pos_count]):
         parameters.append({
             'name': name,
-            'annotation': annotations.get(name),
+            'annotation': annotations.get(name, 'org/python/Object'),
             'kind': POSITIONAL_OR_KEYWORD,
         })
 
     # *args
     if code.co_flags & CO_VARARGS:
         name = arg_names[pos_count + keyword_only_count]
-        annotation = annotations.get(name)
+        annotation = annotations.get(name, 'org/python/Object')
         parameters.append({
             'name': name,
             'annotation': annotation,
@@ -539,7 +632,7 @@ def extract_parameters(code):
     for name in arg_names[pos_count:pos_count + keyword_only_count]:
         parameters.append({
             'name': name,
-            'annotation': annotations.get(name),
+            'annotation': annotations.get(name, 'org/python/Object'),
             'kind': KEYWORD_ONLY,
         })
 
@@ -552,7 +645,7 @@ def extract_parameters(code):
         name = arg_names[index]
         parameters.append({
             'name': name,
-            'annotation': annotations.get(name),
+            'annotation': annotations.get(name, 'org/python/Object'),
             'kind': VAR_KEYWORD
         })
 

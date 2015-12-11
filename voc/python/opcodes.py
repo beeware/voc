@@ -693,6 +693,78 @@ def IINC_name(context, name, value):
     return JavaOpcodes.IINC(index, value)
 
 
+def LLOAD_name(context, name):
+    """Generate the opcode to load a long variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD LVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.LLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.LLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.LLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.LLOAD_3()
+    else:
+        return JavaOpcodes.LLOAD(index)
+
+
+def FLOAD_name(context, name):
+    """Generate the opcode to load a float variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD FVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.FLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.FLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.FLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.FLOAD_3()
+    else:
+        return JavaOpcodes.FLOAD(index)
+
+
+def DLOAD_name(context, name):
+    """Generate the opcode to load a double variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD LVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.DLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.DLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.DLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.DLOAD_3()
+    else:
+        return JavaOpcodes.DLOAD(index)
+
+
 def free_name(context, name):
     """Remove a name from the local variable pool
     """
@@ -1322,7 +1394,78 @@ class RETURN_VALUE(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
-        context.add_opcodes(JavaOpcodes.ARETURN())
+        return_type = context.returns['annotation']
+
+        if return_type is None:
+            context.add_opcodes(
+                JavaOpcodes.RETURN()
+            )
+        elif return_type == 'bool':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+                JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'byte':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+                JavaOpcodes.L2I(),
+                JavaOpcodes.I2B(),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'char':
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
+                JavaOpcodes.CHECKCAST('java/lang/String'),
+                ICONST_val(0),
+                JavaOpcodes.INVOKEVIRTUAL('java/lang/String', 'charAt', '(I)C'),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'short':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+                JavaOpcodes.L2I(),
+                JavaOpcodes.I2S(),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'int':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+                JavaOpcodes.L2I(),
+                JavaOpcodes.IRETURN(),
+            )
+        elif return_type == 'long':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+                JavaOpcodes.LRETURN(),
+            )
+        elif return_type == 'float':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Float'),
+                JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
+                JavaOpcodes.DTOF(),
+                JavaOpcodes.FRETURN(),
+            )
+        elif return_type == 'double':
+            context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/types/Float'),
+                JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
+                JavaOpcodes.DRETURN(),
+            )
+        elif return_type != 'org/python/Object':
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
+                JavaOpcodes.CHECKCAST(return_type.replace('.', '/')),
+                JavaOpcodes.ARETURN(),
+            )
+        else:
+            context.add_opcodes(
+                JavaOpcodes.ARETURN()
+            )
 
 
 class IMPORT_STAR(Opcode):
@@ -2376,6 +2519,22 @@ class DELETE_FAST(Opcode):
 
 # class RAISE_VARARGS(Opcode):
 
+def extract_constant(arg):
+    if arg.operation.opname == 'LOAD_CONST':
+        value = arg.operation.const
+    elif arg.operation.opname == 'LOAD_NAME':
+        value = arg.operation.name
+    elif arg.operation.opname in ('BUILD_LIST', 'BUILD_TUPLE'):
+        value = [
+            extract_constant(a)
+            for a in arg.arguments
+        ]
+    elif arg.operation.opname == 'LOAD_ATTR':
+        value = '.'.join([extract_constant(arg.arguments[0]), arg.operation.name])
+    else:
+        raise Exception("Don't know how to extract constant from " + arg.operation.opname)
+    return value
+
 
 class CALL_FUNCTION(Opcode):
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
@@ -2401,15 +2560,37 @@ class CALL_FUNCTION(Opcode):
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # Construct a class.
             from .klass import Class
-            code = arguments[1].arguments[0].operation.const
-            class_name = arguments[1].arguments[1].operation.const
+            code = extract_constant(arguments[1].arguments[0])
+            class_name = extract_constant(arguments[2])
 
-            if len(arguments) == 4:
-                super_name = arguments[2].operation.const
-            else:
-                super_name = None
+            bases = [
+                extract_constant(arg).replace('.', '/')
+                for arg in arguments[3:self.args+1]
+            ]
 
-            self.klass = Class(context.parent, class_name, super_name=super_name)
+            extends = None
+            implements = []
+
+            for key_arg, value_arg in zip(arguments[self.args+1::2], arguments[self.args+2::2]):
+                key = extract_constant(key_arg)
+                value = extract_constant(value_arg)
+
+                if key == "metaclass":
+                    raise Exception("Can't handle metaclasses")
+                elif key == "extends":
+                    extends = value.replace('.', '/')
+                elif key == "implements":
+                    if isinstance(value, list):
+                        implements = [
+                            v.replace('.', '/')
+                            for v in value
+                        ]
+                    else:
+                        implements = [value.replace('.', '/')]
+                else:
+                    raise Exception("Unknown meta keyword " + str(key))
+
+            self.klass = Class(context.parent, class_name, bases=bases, extends=extends, implements=implements)
             self.klass.extract(code)
             context.parent.classes.append(self.klass)
 
@@ -2534,9 +2715,14 @@ class MAKE_FUNCTION(Opcode):
 
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.default_args = argc & 0xff
         self.default_kwargs = ((argc >> 8) & 0xFF)
         self.annotations = (argc >> 16) & 0x7FFF
+        self.default_args = argc & 0xff - self.annotations
+
+        # if we have annotations, the value wil be one more
+        # than it should be.
+        if self.annotations:
+            self.annotations = self.annotations - 1
 
     def __arg_repr__(self):
         return '%s default args, %s default kwargs, %s annotations' % (
@@ -2548,7 +2734,7 @@ class MAKE_FUNCTION(Opcode):
     @property
     def consume_count(self):
         if self.annotations:
-            return 2 + self.annotations
+            return 3 + self.annotations + self.default_args + (2 * self.default_kwargs)
         else:
             return 2 + self.default_args + (2 * self.default_kwargs)
 
@@ -2564,7 +2750,17 @@ class MAKE_FUNCTION(Opcode):
         if full_method_name == '<listcomp>':
             full_method_name = 'listcomp_%x' % id(self)
 
-        self.method = context.add_method(full_method_name, code)
+        # TODO... do something with this annotation information
+        annotations = {}
+        if self.annotations:
+            values = []
+            for argument in arguments[self.default_args + self.default_kwargs * 2:self.default_args + self.default_kwargs * 2 + self.annotations]:
+                values.append(extract_constant(argument))
+
+            keys = extract_constant(arguments[self.default_args + self.default_kwargs * 2 + self.annotations])
+            annotations = dict(zip(keys, values))
+
+        self.method = context.add_method(full_method_name, code=code, annotations=annotations)
 
     def convert(self, context, arguments):
         full_method_name = arguments[-1].operation.const
@@ -2762,7 +2958,49 @@ def add_callable(opcode, context, arguments, full_method_name):
         context.add_opcodes(
             JavaOpcodes.DUP(),
             ICONST_val(i),
-            JavaOpcodes.LDC_W(Classref('Lorg/python/Object;')),
+        )
+
+        annotation = param.get('annotation', 'org/python/Object')
+        if annotation is None:
+            raise Exception("Arguments cannot be void")
+        elif annotation == "bool":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Boolean', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "byte":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Byte', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == 'char':
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Char', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "short":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Short', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "int":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Integer', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "long":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Long', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "float":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Float', 'TYPE', 'Ljava/lang/Class;')
+            )
+        elif annotation == "double":
+            context.add_opcodes(
+                JavaOpcodes.GETSTATIC('java/lang/Double', 'TYPE', 'Ljava/lang/Class;')
+            )
+        else:
+            context.add_opcodes(
+                JavaOpcodes.LDC_W(Classref("L%s;" % annotation)),
+            )
+
+        context.add_opcodes(
             JavaOpcodes.AASTORE(),
         )
 
@@ -2910,7 +3148,6 @@ class LOAD_CLOSURE(Opcode):
     @property
     def product_count(self):
         return 1
-
 
 
 class LOAD_DEREF(Opcode):

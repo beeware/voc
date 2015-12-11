@@ -14,10 +14,6 @@ from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 class StaticBlock(Block):
 
-    @property
-    def has_void_return(self):
-        return True
-
     def transpile_setup(self):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
@@ -31,6 +27,11 @@ class StaticBlock(Block):
 
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP()
+        )
+
+    def transpile_teardown(self):
+        self.add_opcodes(
+            JavaOpcodes.RETURN(),
         )
 
     def store_name(self, name, use_locals):
@@ -89,8 +90,17 @@ class StaticBlock(Block):
     def module(self):
         return self.parent
 
-    def add_method(self, method_name, code):
-        method = Method(self.module, method_name, extract_parameters(code), static=True, code=code)
+    def add_method(self, method_name, code, annotations):
+        method = Method(
+            self.module,
+            name=method_name,
+            parameters=extract_parameters(code, annotations),
+            returns={
+                'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+            },
+            static=True,
+            code=code
+        )
         method.extract(code)
         self.module.methods.append(method)
         return method
@@ -195,7 +205,7 @@ class Module(Block):
         """
         # If there is any static content, generate a classfile
         # for this module
-        classfile = JavaClass(self.descriptor, supername='org/python/types/Module')
+        classfile = JavaClass(self.descriptor, extends='org/python/types/Module')
         classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
 
         # Add a static method to the module, populated with the
