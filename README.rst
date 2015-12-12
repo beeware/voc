@@ -44,11 +44,13 @@ What it does:
 
   * Importing and using native Java APIs
 
+  * Implementing Java interfaces.
+
 It *doesn't* currently support (this list is incomplete):
 
 * Subclassing Python classes
 
-* Extending native java classes and interfaces.
+* Extending native java classes.
 
 * Generators
 

@@ -4,7 +4,7 @@ from .transpiler import transpile
 
 def main():
     if len(sys.argv) == 2:
-        srcdir = None
+        srcdir = '.'
         outdir = None
     elif len(sys.argv) == 3:
         srcdir = sys.argv[2]

@@ -4,7 +4,7 @@ public class Function extends org.python.types.Object implements org.python.Call
     java.lang.String name;
     java.util.Map<java.lang.String, java.lang.reflect.Method> methods;
 
-    static java.lang.String descriptor(java.lang.Class klass, boolean weak) {
+    public static java.lang.String descriptor(java.lang.Class klass, boolean weak) {
         if (klass.getName().startsWith("[")) {
             return klass.getName();
         }
@@ -51,6 +51,41 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
     }
 
+    public static <T> T selectMethod(java.util.Map<java.lang.String, T> options, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        // System.out.println("Options " + options);
+        T method;
+        java.lang.StringBuilder signature = new java.lang.StringBuilder();
+        for (org.python.Object arg: args) {
+            signature.append(org.python.java.Function.descriptor(arg.toJava().getClass(), false));
+        }
+        // System.out.println("Signature " + signature.toString());
+        method = options.get(signature.toString());
+
+        // No match - need to try alternatives for signature.
+        if (method == null) {
+            signature = new java.lang.StringBuilder();
+            for (org.python.Object arg: args) {
+                signature.append(org.python.java.Function.descriptor(arg.toJava().getClass(), true));
+            }
+            // System.out.println("Signature " + signature.toString());
+            method = options.get(signature.toString());
+        }
+        return method;
+    }
+
+    public static <T> java.lang.Object [] adjustArguments(T method, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (kwargs.size() > 0) {
+            // TODO: This doesn't have to be so - we *could* introspect argument names.
+            throw new org.python.exceptions.RuntimeError("Cannot use kwargs to invoke a native Java method.");
+        }
+
+        java.lang.Object [] adjusted = new java.lang.Object [args.length];
+        for (int i = 0; i < args.length; i++) {
+            adjusted[i] = args[i].toJava();
+        }
+        return adjusted;
+    }
+
     public Function(java.lang.Class klass, java.lang.String name) {
         super();
         this.name = name;
@@ -92,45 +127,6 @@ public class Function extends org.python.types.Object implements org.python.Call
         return new org.python.java.Method(instance.toJava(), this);
     }
 
-    java.lang.reflect.Method selectMethod(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        // System.out.println("Options " + this.methods);
-        java.lang.reflect.Method method;
-        java.lang.StringBuilder signature = new java.lang.StringBuilder();
-        for (org.python.Object arg: args) {
-            signature.append(org.python.java.Function.descriptor(arg.toJava().getClass(), false));
-        }
-        // System.out.println("Signature " + signature.toString());
-        method = this.methods.get(signature.toString());
-
-        // No match - need to try alternatives for signature.
-        if (method == null) {
-            signature = new java.lang.StringBuilder();
-            for (org.python.Object arg: args) {
-                signature.append(org.python.java.Function.descriptor(arg.toJava().getClass(), true));
-            }
-            // System.out.println("Signature " + signature.toString());
-            method = this.methods.get(signature.toString());
-        }
-
-        // If there is still no match, raise an error.
-        if (method == null) {
-            throw new org.python.exceptions.RuntimeError(String.format("Parameter mismatch calling native Java method '%s'", this.name));
-        }
-        return method;
-    }
-
-    java.lang.Object [] adjustArguments(java.lang.reflect.Method method, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs.size() > 0) {
-            // TODO: This doesn't have to be so - we *could* introspect argument names.
-            throw new org.python.exceptions.RuntimeError("Cannot use kwargs to invoke a native Java method.");
-        }
-
-        java.lang.Object [] adjusted = new java.lang.Object [args.length];
-        for (int i = 0; i < args.length; i++) {
-            adjusted[i] = args[i].toJava();
-        }
-        return adjusted;
-    }
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return this.invoke(null, args, kwargs);
@@ -142,9 +138,14 @@ public class Function extends org.python.types.Object implements org.python.Call
             // System.out.println("           args:" + args);
             // System.out.println("         kwargs:" + kwargs);
 
-            java.lang.reflect.Method method = selectMethod(args, kwargs);
+            java.lang.reflect.Method method = org.python.java.Function.selectMethod(this.methods, args, kwargs);
 
-            java.lang.Object [] adjusted_args = adjustArguments(method, args, kwargs);
+            // If there is still no match, raise an error.
+            if (method == null) {
+                throw new org.python.exceptions.RuntimeError(String.format("Parameter mismatch calling native Java method '%s'", name));
+            }
+
+            java.lang.Object [] adjusted_args = org.python.java.Function.adjustArguments(method, args, kwargs);
 
             // System.out.println("Invoke method " + method + " with ");
             // System.out.print("           args:");
