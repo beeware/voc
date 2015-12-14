@@ -16,6 +16,39 @@ from voc.java.attributes import Code as JavaCode
 from voc.transpiler import Transpiler
 
 
+# A state variable to determine if the test environment has been configured.
+_suite_configured = False
+
+
+def setUpSuite():
+    """Configure the entire test suite.
+
+    This only needs to be run once, prior to the first test.
+    """
+    global _suite_configured
+    if _suite_configured:
+        return
+
+    proc = subprocess.Popen(
+        ["ant", "java"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+
+    try:
+        out, err = proc.communicate(timeout=15)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        out, err = proc.communicate()
+        raise
+
+    if proc.returncode != 0:
+        raise Exception("Error compiling java sources: " + out.decode('ascii'))
+
+    _suite_configured = True
+
+
 @contextlib.contextmanager
 def capture_output(redirect_stderr=True):
     oldout, olderr = sys.stdout, sys.stderr
@@ -177,6 +210,9 @@ def cleanse_python(input):
 
 
 class TranspileTestCase(TestCase):
+    def setUp(self):
+        setUpSuite()
+
     def assertBlock(self, python, java):
         self.maxDiff = None
         dump = False
