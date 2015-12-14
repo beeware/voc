@@ -109,7 +109,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_dict',
-        'test_multiply_float',
         'test_multiply_frozenset',
         'test_multiply_list',
         'test_multiply_set',
