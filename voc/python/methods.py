@@ -367,28 +367,36 @@ class InitMethod(Method):
         self.local_vars['self'] = len(self.local_vars)
 
     def transpile_setup(self):
-        self.add_opcodes(
-            JavaOpcodes.ALOAD_0(),
-            JavaOpcodes.INVOKESPECIAL(self.klass.extends, '<init>', '()V'),
-        )
-
-        self.add_opcodes(
-            TRY(),
-                JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.LDC_W('__init__'),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
-        )
-
-        for i, param in enumerate(self.parameters[self.self_offset:]):
+        if self.klass.extends:
             self.add_opcodes(
-                ALOAD_name(self, param['name']),
+                JavaOpcodes.ALOAD_0(),
+                JavaOpcodes.INVOKESPECIAL(self.klass.extends, '<init>', '()V'),
+            )
+        else:
+            super_class = 'org/python/types/Object'
+            self.add_opcodes(
+                JavaOpcodes.ALOAD_0(),
+                JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '()V'),
             )
 
-        self.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
-            CATCH('org/python/exceptions/AttributeError'),
-            END_TRY(),
-        )
+            for base in self.klass.bases:
+                self.add_opcodes(
+                    TRY(),
+                        JavaOpcodes.ALOAD_0(),
+                        JavaOpcodes.LDC_W('__init__'),
+                        JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+                )
+
+                for i, param in enumerate(self.parameters[self.self_offset:]):
+                    self.add_opcodes(
+                        ALOAD_name(self, param['name']),
+                    )
+
+                self.add_opcodes(
+                        JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+                    CATCH('org/python/exceptions/AttributeError'),
+                    END_TRY(),
+                )
 
     def transpile_teardown(self):
         self.add_opcodes(

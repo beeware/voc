@@ -1,13 +1,16 @@
 package org.python.java;
 
-public class Type extends org.python.types.Type implements org.python.Callable {
+public class Type extends org.python.types.Type {
     java.util.Map<java.lang.String, java.lang.reflect.Constructor> constructors;
 
     public Type(java.lang.Class klass) {
         super(klass, org.python.types.Type.Origin.JAVA);
 
+        // System.out.println("NATIVE TYPE " + klass);
+
         this.constructors = new java.util.HashMap<java.lang.String, java.lang.reflect.Constructor>();
         for (java.lang.reflect.Constructor constructor: klass.getConstructors()) {
+            // System.out.println("Found constructor " + constructor);
             java.lang.StringBuilder signature = new java.lang.StringBuilder();
 
             for (java.lang.Class c: constructor.getParameterTypes()) {
@@ -19,6 +22,7 @@ public class Type extends org.python.types.Type implements org.python.Callable {
                 constructor
             );
         }
+        // System.out.println("Constructors: " + this.constructors);
     }
 
     public org.python.Object __getattribute_null(java.lang.String name) {

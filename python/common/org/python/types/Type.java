@@ -1,9 +1,11 @@
 package org.python.types;
 
-public class Type extends org.python.types.Object {
+public class Type extends org.python.types.Object implements org.python.Callable {
     public enum Origin {PLACEHOLDER, BUILTIN, PYTHON, JAVA};
     public java.lang.String PYTHON_TYPE_NAME;
     private static java.util.Map<java.lang.Class, org.python.types.Type> known_types = new java.util.HashMap<java.lang.Class, org.python.types.Type>();
+
+    java.lang.reflect.Constructor constructor;
 
     /**
      * Factory method to obtain Python classes from their Java counterparts
@@ -48,31 +50,23 @@ public class Type extends org.python.types.Object {
         }
     }
 
+    /**
+     * Convert a Java instance into the a Python-wrapped type.
+     *
+     * This means converting:
+     *    * `null` into a None
+     *    * Returning any object that already implements org.python.Object as itself.
+     *    * Wrapping any other object in a org.python.java.Object wrapper.
+     */
     public static org.python.Object toPython(java.lang.Object value) {
-        if (org.python.Object.class.isAssignableFrom(value.getClass())) {
-            try {
-                org.python.types.Type python_type = org.python.types.Type.pythonType(value.getClass());
-                java.lang.reflect.Constructor constructor = python_type.klass.getConstructor(value.getClass());
-                return (org.python.Object) constructor.newInstance(value);
-            } catch (java.lang.NoSuchMethodException e) {
-                throw new org.python.exceptions.RuntimeError("Couldn't find toPython() compatible constructor for " + value);
-            } catch (java.lang.IllegalAccessException e) {
-                throw new org.python.exceptions.RuntimeError("Invalid access to toPython() compatible constructor for " + value);
-            } catch (java.lang.reflect.InvocationTargetException e) {
-                try {
-                    // e.getTargetException().printStackTrace();
-                    // If the Java method raised an Python exception, re-raise that
-                    // exception as-is. If it wasn"t a Python exception, wrap it
-                    // as one and continue.
-                    throw (org.python.exceptions.BaseException) e.getCause();
-                } catch (ClassCastException java_e) {
-                    throw new org.python.exceptions.RuntimeError(e.getCause().getMessage());
-                }
-            } catch (java.lang.InstantiationException e) {
-                throw new org.python.exceptions.RuntimeError("Couldn't instantiate Python() compatible constructor for " + value);
-            }
+        if (value == null) {
+            return org.python.types.NoneType.NONE;
         } else {
-            return new org.python.java.Object(value);
+            if (org.python.Object.class.isAssignableFrom(value.getClass())) {
+                return (org.python.Object) value;
+            } else {
+                return new org.python.java.Object(value);
+            }
         }
     }
 
@@ -101,6 +95,12 @@ public class Type extends org.python.types.Object {
 
         if (origin == Origin.BUILTIN) {
             org.Python.initializeModule(klass, this.attrs);
+        } else if (origin == Origin.PYTHON) {
+            try {
+                this.constructor = this.klass.getConstructor(org.python.Object[].class, java.util.Map.class);
+            } catch (java.lang.NoSuchMethodException e) {
+                this.constructor = null;
+            }
         }
     }
 
@@ -161,5 +161,42 @@ public class Type extends org.python.types.Object {
 
         this.attrs.put(name, value);
         return true;
+    }
+
+    public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        try {
+            // System.out.println("CONSTRUCTOR :" + this.constructor);
+            // System.out.println("TYPE: " + this);
+            // System.out.println("ARGS:");
+            // for (org.python.Object arg: args) {
+            //     System.out.println("  " + arg);
+            // }
+
+            // System.out.println("KWARGS:");
+            // for (java.lang.String argname: kwargs.keySet()) {
+            //     System.out.println("  " + argname + " = " + kwargs.get(argname));
+            // }
+            if (this.constructor != null) {
+                return (org.python.Object) this.constructor.newInstance(args, kwargs);
+            } else {
+                throw new org.python.exceptions.RuntimeError("No Python-compatible constructor for type " + this.klass);
+            }
+        } catch (java.lang.IllegalAccessException e) {
+            throw new org.python.exceptions.RuntimeError("Illegal access to Java constructor " + this.constructor);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            try {
+                // e.getTargetException().printStackTrace();
+                // If the Java method raised an Python exception, re-raise that
+                // exception as-is. If it wasn't a Python exception, wrap it
+                // as one and continue.
+                throw (org.python.exceptions.BaseException) e.getCause();
+            } catch (ClassCastException java_e) {
+                throw new org.python.exceptions.RuntimeError(e.getCause().toString());
+            }
+        } catch (java.lang.InstantiationException e) {
+            throw new org.python.exceptions.RuntimeError(e.getCause().toString());
+        } finally {
+        //     System.out.println("CONSTRUCTOR DONE");
+        }
     }
 }

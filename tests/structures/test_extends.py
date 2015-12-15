@@ -16,9 +16,9 @@ class ExtendsTests(TranspileTestCase):
 
             mymap = MyHashMap()
 
-            mymap.put("X", "Y")
+            mymap.put("The answer", "42")
 
-            print(mymap.get("X"))
+            print(mymap.get("The answer"))
             print("The machine goes " + mymap.push_button())
             print("Done.")
             """,
