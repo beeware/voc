@@ -144,6 +144,9 @@ class Class(Block):
         for method in self.methods:
             method.materialize()
 
+        # Add a flag to indicate this was a VOC generated class.
+        self.fields["__VOC__"] = "Z"
+
     def transpile(self):
         classfile = JavaClass(
             self.descriptor,

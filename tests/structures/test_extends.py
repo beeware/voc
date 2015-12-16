@@ -4,7 +4,6 @@ from ..utils import TranspileTestCase
 
 
 class ExtendsTests(TranspileTestCase):
-    @expectedFailure
     def test_extends(self):
         self.assertJavaExecution(
             """
@@ -23,6 +22,7 @@ class ExtendsTests(TranspileTestCase):
             print("Done.")
             """,
             """
-            Hello, world
+            42
+            The machine goes Bing!
             Done.
             """, run_in_function=False)

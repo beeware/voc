@@ -1,11 +1,12 @@
 package org.python.types;
 
 public class Type extends org.python.types.Object implements org.python.Callable {
-    public enum Origin {PLACEHOLDER, BUILTIN, PYTHON, JAVA};
+    public enum Origin {PLACEHOLDER, BUILTIN, PYTHON, JAVA, EXTENSION};
     public java.lang.String PYTHON_TYPE_NAME;
     private static java.util.Map<java.lang.Class, org.python.types.Type> known_types = new java.util.HashMap<java.lang.Class, org.python.types.Type>();
 
-    java.lang.reflect.Constructor constructor;
+    public java.lang.reflect.Constructor constructor;
+    public java.lang.Class klass;
 
     /**
      * Factory method to obtain Python classes from their Java counterparts
@@ -24,12 +25,17 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // otherwise, wrap it as a native Java type.
             if (org.python.Object.class.isAssignableFrom(java_class)) {
                 if (java_class.getName().startsWith("org.python.types.")) {
-                    python_type = new org.python.types.Type(java_class, Origin.BUILTIN);
+                    python_type = new org.python.types.Type(Origin.BUILTIN, java_class);
                 } else {
-                    python_type = new org.python.types.Type(java_class, Origin.PYTHON);
+                    python_type = new org.python.types.Type(Origin.PYTHON, java_class);
                 }
             } else {
-                python_type = new org.python.java.Type(java_class);
+                try {
+                    java_class.getField("__VOC__");
+                    python_type = new org.python.java.Type(Origin.EXTENSION, java_class);
+                } catch (NoSuchFieldException e) {
+                    python_type = new org.python.java.Type(Origin.JAVA, java_class);
+                }
             }
             known_types.put(java_class, python_type);
 
@@ -62,16 +68,52 @@ public class Type extends org.python.types.Object implements org.python.Callable
         if (value == null) {
             return org.python.types.NoneType.NONE;
         } else {
-            if (org.python.Object.class.isAssignableFrom(value.getClass())) {
-                return (org.python.Object) value;
-            } else {
-                return new org.python.java.Object(value);
+            switch (value.getClass().getName()) {
+                case "boolean":
+                case "java.lang.Boolean":
+                    return new org.python.types.Bool((boolean) value);
+
+                case "byte":
+                case "java.lang.Byte":
+                    return new org.python.types.Int((byte) value);
+
+                case "char":
+                case "java.lang.Char":
+                    return new org.python.types.Str((char) value);
+
+                case "short":
+                case "java.lang.Short":
+                    return new org.python.types.Int((short) value);
+
+                case "int":
+                case "java.lang.Integer":
+                    return new org.python.types.Int((int) value);
+
+                case "long":
+                case "java.lang.Long":
+                    return new org.python.types.Int((long) value);
+
+                case "float":
+                case "java.lang.Float":
+                    return new org.python.types.Float((float) value);
+
+                case "double":
+                case "java.lang.Double":
+                    return new org.python.types.Float((double) value);
+
+                case "java.lang.String":
+                    return new org.python.types.Str((java.lang.String) value);
+
+                default:
+                    if (org.python.Object.class.isAssignableFrom(value.getClass())) {
+                        return (org.python.Object) value;
+                    } else {
+                        return new org.python.java.Object(value);
+                    }
             }
         }
     }
 
-    public java.lang.Class klass;
-    public Origin origin;
 
     /**
      * A utility method to update the internal value of this object.
@@ -83,8 +125,9 @@ public class Type extends org.python.types.Object implements org.python.Callable
         this.klass = ((org.python.types.Type) obj).klass;
     }
 
-    public Type(java.lang.Class klass, Origin origin) {
+    public Type(Origin origin, java.lang.Class klass) {
         super(origin, null);
+
         if (origin != Origin.PLACEHOLDER) {
             this.klass = klass;
 
@@ -95,7 +138,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
         if (origin == Origin.BUILTIN) {
             org.Python.initializeModule(klass, this.attrs);
-        } else if (origin == Origin.PYTHON) {
+        } else if (origin == Origin.PYTHON || origin == Origin.EXTENSION) {
             try {
                 this.constructor = this.klass.getConstructor(org.python.Object[].class, java.util.Map.class);
             } catch (java.lang.NoSuchMethodException e) {
@@ -105,7 +148,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
     }
 
     public Type(java.lang.Class klass) {
-        this(klass, Origin.PYTHON);
+        this(Origin.PYTHON, klass);
     }
 
     public void add_reference(org.python.Object instance) {
@@ -130,7 +173,9 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // If the key *doesn't* exist in the attributes dictionary,
             // try to look it up. If it doesn't exist as a field, then
             // store a null to represent this fact, so we won't look again.
+            // System.out.println("No class attr");
             if (!this.attrs.containsKey(name)) {
+                // System.out.println("doing lookup...");
                 try {
                     value = new org.python.java.Field(klass.getField(name));
                 } catch (java.lang.NoSuchFieldException e) {
@@ -138,9 +183,11 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 }
                 // If the field doesn't exist, store a value of null
                 // so that we don't try to look up the field again.
+                // If it does, store the field.
                 this.attrs.put(name, value);
             }
         }
+        // System.out.println("GETATTRIBUTE CLASS " + this + " " + name + " = " + value);
         return value;
     }
 

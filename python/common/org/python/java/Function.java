@@ -124,6 +124,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         __doc__ = "Implement __get__(self)."
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
+        // System.out.println("__GET__ on native function " + this + " " + this.getClass());
         return new org.python.java.Method(instance.toJava(), this);
     }
 
@@ -134,8 +135,12 @@ public class Function extends org.python.types.Object implements org.python.Call
 
     public org.python.Object invoke(java.lang.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("Native Function:" + this.name);
-            // System.out.println("           args:" + args);
+            // System.out.println("Native Function:" + this);
+            // System.out.println("       instance: " + instance + " " + instance.getClass());
+            // System.out.println("           args:");
+            // for (org.python.Object arg: args) {
+            //     System.out.println("                " + arg);
+            // }
             // System.out.println("         kwargs:" + kwargs);
 
             java.lang.reflect.Method method = org.python.java.Function.selectMethod(this.methods, args, kwargs);

@@ -5,7 +5,7 @@ class PlaceholderType extends org.python.types.Type {
     private java.util.ArrayList<org.python.Object> instances = new java.util.ArrayList<org.python.Object>();
 
     PlaceholderType(java.lang.Class klass) {
-        super(klass, org.python.types.Type.Origin.PLACEHOLDER);
+        super(org.python.types.Type.Origin.PLACEHOLDER, klass);
     }
 
     public void add_reference(org.python.Object instance) {
