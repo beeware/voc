@@ -2608,48 +2608,14 @@ class CALL_FUNCTION(Opcode):
         context.next_resolve_list.append((self, 'start_op'))
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # print("DESCRIPTOR", klass.descriptor)
-            # Push a callable onto the stack so that it can be stored
-            # in globals and subsequently retrieved and run.
-
+            # Push the type object onto the stack so that it can be stored
+            # in globals and subsequently retrieved and invoked to create
+            # new instances.
             context.add_opcodes(
-                # Get a Method representing the new function
-                TRY(),
-                    JavaOpcodes.NEW('org/python/types/Constructor'),
-                    JavaOpcodes.DUP(),
-
-                    JavaOpcodes.LDC_W(Classref(self.klass.descriptor)),
-
-                    JavaOpcodes.ICONST_2(),
-                    JavaOpcodes.ANEWARRAY('java/lang/Class'),
-
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.ICONST_0(),
-                    JavaOpcodes.LDC_W(Classref('[Lorg/python/Object;')),
-                    JavaOpcodes.AASTORE(),
-
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.ICONST_1(),
-                    JavaOpcodes.LDC_W(Classref('java/util/Map')),
-                    JavaOpcodes.AASTORE(),
-
-                    JavaOpcodes.INVOKEVIRTUAL(
-                        'java/lang/Class',
-                        'getConstructor',
-                        '([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;'
-                    ),
-
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
-
-                CATCH('java/lang/NoSuchMethodError'),
-                    ASTORE_name(context, '#EXCEPTION'),
-                    JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W('Unable to find class %s' % (self.klass.descriptor)),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
-                    JavaOpcodes.ATHROW(),
-                END_TRY()
+                JavaOpcodes.LDC_W(Classref(self.klass.descriptor)),
+                JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
             )
-            free_name(context, '#EXCEPTION')
+
         else:
             if arguments[0].operation.opname == 'MAKE_FUNCTION':
                 # If this is an comprehension, the line of code

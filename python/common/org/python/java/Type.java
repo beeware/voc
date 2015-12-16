@@ -1,13 +1,14 @@
 package org.python.java;
 
-public class Type extends org.python.types.Type implements org.python.Callable {
+public class Type extends org.python.types.Type {
     java.util.Map<java.lang.String, java.lang.reflect.Constructor> constructors;
 
-    public Type(java.lang.Class klass) {
-        super(klass, org.python.types.Type.Origin.JAVA);
+    public Type(org.python.types.Type.Origin origin, java.lang.Class klass) {
+        super(origin, klass);
 
         this.constructors = new java.util.HashMap<java.lang.String, java.lang.reflect.Constructor>();
         for (java.lang.reflect.Constructor constructor: klass.getConstructors()) {
+            // System.out.println("Found constructor " + constructor);
             java.lang.StringBuilder signature = new java.lang.StringBuilder();
 
             for (java.lang.Class c: constructor.getParameterTypes()) {
@@ -19,6 +20,7 @@ public class Type extends org.python.types.Type implements org.python.Callable {
                 constructor
             );
         }
+        // System.out.println("Constructors: " + this.constructors);
     }
 
     public org.python.Object __getattribute_null(java.lang.String name) {
@@ -33,7 +35,9 @@ public class Type extends org.python.types.Type implements org.python.Callable {
             // java.lang.Map doesn't differentiate between "doesn't exist"
             // and "value is null"; so since we know the value is null, check
             // to see if it is an explicit null (i.e., attribute doesn't exist)
+            // System.out.println("No class attr");
             if (!this.attrs.containsKey(name)) {
+                // System.out.println("doing lookup...");
                 try {
                     value = new org.python.java.Function(this.klass, name);
                 } catch (org.python.exceptions.AttributeError ae) {
@@ -45,9 +49,13 @@ public class Type extends org.python.types.Type implements org.python.Callable {
                         value = null;
                     }
                 }
+                // If the field doesn't exist, store a value of null
+                // so that we don't try to look up the field again.
+                // If it does, store the field.
                 this.attrs.put(name, value);
             }
         }
+        // System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + name + " = " + value);
         return value;
     }
 
@@ -63,7 +71,7 @@ public class Type extends org.python.types.Type implements org.python.Callable {
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("NATIVE CONSTRUCTOR :" + this.klass);
+            // System.out.println("NATIVE CONSTRUCTOR :" + this.klass + " " + this.origin);
             // System.out.println("ARGS:");
             // for (org.python.Object arg: args) {
             //     System.out.println("  " + arg);
@@ -74,17 +82,22 @@ public class Type extends org.python.types.Type implements org.python.Callable {
             //     System.out.println("  " + argname + " = " + kwargs.get(argname));
             // }
 
-            java.lang.reflect.Constructor constructor = org.python.java.Function.selectMethod(this.constructors, args, kwargs);
+            java.lang.reflect.Constructor constructor;
+            if (this.origin == org.python.types.Type.Origin.EXTENSION) {
+                constructor = this.constructor;
 
-            // If there is still no match, raise an error.
-            if (constructor == null) {
-                throw new org.python.exceptions.RuntimeError(String.format("Parameter mismatch calling native Java constructor."));
+                return new org.python.java.Object(constructor.newInstance(args, kwargs));
+            } else {
+                constructor = org.python.java.Function.selectMethod(this.constructors, args, kwargs);
+                java.lang.Object [] adjusted_args = org.python.java.Function.adjustArguments(constructor, args, kwargs);
+
+                // If there is still no match, raise an error.
+                if (constructor == null) {
+                    throw new org.python.exceptions.RuntimeError(String.format("Parameter mismatch calling native Java constructor."));
+                }
+
+                return new org.python.java.Object(constructor.newInstance(adjusted_args));
             }
-
-            java.lang.Object [] adjusted_args = org.python.java.Function.adjustArguments(constructor, args, kwargs);
-
-            return new org.python.java.Object(constructor.newInstance(adjusted_args));
-
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to native Java constructor for " + this.klass);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -103,5 +116,4 @@ public class Type extends org.python.types.Type implements org.python.Callable {
         //     System.out.println("CONSTRUCTOR DONE");
         }
     }
-
 }

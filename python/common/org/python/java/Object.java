@@ -26,6 +26,11 @@ public class Object extends org.python.types.Object {
         this.object = object;
     }
 
+    public Object(org.python.types.Type.Origin origin, java.lang.Object object) {
+        super(org.python.types.Type.Origin.JAVA, object.getClass());
+        this.object = object;
+    }
+
     @org.python.Method(
         __doc__ = ""
     )

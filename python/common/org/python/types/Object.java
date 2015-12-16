@@ -34,9 +34,11 @@ public class Object implements org.python.Object {
      *
      * klass is the underlying java class being represented by this object.
      * In the case of a Python object, the klass is the Java manifestation of
-     * the object; when wrapping Java objects, the native class of the object is used.
+     * the object; when wrapping Java objects, the native class of the object
+     * is used.
      */
     protected Object(org.python.types.Type.Origin origin, java.lang.Class klass) {
+        this.origin = origin;
         if (origin != org.python.types.Type.Origin.PLACEHOLDER) {
             this.attrs = new java.util.HashMap<java.lang.String, org.python.Object>();
             if (klass == null) {
@@ -254,23 +256,28 @@ public class Object implements org.python.Object {
 
     public org.python.Object __getattribute_null(java.lang.String name) {
         // Look for local instance attributes first
+        // System.out.println("GETATTRIBUTE " + name + " on " + this);
         // System.out.println("ATTRS " + this.attrs);
         org.python.Object value = this.attrs.get(name);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
 
         if (value == null) {
             // Look to the class for an attribute
+            // System.out.println("no instance attribute");
             value = cls.__getattribute_null(name);
             if (value == null) {
+                // System.out.println("no class attribute");
                 // Use the descriptor protocol
                 value = this.__getattr_null(name);
                 if (value == null) {
+                    // System.out.println("no descriptor protocol");
                     // Still nothing - give up, and return a value
                     // that can be interpreted as an exception.
                     return null;
                 }
             }
         }
+        // System.out.println("GETATTRIBUTE " + name + " on " + this + " = " + value);
         // Post-process the value retrieved.
         return value.__get__(this, cls);
     }
@@ -280,6 +287,7 @@ public class Object implements org.python.Object {
         args = {"instance", "klass"}
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
+        // System.out.println("__GET__ on " + this + " " + this.getClass());
         return this;
     }
 

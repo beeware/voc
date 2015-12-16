@@ -46,11 +46,11 @@ What it does:
 
   * Implementing Java interfaces.
 
+  * Extending Java classes.
+
 It *doesn't* currently support (this list is incomplete):
 
 * Subclassing Python classes
-
-* Extending native java classes.
 
 * Generators
 

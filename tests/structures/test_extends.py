@@ -4,7 +4,6 @@ from ..utils import TranspileTestCase
 
 
 class ExtendsTests(TranspileTestCase):
-    @expectedFailure
     def test_extends(self):
         self.assertJavaExecution(
             """
@@ -16,13 +15,14 @@ class ExtendsTests(TranspileTestCase):
 
             mymap = MyHashMap()
 
-            mymap.put("X", "Y")
+            mymap.put("The answer", "42")
 
-            print(mymap.get("X"))
+            print(mymap.get("The answer"))
             print("The machine goes " + mymap.push_button())
             print("Done.")
             """,
             """
-            Hello, world
+            42
+            The machine goes Bing!
             Done.
             """, run_in_function=False)

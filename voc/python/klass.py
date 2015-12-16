@@ -99,8 +99,8 @@ class Class(Block):
     def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None):
         super().__init__(module)
         self.name = name
-        self.bases = bases if bases else 'org/python/types/Object'
-        self.extends = extends if extends else 'org/python/types/Object'
+        self.bases = bases if bases else ['org/python/types/Object']
+        self.extends = extends
         self.implements = implements if implements else []
         self.public = public
         self.final = final
@@ -144,10 +144,13 @@ class Class(Block):
         for method in self.methods:
             method.materialize()
 
+        # Add a flag to indicate this was a VOC generated class.
+        self.fields["__VOC__"] = "Z"
+
     def transpile(self):
         classfile = JavaClass(
             self.descriptor,
-            extends=self.extends,
+            extends=self.extends if self.extends else 'org/python/types/Object',
             implements=self.implements,
             public=self.public,
             final=self.final
