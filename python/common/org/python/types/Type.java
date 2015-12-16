@@ -177,7 +177,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
             if (!this.attrs.containsKey(name)) {
                 // System.out.println("doing lookup...");
                 try {
-                    value = new org.python.java.Field(klass.getField(name));
+                    value = new org.python.java.Field(this.klass.getField(name));
                 } catch (java.lang.NoSuchFieldException e) {
                     value = null;
                 }

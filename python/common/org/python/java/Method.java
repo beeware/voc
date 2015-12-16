@@ -1,10 +1,10 @@
 package org.python.java;
 
 public class Method extends org.python.types.Object implements org.python.Callable {
-    java.lang.Object instance;
+    org.python.Object instance;
     org.python.java.Function function;
 
-    public Method(java.lang.Object instance, org.python.java.Function function) {
+    public Method(org.python.Object instance, org.python.java.Function function) {
         super();
         this.instance = instance;
         this.function = function;

@@ -235,16 +235,7 @@ public class Function extends org.python.types.Object implements org.python.Call
     public org.python.Object invoke(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // System.out.println("Function:" + this.method);
-            // java.lang.String klass;
-            java.lang.Object java_instance;
-            if (instance == null) {
-                // klass = "NULL";
-                java_instance = null;
-            } else {
-                // klass = instance.getClass().getName();
-                java_instance = instance.toJava();
-            }
-            // System.out.println("       instance: " + instance + " " + klass);
+            // System.out.println("       instance: " + instance);
             // System.out.print("           args:");
             // for (org.python.Object arg: args) {
             //     System.out.print(arg + ", ");
@@ -261,16 +252,10 @@ public class Function extends org.python.types.Object implements org.python.Call
             // else:
 
             java.lang.Object [] adjusted_args = adjustArguments(instance, args, kwargs);
-            if (adjusted_args == null) {
-                return (org.python.Object) this.method.invoke(java_instance);
+            if (instance == null) {
+                return (org.python.Object) this.method.invoke(null, adjusted_args);
             } else {
-                // System.out.print("           args:");
-                // for (java.lang.Object arg: adjusted_args) {
-                //     System.out.print(arg + ", ");
-                // }
-                // System.out.println();
-
-                return (org.python.Object) this.method.invoke(java_instance, adjusted_args);
+                return (org.python.Object) this.method.invoke(instance.toObject(), adjusted_args);
             }
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.method);
@@ -282,7 +267,11 @@ public class Function extends org.python.types.Object implements org.python.Call
                 // as one and continue.
                 throw (org.python.exceptions.BaseException) e.getCause();
             } catch (ClassCastException java_e) {
-                throw new org.python.exceptions.RuntimeError(e.getCause().getMessage());
+                java.lang.String message = e.getCause().getMessage();
+                if (message == null) {
+                    message = e.getCause().getClass().getName();
+                }
+                throw new org.python.exceptions.RuntimeError(message);
             }
         } finally {
         //     System.out.println("INVOKE METHOD DONE");
