@@ -283,6 +283,9 @@ public class Str extends org.python.types.Object {
             }
             return new Str(res.toString());
         }
+        else if (other instanceof org.python.types.Float) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+        }
         throw new org.python.exceptions.NotImplementedError("__mul__() has not been implemented.");
     }
 
