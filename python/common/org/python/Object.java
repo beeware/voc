@@ -3,10 +3,20 @@ package org.python;
 
 public interface Object {
     /**
-     * Extract a Java object that is the underlying representation
-     * of this object (e.g., the java.util.Map behind a Python dict())
+     * Return a Java object that is the underlying data representation
+     * of this object (e.g., the java.util.Map behind a Python dict()).
+     * If the object is a pure Python object, calling this on an instance
+     * returns itself.
      */
     public java.lang.Object toJava();
+
+    /**
+     * Return a Java object that is the best representation of the
+     * object being manipulated. This is used as the target for function
+     * invocation. Python-side objects will return themselves; Wrapped
+     * Java objects will return the wrapped object.
+     */
+    public java.lang.Object toObject();
 
     /**
      * Return the Python type name for this object.

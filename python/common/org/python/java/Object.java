@@ -21,6 +21,10 @@ public class Object extends org.python.types.Object {
         return this.object;
     }
 
+    public java.lang.Object toObject() {
+        return this.object;
+    }
+
     public Object(java.lang.Object object) {
         super(org.python.types.Type.Origin.JAVA, object.getClass());
         this.object = object;

@@ -125,15 +125,14 @@ public class Function extends org.python.types.Object implements org.python.Call
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         // System.out.println("__GET__ on native function " + this + " " + this.getClass());
-        return new org.python.java.Method(instance.toJava(), this);
+        return new org.python.java.Method(instance, this);
     }
-
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return this.invoke(null, args, kwargs);
     }
 
-    public org.python.Object invoke(java.lang.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // System.out.println("Native Function:" + this);
             // System.out.println("       instance: " + instance + " " + instance.getClass());
@@ -158,7 +157,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             //     System.out.print(arg + ", ");
             // }
             // System.out.println();
-            return org.python.types.Type.toPython(method.invoke(instance, adjusted_args));
+            return org.python.types.Type.toPython(method.invoke(instance.toObject(), adjusted_args));
 
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java function");
@@ -170,7 +169,11 @@ public class Function extends org.python.types.Object implements org.python.Call
                 // as one and continue.
                 throw (org.python.exceptions.BaseException) e.getCause();
             } catch (ClassCastException java_e) {
-                throw new org.python.exceptions.RuntimeError(e.getCause().getMessage());
+                java.lang.String message = e.getCause().getMessage();
+                if (message == null) {
+                    message = e.getCause().getClass().getName();
+                }
+                throw new org.python.exceptions.RuntimeError(message);
             }
         } finally {
         //     System.out.println("INVOKE METHOD DONE");
