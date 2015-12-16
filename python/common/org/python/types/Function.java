@@ -234,8 +234,14 @@ public class Function extends org.python.types.Object implements org.python.Call
 
     public org.python.Object invoke(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("Function:" + this.method);
+            java.lang.Object target = null;
+            if (instance != null) {
+                target = instance.toObject();
+            }
+
+            // System.out.println("Function:" + this);
             // System.out.println("       instance: " + instance);
+            // System.out.println("       target: " + target);
             // System.out.print("           args:");
             // for (org.python.Object arg: args) {
             //     System.out.print(arg + ", ");
@@ -252,11 +258,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             // else:
 
             java.lang.Object [] adjusted_args = adjustArguments(instance, args, kwargs);
-            if (instance == null) {
-                return (org.python.Object) this.method.invoke(null, adjusted_args);
-            } else {
-                return (org.python.Object) this.method.invoke(instance.toObject(), adjusted_args);
-            }
+            return (org.python.Object) this.method.invoke(target, adjusted_args);
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.method);
         } catch (java.lang.reflect.InvocationTargetException e) {
