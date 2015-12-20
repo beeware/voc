@@ -431,11 +431,29 @@ class InstanceMethod(Method):
                         max_stack=len(self.parameters),
                         max_locals=len(self.parameters),
                         code=[
-                            JavaOpcodes.ALOAD(i)
-                            for i in range(0, len(self.parameters))
+                            {
+                                'bool': JavaOpcodes.ILOAD(i),
+                                'byte': JavaOpcodes.ILOAD(i),
+                                'char': JavaOpcodes.ILOAD(i),
+                                'short': JavaOpcodes.ILOAD(i),
+                                'int': JavaOpcodes.ILOAD(i),
+                                'long': JavaOpcodes.ILOAD(i),
+                                'float': JavaOpcodes.FLOAD(i),
+                                'double': JavaOpcodes.DLOAD(i),
+                            }.get(param['annotation'], JavaOpcodes.ALOAD(i))
+                            for i, param in enumerate(self.parameters)
                         ] + [
                             JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.name, self.signature),
-                            JavaOpcodes.ARETURN()
+                            {
+                                'bool': JavaOpcodes.IRETURN(),
+                                'byte': JavaOpcodes.IRETURN(),
+                                'char': JavaOpcodes.IRETURN(),
+                                'short': JavaOpcodes.IRETURN(),
+                                'int': JavaOpcodes.IRETURN(),
+                                'long': JavaOpcodes.IRETURN(),
+                                'float': JavaOpcodes.FRETURN(),
+                                'double': JavaOpcodes.DRETURN(),
+                            }.get(self.returns['annotation'], JavaOpcodes.ARETURN())
                         ],
                     )
                 ]
