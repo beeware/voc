@@ -174,7 +174,7 @@ class Method(Block):
             parent=self.parent,
             name='%s$%s' % (self.parent.name, method_name.replace('.<locals>.', '$')),
             closure_var_names=code.co_names,
-            extends='org/python/types/Closure',
+            bases=['org/python/types/Closure'],
             implements=['org/python/Callable'],
             public=True,
             final=True,
@@ -376,15 +376,23 @@ class InitMethod(Method):
     def transpile_setup(self):
         if self.klass.extends:
             super_class = self.klass.extends
+
+            self.add_opcodes(
+                JavaOpcodes.ALOAD_0(),
+                # TODO - this only allows using the default constructor
+                # for extended Java classes.
+                JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '()V'),
+            )
+
         else:
             super_class = 'org/python/types/Object'
 
-        self.add_opcodes(
-            JavaOpcodes.ALOAD_0(),
-            JavaOpcodes.ALOAD_1(),
-            JavaOpcodes.ALOAD_2(),
-            JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
-        )
+            self.add_opcodes(
+                JavaOpcodes.ALOAD_0(),
+                JavaOpcodes.ALOAD_1(),
+                JavaOpcodes.ALOAD_2(),
+                JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+            )
 
     def transpile_teardown(self):
         self.add_opcodes(
