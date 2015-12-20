@@ -929,9 +929,6 @@ def extract_command(instructions, blocks, i, start_index=0, literal=False):
     # into the instruction argument we've already read.
     if i > 0 and instructions[i - 1].opname == 'EXTENDED_ARG':
         i = i - 1
-        extended = instructions[i]
-
-        argval = argval | extended.argval
 
     try:
         if literal:

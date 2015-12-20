@@ -23,7 +23,7 @@ class Block:
         self.local_vars = {}
         self.deleted_vars = set()
 
-        self.code = []
+        self.opcodes = []
         self.try_catches = []
         self.blocks = []
         self.jumps = []
@@ -57,6 +57,7 @@ class Block:
         provided block.
 
         """
+        self.code = code
         instructions = list(dis.Bytecode(code))
 
         blocks = find_blocks(instructions)
@@ -97,7 +98,7 @@ class Block:
         for opcode in opcodes:
             # print("ADD OPCODE", id(opcode), opcode)
             if opcode.process(self):
-                self.code.append(opcode)
+                self.opcodes.append(opcode)
 
                 # If we've flagged a code line change, attach that to the opcode
                 if self.next_opcode_starts_line:
@@ -116,7 +117,7 @@ class Block:
         depth = 0
         max_depth = 0
 
-        for opcode in self.code:
+        for opcode in self.opcodes:
             depth = depth + opcode.stack_effect
             # print("   ", opcode, depth)
             if depth > max_depth:
@@ -169,7 +170,7 @@ class Block:
                 opcode
             ])
 
-        self.code = init_vars + self.code
+        self.opcodes = init_vars + self.opcodes
 
         # Since we've processed all the Python opcodes, we can now resolve
         # all the unknown jump targets.
@@ -182,9 +183,9 @@ class Block:
         # If the block has no content in it, and the block allows,
         # ignore this block.
         if self.can_ignore_empty:
-            if len(self.code) == 1 and isinstance(self.code[0], JavaOpcodes.RETURN):
+            if len(self.opcodes) == 1 and isinstance(self.opcodes[0], JavaOpcodes.RETURN):
                 raise IgnoreBlock()
-            elif len(self.code) == 2 and isinstance(self.code[1], JavaOpcodes.ARETURN):
+            elif len(self.opcodes) == 2 and isinstance(self.opcodes[1], JavaOpcodes.ARETURN):
                 raise IgnoreBlock()
 
         # # If the block has a void return, make sure that is honored.
@@ -195,7 +196,7 @@ class Block:
         # with the known offsets.
         offset = 0
         # print('>>>>> set offsets', self)
-        for index, instruction in enumerate(self.code):
+        for index, instruction in enumerate(self.opcodes):
             # print("%4d:%4d (0x%x) %s" % (index, offset, id(instruction), instruction))
             instruction.java_index = index
             instruction.java_offset = offset
@@ -259,15 +260,15 @@ class Block:
         # Construct a line number table from
         # the source code reference data on opcodes.
         line_numbers = []
-        for code in self.code:
-            if code.starts_line is not None:
-                line_numbers.append((code.java_offset, code.starts_line))
+        for opcode in self.opcodes:
+            if opcode.starts_line is not None:
+                line_numbers.append((opcode.java_offset, opcode.starts_line))
         line_number_table = LineNumberTable(line_numbers)
 
         return JavaCode(
             max_stack=self.stack_depth() + len(exceptions),
             max_locals=len(self.local_vars) + len(self.deleted_vars),
-            code=self.code,
+            code=self.opcodes,
             exceptions=exceptions,
             attributes=[
                 line_number_table

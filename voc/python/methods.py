@@ -1,4 +1,5 @@
 from ..java import (
+    Code as JavaCode,
     Method as JavaMethod,
     opcodes as JavaOpcodes,
     RuntimeVisibleAnnotations,
@@ -42,11 +43,11 @@ def descriptor(annotation):
     elif annotation is None:
         return "V"
     else:
-        return "L%s;" % annotation
+        return "L%s;" % annotation.replace('.', '/')
 
 
 class Method(Block):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
         super().__init__(parent, commands=commands)
         self.name = name
         self.parameters = parameters
@@ -58,13 +59,14 @@ class Method(Block):
         else:
             self.returns = returns
 
-        # Load args and kwargs, but don't expose those names into the local_vars.
+        # Reserve space for the register that will hold self (if required)
         self.add_self()
-        for i, param in enumerate(self.parameters[self.self_offset:]):
+
+        # Reserve space for the registers that will hold arguments.
+        for i, param in enumerate(self.parameters):
             self.local_vars[param['name']] = len(self.local_vars)
 
         self.static = static
-        self.code_obj = code
 
     def __repr__(self):
         return '<Method %s (%s parameters)>' % (self.name, len(self.parameters))
@@ -80,6 +82,9 @@ class Method(Block):
     @property
     def globals_module(self):
         return self.module
+
+    def add_self(self):
+        pass
 
     def store_name(self, name, use_locals):
         if use_locals:
@@ -149,7 +154,7 @@ class Method(Block):
     def signature(self):
         return_descriptor = descriptor(self.returns.get('annotation'))
         return '(%s)%s' % (
-            ''.join(descriptor(p['annotation']) for p in self.parameters[self.self_offset:]),
+            ''.join(descriptor(p['annotation']) for p in self.parameters),
             return_descriptor
         )
 
@@ -160,13 +165,6 @@ class Method(Block):
     @property
     def module(self):
         return self.parent
-
-    @property
-    def self_offset(self):
-        return 0
-
-    def add_self(self):
-        pass
 
     def add_method(self, method_name, code, annotations):
         # If a method is added to a method, it is added as an anonymous
@@ -188,8 +186,7 @@ class Method(Block):
             parameters=extract_parameters(code, annotations),
             returns={
                 'annotation': annotations.get('return', 'org/python/Object').replace('.', '/')
-            },
-            code=code
+            }
         )
         method.extract(code)
         callable.methods.append(method)
@@ -204,7 +201,7 @@ class Method(Block):
         return method
 
     def transpile_args(self):
-        for i, param in enumerate(self.parameters[self.self_offset:]):
+        for i, param in enumerate(self.parameters):
             annotation = param.get('annotation', 'org/python/Object')
 
             if annotation is None:
@@ -273,12 +270,20 @@ class Method(Block):
                     JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
                     ASTORE_name(self, param['name']),
                 )
+            elif annotation == "java/lang/String":
+                self.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Str'),
+                    JavaOpcodes.DUP(),
+                    ALOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                    ASTORE_name(self, param['name']),
+                )
             elif annotation != 'org/python/Object':
                 self.add_opcodes(
                     JavaOpcodes.NEW('org/python/java/Object'),
                     JavaOpcodes.DUP(),
                     ALOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(F)V'),
+                    JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),
                     ASTORE_name(self, param['name']),
                 )
 
@@ -286,7 +291,7 @@ class Method(Block):
         self.transpile_args()
 
     def transpile_teardown(self):
-        if len(self.code) == 0 or not isinstance(self.code[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
+        if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
             if self.returns.get('annotation') is None:
                 self.add_opcodes(JavaOpcodes.RETURN())
             else:
@@ -304,15 +309,21 @@ class Method(Block):
             ])
         ]
 
-    def transpile(self):
-        code = super().transpile()
+    def transpile_method(self):
+        return [
+            JavaMethod(
+                self.method_name,
+                self.signature,
+                static=self.static,
+                attributes=[super().transpile()] + self.method_attributes()
+            )
+        ]
 
-        return JavaMethod(
-            self.method_name,
-            self.signature,
-            static=self.static,
-            attributes=[code] + self.method_attributes()
-        )
+    def transpile_binding(self):
+        return []
+
+    def transpile(self):
+        return self.transpile_method() + self.transpile_binding()
 
 
 class InitMethod(Method):
@@ -322,15 +333,18 @@ class InitMethod(Method):
             parameters=[
                 {
                     'name': 'self',
-                    'kind': POSITIONAL_OR_KEYWORD
+                    'kind': POSITIONAL_OR_KEYWORD,
+                    'annotation': 'org/python/Object'
                 },
                 {
                     'name': 'args',
-                    'kind': POSITIONAL_OR_KEYWORD
+                    'kind': POSITIONAL_OR_KEYWORD,
+                    'annotation': '[Lorg/python/Object;'
                 },
                 {
                     'name': 'kwargs',
-                    'kind': POSITIONAL_OR_KEYWORD
+                    'kind': POSITIONAL_OR_KEYWORD,
+                    'annotation': 'java/util/Map'
                 }
             ],
             returns={'annotation': None},
@@ -359,44 +373,18 @@ class InitMethod(Method):
     def signature(self):
         return '([Lorg/python/Object;Ljava/util/Map;)V'
 
-    @property
-    def self_offset(self):
-        return 1
-
-    def add_self(self):
-        self.local_vars['self'] = len(self.local_vars)
-
     def transpile_setup(self):
         if self.klass.extends:
-            self.add_opcodes(
-                JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.INVOKESPECIAL(self.klass.extends, '<init>', '()V'),
-            )
+            super_class = self.klass.extends
         else:
             super_class = 'org/python/types/Object'
-            self.add_opcodes(
-                JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '()V'),
-            )
 
-            for base in self.klass.bases:
-                self.add_opcodes(
-                    TRY(),
-                        JavaOpcodes.ALOAD_0(),
-                        JavaOpcodes.LDC_W('__init__'),
-                        JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
-                )
-
-                for i, param in enumerate(self.parameters[self.self_offset:]):
-                    self.add_opcodes(
-                        ALOAD_name(self, param['name']),
-                    )
-
-                self.add_opcodes(
-                        JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
-                    CATCH('org/python/exceptions/AttributeError'),
-                    END_TRY(),
-                )
+        self.add_opcodes(
+            JavaOpcodes.ALOAD_0(),
+            JavaOpcodes.ALOAD_1(),
+            JavaOpcodes.ALOAD_2(),
+            JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+        )
 
     def transpile_teardown(self):
         self.add_opcodes(
@@ -405,14 +393,13 @@ class InitMethod(Method):
 
 
 class InstanceMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
         super().__init__(
             parent, name,
             parameters=parameters,
             returns=returns,
             static=static,
             commands=commands,
-            code=code
         )
 
     def __repr__(self):
@@ -427,22 +414,43 @@ class InstanceMethod(Method):
         return self.klass.module
 
     @property
-    def self_offset(self):
-        return 1
+    def bound_signature(self):
+        return_descriptor = descriptor(self.returns.get('annotation'))
+        return '(%s)%s' % (
+            ''.join(descriptor(p['annotation']) for p in self.parameters[1:]),
+            return_descriptor
+        )
 
-    def add_self(self):
-        self.local_vars['self'] = len(self.local_vars)
+    def transpile_binding(self):
+        return [
+            JavaMethod(
+                self.name,
+                self.bound_signature,
+                attributes=[
+                    JavaCode(
+                        max_stack=len(self.parameters),
+                        max_locals=len(self.parameters),
+                        code=[
+                            JavaOpcodes.ALOAD(i)
+                            for i in range(0, len(self.parameters))
+                        ] + [
+                            JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.name, self.signature),
+                            JavaOpcodes.ARETURN()
+                        ],
+                    )
+                ]
+            )
+        ]
 
 
 class MainMethod(Method):
-    def __init__(self, parent, commands=None, code=None, end_offset=None):
+    def __init__(self, parent, commands=None, end_offset=None):
         super().__init__(
             parent, '__main__',
             parameters=[{'name': 'args', 'annotation': 'argv'}],
             returns={'annotation': None},
             static=True,
             commands=commands,
-            code=code
         )
         self.end_offset = end_offset
 
@@ -469,8 +477,8 @@ class MainMethod(Method):
     def globals_module(self):
         return self.module
 
-    def add_self(self):
-        pass
+    # def add_self(self):
+    #     pass
 
     def store_name(self, name, use_locals):
         self.add_opcodes(
@@ -573,14 +581,14 @@ class MainMethod(Method):
 
 
 class ClosureMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, code=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+
         super().__init__(
             parent, name,
             parameters=parameters,
             returns=returns,
             static=static,
             commands=commands,
-            code=code
         )
 
     def __repr__(self):
@@ -608,7 +616,7 @@ class ClosureMethod(Method):
     #             JavaOpcodes.GETFIELD('org/python/types/Function', closure_var_name, 'Lorg/python/Object;'),
     #             ASTORE_name(self, closure_var_name),
     #         ])
-    #     self.code = setup + self.code
+    #     self.opcodes = setup + self.opcodes
 
 
 def extract_parameters(code, annotations):

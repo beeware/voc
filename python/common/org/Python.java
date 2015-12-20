@@ -10,6 +10,10 @@ public class Python {
         org.Python.initializeModule(org.Python.class, builtins);
     }
 
+    public static void debug(java.lang.Object msg, java.lang.String label) {
+        System.out.println("DEBUG " + label + ": " + msg);
+    }
+
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
         // Iterate over every method in the class, and if the
         // method is annotated for inclusion in the Python class,

@@ -74,8 +74,9 @@ public class Type extends org.python.types.Type {
             // System.out.println("NATIVE CONSTRUCTOR :" + this.klass + " " + this.origin);
             // System.out.println("ARGS:");
             // for (org.python.Object arg: args) {
-            //     System.out.println("  " + arg);
+            //     System.out.print("  " + arg + ",");
             // }
+            // System.out.println();
 
             // System.out.println("KWARGS:");
             // for (java.lang.String argname: kwargs.keySet()) {

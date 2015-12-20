@@ -2,14 +2,6 @@ package org.python.java;
 
 
 public class Object extends org.python.types.Object {
-    static
-    // public static org.python.Object convert(java.lang.Object java) {
-    //     if (java instanceof java.lang.String) {
-    //         return new org.python.types.Str((java.lang.String) java);
-    //     } else {
-    //         return new org.python.java.Object(java);
-    //     }
-    // }
 
     public java.lang.Object object;
 
@@ -26,12 +18,11 @@ public class Object extends org.python.types.Object {
     }
 
     public Object(java.lang.Object object) {
-        super(org.python.types.Type.Origin.JAVA, object.getClass());
-        this.object = object;
+        this(org.python.types.Type.Origin.JAVA, object);
     }
 
     public Object(org.python.types.Type.Origin origin, java.lang.Object object) {
-        super(org.python.types.Type.Origin.JAVA, object.getClass());
+        super(origin, object.getClass());
         this.object = object;
     }
 

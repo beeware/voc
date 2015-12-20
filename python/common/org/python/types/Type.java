@@ -7,6 +7,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
+    public org.python.types.Type __base__;
+    public org.python.types.Tuple __bases__;
 
     /**
      * Factory method to obtain Python classes from their Java counterparts
@@ -52,7 +54,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
         try {
             return pythonType(java.lang.Class.forName(java_class_name.replace("/", ".")));
         } catch (ClassNotFoundException e) {
-            throw new org.python.exceptions.RuntimeError("Unknown Class");
+            throw new org.python.exceptions.RuntimeError("Unknown Class " + java_class_name);
         }
     }
 
@@ -163,31 +165,33 @@ public class Type extends org.python.types.Object implements org.python.Callable
     }
 
     public org.python.Object __getattribute_null(java.lang.String name) {
-        // System.out.println("GETATTRIBUTE CLASS " + this + " " + name);
+        // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name);
         // System.out.println("CLASS ATTRS " + this.attrs);
         org.python.Object value = this.attrs.get(name);
 
         if (value == null) {
-            // The class attributes didn't contain the object. We must
-            // differentiate between "doesn't exist" and "value is null";
-            // If the key *doesn't* exist in the attributes dictionary,
-            // try to look it up. If it doesn't exist as a field, then
-            // store a null to represent this fact, so we won't look again.
-            // System.out.println("No class attr");
-            if (!this.attrs.containsKey(name)) {
-                // System.out.println("doing lookup...");
-                try {
-                    value = new org.python.java.Field(this.klass.getField(name));
-                } catch (java.lang.NoSuchFieldException e) {
-                    value = null;
-                }
-                // If the field doesn't exist, store a value of null
-                // so that we don't try to look up the field again.
-                // If it does, store the field.
-                this.attrs.put(name, value);
+            // The class attributes didn't contain a value for the attribute
+            // name. Introspect on the object class to see if a field
+            // with the given name exists, caching either the Field instance,
+            // or an AttributeError representation of the NoSuchFieldException.
+            try {
+                value = new org.python.java.Field(this.klass.getField(name));
+            } catch (java.lang.NoSuchFieldException e) {
+                value = new org.python.exceptions.AttributeError(this.klass, name);
+            }
+            this.attrs.put(name, value);
+        }
+
+        // If the result of the lookup is an AttributeError, there's
+        // no local field; so defer to the base type.
+        if (value instanceof org.python.exceptions.AttributeError) {
+            if (this.__base__ == null) {
+                value = null;
+            } else {
+                value = this.__base__.__getattribute_null(name);
             }
         }
-        // System.out.println("GETATTRIBUTE CLASS " + this + " " + name + " = " + value);
+        // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name + " = " + value);
         return value;
     }
 
@@ -198,7 +202,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
-        // System.out.println("SETATTRIBUTE TYPE " + this + " " + name + " = " + value);
+        // System.out.println("SETATTRIBUTE TYPE " + name + " = " + value);
         // System.out.println("class attrs = " + this.attrs);
 
         // Can't set attributes of builtin types.
@@ -216,13 +220,15 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // System.out.println("TYPE: " + this);
             // System.out.println("ARGS:");
             // for (org.python.Object arg: args) {
-            //     System.out.println("  " + arg);
+            //     System.out.print("  " + arg + ",");
             // }
+            // System.out.println();
 
             // System.out.println("KWARGS:");
             // for (java.lang.String argname: kwargs.keySet()) {
             //     System.out.println("  " + argname + " = " + kwargs.get(argname));
             // }
+
             if (this.constructor != null) {
                 return (org.python.Object) this.constructor.newInstance(args, kwargs);
             } else {

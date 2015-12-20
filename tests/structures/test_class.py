@@ -46,7 +46,6 @@ class ClassTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
-    @expectedFailure
     def test_subclass(self):
         self.assertCodeExecution("""
             class MyBase:
@@ -58,6 +57,7 @@ class ClassTests(TranspileTestCase):
 
                 def first(self):
                     return self.x * 2
+
 
             class MyObject(MyBase):
                 def __init__(self, x, y):

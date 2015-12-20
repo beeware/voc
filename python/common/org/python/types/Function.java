@@ -186,15 +186,6 @@ public class Function extends org.python.types.Object implements org.python.Call
             n_args += 1;
         }
 
-        // If this is an instance, the first argument will be self; we don't
-        // need to pass this to the Java function.
-        if (this.origin == org.python.types.Type.Origin.BUILTIN || instance == null || instance instanceof org.python.types.Closure) {
-            first_arg = 0;
-        } else {
-            first_arg = 1;
-            pos_count -= 1;
-            n_args -= 1;
-        }
         first_default = pos_count - this.default_args.size();
         // System.out.println("nargs " + n_args);
 
@@ -204,10 +195,19 @@ public class Function extends org.python.types.Object implements org.python.Call
 
         java.lang.Object [] adjusted = new java.lang.Object [n_args];
 
-        for (int i = 0; i < pos_count; i++) {
-            java.lang.String varname = ((org.python.types.Str) varnames.get(i + first_arg)).value;
-            if (i < args.length) {
-                adjusted[i] = args[i];
+        // If this is an instance, the first argument will be self; we don't
+        // need to pass this to the Java function.
+        if (instance == null || !java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
+            first_arg = 0;
+        } else {
+            first_arg = 1;
+            adjusted[0] = instance;
+        }
+
+        for (int i = first_arg; i < pos_count; i++) {
+            java.lang.String varname = ((org.python.types.Str) varnames.get(i)).value;
+            if (i < args.length + first_arg) {
+                adjusted[i] = args[i - first_arg];
                 org.python.Object value = kwargs.remove(varname);
                 if (value != null) {
                     throw new org.python.exceptions.TypeError(this.name + "() got multiple values for argument '" + varname + "'");
@@ -222,7 +222,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
 
         if ((flags & CO_VARARGS) != 0) {
-            adjusted[pos_count] = java.util.Arrays.copyOfRange(args, pos_count + first_arg, args.length);
+            adjusted[pos_count] = java.util.Arrays.copyOfRange(args, pos_count, args.length);
         }
 
         return adjusted;
@@ -234,14 +234,8 @@ public class Function extends org.python.types.Object implements org.python.Call
 
     public org.python.Object invoke(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            java.lang.Object target = null;
-            if (instance != null) {
-                target = instance.toObject();
-            }
-
-            // System.out.println("Function:" + this);
+            // System.out.println("Function:" + this.name);
             // System.out.println("       instance: " + instance);
-            // System.out.println("       target: " + target);
             // System.out.print("           args:");
             // for (org.python.Object arg: args) {
             //     System.out.print(arg + ", ");
@@ -258,7 +252,26 @@ public class Function extends org.python.types.Object implements org.python.Call
             // else:
 
             java.lang.Object [] adjusted_args = adjustArguments(instance, args, kwargs);
-            return (org.python.Object) this.method.invoke(target, adjusted_args);
+
+            // if (adjusted_args != null) {
+            //     System.out.print("Adjusted args:");
+            //     for (java.lang.Object arg: adjusted_args) {
+            //         System.out.print(arg + ", ");
+            //     }
+            //     System.out.println();
+            // } else {
+            //     System.out.println("No adjusted args");
+            // }
+
+            // Python methods are stored as static methods on the class, so
+            // the instance argument is passed in as a regular method argument,
+            // not as the implied Java register 0. Builtins and closure methods
+            // require the instance to be passed as the explicit instance.
+            if (java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
+                return (org.python.Object) this.method.invoke(null, adjusted_args);
+            } else {
+                return (org.python.Object) this.method.invoke(instance, adjusted_args);
+            }
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.method);
         } catch (java.lang.reflect.InvocationTargetException e) {
