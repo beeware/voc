@@ -14,17 +14,15 @@ public class Closure extends org.python.types.Object {
     void setValue(org.python.Object obj) {
     }
 
-    // public Closure(
-    //             java.util.List<org.python.Object> default_args,
-    //             java.util.Map<java.lang.String, org.python.Object> default_kwargs
-    //         ) {
-    //     super();
-    //     this.default_args = default_args;
-    //     this.default_kwargs = default_kwargs;
-    // }
+    public Closure(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super(args, kwargs);
+    }
 
-    public Closure() {
-        super();
+    @org.python.Method(
+        __doc__ = "Return repr(self)."
+    )
+    public org.python.Object __repr__() {
+        return new org.python.types.Str(String.format("<function %s at 0x%x>", this.typeName(), this.hashCode()));
     }
 
 }

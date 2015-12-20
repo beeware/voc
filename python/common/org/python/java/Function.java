@@ -139,7 +139,7 @@ public class Function extends org.python.types.Object implements org.python.Call
                 target = instance.toObject();
             }
 
-            // System.out.println("Native Function:" + this);
+            // System.out.println("Native Function:" + this.name);
             // System.out.println("       instance: " + instance);
             // System.out.println("       target: " + target);
             // System.out.println("           args:");

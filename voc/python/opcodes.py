@@ -437,7 +437,7 @@ class CATCH:
                     command.transpile(context)
 
             try_catch.handlers[-1].jump_op = end_jump
-            try_catch.handlers[-1].end_op = context.code[-1]
+            try_catch.handlers[-1].end_op = context.opcodes[-1]
 
         context.add_opcodes(end_jump)
         jump(end_jump, context, try_catch, Opcode.NEXT)
@@ -509,7 +509,7 @@ class FINALLY:
                     command.transpile(context)
 
             try_catch.handlers[-1].jump_op = end_jump
-            try_catch.handlers[-1].end_op = context.code[-1]
+            try_catch.handlers[-1].end_op = context.opcodes[-1]
 
         context.add_opcodes(end_jump)
         jump(end_jump, context, try_catch, Opcode.NEXT)
@@ -542,11 +542,11 @@ class END_TRY:
         # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
 
         if try_catch.finally_handler:
-            try_catch.finally_handler.end_op = context.code[-1]
+            try_catch.finally_handler.end_op = context.opcodes[-1]
         elif len(try_catch.handlers) > 0:
-            try_catch.handlers[-1].end_op = context.code[-1]
+            try_catch.handlers[-1].end_op = context.opcodes[-1]
 
-        try_catch.end_op = context.code[-1]
+        try_catch.end_op = context.opcodes[-1]
 
         # The next opcode is the end of the try-catch block.
         context.next_resolve_list.append((try_catch, 'next_op'))
@@ -932,15 +932,15 @@ class Opcode:
         if self.starts_line:
             context.next_opcode_starts_line = self.starts_line
 
-        n_ops = len(context.code)
+        n_ops = len(context.opcodes)
 
         # Actually convert the opcode. This is recursive down the Command sequence.
         self.convert(context, arguments)
 
-        if len(context.code) == n_ops:
+        if len(context.opcodes) == n_ops:
             context.next_resolve_list.append((self, 'end_op'))
         else:
-            self.end_op = context.code[-1]
+            self.end_op = context.opcodes[-1]
         context.next_resolve_list.append((self, 'next_op'))
 
         context.jump_targets[self.jump_target(arguments)] = self
@@ -1331,6 +1331,8 @@ class PRINT_EXPR(Opcode):
 
 
 class LOAD_BUILD_CLASS(Opcode):
+    # This opcode isn't needed; it's handled as a special case of MAKE_FUNCTION.
+    # However, the opcode definition is required for parsing purposes.
     @property
     def consume_count(self):
         return 0
@@ -2524,6 +2526,8 @@ def extract_constant(arg):
         value = arg.operation.const
     elif arg.operation.opname == 'LOAD_NAME':
         value = arg.operation.name
+    elif arg.operation.opname == 'LOAD_FAST':
+        value = arg.operation.name
     elif arg.operation.opname in ('BUILD_LIST', 'BUILD_TUPLE'):
         value = [
             extract_constant(a)
@@ -2616,6 +2620,55 @@ class CALL_FUNCTION(Opcode):
                 JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
             )
 
+        elif arguments[0].operation.opname == 'LOAD_GLOBAL' \
+                and arguments[0].operation.name == 'super':
+
+            if len(arguments) == 1:
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
+
+                    # The super class to bind to.
+                    JavaOpcodes.LDC_W(Classref(context.klass.descriptor)),
+                    JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+
+                    # Bind to self. Since we know we are in a class building context,
+                    # we can be certain that register 0 contains self.
+                    JavaOpcodes.ALOAD_0(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                )
+
+            elif len(arguments) == 2:  # Unbound super
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
+                )
+
+                # The super class to bind to.
+                arguments[1].operation.transpile(context, arguments[1].arguments)
+
+                context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;)V'),
+                )
+
+            elif len(arguments) == 3:  # Bound super
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
+                )
+
+                # The super class to bind to.
+                arguments[1].operation.transpile(context, arguments[1].arguments)
+
+                # The instance to bind to.
+                arguments[2].operation.transpile(context, arguments[2].arguments)
+
+                context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                )
+
+            else:
+                raise Exception("Invalid number of arguments to super()")
         else:
             if arguments[0].operation.opname == 'MAKE_FUNCTION':
                 # If this is an comprehension, the line of code
@@ -2681,9 +2734,9 @@ class MAKE_FUNCTION(Opcode):
 
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.default_kwargs = ((argc >> 8) & 0xFF)
         self.annotations = (argc >> 16) & 0x7FFF
-        self.default_args = argc & 0xff - self.annotations
+        self.default_kwargs = ((argc >> 8) & 0xFF)
+        self.default_args = argc & 0xff
 
         # if we have annotations, the value wil be one more
         # than it should be.
@@ -2716,7 +2769,6 @@ class MAKE_FUNCTION(Opcode):
         if full_method_name == '<listcomp>':
             full_method_name = 'listcomp_%x' % id(self)
 
-        # TODO... do something with this annotation information
         annotations = {}
         if self.annotations:
             values = []
@@ -2863,7 +2915,7 @@ def add_int(context, value):
     )
 
 
-def add_callable(opcode, context, arguments, full_method_name):
+def add_callable(opcode, context, arguments, full_method_name, closure=False):
     method = opcode.method
 
     context.add_opcodes(
@@ -2881,33 +2933,33 @@ def add_callable(opcode, context, arguments, full_method_name):
             JavaOpcodes.DUP(),
     )
 
-    add_int(context, method.code_obj.co_argcount)
-    add_tuple(context, method.code_obj.co_cellvars)
+    add_int(context, method.code.co_argcount)
+    add_tuple(context, method.code.co_cellvars)
 
     context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # co_code
     )
 
-    # add_tuple(context, method.code_obj.co_consts)
+    # add_tuple(context, method.code.co_consts)
     context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # co_consts
     )
 
-    add_str(context, method.code_obj.co_filename)
-    add_int(context, method.code_obj.co_firstlineno)
-    add_int(context, method.code_obj.co_flags)
-    add_tuple(context, method.code_obj.co_freevars)
-    add_int(context, method.code_obj.co_kwonlyargcount)
+    add_str(context, method.code.co_filename)
+    add_int(context, method.code.co_firstlineno)
+    add_int(context, method.code.co_flags)
+    add_tuple(context, method.code.co_freevars)
+    add_int(context, method.code.co_kwonlyargcount)
 
     context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # co_lnotab
     )
 
-    add_str(context, method.code_obj.co_name)
-    add_tuple(context, method.code_obj.co_names)
-    add_int(context, method.code_obj.co_nlocals)
-    add_int(context, method.code_obj.co_stacksize)
-    add_tuple(context, method.code_obj.co_varnames)
+    add_str(context, method.code.co_name)
+    add_tuple(context, method.code.co_names)
+    add_int(context, method.code.co_nlocals)
+    add_int(context, method.code.co_stacksize)
+    add_tuple(context, method.code.co_varnames)
 
     context.add_opcodes(
             JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
@@ -2916,11 +2968,11 @@ def add_callable(opcode, context, arguments, full_method_name):
             JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
             JavaOpcodes.LDC_W(method.name),
 
-            ICONST_val(len(method.parameters) - method.self_offset),
+            ICONST_val(len(method.parameters)),
             JavaOpcodes.ANEWARRAY('java/lang/Class'),
     )
 
-    for i, param in enumerate(method.parameters[method.self_offset:]):
+    for i, param in enumerate(method.parameters):
         context.add_opcodes(
             JavaOpcodes.DUP(),
             ICONST_val(i),
@@ -2963,7 +3015,7 @@ def add_callable(opcode, context, arguments, full_method_name):
             )
         else:
             context.add_opcodes(
-                JavaOpcodes.LDC_W(Classref("L%s;" % annotation)),
+                JavaOpcodes.LDC_W(Classref(annotation.replace('.', '/'))),
             )
 
         context.add_opcodes(
@@ -2989,6 +3041,7 @@ def add_callable(opcode, context, arguments, full_method_name):
             JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
     )
 
+    # Default arguments list
     for argument in arguments[:opcode.default_args]:
         context.add_opcodes(
             JavaOpcodes.DUP(),
@@ -3001,8 +3054,8 @@ def add_callable(opcode, context, arguments, full_method_name):
             JavaOpcodes.POP(),
         )
 
+    # Default keyword arguments list
     context.add_opcodes(
-            # Default kwargs
             JavaOpcodes.NEW('java/util/HashMap'),
             JavaOpcodes.DUP(),
             JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
@@ -3023,9 +3076,16 @@ def add_callable(opcode, context, arguments, full_method_name):
             JavaOpcodes.POP(),
         )
 
-    context.add_opcodes(
-            JavaOpcodes.ACONST_NULL(),  # closure
+    # Closure
+    if closure:
+        closure_arg = arguments[-3]
+        closure_arg.operation.transpile(context, closure_arg.arguments)
+    else:
+        context.add_opcodes(
+            JavaOpcodes.ACONST_NULL(),
+        )
 
+    context.add_opcodes(
             JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;Ljava/util/List;)V'),
 
         CATCH('java/lang/NoSuchMethodError'),
@@ -3083,29 +3143,105 @@ class BUILD_SLICE(Opcode):
 
 
 class MAKE_CLOSURE(Opcode):
+    prefaced = 0
+
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.argc = argc
+        self.annotations = (argc >> 16) & 0x7FFF
+        self.default_kwargs = ((argc >> 8) & 0xFF)
+        self.default_args = argc & 0xff
+
+        # if we have annotations, the value wil be one more
+        # than it should be.
+        if self.annotations:
+            self.annotations = self.annotations - 1
 
     def __arg_repr__(self):
-        return '%s' % (self.argc)
+        return '%s default args, %s default kwargs, %s annotations' % (
+            self.default_args,
+            self.default_kwargs,
+            self.annotations,
+        )
 
     @property
     def consume_count(self):
-        return 3 + self.argc
+        if self.annotations:
+            return 4 + self.annotations + self.default_args + (2 * self.default_kwargs)
+        else:
+            return 3 + self.default_args + (2 * self.default_kwargs)
 
     @property
     def product_count(self):
         return 1
 
+    def materialize(self, context, arguments):
+        # Add a new method definition to the context class/module
+        code = arguments[-2].operation.const
+        full_method_name = arguments[-1].operation.const
+
+        # if full_method_name == '<listcomp>':
+        #     full_method_name = 'listcomp_%x' % id(self)
+
+        annotations = {}
+        if self.annotations:
+            values = []
+            for argument in arguments[self.default_args + self.default_kwargs * 2:self.default_args + self.default_kwargs * 2 + self.annotations]:
+                values.append(extract_constant(argument))
+
+            keys = extract_constant(arguments[self.default_args + self.default_kwargs * 2 + self.annotations])
+            annotations = dict(zip(keys, values))
+
+        self.method = context.add_method(full_method_name, code=code, annotations=annotations)
+
+    def convert(self, context, arguments):
+        full_method_name = arguments[-1].operation.const
+        context.next_resolve_list.append((self, 'start_op'))
+
+        # # Build the callable to invoke the method
+        # if self.method.is_constructor:
+        #     pass
+        #     # Nothing needed on stack; class construction is self contained.
+
+        # elif self.method.is_closuremethod:
+        #     context.add_opcodes(
+        #         JavaOpcodes.NEW(self.method.parent.descriptor),
+        #         JavaOpcodes.DUP(),
+
+        #         # These are the args and kwargs for the closure class
+        #         JavaOpcodes.ACONST_NULL(),
+        #         JavaOpcodes.ACONST_NULL(),
+
+        #         JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+
+        #         JavaOpcodes.LDC_W(Classref(self.method.parent.descriptor)),
+        #         JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+
+        #         JavaOpcodes.LDC_W(self.method.name),
+        #     )
+
+        #     add_callable(self, context, arguments, self.method.name)
+
+        #     context.add_opcodes(
+        #         JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+
+        #         JavaOpcodes.LDC_W(self.method.name),
+        #         JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;')
+        #     )
+
+        # else:
+
+        # Push a callable onto the stack so that it can be stored
+        # in globals and subsequently retrieved and run.
+        add_callable(self, context, arguments, full_method_name, closure=True)
+
 
 class LOAD_CLOSURE(Opcode):
-    def __init__(self, i, python_offset, starts_line, is_jump_target):
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.i = i
+        self.name = name
 
     def __arg_repr__(self):
-        return '%s' % (self.i)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -3114,6 +3250,11 @@ class LOAD_CLOSURE(Opcode):
     @property
     def product_count(self):
         return 1
+
+    def convert_opcode(self, context, arguments):
+        # Depending on context, this might mean loading from local
+        # variables, class attributes, or the global context.
+        context.load_name(self.name, use_locals=True)
 
 
 class LOAD_DEREF(Opcode):

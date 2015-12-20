@@ -99,7 +99,6 @@ class StaticBlock(Block):
                 'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
             },
             static=True,
-            code=code
         )
         method.extract(code)
         self.module.methods.append(method)
@@ -235,7 +234,7 @@ class Module(Block):
 
         # Add any static methods defined in the module
         for method in self.methods:
-            classfile.methods.append(method.transpile())
+            classfile.methods.extend(method.transpile())
 
         # The list of classfiles that will be returned will contain
         # at least one entry - the class for the module itself.

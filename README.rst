@@ -42,6 +42,8 @@ What it does:
 
   * `import`, `from X import Y` and `from X import *` statements for Python code
 
+  * Subclassing Python classes
+
   * Importing and using native Java APIs
 
   * Implementing Java interfaces.
@@ -50,13 +52,11 @@ What it does:
 
 It *doesn't* currently support (this list is incomplete):
 
-* Subclassing Python classes
-
 * Generators
 
 * with statements
 
-* ``exec()``/``eval()``
+* ``exec()`` and ``eval()``
 
 These things are all *possible* - it's just a matter of time
 and development effort. The order listed here is a rough indicator of

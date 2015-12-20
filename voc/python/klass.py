@@ -72,22 +72,72 @@ class ClassBlock(Block):
         )
 
     def add_method(self, full_method_name, code, annotations):
-        class_name, method_name = full_method_name.split('.')
+        parts = full_method_name.split('.')
+        method_name = parts[-1]
+        class_name = parts[-2]
+
         if class_name != self.klass.name:
             raise Exception("Method %s being added to %s!" % (full_method_name, self.klass.name))
+
+        parameters = extract_parameters(code, annotations)
 
         method = InstanceMethod(
             self.klass,
             name=method_name,
-            parameters=extract_parameters(code, annotations),
+            parameters=parameters,
             returns={
                 'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
             },
-            code=code)
+            static=True,
+        )
         method.extract(code)
         self.klass.add_method(method)
 
         return method
+
+    def transpile_setup(self):
+        base_namespace = self.parent.namespace.replace('.', '/') + '/'
+        self.add_opcodes(
+            # Set __base__ on the type
+            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.LDC_W(self.klass.bases[0] if self.klass.bases[0].startswith('org/python/') else base_namespace + self.klass.bases[0]),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.PUTFIELD('org/python/types/Type', '__base__', 'Lorg/python/types/Type;'),
+
+            # Set __bases__ on the type
+            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.NEW('org/python/types/Tuple'),
+            JavaOpcodes.DUP(),
+
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+        )
+
+        for base in self.klass.bases:
+            base_namespace = self.parent.namespace.replace('.', '/') + '/'
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(base if base.startswith('org/python/') else base_namespace + base),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP()
+            )
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
+
+            JavaOpcodes.PUTFIELD('org/python/types/Type', '__bases__', 'Lorg/python/types/Tuple;'),
+        )
 
     def transpile_teardown(self):
         self.add_opcodes(
@@ -115,6 +165,7 @@ class Class(Block):
 
         # Track constructors when they are added
         self.init_method = None
+
         # Make sure there is a default constructor
         self.add_method(InitMethod(self))
 
@@ -129,8 +180,6 @@ class Class(Block):
     def add_method(self, method):
         self.methods.append(method)
         if method.name == '__init__':
-            if self.init_method is not None:
-                raise Exception("Multiple __init__ methods defined")
             self.init_method = method
 
     def materialize(self):
@@ -144,7 +193,9 @@ class Class(Block):
         for method in self.methods:
             method.materialize()
 
-        # Add a flag to indicate this was a VOC generated class.
+        # Add a field to indicate this was a VOC generated class.
+        # The value of this field doesn't matter; the fact that it
+        # exists is enough to establish provenance.
         self.fields["__VOC__"] = "Z"
 
     def transpile(self):
@@ -187,7 +238,7 @@ class Class(Block):
 
         # Add any methods
         for method in self.methods:
-            classfile.methods.append(method.transpile())
+            classfile.methods.extend(method.transpile())
 
         return self.namespace, self.name, classfile
 
