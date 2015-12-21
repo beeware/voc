@@ -24,26 +24,26 @@ CO_VARKEYWORDS = 0x0008
 
 
 def descriptor(annotation):
-    if annotation == "bool":
-        return "Z"
-    elif annotation == "byte":
-        return "B"
+    if annotation == 'bool':
+        return 'Z'
+    elif annotation == 'byte':
+        return 'B'
     elif annotation == 'char':
-        return "C"
-    elif annotation == "short":
-        return "S"
-    elif annotation == "int":
-        return "I"
-    elif annotation == "long":
-        return "J"
-    elif annotation == "float":
-        return "F"
-    elif annotation == "double":
-        return "D"
-    elif annotation is None:
-        return "V"
+        return 'C'
+    elif annotation == 'short':
+        return 'S'
+    elif annotation == 'int':
+        return 'I'
+    elif annotation == 'long':
+        return 'J'
+    elif annotation == 'float':
+        return 'F'
+    elif annotation == 'double':
+        return 'D'
+    elif annotation is None or annotation == 'void':
+        return 'V'
     else:
-        return "L%s;" % annotation.replace('.', '/')
+        return 'L%s;' % annotation.replace('.', '/')
 
 
 class Method(Block):
@@ -58,6 +58,10 @@ class Method(Block):
             }
         else:
             self.returns = returns
+
+        # Make sure a return type of "void" is turned into a None annotation.
+        if self.returns.get('annotation', None) == 'void':
+            self.returns['annotation'] = None
 
         # Reserve space for the register that will hold self (if required)
         self.add_self()
@@ -453,6 +457,7 @@ class InstanceMethod(Method):
                         ] + [
                             JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.name, self.signature),
                             {
+                                None: JavaOpcodes.RETURN(),
                                 'bool': JavaOpcodes.IRETURN(),
                                 'byte': JavaOpcodes.IRETURN(),
                                 'char': JavaOpcodes.IRETURN(),

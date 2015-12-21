@@ -9,45 +9,34 @@ public class Function extends org.python.types.Object implements org.python.Call
             return klass.getName();
         }
 
-        switch (klass.getName()) {
-            case "boolean":
-            case "java.lang.Boolean":
-                return "Z";
-
-            case "byte":
-            case "java.lang.Byte":
-                return "B";
-
-            case "char":
-            case "java.lang.Char":
-                return "C";
-
-            case "short":
-            case "java.lang.Short":
-                return "S";
-
-            case "int":
-            case "java.lang.Integer":
-                return "I";
-
-            case "long":
-            case "java.lang.Long":
-                return "J";
-
-            case "float":
-            case "java.lang.Float":
-                return "F";
-
-            case "double":
-            case "java.lang.Double":
-                return "D";
-
-            default:
-                if (weak) {
-                    return "Ljava/lang/Object;";
-                } else {
-                    return "L" + klass.getName().replace('.', '/') + ";";
-                }
+        if (   klass == java.lang.Boolean.TYPE
+            || klass == java.lang.Boolean.class) {
+            return "Z";
+        } else if (   klass == java.lang.Byte.TYPE
+                   || klass == java.lang.Byte.class) {
+            return "B";
+        } else if (   klass == java.lang.Character.TYPE
+                   || klass == java.lang.Character.class) {
+            return "C";
+        } else if (   klass == java.lang.Short.TYPE
+                   || klass == java.lang.Short.class) {
+            return "S";
+        } else if (   klass == java.lang.Integer.TYPE
+                   || klass == java.lang.Integer.class) {
+            return "I";
+        } else if (   klass == java.lang.Long.TYPE
+                   || klass == java.lang.Long.class) {
+            return "J";
+        } else if (   klass == java.lang.Float.TYPE
+                   || klass == java.lang.Float.class) {
+            return "F";
+        } else if (   klass == java.lang.Double.TYPE
+                   || klass == java.lang.Double.class) {
+            return "D";
+        } else if (weak) {
+            return "Ljava/lang/Object;";
+        } else {
+            return "L" + klass.getName().replace('.', '/') + ";";
         }
     }
 
