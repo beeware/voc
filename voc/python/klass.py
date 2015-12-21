@@ -4,6 +4,7 @@ from ..java import (
     Class as JavaClass,
     Field as JavaField,
     Method as JavaMethod,
+    Code as JavaCode,
     opcodes as JavaOpcodes,
     SourceFile,
     RuntimeVisibleAnnotations,
@@ -239,6 +240,26 @@ class Class(Block):
         # Add any methods
         for method in self.methods:
             classfile.methods.extend(method.transpile())
+
+        if self.extends:
+            classfile.methods.append(
+                JavaMethod(
+                    '<init>',
+                    '()V',
+                    static=False,
+                    attributes=[
+                        JavaCode(
+                            max_stack=1,
+                            max_locals=1,
+                            code=[
+                                JavaOpcodes.ALOAD_0(),
+                                JavaOpcodes.INVOKESPECIAL(self.extends, '<init>', '()V'),
+                                JavaOpcodes.RETURN(),
+                            ]
+                        )
+                    ]
+                )
+            )
 
         return self.namespace, self.name, classfile
 
