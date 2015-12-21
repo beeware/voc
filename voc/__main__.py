@@ -10,10 +10,10 @@ def main():
         srcdir = sys.argv[2]
         outdir = None
     elif len(sys.argv) == 4:
-        srcdir = sys.argv[3]
-        outdir = sys.argv[2]
+        srcdir = sys.argv[2]
+        outdir = sys.argv[3]
     else:
-        print("Usage: voc <path to .py file> [<input dir>] [<output dir>]")
+        print("Usage: voc <path to .py file> [<input prefix>] [<output dir>]")
         print()
         print('  e.g.: voc tests/example.py src out')
         sys.exit(1)
