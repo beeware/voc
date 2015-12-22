@@ -30,7 +30,7 @@ public class Object extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<Native %s object at 0x>", this.object.getClass(), this.object.hashCode()));
+        return new org.python.types.Str(String.format("<Native %s object at 0x%x>", this.object.getClass(), this.object.hashCode()));
     }
 
     @org.python.Method(
