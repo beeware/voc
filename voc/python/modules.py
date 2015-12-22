@@ -21,8 +21,9 @@ class StaticBlock(Block):
 
             JavaOpcodes.NEW('org/python/types/Module'),
             JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.descriptor.replace('/', '.')),
+            JavaOpcodes.LDC_W(self.module.class_name),
             JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+
             JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', '(Ljava/lang/Class;)V'),
 
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
@@ -111,8 +112,6 @@ class Module(Block):
         self.sourcefile = sourcefile
 
         parts = os.path.splitext(sourcefile)[0].split(os.path.sep)
-        # The __init__ module is collapsed up one level to be the
-        # static block in the "parent" class.
         if parts[-1] == '__init__':
             parts.pop()
 
@@ -133,6 +132,14 @@ class Module(Block):
     @property
     def descriptor(self):
         return '/'.join(self.namespace.split('.') + [self.name])
+
+    @property
+    def class_name(self):
+        return '.'.join(self.namespace.split('.') + [self.name, '__init__'])
+
+    @property
+    def class_descriptor(self):
+        return '/'.join(self.namespace.split('.') + [self.name, '__init__'])
 
     def materialize(self):
         "Convert a collection of commands into a full Python code definition"
@@ -204,7 +211,7 @@ class Module(Block):
         """
         # If there is any static content, generate a classfile
         # for this module
-        classfile = JavaClass(self.descriptor, extends='org/python/types/Module')
+        classfile = JavaClass(self.class_descriptor, extends='org/python/types/Module')
         classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
 
         # Add a static method to the module, populated with the
@@ -238,7 +245,11 @@ class Module(Block):
 
         # The list of classfiles that will be returned will contain
         # at least one entry - the class for the module itself.
-        classfiles = [(self.namespace, self.name, classfile)]
+        classfiles = [(
+            self.namespace,
+            '%s/__init__' % self.name,
+            classfile
+        )]
         # Also output any classes defined in this module.
         for klass in self.classes:
             classfiles.append(klass.transpile())

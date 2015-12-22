@@ -567,7 +567,7 @@ class MainMethod(Method):
 
             JavaOpcodes.NEW('org/python/types/Module'),
             JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.descriptor.replace('/', '.')),
+            JavaOpcodes.LDC_W(self.module.class_name),
             JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', '(Ljava/lang/Class;)V'),
 

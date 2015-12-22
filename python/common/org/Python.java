@@ -10,7 +10,11 @@ public class Python {
         org.Python.initializeModule(org.Python.class, builtins);
     }
 
-    public static void debug(java.lang.Object msg, java.lang.String label) {
+    public static void debug(java.lang.String label) {
+        System.out.println("DEBUG " + label);
+    }
+
+    public static void debug(java.lang.String label, java.lang.Object msg) {
         System.out.println("DEBUG " + label + ": " + msg);
     }
 

@@ -2965,7 +2965,7 @@ def add_callable(opcode, context, arguments, full_method_name, closure=False):
             JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
 
             # Get a Method representing the new function
-            JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
+            JavaOpcodes.LDC_W(Classref(method.parent.class_descriptor)),
             JavaOpcodes.LDC_W(method.name),
 
             ICONST_val(len(method.parameters)),

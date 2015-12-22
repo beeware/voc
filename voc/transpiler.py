@@ -29,12 +29,12 @@ class Transpiler:
 
         for namespace, class_name, javaclassfile in self.classfiles:
             dirname = os.path.join(*(basedir + namespace.split('.')))
+            classfilename = os.path.join(dirname, '%s.class' % class_name)
+
             try:
-                os.makedirs(dirname)
+                os.makedirs(os.path.dirname(classfilename))
             except FileExistsError:
                 pass
-
-            classfilename = os.path.join(dirname, '%s.class' % class_name)
 
             if verbosity:
                 print("Writing %s ..." % classfilename)

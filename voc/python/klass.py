@@ -175,6 +175,14 @@ class Class(Block):
         return '/'.join([self.namespace.replace('.', '/'), self.name])
 
     @property
+    def class_name(self):
+        return '.'.join(self.namespace.split('.') + [self.name])
+
+    @property
+    def class_descriptor(self):
+        return '/'.join(self.namespace.split('.') + [self.name])
+
+    @property
     def module(self):
         return self.parent
 
