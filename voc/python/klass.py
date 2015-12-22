@@ -98,12 +98,18 @@ class ClassBlock(Block):
 
     def transpile_setup(self):
         base_namespace = self.parent.namespace.replace('.', '/') + '/'
+
+        if self.klass.extends:
+            base_descriptor = self.klass.extends.replace('.', '/')
+        else:
+            base_descriptor = self.klass.bases[0] if self.klass.bases[0].startswith('org/python/') else base_namespace + self.klass.bases[0]
+
         self.add_opcodes(
             # Set __base__ on the type
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
-            JavaOpcodes.LDC_W(self.klass.bases[0] if self.klass.bases[0].startswith('org/python/') else base_namespace + self.klass.bases[0]),
+            JavaOpcodes.LDC_W(base_descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
             JavaOpcodes.PUTFIELD('org/python/types/Type', '__base__', 'Lorg/python/types/Type;'),
@@ -119,6 +125,19 @@ class ClassBlock(Block):
             JavaOpcodes.DUP(),
             JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
         )
+
+        if self.klass.extends:
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(self.klass.extends.replace('.', '/')),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP()
+            )
 
         for base in self.klass.bases:
             base_namespace = self.parent.namespace.replace('.', '/') + '/'
