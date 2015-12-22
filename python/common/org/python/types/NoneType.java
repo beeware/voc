@@ -6,6 +6,10 @@ public class NoneType extends org.python.types.Object {
 
     NoneType() {}
 
+    public java.lang.Object toJava() {
+        return null;
+    }
+
     @org.python.Method(
         __doc__ = ""
     )
