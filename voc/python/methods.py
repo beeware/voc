@@ -11,7 +11,8 @@ from .blocks import Block
 from .opcodes import (
     ALOAD_name, ASTORE_name, free_name,
     ILOAD_name, FLOAD_name, DLOAD_name,
-    Opcode, TRY, CATCH, END_TRY
+    Opcode, TRY, CATCH, END_TRY,
+    IF, ELSE, END_IF
 )
 
 POSITIONAL_OR_KEYWORD = 1
@@ -204,95 +205,143 @@ class Method(Block):
 
         return method
 
-    def transpile_args(self):
+    def transpile_params(self):
         for i, param in enumerate(self.parameters):
             annotation = param.get('annotation', 'org/python/Object')
 
             if annotation is None:
-                raise Exception("Arguments can't be void")
+                raise Exception("Parameters can't be void")
             elif annotation == "bool":
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Bool'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Bool'),
+                        JavaOpcodes.DUP(),
+                        ILOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation == "byte":
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Int'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(B)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Int'),
+                        JavaOpcodes.DUP(),
+                        ILOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(B)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation == 'char':
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Str'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(C)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Str'),
+                        JavaOpcodes.DUP(),
+                        ILOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(C)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation == "short":
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Int'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(S)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Int'),
+                        JavaOpcodes.DUP(),
+                        ILOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(S)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation == "int":
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Int'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Int'),
+                        JavaOpcodes.DUP(),
+                        ILOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation == "long":
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Int'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Int'),
+                        JavaOpcodes.DUP(),
+                        ILOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation == "float":
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Float'),
-                    JavaOpcodes.DUP(),
-                    FLOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(F)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([FLOAD_name(self, param['name'])], JavaOpcodes.IFNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Float'),
+                        JavaOpcodes.DUP(),
+                        FLOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(F)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation == "double":
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Float'),
-                    JavaOpcodes.DUP(),
-                    DLOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([DLOAD_name(self, param['name'])], JavaOpcodes.IFNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Float'),
+                        JavaOpcodes.DUP(),
+                        DLOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation == "java/lang/String":
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Str'),
-                    JavaOpcodes.DUP(),
-                    ALOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([
+                                ALOAD_name(self, param['name']),
+                                JavaOpcodes.ACONST_NULL()
+                            ], JavaOpcodes.IF_ACMPNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Str'),
+                        JavaOpcodes.DUP(),
+                        ALOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
             elif annotation != 'org/python/Object':
                 self.add_opcodes(
-                    JavaOpcodes.NEW('org/python/java/Object'),
-                    JavaOpcodes.DUP(),
-                    ALOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),
-                    ASTORE_name(self, param['name']),
+                    IF([
+                                ALOAD_name(self, param['name']),
+                                JavaOpcodes.ACONST_NULL()
+                            ], JavaOpcodes.IF_ACMPNE),
+                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/java/Object'),
+                        JavaOpcodes.DUP(),
+                        ALOAD_name(self, param['name']),
+                        JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
+                        JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),
+                    END_IF(),
+                    ASTORE_name(self, param['name'])
                 )
+            # else:  # org/python/Object; no transformation required
 
     def transpile_setup(self):
-        self.transpile_args()
+        self.transpile_params()
 
     def transpile_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
