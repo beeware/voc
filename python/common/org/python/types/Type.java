@@ -163,7 +163,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // with the given name exists, caching either the Field instance,
             // or an AttributeError representation of the NoSuchFieldException.
             try {
-                value = new org.python.java.Field(this.klass.getField(name));
+                value = new org.python.java.Field(this.klass.getDeclaredField(name));
             } catch (java.lang.NoSuchFieldException e) {
                 value = new org.python.exceptions.AttributeError(this.klass, name);
             }

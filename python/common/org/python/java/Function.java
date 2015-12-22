@@ -78,9 +78,10 @@ public class Function extends org.python.types.Object implements org.python.Call
     public Function(java.lang.Class klass, java.lang.String name) {
         super();
         this.name = name;
+        // org.Python.debug("FUNCTION ", this.name);
         this.methods = new java.util.HashMap<java.lang.String, java.lang.reflect.Method>();
-        for (java.lang.reflect.Method method: klass.getMethods()) {
-            // System.out.println("METHOD:" + method);
+        for (java.lang.reflect.Method method: klass.getDeclaredMethods()) {
+            // org.Python.debug("METHOD:", method.getName());
             java.lang.StringBuilder signature = new java.lang.StringBuilder();
             if (method.getName().equals(name)) {
 
@@ -88,13 +89,14 @@ public class Function extends org.python.types.Object implements org.python.Call
                     signature.append(org.python.java.Function.descriptor(c, false));
                 }
 
+                // org.Python.debug("  match: ", signature);
                 this.methods.put(
                     signature.toString(),
                     method
                 );
             }
         }
-        // System.out.println("FUNCTION " + this.name + " " + this.methods);
+        // org.Python.debug("methods: ", this.methods);
         if (this.methods.size() == 0) {
             throw new org.python.exceptions.AttributeError(klass, name);
         }

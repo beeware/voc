@@ -26,6 +26,7 @@ public class Type extends org.python.types.Type {
     public org.python.Object __getattribute_null(java.lang.String name) {
         // System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + name);
         // System.out.println("CLASS ATTRS " + this.attrs);
+        // org.Python.debug("GETATTRIBUTE NATIVE TYPE", name);
         org.python.Object value = this.attrs.get(name);
 
         // On a native type, attrs is a cache of lookups on actual functions.
@@ -43,7 +44,7 @@ public class Type extends org.python.types.Type {
                 } catch (org.python.exceptions.AttributeError ae) {
                     // No function; look for an attribute with the same name.
                     try {
-                        value = new org.python.java.Field(klass.getField(name));
+                        value = new org.python.java.Field(klass.getDeclaredField(name));
                     } catch (java.lang.NoSuchFieldException e) {
                         // Field does not exist.
                         value = null;
