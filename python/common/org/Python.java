@@ -10,12 +10,12 @@ public class Python {
         org.Python.initializeModule(org.Python.class, builtins);
     }
 
-    public static void debug(java.lang.String label) {
-        System.out.println("DEBUG " + label);
+    public static void debug(java.lang.String msg) {
+        python.platform.impl.debug(msg);
     }
 
-    public static void debug(java.lang.String label, java.lang.Object msg) {
-        System.out.println("DEBUG " + label + ": " + msg);
+    public static void debug(java.lang.String msg, java.lang.Object obj) {
+        python.platform.impl.debug(msg, obj);
     }
 
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
