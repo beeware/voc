@@ -257,13 +257,13 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
-            Str other_str = (Str)other;
+            org.python.types.Str other_str = (org.python.types.Str)other;
             if (0 == other_str.value.length()) {
                 return this;
             }
             java.lang.StringBuffer sb = new java.lang.StringBuffer(value);
             sb.append(other_str.value);
-            return new Str(sb.toString());
+            return new org.python.types.Str(sb.toString());
         }
         throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
     }
