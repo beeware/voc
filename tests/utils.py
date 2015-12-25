@@ -117,7 +117,7 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, arg
         args = []
 
     proc = subprocess.Popen(
-        ["python", "test.py"] + args,
+        ["python3", "test.py"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
