@@ -80,21 +80,32 @@ public class Function extends org.python.types.Object implements org.python.Call
         this.name = name;
         // org.Python.debug("FUNCTION ", this.name);
         this.methods = new java.util.HashMap<java.lang.String, java.lang.reflect.Method>();
-        for (java.lang.reflect.Method method: klass.getDeclaredMethods()) {
-            // org.Python.debug("METHOD:", method.getName());
-            java.lang.StringBuilder signature = new java.lang.StringBuilder();
-            if (method.getName().equals(name)) {
 
-                for (java.lang.Class c: method.getParameterTypes()) {
-                    signature.append(org.python.java.Function.descriptor(c, false));
+        java.lang.Class<?> clazz = klass;
+        while (clazz != null) {
+            // org.Python.debug("CLAZZ:", clazz);
+            for (java.lang.reflect.Method method: clazz.getDeclaredMethods()) {
+                // org.Python.debug("METHOD:", method.getName());
+                if (method.getName().equals(name)) {
+                    java.lang.StringBuilder signature = new java.lang.StringBuilder();
+
+                    for (java.lang.Class c: method.getParameterTypes()) {
+                        signature.append(org.python.java.Function.descriptor(c, false));
+                    }
+
+                    // org.Python.debug("  match: ", signature.toString());
+                    // org.Python.debug("    known: ", this.methods.containsKey(signature.toString()));
+                    // org.Python.debug("    abstract: ", java.lang.reflect.Modifier.isAbstract(method.getModifiers()));
+
+                    java.lang.String sig = signature.toString();
+                    boolean is_abstract = java.lang.reflect.Modifier.isAbstract(method.getModifiers());
+                    if (!this.methods.containsKey(sig) && !is_abstract) {
+                        this.methods.put(sig, method);
+                    }
                 }
-
-                // org.Python.debug("  match: ", signature);
-                this.methods.put(
-                    signature.toString(),
-                    method
-                );
             }
+
+            clazz = clazz.getSuperclass();
         }
         // org.Python.debug("methods: ", this.methods);
         if (this.methods.size() == 0) {
@@ -126,13 +137,16 @@ public class Function extends org.python.types.Object implements org.python.Call
     public org.python.Object invoke(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             java.lang.Object target = null;
+            // org.Python.debug("Native Function:", this.name);
+            // org.Python.debug("       instance: ", instance);
             if (instance != null) {
                 target = instance.toObject();
+                // org.Python.debug("       target: ", target);
             }
 
             // System.out.println("Native Function:" + this.name);
             // System.out.println("       instance: " + instance);
-            // System.out.println("       target: " + target);
+            // System.out.println("       target: " + target.getClass());
             // System.out.println("           args:");
             // for (org.python.Object arg: args) {
             //     System.out.println("                " + arg);
@@ -151,12 +165,14 @@ public class Function extends org.python.types.Object implements org.python.Call
             // System.out.println("Invoke method " + method + " with ");
             // System.out.print("           args:");
             // for (java.lang.Object arg: adjusted_args) {
-            //     System.out.print(arg + ", ");
+            //     System.out.print(arg + " (" + arg.getClass() + ")");
             // }
             // System.out.println();
-            return org.python.types.Type.toPython(method.invoke(target, adjusted_args));
-
+            java.lang.Object result = method.invoke(target, adjusted_args);
+            // System.out.println("RESULT " + result);
+            return org.python.types.Type.toPython(result);
         } catch (java.lang.IllegalAccessException e) {
+            e.printStackTrace();
             throw new org.python.exceptions.RuntimeError("Illegal access to Java function");
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
