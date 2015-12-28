@@ -15,7 +15,11 @@ public class Python {
     }
 
     public static void debug(java.lang.String msg, java.lang.Object obj) {
-        python.platform.impl.debug(msg, obj);
+        if (obj == null) {
+            python.platform.impl.debug(msg, "NULL");
+        } else {
+            python.platform.impl.debug(msg, obj);
+        }
     }
 
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
