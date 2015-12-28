@@ -1,9 +1,9 @@
-package python;
+package python.platform;
 
 import android.os.Debug;
 
 
-public class AndroidPlatform implements python.PythonPlatform {
+public class AndroidPlatform implements python.Platform {
     public AndroidPlatform() {}
 
     public long clock() {

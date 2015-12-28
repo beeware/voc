@@ -190,7 +190,7 @@ def cleanse_java(input):
         ]),
         '\n' if stack else ''
     )
-    return JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test'", '***EXECUTABLE***')
+    return JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***')
 
 
 def cleanse_python(input):
@@ -341,7 +341,6 @@ class TranspileTestCase(TestCase):
                 # Clean up the test directory where the class file was written.
                 shutil.rmtree(test_dir)
                 # print(java_out)
-
 
             # Cleanse the Python and Java output, producing a simple
             # normalized format for exceptions, floats etc.

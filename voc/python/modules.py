@@ -53,7 +53,7 @@ class StaticBlock(Block):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.LDC_W(self.module.class_name),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
             JavaOpcodes.GETFIELD('org/python/types/Type', 'attrs', 'Ljava/util/Map;'),

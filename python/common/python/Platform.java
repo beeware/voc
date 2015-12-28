@@ -1,6 +1,6 @@
 package python;
 
-public interface PythonPlatform {
+public interface Platform {
     /**
      * Return the number of CPU nanoseconds that this thread has consumed.
      */

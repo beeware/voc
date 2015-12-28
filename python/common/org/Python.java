@@ -11,14 +11,14 @@ public class Python {
     }
 
     public static void debug(java.lang.String msg) {
-        python.platform.impl.debug(msg);
+        python.platform.__init__.impl.debug(msg);
     }
 
     public static void debug(java.lang.String msg, java.lang.Object obj) {
         if (obj == null) {
-            python.platform.impl.debug(msg, "NULL");
+            python.platform.__init__.impl.debug(msg, "NULL");
         } else {
-            python.platform.impl.debug(msg, obj);
+            python.platform.__init__.impl.debug(msg, obj);
         }
     }
 

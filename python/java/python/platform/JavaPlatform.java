@@ -1,10 +1,10 @@
-package python;
+package python.platform;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
 
-public class JavaPlatform implements python.PythonPlatform {
+public class JavaPlatform implements python.Platform {
     public JavaPlatform() {}
 
     public long clock() {
