@@ -275,28 +275,28 @@ public class Object implements org.python.Object {
 
     public org.python.Object __getattribute_null(java.lang.String name) {
         // Look for local instance attributes first
-        // System.out.println("GETATTRIBUTE " + name);
-        // System.out.println("ATTRS " + this.attrs);
+        // org.Python.debug("GETATTRIBUTE ", name);
+        // org.Python.debug("ATTRS ", this.attrs);
         org.python.Object value = this.attrs.get(name);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
 
         if (value == null) {
             // Look to the class for an attribute
-            // System.out.println("no instance attribute");
+            // org.Python.debug("no instance attribute");
             value = cls.__getattribute_null(name);
             if (value == null) {
-                // System.out.println("no class attribute");
+                // org.Python.debug("no class attribute");
                 // Use the descriptor protocol
                 value = this.__getattr_null(name);
                 if (value == null) {
-                    // System.out.println("no descriptor protocol");
+                    // org.Python.debug("no descriptor protocol");
                     // Still nothing - give up, and return a value
                     // that can be interpreted as an exception.
                     return null;
                 }
             }
         }
-        // System.out.println("GETATTRIBUTE " + name + " = " + value);
+        // org.Python.debug("GETATTRIBUTE %s = " % name, value);
         // Post-process the value retrieved.
         return value.__get__(this, cls);
     }
@@ -329,7 +329,7 @@ public class Object implements org.python.Object {
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
-        // System.out.println("SETATTR " + name + " = " + value + " ");
+        // org.Python.debug("SETATTR %s =" % name, value);
         org.python.types.Type cls = (org.python.types.Type) this.attrs.get("__class__");
 
         // If the attribute already exists, then it's OK to set it.
