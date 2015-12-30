@@ -117,7 +117,7 @@ public class Function extends org.python.types.Object implements org.python.Call
                         }
                     }
 
-                    if (more_specific && (less_specific == null || !less_specific)) {
+                    if (more_specific != null && more_specific && (less_specific == null || !less_specific)) {
                         // org.Python.debug("New best candidate", candidate);
                         method = candidate;
                         param_types = candidate_types;
@@ -227,6 +227,9 @@ public class Function extends org.python.types.Object implements org.python.Call
             }
             // for (org.python.Object arg: args) {
             //     org.Python.debug("            arg: ", arg);
+            //     if (arg != null) {
+            //         org.Python.debug("           type: ", arg.getClass());
+            //     }
             // }
             // org.Python.debug("         kwargs: ", kwargs);
 
