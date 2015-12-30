@@ -1,10 +1,10 @@
-package python;
+package python.sys;
 
 
-public class sys extends org.python.types.Module {
+public class __init__ extends org.python.types.Module {
     static {
-        org.python.types.Type cls = org.python.types.Type.pythonType(python.sys.class);
-        org.Python.initializeModule(python.sys.class, cls.attrs);
+        org.python.types.Type cls = org.python.types.Type.pythonType(python.sys.__init__.class);
+        org.Python.initializeModule(python.sys.__init__.class, cls.attrs);
     }
 
     @org.python.Method(

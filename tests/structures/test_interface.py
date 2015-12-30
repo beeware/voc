@@ -36,6 +36,6 @@ class InterfaceTests(TranspileTestCase):
             print("Done.")
             """,
             """
-            Hello, world
+            Hello, xxxxx
             Done.
             """, run_in_function=False)

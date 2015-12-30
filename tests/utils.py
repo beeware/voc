@@ -148,7 +148,7 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
         args = []
 
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../dist/python-java.jar:.", "-XX:-UseSplitVerifier", "python.test"] + args,
+        ["java", "-classpath", "../../dist/python-java.jar:.", "-XX:-UseSplitVerifier", "python.test.__init__"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -190,7 +190,7 @@ def cleanse_java(input):
         ]),
         '\n' if stack else ''
     )
-    return JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test'", '***EXECUTABLE***')
+    return JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***')
 
 
 def cleanse_python(input):
@@ -341,7 +341,6 @@ class TranspileTestCase(TestCase):
                 # Clean up the test directory where the class file was written.
                 shutil.rmtree(test_dir)
                 # print(java_out)
-
 
             # Cleanse the Python and Java output, producing a simple
             # normalized format for exceptions, floats etc.

@@ -1,12 +1,12 @@
-package python;
+package python.time;
 
 
-public class time extends org.python.types.Module {
+public class __init__ extends org.python.types.Module {
     static {
-        org.python.types.Type cls = org.python.types.Type.pythonType(python.time.class);
-        org.Python.initializeModule(python.time.class, cls.attrs);
+        org.python.types.Type cls = org.python.types.Type.pythonType(python.time.__init__.class);
+        org.Python.initializeModule(python.time.__init__.class, cls.attrs);
 
-        vm_start_time = python.platform.impl.clock();
+        vm_start_time = python.platform.__init__.impl.clock();
     }
 
     private static long vm_start_time;
@@ -36,7 +36,7 @@ public class time extends org.python.types.Module {
             "records.\n"
     )
     public static org.python.Object clock() {
-        long current_time = python.platform.impl.clock() - vm_start_time;
+        long current_time = python.platform.__init__.impl.clock() - vm_start_time;
 
         // thread time is in nanoseconds; convert to seconds.
         return new org.python.types.Float(current_time / 1000000000.0);

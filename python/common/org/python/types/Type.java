@@ -33,7 +33,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 }
             } else {
                 try {
-                    java_class.getField("__VOC__");
+                    java_class.getDeclaredField("__VOC__");
                     python_type = new org.python.java.Type(Origin.EXTENSION, java_class);
                 } catch (NoSuchFieldException e) {
                     python_type = new org.python.java.Type(Origin.JAVA, java_class);
@@ -70,48 +70,36 @@ public class Type extends org.python.types.Object implements org.python.Callable
         if (value == null) {
             return org.python.types.NoneType.NONE;
         } else {
-            switch (value.getClass().getName()) {
-                case "boolean":
-                case "java.lang.Boolean":
-                    return new org.python.types.Bool((boolean) value);
-
-                case "byte":
-                case "java.lang.Byte":
-                    return new org.python.types.Int((byte) value);
-
-                case "char":
-                case "java.lang.Char":
-                    return new org.python.types.Str((char) value);
-
-                case "short":
-                case "java.lang.Short":
-                    return new org.python.types.Int((short) value);
-
-                case "int":
-                case "java.lang.Integer":
-                    return new org.python.types.Int((int) value);
-
-                case "long":
-                case "java.lang.Long":
-                    return new org.python.types.Int((long) value);
-
-                case "float":
-                case "java.lang.Float":
-                    return new org.python.types.Float((float) value);
-
-                case "double":
-                case "java.lang.Double":
-                    return new org.python.types.Float((double) value);
-
-                case "java.lang.String":
-                    return new org.python.types.Str((java.lang.String) value);
-
-                default:
-                    if (org.python.Object.class.isAssignableFrom(value.getClass())) {
-                        return (org.python.Object) value;
-                    } else {
-                        return new org.python.java.Object(value);
-                    }
+            if (   value.getClass() == java.lang.Boolean.TYPE
+                || value.getClass() == java.lang.Boolean.class) {
+                return new org.python.types.Bool((java.lang.Boolean) value);
+            } else if (   value.getClass() == java.lang.Byte.TYPE
+                       || value.getClass() == java.lang.Byte.class) {
+                return new org.python.types.Int((java.lang.Byte) value);
+            } else if (   value.getClass() == java.lang.Character.TYPE
+                       || value.getClass() == java.lang.Character.class) {
+                return new org.python.types.Str((java.lang.Character) value);
+            } else if (   value.getClass() == java.lang.Short.TYPE
+                       || value.getClass() == java.lang.Short.class) {
+                return new org.python.types.Int((java.lang.Short) value);
+            } else if (   value.getClass() == java.lang.Integer.TYPE
+                       || value.getClass() == java.lang.Integer.class) {
+                return new org.python.types.Int((java.lang.Integer) value);
+            } else if (   value.getClass() == java.lang.Long.TYPE
+                       || value.getClass() == java.lang.Long.class) {
+                return new org.python.types.Int((java.lang.Long) value);
+            } else if (   value.getClass() == java.lang.Float.TYPE
+                       || value.getClass() == java.lang.Float.class) {
+                return new org.python.types.Float((java.lang.Float) value);
+            } else if (   value.getClass() == java.lang.Double.TYPE
+                       || value.getClass() == java.lang.Double.class) {
+                return new org.python.types.Float((java.lang.Double) value);
+            } else if (value.getClass() == java.lang.String.class) {
+                return new org.python.types.Str((java.lang.String) value);
+            } else if (org.python.Object.class.isAssignableFrom(value.getClass())) {
+                return (org.python.Object) value;
+            } else {
+                return new org.python.java.Object(value);
             }
         }
     }
@@ -175,7 +163,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // with the given name exists, caching either the Field instance,
             // or an AttributeError representation of the NoSuchFieldException.
             try {
-                value = new org.python.java.Field(this.klass.getField(name));
+                value = new org.python.java.Field(this.klass.getDeclaredField(name));
             } catch (java.lang.NoSuchFieldException e) {
                 value = new org.python.exceptions.AttributeError(this.klass, name);
             }
@@ -216,18 +204,13 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("CONSTRUCTOR :" + this.constructor);
-            // System.out.println("TYPE: " + this);
-            // System.out.println("ARGS:");
+            // org.Python.debug("Constructor:", this.constructor);
+            // org.Python.debug("     Origin:", this.origin);
+            // org.Python.debug("       Type:", this);
             // for (org.python.Object arg: args) {
-            //     System.out.print("  " + arg + ",");
+            //     org.Python.debug("            arg: ", arg);
             // }
-            // System.out.println();
-
-            // System.out.println("KWARGS:");
-            // for (java.lang.String argname: kwargs.keySet()) {
-            //     System.out.println("  " + argname + " = " + kwargs.get(argname));
-            // }
+            // org.Python.debug("         kwargs: ", kwargs);
 
             if (this.constructor != null) {
                 return (org.python.Object) this.constructor.newInstance(args, kwargs);

@@ -10,8 +10,16 @@ public class Python {
         org.Python.initializeModule(org.Python.class, builtins);
     }
 
-    public static void debug(java.lang.Object msg, java.lang.String label) {
-        System.out.println("DEBUG " + label + ": " + msg);
+    public static void debug(java.lang.String msg) {
+        python.platform.__init__.impl.debug(msg);
+    }
+
+    public static void debug(java.lang.String msg, java.lang.Object obj) {
+        if (obj == null) {
+            python.platform.__init__.impl.debug(msg, "NULL");
+        } else {
+            python.platform.__init__.impl.debug(msg, obj);
+        }
     }
 
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {

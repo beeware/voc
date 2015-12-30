@@ -234,16 +234,17 @@ public class Function extends org.python.types.Object implements org.python.Call
 
     public org.python.Object invoke(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("Function:" + this.name);
-            // System.out.println("       instance: " + instance);
-            // System.out.print("           args:");
+            // org.Python.debug("Function:", this.name);
+            // org.Python.debug("       instance: ", instance);
             // for (org.python.Object arg: args) {
-            //     System.out.print(arg + ", ");
+            //     org.Python.debug("            arg: ", arg);
+            //     if (arg != null) {
+            //         org.Python.debug("           type: ", arg.getClass());
+            //     }
             // }
-            // System.out.println();
-            // System.out.println("         kwargs:" + kwargs);
-            // System.out.println("   default args: " + this.default_args);
-            // System.out.println(" default kwargs: " + this.default_kwargs);
+            // org.Python.debug("         kwargs: ", kwargs);
+            // org.Python.debug("   default args: ", this.default_args);
+            // org.Python.debug(" default kwargs: ", this.default_kwargs);
 
             // if this.attrs.__code__.co_flags & CO_GENERATOR:
             //     gen = Generator(frame, self._vm)
@@ -254,13 +255,14 @@ public class Function extends org.python.types.Object implements org.python.Call
             java.lang.Object [] adjusted_args = adjustArguments(instance, args, kwargs);
 
             // if (adjusted_args != null) {
-            //     System.out.print("Adjusted args:");
             //     for (java.lang.Object arg: adjusted_args) {
-            //         System.out.print(arg + ", ");
+            //         org.Python.debug("   Adjusted arg: ", arg);
+            //         if (arg != null) {
+            //             org.Python.debug("           type: ", arg.getClass());
+            //         }
             //     }
-            //     System.out.println();
             // } else {
-            //     System.out.println("No adjusted args");
+            //     org.Python.debug("No adjusted args");
             // }
 
             // Python methods are stored as static methods on the class, so
@@ -268,9 +270,9 @@ public class Function extends org.python.types.Object implements org.python.Call
             // not as the implied Java register 0. Builtins and closure methods
             // require the instance to be passed as the explicit instance.
             if (java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
-                return (org.python.Object) this.method.invoke(null, adjusted_args);
+                return org.python.types.Type.toPython(this.method.invoke(null, adjusted_args));
             } else {
-                return (org.python.Object) this.method.invoke(instance, adjusted_args);
+                return org.python.types.Type.toPython(this.method.invoke(instance, adjusted_args));
             }
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.method);

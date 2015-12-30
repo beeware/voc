@@ -1,8 +1,8 @@
-package python;
+package python.platform;
 
 
-public class platform extends org.python.types.Module {
-    public static PythonPlatform impl;
+public class __init__ extends org.python.types.Module {
+    public static python.Platform impl;
 
     static {
         java.util.Properties prop = System.getProperties();
@@ -11,16 +11,16 @@ public class platform extends org.python.types.Module {
         java.lang.Class platform_class;
 
         if (vendor.equals("Oracle Corporation")) {
-            platform_class_name = "python.JavaPlatform";
+            platform_class_name = "python.platform.JavaPlatform";
         } else if (vendor.equals("The Android Project")) {
-            platform_class_name = "python.AndroidPlatform";
+            platform_class_name = "python.platform.AndroidPlatform";
         } else {
             throw new org.python.exceptions.RuntimeError("Unknown platform vendor '" + vendor + "'");
         }
 
         try {
             platform_class = Class.forName(platform_class_name);
-            impl = (PythonPlatform) platform_class.getConstructor().newInstance();
+            impl = (python.Platform) platform_class.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             throw new org.python.exceptions.RuntimeError("Unable to find platform '" + platform_class_name + "'");
         } catch (NoSuchMethodException e) {

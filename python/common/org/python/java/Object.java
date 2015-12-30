@@ -23,14 +23,24 @@ public class Object extends org.python.types.Object {
 
     public Object(org.python.types.Type.Origin origin, java.lang.Object object) {
         super(origin, object.getClass());
+        // System.out.println("JAVA WRAPPER FOR " + this.getClass());
         this.object = object;
+        try {
+            java.lang.reflect.Field voc_field = this.object.getClass().getField("__VOC__");
+            // System.out.println("SET __VOC__");
+            voc_field.set(this.object, this);
+        } catch (NoSuchFieldException e) {
+            // System.out.println("NO __VOC__ FIELD");
+        } catch (java.lang.IllegalAccessException e) {
+            throw new org.python.exceptions.RuntimeError("Illegal access to __VOC__ field for " + this.object.getClass());
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<Native %s object at 0x>", this.object.getClass(), this.object.hashCode()));
+        return new org.python.types.Str(String.format("<Native %s object at 0x%x>", this.object.getClass(), this.object.hashCode()));
     }
 
     @org.python.Method(
