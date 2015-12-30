@@ -101,6 +101,7 @@ class Method(Block):
                 ASTORE_name(self, '#value'),
 
                 JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
+
                 JavaOpcodes.LDC_W(self.globals_module.descriptor),
                 JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -128,6 +129,7 @@ class Method(Block):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
             JavaOpcodes.LDC_W(self.globals_module.descriptor),
+
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -213,6 +215,9 @@ class Method(Block):
                 raise Exception("Parameters can't be void")
             elif annotation == "bool":
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
                         JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                     ELSE(),
@@ -225,6 +230,9 @@ class Method(Block):
                 )
             elif annotation == "byte":
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
                         JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                     ELSE(),
@@ -237,6 +245,9 @@ class Method(Block):
                 )
             elif annotation == 'char':
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
                         JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                     ELSE(),
@@ -249,6 +260,9 @@ class Method(Block):
                 )
             elif annotation == "short":
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
                         JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                     ELSE(),
@@ -261,6 +275,9 @@ class Method(Block):
                 )
             elif annotation == "int":
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
                         JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                     ELSE(),
@@ -273,6 +290,9 @@ class Method(Block):
                 )
             elif annotation == "long":
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([ILOAD_name(self, param['name'])], JavaOpcodes.IFNE),
                         JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                     ELSE(),
@@ -285,6 +305,9 @@ class Method(Block):
                 )
             elif annotation == "float":
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([FLOAD_name(self, param['name'])], JavaOpcodes.IFNE),
                         JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                     ELSE(),
@@ -297,6 +320,9 @@ class Method(Block):
                 )
             elif annotation == "double":
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([DLOAD_name(self, param['name'])], JavaOpcodes.IFNE),
                         JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                     ELSE(),
@@ -309,6 +335,9 @@ class Method(Block):
                 )
             elif annotation == "java/lang/String":
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([
                                 ALOAD_name(self, param['name']),
                                 JavaOpcodes.ACONST_NULL()
@@ -324,6 +353,9 @@ class Method(Block):
                 )
             elif annotation != 'org/python/Object':
                 self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT generic %s TRANSFORM %s" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
                     IF([
                                 ALOAD_name(self, param['name']),
                                 JavaOpcodes.ACONST_NULL()
@@ -333,12 +365,25 @@ class Method(Block):
                         JavaOpcodes.NEW('org/python/java/Object'),
                         JavaOpcodes.DUP(),
                         ALOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
+                        # JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
                         JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),
                     END_IF(),
                     ASTORE_name(self, param['name'])
                 )
-            # else:  # org/python/Object; no transformation required
+            else:  # org/python/Object; no transformation required
+                self.add_opcodes(
+                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s - PASS AS IS" % (i, annotation)),
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+                )
+
+            # self.add_opcodes(
+            #     JavaOpcodes.LDC_W("INPUT %s TRANSFORMED" % (i)),
+            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+            # )
+        # self.add_opcodes(
+        #     JavaOpcodes.LDC_W("INPUTS TRANSFORMED"),
+        #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+        # )
 
     def transpile_setup(self):
         self.transpile_params()
@@ -372,11 +417,11 @@ class Method(Block):
             )
         ]
 
-    def transpile_binding(self):
+    def transpile_wrapper(self):
         return []
 
     def transpile(self):
-        return self.transpile_method() + self.transpile_binding()
+        return self.transpile_method() + self.transpile_wrapper()
 
 
 class InitMethod(Method):
@@ -482,45 +527,182 @@ class InstanceMethod(Method):
             return_descriptor
         )
 
-    def transpile_binding(self):
-        return [
+    def transpile_wrapper(self):
+        # The first register holds "self"; since the binding is only
+        # invoked via a native call, wrap it in a Java Object - unless
+        # the object is an extension type, in which case the wrapper
+        # object should already exist.
+        binding_opcodes = [
+            # JavaOpcodes.LDC_W("BINDING FOR " + self.name + self.signature),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+            # JavaOpcodes.LDC_W("BOUND AS " + self.name + self.bound_signature),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+            # JavaOpcodes.LDC_W("BINDING SELF IN"),
+            # JavaOpcodes.ALOAD_0(),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
+
+            JavaOpcodes.ALOAD_0(),
+            JavaOpcodes.INSTANCEOF('org/python/Object'),
+            JavaOpcodes.IFNE(36),  # 3
+
+            # JavaOpcodes.LDC_W("CHECK FOR __VOC__ FIELD"),  # 3
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
+
+                JavaOpcodes.ALOAD_0(),  # 1
+
+                JavaOpcodes.INVOKEVIRTUAL('java/lang/Object', 'getClass', '()Ljava/lang/Class;'),  # 3
+                JavaOpcodes.LDC_W("__VOC__"),  # 3
+                JavaOpcodes.INVOKEVIRTUAL('java/lang/Class', 'getField', '(Ljava/lang/String;)Ljava/lang/reflect/Field;'),  # 3
+
+                JavaOpcodes.DUP(),  # 1
+                JavaOpcodes.IFNONNULL(10),  # 3
+
+                    # JavaOpcodes.LDC_W("NON NULL FIELD VALUE"),  # 3
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
+
+                    JavaOpcodes.ALOAD_0(),  # 1
+                    JavaOpcodes.INVOKEVIRTUAL('java/lang/reflect/Field', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),  # 3
+
+                    JavaOpcodes.GOTO(16),  # 3
+
+                # else
+
+                    # JavaOpcodes.LDC_W("NULL FIELD VALUE"),  # 3
+                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
+
+                    JavaOpcodes.POP(),  # 1
+                    JavaOpcodes.NEW('org/python/java/Object'),  # 3
+                    JavaOpcodes.DUP(),  #1
+                    JavaOpcodes.ALOAD_0(),  # 1
+                    JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),  # 3
+
+                    JavaOpcodes.GOTO(4),  # 3
+
+            # else
+                JavaOpcodes.ALOAD_0(), #1
+
+            # JavaOpcodes.DUP(),
+            # JavaOpcodes.LDC_W("BINDING SELF OUT"),
+            # JavaOpcodes.SWAP(),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
+        ]
+
+        # Then extract each argument:
+        for i, param in enumerate(self.parameters[1:]):
+
+            binding_opcodes.append({
+                    'bool': JavaOpcodes.ILOAD(i + 1),
+                    'byte': JavaOpcodes.ILOAD(i + 1),
+                    'char': JavaOpcodes.ILOAD(i + 1),
+                    'short': JavaOpcodes.ILOAD(i + 1),
+                    'int': JavaOpcodes.ILOAD(i + 1),
+                    'long': JavaOpcodes.ILOAD(i + 1),
+                    'float': JavaOpcodes.FLOAD(i + 1),
+                    'double': JavaOpcodes.DLOAD(i + 1),
+                }.get(param['annotation'], JavaOpcodes.ALOAD(i + 1))
+            )
+
+            # binding_opcodes.extend([
+            #     JavaOpcodes.LDC_W("BINDING ARGUMENT %s to type %s" % (i, param['annotation'])),
+            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+            # ])
+
+        # Then call the method, and process the return type.
+        binding_opcodes.extend([
+            JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.name, self.signature),
+
+            {
+                None: JavaOpcodes.RETURN(),
+                'bool': JavaOpcodes.IRETURN(),
+                'byte': JavaOpcodes.IRETURN(),
+                'char': JavaOpcodes.IRETURN(),
+                'short': JavaOpcodes.IRETURN(),
+                'int': JavaOpcodes.IRETURN(),
+                'long': JavaOpcodes.IRETURN(),
+                'float': JavaOpcodes.FRETURN(),
+                'double': JavaOpcodes.DRETURN(),
+            }.get(self.returns['annotation'], JavaOpcodes.ARETURN()),
+
+            # JavaOpcodes.LDC_W("BINDING OUTPUT to type %s" % self.returns['annotation']),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+        ])
+
+        wrapper_methods = [
             JavaMethod(
                 self.name,
                 self.bound_signature,
                 attributes=[
                     JavaCode(
-                        max_stack=len(self.parameters),
+                        max_stack=len(self.parameters) + 4,
                         max_locals=len(self.parameters),
-                        code=[
-                            {
-                                'bool': JavaOpcodes.ILOAD(i),
-                                'byte': JavaOpcodes.ILOAD(i),
-                                'char': JavaOpcodes.ILOAD(i),
-                                'short': JavaOpcodes.ILOAD(i),
-                                'int': JavaOpcodes.ILOAD(i),
-                                'long': JavaOpcodes.ILOAD(i),
-                                'float': JavaOpcodes.FLOAD(i),
-                                'double': JavaOpcodes.DLOAD(i),
-                            }.get(param['annotation'], JavaOpcodes.ALOAD(i))
-                            for i, param in enumerate(self.parameters)
-                        ] + [
-                            JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.name, self.signature),
-                            {
-                                None: JavaOpcodes.RETURN(),
-                                'bool': JavaOpcodes.IRETURN(),
-                                'byte': JavaOpcodes.IRETURN(),
-                                'char': JavaOpcodes.IRETURN(),
-                                'short': JavaOpcodes.IRETURN(),
-                                'int': JavaOpcodes.IRETURN(),
-                                'long': JavaOpcodes.IRETURN(),
-                                'float': JavaOpcodes.FRETURN(),
-                                'double': JavaOpcodes.DRETURN(),
-                            }.get(self.returns['annotation'], JavaOpcodes.ARETURN())
-                        ],
+                        code=binding_opcodes
                     )
                 ]
-            )
+            ),
         ]
+
+        if self.klass.extends:
+            # We also need to generate a manual call to the super
+            super_opcodes = [
+                JavaOpcodes.ALOAD_0(),
+            ]
+
+            # Then extract each argument:
+            for i, param in enumerate(self.parameters[1:]):
+                super_opcodes.append({
+                        'bool': JavaOpcodes.ILOAD(i + 1),
+                        'byte': JavaOpcodes.ILOAD(i + 1),
+                        'char': JavaOpcodes.ILOAD(i + 1),
+                        'short': JavaOpcodes.ILOAD(i + 1),
+                        'int': JavaOpcodes.ILOAD(i + 1),
+                        'long': JavaOpcodes.ILOAD(i + 1),
+                        'float': JavaOpcodes.FLOAD(i + 1),
+                        'double': JavaOpcodes.DLOAD(i + 1),
+                    }.get(param['annotation'], JavaOpcodes.ALOAD(i + 1))
+                )
+
+                # super_opcodes.extend([
+                #     JavaOpcodes.LDC_W("SUPER WRAPPER ARGUMENT %s to type %s" % (i, param['annotation'])),
+                #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+                # ])
+
+            # Then call the method, and process the return type.
+            super_opcodes.extend([
+                JavaOpcodes.INVOKESPECIAL(self.klass.extends.replace('.', '/'), self.name, self.bound_signature),
+
+                {
+                    None: JavaOpcodes.RETURN(),
+                    'bool': JavaOpcodes.IRETURN(),
+                    'byte': JavaOpcodes.IRETURN(),
+                    'char': JavaOpcodes.IRETURN(),
+                    'short': JavaOpcodes.IRETURN(),
+                    'int': JavaOpcodes.IRETURN(),
+                    'long': JavaOpcodes.IRETURN(),
+                    'float': JavaOpcodes.FRETURN(),
+                    'double': JavaOpcodes.DRETURN(),
+                }.get(self.returns['annotation'], JavaOpcodes.ARETURN()),
+
+                # JavaOpcodes.LDC_W("SUPER WRAPPER OUTPUT to type %s" % self.returns['annotation']),
+                # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+            ])
+
+            wrapper_methods.append(
+                JavaMethod(
+                    self.name + "$super",
+                    self.bound_signature,
+                    attributes=[
+                        JavaCode(
+                            max_stack=len(self.parameters) + 2,
+                            max_locals=len(self.parameters) + 2,
+                            code=super_opcodes
+                        )
+                    ]
+                )
+            )
+
+        return wrapper_methods
 
 
 class MainMethod(Method):

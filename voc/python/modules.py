@@ -16,6 +16,9 @@ class StaticBlock(Block):
 
     def transpile_setup(self):
         self.add_opcodes(
+            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.module.class_name),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
             JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
             JavaOpcodes.LDC_W(self.module.descriptor),
 

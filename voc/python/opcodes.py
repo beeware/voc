@@ -2612,16 +2612,26 @@ class CALL_FUNCTION(Opcode):
         context.next_resolve_list.append((self, 'start_op'))
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # print("DESCRIPTOR", klass.descriptor)
-            # Push the type object onto the stack so that it can be stored
-            # in globals and subsequently retrieved and invoked to create
-            # new instances.
+            # Force the load of the class module, and then push the type
+            # object onto the stack so that it can be stored in globals
+            # and subsequently retrieved and invoked to create new instances.
             context.add_opcodes(
-                JavaOpcodes.LDC_W(Classref(self.klass.descriptor)),
+                # JavaOpcodes.LDC_W("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+                # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+                JavaOpcodes.LDC_W(self.klass.descriptor.replace('/', '.')),
+                JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+
                 JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
             )
 
         elif arguments[0].operation.opname == 'LOAD_GLOBAL' \
                 and arguments[0].operation.name == 'super':
+
+            # context.add_opcodes(
+            #     JavaOpcodes.LDC_W("ATTRIBUTE ON SUPER"),
+            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+            # )
 
             if len(arguments) == 1:
                 context.add_opcodes(
@@ -2669,9 +2679,26 @@ class CALL_FUNCTION(Opcode):
 
             else:
                 raise Exception("Invalid number of arguments to super()")
+
+            # context.add_opcodes(
+            #     JavaOpcodes.DUP(),
+            #     JavaOpcodes.LDC_W("SUPER is"),
+            #     JavaOpcodes.SWAP(),
+            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
+            # )
+
+        # elif arguments[0].operation.opname == 'LOAD_ATTR' \
+        #         and len(arguments[0].arguments) > 0 \
+        #         and arguments[0].arguments[0].operation.opname == 'CALL_FUNCTION' \
+        #         and arguments[0].arguments[0].arguments[0].operation.opname == 'LOAD_GLOBAL' \
+        #         and arguments[0].arguments[0].arguments[0].operation.name == 'super':
+        #     print("CALL FUNCTION %s on SUPER" % arguments[0].operation.name)
+
+        #     arguments[0].operation.transpile(context, arguments[0].arguments)
+
         else:
             if arguments[0].operation.opname == 'MAKE_FUNCTION':
-                # If this is an comprehension, the line of code
+                # If this is a comprehension, the line of code
                 # defining the inline function will be associated with the
                 # class that is created; pull out that line of code and
                 # associate it with the use of the function, too.

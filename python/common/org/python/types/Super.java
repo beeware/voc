@@ -243,16 +243,23 @@ public class Super implements org.python.Object {
 
     public org.python.Object __getattribute_null(java.lang.String name) {
         // Look for local instance attributes first
-        // System.out.println("SUPER GETATTRIBUTE " + name);
+        // org.Python.debug("SUPER GETATTRIBUTE ", name);
 
-        // Look to the class for an attribute
-        // System.out.println("no instance attribute");
-        org.python.Object value = this.klass.__base__.__getattribute_null(name);
+        // Look to the class for a super-proxy attribute
+        org.python.Object value = this.klass.__getattribute_null(name + "$super");
+
+        // If no super proxy exists, check the base class.
+        if (value == null) {
+            // org.Python.debug("no instance attributes on super;");
+            // org.Python.debug("    look to super of ", this.klass);
+            // org.Python.debug("    which is ", this.klass.__base__);
+            value = this.klass.__base__.__getattribute_null(name);
+        }
         if (value == null) {
             throw new org.python.exceptions.NotImplementedError("Can't get attributes on super() (yet!)");
         }
 
-        // System.out.println("SUPER GETATTRIBUTE " + name + " = " + value);
+        // org.Python.debug("SUPER GETATTRIBUTE " + name + " = " + value);
         // Post-process the value retrieved, using the binding fr
         return value.__get__(this.instance, this.klass);
     }
@@ -285,7 +292,7 @@ public class Super implements org.python.Object {
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
-        System.out.println("SUPER SETATTR " + name + " = " + value);
+        // org.Python.debug("SUPER SETATTR %s" % name, value);
         // If the attribute already exists, then it's OK to set it.
         org.python.Object attr = this.klass.__getattribute_null(name);
 
