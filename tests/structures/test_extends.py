@@ -11,9 +11,9 @@ class ExtendsTests(TranspileTestCase):
                 def push_button(self):
                     return "Bing!"
 
-                def put(self, key: java.lang.Object, value: java.lang.Object) -> void:
+                def put(self, key: java.lang.Object, value: java.lang.Object) -> java.lang.Object:
                     print("I WANT TO SET", key, "TO", value)
-                    super().put(key, value)
+                    return super().put(key, value)
 
             mymap = MyHashMap()
             print(mymap)
