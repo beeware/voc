@@ -12,7 +12,7 @@ public class Type extends org.python.types.Type {
             java.lang.StringBuilder signature = new java.lang.StringBuilder();
 
             for (java.lang.Class c: constructor.getParameterTypes()) {
-                signature.append(org.python.java.Function.descriptor(c, false));
+                signature.append(org.python.java.Function.descriptor(c));
             }
 
             this.constructors.put(
@@ -23,10 +23,127 @@ public class Type extends org.python.types.Type {
         // System.out.println("Constructors: " + this.constructors);
     }
 
+    public java.lang.reflect.Constructor selectConstructor(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        // org.Python.debug("Constructor options: ", this.constructors);
+
+        java.lang.reflect.Constructor constructor = null;
+        java.lang.StringBuilder signature = new java.lang.StringBuilder();
+        java.lang.Class<?> [] arg_types = new java.lang.Class<?> [args.length];
+        int n_args = args.length;
+        for (int i = 0; i < n_args; i++) {
+            if (args[i] == null) {
+                arg_types[i] = null;
+            } else if (args[i].toJava() == null) {
+                arg_types[i] = null;
+            } else {
+                arg_types[i] = args[i].toJava().getClass();
+            }
+            signature.append(org.python.java.Function.descriptor(arg_types[i]));
+        }
+        // System.out.println("Argument signature " + signature.toString());
+        constructor = this.constructors.get(signature.toString());
+
+        // No pre-cached match - need to try alternatives for signature.
+        if (constructor == null) {
+            java.util.List<java.lang.reflect.Constructor> candidates = new java.util.ArrayList<java.lang.reflect.Constructor>();
+            Class<?> [] param_types = null;
+
+            for (java.lang.reflect.Constructor candidate: this.constructors.values()) {
+                param_types = candidate.getParameterTypes();
+
+                // Candidate must have the same number of parameters as
+                // there are arguments.
+                if (param_types.length == n_args) {
+
+                    // Check each parameter; the argument must be a
+                    // subclass of the paramteter type.
+                    boolean match = true;
+                    for (int i = 0; i < n_args; i++) {
+                        if (arg_types[i] != null && !param_types[i].isAssignableFrom(arg_types[i])) {
+                            match = false;
+                        }
+                    }
+
+                    if (match) {
+                        // org.Python.debug("New candidate", candidate);
+                        candidates.add(candidate);
+                    // } else {
+                    //     org.Python.debug("Ignore candidate; non-matching signature", candidate);
+                    }
+                // } else {
+                //     org.Python.debug("Ignore candidate; wrong number of parameters", candidate);
+                }
+            }
+
+            // Now work out *which* candidate is the most specific match.
+            java.lang.Class<?> [] candidate_types;
+            // org.Python.debug("Choose best candidate...", candidates);
+            for (java.lang.reflect.Constructor candidate: candidates) {
+                // org.Python.debug("Evaluate candidate", candidate);
+                if (constructor == null) {
+                    // org.Python.debug("New best candidate", candidate);
+                    constructor = candidate;
+                    param_types = candidate.getParameterTypes();
+                } else {
+                    candidate_types = candidate.getParameterTypes();
+                    java.lang.Boolean more_specific = null;
+                    java.lang.Boolean less_specific = null;
+                    for (int i = 0; i < n_args; i++) {
+                        if (param_types[i] != candidate_types[i]) {
+                            if (param_types[i].isAssignableFrom(candidate_types[i])) {
+                                // org.Python.debug("More specific type on parameter", i);
+                                more_specific = true;
+                            } else if (candidate_types[i].isAssignableFrom(param_types[i])) {
+                                // org.Python.debug("Less specific type on parameter", i);
+                                less_specific = true;
+                            }
+                        // } else {
+                        //     org.Python.debug("Same type on parameter", i);
+                        }
+                    }
+
+                    if (more_specific && (less_specific == null || !less_specific)) {
+                        // org.Python.debug("New best candidate", candidate);
+                        constructor = candidate;
+                        param_types = candidate_types;
+                    }
+                }
+            }
+
+            // If there is still no match, raise an error.
+            if (constructor == null) {
+                throw new org.python.exceptions.RuntimeError(
+                    String.format(
+                        "No candidate constructor found for signature (%s); tried %s",
+                        signature.toString(),
+                        candidates
+                    )
+                );
+            }
+
+            // We have a match that wasn't previously in the this.constructors dictionary;
+            // Cache it for later use.
+            this.constructors.put(signature.toString(), constructor);
+        }
+
+        return constructor;
+    }
+
+    public java.lang.Object [] adjustArguments(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        java.lang.Object [] adjusted = new java.lang.Object [args.length];
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] == null) {
+                adjusted[i] = null;
+            } else {
+                adjusted[i] = args[i].toJava();
+            }
+        }
+        return adjusted;
+    }
+
     public org.python.Object __getattribute_null(java.lang.String name) {
-        // System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + name);
-        // System.out.println("CLASS ATTRS " + this.attrs);
-        // org.Python.debug("GETATTRIBUTE NATIVE TYPE", name);
+        // org.Python.debug("GETATTRIBUTE NATIVE TYPE", this.klass);
+        // org.Python.debug("               attr name", name);
         org.python.Object value = this.attrs.get(name);
 
         // On a native type, attrs is a cache of lookups on actual functions.
@@ -36,9 +153,9 @@ public class Type extends org.python.types.Type {
             // java.lang.Map doesn't differentiate between "doesn't exist"
             // and "value is null"; so since we know the value is null, check
             // to see if it is an explicit null (i.e., attribute doesn't exist)
-            // System.out.println("No class attr");
+            // org.Python.debug("No class attr");
             if (!this.attrs.containsKey(name)) {
-                // System.out.println("doing lookup...");
+                // org.Python.debug("doing lookup...");
                 try {
                     value = new org.python.java.Function(this.klass, name);
                 } catch (org.python.exceptions.AttributeError ae) {
@@ -56,7 +173,7 @@ public class Type extends org.python.types.Type {
                 this.attrs.put(name, value);
             }
         }
-        // System.out.println("GETATTRIBUTE NATIVE TYPE " + this + " " + name + " = " + value);
+        // org.Python.debug("GETATTRIBUTE NATIVE value ", value);
         return value;
     }
 
@@ -72,17 +189,13 @@ public class Type extends org.python.types.Type {
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("NATIVE CONSTRUCTOR :" + this.klass + " " + this.origin);
-            // System.out.println("ARGS:");
+            // org.Python.debug("Native Constructor:", this.constructor);
+            // org.Python.debug("            Origin:", this.origin);
+            // org.Python.debug("              Type:", this);
             // for (org.python.Object arg: args) {
-            //     System.out.print("  " + arg + ",");
+            //     org.Python.debug("            arg: ", arg);
             // }
-            // System.out.println();
-
-            // System.out.println("KWARGS:");
-            // for (java.lang.String argname: kwargs.keySet()) {
-            //     System.out.println("  " + argname + " = " + kwargs.get(argname));
-            // }
+            // org.Python.debug("         kwargs: ", kwargs);
 
             java.lang.reflect.Constructor constructor;
             if (this.origin == org.python.types.Type.Origin.EXTENSION) {
@@ -90,13 +203,8 @@ public class Type extends org.python.types.Type {
 
                 return new org.python.java.Object(constructor.newInstance(args, kwargs));
             } else {
-                constructor = org.python.java.Function.selectMethod(this.constructors, args, kwargs);
-                java.lang.Object [] adjusted_args = org.python.java.Function.adjustArguments(constructor, args, kwargs);
-
-                // If there is still no match, raise an error.
-                if (constructor == null) {
-                    throw new org.python.exceptions.RuntimeError(String.format("Parameter mismatch calling native Java constructor."));
-                }
+                constructor = this.selectConstructor(args, kwargs);
+                java.lang.Object [] adjusted_args = this.adjustArguments(args, kwargs);
 
                 return new org.python.java.Object(constructor.newInstance(adjusted_args));
             }
@@ -105,7 +213,7 @@ public class Type extends org.python.types.Type {
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
                 // e.getTargetException().printStackTrace();
-                // If the Java method raised an Python exception, re-raise that
+                // If the Java constructor raised an Python exception, re-raise that
                 // exception as-is. If it wasn't a Python exception, wrap it
                 // as one and continue.
                 throw (org.python.exceptions.BaseException) e.getCause();
