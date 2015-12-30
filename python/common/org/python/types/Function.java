@@ -238,6 +238,9 @@ public class Function extends org.python.types.Object implements org.python.Call
             // org.Python.debug("       instance: ", instance);
             // for (org.python.Object arg: args) {
             //     org.Python.debug("            arg: ", arg);
+            //     if (arg != null) {
+            //         org.Python.debug("           type: ", arg.getClass());
+            //     }
             // }
             // org.Python.debug("         kwargs: ", kwargs);
             // org.Python.debug("   default args: ", this.default_args);
