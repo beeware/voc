@@ -193,10 +193,6 @@ class Block:
             elif len(self.opcodes) == 2 and isinstance(self.opcodes[1], JavaOpcodes.ARETURN):
                 raise IgnoreBlock()
 
-        # # If the block has a void return, make sure that is honored.
-        # if self.has_void_return:
-        #     self.void_return()
-
         # Now that we have a complete opcode list, postprocess the list
         # with the known offsets.
         offset = 0
