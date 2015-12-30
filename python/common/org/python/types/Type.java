@@ -33,7 +33,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 }
             } else {
                 try {
-                    java_class.getField("__VOC__");
+                    java_class.getDeclaredField("__VOC__");
                     python_type = new org.python.java.Type(Origin.EXTENSION, java_class);
                 } catch (NoSuchFieldException e) {
                     python_type = new org.python.java.Type(Origin.JAVA, java_class);
@@ -204,18 +204,13 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
-            // System.out.println("CONSTRUCTOR :" + this.constructor);
-            // System.out.println("TYPE: " + this);
-            // System.out.println("ARGS:");
+            // org.Python.debug("Constructor:", this.constructor);
+            // org.Python.debug("     Origin:", this.origin);
+            // org.Python.debug("       Type:", this);
             // for (org.python.Object arg: args) {
-            //     System.out.print("  " + arg + ",");
+            //     org.Python.debug("            arg: ", arg);
             // }
-            // System.out.println();
-
-            // System.out.println("KWARGS:");
-            // for (java.lang.String argname: kwargs.keySet()) {
-            //     System.out.println("  " + argname + " = " + kwargs.get(argname));
-            // }
+            // org.Python.debug("         kwargs: ", kwargs);
 
             if (this.constructor != null) {
                 return (org.python.Object) this.constructor.newInstance(args, kwargs);

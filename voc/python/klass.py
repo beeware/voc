@@ -105,12 +105,29 @@ class ClassBlock(Block):
             base_descriptor = self.klass.bases[0] if self.klass.bases[0].startswith('org/python/') else base_namespace + self.klass.bases[0]
 
         self.add_opcodes(
+            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+            # JavaOpcodes.LDC_W("FORCE LOAD OF " + self.module.class_name),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+            # Force the loading and instantiation of the module
+            # that contains the class.
+            JavaOpcodes.LDC_W(self.module.class_name),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+            JavaOpcodes.POP(),
+
             # Set __base__ on the type
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
             JavaOpcodes.LDC_W(base_descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            # JavaOpcodes.DUP(),
+            # JavaOpcodes.LDC_W("__base__ for %s should be %s; is" % (self.klass, base_descriptor)),
+            # JavaOpcodes.SWAP(),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
 
             JavaOpcodes.PUTFIELD('org/python/types/Type', '__base__', 'Lorg/python/types/Type;'),
 
@@ -157,6 +174,9 @@ class ClassBlock(Block):
             JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
 
             JavaOpcodes.PUTFIELD('org/python/types/Type', '__bases__', 'Lorg/python/types/Tuple;'),
+
+            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
         )
 
     def transpile_teardown(self):
@@ -222,9 +242,10 @@ class Class(Block):
             method.materialize()
 
         # Add a field to indicate this was a VOC generated class.
-        # The value of this field doesn't matter; the fact that it
-        # exists is enough to establish provenance.
-        self.fields["__VOC__"] = "Z"
+        # The value of this field is the VOC wrapper instance in the
+        # case of an extension type; it will be self in most other
+        # cases.
+        self.fields["__VOC__"] = "Lorg/python/Object;"
 
     def transpile(self):
         classfile = JavaClass(
