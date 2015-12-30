@@ -168,7 +168,8 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.NotImplementedError("__len__() has not been implemented.");
+        // throw new org.python.exceptions.NotImplementedError("__len__() has not been implemented.");
+        return new org.python.types.Int(this.value.length());
     }
 
     @org.python.Method(
