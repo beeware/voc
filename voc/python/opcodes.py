@@ -1400,69 +1400,8 @@ class RETURN_VALUE(Opcode):
 
         if return_type is None:
             context.add_opcodes(
+                JavaOpcodes.POP(),
                 JavaOpcodes.RETURN()
-            )
-        elif return_type == 'bool':
-            context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-                JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'byte':
-            context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
-                JavaOpcodes.L2I(),
-                JavaOpcodes.I2B(),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'char':
-            context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
-                JavaOpcodes.CHECKCAST('java/lang/String'),
-                ICONST_val(0),
-                JavaOpcodes.INVOKEVIRTUAL('java/lang/String', 'charAt', '(I)C'),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'short':
-            context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
-                JavaOpcodes.L2I(),
-                JavaOpcodes.I2S(),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'int':
-            context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
-                JavaOpcodes.L2I(),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'long':
-            context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
-                JavaOpcodes.LRETURN(),
-            )
-        elif return_type == 'float':
-            context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Float'),
-                JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
-                JavaOpcodes.DTOF(),
-                JavaOpcodes.FRETURN(),
-            )
-        elif return_type == 'double':
-            context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Float'),
-                JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
-                JavaOpcodes.DRETURN(),
-            )
-        elif return_type != 'org/python/Object':
-            context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
-                JavaOpcodes.CHECKCAST(return_type.replace('.', '/')),
-                JavaOpcodes.ARETURN(),
             )
         else:
             context.add_opcodes(
@@ -3003,49 +2942,7 @@ def add_callable(opcode, context, arguments, full_method_name, closure=False):
         context.add_opcodes(
             JavaOpcodes.DUP(),
             ICONST_val(i),
-        )
-
-        annotation = param.get('annotation', 'org/python/Object')
-        if annotation is None:
-            raise Exception("Arguments cannot be void")
-        elif annotation == "bool":
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/Boolean', 'TYPE', 'Ljava/lang/Class;')
-            )
-        elif annotation == "byte":
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/Byte', 'TYPE', 'Ljava/lang/Class;')
-            )
-        elif annotation == 'char':
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/Char', 'TYPE', 'Ljava/lang/Class;')
-            )
-        elif annotation == "short":
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/Short', 'TYPE', 'Ljava/lang/Class;')
-            )
-        elif annotation == "int":
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/Integer', 'TYPE', 'Ljava/lang/Class;')
-            )
-        elif annotation == "long":
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/Long', 'TYPE', 'Ljava/lang/Class;')
-            )
-        elif annotation == "float":
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/Float', 'TYPE', 'Ljava/lang/Class;')
-            )
-        elif annotation == "double":
-            context.add_opcodes(
-                JavaOpcodes.GETSTATIC('java/lang/Double', 'TYPE', 'Ljava/lang/Class;')
-            )
-        else:
-            context.add_opcodes(
-                JavaOpcodes.LDC_W(Classref(annotation.replace('.', '/'))),
-            )
-
-        context.add_opcodes(
+            JavaOpcodes.LDC_W(Classref('org/python/Object')),
             JavaOpcodes.AASTORE(),
         )
 
