@@ -187,3 +187,34 @@ class PythonNormalizationTests(unittest.TestCase):
 
     def test_float(self):
         self.assertNormalized('7.950899459780156e-06', '7.950899459780156e-6')
+
+
+class JavaBootstrapTests(unittest.TestCase):
+    def test_java_code(self):
+        "You can supply Java code and use it from within Python"
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
+
+            obj = MyClass()
+
+            obj.doStuff()
+
+            print("Done.")
+            """,
+            java={
+                'com/example/MyClass': """
+                package com.example;
+
+                public class MyClass {
+                    public void doStuff() {
+                        System.out.println("Hello from Java");
+                    }
+                }
+                """
+            },
+            out="""
+            Hello from Java
+            Done.
+            """,
+        )

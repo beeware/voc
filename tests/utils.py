@@ -148,11 +148,48 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
         args = []
 
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../dist/python-java.jar:.", "-XX:-UseSplitVerifier", "python.test.__init__"] + args,
+        ["java", "-classpath", "../../dist/python-java.jar:../java:.", "-XX:-UseSplitVerifier", "python.test.__init__"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=test_dir,
+    )
+    out = proc.communicate()
+
+    return out[0].decode('utf8')
+
+
+def compileJava(java_dir, java):
+    if not java:
+        return None
+
+    sources = []
+    with capture_output():
+        for descriptor, code in java.items():
+            parts = descriptor.split('/')
+
+            class_dir = os.path.sep.join(parts[:-1])
+            class_file = os.path.join(class_dir, "%s.java" % parts[-1])
+
+            full_dir = os.path.join(java_dir, class_dir)
+            full_path = os.path.join(java_dir, class_file)
+
+            try:
+                os.makedirs(full_dir)
+            except FileExistsError:
+                pass
+
+            with open(full_path, 'w') as java_source:
+                java_source.write(adjust(code))
+
+            sources.append(class_file)
+
+    proc = subprocess.Popen(
+        ["javac", "-classpath", "../../dist/python-java.jar:."] + sources,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        cwd=java_dir,
     )
     out = proc.communicate()
 
@@ -318,67 +355,90 @@ class TranspileTestCase(TestCase):
                 context = 'Function context'
             self.assertEqual(java_out, py_out, context)
 
-    def assertJavaExecution(self, code, py_out, extra_code=None, run_in_global=True, run_in_function=True, args=None):
+    def assertJavaExecution(self, code, out, extra_code=None, java=None, run_in_global=True, run_in_function=True, args=None):
         "Run code under Java and check the output is as expected"
         self.maxDiff = None
-        #==================================================
-        # Pass 1 - run the code in the global context
-        #==================================================
-        if run_in_global:
+        try:
+            #==================================================
+            # Prep - compile any required Java sources
+            #==================================================
+            # Create the temp directory into which code will be placed
+            java_dir = os.path.join(os.path.dirname(__file__), 'java')
+
             try:
-                # Create the temp directory into which code will be placed
-                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
-                try:
-                    os.mkdir(test_dir)
-                except FileExistsError:
-                    pass
+                os.mkdir(java_dir)
+            except FileExistsError:
+                pass
 
-                # Run the code as Java.
-                java_out = runAsJava(test_dir, code, extra_code, False, args=args)
-            except Exception as e:
-                self.fail(e)
-            finally:
-                # Clean up the test directory where the class file was written.
-                shutil.rmtree(test_dir)
-                # print(java_out)
+            # Compile the java support code
+            java_compile_out = compileJava(java_dir, java)
 
-            # Cleanse the Python and Java output, producing a simple
+            if java_compile_out:
+                self.fail(java_compile_out)
+
+            # Cleanse the Python output, producing a simple
             # normalized format for exceptions, floats etc.
-            java_out = cleanse_java(java_out)
-            py_out = adjust(py_out)
+            py_out = adjust(out)
 
-            # Confirm that the output of the Java code is the same as the Python code.
-            self.assertEqual(java_out, py_out, 'Global context')
-
-        #==================================================
-        # Pass 2 - run the code in a function's context
-        #==================================================
-        if run_in_function:
-            try:
-                # Create the temp directory into which code will be placed
-                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+            #==================================================
+            # Pass 1 - run the code in the global context
+            #==================================================
+            if run_in_global:
                 try:
-                    os.mkdir(test_dir)
-                except FileExistsError:
-                    pass
+                    # Create the temp directory into which code will be placed
+                    test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+                    try:
+                        os.mkdir(test_dir)
+                    except FileExistsError:
+                        pass
 
-                # Run the code as Java.
-                java_out = runAsJava(test_dir, code, extra_code, True, args=args)
-            except Exception as e:
-                self.fail(e)
-            finally:
-                # Clean up the test directory where the class file was written.
-                shutil.rmtree(test_dir)
-                # print(java_out)
+                    # Run the code as Java.
+                    java_out = runAsJava(test_dir, code, extra_code, False, args=args)
+                except Exception as e:
+                    self.fail(e)
+                finally:
+                    # Clean up the test directory where the class file was written.
+                    shutil.rmtree(test_dir)
+                    # print(java_out)
 
-            # Cleanse the Python and Java output, producing a simple
-            # normalized format for exceptions, floats etc.
-            java_out = cleanse_java(java_out)
-            py_out = adjust(py_out)
+                # Cleanse the Java output, producing a simple
+                # normalized format for exceptions, floats etc.
+                java_out = cleanse_java(java_out)
 
-            # Confirm that the output of the Java code is the same as the Python code.
-            self.assertEqual(java_out, py_out, 'Function context')
+                # Confirm that the output of the Java code is the same as the Python code.
+                self.assertEqual(java_out, py_out, 'Global context')
 
+            #==================================================
+            # Pass 2 - run the code in a function's context
+            #==================================================
+            if run_in_function:
+                try:
+                    # Create the temp directory into which code will be placed
+                    test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+                    try:
+                        os.mkdir(test_dir)
+                    except FileExistsError:
+                        pass
+
+                    # Run the code as Java.
+                    java_out = runAsJava(test_dir, code, extra_code, True, args=args)
+                except Exception as e:
+                    self.fail(e)
+                finally:
+                    # Clean up the test directory where the class file was written.
+                    shutil.rmtree(test_dir)
+                    # print(java_out)
+
+                # Cleanse the Java output, producing a simple
+                # normalized format for exceptions, floats etc.
+                java_out = cleanse_java(java_out)
+
+                # Confirm that the output of the Java code is the same as the Python code.
+                self.assertEqual(java_out, py_out, 'Function context')
+
+        finally:
+            # Clean up the java directory where the class file was written.
+            shutil.rmtree(java_dir)
 
 def _unary_test(test_name, operation):
     def func(self):
