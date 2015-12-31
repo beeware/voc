@@ -208,8 +208,11 @@ public class Function extends org.python.types.Object implements org.python.Call
         __doc__ = "Implement __get__(self)."
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
-        // org.Python.debug("__GET__ on native function " + this + " " + this.getClass());
-        return new org.python.java.Method(instance, this);
+        if (instance == klass) {
+            return this;
+        } else {
+            return new org.python.java.Method(instance, this);
+        }
     }
 
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {

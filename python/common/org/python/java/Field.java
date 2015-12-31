@@ -18,10 +18,22 @@ public class Field extends org.python.types.Object {
     }
 
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
-        try {
-            return (org.python.Object) this.field.get(instance.toJava());
-        } catch (IllegalAccessException iae) {
-            throw new org.python.exceptions.RuntimeError("Illegal access to native field " + this.field.getName());
+        if (instance == klass) {
+            if (java.lang.reflect.Modifier.isStatic(this.field.getModifiers())) {
+                try {
+                    return org.python.types.Type.toPython(this.field.get(null));
+                } catch (IllegalAccessException iae) {
+                    throw new org.python.exceptions.RuntimeError("Illegal access to native field " + this.field.getName());
+                }
+            } else {
+                return this;
+            }
+        } else {
+            try {
+                return org.python.types.Type.toPython(this.field.get(instance.toJava()));
+            } catch (IllegalAccessException iae) {
+                throw new org.python.exceptions.RuntimeError("Illegal access to native field " + this.field.getName());
+            }
         }
     }
 
