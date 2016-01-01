@@ -1,68 +1,26 @@
 VOC
 ===
 
-A transpiler that converts Python bytecode into Java bytecode.
+.. image:: https://travis-ci.org/pybee/voc.svg?branch=master
+    :target: https://travis-ci.org/pybee/voc
 
-This is experimental code. If it breaks, you get to keep all the shiny pieces.
+**VOC is an early alpha project. If it breaks, you get to keep all the shiny pieces.**
 
-What it does:
+VOC is a transpiler that takes Python 3.4 source code, and compile it into a Java
+class file that can then be executed on a JVM, or run through a DEX tool to
+run on Android. It does this *at the bytecode level*, rather than the source code level.
 
-* Provides an API to let you programmatically create Java class files.
-
-Quickstart
-----------
-
-Run away. :-)
-
-
-Why "VOC"?
-----------
-
-The `Vereenigde Oostindische Compagnie (VOC)`_, or Dutch East India Company,
-is often considered the be the world's first multinational corporation. It was
-also the first company to issue shares, and facilitate the trading of those
-shares. It was granted a 21 year monopoly to carry out trade activities in
-Asia, primarily the Spice Islands - the Dutch East Indies. They established a
-major trading port at Batavia - now Jakarta, on the island of Java (now part
-of Indonesia). As a result of their monopoly, the VOC became an incredibly
-valuable company, issuing an 18% annual dividend for almost 200 years.
-
-VOC was... the worlds first Enterprise site in Java. (rimshot!)
-
-.. _Vereenigde Oostindische Compagnie (VOC): https://en.wikipedia.org/wiki/Dutch_East_India_Company
-
-Community
----------
-
-VOC is part of the `BeeWare suite`_. You can talk to the community through:
-
- * `@pybeeware on Twitter`_
-
- * The `BeeWare Users Mailing list`_, for questions about how to use the BeeWare suite.
-
- * The `BeeWare Developers Mailing list`_, for discussing the development of new features in the BeeWare suite, and ideas for new tools for the suite.
-
-.. _BeeWare suite: http://pybee.org
-.. _Read The Docs: http://voc.readthedocs.org
-.. _@pybeeware on Twitter: https://twitter.com/pybeeware
-.. _BeeWare Users Mailing list: https://groups.google.com/forum/#!forum/beeware-users
-.. _BeeWare Developers Mailing list: https://groups.google.com/forum/#!forum/beeware-developers
-
-Contents:
+It honors Python 3.4 syntax and conventions, but also provides the ability to
+reference objects and classes defined in Java code, andimplement interfaces
+defined in Java code.
 
 .. toctree::
    :maxdepth: 2
    :glob:
 
-   internals/contributing
-   internals/roadmap
-   releases
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   intro/index
+   tutorials/index
+   howto/index
+   topics/index
+   reference/index
+   internals/index

@@ -142,8 +142,7 @@ public class Type extends org.python.types.Type {
     }
 
     public org.python.Object __getattribute_null(java.lang.String name) {
-        // org.Python.debug("GETATTRIBUTE NATIVE TYPE", this.klass);
-        // org.Python.debug("               attr name", name);
+        // org.Python.debug(String.format("GETATTRIBUTE %s FROM NATIVE TYPE", name), this.klass);
         org.python.Object value = this.attrs.get(name);
 
         // On a native type, attrs is a cache of lookups on actual functions.
@@ -157,14 +156,40 @@ public class Type extends org.python.types.Type {
             if (!this.attrs.containsKey(name)) {
                 // org.Python.debug("doing lookup...");
                 try {
+                    // org.Python.debug("Declared method", this.klass);
+                    // for (java.lang.reflect.Method m: klass.getDeclaredMethods()) {
+                    //     org.Python.debug("    ", m);
+                    // }
                     value = new org.python.java.Function(this.klass, name);
                 } catch (org.python.exceptions.AttributeError ae) {
+                    // org.Python.debug("Function not found", ae);
                     // No function; look for an attribute with the same name.
                     try {
+                        // org.Python.debug("Declared fields", this.klass);
+                        // for (java.lang.reflect.Field f: klass.getDeclaredFields()) {
+                        //     org.Python.debug("    ", f);
+                        // }
                         value = new org.python.java.Field(klass.getDeclaredField(name));
-                    } catch (java.lang.NoSuchFieldException e) {
+                    } catch (java.lang.NoSuchFieldException fe) {
+                        // org.Python.debug("Field not found", fe);
                         // Field does not exist.
-                        value = null;
+                        try {
+                            // org.Python.debug("Look for inner class ", this.klass.getName() + "$" + name);
+                            java.lang.Class inner_klass = java.lang.Class.forName(this.klass.getName() + "$" + name);
+                            value = new org.python.java.Type(org.python.types.Type.Origin.JAVA, inner_klass);
+                        } catch (java.lang.ClassNotFoundException ce) {
+                            // org.Python.debug("Inner class not found", ce);
+                            // Inner class does not exist. Check superclasses
+
+                            if (this.klass.getSuperclass() != null) {
+                                // org.Python.debug("Check superclass", this.klass.getSuperclass());
+                                org.python.types.Type superclass = org.python.types.Type.pythonType(this.klass.getSuperclass());
+                                value = superclass.__getattribute_null(name);
+                            } else {
+                                // org.Python.debug("No superclass", this.klass);
+                                value = null;
+                            }
+                        }
                     }
                 }
                 // If the field doesn't exist, store a value of null
@@ -173,8 +198,15 @@ public class Type extends org.python.types.Type {
                 this.attrs.put(name, value);
             }
         }
-        // org.Python.debug("GETATTRIBUTE NATIVE value ", value);
-        return value;
+
+        // org.Python.debug(String.format("GETATTRIBUTE %s NATIVE value ", name), value);
+        // If there's still no value, return that as an indicator of no attribute.
+        if (value == null) {
+            return null;
+        }
+
+        // Post-process the attribute, passing the class as the instance.
+        return value.__get__(this, this);
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {

@@ -35,16 +35,15 @@ Now you are ready to start hacking! Have fun!
 Java
 ----
 
-Java 7 is needed to run the tests because java 8 removed the option
-    
-    -XX:-UseSplitVerifier
-
-You can use java 8 if you have to. In that case go into the
-tests/utils.py and edit replace 
+Java 7 is needed to run the tests because Java 8 removed the option
 
     -XX:-UseSplitVerifier
 
-with
+You *can* use Java 8 if you have to. In that case go into the
+tests/utils.py and edit replace::
+
+    -XX:-UseSplitVerifier
+
+with::
 
     -noverify
-

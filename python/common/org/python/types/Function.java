@@ -156,7 +156,7 @@ public class Function extends org.python.types.Object implements org.python.Call
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         // System.out.println("__GET__ on function " + this + " " + this.getClass() + " " + instance + " " + instance.getClass());
-        if (instance != null && !(instance instanceof org.python.types.Module)) {
+        if (instance != klass && !(instance instanceof org.python.types.Module)) {
             return new Method(instance, (org.python.types.Type) klass, this);
         }
         return this;

@@ -1,6 +1,6 @@
 import unittest
 
-from .utils import adjust, cleanse_java, cleanse_python
+from .utils import adjust, cleanse_java, cleanse_python, TranspileTestCase
 
 
 class AdjustTests(unittest.TestCase):
@@ -138,6 +138,24 @@ class JavaNormalizationTests(unittest.TestCase):
     def test_float(self):
         self.assertNormalized('7.950899459780156E-6', '7.950899459780156e-6')
 
+    def test_memory_reference(self):
+        self.assertNormalized(
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0x1eb19f4e>>
+            Hello from the instance!
+            Done.
+            """,
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+            Hello from the instance!
+            Done.
+            """
+        )
+
 
 class PythonNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
@@ -187,3 +205,52 @@ class PythonNormalizationTests(unittest.TestCase):
 
     def test_float(self):
         self.assertNormalized('7.950899459780156e-06', '7.950899459780156e-6')
+
+    def test_memory_reference(self):
+        self.assertNormalized(
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0x1eb19f4e>>
+            Hello from the instance!
+            Done.
+            """,
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+            Hello from the instance!
+            Done.
+            """
+        )
+
+
+class JavaBootstrapTests(TranspileTestCase):
+    def test_java_code(self):
+        "You can supply Java code and use it from within Python"
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
+
+            obj = MyClass()
+
+            obj.doStuff()
+
+            print("Done.")
+            """,
+            java={
+                'com/example/MyClass': """
+                package com.example;
+
+                public class MyClass {
+                    public void doStuff() {
+                        System.out.println("Hello from Java");
+                    }
+                }
+                """
+            },
+            out="""
+            Hello from Java
+            Done.
+            """,
+        )

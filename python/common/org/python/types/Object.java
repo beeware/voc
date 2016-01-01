@@ -296,7 +296,7 @@ public class Object implements org.python.Object {
                 }
             }
         }
-        // org.Python.debug("GETATTRIBUTE %s = " % name, value);
+        // org.Python.debug(String.format("GETATTRIBUTE %s = ", name), value);
         // Post-process the value retrieved.
         return value.__get__(this, cls);
     }

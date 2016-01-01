@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from ..utils import TranspileTestCase
 
 
@@ -73,7 +71,9 @@ class ClassTests(TranspileTestCase):
             obj = MyObject(37, 42)
 
             print(obj)
+            print(obj.x)
             print(obj.first())
+            print(obj.y)
             print(obj.second())
             print('Done.')
             """)
