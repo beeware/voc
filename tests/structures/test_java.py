@@ -459,7 +459,6 @@ class JavaTests(TranspileTestCase):
                 Done.
                 """)
 
-    @expectedFailure
     def test_inner_class_method(self):
         "Inner classes can be instantiated, and methods invoked"
         self.assertJavaExecution("""
@@ -470,7 +469,7 @@ class JavaTests(TranspileTestCase):
                 obj1.method()
 
                 print("Inner class is", OuterClass.InnerClass)
-                obj2 = OuterClass.InnerClass()
+                obj2 = OuterClass.InnerClass(obj1)
                 obj2.method()
 
                 print("Done.")
