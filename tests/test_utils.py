@@ -1,6 +1,6 @@
 import unittest
 
-from .utils import adjust, cleanse_java, cleanse_python
+from .utils import adjust, cleanse_java, cleanse_python, TranspileTestCase
 
 
 class AdjustTests(unittest.TestCase):
@@ -225,7 +225,7 @@ class PythonNormalizationTests(unittest.TestCase):
         )
 
 
-class JavaBootstrapTests(unittest.TestCase):
+class JavaBootstrapTests(TranspileTestCase):
     def test_java_code(self):
         "You can supply Java code and use it from within Python"
         self.assertJavaExecution(
