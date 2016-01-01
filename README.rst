@@ -70,13 +70,13 @@ Using Python 3.4, install ``voc``, then run it over your python script::
     $ pip install voc
     $ python -m voc path/to/your/example.py
     Creating class 'example'...
-    Writing example.class...
+    Writing example/__init__.class...
     Done.
 
-This will produce an ``example.class``, in the ``python`` namespace, that you can
-run on any Java 1.7+ VM. To run the classfile, you'll need the Python support
-libraries. These will eventually be available as a download; for now, you'll
-need to compile them. See below for compilation instructions.
+This will produce an ``__init__.class``, in the ``python/example`` namespace,
+that you can run on any Java 1.7+ VM. To run the classfile, you'll need the
+Python support libraries. These will eventually be available as a download;
+for now, you'll need to compile them. See below for compilation instructions.
 
 Once you've got the support Jarfile, you can run the example.class ensuring that
 the support jarfile is in your classpath. For example, using the Oracle Java VM,
@@ -89,8 +89,7 @@ The ``-XX:-UseSplitVerifier`` argument is necessary to turn off stack map
 verification in Java 7. This could be addressed by computing stack maps
 for generated code.
 
-NOTE: if using Java 8 subsitute ``-XX:-UseSplitVerifier`` for ``-noverify`` as 
-it has be deprecated. 
+NOTE: If you are using Java 8, substitute ``-noverify`` in place of ``-XX:-UseSplitVerifier``.
 
 Compiling the support library
 -----------------------------
