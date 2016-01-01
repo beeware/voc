@@ -85,7 +85,7 @@ you would run::
     $ java -XX:-UseSplitVerifier -classpath dist/python-java.jar:. python.example
     Hello, World
 
-The ``-CC:-UseSplitVerifier`` argument is necessary to turn off stack map
+The ``-XX:-UseSplitVerifier`` argument is necessary to turn off stack map
 verification in Java 7. This could be addressed by computing stack maps
 for generated code.
 
