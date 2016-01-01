@@ -259,7 +259,8 @@ public class Super implements org.python.Object {
             throw new org.python.exceptions.NotImplementedError("Can't get attributes on super() (yet!)");
         }
 
-        // org.Python.debug("SUPER GETATTRIBUTE " + name + " = " + value);
+        // org.Python.debug("SUPER GETATTRIBUTE " + name, value);
+        // org.Python.debug("INSTANCE  ", this.instance);
         // Post-process the value retrieved, using the binding fr
         return value.__get__(this.instance, this.klass);
     }
