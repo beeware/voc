@@ -82,12 +82,15 @@ Once you've got the support Jarfile, you can run the example.class ensuring that
 the support jarfile is in your classpath. For example, using the Oracle Java VM,
 you would run::
 
-    $ java -XX:-UseSplitVerifier -classpath dist/python-java.jar:. python.example
+    $ java -XX:-UseSplitVerifier -classpath dist/python-java.jar:. python.example.__init__
     Hello, World
 
 The ``-XX:-UseSplitVerifier`` argument is necessary to turn off stack map
 verification in Java 7. This could be addressed by computing stack maps
 for generated code.
+
+NOTE: if using Java 8 subsitute ``-XX:-UseSplitVerifier`` for ``-noverify`` as 
+it has be deprecated. 
 
 Compiling the support library
 -----------------------------
