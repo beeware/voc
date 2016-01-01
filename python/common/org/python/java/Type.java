@@ -156,12 +156,22 @@ public class Type extends org.python.types.Type {
             if (!this.attrs.containsKey(name)) {
                 // org.Python.debug("doing lookup...");
                 try {
+                    // org.Python.debug("Declared method", this.klass);
+                    // for (java.lang.reflect.Method m: klass.getDeclaredMethods()) {
+                    //     org.Python.debug("    ", m);
+                    // }
                     value = new org.python.java.Function(this.klass, name);
                 } catch (org.python.exceptions.AttributeError ae) {
+                    // org.Python.debug("Function not found", ae);
                     // No function; look for an attribute with the same name.
                     try {
+                        // org.Python.debug("Declared fields", this.klass);
+                        // for (java.lang.reflect.Field f: klass.getDeclaredFields()) {
+                        //     org.Python.debug("    ", f);
+                        // }
                         value = new org.python.java.Field(klass.getDeclaredField(name));
                     } catch (java.lang.NoSuchFieldException fe) {
+                        // org.Python.debug("Field not found", fe);
                         // Field does not exist.
                         try {
                             // org.Python.debug("Look for inner class ", this.klass.getName() + "$" + name);
@@ -169,8 +179,16 @@ public class Type extends org.python.types.Type {
                             value = new org.python.java.Type(org.python.types.Type.Origin.JAVA, inner_klass);
                         } catch (java.lang.ClassNotFoundException ce) {
                             // org.Python.debug("Inner class not found", ce);
-                            // Inner class does not exist.
-                            value = null;
+                            // Inner class does not exist. Check superclasses
+
+                            if (this.klass.getSuperclass() != null) {
+                                // org.Python.debug("Check superclass", this.klass.getSuperclass());
+                                org.python.types.Type superclass = org.python.types.Type.pythonType(this.klass.getSuperclass());
+                                value = superclass.__getattribute_null(name);
+                            } else {
+                                // org.Python.debug("No superclass", this.klass);
+                                value = null;
+                            }
                         }
                     }
                 }

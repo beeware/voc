@@ -138,6 +138,24 @@ class JavaNormalizationTests(unittest.TestCase):
     def test_float(self):
         self.assertNormalized('7.950899459780156E-6', '7.950899459780156e-6')
 
+    def test_memory_reference(self):
+        self.assertNormalized(
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0x1eb19f4e>>
+            Hello from the instance!
+            Done.
+            """,
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+            Hello from the instance!
+            Done.
+            """
+        )
+
 
 class PythonNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
@@ -187,6 +205,24 @@ class PythonNormalizationTests(unittest.TestCase):
 
     def test_float(self):
         self.assertNormalized('7.950899459780156e-06', '7.950899459780156e-6')
+
+    def test_memory_reference(self):
+        self.assertNormalized(
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0x1eb19f4e>>
+            Hello from the instance!
+            Done.
+            """,
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+            Hello from the instance!
+            Done.
+            """
+        )
 
 
 class JavaBootstrapTests(unittest.TestCase):

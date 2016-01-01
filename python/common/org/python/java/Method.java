@@ -13,17 +13,13 @@ public class Method extends org.python.types.Object implements org.python.Callab
 
     public org.python.types.Str __repr__() {
         if (this.instance == null) {
-            return new org.python.types.Str(
-                String.format("<unbound native method %s>",
-                    this.function
-                )
-            );
+            return this.function.__repr__();
         } else {
             return new org.python.types.Str(
-                String.format("<bound native method %s of <%s object at 0x%x>>",
-                    this.function.toString(),
-                    this.instance.getClass(),
-                    this.instance.hashCode()
+                String.format("<bound native method %s.%s of %s>",
+                    this.function.klass.getName(),
+                    this.function.name,
+                    this.instance.__repr__()
                 )
             );
         }

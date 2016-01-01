@@ -210,6 +210,8 @@ PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File "(?
 PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n')
 PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
 
+MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,8}')
+
 
 def cleanse_java(input):
     try:
@@ -227,6 +229,7 @@ def cleanse_java(input):
         ]),
         '\n' if stack else ''
     )
+    out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
     return JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***')
 
 
@@ -243,6 +246,7 @@ def cleanse_python(input):
         ),
         '\n' if stack else ''
     )
+    out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
     return PYTHON_FLOAT.sub('\\1e\\2\\3', out).replace("'test.py'", '***EXECUTABLE***')
 
 
@@ -439,6 +443,7 @@ class TranspileTestCase(TestCase):
         finally:
             # Clean up the java directory where the class file was written.
             shutil.rmtree(java_dir)
+
 
 def _unary_test(test_name, operation):
     def func(self):

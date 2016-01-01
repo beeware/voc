@@ -1,6 +1,7 @@
 package org.python.java;
 
 public class Function extends org.python.types.Object implements org.python.Callable {
+    java.lang.Class klass;
     java.lang.String name;
     java.util.Map<java.lang.String, java.lang.reflect.Method> methods;
 
@@ -159,10 +160,17 @@ public class Function extends org.python.types.Object implements org.python.Call
 
     public Function(java.lang.Class klass, java.lang.String name) {
         super();
+        this.klass = klass;
         this.name = name;
         // org.Python.debug("FUNCTION ", this.name);
         this.methods = new java.util.HashMap<java.lang.String, java.lang.reflect.Method>();
 
+        // When searching for a function, we search *declared* fields -
+        // that's all fields that are acutally defined directly on this
+        // class. However, having found a match on this class, we then
+        // search all subclasses as well, in case there is a method
+        // with the same name, but a different prototype. This simplifies
+        // the lookup process when the function is invoked.
         java.lang.Class<?> clazz = klass;
         while (clazz != null) {
             // org.Python.debug("CLAZZ:", clazz);
@@ -187,21 +195,28 @@ public class Function extends org.python.types.Object implements org.python.Call
                 }
             }
 
+            // If we've searched for the name, and and we haven't found
+            // any matches, throw an attribute error.
+            if (this.methods.size() == 0) {
+                throw new org.python.exceptions.AttributeError(klass, name);
+            }
+
             clazz = clazz.getSuperclass();
         }
         // org.Python.debug("methods: ", this.methods);
-        if (this.methods.size() == 0) {
-            throw new org.python.exceptions.AttributeError(klass, name);
-        }
         this.attrs.put("__name__", new org.python.types.Str(this.name));
         this.attrs.put("__qualname__", new org.python.types.Str(this.name));
     }
 
     @org.python.Method(
-        __doc__ = "Implement str(self)."
+        __doc__ = "Implement repr(self)."
     )
-    public org.python.types.Str __str__() {
-        return new org.python.types.Str(this.name + "()");
+    public org.python.types.Str __repr__() {
+        return new org.python.types.Str(
+            String.format("<native function %s.%s>",
+                this.klass.getName(),
+                this.name)
+            );
     }
 
     @org.python.Method(
