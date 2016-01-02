@@ -745,7 +745,7 @@ class DLOAD(Opcode):
     # Stack: → value
     code = 0x18
 
-    def __init__(self, var):
+    def __init__(self):
         super(DLOAD, self).__init__()
 
 
