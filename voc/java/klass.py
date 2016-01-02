@@ -78,7 +78,7 @@ class ClassFileWriter:
         self._outfile.write(struct.pack('>f', f))
 
     def write_u8(self, u8):
-        self._outfile.write(struct.pack('>L', u8))
+        self._outfile.write(struct.pack('>Q', u8))
 
     def write_d(self, d):
         self._outfile.write(struct.pack('>d', d))
@@ -112,7 +112,7 @@ class ClassFileReader:
         return struct.unpack('>f', self._infile.read(4))[0]
 
     def read_u8(self):
-        return struct.unpack('>L', self._infile.read(8))[0]
+        return struct.unpack('>Q', self._infile.read(8))[0]
 
     def read_d(self):
         return struct.unpack('>d', self._infile.read(8))[0]
