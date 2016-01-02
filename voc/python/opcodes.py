@@ -2467,6 +2467,8 @@ def extract_constant(arg):
         value = arg.operation.name
     elif arg.operation.opname == 'LOAD_FAST':
         value = arg.operation.name
+    elif arg.operation.opname == 'BINARY_SUBSCR':
+        value = extract_constant(arg.arguments[0]) + "$" + arg.arguments[1].operation.name
     elif arg.operation.opname in ('BUILD_LIST', 'BUILD_TUPLE'):
         value = [
             extract_constant(a)

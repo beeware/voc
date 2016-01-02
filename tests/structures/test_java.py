@@ -70,6 +70,8 @@ class JavaTests(TranspileTestCase):
                 obj1 = MyClass()
                 print("Field is", MyClass.field)
                 print("Field from instance is", obj1.field)
+                obj1.field = 37
+                print("Updated Field from instance is", obj1.field)
                 print("Done.")
                 """,
             java={
@@ -85,6 +87,7 @@ class JavaTests(TranspileTestCase):
                 Class is <class 'com.example.MyClass'>
                 Field is <unbound native field public int com.example.MyClass.field>
                 Field from instance is 42
+                Updated Field from instance is 37
                 Done.
                 """)
 
@@ -96,7 +99,11 @@ class JavaTests(TranspileTestCase):
                 print("Class is", MyClass)
                 obj1 = MyClass()
                 print("Static field is", MyClass.static_field)
+                MyClass.static_field = 37
+                print("Updated static field is", MyClass.static_field)
                 print("Static field from instance is", obj1.static_field)
+                MyClass.static_field = 42
+                print("Updated static field from instance is", obj1.static_field)
                 print("Done.")
                 """,
             java={
@@ -111,7 +118,9 @@ class JavaTests(TranspileTestCase):
             out="""
                 Class is <class 'com.example.MyClass'>
                 Static field is 42
-                Static field from instance is 42
+                Updated static field is 37
+                Static field from instance is 37
+                Updated static field from instance is 42
                 Done.
                 """)
 

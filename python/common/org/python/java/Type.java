@@ -151,23 +151,7 @@ public class Type extends org.python.types.Type {
         java.lang.Object [] adjusted = new java.lang.Object [args.length];
         java.lang.Class<?> [] param_types = constructor.getParameterTypes();
         for (int i = 0; i < args.length; i++) {
-            if (args[i] == null) {
-                adjusted[i] = null;
-            } else {
-                if (param_types[i] == java.lang.Float.TYPE || param_types[i] == java.lang.Float.class) {
-                    adjusted[i] = ((java.lang.Number) args[i].toJava()).floatValue();
-                } else if (param_types[i] == java.lang.Long.TYPE || param_types[i] == java.lang.Long.class) {
-                    adjusted[i] = ((java.lang.Number) args[i].toJava()).longValue();
-                } else if (param_types[i] == java.lang.Integer.TYPE || param_types[i] == java.lang.Integer.class) {
-                    adjusted[i] = ((java.lang.Number) args[i].toJava()).intValue();
-                } else if (param_types[i] == java.lang.Short.TYPE || param_types[i] == java.lang.Short.class) {
-                    adjusted[i] = ((java.lang.Number) args[i].toJava()).shortValue();
-                } else if (param_types[i] == java.lang.Byte.TYPE || param_types[i] == java.lang.Byte.class) {
-                    adjusted[i] = ((java.lang.Number) args[i].toJava()).byteValue();
-                } else {
-                    adjusted[i] = args[i].toJava();
-                }
-            }
+            adjusted[i] = org.python.types.Type.toJava(param_types[i], args[i]);
         }
         return adjusted;
     }
