@@ -23,6 +23,44 @@ class JavaTests(TranspileTestCase):
             Done.
             """, run_in_function=False)
 
+    def test_most_specific_constructor(self):
+        "The most specific constructor for a native Java class will be selected based on argument."
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
+
+            obj1 = MyClass()
+            obj2 = MyClass(1.234)
+            obj3 = MyClass(3742)
+
+            print("Done.")
+            """,
+            java={
+                'com/example/MyClass': """
+                package com.example;
+
+                public class MyClass {
+                    public MyClass() {
+                        System.out.println("No argument");
+                    }
+
+                    public MyClass(int arg) {
+                        System.out.println("Integer argument " + arg);
+                    }
+
+                    public MyClass(double arg) {
+                        System.out.println("Double argument " + arg);
+                    }
+                }
+                """
+            },
+            out="""
+            No argument
+            Double argument 1.234
+            Integer argument 3742
+            Done.
+            """, run_in_function=False)
+
     def test_field(self):
         "Native fields on an instance can be accessed"
         self.assertJavaExecution("""
