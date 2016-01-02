@@ -81,13 +81,17 @@ class InterfaceTests(TranspileTestCase):
                         this.handler.event(this, name);
                         System.out.println("Event done.");
                     }
+
+                    public String toString() {
+                        return "Java View";
+                    }
                 }
                 """
             },
             out="""
             Set handler to <test.MyHandler object at 0xXXXXXXXX>
             Do event Stuff
-            My handler for a Stuff event on com.example.View@b893008
+            My handler for a Stuff event on Java View
             Event done.
             Done.
             """, run_in_function=False)
