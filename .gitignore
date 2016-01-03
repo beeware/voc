@@ -10,3 +10,5 @@ distribute-*
 tests/temp
 /org
 /docs/_build
+.project
+.pydevproject
