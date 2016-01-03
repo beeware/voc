@@ -2,6 +2,7 @@ import importlib
 import marshal
 import os
 import py_compile
+import sys
 
 from .python.modules import Module
 
@@ -10,10 +11,23 @@ def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):
     transpiler = Transpiler(namespace=namespace, verbosity=verbosity)
 
     for source_file in input:
-        if verbosity:
-            print("Compiling %s ..." % source_file)
-        py_compile.compile(source_file, doraise=True)
-        transpiler.transpile(source_file, prefix)
+        if os.path.isfile(source_file):
+            if verbosity:
+                print("Compiling %s ..." % source_file)
+            py_compile.compile(source_file, doraise=True)
+            transpiler.transpile(source_file, prefix)
+        elif os.path.isdir(source_file):
+            for root, dirs, files in os.walk(source_file, followlinks=True):
+                print (root, dirs, files)
+                for filename in files:
+                    if os.path.splitext(filename)[1] == '.py':
+                        source = os.path.join(root, filename)
+                        if verbosity:
+                            print("Compiling %s ..." % source)
+                        py_compile.compile(source, doraise=True)
+                        transpiler.transpile(source, prefix)
+        else:
+            print("Unknown source file type: ", source_file, file=sys.stderr)
 
     transpiler.write(outdir)
 
