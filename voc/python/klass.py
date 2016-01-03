@@ -314,7 +314,7 @@ class Class(Block):
 
 
 class InnerClass(Class):
-    def __init__(self, parent, name, bases=None, extends=None, implements=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, parent, name, bases=None, extends=None, implements=None, public=True, final=False, methods=None, init=None, verbosity=0):
         if isinstance(parent, Class):
             module = parent.module
         else:
@@ -329,12 +329,13 @@ class InnerClass(Class):
             public=public,
             final=final,
             methods=methods,
-            init=init
+            init=init,
+            verbosity=verbosity
         )
 
 
 class ClosureClass(Class):
-    def __init__(self, parent, closure_var_names, name=None, extends=None, bases=None, implements=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, parent, closure_var_names, name=None, extends=None, bases=None, implements=None, public=True, final=False, methods=None, init=None, verbosity=0):
         self.closure_var_names = closure_var_names
         if isinstance(parent, Class):
             module = parent.module
@@ -353,5 +354,6 @@ class ClosureClass(Class):
             public=public,
             final=final,
             methods=methods,
-            init=init
+            init=init,
+            verbosity=verbosity
         )
