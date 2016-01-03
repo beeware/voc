@@ -903,32 +903,32 @@ class FullFrame(StackMapFrame):
     # whose index is greater than the maximum operand stack size for the
     # method.
 
-    def __init__(self, offset_delta, locals, stack):
+    def __init__(self, offset_delta, local_vars, stack):
         super().__init__(255)
         self.offset_delta = offset_delta
-        self.locals = locals
+        self.locals = local_vars
         self.stack = stack
 
     def __repr__(self):
         return '<FullFrame %s, locals=%s, stack=%s>' % (self.offset_delta, self.locals, self.stack)
 
     def __len__(self):
-        return 7 + sum(len(local) for local in locals) + sum(len(frame) for frame in self.stack)
+        return 7 + sum(len(local) for local in local_vars) + sum(len(frame) for frame in self.stack)
 
     @staticmethod
     def read_info(reader, frame_type):
         offset_delta = reader.read_u2()
 
-        n_locals = reader.read_u2()
-        locals = []
-        for i in range(0, n_locals):
-            locals.append(VerificationTypeInfo.read(reader))
+        n_local_vars = reader.read_u2()
+        local_vars = []
+        for i in range(0, n_local_vars):
+            local_vars.append(VerificationTypeInfo.read(reader))
 
         n_frames = reader.read_u2()
         stack = []
         for i in range(0, n_frames):
             stack.append(VerificationTypeInfo.read(reader))
-        return FullFrame(offset_delta, locals, stack)
+        return FullFrame(offset_delta, local_vars, stack)
 
     def write_info(self, writer):
         writer.write_u2(self.offset_delta)
