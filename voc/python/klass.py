@@ -90,6 +90,7 @@ class ClassBlock(Block):
                 'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
             },
             static=True,
+            verbosity=self.klass.verbosity
         )
         method.extract(code)
         self.klass.add_method(method)
@@ -186,8 +187,8 @@ class ClassBlock(Block):
 
 
 class Class(Block):
-    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None):
-        super().__init__(module)
+    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0):
+        super().__init__(module, verbosity=verbosity)
         self.name = name
         self.bases = bases if bases else ['org/python/types/Object']
         self.extends = extends

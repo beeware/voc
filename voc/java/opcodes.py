@@ -745,8 +745,31 @@ class DLOAD(Opcode):
     # Stack: → value
     code = 0x18
 
-    def __init__(self):
+    def __init__(self, var):
         super(DLOAD, self).__init__()
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DLOAD_0(Opcode):
