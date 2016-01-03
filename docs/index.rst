@@ -1,8 +1,7 @@
 VOC
 ===
 
-.. image:: https://travis-ci.org/pybee/voc.svg?branch=master
-    :target: https://travis-ci.org/pybee/voc
+.. image:: _static/logo.png
 
 **VOC is an early alpha project. If it breaks, you get to keep all the shiny pieces.**
 

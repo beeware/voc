@@ -1,47 +1,46 @@
 Getting Started
 ===============
 
-In this guide we will walk you through setting up your VOC environment for 
-development and testing. We will assume that you have a working JDK and
-Apache ANT installation and use virtualenv. 
+In this guide we will walk you through setting up your VOC environment for
+development and testing. We will assume that you have a working Python 3, JDK,
+Apache ANT installation and use virtualenv.
 
-Git a copy of pybee/voc
------------------------
-The first step is to fork voc by going to https://github.com/pybee/voc and 
-pressing the fork button at the top. 
+Get a copy of VOC
+-----------------
 
-You are now ready to clone voc by typing in 
+The first step is to create a project directory, and clone VOC:
 
 .. code-block:: bash
 
-    git clone https://github.com/YOUR_ACCOUNT/voc.git
+    $ mkdir tutorial
+    $ cd tutorial
+    $ git clone https://github.com/pybee/voc.git
 
-Setup VOC
----------
-At this point you are ready to setup your isolated voc environment. To do this
-you will need to do the following from the root voc directory
+Then create a virtual environment and install VOC into it:
 
 .. code-block:: bash
 
-    $ virutalenv -p $(which python3) voc
-    $ . voc/bin/activate
+    $ virtualenv -p $(which python3) env
+    $ . env/bin/activate
     $ pip install -e .
 
-
-Building The Support Jar File
+Building the support JAR file
 -----------------------------
-The last thing we need to do is build the python support file. This can be done
-by typing in the following from the VOC root directory
+
+Next, you need to build the Python support file:
 
 .. code-block:: bash
-    
-    $ ant java 
-    
-This should create a dist/python-java.jar file. This will be used when 
-executing the java class that gets compilied. 
 
+    $ cd voc
+    $ ant java
+
+This should create a `dist/python-java.jar` file. This JAR file is a support library
+that implements Python-like behavior and provides the Python standard library for
+the Java environment. This JAR file must be included on the classpath for any
+VOC-generated project.
 
 Next Steps
 ----------
-At this point you are ready to begin your development. A good next step would 
-be to read the `tutorials-0 <https://github.com/pybee/voc/blob/master/docs/tutorials/tutorial-0.rst>`_. 
+
+You now have a working VOC environment, so you can :doc:`start the first
+tutorial </tutorials/tutorial-0>`.
