@@ -2535,7 +2535,14 @@ class CALL_FUNCTION(Opcode):
                 else:
                     raise Exception("Unknown meta keyword " + str(key))
 
-            self.klass = Class(context.parent, class_name, bases=bases, extends=extends, implements=implements)
+            self.klass = Class(
+                context.parent,
+                class_name,
+                bases=bases,
+                extends=extends,
+                implements=implements,
+                verbosity=context.parent.verbosity
+            )
             self.klass.extract(code)
             context.parent.classes.append(self.klass)
 

@@ -38,15 +38,17 @@ class file:
 
 .. code-block:: bash
 
-    $ python -m voc example.py
+    $ voc -v example.py
 
+This runs the VOC compiler over the `example.py` source file. The `-v` flag
+asks VOC to use verbose output so you can see what is going on.
 You will see output like the following:
 
 .. code-block:: bash
 
-    Creating class 'example'...
-    Writing example/__init__.class...
-    Done.
+    Compiling example.py ...
+    Adding default main method...
+    Writing python/example/__init__.class ...
 
 This will produce an ``__init__.class`` in the ``python/example`` namespace.
 This classfile can run on any Java 1.7+ VM. To run the project, type:

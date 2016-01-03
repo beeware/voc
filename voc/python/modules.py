@@ -103,6 +103,7 @@ class StaticBlock(Block):
                 'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
             },
             static=True,
+            verbosity=self.module.verbosity
         )
         method.extract(code)
         self.module.methods.append(method)
@@ -110,8 +111,8 @@ class StaticBlock(Block):
 
 
 class Module(Block):
-    def __init__(self, namespace, sourcefile):
-        super().__init__()
+    def __init__(self, namespace, sourcefile, verbosity=0):
+        super().__init__(verbosity=verbosity)
         self.sourcefile = sourcefile
 
         parts = os.path.splitext(sourcefile)[0].split(os.path.sep)
@@ -157,7 +158,7 @@ class Module(Block):
                 # Marker for the end of the main block:
                 if cmd.is_main_end(main_end):
                     try:
-                        main = MainMethod(self, main_commands, end_offset=main_end)
+                        main = MainMethod(self, main_commands, end_offset=main_end, verbosity=self.verbosity)
                     except IgnoreBlock:
                         pass
                     main_end = None
@@ -188,8 +189,9 @@ class Module(Block):
         self.body = StaticBlock(self, body_commands)
 
         if main is None:
-            print("Adding default main method...")
-            main = MainMethod(self, [])
+            if self.verbosity:
+                print("Adding default main method...")
+            main = MainMethod(self, [], verbosity=self.verbosity)
 
         self.methods.append(main)
 

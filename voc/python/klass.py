@@ -90,6 +90,7 @@ class ClassBlock(Block):
                 'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
             },
             static=True,
+            verbosity=self.klass.verbosity
         )
         method.extract(code)
         self.klass.add_method(method)
@@ -186,8 +187,8 @@ class ClassBlock(Block):
 
 
 class Class(Block):
-    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None):
-        super().__init__(module)
+    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0):
+        super().__init__(module, verbosity=verbosity)
         self.name = name
         self.bases = bases if bases else ['org/python/types/Object']
         self.extends = extends
@@ -313,7 +314,7 @@ class Class(Block):
 
 
 class InnerClass(Class):
-    def __init__(self, parent, name, bases=None, extends=None, implements=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, parent, name, bases=None, extends=None, implements=None, public=True, final=False, methods=None, init=None, verbosity=0):
         if isinstance(parent, Class):
             module = parent.module
         else:
@@ -328,12 +329,13 @@ class InnerClass(Class):
             public=public,
             final=final,
             methods=methods,
-            init=init
+            init=init,
+            verbosity=verbosity
         )
 
 
 class ClosureClass(Class):
-    def __init__(self, parent, closure_var_names, name=None, extends=None, bases=None, implements=None, public=True, final=False, methods=None, init=None):
+    def __init__(self, parent, closure_var_names, name=None, extends=None, bases=None, implements=None, public=True, final=False, methods=None, init=None, verbosity=0):
         self.closure_var_names = closure_var_names
         if isinstance(parent, Class):
             module = parent.module
@@ -352,5 +354,6 @@ class ClosureClass(Class):
             public=public,
             final=final,
             methods=methods,
-            init=init
+            init=init,
+            verbosity=verbosity
         )

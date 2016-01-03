@@ -17,9 +17,11 @@ class IgnoreBlock(Exception):
 
 
 class Block:
-    def __init__(self, parent=None, commands=None):
+    def __init__(self, parent=None, commands=None, verbosity=0):
         self.parent = parent
         self.commands = commands if commands else []
+        self.verbosity = verbosity
+
         self.local_vars = {}
         self.deleted_vars = set()
 
@@ -52,7 +54,7 @@ class Block:
     def delete_name(self, name, use_locals):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
-    def extract(self, code, debug=False):
+    def extract(self, code):
         """Break a code object into the parts it defines, populating the
         provided block.
 
@@ -70,13 +72,12 @@ class Block:
 
         commands.reverse()
 
-        if True:
-            print ('=====' * 10)
+        if self.verbosity > 1:
+            print ('=' * len(str(code)))
             print (code)
-            print ('-----' * 10)
+            print ('-' * len(str(code)))
             for command in commands:
                 command.dump()
-            print ('=====' * 10)
 
         # Append the extracted commands to any pre-existing ones.
         self.commands.extend(commands)

@@ -48,8 +48,8 @@ def descriptor(annotation):
 
 
 class Method(Block):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
-        super().__init__(parent, commands=commands)
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
+        super().__init__(parent, commands=commands, verbosity=verbosity)
         self.name = name
         self.parameters = parameters
 
@@ -181,6 +181,7 @@ class Method(Block):
             implements=['org/python/Callable'],
             public=True,
             final=True,
+            verbosity=self.module.verbosity
         )
 
         method = ClosureMethod(
@@ -189,7 +190,8 @@ class Method(Block):
             parameters=extract_parameters(code, annotations),
             returns={
                 'annotation': annotations.get('return', 'org/python/Object').replace('.', '/')
-            }
+            },
+            verbosity=self.module.verbosity
         )
         method.extract(code)
         callable.methods.append(method)
@@ -237,7 +239,7 @@ class Method(Block):
 
 
 class InitMethod(Method):
-    def __init__(self, parent):
+    def __init__(self, parent, verbosity=0):
         super().__init__(
             parent, '<init>',
             parameters=[
@@ -258,6 +260,7 @@ class InitMethod(Method):
                 }
             ],
             returns={'annotation': None},
+            verbosity=verbosity
         )
 
     def __repr__(self):
@@ -311,13 +314,14 @@ class InitMethod(Method):
 
 
 class InstanceMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
         super().__init__(
             parent, name,
             parameters=parameters,
             returns=returns,
             static=static,
             commands=commands,
+            verbosity=verbosity
         )
 
     def __repr__(self):
@@ -749,13 +753,14 @@ class InstanceMethod(Method):
 
 
 class MainMethod(Method):
-    def __init__(self, parent, commands=None, end_offset=None):
+    def __init__(self, parent, commands=None, end_offset=None, verbosity=0):
         super().__init__(
             parent, '__main__',
             parameters=[{'name': 'args', 'annotation': 'argv'}],
             returns={'annotation': None},
             static=True,
             commands=commands,
+            verbosity=verbosity
         )
         self.end_offset = end_offset
 
@@ -886,7 +891,7 @@ class MainMethod(Method):
 
 
 class ClosureMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None):
+    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
 
         super().__init__(
             parent, name,
@@ -894,6 +899,7 @@ class ClosureMethod(Method):
             returns=returns,
             static=static,
             commands=commands,
+            verbosity=verbosity
         )
 
     def __repr__(self):
