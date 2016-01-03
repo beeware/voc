@@ -654,9 +654,9 @@ class Long(Constant):
     # endian (high byte first) order.
 
     def __init__(self, value):
-        # The tag item of the CONSTANT_LONG_info structure has the value
-        # CONSTANT_LONG (3).
-        super().__init__(Constant.CONSTANT_LONG)
+        # The tag item of the CONSTANT_Long_info structure has the value
+        # CONSTANT_Long (3).
+        super().__init__(Constant.CONSTANT_Long)
 
         self.value = value
 
