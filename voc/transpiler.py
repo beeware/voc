@@ -18,7 +18,6 @@ def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):
             transpiler.transpile(source_file, prefix)
         elif os.path.isdir(source_file):
             for root, dirs, files in os.walk(source_file, followlinks=True):
-                print (root, dirs, files)
                 for filename in files:
                     if os.path.splitext(filename)[1] == '.py':
                         source = os.path.join(root, filename)
