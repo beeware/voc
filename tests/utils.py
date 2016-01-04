@@ -545,7 +545,7 @@ class BinaryOperationTestCase:
 def _inplace_test(test_name, operation, examples):
     def func(self):
         for value in self.values:
-            for example in self.examples:
+            for example in examples:
                 self.assertInplaceOperation(x=value, y=example, operation=operation, format=self.format)
     return func
 
