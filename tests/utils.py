@@ -148,7 +148,7 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
         args = []
 
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../dist/python-java.jar:../java:.", "-XX:-UseSplitVerifier", "python.test.__init__"] + args,
+        ["java", "-classpath", "../../dist/python-java.jar:../java:.", "python.test.__init__"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -545,7 +545,7 @@ class BinaryOperationTestCase:
 def _inplace_test(test_name, operation, examples):
     def func(self):
         for value in self.values:
-            for example in self.examples:
+            for example in examples:
                 self.assertInplaceOperation(x=value, y=example, operation=operation, format=self.format)
     return func
 

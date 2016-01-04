@@ -1901,7 +1901,7 @@ class BUILD_MAP(Opcode):
 
     @property
     def consume_count(self):
-        return self.count
+        return 0
 
     @property
     def product_count(self):
