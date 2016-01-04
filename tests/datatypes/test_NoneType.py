@@ -209,9 +209,11 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
     values = [None]
 
     not_implemented = [
+        'test_add_bytes',
         'test_add_bytearray',
         'test_add_class',
         'test_add_complex',
+        'test_add_dict',
         'test_add_frozenset',
 
         'test_and_bool',
@@ -229,8 +231,10 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
         'test_and_tuple',
 
         'test_floor_divide_bytearray',
+        'test_floor_divide_bytes',
         'test_floor_divide_class',
         'test_floor_divide_complex',
+        'test_floor_divide_dict',
         'test_floor_divide_frozenset',
 
         'test_lshift_bool',
@@ -248,21 +252,19 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
         'test_lshift_tuple',
 
         'test_modulo_bytearray',
+        'test_modulo_bytes',
         'test_modulo_class',
         'test_modulo_complex',
+        'test_modulo_dict',
         'test_modulo_frozenset',
 
-        'test_multiply_bool',
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_dict',
-        'test_multiply_float',
         'test_multiply_frozenset',
-        'test_multiply_int',
         'test_multiply_list',
-        'test_multiply_set',
         'test_multiply_str',
         'test_multiply_tuple',
 
@@ -309,13 +311,17 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
         'test_rshift_tuple',
 
         'test_subtract_bytearray',
+        'test_subtract_bytes',
         'test_subtract_class',
         'test_subtract_complex',
+        'test_subtract_dict',
         'test_subtract_frozenset',
 
         'test_true_divide_bytearray',
+        'test_true_divide_bytes',
         'test_true_divide_class',
         'test_true_divide_complex',
+        'test_true_divide_dict',
         'test_true_divide_frozenset',
 
         'test_xor_bool',

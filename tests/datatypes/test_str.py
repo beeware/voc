@@ -194,7 +194,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_int',
         'test_add_list',
         'test_add_set',
-        'test_add_str',
         'test_add_tuple',
 
         'test_and_bool',
@@ -212,8 +211,10 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_and_tuple',
 
         'test_floor_divide_bytearray',
+        'test_floor_divide_bytes',
         'test_floor_divide_class',
         'test_floor_divide_complex',
+        'test_floor_divide_dict',
         'test_floor_divide_frozenset',
 
         'test_lshift_bool',
@@ -239,7 +240,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_float',
         'test_modulo_frozenset',
         'test_modulo_int',
-        'test_modulo_list',
         'test_modulo_set',
         'test_modulo_str',
         'test_modulo_tuple',
@@ -252,7 +252,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_dict',
         'test_multiply_float',
         'test_multiply_frozenset',
-        'test_multiply_int',
         'test_multiply_list',
         'test_multiply_set',
         'test_multiply_str',
@@ -301,13 +300,17 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_rshift_tuple',
 
         'test_subtract_bytearray',
+        'test_subtract_bytes',
         'test_subtract_class',
         'test_subtract_complex',
+        'test_subtract_dict',
         'test_subtract_frozenset',
 
         'test_true_divide_bytearray',
+        'test_true_divide_bytes',
         'test_true_divide_class',
         'test_true_divide_complex',
+        'test_true_divide_dict',
         'test_true_divide_frozenset',
 
         'test_xor_bool',

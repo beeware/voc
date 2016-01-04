@@ -373,13 +373,17 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_rshift_tuple',
 
         'test_subtract_bytearray',
+        'test_subtract_bytes',
         'test_subtract_class',
         'test_subtract_complex',
+        'test_subtract_dict',
         'test_subtract_frozenset',
 
         'test_true_divide_bytearray',
+        'test_true_divide_bytes',
         'test_true_divide_class',
         'test_true_divide_complex',
+        'test_true_divide_dict',
         'test_true_divide_frozenset',
 
         'test_xor_bool',
