@@ -3,6 +3,9 @@
     Build Python support libraries for voc
   </description>
 
+  <property name="python-version" value="3.4.2"/>
+  <property name="release" value="1"/>
+
   <property name="build" location="build"/>
   <property name="dist" location="dist"/>
 
