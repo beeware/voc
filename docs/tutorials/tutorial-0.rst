@@ -10,7 +10,7 @@ Setup
 This tutorial assumes you've read and followed the instructions in
 :doc:`/intro/getting-started`. If you've done this, you should have:
 
-* Java 7 installed and available on your path,
+* Java 6 (or higher) installed and available on your path,
 * A ``tutorial`` directory with a VOC checkout,
 * A activated Python 3.4 virtual environment,
 * VOC installed in that virtual environment,
@@ -51,16 +51,12 @@ You will see output like the following:
     Writing python/example/__init__.class ...
 
 This will produce an ``__init__.class`` in the ``python/example`` namespace.
-This classfile can run on any Java 1.7+ VM. To run the project, type:
+This classfile can run on any Java 6 (or higher) VM. To run the project, type:
 
 .. code-block:: bash
 
-    $ java -XX:-UseSplitVerifier -classpath ../voc/dist/python-java.jar:. python.example.__init__
+    $ java -classpath ../voc/dist/python-java.jar:. python.example.__init__
     Hello, World
-
-.. note:: Java 8
-
-   If you are using Java 8, substitute ``-noverify`` in place of ``-XX:-UseSplitVerifier``.
 
 Congratulations! You've just run your first Python program under Java using
 VOC! Now you're ready to get a little more adventurous.
