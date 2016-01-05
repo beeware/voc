@@ -78,7 +78,7 @@ class ClassFileWriter:
         self._outfile.write(struct.pack('>f', f))
 
     def write_u8(self, u8):
-        self._outfile.write(struct.pack('>L', u8))
+        self._outfile.write(struct.pack('>Q', u8))
 
     def write_d(self, d):
         self._outfile.write(struct.pack('>d', d))
@@ -112,7 +112,7 @@ class ClassFileReader:
         return struct.unpack('>f', self._infile.read(4))[0]
 
     def read_u8(self):
-        return struct.unpack('>L', self._infile.read(8))[0]
+        return struct.unpack('>Q', self._infile.read(8))[0]
 
     def read_d(self):
         return struct.unpack('>d', self._infile.read(8))[0]
@@ -193,9 +193,23 @@ class BaseClass:
         # releases 1.1.* support class file format versions in the range 45.0
         # through 45.65535 inclusive. For k ≥ 2, JDK release 1.k supports class
         # file format versions in the range 45.0 through 44+k.0 inclusive.
-
-        # Java 7 is v51.0
-        self.major_version = 51
+        #
+        # i.e.,
+        #   J2SE 8 = 52 (0x34 hex),
+        #   J2SE 7 = 51 (0x33 hex),
+        #   J2SE 6.0 = 50 (0x32 hex),
+        #   J2SE 5.0 = 49 (0x31 hex),
+        #   JDK 1.4 = 48 (0x30 hex),
+        #   JDK 1.3 = 47 (0x2F hex),
+        #   JDK 1.2 = 46 (0x2E hex),
+        #   JDK 1.1 = 45 (0x2D hex).
+        #
+        # If major_version is set to 51 or higher, and you're using a Java 7
+        # virtual machine, you'll need to use the ``-XX:-UseSplitVerifier``
+        # on the command line. This disables the use of the StackMapFrame
+        # verifier. If you're using a Java 8 or higher VM, you'll need to
+        # use -noverify, because StackMapFrame are no longer optional.
+        self.major_version = 50
         self.minor_version = 0
 
         # Each value in the interfaces array must be a valid index into the

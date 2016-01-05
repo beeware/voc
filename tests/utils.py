@@ -131,7 +131,7 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, arg
 def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
     """Run a block of Python code as a Java program."""
     # Output source code into test directory
-    transpiler = Transpiler()
+    transpiler = Transpiler(verbosity=0)
 
     # Don't redirect stderr; we want to see any errors from the transpiler
     # as top level test failures.
@@ -142,13 +142,13 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
             for name, code in extra_code.items():
                 transpiler.transpile_string("%s.py" % name.replace('.', os.path.sep), adjust(code))
 
-    transpiler.write(test_dir, verbosity=0)
+    transpiler.write(test_dir)
 
     if args is None:
         args = []
 
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../dist/python-java.jar:../java:.", "-XX:-UseSplitVerifier", "python.test.__init__"] + args,
+        ["java", "-classpath", "../../dist/python-java.jar:../java:.", "python.test.__init__"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,

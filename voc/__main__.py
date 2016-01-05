@@ -1,25 +1,49 @@
-import sys
 from .transpiler import transpile
+import argparse
 
 
 def main():
-    if len(sys.argv) == 2:
-        srcdir = '.'
-        outdir = None
-    elif len(sys.argv) == 3:
-        srcdir = sys.argv[2]
-        outdir = None
-    elif len(sys.argv) == 4:
-        srcdir = sys.argv[2]
-        outdir = sys.argv[3]
-    else:
-        print("Usage: voc <path to .py file> [<input prefix>] [<output dir>]")
-        print()
-        print('  e.g.: voc tests/example.py src out')
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        prog='voc',
+        description='Transpiles Python code to Java class files.'
+    )
 
-    transpile(sys.argv[1], srcdir=srcdir, outdir=outdir)
+    parser.add_argument(
+        '-o', '--output',
+        help='The directory where class files should be output.',
+        default='.'
+    )
+    parser.add_argument(
+        '-p', '--prefix',
+        help='The prefix to strip from all source file paths.',
+        default='.'
+    )
+    parser.add_argument(
+        '-n', '--namespace',
+        help='The namespace for the generated Java classfiles.',
+        default='python'
+    )
+    parser.add_argument(
+        '-v', '--verbosity',
+        action='count',
+        default=0
+    )
+    parser.add_argument(
+        'input',
+        metavar='source file',
+        nargs='+',
+        help='The source file or directory to compile'
+    )
 
+    args = parser.parse_args()
 
-if __name__ == "__main__":
+    transpile(
+        input=args.input,
+        prefix=args.prefix,
+        outdir=args.output,
+        namespace=args.namespace,
+        verbosity=args.verbosity
+    )
+
+if __name__ == '__main__':
     main()

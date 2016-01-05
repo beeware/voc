@@ -23,6 +23,44 @@ class JavaTests(TranspileTestCase):
             Done.
             """, run_in_function=False)
 
+    def test_most_specific_constructor(self):
+        "The most specific constructor for a native Java class will be selected based on argument."
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
+
+            obj1 = MyClass()
+            obj2 = MyClass(1.234)
+            obj3 = MyClass(3742)
+
+            print("Done.")
+            """,
+            java={
+                'com/example/MyClass': """
+                package com.example;
+
+                public class MyClass {
+                    public MyClass() {
+                        System.out.println("No argument");
+                    }
+
+                    public MyClass(int arg) {
+                        System.out.println("Integer argument " + arg);
+                    }
+
+                    public MyClass(double arg) {
+                        System.out.println("Double argument " + arg);
+                    }
+                }
+                """
+            },
+            out="""
+            No argument
+            Double argument 1.234
+            Integer argument 3742
+            Done.
+            """, run_in_function=False)
+
     def test_field(self):
         "Native fields on an instance can be accessed"
         self.assertJavaExecution("""
@@ -32,6 +70,8 @@ class JavaTests(TranspileTestCase):
                 obj1 = MyClass()
                 print("Field is", MyClass.field)
                 print("Field from instance is", obj1.field)
+                obj1.field = 37
+                print("Updated Field from instance is", obj1.field)
                 print("Done.")
                 """,
             java={
@@ -47,6 +87,7 @@ class JavaTests(TranspileTestCase):
                 Class is <class 'com.example.MyClass'>
                 Field is <unbound native field public int com.example.MyClass.field>
                 Field from instance is 42
+                Updated Field from instance is 37
                 Done.
                 """)
 
@@ -58,7 +99,11 @@ class JavaTests(TranspileTestCase):
                 print("Class is", MyClass)
                 obj1 = MyClass()
                 print("Static field is", MyClass.static_field)
+                MyClass.static_field = 37
+                print("Updated static field is", MyClass.static_field)
                 print("Static field from instance is", obj1.static_field)
+                MyClass.static_field = 42
+                print("Updated static field from instance is", obj1.static_field)
                 print("Done.")
                 """,
             java={
@@ -73,7 +118,9 @@ class JavaTests(TranspileTestCase):
             out="""
                 Class is <class 'com.example.MyClass'>
                 Static field is 42
-                Static field from instance is 42
+                Updated static field is 37
+                Static field from instance is 37
+                Updated static field from instance is 42
                 Done.
                 """)
 
@@ -459,7 +506,6 @@ class JavaTests(TranspileTestCase):
                 Done.
                 """)
 
-    @expectedFailure
     def test_inner_class_method(self):
         "Inner classes can be instantiated, and methods invoked"
         self.assertJavaExecution("""
@@ -470,7 +516,7 @@ class JavaTests(TranspileTestCase):
                 obj1.method()
 
                 print("Inner class is", OuterClass.InnerClass)
-                obj2 = OuterClass.InnerClass()
+                obj2 = OuterClass.InnerClass(obj1)
                 obj2.method()
 
                 print("Done.")

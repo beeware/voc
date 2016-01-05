@@ -1901,7 +1901,7 @@ class BUILD_MAP(Opcode):
 
     @property
     def consume_count(self):
-        return self.count
+        return 0
 
     @property
     def product_count(self):
@@ -2467,6 +2467,8 @@ def extract_constant(arg):
         value = arg.operation.name
     elif arg.operation.opname == 'LOAD_FAST':
         value = arg.operation.name
+    elif arg.operation.opname == 'BINARY_SUBSCR':
+        value = extract_constant(arg.arguments[0]) + "$" + arg.arguments[1].operation.name
     elif arg.operation.opname in ('BUILD_LIST', 'BUILD_TUPLE'):
         value = [
             extract_constant(a)
@@ -2533,7 +2535,14 @@ class CALL_FUNCTION(Opcode):
                 else:
                     raise Exception("Unknown meta keyword " + str(key))
 
-            self.klass = Class(context.parent, class_name, bases=bases, extends=extends, implements=implements)
+            self.klass = Class(
+                context.parent,
+                class_name,
+                bases=bases,
+                extends=extends,
+                implements=implements,
+                verbosity=context.parent.verbosity
+            )
             self.klass.extract(code)
             context.parent.classes.append(self.klass)
 

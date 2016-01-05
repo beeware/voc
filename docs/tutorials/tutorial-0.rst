@@ -1,8 +1,6 @@
 Tutorial 0 - Hello, world!
 ==========================
 
-.. _getting-started: https://github.com/pybee/voc/blob/master/docs/intro/getting-started.rst
-
 In this tutorial, you'll take a really simple "Hello, world!" program written in
 Python, convert it into a classfile, and run it on the Java Virtual Machine.
 
@@ -10,48 +8,55 @@ Setup
 -----
 
 This tutorial assumes you've read and followed the instructions in
-getting-started_. If you've done this, you should have:
+:doc:`/intro/getting-started`. If you've done this, you should have:
 
-* Java 7 installed and available on your path
-* A activated Python 3.4 virtual environment
-* `voc` installed in that virtual environment
+* Java 6 (or higher) installed and available on your path,
+* A ``tutorial`` directory with a VOC checkout,
+* A activated Python 3.4 virtual environment,
+* VOC installed in that virtual environment,
+* A compiled VOC support library.
 
 Start a new project
 -------------------
-Lets start by creating a file called example.py. Inside of this example file
-lets add the following python code
+
+Lets start by creating a ``tutorial0`` directory:
 
 .. code-block:: python
 
-  print("Hello World!)
-	
-now lets save the file. We will now compile the class
+    $ mkdir tutorial0
+    $ cd tutorial0
+
+Then create a file called ``example.py`` in this directory.
+Add the following Python code to ``example.py``:
+
+.. code-block:: python
+
+    print("Hello World!")
+
+Save the file. Run VOC over this file, compiling the Python code into a Java
+class file:
 
 .. code-block:: bash
 
-    $ python -m voc path/to/your/example.py
-    
-you will see output like the following 
+    $ voc -v example.py
+
+This runs the VOC compiler over the `example.py` source file. The `-v` flag
+asks VOC to use verbose output so you can see what is going on.
+You will see output like the following:
 
 .. code-block:: bash
 
-    $ Creating class 'example'...
-    $ Writing example/__init__.class...
-    $ Done.
+    Compiling example.py ...
+    Adding default main method...
+    Writing python/example/__init__.class ...
 
-This will produce an ``__init__.class``, in the ``python/example`` namespace,
-that you can run on any Java 1.7+ VM. To run the classfile, you'll need the
-Python support libraries. These will eventually be available as a download;
-for now, you'll need to compile them. See the getting-started_ instructions 
-for details on how to compile it.
+This will produce an ``__init__.class`` in the ``python/example`` namespace.
+This classfile can run on any Java 6 (or higher) VM. To run the project, type:
 
-Once you've got the support Jarfile, you can run the example.class ensuring that
-the support jarfile is in your classpath. For example, using the Oracle Java VM,
-you would run::
+.. code-block:: bash
 
-    $ java -XX:-UseSplitVerifier -classpath dist/python-java.jar:. python.example.__init__
+    $ java -classpath ../voc/dist/python-java.jar:. python.example.__init__
     Hello, World
 
-.. note: Java 8
-
-   If you are using Java 8, substitute ``-noverify`` in place of ``-XX:-UseSplitVerifier``.
+Congratulations! You've just run your first Python program under Java using
+VOC! Now you're ready to get a little more adventurous.

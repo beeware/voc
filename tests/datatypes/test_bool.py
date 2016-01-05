@@ -219,7 +219,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_power_bytes',
         'test_power_class',
         'test_power_complex',
-        'test_power_dict',
         'test_power_float',
         'test_power_frozenset',
         'test_power_int',

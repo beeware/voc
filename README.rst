@@ -15,113 +15,23 @@ What it does:
 
 * Provides an API to let you programmatically create Java class files.
 
-* Compiles a Python 3.4 source file into a Java class file in a nominated
-  package. Supports the conversion of:
+* Compiles Python 3.4 source files into Java class files, enabling you to run
+  Python code on a JVM (including Android's VM).
 
-  * Class definition and construction
+It isn't a *completely* compliant Python 3.4 implementation - there are some
+language features (like generators and context managers) that still need to be
+implemented, and there is only a bare bones standard library implementation.
+However, it is possible to convert simple Python programs, and even write
+simple Android applications.
 
-  * Class instantiation
+Tutorial
+--------
 
-  * Method definition and invocation
+To take VOC for a spin, run through the `Getting Started guide`_, then start
+with `the first tutorial`_.
 
-  * Some mathematical operations
-
-  * Some operations and methods on primitive types
-
-  * Exception handling
-
-  * for/while/if constructs
-
-  * Identification of mainline entry points
-
-  * Static initialization of modules.
-
-  * List comprehensions
-
-  * Keyword arguments
-
-  * `import`, `from X import Y` and `from X import *` statements for Python code
-
-  * Subclassing Python classes
-
-  * Importing and using native Java APIs
-
-  * Implementing Java interfaces.
-
-  * Extending Java classes.
-
-It *doesn't* currently support (this list is incomplete):
-
-* Generators
-
-* with statements
-
-* ``exec()`` and ``eval()``
-
-These things are all *possible* - it's just a matter of time
-and development effort. The order listed here is a rough indicator of
-development priorities.
-
-Quickstart
-----------
-
-Using Python 3.4, install ``voc``, then run it over your python script::
-
-    $ pip install voc
-    $ python -m voc path/to/your/example.py
-    Creating class 'example'...
-    Writing example/__init__.class...
-    Done.
-
-This will produce an ``__init__.class``, in the ``python/example`` namespace,
-that you can run on any Java 1.7+ VM. To run the classfile, you'll need the
-Python support libraries. These will eventually be available as a download;
-for now, you'll need to compile them. See below for compilation instructions.
-
-Once you've got the support Jarfile, you can run the example.class ensuring that
-the support jarfile is in your classpath. For example, using the Oracle Java VM,
-you would run::
-
-    $ java -XX:-UseSplitVerifier -classpath dist/python-java.jar:. python.example.__init__
-    Hello, World
-
-The ``-XX:-UseSplitVerifier`` argument is necessary to turn off stack map
-verification in Java 7. This could be addressed by computing stack maps
-for generated code.
-
-NOTE: If you are using Java 8, substitute ``-noverify`` in place of ``-XX:-UseSplitVerifier``.
-
-Compiling the support library
------------------------------
-
-Oracle Java
-~~~~~~~~~~~
-
-To compile the Python support libraries for Java (the Oracle JVM)::
-
-    $ ant java
-
-This will create a ``dist`` directory that contains ``python-java.jar``.
-
-Android
-~~~~~~~
-
-To compile for Android, you'll need to `download the Android SDK`_. You only
-need the standalone SDK (see "Other install options") - you don't have to
-download the fully Android Studio if you don't want to.
-
-Once you've downloaded and installed the SDK, create a ``local.properties``
-in the top level ``voc`` project directory, containing a single line::
-
-    sdk.dir=<path to SDK>/sdk
-
-You can then run ``ant`` to compile ``dist/python-android.jar``::
-
-    $ ant android
-
-You can then add ``dist/python-android.jar`` to your Android project.
-
-.. _download the Android SDK: https://developer.android.com/sdk/index.html
+.. _Getting Started guide: http://voc.readthedocs.org/en/latest/intro/getting-started.html
+.. _the first tutorial: http://voc.readthedocs.org/en/latest/tutorials/tutorial-0.html
 
 Documentation
 -------------
@@ -173,4 +83,3 @@ want to contribute code, please `fork the code`_ and `submit a pull request`_.
 .. _log them on Github: https://github.com/pybee/voc/issues
 .. _fork the code: https://github.com/pybee/voc
 .. _submit a pull request: https://github.com/pybee/voc/pulls
-

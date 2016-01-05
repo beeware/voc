@@ -104,6 +104,25 @@ public class Type extends org.python.types.Object implements org.python.Callable
         }
     }
 
+    public static java.lang.Object toJava(java.lang.Class<?> klass, org.python.Object value) {
+        if (value == null) {
+            return value;
+        } else {
+            if (klass == java.lang.Float.TYPE || klass == java.lang.Float.class) {
+                return ((java.lang.Number) value.toJava()).floatValue();
+            } else if (klass == java.lang.Long.TYPE || klass == java.lang.Long.class) {
+                return ((java.lang.Number) value.toJava()).longValue();
+            } else if (klass == java.lang.Integer.TYPE || klass == java.lang.Integer.class) {
+                return ((java.lang.Number) value.toJava()).intValue();
+            } else if (klass == java.lang.Short.TYPE || klass == java.lang.Short.class) {
+                return ((java.lang.Number) value.toJava()).shortValue();
+            } else if (klass == java.lang.Byte.TYPE || klass == java.lang.Byte.class) {
+                return ((java.lang.Number) value.toJava()).byteValue();
+            } else {
+                return value.toJava();
+            }
+        }
+    }
 
     /**
      * A utility method to update the internal value of this object.

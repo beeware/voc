@@ -1,8 +1,8 @@
 VOC
 ===
 
-.. image:: https://travis-ci.org/pybee/voc.svg?branch=master
-    :target: https://travis-ci.org/pybee/voc
+.. image:: _static/logo.png
+    :target: https://pybee.org/voc
 
 **VOC is an early alpha project. If it breaks, you get to keep all the shiny pieces.**
 
@@ -11,7 +11,7 @@ class file that can then be executed on a JVM, or run through a DEX tool to
 run on Android. It does this *at the bytecode level*, rather than the source code level.
 
 It honors Python 3.4 syntax and conventions, but also provides the ability to
-reference objects and classes defined in Java code, andimplement interfaces
+reference objects and classes defined in Java code, and implement interfaces
 defined in Java code.
 
 .. toctree::

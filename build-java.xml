@@ -23,7 +23,12 @@
   <target name="dist" depends="compile" description="Generate Oracle jar file">
     <mkdir dir="${dist}"/>
 
-    <jar jarfile="${dist}/python-java.jar" basedir="${build}/java"/>
+    <jar jarfile="${dist}/Python-Java-${python-version}-b${release}.jar" basedir="${build}/java"/>
+
+    <symlink
+        link="${dist}/python-java.jar"
+        resource="${dist}/Python-Java-${python-version}-b${release}.jar"
+        overwrite="true" />
   </target>
 
   <target name="clean" description="Clean up">
