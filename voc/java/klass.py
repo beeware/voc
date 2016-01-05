@@ -193,7 +193,7 @@ class BaseClass:
         # releases 1.1.* support class file format versions in the range 45.0
         # through 45.65535 inclusive. For k ≥ 2, JDK release 1.k supports class
         # file format versions in the range 45.0 through 44+k.0 inclusive.
-
+        #
         # i.e.,
         #   J2SE 8 = 52 (0x34 hex),
         #   J2SE 7 = 51 (0x33 hex),
@@ -203,6 +203,12 @@ class BaseClass:
         #   JDK 1.3 = 47 (0x2F hex),
         #   JDK 1.2 = 46 (0x2E hex),
         #   JDK 1.1 = 45 (0x2D hex).
+        #
+        # If major_version is set to 51 or higher, and you're using a Java 7
+        # virtual machine, you'll need to use the ``-XX:-UseSplitVerifier``
+        # on the command line. This disables the use of the StackMapFrame
+        # verifier. If you're using a Java 8 or higher VM, you'll need to
+        # use -noverify, because StackMapFrame are no longer optional.
         self.major_version = 50
         self.minor_version = 0
 
