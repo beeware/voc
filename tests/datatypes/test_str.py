@@ -93,9 +93,9 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_str',
         'test_modulo_tuple',
 
+        'test_multiply_bool',
         
-        
-       
+        'test_multiply_bytes',
        
        
        
