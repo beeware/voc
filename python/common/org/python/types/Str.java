@@ -284,7 +284,14 @@ public class Str extends org.python.types.Object {
             }
             return new Str(res.toString());
         }
-    
+        else if (other instanceof org.python.types.Bool) {
+                boolean other_bool = ((org.python.types.Bool)other).value;
+                if (other_bool) {
+                        return new Str(value);
+                } else {
+                        return new Str("");
+                }
+        }
         throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
     }
 
