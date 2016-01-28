@@ -15,6 +15,7 @@ The first step is to create a project directory, and clone VOC:
     $ mkdir tutorial
     $ cd tutorial
     $ git clone https://github.com/pybee/voc.git
+    $ cd voc
 
 Then create a virtual environment and install VOC into it:
 
@@ -31,7 +32,6 @@ Next, you need to build the Python support file:
 
 .. code-block:: bash
 
-    $ cd voc
     $ ant java
 
 This should create a `dist/python-java.jar` file. This JAR file is a support library
