@@ -19,9 +19,9 @@ This tutorial assumes you've read and followed the instructions in
 Start a new project
 -------------------
 
-Lets start by creating a ``tutorial0`` directory:
+Let's start by creating a ``tutorial0`` directory alongside the ``voc`` directory you just cloned into:
 
-.. code-block:: python
+.. code-block:: bash
 
     $ mkdir tutorial0
     $ cd tutorial0
@@ -40,7 +40,7 @@ class file:
 
     $ voc -v example.py
 
-This runs the VOC compiler over the `example.py` source file. The `-v` flag
+This runs the VOC compiler over the ``example.py`` source file. The ``-v`` flag
 asks VOC to use verbose output so you can see what is going on.
 You will see output like the following:
 
