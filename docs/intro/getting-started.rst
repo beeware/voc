@@ -15,7 +15,6 @@ The first step is to create a project directory, and clone VOC:
     $ mkdir tutorial
     $ cd tutorial
     $ git clone https://github.com/pybee/voc.git
-    $ cd voc
 
 Then create a virtual environment and install VOC into it:
 
@@ -23,6 +22,7 @@ Then create a virtual environment and install VOC into it:
 
     $ virtualenv -p $(which python3) env
     $ . env/bin/activate
+    $ cd voc
     $ pip install -e .
 
 Building the support JAR file
@@ -32,10 +32,9 @@ Next, you need to build the Python support file:
 
 .. code-block:: bash
 
-    $ cd voc
     $ ant java
 
-This should create a `dist/python-java.jar` file. This JAR file is a support library
+This should create a ``dist/python-java.jar`` file. This JAR file is a support library
 that implements Python-like behavior and provides the Python standard library for
 the Java environment. This JAR file must be included on the classpath for any
 VOC-generated project.
@@ -43,5 +42,5 @@ VOC-generated project.
 Next Steps
 ----------
 
-You now have a working VOC environment, so you can :doc:`start the first
-tutorial </tutorials/tutorial-0>`.
+You now have a working VOC environment, so you can :doc:``start the first
+tutorial </tutorials/tutorial-0>``.
