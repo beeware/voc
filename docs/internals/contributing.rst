@@ -65,9 +65,13 @@ To run a full test case, do the same, but stop at the test case name:
 
 Or, to run all the Str datatype tests:
 
+.. code-block:: bash
+
     $ python setup.py test -s tests.datatypes.test_str
 
 Or, to run all the datatypes tests:
+
+.. code-block:: bash
 
     $ python setup.py test -s tests.datatypes
 
