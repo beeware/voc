@@ -3,10 +3,14 @@ include AUTHORS
 include LICENSE
 include Makefile
 include requirements*.txt
+include *.properties
+include *.xml
 recursive-include voc *.py
 recursive-include docs *.bat
+recursive-include docs *.png
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include tests *.py
 recursive-include python *.java
+
