@@ -23,7 +23,6 @@ class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_unary_positive',
         'test_unary_negative',
-        'test_unary_not',
         'test_unary_invert',
     ]
 

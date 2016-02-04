@@ -463,10 +463,10 @@ class UnaryOperationTestCase:
                 getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
         return super().run(result=result)
 
-    def assertUnaryOperator(self, **kwargs):
+    def assertUnaryOperation(self, **kwargs):
         self.assertCodeExecution("""
             x = %(x)s
-            print(%(format)s%(operand)sx)
+            print(%(format)s%(operation)sx)
             """ % kwargs)
 
     test_unary_positive = _unary_test('test_unary_positive', '+')
