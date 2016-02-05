@@ -72,6 +72,8 @@ VOC is part of the `BeeWare suite`_. You can talk to the community through:
 Contributing
 ------------
 
+To get started with contributing to VOC, head over to the `wiki`.
+
 If you experience problems with VOC, `log them on GitHub`_. If you
 want to contribute code, please `fork the code`_ and `submit a pull request`_.
 
@@ -79,6 +81,7 @@ want to contribute code, please `fork the code`_ and `submit a pull request`_.
 .. _Read The Docs: http://voc.readthedocs.org
 .. _@pybeeware on Twitter: https://twitter.com/pybeeware
 .. _BeeWare Users Mailing list: https://groups.google.com/forum/#!forum/beeware-users
+.. _wiki: https://github.com/pybee/voc/wiki/Your-first-VOC-contribution
 .. _BeeWare Developers Mailing list: https://groups.google.com/forum/#!forum/beeware-developers
 .. _log them on Github: https://github.com/pybee/voc/issues
 .. _fork the code: https://github.com/pybee/voc
