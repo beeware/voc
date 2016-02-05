@@ -72,7 +72,7 @@ VOC is part of the `BeeWare suite`_. You can talk to the community through:
 Contributing
 ------------
 
-To get started with contributing to VOC, head over to the `wiki`.
+To get started with contributing to VOC, head over to the `wiki`_.
 
 If you experience problems with VOC, `log them on GitHub`_. If you
 want to contribute code, please `fork the code`_ and `submit a pull request`_.
