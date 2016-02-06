@@ -334,8 +334,8 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
         __doc__=""
     )
-    public org.python.Object __not__() {
-        return new org.python.types.Bool(this.value.length() == 0);
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(this.value.length() > 0);
     }
 
     @org.python.Method(
