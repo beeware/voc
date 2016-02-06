@@ -330,6 +330,13 @@ public class Str extends org.python.types.Object {
     public org.python.Object __neg__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary -: 'str'");
     }
+    
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __not__() {
+        return new org.python.types.Bool(this.value.length() == 0);
+    }
 
     @org.python.Method(
         __doc__ = ""
