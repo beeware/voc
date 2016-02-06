@@ -323,6 +323,13 @@ public class Str extends org.python.types.Object {
     public org.python.Object __pos__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary +: 'str'");
     }
+    
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'str'");
+    }
 
     @org.python.Method(
         __doc__ = ""
