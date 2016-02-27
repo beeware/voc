@@ -15,6 +15,10 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         // System.out.println("EX: " + this);
     }
 
+    public BaseException(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super(args[0].toString());
+    }
+
     public java.lang.Object toJava() {
         return this;
     }

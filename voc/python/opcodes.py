@@ -2458,7 +2458,33 @@ class DELETE_FAST(Opcode):
         free_name(self.name)
 
 
-# class RAISE_VARARGS(Opcode):
+class RAISE_VARARGS(Opcode):
+    def __init__(self, argc, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.argc = argc
+
+    def __arg_repr__(self):
+        return '%s args' % (
+            self.argc,
+        )
+
+    @property
+    def consume_count(self):
+        return self.argc
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert_opcode(self, context, arguments):
+        if self.argc != 1:
+            raise Exception("Don't know how to handle exception with multiple arguments")
+
+        context.add_opcodes(
+            JavaOpcodes.CHECKCAST('java/lang/Throwable'),
+            JavaOpcodes.ATHROW()
+        )
+
 
 def extract_constant(arg):
     if arg.operation.opname == 'LOAD_CONST':

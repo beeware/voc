@@ -62,6 +62,11 @@ class Block:
         self.code = code
         instructions = list(dis.Bytecode(code))
 
+        if self.verbosity > 1:
+            print ('=' * len(str(code)))
+            print (code)
+            print ('-' * len(str(code)))
+
         blocks = find_blocks(instructions)
 
         i = len(instructions)
@@ -73,9 +78,6 @@ class Block:
         commands.reverse()
 
         if self.verbosity > 1:
-            print ('=' * len(str(code)))
-            print (code)
-            print ('-' * len(str(code)))
             for command in commands:
                 command.dump()
 
