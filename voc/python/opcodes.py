@@ -2769,6 +2769,10 @@ class MAKE_FUNCTION(Opcode):
 
         if full_method_name == '<listcomp>':
             full_method_name = 'listcomp_%x' % id(self)
+        elif full_method_name == '<dictcomp>':
+            full_method_name = 'dictcomp_%x' % id(self)
+        elif full_method_name == '<setcomp>':
+            full_method_name = 'setcomp_%x' % id(self)
 
         annotations = {}
         if self.annotations:
@@ -3317,7 +3321,80 @@ class LIST_APPEND(Opcode):
         else:
             raise RuntimeError("Don't know how to handle LIST_APPEND at index %d" % self.index)
 
-# class SET_ADD(Opcode):
-# class MAP_ADD(Opcode):
+
+class SET_ADD(Opcode):
+    prefaced = 0
+
+    def __init__(self, index, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.index = index
+
+    def __arg_repr__(self):
+        return str(self.index)
+
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+
+        if self.index == 2:
+            context.add_opcodes(
+                JavaOpcodes.GETFIELD('org/python/types/Set', 'value', 'Ljava/util/Set;'),
+            )
+
+            for argument in arguments:
+                argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/Set', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+        else:
+            raise RuntimeError("Don't know how to handle SET_ADD at index %d" % self.index)
+
+
+class MAP_ADD(Opcode):
+    prefaced = 0
+
+    def __init__(self, index, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.index = index
+
+    def __arg_repr__(self):
+        return str(self.index)
+
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+
+        if self.index == 2:
+            context.add_opcodes(
+                JavaOpcodes.GETFIELD('org/python/types/Dict', 'value', 'Ljava/util/Map;'),
+            )
+
+            for argument in arguments:
+                argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.POP(),
+            )
+        else:
+            raise RuntimeError("Don't know how to handle MAP_ADD at index %d" % self.index)
+
 
 # class LOAD_CLASSDEREF(Opcode):
