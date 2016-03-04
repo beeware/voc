@@ -65,6 +65,50 @@ class DictTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_builtin_constructor(self):
+        # Construct a dictionary using the dict builtin
+        self.assertCodeExecution("""
+            x = dict()
+            print(x)
+            print('a' in x)
+
+            # List of tuples
+            x = dict([('a', 1), ('b', 2)])
+            print('a' in x)
+            print(x['a'])
+            print('c' in x)
+
+            # List of lists
+            x = dict([['a', 3], ['b', 4]])
+            print('a' in x)
+            print(x['a'])
+            print('c' in x)
+
+            # Tuple of lists
+            x = dict((['a', 5], ['b', 6]))
+            print('a' in x)
+            print(x['a'])
+            print('c' in x)
+
+            # Tuple of tuples
+            x = dict((('a', 5), ('b', 6)))
+            print('a' in x)
+            print(x['a'])
+            print('c' in x)
+        """)
+
+    def test_builtin_non_2_tuples(self):
+        # One of the elements isn't a 2-tuple
+        self.assertCodeExecution("""
+            x = dict([('a', 1), ('b', 2, False)])
+            """)
+
+    def test_builtin_non_sequence(self):
+        # One of the elements isn't a sequence
+        self.assertCodeExecution("""
+            x = dict([('a', 1), False, ('b', 2)])
+            """)
+
 
 class UnaryDictOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ["{}", "{'a': 1, 'b': 'value', 'c': 1.2345}"]

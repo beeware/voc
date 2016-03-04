@@ -8,7 +8,7 @@ from ..java import (
     SourceFile,
 )
 from .blocks import Block, IgnoreBlock
-from .methods import MainMethod, Method, extract_parameters
+from .methods import MainMethod, Method, GeneratorMethod, extract_parameters
 from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 
@@ -95,17 +95,34 @@ class StaticBlock(Block):
         return self.parent
 
     def add_method(self, method_name, code, annotations):
-        method = Method(
-            self.module,
-            name=method_name,
-            parameters=extract_parameters(code, annotations),
-            returns={
-                'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
-            },
-            static=True,
-            verbosity=self.module.verbosity
-        )
-        method.extract(code)
+        if code.co_flags & 32:  # CO_GENERATOR
+            # Generator method.
+            method = GeneratorMethod(
+                self.module,
+                generator=code.co_name,
+                name=method_name,
+                parameters=extract_parameters(code, annotations),
+                returns={
+                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+                },
+                static=True,
+                verbosity=self.module.verbosity
+            )
+            method.extract(code)
+
+        else:
+            # Normal method.
+            method = Method(
+                self.module,
+                name=method_name,
+                parameters=extract_parameters(code, annotations),
+                returns={
+                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+                },
+                static=True,
+                verbosity=self.module.verbosity
+            )
+            method.extract(code)
         self.module.methods.append(method)
         return method
 

@@ -545,21 +545,27 @@ class ComprehensionForLoop(ForLoop):
         super().__init__(start, loop, varname, end, start_offset, for_offset, loop_offset, end_offset, starts_line)
 
     def pre_loop(self, context):
+        if context.generator is None:
+            context.add_opcodes(
+                opcodes.ASTORE_name(context, '#for-accumulator-%x' % id(self)),
+            )
+
         context.add_opcodes(
-            opcodes.ASTORE_name(context, '#for-%x' % id(self)),
             opcodes.ALOAD_name(context, '.0'),
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
         )
 
     def pre_iteration(self, context):
-        context.add_opcodes(
-            opcodes.ALOAD_name(context, '#for-%x' % id(self)),
-        )
+        if context.generator is None:
+            context.add_opcodes(
+                opcodes.ALOAD_name(context, '#for-accumulator-%x' % id(self)),
+            )
 
     def post_loop(self, context):
-        context.add_opcodes(
-            opcodes.ALOAD_name(context, '#for-%x' % id(self)),
-        )
+        if context.generator is None:
+            context.add_opcodes(
+                opcodes.ALOAD_name(context, '#for-accumulator-%x' % id(self)),
+            )
 
 
 class WhileLoop:

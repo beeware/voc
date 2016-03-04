@@ -18,7 +18,7 @@ class SetComprehensionTests(TranspileTestCase):
     def test_method(self):
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            s = set(v**2 for v in x))
+            s = set(v**2 for v in x)
             print(len(s))
             print(1 in s)
             print(4 in s)
@@ -26,4 +26,4 @@ class SetComprehensionTests(TranspileTestCase):
             print(16 in s)
             print(25 in s)
             print('Done.')
-            """)
+            """, run_in_function=False)

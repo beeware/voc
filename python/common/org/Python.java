@@ -442,10 +442,56 @@ public class Python {
             "    for k, v in iterable:\n" +
             "        d[k] = v\n" +
             "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" +
-            "    in the keyword argument list.  For example:  dict(one=1, two=2)\n"
+            "    in the keyword argument list.  For example:  dict(one=1, two=2)\n",
+        default_args = {"iterable"}
     )
-    public static org.python.types.Dict dict() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'dict' not implemented");
+    public static org.python.types.Dict dict(org.python.Object iterable) {
+        if (iterable == null) {
+            return new org.python.types.Dict();
+        } else {
+            if (iterable instanceof org.python.types.Dict) {
+                return new org.python.types.Dict(
+                    new java.util.HashMap<org.python.Object, org.python.Object>(
+                        ((org.python.types.Dict) iterable).value
+                    )
+                );
+            } else {
+                try {
+                    org.python.Iterable iterator = iterable.__iter__();
+                    java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
+                    try {
+                        while (true) {
+                            org.python.Object next = iterator.__next__();
+                            java.util.List<org.python.Object> data;
+                            if (next instanceof org.python.types.Tuple) {
+                                data = ((org.python.types.Tuple) next).value;
+                            } else if (next instanceof org.python.types.List) {
+                                data = ((org.python.types.List) next).value;
+                            } else {
+                                throw new org.python.exceptions.TypeError(
+                                    "cannot convert dictionary update sequence element #" + generated.size() +
+                                        " to a sequence"
+                                );
+                            }
+
+                            if (data.size() != 2) {
+                                throw new org.python.exceptions.ValueError(
+                                    "dictionary update sequence element #" + generated.size() +
+                                        " has length " + data.size() +
+                                        "; 2 is required"
+                                );
+                            }
+
+                            generated.put(data.get(0), data.get(1));
+                        }
+                    } catch (org.python.exceptions.StopIteration si) {
+                    }
+                    return new org.python.types.Dict(generated);
+                } catch (org.python.exceptions.AttributeError ae) {
+                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                }
+            }
+        }
     }
 
     @org.python.Method(
@@ -761,22 +807,37 @@ public class Python {
         } else {
             if (iterable instanceof org.python.types.List) {
                 return new org.python.types.List(
-                    new java.util.ArrayList(
+                    new java.util.ArrayList<org.python.Object>(
                         ((org.python.types.List) iterable).value
+                    )
+                );
+            } else if (iterable instanceof org.python.types.Set) {
+                return new org.python.types.List(
+                    new java.util.ArrayList<org.python.Object>(
+                        ((org.python.types.Set) iterable).value
                     )
                 );
             } else if (iterable instanceof org.python.types.Tuple) {
                 return new org.python.types.List(
-                    new java.util.ArrayList(
+                    new java.util.ArrayList<org.python.Object>(
                         ((org.python.types.Tuple) iterable).value
                     )
                 );
-            } else if (iterable instanceof org.python.Iterable) {
-                throw new org.python.exceptions.NotImplementedError("Builtin function 'list' with iterator argument not implemented");
-                // org.python.types.List out = new org.python.types.List();
-                // return out;
             } else {
-                throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                try {
+                    org.python.Iterable iterator = iterable.__iter__();
+                    java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
+                    try {
+                        while (true) {
+                            org.python.Object next = iterator.__next__();
+                            generated.add(next);
+                        }
+                    } catch (org.python.exceptions.StopIteration si) {
+                    }
+                    return new org.python.types.List(generated);
+                } catch (org.python.exceptions.AttributeError ae) {
+                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                }
             }
         }
     }
@@ -1170,19 +1231,44 @@ public class Python {
         if (iterable == null) {
             return new org.python.types.Set();
         } else {
-            try {
-                // If the object is iterable, the underlying value should be
-                // a Java Collection.
+            if (iterable instanceof org.python.types.Set) {
                 return new org.python.types.Set(
                     new java.util.HashSet<org.python.Object>(
-                        (java.util.Collection) iterable.toJava()
+                        ((org.python.types.Set) iterable).value
                     )
                 );
-            } catch (java.lang.ClassCastException e) {
-                throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+            } else if (iterable instanceof org.python.types.List) {
+                return new org.python.types.Set(
+                    new java.util.HashSet<org.python.Object>(
+                        ((org.python.types.List) iterable).value
+                    )
+                );
+            } else if (iterable instanceof org.python.types.Tuple) {
+                return new org.python.types.Set(
+                    new java.util.HashSet<org.python.Object>(
+                        ((org.python.types.Tuple) iterable).value
+                    )
+                );
+            } else {
+                try {
+                    org.python.Iterable iterator = iterable.__iter__();
+                    java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
+                    try {
+                        while (true) {
+                            org.python.Object next = iterator.__next__();
+                            generated.add(next);
+                        }
+                    } catch (org.python.exceptions.StopIteration si) {
+                    }
+                    return new org.python.types.Set(generated);
+                } catch (org.python.exceptions.AttributeError ae) {
+                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                }
             }
         }
     }
+
+
 
     @org.python.Method(
         __doc__ = "setattr(object, name, value)" +
