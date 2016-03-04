@@ -127,7 +127,7 @@ public class Set extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.NotImplementedError("__len__() has not been implemented");
+        return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
@@ -354,5 +354,4 @@ public class Set extends org.python.types.Object {
     public org.python.Object update(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("update() has not been implemented.");
     }
-
 }

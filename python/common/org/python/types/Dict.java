@@ -130,7 +130,7 @@ public class Dict extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.NotImplementedError("dict.__len__() has not been implemented.");
+        return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(

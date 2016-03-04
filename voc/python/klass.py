@@ -82,16 +82,19 @@ class ClassBlock(Block):
 
         parameters = extract_parameters(code, annotations)
 
-        method = InstanceMethod(
-            self.klass,
-            name=method_name,
-            parameters=parameters,
-            returns={
-                'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
-            },
-            static=True,
-            verbosity=self.klass.verbosity
-        )
+        if code.co_flags & 32:  # CO_GENERATOR
+            raise Exception("Can't handle Generator methods (yet)")
+        else:
+            method = InstanceMethod(
+                self.klass,
+                name=method_name,
+                parameters=parameters,
+                returns={
+                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+                },
+                static=True,
+                verbosity=self.klass.verbosity
+            )
         method.extract(code)
         self.klass.add_method(method)
 

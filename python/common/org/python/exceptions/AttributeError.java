@@ -9,4 +9,8 @@ public class AttributeError extends org.python.exceptions.Exception {
     public AttributeError(java.lang.Class klass, java.lang.String attr) {
         super("'" + org.python.types.Type.pythonType(klass).typeName() + "' object has no attribute '" + attr + "'");
     }
+
+    public AttributeError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super("'" + args[0] + "' object has no attribute '" + args[1] + "'");
+    }
 }

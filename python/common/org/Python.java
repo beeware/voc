@@ -8,6 +8,73 @@ public class Python {
         // Load all the builtins into the dictionary as callables
         builtins = new java.util.HashMap<java.lang.String, org.python.Object>();
         org.Python.initializeModule(org.Python.class, builtins);
+
+        // Add all the builtin exceptions
+        builtins.put("ArithmeticError", org.python.types.Type.pythonType(org.python.exceptions.ArithmeticError.class));
+        builtins.put("AssertionError", org.python.types.Type.pythonType(org.python.exceptions.AssertionError.class));
+        builtins.put("AttributeError", org.python.types.Type.pythonType(org.python.exceptions.AttributeError.class));
+        builtins.put("BaseException", org.python.types.Type.pythonType(org.python.exceptions.BaseException.class));
+        builtins.put("BlockingIOError", org.python.types.Type.pythonType(org.python.exceptions.BlockingIOError.class));
+        builtins.put("BrokenPipeError", org.python.types.Type.pythonType(org.python.exceptions.BrokenPipeError.class));
+        builtins.put("BufferError", org.python.types.Type.pythonType(org.python.exceptions.BufferError.class));
+        builtins.put("BytesWarning", org.python.types.Type.pythonType(org.python.exceptions.BytesWarning.class));
+        builtins.put("ChildProcessError", org.python.types.Type.pythonType(org.python.exceptions.ChildProcessError.class));
+        builtins.put("ConnectionAbortedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionAbortedError.class));
+        builtins.put("ConnectionError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionError.class));
+        builtins.put("ConnectionRefusedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionRefusedError.class));
+        builtins.put("ConnectionResetError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionResetError.class));
+        builtins.put("DeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.DeprecationWarning.class));
+        builtins.put("EOFError", org.python.types.Type.pythonType(org.python.exceptions.EOFError.class));
+        builtins.put("EnvironmentError", org.python.types.Type.pythonType(org.python.exceptions.EnvironmentError.class));
+        builtins.put("Exception", org.python.types.Type.pythonType(org.python.exceptions.Exception.class));
+        builtins.put("FileExistsError", org.python.types.Type.pythonType(org.python.exceptions.FileExistsError.class));
+        builtins.put("FileNotFoundError", org.python.types.Type.pythonType(org.python.exceptions.FileNotFoundError.class));
+        builtins.put("FloatingPointError", org.python.types.Type.pythonType(org.python.exceptions.FloatingPointError.class));
+        builtins.put("FutureWarning", org.python.types.Type.pythonType(org.python.exceptions.FutureWarning.class));
+        builtins.put("GeneratorExit", org.python.types.Type.pythonType(org.python.exceptions.GeneratorExit.class));
+        builtins.put("IOError", org.python.types.Type.pythonType(org.python.exceptions.IOError.class));
+        builtins.put("ImportError", org.python.types.Type.pythonType(org.python.exceptions.ImportError.class));
+        builtins.put("ImportWarning", org.python.types.Type.pythonType(org.python.exceptions.ImportWarning.class));
+        builtins.put("IndentationError", org.python.types.Type.pythonType(org.python.exceptions.IndentationError.class));
+        builtins.put("IndexError", org.python.types.Type.pythonType(org.python.exceptions.IndexError.class));
+        builtins.put("InterruptedError", org.python.types.Type.pythonType(org.python.exceptions.InterruptedError.class));
+        builtins.put("IsADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.IsADirectoryError.class));
+        builtins.put("KeyError", org.python.types.Type.pythonType(org.python.exceptions.KeyError.class));
+        builtins.put("KeyboardInterrupt", org.python.types.Type.pythonType(org.python.exceptions.KeyboardInterrupt.class));
+        builtins.put("LookupError", org.python.types.Type.pythonType(org.python.exceptions.LookupError.class));
+        builtins.put("MemoryError", org.python.types.Type.pythonType(org.python.exceptions.MemoryError.class));
+        builtins.put("NameError", org.python.types.Type.pythonType(org.python.exceptions.NameError.class));
+        builtins.put("NotADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.NotADirectoryError.class));
+        builtins.put("NotImplementedError", org.python.types.Type.pythonType(org.python.exceptions.NotImplementedError.class));
+        builtins.put("OSError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class));
+        builtins.put("OverflowError", org.python.types.Type.pythonType(org.python.exceptions.OverflowError.class));
+        builtins.put("PendingDeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.PendingDeprecationWarning.class));
+        builtins.put("PermissionError", org.python.types.Type.pythonType(org.python.exceptions.PermissionError.class));
+        builtins.put("ProcessLookupError", org.python.types.Type.pythonType(org.python.exceptions.ProcessLookupError.class));
+        builtins.put("ReferenceError", org.python.types.Type.pythonType(org.python.exceptions.ReferenceError.class));
+        builtins.put("ResourceWarning", org.python.types.Type.pythonType(org.python.exceptions.ResourceWarning.class));
+        builtins.put("RuntimeError", org.python.types.Type.pythonType(org.python.exceptions.RuntimeError.class));
+        builtins.put("RuntimeWarning", org.python.types.Type.pythonType(org.python.exceptions.RuntimeWarning.class));
+        builtins.put("StopIteration", org.python.types.Type.pythonType(org.python.exceptions.StopIteration.class));
+        builtins.put("SyntaxError", org.python.types.Type.pythonType(org.python.exceptions.SyntaxError.class));
+        builtins.put("SyntaxWarning", org.python.types.Type.pythonType(org.python.exceptions.SyntaxWarning.class));
+        builtins.put("SystemError", org.python.types.Type.pythonType(org.python.exceptions.SystemError.class));
+        builtins.put("SystemExit", org.python.types.Type.pythonType(org.python.exceptions.SystemExit.class));
+        builtins.put("TabError", org.python.types.Type.pythonType(org.python.exceptions.TabError.class));
+        builtins.put("TimeoutError", org.python.types.Type.pythonType(org.python.exceptions.TimeoutError.class));
+        builtins.put("TypeError", org.python.types.Type.pythonType(org.python.exceptions.TypeError.class));
+        builtins.put("UnboundLocalError", org.python.types.Type.pythonType(org.python.exceptions.UnboundLocalError.class));
+        builtins.put("UnicodeDecodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeDecodeError.class));
+        builtins.put("UnicodeEncodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeEncodeError.class));
+        builtins.put("UnicodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeError.class));
+        builtins.put("UnicodeTranslateError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeTranslateError.class));
+        builtins.put("UnicodeWarning", org.python.types.Type.pythonType(org.python.exceptions.UnicodeWarning.class));
+        builtins.put("UserWarning", org.python.types.Type.pythonType(org.python.exceptions.UserWarning.class));
+        builtins.put("ValueError", org.python.types.Type.pythonType(org.python.exceptions.ValueError.class));
+        builtins.put("Warning", org.python.types.Type.pythonType(org.python.exceptions.Warning.class));
+        builtins.put("ZeroDivisionError", org.python.types.Type.pythonType(org.python.exceptions.ZeroDivisionError.class));
+
+        builtins.put("NotImplemented", org.python.types.NotImplementedType.NOT_IMPLEMENTED);
     }
 
     public static void debug(java.lang.String msg) {
@@ -375,10 +442,56 @@ public class Python {
             "    for k, v in iterable:\n" +
             "        d[k] = v\n" +
             "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" +
-            "    in the keyword argument list.  For example:  dict(one=1, two=2)\n"
+            "    in the keyword argument list.  For example:  dict(one=1, two=2)\n",
+        default_args = {"iterable"}
     )
-    public static org.python.types.Dict dict() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'dict' not implemented");
+    public static org.python.types.Dict dict(org.python.Object iterable) {
+        if (iterable == null) {
+            return new org.python.types.Dict();
+        } else {
+            if (iterable instanceof org.python.types.Dict) {
+                return new org.python.types.Dict(
+                    new java.util.HashMap<org.python.Object, org.python.Object>(
+                        ((org.python.types.Dict) iterable).value
+                    )
+                );
+            } else {
+                try {
+                    org.python.Iterable iterator = iterable.__iter__();
+                    java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
+                    try {
+                        while (true) {
+                            org.python.Object next = iterator.__next__();
+                            java.util.List<org.python.Object> data;
+                            if (next instanceof org.python.types.Tuple) {
+                                data = ((org.python.types.Tuple) next).value;
+                            } else if (next instanceof org.python.types.List) {
+                                data = ((org.python.types.List) next).value;
+                            } else {
+                                throw new org.python.exceptions.TypeError(
+                                    "cannot convert dictionary update sequence element #" + generated.size() +
+                                        " to a sequence"
+                                );
+                            }
+
+                            if (data.size() != 2) {
+                                throw new org.python.exceptions.ValueError(
+                                    "dictionary update sequence element #" + generated.size() +
+                                        " has length " + data.size() +
+                                        "; 2 is required"
+                                );
+                            }
+
+                            generated.put(data.get(0), data.get(1));
+                        }
+                    } catch (org.python.exceptions.StopIteration si) {
+                    }
+                    return new org.python.types.Dict(generated);
+                } catch (org.python.exceptions.AttributeError ae) {
+                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                }
+            }
+        }
     }
 
     @org.python.Method(
@@ -694,22 +807,37 @@ public class Python {
         } else {
             if (iterable instanceof org.python.types.List) {
                 return new org.python.types.List(
-                    new java.util.ArrayList(
+                    new java.util.ArrayList<org.python.Object>(
                         ((org.python.types.List) iterable).value
+                    )
+                );
+            } else if (iterable instanceof org.python.types.Set) {
+                return new org.python.types.List(
+                    new java.util.ArrayList<org.python.Object>(
+                        ((org.python.types.Set) iterable).value
                     )
                 );
             } else if (iterable instanceof org.python.types.Tuple) {
                 return new org.python.types.List(
-                    new java.util.ArrayList(
+                    new java.util.ArrayList<org.python.Object>(
                         ((org.python.types.Tuple) iterable).value
                     )
                 );
-            } else if (iterable instanceof org.python.Iterable) {
-                throw new org.python.exceptions.NotImplementedError("Builtin function 'list' with iterator argument not implemented");
-                // org.python.types.List out = new org.python.types.List();
-                // return out;
             } else {
-                throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                try {
+                    org.python.Iterable iterator = iterable.__iter__();
+                    java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
+                    try {
+                        while (true) {
+                            org.python.Object next = iterator.__next__();
+                            generated.add(next);
+                        }
+                    } catch (org.python.exceptions.StopIteration si) {
+                    }
+                    return new org.python.types.List(generated);
+                } catch (org.python.exceptions.AttributeError ae) {
+                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                }
             }
         }
     }
@@ -1103,19 +1231,44 @@ public class Python {
         if (iterable == null) {
             return new org.python.types.Set();
         } else {
-            try {
-                // If the object is iterable, the underlying value should be
-                // a Java Collection.
+            if (iterable instanceof org.python.types.Set) {
                 return new org.python.types.Set(
                     new java.util.HashSet<org.python.Object>(
-                        (java.util.Collection) iterable.toJava()
+                        ((org.python.types.Set) iterable).value
                     )
                 );
-            } catch (java.lang.ClassCastException e) {
-                throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+            } else if (iterable instanceof org.python.types.List) {
+                return new org.python.types.Set(
+                    new java.util.HashSet<org.python.Object>(
+                        ((org.python.types.List) iterable).value
+                    )
+                );
+            } else if (iterable instanceof org.python.types.Tuple) {
+                return new org.python.types.Set(
+                    new java.util.HashSet<org.python.Object>(
+                        ((org.python.types.Tuple) iterable).value
+                    )
+                );
+            } else {
+                try {
+                    org.python.Iterable iterator = iterable.__iter__();
+                    java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
+                    try {
+                        while (true) {
+                            org.python.Object next = iterator.__next__();
+                            generated.add(next);
+                        }
+                    } catch (org.python.exceptions.StopIteration si) {
+                    }
+                    return new org.python.types.Set(generated);
+                } catch (org.python.exceptions.AttributeError ae) {
+                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                }
             }
         }
     }
+
+
 
     @org.python.Method(
         __doc__ = "setattr(object, name, value)" +

@@ -850,6 +850,10 @@ class Ref:
     def next_op(self):
         return self.context.jump_targets[self.target].next_op
 
+    @property
+    def yield_op(self):
+        return self.context.jump_targets[self.target].yield_op
+
 
 def jump(opcode, context, target, position):
     """Define a jump operation.
@@ -880,6 +884,8 @@ def resolve_jump(opcode, context, target, position):
         opcode.jump_op = target.end_op
     elif position == Opcode.NEXT:
         opcode.jump_op = target.next_op
+    elif position == Opcode.YIELD:
+        opcode.jump_op = target.yield_op
     else:
         raise Exception("Unknown opcode position")
     # print("JUMP OP IS", opcode.jump_op)
@@ -904,6 +910,7 @@ class Opcode:
     START = 10
     END = 20
     NEXT = 30
+    YIELD = 40
 
     def __init__(self, python_offset, starts_line, is_jump_target):
         self.python_offset = python_offset
@@ -922,7 +929,7 @@ class Opcode:
 
     def materialize(self, context, arguments):
         for argument in arguments:
-            argument.operation.materialize(context, argument.arguments)
+            argument.materialize(context)
 
     def transpile(self, context, arguments):
         # print ("TRANSPILE", self.python_offset, self)
@@ -947,7 +954,7 @@ class Opcode:
 
     def convert_args(self, context, arguments):
         for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
+            argument.transpile(context)
 
     def convert(self, context, arguments):
         self.convert_args(context, arguments)
@@ -1423,11 +1430,61 @@ class IMPORT_STAR(Opcode):
         context.add_opcodes(
             JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'importAll', '(Lorg/python/types/Module;)Ljava/util/Map;')
         )
-        # Add all the exported sympbols to the currrent context
+        # Add all the exported symbols to the currrent context
         context.store_dynamic()
 
 
-# class YIELD_VALUE(Opcode):
+class YIELD_VALUE(Opcode):
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert_opcode(self, context, arguments):
+        n_vars = len(context.local_vars) + len(context.deleted_vars)
+        # Save the current stack and yield index
+        context.add_opcodes(
+            ALOAD_name(context, '<generator>'),
+            ICONST_val(n_vars - 1),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+        for i in range(1, n_vars):
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i - 1),
+                JavaOpcodes.ALOAD(i),
+                JavaOpcodes.AASTORE(),
+            )
+
+        yield_point = len(context.yield_points) + 1
+        context.add_opcodes(
+            ICONST_val(yield_point),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Generator', 'yield', '([Lorg/python/Object;I)V'),
+
+            # "yield" by returning from the generator method.
+            JavaOpcodes.ARETURN()
+        )
+
+        # On restore, the next instruction is the target
+        # for the restore jump.
+        context.yield_points.append(self.python_offset)
+        context.next_resolve_list.append((self, 'yield_op'))
+
+        #  First thing to do is restore the state of the stack.
+        context.add_opcodes(
+            ALOAD_name(context, '<generator>'),
+            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', '[Lorg/python/Object;'),
+        )
+        for i in range(1, n_vars):
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i - 1),
+                JavaOpcodes.AALOAD(),
+                JavaOpcodes.ASTORE(i),
+            )
 
 
 class POP_BLOCK(Opcode):
@@ -2458,7 +2515,33 @@ class DELETE_FAST(Opcode):
         free_name(self.name)
 
 
-# class RAISE_VARARGS(Opcode):
+class RAISE_VARARGS(Opcode):
+    def __init__(self, argc, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.argc = argc
+
+    def __arg_repr__(self):
+        return '%s args' % (
+            self.argc,
+        )
+
+    @property
+    def consume_count(self):
+        return self.argc
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert_opcode(self, context, arguments):
+        if self.argc != 1:
+            raise Exception("Don't know how to handle exception with multiple arguments")
+
+        context.add_opcodes(
+            JavaOpcodes.CHECKCAST('java/lang/Throwable'),
+            JavaOpcodes.ATHROW()
+        )
+
 
 def extract_constant(arg):
     if arg.operation.opname == 'LOAD_CONST':
@@ -2743,6 +2826,12 @@ class MAKE_FUNCTION(Opcode):
 
         if full_method_name == '<listcomp>':
             full_method_name = 'listcomp_%x' % id(self)
+        elif full_method_name == '<dictcomp>':
+            full_method_name = 'dictcomp_%x' % id(self)
+        elif full_method_name == '<setcomp>':
+            full_method_name = 'setcomp_%x' % id(self)
+        elif full_method_name == '<genexpr>':
+            full_method_name = 'genexpr_%x' % id(self)
 
         annotations = {}
         if self.annotations:
@@ -3291,7 +3380,80 @@ class LIST_APPEND(Opcode):
         else:
             raise RuntimeError("Don't know how to handle LIST_APPEND at index %d" % self.index)
 
-# class SET_ADD(Opcode):
-# class MAP_ADD(Opcode):
+
+class SET_ADD(Opcode):
+    prefaced = 0
+
+    def __init__(self, index, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.index = index
+
+    def __arg_repr__(self):
+        return str(self.index)
+
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+
+        if self.index == 2:
+            context.add_opcodes(
+                JavaOpcodes.GETFIELD('org/python/types/Set', 'value', 'Ljava/util/Set;'),
+            )
+
+            for argument in arguments:
+                argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/Set', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+        else:
+            raise RuntimeError("Don't know how to handle SET_ADD at index %d" % self.index)
+
+
+class MAP_ADD(Opcode):
+    prefaced = 0
+
+    def __init__(self, index, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.index = index
+
+    def __arg_repr__(self):
+        return str(self.index)
+
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+
+        if self.index == 2:
+            context.add_opcodes(
+                JavaOpcodes.GETFIELD('org/python/types/Dict', 'value', 'Ljava/util/Map;'),
+            )
+
+            for argument in arguments:
+                argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.POP(),
+            )
+        else:
+            raise RuntimeError("Don't know how to handle MAP_ADD at index %d" % self.index)
+
 
 # class LOAD_CLASSDEREF(Opcode):

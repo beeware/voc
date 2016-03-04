@@ -8,4 +8,8 @@ public class ImportWarning extends org.python.exceptions.Warning {
     public ImportWarning(String msg) {
         super(msg);
     }
+
+    public ImportWarning(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super(args, kwargs);
+    }
 }

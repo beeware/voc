@@ -217,12 +217,11 @@ public class Tuple extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("'tuple' object doesn't support item deletion");
     }
 
-
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Iterable __iter__() {
-        throw new org.python.exceptions.NotImplementedError("__iter__() has not been implemented.");
+        return new org.python.types.Iterator(this);
     }
 
     @org.python.Method(

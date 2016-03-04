@@ -184,15 +184,18 @@ class Method(Block):
             verbosity=self.module.verbosity
         )
 
-        method = ClosureMethod(
-            callable,
-            name='invoke',
-            parameters=extract_parameters(code, annotations),
-            returns={
-                'annotation': annotations.get('return', 'org/python/Object').replace('.', '/')
-            },
-            verbosity=self.module.verbosity
-        )
+        if code.co_flags & 32:  # CO_GENERATOR
+            raise Exception("Can't handle Generator closures (yet)")
+        else:
+            method = ClosureMethod(
+                callable,
+                name='invoke',
+                parameters=extract_parameters(code, annotations),
+                returns={
+                    'annotation': annotations.get('return', 'org/python/Object').replace('.', '/')
+                },
+                verbosity=self.module.verbosity
+            )
         method.extract(code)
         callable.methods.append(method)
 
@@ -227,7 +230,7 @@ class Method(Block):
                 self.method_name,
                 self.signature,
                 static=self.static,
-                attributes=[super().transpile()] + self.method_attributes()
+                attributes=[self.transpile_commands()] + self.method_attributes()
             )
         ]
 
@@ -928,6 +931,113 @@ class ClosureMethod(Method):
     #             ASTORE_name(self, closure_var_name),
     #         ])
     #     self.opcodes = setup + self.opcodes
+
+
+class GeneratorMethod(Method):
+    def __init__(self, parent, generator, name, parameters, returns=None, static=False, commands=None, verbosity=0):
+        super().__init__(parent, name=name, parameters=parameters, returns=returns, static=static, commands=commands, verbosity=verbosity)
+        self.generator = generator
+
+    def add_self(self):
+        self.local_vars['<generator>'] = len(self.local_vars)
+
+    def materialize(self):
+        # The Generator will have a return statement; this doesn't form
+        # part of the generator body.
+        self.commands = self.commands[0].arguments
+        super(GeneratorMethod, self).materialize()
+
+    def transpile_setup(self):
+        # Restore the variables needed for the entry of the generator.
+        self.add_opcodes(
+            ALOAD_name(self, '<generator>'),
+            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', '[Lorg/python/Object;'),
+        )
+
+        for i, param in enumerate(self.parameters):
+            self.add_opcodes(
+                ICONST_val(i),
+                JavaOpcodes.AALOAD(),
+                JavaOpcodes.ASTORE(i + 1),
+            )
+
+    def transpile_teardown(self):
+        self.add_opcodes(
+            JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('org/python/exceptions/StopIteration', '<init>', '()V'),
+            JavaOpcodes.ATHROW(),
+        )
+
+    def transpile_method(self):
+        return [
+            JavaMethod(
+                self.method_name + "$generator",
+                '(Lorg/python/types/Generator;)Lorg/python/Object;',
+                static=self.static,
+                attributes=[self.transpile_commands()] + self.method_attributes()
+            )
+        ]
+
+    def transpile_wrapper(self):
+        wrapper_opcodes = [
+            # Construct a generator instance
+            JavaOpcodes.NEW('org/python/types/Generator'),
+            JavaOpcodes.DUP(),
+
+            # p1: The name of the generator
+            JavaOpcodes.LDC_W(self.generator),
+
+            # p2: The actual generator method
+            JavaOpcodes.LDC_W(self.module.class_name),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+
+            JavaOpcodes.LDC_W(self.method_name + "$generator"),
+            ICONST_val(1),
+            JavaOpcodes.ANEWARRAY('java/lang/Class'),
+            JavaOpcodes.DUP(),
+
+            ICONST_val(0),
+            JavaOpcodes.LDC_W('org.python.types.Generator'),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+            JavaOpcodes.AASTORE(),
+
+            JavaOpcodes.INVOKEVIRTUAL('java/lang/Class', 'getMethod', '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'),
+
+            # p3: The arguments passed to the generator method. These will be
+            # restored on the first call to the generator.
+            ICONST_val(len(self.parameters)),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        ]
+
+        for i, param in enumerate(self.parameters):
+            wrapper_opcodes.extend([
+                JavaOpcodes.DUP(),
+                ICONST_val(i),
+                JavaOpcodes.ALOAD(i),
+                JavaOpcodes.AASTORE(),
+            ])
+
+        # Construct and return the generator object.
+        wrapper_opcodes.extend([
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Generator', '<init>', '(Ljava/lang/String;Ljava/lang/reflect/Method;[Lorg/python/Object;)V'),
+            JavaOpcodes.ARETURN(),
+        ])
+
+        return [
+            JavaMethod(
+                self.method_name,
+                self.signature,
+                static=self.static,
+                attributes=[
+                    JavaCode(
+                        max_stack=len(self.parameters) + 8,
+                        max_locals=len(self.parameters) + 8,
+                        code=wrapper_opcodes
+                    )
+                ]
+            )
+        ]
 
 
 def extract_parameters(code, annotations):

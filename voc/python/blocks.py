@@ -8,7 +8,7 @@ from ..java import (
 )
 
 from .utils import extract_command, find_blocks
-from .opcodes import resolve_jump
+from .opcodes import Ref, resolve_jump, jump, Opcode, ALOAD_name, ICONST_val
 
 
 class IgnoreBlock(Exception):
@@ -25,6 +25,9 @@ class Block:
         self.local_vars = {}
         self.deleted_vars = set()
 
+        self.generator = None
+        self.yield_points = []
+
         self.opcodes = []
         self.try_catches = []
         self.blocks = []
@@ -35,6 +38,7 @@ class Block:
         self.returns = {
             'annotation': None
         }
+
         self.next_resolve_list = []
         self.next_opcode_starts_line = None
 
@@ -62,6 +66,11 @@ class Block:
         self.code = code
         instructions = list(dis.Bytecode(code))
 
+        if self.verbosity > 1:
+            print ('=' * len(str(code)))
+            print (code)
+            print ('-' * len(str(code)))
+
         blocks = find_blocks(instructions)
 
         i = len(instructions)
@@ -73,22 +82,11 @@ class Block:
         commands.reverse()
 
         if self.verbosity > 1:
-            print ('=' * len(str(code)))
-            print (code)
-            print ('-' * len(str(code)))
             for command in commands:
                 command.dump()
 
         # Append the extracted commands to any pre-existing ones.
         self.commands.extend(commands)
-
-    def transpile_setup(self):
-        """Tweak the bytecode generated for this block."""
-        pass
-
-    def transpile_teardown(self):
-        """Tweak the bytecode generated for this block."""
-        pass
 
     @property
     def can_ignore_empty(self):
@@ -134,7 +132,15 @@ class Block:
         for cmd in self.commands:
             cmd.materialize(self)
 
-    def transpile(self):
+    def transpile_setup(self):
+        """Tweak the bytecode generated for this block."""
+        pass
+
+    def transpile_teardown(self):
+        """Tweak the bytecode generated for this block."""
+        pass
+
+    def transpile_commands(self):
         """Create a JavaCode object representing the commands stored in the block
 
         May raise ``IgnoreBlock`` if the block should be ignored.
@@ -152,6 +158,19 @@ class Block:
 
         # Insert content that needs to occur after the main block commands
         self.transpile_teardown()
+
+        # Install the shortcut jump points for yield statements.
+        yield_jumps = []
+
+        for i, yield_point in enumerate(self.yield_points):
+            yield_jumps.extend([
+                ALOAD_name(self, '<generator>'),
+                JavaOpcodes.GETFIELD('org/python/types/Generator', 'yield_point', 'I'),
+                ICONST_val(i + 1),
+                jump(JavaOpcodes.IF_ICMPEQ(0), self, Ref(self, yield_point), Opcode.YIELD)
+            ])
+
+        self.opcodes = yield_jumps + self.opcodes
 
         # Make sure every local variable slot has been initialized
         # as an object. This is needed because Python allows a variable
@@ -251,13 +270,13 @@ class Block:
 
         # Update any jump instructions
         # print ("There are %s jumps" % len(self.jumps))
-        for jump in self.jumps:
-            # print ("JUMP", hex(id(jump)), jump, jump.java_offset, jump.jump_op, hex(id(jump.jump_op)))
+        for jmp in self.jumps:
+            # print ("JUMP", hex(id(jmp)), jmp, jmp.java_offset, jmp.jump_op, hex(id(jmp.jump_op)))
 
             try:
-                jump.offset = jump.jump_op.java_offset - jump.java_offset
+                jmp.offset = jmp.jump_op.java_offset - jmp.java_offset
             except AttributeError:
-                jump.offset = jump.jump_op.start_op.java_offset - jump.java_offset
+                jmp.offset = jmp.jump_op.start_op.java_offset - jmp.java_offset
 
         # Construct a line number table from
         # the source code reference data on opcodes.
@@ -276,3 +295,6 @@ class Block:
                 line_number_table
             ]
         )
+
+    def transpile(self):
+        return self.transpile_commands()
