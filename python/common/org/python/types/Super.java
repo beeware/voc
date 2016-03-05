@@ -23,6 +23,10 @@ public class Super implements org.python.Object {
         return this.instance;
     }
 
+    public org.python.Object byValue() {
+        return this;
+    }
+
     public java.lang.String typeName() {
         return "super";
     }
