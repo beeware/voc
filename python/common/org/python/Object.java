@@ -24,6 +24,14 @@ public interface Object {
     public java.lang.String typeName();
 
     /**
+     * Return a version of the object that can be used when returning by
+     * value. For most objects, this will be itself; but primitive types
+     * need to return a copy of themselves to ensure that they aren't
+     * modified.
+     */
+    public org.python.Object byValue();
+
+    /**
      * Python interface compatibility
      * Section 3.3.1 - Basic customization
      */

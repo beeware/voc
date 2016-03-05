@@ -8,7 +8,7 @@ from ..java import (
     SourceFile,
 )
 from .blocks import Block, IgnoreBlock
-from .methods import MainMethod, Method, GeneratorMethod, extract_parameters
+from .methods import MainMethod, Method, CO_GENERATOR, GeneratorMethod, extract_parameters
 from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 
@@ -95,7 +95,7 @@ class StaticBlock(Block):
         return self.parent
 
     def add_method(self, method_name, code, annotations):
-        if code.co_flags & 32:  # CO_GENERATOR
+        if code.co_flags & CO_GENERATOR:
             # Generator method.
             method = GeneratorMethod(
                 self.module,
@@ -108,8 +108,6 @@ class StaticBlock(Block):
                 static=True,
                 verbosity=self.module.verbosity
             )
-            method.extract(code)
-
         else:
             # Normal method.
             method = Method(
@@ -122,7 +120,7 @@ class StaticBlock(Block):
                 static=True,
                 verbosity=self.module.verbosity
             )
-            method.extract(code)
+        method.extract(code)
         self.module.methods.append(method)
         return method
 

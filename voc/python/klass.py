@@ -13,7 +13,7 @@ from ..java import (
 )
 
 from .blocks import Block, IgnoreBlock
-from .methods import InitMethod, InstanceMethod, extract_parameters
+from .methods import InitMethod, InstanceMethod, CO_GENERATOR, extract_parameters
 from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 
@@ -82,8 +82,8 @@ class ClassBlock(Block):
 
         parameters = extract_parameters(code, annotations)
 
-        if code.co_flags & 32:  # CO_GENERATOR
-            raise Exception("Can't handle Generator methods (yet)")
+        if code.co_flags & CO_GENERATOR:
+            raise Exception("Can't handle Generator instance methods (yet)")
         else:
             method = InstanceMethod(
                 self.klass,

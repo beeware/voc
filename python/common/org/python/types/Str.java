@@ -17,6 +17,10 @@ public class Str extends org.python.types.Object {
         return this.value;
     }
 
+    public org.python.Object byValue() {
+        return new org.python.types.Str(this.value);
+    }
+
     public int hashCode() {
         return this.value.hashCode();
     }
@@ -323,14 +327,14 @@ public class Str extends org.python.types.Object {
     public org.python.Object __pos__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary +: 'str'");
     }
-    
+
     @org.python.Method(
         __doc__=""
     )
     public org.python.Object __neg__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary -: 'str'");
     }
-    
+
     @org.python.Method(
         __doc__=""
     )

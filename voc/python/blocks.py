@@ -71,6 +71,9 @@ class Block:
             print (code)
             print ('-' * len(str(code)))
 
+        # for i, inst in enumerate(instructions):
+        #     print (i, inst.offset, inst.opname, inst.argval)
+
         blocks = find_blocks(instructions)
 
         i = len(instructions)

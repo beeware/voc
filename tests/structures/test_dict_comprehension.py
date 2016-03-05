@@ -26,4 +26,4 @@ class DictComprehensionTests(TranspileTestCase):
             print(d[4])
             print(d[5])
             print('Done.')
-            """, run_in_function=False)
+            """)

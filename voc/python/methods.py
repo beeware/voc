@@ -22,6 +22,7 @@ VAR_KEYWORD = 4
 
 CO_VARARGS = 0x0004
 CO_VARKEYWORDS = 0x0008
+CO_GENERATOR = 0x0020
 
 
 def descriptor(annotation):
@@ -175,7 +176,7 @@ class Method(Block):
         from .klass import ClosureClass
         callable = ClosureClass(
             parent=self.parent,
-            name='%s$%s' % (self.parent.name, method_name.replace('.<locals>.', '$')),
+            name='%s$%s' % (self.parent.name, method_name),
             closure_var_names=code.co_names,
             bases=['org/python/types/Closure'],
             implements=['org/python/Callable'],
@@ -184,8 +185,17 @@ class Method(Block):
             verbosity=self.module.verbosity
         )
 
-        if code.co_flags & 32:  # CO_GENERATOR
-            raise Exception("Can't handle Generator closures (yet)")
+        if code.co_flags & CO_GENERATOR:
+            method = ClosureGeneratorMethod(
+                callable,
+                generator=code.co_name,
+                name='invoke',
+                parameters=extract_parameters(code, annotations),
+                returns={
+                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+                },
+                verbosity=self.module.verbosity
+            )
         else:
             method = ClosureMethod(
                 callable,
@@ -895,7 +905,6 @@ class MainMethod(Method):
 
 class ClosureMethod(Method):
     def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
-
         super().__init__(
             parent, name,
             parameters=parameters,
@@ -921,31 +930,21 @@ class ClosureMethod(Method):
     def add_self(self):
         self.local_vars['self'] = len(self.local_vars)
 
-    # def _insert_closure_vars(self):
-    #     # Load all the arguments into locals
-    #     setup = []
-    #     for i, closure_var_name in enumerate(self.parent.closure_var_names):
-    #         setup.extend([
-    #             ALOAD_name(self, 'self'),
-    #             JavaOpcodes.GETFIELD('org/python/types/Function', closure_var_name, 'Lorg/python/Object;'),
-    #             ASTORE_name(self, closure_var_name),
-    #         ])
-    #     self.opcodes = setup + self.opcodes
-
 
 class GeneratorMethod(Method):
     def __init__(self, parent, generator, name, parameters, returns=None, static=False, commands=None, verbosity=0):
-        super().__init__(parent, name=name, parameters=parameters, returns=returns, static=static, commands=commands, verbosity=verbosity)
+        super().__init__(
+            parent, name=name,
+            parameters=parameters,
+            returns=returns,
+            static=static,
+            commands=commands,
+            verbosity=verbosity
+        )
         self.generator = generator
 
     def add_self(self):
         self.local_vars['<generator>'] = len(self.local_vars)
-
-    def materialize(self):
-        # The Generator will have a return statement; this doesn't form
-        # part of the generator body.
-        self.commands = self.commands[0].arguments
-        super(GeneratorMethod, self).materialize()
 
     def transpile_setup(self):
         # Restore the variables needed for the entry of the generator.
@@ -956,25 +955,30 @@ class GeneratorMethod(Method):
 
         for i, param in enumerate(self.parameters):
             self.add_opcodes(
+                JavaOpcodes.DUP(),
                 ICONST_val(i),
                 JavaOpcodes.AALOAD(),
                 JavaOpcodes.ASTORE(i + 1),
             )
+        self.add_opcodes(
+            JavaOpcodes.POP(),
+        )
 
     def transpile_teardown(self):
-        self.add_opcodes(
-            JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('org/python/exceptions/StopIteration', '<init>', '()V'),
-            JavaOpcodes.ATHROW(),
-        )
+        if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
+            self.add_opcodes(
+                JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL('org/python/exceptions/StopIteration', '<init>', '()V'),
+                JavaOpcodes.ATHROW(),
+            )
 
     def transpile_method(self):
         return [
             JavaMethod(
                 self.method_name + "$generator",
                 '(Lorg/python/types/Generator;)Lorg/python/Object;',
-                static=self.static,
+                static=True,
                 attributes=[self.transpile_commands()] + self.method_attributes()
             )
         ]
@@ -1014,7 +1018,7 @@ class GeneratorMethod(Method):
             wrapper_opcodes.extend([
                 JavaOpcodes.DUP(),
                 ICONST_val(i),
-                JavaOpcodes.ALOAD(i),
+                JavaOpcodes.ALOAD(i + (0 if self.static else 1)),
                 JavaOpcodes.AASTORE(),
             ])
 
@@ -1038,6 +1042,21 @@ class GeneratorMethod(Method):
                 ]
             )
         ]
+
+
+class ClosureGeneratorMethod(GeneratorMethod):
+    def __repr__(self):
+        return '<ClosureGeneratorMethod %s (%s parameters, %s closure vars)>' % (
+            self.name, len(self.parameters), len(self.parent.closure_var_names)
+        )
+
+    @property
+    def is_closuremethod(self):
+        return True
+
+    @property
+    def globals_module(self):
+        return self.module.parent
 
 
 def extract_parameters(code, annotations):
