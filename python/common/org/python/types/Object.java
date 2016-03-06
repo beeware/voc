@@ -24,6 +24,10 @@ public class Object implements org.python.Object {
         return this;
     }
 
+    public org.python.Object byValue() {
+        return this;
+    }
+
     public java.lang.String typeName() {
         return org.Python.typeName(this.getClass());
     }

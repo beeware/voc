@@ -286,7 +286,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object append(org.python.Object item) {
         this.value.add(item);

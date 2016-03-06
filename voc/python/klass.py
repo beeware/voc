@@ -13,7 +13,7 @@ from ..java import (
 )
 
 from .blocks import Block, IgnoreBlock
-from .methods import InitMethod, InstanceMethod, extract_parameters
+from .methods import InitMethod, InstanceMethod, CO_GENERATOR, extract_parameters
 from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 
@@ -73,17 +73,17 @@ class ClassBlock(Block):
         )
 
     def add_method(self, full_method_name, code, annotations):
-        parts = full_method_name.split('.')
+        parts = full_method_name.split('$')[-1].split('.')
         method_name = parts[-1]
         class_name = parts[-2]
 
         if class_name != self.klass.name:
-            raise Exception("Method %s being added to %s!" % (full_method_name, self.klass.name))
+            raise Exception("Method %s being added to %s!" % (class_name, self.klass.name))
 
         parameters = extract_parameters(code, annotations)
 
-        if code.co_flags & 32:  # CO_GENERATOR
-            raise Exception("Can't handle Generator methods (yet)")
+        if code.co_flags & CO_GENERATOR:
+            raise Exception("Can't handle Generator instance methods (yet)")
         else:
             method = InstanceMethod(
                 self.klass,

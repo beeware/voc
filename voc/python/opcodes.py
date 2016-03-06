@@ -1405,15 +1405,37 @@ class RETURN_VALUE(Opcode):
     def convert_opcode(self, context, arguments):
         return_type = context.returns['annotation']
 
-        if return_type is None:
-            context.add_opcodes(
-                JavaOpcodes.POP(),
-                JavaOpcodes.RETURN()
-            )
+        if context.generator:
+            # Inside a generator, a return is converted to a StopIteration.
+            if return_type is None:
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/StopIteration', '<init>', '()V'),
+                    JavaOpcodes.ATHROW(),
+                )
+            else:
+                context.add_opcodes(
+                    ASTORE_name(context, '#return-%x' % id(self)),
+                    JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
+                    JavaOpcodes.DUP(),
+                    ALOAD_name(context, '#return-%x' % id(self)),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/StopIteration', '<init>', '(Lorg/python/Object;)V'),
+                    JavaOpcodes.ATHROW(),
+                )
+                free_name(context, '#return-%x' % id(self))
         else:
-            context.add_opcodes(
-                JavaOpcodes.ARETURN()
-            )
+            if return_type is None:
+                context.add_opcodes(
+                    JavaOpcodes.POP(),
+                    JavaOpcodes.RETURN()
+                )
+            else:
+                context.add_opcodes(
+                    # Convert to a new value for return purposes
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', '()Lorg/python/Object;'),
+                    JavaOpcodes.ARETURN()
+                )
 
 
 class IMPORT_STAR(Opcode):
@@ -1441,12 +1463,15 @@ class YIELD_VALUE(Opcode):
 
     @property
     def product_count(self):
-        return 0
+        return 1
 
     def convert_opcode(self, context, arguments):
         n_vars = len(context.local_vars) + len(context.deleted_vars)
-        # Save the current stack and yield index
         context.add_opcodes(
+            # Convert to a new value for return purposes
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', '()Lorg/python/Object;'),
+
+            # Save the current stack and yield index
             ALOAD_name(context, '<generator>'),
             ICONST_val(n_vars - 1),
             JavaOpcodes.ANEWARRAY('org/python/Object'),
@@ -2824,14 +2849,15 @@ class MAKE_FUNCTION(Opcode):
         code = arguments[-2].operation.const
         full_method_name = arguments[-1].operation.const
 
-        if full_method_name == '<listcomp>':
-            full_method_name = 'listcomp_%x' % id(self)
-        elif full_method_name == '<dictcomp>':
-            full_method_name = 'dictcomp_%x' % id(self)
-        elif full_method_name == '<setcomp>':
-            full_method_name = 'setcomp_%x' % id(self)
-        elif full_method_name == '<genexpr>':
-            full_method_name = 'genexpr_%x' % id(self)
+        full_method_name = full_method_name.replace('.<locals>.', '$')
+        if full_method_name.endswith('<listcomp>'):
+            full_method_name = full_method_name.replace('<listcomp>', 'listcomp_%x' % id(self))
+        elif full_method_name.endswith('<dictcomp>'):
+            full_method_name = full_method_name.replace('<dictcomp>', 'dictcomp_%x' % id(self))
+        elif full_method_name.endswith('<setcomp>'):
+            full_method_name = full_method_name.replace('<setcomp>', 'setcomp_%x' % id(self))
+        elif full_method_name.endswith('<genexpr>'):
+            full_method_name = full_method_name.replace('<genexpr>', 'genexpr_%x' % id(self))
 
         annotations = {}
         if self.annotations:

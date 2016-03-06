@@ -26,4 +26,4 @@ class SetComprehensionTests(TranspileTestCase):
             print(16 in s)
             print(25 in s)
             print('Done.')
-            """, run_in_function=False)
+            """)

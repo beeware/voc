@@ -11,6 +11,10 @@ public class Generator extends org.python.types.Object implements org.python.Ite
     }
 
     public Generator(java.lang.String name, java.lang.reflect.Method expression, org.python.Object [] stack) {
+        // System.out.println("GENERATOR: " + expression);
+        // for (org.python.Object obj: stack) {
+        //     System.out.println("     : " + obj);
+        // }
         this.name = name;
         this.expression = expression;
         this.yield_point = 0;
@@ -18,6 +22,10 @@ public class Generator extends org.python.types.Object implements org.python.Ite
     }
 
     public void yield(org.python.Object [] stack, int yield_point) {
+        // System.out.println("YIELD: " + yield_point);
+        // for (org.python.Object obj: stack) {
+        //     System.out.println("     : " + obj);
+        // }
         this.yield_point = yield_point;
         this.stack = stack;
     }
