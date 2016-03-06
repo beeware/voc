@@ -73,12 +73,12 @@ class ClassBlock(Block):
         )
 
     def add_method(self, full_method_name, code, annotations):
-        parts = full_method_name.split('.')
+        parts = full_method_name.split('$')[-1].split('.')
         method_name = parts[-1]
         class_name = parts[-2]
 
         if class_name != self.klass.name:
-            raise Exception("Method %s being added to %s!" % (full_method_name, self.klass.name))
+            raise Exception("Method %s being added to %s!" % (class_name, self.klass.name))
 
         parameters = extract_parameters(code, annotations)
 
