@@ -465,7 +465,7 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.NotImplementedError("int.__invert__() has not been implemented");
+        return new org.python.types.Int(-(this.value + 1));
     }
 
     @org.python.Method(

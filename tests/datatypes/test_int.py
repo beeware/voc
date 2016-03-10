@@ -21,7 +21,6 @@ class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['42', '0']  # , '-37']
 
     not_implemented = [
-        'test_unary_invert',
     ]
 
 
