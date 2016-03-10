@@ -432,7 +432,11 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.NotImplementedError("int.__neg__() has not been implemented");
+        if (this.value < 0) {
+            return new org.python.types.Int(this.value);
+        } else {
+            return new org.python.types.Int(-this.value);
+        }
     }
 
     @org.python.Method(
