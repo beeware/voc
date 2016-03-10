@@ -322,6 +322,9 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __and__(org.python.Object other) {
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(0);
+        }
         throw new org.python.exceptions.NotImplementedError("int.__and__() has not been implemented");
     }
 

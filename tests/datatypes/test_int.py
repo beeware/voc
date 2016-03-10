@@ -34,7 +34,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_add_complex',
         'test_add_frozenset',
 
-        'test_and_bool',
         'test_and_bytearray',
         'test_and_bytes',
         'test_and_class',
