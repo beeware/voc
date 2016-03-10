@@ -325,7 +325,7 @@ public class Int extends org.python.types.Object {
         if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(0);
         }
-        throw new org.python.exceptions.NotImplementedError("int.__and__() has not been implemented");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: 'int' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
