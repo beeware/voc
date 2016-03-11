@@ -167,13 +167,11 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_true_divide_frozenset',
         'test_true_divide_int',
 
-        'test_xor_bool',
         'test_xor_bytearray',
         'test_xor_bytes',
         'test_xor_class',
         'test_xor_complex',
         'test_xor_frozenset',
-        'test_xor_int',
     ]
 
 
