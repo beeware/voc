@@ -336,6 +336,12 @@ public class Int extends org.python.types.Object {
                 throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
             }
             return new org.python.types.Float(java.lang.Math.pow((double) this.value, other_val));
+        } else if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Int(this.value);
+            } else {
+                return new org.python.types.Int(1);
+            }
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'int' and '" + other.typeName() + "'");
     }

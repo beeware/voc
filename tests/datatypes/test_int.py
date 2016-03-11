@@ -118,7 +118,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_or_complex',
         'test_or_frozenset',
 
-        'test_power_bool',
         'test_power_bytearray',
         'test_power_bytes',
         'test_power_class',
