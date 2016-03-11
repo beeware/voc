@@ -553,11 +553,7 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __pos__() {
-        if (this.value < 0) {
-            return new org.python.types.Int(-this.value);
-        } else {
-            return new org.python.types.Int(this.value);
-        }
+        return new org.python.types.Int(this.value);
     }
 
     @org.python.Method(
