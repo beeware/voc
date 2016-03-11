@@ -217,7 +217,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
     values = ['42', '0']  # , '-37']
 
     not_implemented = [
-        'test_add_bool',
         'test_add_bytearray',
         'test_add_bytes',
         'test_add_class',
