@@ -226,6 +226,9 @@ public class Int extends org.python.types.Object {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Float(this.value / ((double)((org.python.types.Int) other).value));
         } else if (other instanceof org.python.types.Float) {
+            if (((org.python.types.Float) other).value == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("float division by zero");
+            }
             return new org.python.types.Float(this.value / ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
@@ -244,7 +247,10 @@ public class Int extends org.python.types.Object {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Int(this.value / ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Int(this.value / ((long) ((org.python.types.Float) other).value));
+            if (((org.python.types.Float) other).value == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("float divmod()");
+            }
+            return new org.python.types.Float(Math.floor(this.value / ((org.python.types.Float) other).value));
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Int(this.value);
