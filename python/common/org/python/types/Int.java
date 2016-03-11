@@ -376,6 +376,15 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lshift__(org.python.Object other) {
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(this.value << (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int(this.value << other_val);
+        }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: 'int' and '" + other.typeName() + "'");
     }
 
@@ -383,6 +392,15 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __rshift__(org.python.Object other) {
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(this.value >> (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int(this.value >> other_val);
+        }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: 'int' and '" + other.typeName() + "'");
     }
 

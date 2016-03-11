@@ -70,13 +70,11 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_le_complex',
         'test_le_frozenset',
 
-        'test_lshift_bool',
         'test_lshift_bytearray',
         'test_lshift_bytes',
         'test_lshift_class',
         'test_lshift_complex',
         'test_lshift_frozenset',
-        'test_lshift_int',
 
         'test_lt_bytearray',
         'test_lt_bytes',
@@ -116,13 +114,11 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_power_frozenset',
         'test_power_float',
 
-        'test_rshift_bool',
         'test_rshift_bytearray',
         'test_rshift_bytes',
         'test_rshift_class',
         'test_rshift_complex',
         'test_rshift_frozenset',
-        'test_rshift_int',
 
         'test_subscr_bool',
         'test_subscr_bytearray',
