@@ -113,7 +113,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_frozenset',
         'test_multiply_tuple',
 
-        'test_ne_bool',
         'test_ne_bytearray',
         'test_ne_bytes',
         'test_ne_class',
