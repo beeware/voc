@@ -256,8 +256,17 @@ public class Int extends org.python.types.Object {
                 long other_val = ((org.python.types.Int) other).value;
                 if (other_val == 0) {
                     throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                } else {
+                    long result = this.value % other_val;
+                    if (other_val > 0 && result < 0) {
+                        // second operand is positive, ensure that result is positive
+                        result += other_val;
+                    } else if (other_val < 0 && result > 0) {
+                        // second operand is negative, ensure that result is negative
+                        result += other_val; // subtract other_val, which is negative
+                    }
+                    return new org.python.types.Int(result);
                 }
-                return new org.python.types.Int(this.value % other_val);
             } else if (other instanceof org.python.types.Float) {
                 double other_val = ((org.python.types.Float) other).value;
                 if (other_val == 0.0) {
