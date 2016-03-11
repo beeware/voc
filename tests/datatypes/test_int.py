@@ -152,7 +152,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_str',
         'test_subscr_tuple',
 
-        'test_subtract_bool',
         'test_subtract_bytearray',
         'test_subtract_bytes',
         'test_subtract_class',
