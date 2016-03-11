@@ -189,9 +189,7 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __sub__(org.python.Object other) {
-        if (other instanceof org.python.types.Str) {
-            return other.__sub__(this);
-        } else if (other instanceof org.python.types.Int) {
+        if (other instanceof org.python.types.Int) {
             return new org.python.types.Int(this.value - ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) - ((org.python.types.Float) other).value);
