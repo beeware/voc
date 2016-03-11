@@ -326,7 +326,7 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __and__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Int(0);
+            return new org.python.types.Int(this.value & (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Int) {
             return new org.python.types.Int(this.value & ((org.python.types.Int) other).value);
         }
