@@ -99,7 +99,6 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof Bool) {
             return new org.python.types.Bool(
                 (this.value == 0 && !((org.python.types.Bool) other).value)
-                || (this.value != 0 && ((org.python.types.Bool) other).value)
             );
         }
         throw new org.python.exceptions.TypeError("unorderable types: int() == " + other.typeName() + "()");
