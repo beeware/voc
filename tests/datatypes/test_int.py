@@ -18,14 +18,14 @@ class IntTests(TranspileTestCase):
 
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = ['42', '0']  # , '-37']
+    values = ['42', '0', '-37']
 
     not_implemented = [
     ]
 
 
 class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['42', '0']  # , '-37']
+    values = ['42', '0', '-37']
 
     not_implemented = [
         'test_add_bytearray',
@@ -183,7 +183,7 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = ['42', '0']  # , '-37']
+    values = ['42', '0', '-37']
 
     not_implemented = [
         'test_add_bytearray',
