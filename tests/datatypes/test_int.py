@@ -51,7 +51,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_floor_divide_class',
         'test_floor_divide_complex',
         'test_floor_divide_frozenset',
-        'test_floor_divide_int',
 
         'test_ge_bytearray',
         'test_ge_bytes',
@@ -162,7 +161,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_true_divide_class',
         'test_true_divide_complex',
         'test_true_divide_frozenset',
-        'test_true_divide_int',
 
         'test_xor_bytearray',
         'test_xor_bytes',

@@ -224,7 +224,10 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __truediv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Float(this.value / ((double)((org.python.types.Int) other).value));
+            if (((org.python.types.Int) other).value == 0) {
+                throw new org.python.exceptions.ZeroDivisionError("division by zero");
+            }
+            return new org.python.types.Float((double) this.value / ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             if (((org.python.types.Float) other).value == 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
@@ -245,7 +248,10 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __floordiv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Int(this.value / ((org.python.types.Int) other).value);
+            if (((org.python.types.Int) other).value == 0) {
+                throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+            }
+            return new org.python.types.Int((long) Math.floor((double) this.value / ((org.python.types.Int) other).value));
         } else if (other instanceof org.python.types.Float) {
             if (((org.python.types.Float) other).value == 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("float divmod()");
