@@ -123,6 +123,7 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_power_class',
         'test_power_complex',
         'test_power_frozenset',
+        'test_power_float',
 
         'test_rshift_bool',
         'test_rshift_bytearray',

@@ -335,6 +335,8 @@ public class Int extends org.python.types.Object {
             if (this.value == 0 && other_val < 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
             }
+            // TODO: if this.value < 0 && other_val is not an integer, this will be a Complex result, so change this.value to Complex and delegate it out
+            // return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
             return new org.python.types.Float(java.lang.Math.pow((double) this.value, other_val));
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
