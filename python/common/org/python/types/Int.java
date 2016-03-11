@@ -334,7 +334,7 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __xor__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("int.__xor__() has not been implemented");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: 'int' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
