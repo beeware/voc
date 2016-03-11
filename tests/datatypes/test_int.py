@@ -97,7 +97,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_bytes',
         'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_float',
         'test_modulo_frozenset',
 
         'test_multiply_bool',
