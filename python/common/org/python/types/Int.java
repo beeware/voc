@@ -72,6 +72,8 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Bool(this.value < ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) < ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(((double) this.value) < (((org.python.types.Bool) other).value ? 1 : 0));
         }
         throw new org.python.exceptions.TypeError("unorderable types: int() < " + other.typeName() + "()");
     }
@@ -84,6 +86,8 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Bool(this.value <= ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) <= ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(((double) this.value) <= (((org.python.types.Bool) other).value ? 1 : 0));
         }
         throw new org.python.exceptions.TypeError("unorderable types: int() <= " + other.typeName() + "()");
     }
@@ -128,6 +132,8 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Bool(this.value > ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) > ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(((double) this.value) > (((org.python.types.Bool) other).value ? 1 : 0));
         }
         throw new org.python.exceptions.TypeError("unorderable types: int() > " + other.typeName() + "()");
     }
@@ -140,6 +146,8 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Bool(this.value >= ((org.python.types.Int) other).value);
         } else if (other instanceof Float) {
             return new org.python.types.Bool(((double) this.value) >= ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(((double) this.value) >= (((org.python.types.Bool) other).value ? 1 : 0));
         }
         throw new org.python.exceptions.TypeError("unorderable types: int() >= " + other.typeName() + "()");
     }
