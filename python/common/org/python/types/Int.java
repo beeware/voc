@@ -227,6 +227,12 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Float(this.value / ((double)((org.python.types.Int) other).value));
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(this.value / ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Float(this.value);
+            } else {
+                throw new org.python.exceptions.ZeroDivisionError("division by zero");
+            }
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'int' and '" + other.typeName() + "'");
     }
@@ -239,6 +245,12 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Int(this.value / ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Int(this.value / ((long) ((org.python.types.Float) other).value));
+        } else if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Int(this.value);
+            } else {
+                throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+            }
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'int' and '" + other.typeName() + "'");
     }
