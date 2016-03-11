@@ -171,14 +171,12 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_and_str',
         'test_and_tuple',
 
-        'test_floor_divide_bool',
         'test_floor_divide_bytearray',
         'test_floor_divide_bytes',
         'test_floor_divide_class',
         'test_floor_divide_complex',
         'test_floor_divide_frozenset',
         'test_floor_divide_float',
-        'test_floor_divide_int',
 
         'test_lshift_bool',
         'test_lshift_bytearray',
@@ -201,7 +199,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_frozenset',
         'test_modulo_float',
 
-        'test_multiply_bool',
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
@@ -254,7 +251,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_rshift_str',
         'test_rshift_tuple',
 
-        'test_subtract_bool',
         'test_subtract_bytearray',
         'test_subtract_bytes',
         'test_subtract_class',
