@@ -344,6 +344,11 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __or__(org.python.Object other) {
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(this.value | (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            return new org.python.types.Int(this.value | ((org.python.types.Int) other).value);
+        }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: 'int' and '" + other.typeName() + "'");
     }
 
