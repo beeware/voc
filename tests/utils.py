@@ -209,9 +209,9 @@ def compileJava(java_dir, java):
 
 JAVA_EXCEPTION = re.compile(
     '(((Exception in thread "\w+" )?org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\r?\n]+))|' +
-    '((Exception in thread "\w+" )?[^\r?\n]+\r?\n' +
+    '((Exception in thread "[\w-]+" )?([^\r?\n]+\r?\n)+' +
     'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\r?\n]+)))\r?\n' +
-    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)' +
+    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)(.*\r?\n)*' +
     '(Exception in thread "\w+" )?'
 )
 JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)')
