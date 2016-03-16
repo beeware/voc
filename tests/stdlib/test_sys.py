@@ -1,4 +1,5 @@
 from unittest import expectedFailure
+from unittest import skip
 
 from ..utils import TranspileTestCase
 
@@ -359,6 +360,7 @@ class SysModuleTests(TranspileTestCase):
             print('Done.')
             """)
 
+    @skip
     def test_exit(self):
         # From inside main
         self.assertCodeExecution("""
