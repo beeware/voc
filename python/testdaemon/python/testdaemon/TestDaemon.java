@@ -1,4 +1,3 @@
-
 package python.testdaemon;
 
 import java.io.File;
@@ -14,16 +13,22 @@ public class TestDaemon {
         Scanner sc = new Scanner(System.in);
         String input = "";
 
-        URL url;
+        URL voc;
+        URL runtime1;
+        URL runtime2;
         try {
+            // load the voc jar here so that they can see the runtime classes
+            voc = new URL("file:" + System.getProperty("user.dir") + "/../dist/python-java.jar");
             // need the trailing slash so that the ClassLoader knows it's a
             // directory instead of a jar file
-            url = new URL("file:" + System.getProperty("user.dir") + "/temp/");
+            runtime1 = new URL("file:" + System.getProperty("user.dir") + "/temp/");
+            runtime2 = new URL("file:" + System.getProperty("user.dir") + "/java/");
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return;
         }
-        URL[] urls = new URL[] { url };
+        ClassLoader vocClassLoader = new URLClassLoader(new URL[] { voc });
+        URL[] runtimeURLs = new URL[] { runtime1, runtime2 };
 
         input = sc.nextLine();
 
@@ -34,12 +39,12 @@ public class TestDaemon {
             String[] inputArgs = Arrays.copyOfRange(parts, 1, parts.length);
 
             // get a fresh ClassLoader so that we pick up the latest class files
-            ClassLoader newClassLoader = new URLClassLoader(urls);
+            ClassLoader runtimeClassLoader = new URLClassLoader(runtimeURLs);
 
             try {
                 // don't leave this as Class type as that's raw and compiler
                 // is required to generate a warning. add generic type <?>.
-                Class<?> klass = newClassLoader.loadClass(className);
+                Class<?> klass = runtimeClassLoader.loadClass(className);
 
                 // retrieve the standard main(String[] args)
                 Method method = klass.getMethod("main", String[].class);
