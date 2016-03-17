@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.SecureClassLoader;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 // http://www.source-code.biz/snippets/java/12.htm
@@ -20,29 +23,54 @@ import java.util.Vector;
  */
 public class JoinClassLoader extends ClassLoader {
 
-    private ClassLoader[] delegateClassLoaders;
+    // made static to be retained between different instances of JoinClassLoader
+    static private Map<URL, Class> cache = Collections.synchronizedMap(new HashMap<URL, Class>());
 
-    public JoinClassLoader(ClassLoader parent, ClassLoader...delegateClassLoaders) {
+    private ClassLoader[] delegateClassLoaders;
+    private ClassLoader cacheableClassLoader;
+
+    public JoinClassLoader(ClassLoader parent, ClassLoader cacheableClassLoader, ClassLoader...delegateClassLoaders) {
         super(parent);
+        this.cacheableClassLoader = cacheableClassLoader;
         this.delegateClassLoaders = delegateClassLoaders;
     }
 
     protected Class <?> findClass(String name) throws ClassNotFoundException {
-        // It would be easier to call the loadClass() methods of the delegateClassLoaders
-        // here, but we have to load the class from the byte code ourselves, because we
-        // need it to be associated with our class loader.
         String path = name.replace('.', '/') + ".class";
-        URL url = findResource(path);
-        if (url == null) {
-            throw new ClassNotFoundException(name);
+
+        URL url = cacheableClassLoader.getResource(path);
+        if (url != null) {
+            // class is found in the cacheable ClassLoader
+            // attempt to load from cache
+            if (cache.containsKey(url)) {
+                return cache.get(url);
+            }
+
+            // not in cache, load and retain in cache
+            ByteBuffer byteCode;
+            try {
+                byteCode = loadResource(url);
+            } catch (IOException e) {
+                throw new ClassNotFoundException(name, e);
+            }
+            Class klass = defineClass(name, byteCode, null);
+            cache.put(url, klass);
+            return klass;
+        } else {
+            // class not found in the cacheable ClassLoader, try and load on the
+            // fly from the other ClassLoaders
+            url = findResource(path);
+            if (url == null) {
+                throw new ClassNotFoundException(name);
+            }
+            ByteBuffer byteCode;
+            try {
+                byteCode = loadResource(url);
+            } catch (IOException e) {
+                throw new ClassNotFoundException(name, e);
+            }
+            return defineClass(name, byteCode, null);
         }
-        ByteBuffer byteCode;
-        try {
-            byteCode = loadResource(url);
-        } catch (IOException e) {
-            throw new ClassNotFoundException(name, e);
-        }
-        return defineClass(name, byteCode, null);
     }
 
     private ByteBuffer loadResource(URL url) throws IOException {
