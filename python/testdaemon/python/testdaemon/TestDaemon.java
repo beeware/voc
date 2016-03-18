@@ -41,10 +41,15 @@ public class TestDaemon {
             // get a fresh ClassLoader so that we pick up the latest class files
             ClassLoader runtimeClassLoader = new URLClassLoader(runtimeURLs);
 
+            ClassLoader joinedClassLoader = new JoinClassLoader(
+                TestDaemon.class.getClassLoader(),
+                vocClassLoader,
+                runtimeClassLoader);
+
             try {
                 // don't leave this as Class type as that's raw and compiler
                 // is required to generate a warning. add generic type <?>.
-                Class<?> klass = runtimeClassLoader.loadClass(className);
+                Class<?> klass = joinedClassLoader.loadClass(className);
 
                 // retrieve the standard main(String[] args)
                 Method method = klass.getMethod("main", String[].class);
