@@ -3,9 +3,11 @@ package python.testdaemon;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.MalformedURLException;
+import java.security.Permission;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -30,6 +32,8 @@ public class TestDaemon {
         }
         ClassLoader vocClassLoader = new URLClassLoader(new URL[] { voc });
         URL[] runtimeURLs = new URL[] { runtime1, runtime2 };
+
+        System.setSecurityManager(new NoExitSecurityManager());
 
         input = sc.nextLine();
 
@@ -66,8 +70,16 @@ public class TestDaemon {
                 Field importlib_modules = importlib.getDeclaredField("modules");
                 importlib_modules.set(null, new java.util.HashMap());
             } catch (ReflectiveOperationException e) {
-                // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
-                e.printStackTrace();
+                // InvocationTargetException may contain an ExitException
+                if (e instanceof InvocationTargetException && e.getCause() != null
+                        && e.getCause() instanceof ExitException) {
+                    // System.exit() was invoked somewhere, and caught due to
+                    // the custom SecurityManager
+                    System.out.println(".");
+                } else {
+                    // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
+                    e.printStackTrace();
+                }
             } catch (ExceptionInInitializerError e) {
                 // unwrap the Error to get the org.python.exceptions.* thing
                 System.err.print("Exception in thread \"main\" ");
@@ -82,5 +94,28 @@ public class TestDaemon {
             input = sc.nextLine();
         }
 
+    }
+
+    private static class NoExitSecurityManager extends SecurityManager {
+        @Override
+        public void checkPermission(Permission perm) {}
+
+        @Override
+        public void checkPermission(Permission perm, Object context) {}
+
+        // System.exit() checks this
+        @Override
+        public void checkExit(int status) {
+            // super.checkExit(status);
+            throw new ExitException(Integer.toString(status));
+        }
+    }
+
+    // This needs to be RuntimeException as SecurityManager.checkExit() can't
+    // throw a checked exception
+    private static class ExitException extends RuntimeException {
+        public ExitException(String status) {
+            super(status);
+        }
     }
 }
