@@ -1,6 +1,7 @@
 package python.testdaemon;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -57,6 +58,11 @@ public class TestDaemon {
                 // first parameter can be null since method is static
                 // cast second parameter to Object to make it a varargs call
                 method.invoke(null, (Object) inputArgs);
+
+                // cleanup
+                Class<?> importlib = joinedClassLoader.loadClass("org.python.ImportLib");
+                Field importlib_modules = importlib.getDeclaredField("modules");
+                importlib_modules.set(null, new java.util.HashMap());
             } catch (ReflectiveOperationException e) {
                 // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
                 e.printStackTrace();
