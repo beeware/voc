@@ -27,7 +27,7 @@ public class Module extends org.python.types.Module {
         value = cls.attrs.get(name);
         if (value == null) {
             try {
-                java.lang.Class java_class = java.lang.Class.forName(java_namespace + "." + name);
+                java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(java_namespace + "." + name);
                 value = new org.python.java.Type(org.python.types.Type.Origin.JAVA, java_class);
                 cls.attrs.put(name, value);
             } catch (java.lang.ClassNotFoundException e) {

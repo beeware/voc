@@ -47,6 +47,8 @@ public class TestDaemon {
                 vocClassLoader,
                 runtimeClassLoader);
 
+            Thread.currentThread().setContextClassLoader(joinedClassLoader);
+
             try {
                 // don't leave this as Class type as that's raw and compiler
                 // is required to generate a warning. add generic type <?>.

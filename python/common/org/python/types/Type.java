@@ -52,7 +52,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
     public static org.python.types.Type pythonType(java.lang.String java_class_name) {
         try {
-            return pythonType(java.lang.Class.forName(java_class_name.replace("/", ".")));
+            return pythonType(java.lang.Thread.currentThread().getContextClassLoader().loadClass(java_class_name.replace("/", ".")));
         } catch (ClassNotFoundException e) {
             throw new org.python.exceptions.RuntimeError("Unknown Class " + java_class_name);
         }
