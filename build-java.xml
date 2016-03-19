@@ -25,9 +25,9 @@
 
     <jar jarfile="${dist}/Python-Java-${python-version}-b${release}.jar" basedir="${build}/java"/>
 
-    <symlink
-        link="${dist}/python-java.jar"
-        resource="${dist}/Python-Java-${python-version}-b${release}.jar"
+    <copy
+        tofile="${dist}/python-java.jar"
+        file="${dist}/Python-Java-${python-version}-b${release}.jar"
         overwrite="true" />
   </target>
 
