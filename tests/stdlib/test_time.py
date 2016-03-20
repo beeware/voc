@@ -1,3 +1,4 @@
+import os
 from unittest import expectedFailure
 
 from ..utils import TranspileTestCase
@@ -101,16 +102,20 @@ class TimeModuleTests(TranspileTestCase):
         # Since we can't know exactly what CPU time will be used,
         # and CPU time will vary between implementations,
         # this test validates that clock returns a float < 0.01s
+        sleepy_time = 1
+        diff_offset = sleepy_time if os.name == 'nt' else 0
+        # On Windows, time.clock includes the time spent in time.sleep
+        # however on Unix it does not.
         self.assertCodeExecution("""
             import time
             start = time.clock()
-            time.sleep(1)
+            time.sleep({sleepy_time})
             end = time.clock()
-            diff = end - start
+            diff = end - start - {diff_offset}
             print(type(diff))
             print(diff < 0.1)
             print('Done.')
-            """)
+            """.format(sleepy_time=sleepy_time, diff_offset=diff_offset))
 
     #######################################################
     # ctime

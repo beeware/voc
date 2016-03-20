@@ -30,10 +30,11 @@ def setUpSuite():
         return
 
     proc = subprocess.Popen(
-        ["ant", "java"],
+        "ant java",
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
+        shell=True,
     )
 
     try:
@@ -147,8 +148,13 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
     if args is None:
         args = []
 
+    classpath = os.pathsep.join([
+        os.path.join('..', '..', 'dist', 'python-java.jar'),
+        os.path.join('..', 'java'),
+        os.curdir,
+    ])
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../dist/python-java.jar:../java:.", "python.test.__init__"] + args,
+        ["java", "-classpath", classpath, "python.test.__init__"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -184,8 +190,12 @@ def compileJava(java_dir, java):
 
             sources.append(class_file)
 
+    classpath = os.pathsep.join([
+        os.path.join('..', '..', 'dist', 'python-java.jar'),
+        os.curdir,
+    ])
     proc = subprocess.Popen(
-        ["javac", "-classpath", "../../dist/python-java.jar:."] + sources,
+        ["javac", "-classpath", classpath] + sources,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -197,17 +207,18 @@ def compileJava(java_dir, java):
 
 
 JAVA_EXCEPTION = re.compile(
-    '((Exception in thread "\w+" org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\n]+))|' +
-    '(Exception in thread "\w+" [^\n]+\n' +
-    'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\n]+)))\n' +
-    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\n)+)'
+    '(((Exception in thread "\w+" )?org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\r?\n]+))|' +
+    '((Exception in thread "\w+" )?[^\r?\n]+\r?\n' +
+    'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\r?\n]+)))\r?\n' +
+    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)' +
+    '(Exception in thread "\w+" )?'
 )
 JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)')
 JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 
 # PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
-PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n)+(?P<exception>.*?): (?P<message>.*\n)')
-PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n')
+PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n)+(?P<exception>.*?): (?P<message>.*\r?\n)')
+PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n')
 PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
 
 MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,8}')
@@ -215,39 +226,44 @@ MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,8}')
 
 def cleanse_java(input):
     try:
-        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception2>: \\g<message2>\n\\g<trace>', input)
+        out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception2>: \\g<message2>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
     except:
-        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception1>: \\g<message1>\n\\g<trace>', input)
+        out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception1>: \\g<message1>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
+
     stack = JAVA_STACK.findall(out)
     out = JAVA_STACK.sub('', out)
     out = '%s%s%s' % (
         out,
-        '\n'.join([
+        os.linesep.join([
             "    %s:%s" % (s[3], s[5])
             for s in stack[::-1]
             if s[0].startswith('python.') and not s[0].endswith('.<init>')
         ]),
-        '\n' if stack else ''
+        os.linesep if stack else ''
     )
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
-    return JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***')
+    out = JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***')
+    out = out.replace('\r\n', '\n')
+    return out
 
 
 def cleanse_python(input):
-    out = PYTHON_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception>: \\g<message>', input)
+    out = PYTHON_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception>: \\g<message>'.format(linesep=os.linesep), input)
     stack = PYTHON_STACK.findall(input)
     out = '%s%s%s' % (
         out,
-        '\n'.join(
+        os.linesep.join(
             [
                 "    %s:%s" % (s[0], s[1])
                 for s in stack
             ]
         ),
-        '\n' if stack else ''
+        os.linesep if stack else ''
     )
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
-    return PYTHON_FLOAT.sub('\\1e\\2\\3', out).replace("'test.py'", '***EXECUTABLE***')
+    out = PYTHON_FLOAT.sub('\\1e\\2\\3', out).replace("'test.py'", '***EXECUTABLE***')
+    out = out.replace('\r\n', '\n')
+    return out
 
 
 class TranspileTestCase(TestCase):
