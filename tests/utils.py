@@ -30,7 +30,7 @@ def setUpSuite():
         return
 
     proc = subprocess.Popen(
-        ["ant", "java"],
+        "ant java",
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -190,8 +190,12 @@ def compileJava(java_dir, java):
 
             sources.append(class_file)
 
+    classpath = os.pathsep.join([
+        os.path.join('..', '..', 'dist', 'python-java.jar'),
+        os.curdir,
+    ])
     proc = subprocess.Popen(
-        ["javac", "-classpath", "../../dist/python-java.jar:."] + sources,
+        ["javac", "-classpath", classpath] + sources,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -207,7 +211,7 @@ JAVA_EXCEPTION = re.compile(
     '((Exception in thread "\w+" )?[^\r?\n]+\r?\n' +
     'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\r?\n]+)))\r?\n' +
     '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)' +
-    '(Exception in thread "\w+" )'
+    '(Exception in thread "\w+" )?'
 )
 JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)')
 JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
