@@ -126,26 +126,16 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
 
-   
-    //Marina : trying to implement add for  booleans
-    
-    
     public org.python.Object __add__(org.python.Object other) {
-
-
         if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int( (((org.python.types.Bool) this).value ? 1 : 0) + (((org.python.types.Bool) other).value ? 1 : 0) );
-    } else if (other instanceof org.python.types.Int) {
+        } else if (other instanceof org.python.types.Int) {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Float) other).value);
-        }
-
-          
+        }          
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'bool' and '" + other.typeName() + "'");
     }
-
-
 
     @org.python.Method(
         __doc__ = ""
