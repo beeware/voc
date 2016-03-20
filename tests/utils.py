@@ -148,6 +148,7 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
     if args is None:
         args = []
 
+    if len(args) == 0:
     global _jvm
     # encode to turn str into bytes-like object
     _jvm.stdin.write(("python.test.__init__\n").encode())
@@ -162,6 +163,15 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
                 out += line
         except IOError:
             continue
+    else:
+        proc = subprocess.Popen(
+            ["java", "-classpath", "../../dist/python-java.jar:../java:.", "python.test.__init__"] + args,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=test_dir
+        )
+        out = proc.communicate()[0].decode('utf8')
 
     return out
 
@@ -243,7 +253,7 @@ def cleanse_java(input):
         os.linesep if stack else ''
     )
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
-    out = JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***')
+    out = JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***').replace("'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
     out = out.replace('\r\n', '\n')
     return out
 
