@@ -148,20 +148,20 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
         args = []
 
     if len(args) == 0:
-    global _jvm
-    # encode to turn str into bytes-like object
-    _jvm.stdin.write(("python.test.__init__\n").encode())
-    _jvm.stdin.flush()
-    out = ""
-    while True:
-        try:
-            line = _jvm.stdout.readline().decode("utf-8")
-            if line == ".\n":
-                break
-            else:
-                out += line
-        except IOError:
-            continue
+        global _jvm
+        # encode to turn str into bytes-like object
+        _jvm.stdin.write(("python.test.__init__\n").encode())
+        _jvm.stdin.flush()
+        out = ""
+        while True:
+            try:
+                line = _jvm.stdout.readline().decode("utf-8")
+                if line == ".\n":
+                    break
+                else:
+                    out += line
+            except IOError:
+                continue
     else:
         proc = subprocess.Popen(
             ["java", "-classpath", "../../dist/python-java.jar:../java:.", "python.test.__init__"] + args,
