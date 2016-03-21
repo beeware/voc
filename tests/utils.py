@@ -150,7 +150,7 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
     if len(args) == 0:
         global _jvm
         # encode to turn str into bytes-like object
-        _jvm.stdin.write(("python.test.__init__\n").encode())
+        _jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
         _jvm.stdin.flush()
         out = ""
         while True:
@@ -295,7 +295,7 @@ class TranspileTestCase(TestCase):
         global _jvm
         if _jvm is None:
             # use communicate here to wait for process to exit
-            _jvm.communicate("exit".encode())
+            _jvm.communicate("exit".encode("utf-8"))
 
     def assertBlock(self, python, java):
         self.maxDiff = None
