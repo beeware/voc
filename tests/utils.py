@@ -277,10 +277,8 @@ def cleanse_python(input):
 
 
 class TranspileTestCase(TestCase):
-    def setUp(self):
-        setUpSuite()
-
     def setUpClass():
+        setUpSuite()
         global _jvm
         test_dir = os.path.join(os.path.dirname(__file__))
         _jvm = subprocess.Popen(
