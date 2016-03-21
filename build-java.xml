@@ -47,9 +47,9 @@
 
     <jar jarfile="${dist}/Python-Java-testdaemon-${python-version}-b${release}.jar" basedir="${build}/java-testdaemon"/>
 
-    <symlink
-        link="${dist}/python-java-testdaemon.jar"
-        resource="${dist}/Python-Java-testdaemon-${python-version}-b${release}.jar"
+    <copy
+        tofile="${dist}/python-java-testdaemon.jar"
+        file="${dist}/Python-Java-testdaemon-${python-version}-b${release}.jar"
         overwrite="true" />
   </target>
 
