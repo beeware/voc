@@ -76,10 +76,68 @@ class JavaNormalizationTests(unittest.TestCase):
             """
         )
 
+    def test_exception_in_clinit_after_output_windows(self):
+        self.assertNormalized(
+            """
+            Hello, world.
+            java.lang.ExceptionInInitializerError
+            Caused by: org.python.exceptions.IndexError: list index out of range
+                at org.python.types.List.__getitem__(List.java:100)
+                at org.python.types.List.__getitem__(List.java:85)
+                at python.test.<clinit>(test.py:2)
+            """,
+            """
+            Hello, world.
+            ### EXCEPTION ###
+            IndexError: list index out of range
+                test.py:2
+            """
+        )
+
+    def test_exception_in_clinit_after_output_testdaemon(self):
+        self.assertNormalized(
+            """
+            False
+            True
+            Exception in thread "main" java.lang.ExceptionInInitializerError
+            \tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+            \tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+            \tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+            \tat java.lang.reflect.Method.invoke(Method.java:497)
+            \tat python.testdaemon.TestDaemon.main(TestDaemon.java:66)
+            Caused by: org.python.exceptions.KeyError: 'c'
+                at org.python.types.Dict.__getitem__(Dict.java:142)
+                at python.test.__init__.<clinit>(test.py:4)
+                ... 5 more
+            """,
+            """
+            False
+            True
+            ### EXCEPTION ###
+            KeyError: 'c'
+                test.py:4
+            """
+        )
+
     def test_exception_in_method(self):
         self.assertNormalized(
             """
             Exception in thread "main" org.python.exceptions.IndexError: list index out of range
+                at org.python.types.List.__getitem__(List.java:100)
+                at org.python.types.List.__getitem__(List.java:85)
+                at python.test.main(test.py:3)
+            """,
+            """
+            ### EXCEPTION ###
+            IndexError: list index out of range
+                test.py:3
+            """
+        )
+
+    def test_exception_in_method_windows(self):
+        self.assertNormalized(
+            """
+            org.python.exceptions.IndexError: list index out of range
                 at org.python.types.List.__getitem__(List.java:100)
                 at org.python.types.List.__getitem__(List.java:85)
                 at python.test.main(test.py:3)
@@ -96,6 +154,23 @@ class JavaNormalizationTests(unittest.TestCase):
             """
             Hello, world.
             Exception in thread "main" org.python.exceptions.IndexError: list index out of range
+                at org.python.types.List.__getitem__(List.java:100)
+                at org.python.types.List.__getitem__(List.java:85)
+                at python.test.main(test.py:3)
+            """,
+            """
+            Hello, world.
+            ### EXCEPTION ###
+            IndexError: list index out of range
+                test.py:3
+            """
+        )
+
+    def test_exception_in_method_after_output_windows(self):
+        self.assertNormalized(
+            """
+            Hello, world.
+            org.python.exceptions.IndexError: list index out of range
                 at org.python.types.List.__getitem__(List.java:100)
                 at org.python.types.List.__getitem__(List.java:85)
                 at python.test.main(test.py:3)

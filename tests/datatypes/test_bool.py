@@ -31,20 +31,12 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
     values = ['True', 'False']
 
     not_implemented = [
-        'test_add_bool',
         'test_add_bytearray',
         'test_add_bytes',
         'test_add_class',
         'test_add_complex',
-        'test_add_dict',
-        'test_add_float',
         'test_add_frozenset',
-        'test_add_int',
-        'test_add_list',
-        'test_add_set',
-        'test_add_str',
 
-        'test_add_tuple',
         'test_and_bool',
         'test_and_bytearray',
         'test_and_bytes',
@@ -303,14 +295,9 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_bytes',
         'test_add_class',
         'test_add_complex',
-        'test_add_dict',
         'test_add_float',
         'test_add_frozenset',
         'test_add_int',
-        'test_add_list',
-        'test_add_set',
-        'test_add_str',
-        'test_add_tuple',
 
         'test_and_bool',
         'test_and_bytearray',

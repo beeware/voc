@@ -190,7 +190,7 @@ public class Type extends org.python.types.Type {
                         // Field does not exist.
                         try {
                             // org.Python.debug("Look for inner class ", this.klass.getName() + "$" + name);
-                            java.lang.Class inner_klass = java.lang.Class.forName(this.klass.getName() + "$" + name);
+                            java.lang.Class inner_klass = java.lang.Thread.currentThread().getContextClassLoader().loadClass(this.klass.getName() + "$" + name);
                             value = new org.python.java.Type(org.python.types.Type.Origin.JAVA, inner_klass);
                         } catch (java.lang.ClassNotFoundException ce) {
                             // org.Python.debug("Inner class not found", ce);
