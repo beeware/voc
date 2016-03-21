@@ -32,7 +32,7 @@ public class NoneType extends org.python.types.Object {
         __doc__=""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(true);
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
