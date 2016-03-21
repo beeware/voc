@@ -41,126 +41,49 @@ public class NoneType extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= " + Python.typeName(other.getClass()));
-        // if (other instanceof org.python.types.Bool) {
-        //     throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= bool()");
-        // } else if (other instanceof org.python.types.Float) {
-        //     throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= float()");
-        // } else if (other instanceof org.python.types.Int) {
-        //     throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= int()");
-        // } else if (other instanceof org.python.types.Str) {
-        //     throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= str()");
-        // } else if (other instanceof org.python.types.List) {
-        //     throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= list()");
-        // } else if (other instanceof org.python.types.Set) {
-        //     throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= set()");
-        // } else if (other instanceof org.python.types.Tuple) {
-        //     throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= tuple()");
-        // } else if (other instanceof org.python.types.Dict) {
-        //     throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= dict()");
-        // }
-
-        // throw new Error();
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: NoneType() >= %s()",
+                Python.typeName(other.getClass())));
     }
 
         @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        if (other instanceof org.python.types.Bool) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > bool()");
-        } else if (other instanceof org.python.types.Float) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > float()");
-        } else if (other instanceof org.python.types.Int) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > int()");
-        } else if (other instanceof org.python.types.Str) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > str()");
-        } else if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > list()");
-        } else if (other instanceof org.python.types.Set) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > set()");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > tuple()");
-        } else if (other instanceof org.python.types.Dict) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > dict()");
-        }
-
-        throw new Error();
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: NoneType() > %s()",
+                Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __lt__(org.python.Object other) {
-        if (other instanceof org.python.types.Bool) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < bool()");
-        } else if (other instanceof org.python.types.Float) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < float()");
-        } else if (other instanceof org.python.types.Int) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < int()");
-        } else if (other instanceof org.python.types.Str) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < str()");
-        } else if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < list()");
-        } else if (other instanceof org.python.types.Set) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < set()");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < tuple()");
-        } else if (other instanceof org.python.types.Dict) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < dict()");
-        }
-
-        throw new Error();
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: NoneType() < %s()",
+                Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        if (other instanceof org.python.types.Bool) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= bool()");
-        } else if (other instanceof org.python.types.Float) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= float()");
-        } else if (other instanceof org.python.types.Int) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= int()");
-        } else if (other instanceof org.python.types.Str) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= str()");
-        } else if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= list()");
-        } else if (other instanceof org.python.types.Set) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= set()");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= tuple()");
-        } else if (other instanceof org.python.types.Dict) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= dict()");
-        }
-
-        throw new Error();
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: NoneType() <= %s()",
+                Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.Bool) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'NoneType' and 'bool'");
-        } else if (other instanceof org.python.types.Float) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'NoneType' and 'float'");
-        } else if (other instanceof org.python.types.Int) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'NoneType' and 'int'");
-        } else if (other instanceof org.python.types.Str) {
+        if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NoneType'");
-        } else if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NoneType'");
-        } else if (other instanceof org.python.types.Set) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'NoneType' and 'set'");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NoneType'");
-        } else if (other instanceof org.python.types.Dict) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'NoneType' and 'dict'");
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("unsupported operand type(s) for *: 'NoneType' and '%s'",
+                    Python.typeName(other.getClass())));
         }
-
-        throw new Error();
     }
 
     @org.python.Method(
