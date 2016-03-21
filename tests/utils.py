@@ -18,7 +18,6 @@ from voc.transpiler import Transpiler
 
 # A state variable to determine if the test environment has been configured.
 _suite_configured = False
-_jvm_configured = False
 
 def setUpSuite():
     """Configure the entire test suite.
@@ -283,7 +282,6 @@ class TranspileTestCase(TestCase):
 
     def setUpClass():
         global _jvm
-        global _jvm_configured
         test_dir = os.path.join(os.path.dirname(__file__))
         _jvm = subprocess.Popen(
             ["java", "-classpath", "../dist/python-java-testdaemon.jar", "python.testdaemon.TestDaemon"],
@@ -292,15 +290,12 @@ class TranspileTestCase(TestCase):
             stderr=subprocess.STDOUT,
             cwd=test_dir,
         )
-        _jvm_configured = True
 
     def tearDownClass():
         global _jvm
-        global _jvm_configured
-        if _jvm_configured:
+        if _jvm is None:
             # use communicate here to wait for process to exit
             _jvm.communicate("exit".encode())
-            _jvm_configured = False
 
     def assertBlock(self, python, java):
         self.maxDiff = None
