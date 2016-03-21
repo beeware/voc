@@ -19,7 +19,6 @@ from voc.transpiler import Transpiler
 # A state variable to determine if the test environment has been configured.
 _suite_configured = False
 
-
 def setUpSuite():
     """Configure the entire test suite.
 
@@ -148,21 +147,32 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
     if args is None:
         args = []
 
-    classpath = os.pathsep.join([
-        os.path.join('..', '..', 'dist', 'python-java.jar'),
-        os.path.join('..', 'java'),
-        os.curdir,
-    ])
-    proc = subprocess.Popen(
-        ["java", "-classpath", classpath, "python.test.__init__"] + args,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        cwd=test_dir,
-    )
-    out = proc.communicate()
+    if len(args) == 0:
+        global _jvm
+        # encode to turn str into bytes-like object
+        _jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
+        _jvm.stdin.flush()
+        out = ""
+        while True:
+            try:
+                line = _jvm.stdout.readline().decode("utf-8")
+                if line == ".\n":
+                    break
+                else:
+                    out += line
+            except IOError:
+                continue
+    else:
+        proc = subprocess.Popen(
+            ["java", "-classpath", "../../dist/python-java.jar:../java:.", "python.test.__init__"] + args,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=test_dir
+        )
+        out = proc.communicate()[0].decode('utf8')
 
-    return out[0].decode('utf8')
+    return out
 
 
 def compileJava(java_dir, java):
@@ -207,10 +217,10 @@ def compileJava(java_dir, java):
 
 
 JAVA_EXCEPTION = re.compile(
-    '(((Exception in thread "\w+" )?org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\r?\n]+))|' +
-    '((Exception in thread "\w+" )?[^\r?\n]+\r?\n' +
+    '(((Exception in thread "[\w-]+" )?org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\r?\n]+))|' +
+    '([^\r\n]*?\r?\n((    |\t)at[^\r\n]*?\r?\n)*' +
     'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\r?\n]+)))\r?\n' +
-    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)' +
+    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)(.*\r?\n)*' +
     '(Exception in thread "\w+" )?'
 )
 JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)')
@@ -242,7 +252,7 @@ def cleanse_java(input):
         os.linesep if stack else ''
     )
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
-    out = JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***')
+    out = JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***').replace("'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
     out = out.replace('\r\n', '\n')
     return out
 
@@ -269,6 +279,23 @@ def cleanse_python(input):
 class TranspileTestCase(TestCase):
     def setUp(self):
         setUpSuite()
+
+    def setUpClass():
+        global _jvm
+        test_dir = os.path.join(os.path.dirname(__file__))
+        _jvm = subprocess.Popen(
+            ["java", "-classpath", "../dist/python-java-testdaemon.jar", "python.testdaemon.TestDaemon"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=test_dir,
+        )
+
+    def tearDownClass():
+        global _jvm
+        if _jvm is None:
+            # use communicate here to wait for process to exit
+            _jvm.communicate("exit".encode("utf-8"))
 
     def assertBlock(self, python, java):
         self.maxDiff = None

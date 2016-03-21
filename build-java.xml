@@ -20,6 +20,17 @@
     </javac>
   </target>
 
+  <target name="compile-testdaemon" description="Compile the testdaemon source">
+    <mkdir dir="${build}/java-testdaemon"/>
+    <javac
+        debug="true"
+        debuglevel="lines,vars,source"
+        includeantruntime="false"
+        destdir="${build}/java-testdaemon">
+      <src path="${src}/testdaemon" />
+    </javac>
+  </target>
+
   <target name="dist" depends="compile" description="Generate Oracle jar file">
     <mkdir dir="${dist}"/>
 
@@ -28,6 +39,17 @@
     <copy
         tofile="${dist}/python-java.jar"
         file="${dist}/Python-Java-${python-version}-b${release}.jar"
+        overwrite="true" />
+  </target>
+
+  <target name="dist-testdaemon" depends="compile-testdaemon" description="Generate testdaemon jar file">
+    <mkdir dir="${dist}"/>
+
+    <jar jarfile="${dist}/Python-Java-testdaemon-${python-version}-b${release}.jar" basedir="${build}/java-testdaemon"/>
+
+    <symlink
+        link="${dist}/python-java-testdaemon.jar"
+        resource="${dist}/Python-Java-testdaemon-${python-version}-b${release}.jar"
         overwrite="true" />
   </target>
 

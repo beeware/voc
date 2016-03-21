@@ -79,7 +79,7 @@ public class ImportLib {
                 if (!name.equals("*")) {
                     try {
                         if (native_import) {
-                            java.lang.Class java_class = java.lang.Class.forName(java_name.toString().replace("/", ".") + name);
+                            java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(java_name.toString().replace("/", ".") + name);
                             parent_module.__setattr__(name, org.python.java.Type.pythonType(java_class));
                         } else {
                             python_module = importPythonModule(java_name.toString() + name);
@@ -106,7 +106,7 @@ public class ImportLib {
             throws java.lang.ClassNotFoundException {
         org.python.types.Module python_module;
         try {
-            java.lang.Class java_class = java.lang.Class.forName(java_name.replace("/", "."));
+            java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(java_name.replace("/", "."));
             python_module = null;
         } catch (java.lang.ClassNotFoundException e) {
             python_module = new org.python.java.Module(java_name.replace("/", "."));
@@ -136,7 +136,7 @@ public class ImportLib {
             throws java.lang.ClassNotFoundException {
         org.python.types.Module python_module;
         try {
-            java.lang.Class java_class = java.lang.Class.forName(java_name.replace("/", ".") + ".__init__");
+            java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(java_name.replace("/", ".") + ".__init__");
             java.lang.reflect.Constructor constructor = java_class.getConstructor();
             python_module = (org.python.types.Module) constructor.newInstance();
             modules.put(java_name, python_module);
