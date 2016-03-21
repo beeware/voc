@@ -23,7 +23,7 @@ class InterfaceTests(TranspileTestCase):
                     return MyStringAnalog(self.value[start:end])
 
                 def toString(self) -> java.lang.String:
-                    return self.value
+                    return len(self.value) * 'x'
 
             analog = MyStringAnalog("world")
 
