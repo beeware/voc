@@ -19,7 +19,7 @@ public class __init__ extends org.python.types.Module {
         }
 
         try {
-            platform_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(platform_class_name);
+            platform_class = java.lang.Class.forName(platform_class_name);
             impl = (python.Platform) platform_class.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             throw new org.python.exceptions.RuntimeError("Unable to find platform '" + platform_class_name + "'");
