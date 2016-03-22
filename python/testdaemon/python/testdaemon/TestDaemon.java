@@ -64,30 +64,38 @@ public class TestDaemon {
                 // first parameter can be null since method is static
                 // cast second parameter to Object to make it a varargs call
                 method.invoke(null, (Object) inputArgs);
-
-                // cleanup
-                Class<?> importlib = joinedClassLoader.loadClass("org.python.ImportLib");
-                Field importlib_modules = importlib.getDeclaredField("modules");
-                importlib_modules.set(null, new java.util.HashMap());
             } catch (ReflectiveOperationException e) {
                 // InvocationTargetException may contain an ExitException
                 if (e instanceof InvocationTargetException && e.getCause() != null
                         && e.getCause() instanceof ExitException) {
                     // System.exit() was invoked somewhere, and caught due to
                     // the custom SecurityManager
-                    System.out.println(".");
+                    // Do nothing, there should be no output
                 } else {
                     // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
                     e.printStackTrace();
                 }
             } catch (ExceptionInInitializerError e) {
-                // unwrap the Error to get the org.python.exceptions.* thing
-                System.err.print("Exception in thread \"main\" ");
-                e.printStackTrace();
+                if (e.getCause() != null && e.getCause() instanceof ExitException) {
+                    // System.exit() was invoked somewhere, and caught due to
+                    // the custom SecurityManager
+                    // Do nothing, there should be no output
+                } else {
+                    e.printStackTrace();
+                }
             } catch (Throwable e) {
                 // NoSuchMethodError
                 e.printStackTrace();
             } finally {
+                // always cleanup the module cache in ImportLib
+                try {
+                    Class<?> importlib = joinedClassLoader.loadClass("org.python.ImportLib");
+                    Field importlib_modules = importlib.getDeclaredField("modules");
+                    importlib_modules.set(null, new java.util.HashMap());
+                } catch (ReflectiveOperationException e) {
+                    // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
+                }
+
                 System.out.println(".");
             }
 

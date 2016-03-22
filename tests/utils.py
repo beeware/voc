@@ -156,7 +156,7 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
         while True:
             try:
                 line = _jvm.stdout.readline().decode("utf-8")
-                if line == ".\n":
+                if line == ".{0}".format(os.linesep):
                     break
                 else:
                     out += line
@@ -277,10 +277,8 @@ def cleanse_python(input):
 
 
 class TranspileTestCase(TestCase):
-    def setUp(self):
-        setUpSuite()
-
     def setUpClass():
+        setUpSuite()
         global _jvm
         test_dir = os.path.join(os.path.dirname(__file__))
         _jvm = subprocess.Popen(
