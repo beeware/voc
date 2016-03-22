@@ -75,15 +75,20 @@ public class TestDaemon {
                         && e.getCause() instanceof ExitException) {
                     // System.exit() was invoked somewhere, and caught due to
                     // the custom SecurityManager
-                    System.out.println(".");
+                    // Do nothing, there should be no output
                 } else {
                     // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
                     e.printStackTrace();
                 }
             } catch (ExceptionInInitializerError e) {
-                // unwrap the Error to get the org.python.exceptions.* thing
-                System.err.print("Exception in thread \"main\" ");
-                e.printStackTrace();
+                if (e.getCause() != null && e.getCause() instanceof ExitException) {
+                    // System.exit() was invoked somewhere, and caught due to
+                    // the custom SecurityManager
+                    // Do nothing, there should be no output
+                } else {
+                    System.err.print("Exception in thread \"main\" ");
+                    e.printStackTrace();
+                }
             } catch (Throwable e) {
                 // NoSuchMethodError
                 e.printStackTrace();
