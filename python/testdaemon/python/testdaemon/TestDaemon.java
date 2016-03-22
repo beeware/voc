@@ -86,7 +86,6 @@ public class TestDaemon {
                     // the custom SecurityManager
                     // Do nothing, there should be no output
                 } else {
-                    System.err.print("Exception in thread \"main\" ");
                     e.printStackTrace();
                 }
             } catch (Throwable e) {
