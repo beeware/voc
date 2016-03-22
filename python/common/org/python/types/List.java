@@ -1,5 +1,7 @@
 package org.python.types;
 
+import org.Python;
+
 public class List extends org.python.types.Object {
     public java.util.List<org.python.Object> value;
 
@@ -40,6 +42,35 @@ public class List extends org.python.types.Object {
     // }
 
     @org.python.Method(
+            __doc__=""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'list'");
+    }
+
+    @org.python.Method(
+            __doc__=""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'list'");
+    }
+
+    @org.python.Method(
+            __doc__=""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'list'");
+    }
+
+
+    @org.python.Method(
+            __doc__=""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(!this.value.isEmpty());
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
@@ -68,42 +99,135 @@ public class List extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("list.__lt__() has not been implemented.");
+        if (other instanceof org.python.types.List)  {
+            org.python.types.List otherList = (org.python.types.List) other;
+            int size = this.value.size();
+            int otherSize = otherList.value.size();
+            int count = Math.min(size, otherSize);
+
+            for(int i=0; i<count; i++) {
+                org.python.types.Bool b =
+                        (org.python.types.Bool)this.value.get(i).__lt__(otherList.value.get(i));
+
+                if (b.value) {
+                    return b;
+                }
+            }
+
+            // At this point the lists are different sizes or every comparison is true.
+            return new org.python.types.Bool(size < otherSize);
+
+        } else {
+            throw new org.python.exceptions.TypeError(
+                    String.format("unorderable types: list() < %s()",
+                            Python.typeName(other.getClass())));
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("list.__le__() has not been implemented.");
+        if (other instanceof org.python.types.List)  {
+            org.python.types.List otherList = (org.python.types.List) other;
+            int size = this.value.size();
+            int otherSize = otherList.value.size();
+            int count = Math.min(size, otherSize);
+
+            for(int i=0; i<count; i++) {
+                org.python.types.Bool b =
+                        (org.python.types.Bool)this.value.get(i).__le__(otherList.value.get(i));
+
+                if (b.value) {
+                    return b;
+                }
+            }
+
+            // At this point the lists are different sizes or every comparison is true.
+            return new org.python.types.Bool(size <= otherSize);
+
+        } else {
+            throw new org.python.exceptions.TypeError(
+                    String.format("unorderable types: list() <= %s()",
+                            Python.typeName(other.getClass())));
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("list.__eq__() has not been implemented.");
+        boolean eq = false;
+        if (other instanceof org.python.types.List) {
+            org.python.types.List otherList = (org.python.types.List) other;
+            eq = this.value.equals(otherList.value);
+        }
+        return new org.python.types.Bool(eq);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("list.__ne__() has not been implemented.");
+        return new org.python.types.Bool(!((org.python.types.Bool)this.__eq__(other)).value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("list.__gt__() has not been implemented.");
+        if (other instanceof org.python.types.List)  {
+            org.python.types.List otherList = (org.python.types.List) other;
+            int size = this.value.size();
+            int otherSize = otherList.value.size();
+            int count = Math.min(size, otherSize);
+
+            for(int i=0; i<count; i++) {
+                org.python.types.Bool b =
+                        (org.python.types.Bool)this.value.get(i).__gt__(otherList.value.get(i));
+
+                if (!b.value) {
+                    return b;
+                }
+            }
+
+            // At this point the lists are different sizes or every comparison is true.
+            return new org.python.types.Bool(size > otherSize);
+
+        } else {
+            throw new org.python.exceptions.TypeError(
+                    String.format("unorderable types: list() > %s()",
+                            Python.typeName(other.getClass())));
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("list.__ge__() has not been implemented.");
+        if (other instanceof org.python.types.List)  {
+            org.python.types.List otherList = (org.python.types.List) other;
+            int size = this.value.size();
+            int otherSize = otherList.value.size();
+            int count = Math.min(size, otherSize);
+
+            for(int i=0; i<count; i++) {
+                org.python.types.Bool b =
+                        (org.python.types.Bool)this.value.get(i).__ge__(otherList.value.get(i));
+
+                if (!b.value) {
+                    return b;
+                }
+            }
+
+            // At this point the lists are different sizes or every comparison is true.
+            return new org.python.types.Bool(size >= otherSize);
+
+        } else {
+            throw new org.python.exceptions.TypeError(
+                    String.format("unorderable types: list() >= %s()",
+                            Python.typeName(other.getClass())));
+        }
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
@@ -252,7 +376,15 @@ public class List extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("list.__add__() has not been implemented.");
+        if (other instanceof org.python.types.List) {
+            org.python.types.List result = new org.python.types.List();
+            result.value.addAll(this.value);
+            result.value.addAll(((org.python.types.List) other).value);
+            return result;
+        } else {
+            throw new org.python.exceptions.TypeError(
+                    String.format("can only concatenate list (not \"%s\") to list", Python.typeName(other.getClass())));
+        }
     }
 
     @org.python.Method(
