@@ -48,8 +48,7 @@ class StaticBlock(Block):
                 CATCH('org/python/exceptions/SystemExit'),
                     JavaOpcodes.GETFIELD('org/python/exceptions/SystemExit', 'return_code', 'I'),
                     JavaOpcodes.INVOKESTATIC('java/lang/System', 'exit', '(I)V'),
-                END_TRY(),
-                JavaOpcodes.RETURN()
+                END_TRY()
             )
 
         self.add_opcodes(
