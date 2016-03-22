@@ -350,7 +350,6 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # exit
-    @expectedFailure
     def test_exit_from_static(self):
         # Exit from static block
         self.assertCodeExecution("""

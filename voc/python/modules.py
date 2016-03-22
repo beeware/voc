@@ -9,7 +9,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import MainMethod, Method, CO_GENERATOR, GeneratorMethod, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, free_name
+from .opcodes import ASTORE_name, ALOAD_name, free_name, TRY, CATCH, END_TRY
 
 
 class StaticBlock(Block):
@@ -33,7 +33,24 @@ class StaticBlock(Block):
             JavaOpcodes.POP()
         )
 
+        # If there are any commands in this static block,
+        # add a TRY-CATCH for SystemExit
+        if self.commands:
+            self.add_opcodes(
+                TRY()
+            )
+
     def transpile_teardown(self):
+        # If there are any commands in this static block,
+        # finish the TRY-CATCH for SystemExit
+        if self.commands:
+            self.add_opcodes(
+                CATCH('org/python/exceptions/SystemExit'),
+                    JavaOpcodes.GETFIELD('org/python/exceptions/SystemExit', 'return_code', 'I'),
+                    JavaOpcodes.INVOKESTATIC('java/lang/System', 'exit', '(I)V'),
+                END_TRY()
+            )
+
         self.add_opcodes(
             JavaOpcodes.RETURN(),
         )
