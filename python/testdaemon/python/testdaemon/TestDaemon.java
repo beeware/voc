@@ -64,11 +64,6 @@ public class TestDaemon {
                 // first parameter can be null since method is static
                 // cast second parameter to Object to make it a varargs call
                 method.invoke(null, (Object) inputArgs);
-
-                // cleanup
-                Class<?> importlib = joinedClassLoader.loadClass("org.python.ImportLib");
-                Field importlib_modules = importlib.getDeclaredField("modules");
-                importlib_modules.set(null, new java.util.HashMap());
             } catch (ReflectiveOperationException e) {
                 // InvocationTargetException may contain an ExitException
                 if (e instanceof InvocationTargetException && e.getCause() != null
@@ -92,6 +87,15 @@ public class TestDaemon {
                 // NoSuchMethodError
                 e.printStackTrace();
             } finally {
+                // always cleanup the module cache in ImportLib
+                try {
+                    Class<?> importlib = joinedClassLoader.loadClass("org.python.ImportLib");
+                    Field importlib_modules = importlib.getDeclaredField("modules");
+                    importlib_modules.set(null, new java.util.HashMap());
+                } catch (ReflectiveOperationException e) {
+                    // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
+                }
+
                 System.out.println(".");
             }
 
