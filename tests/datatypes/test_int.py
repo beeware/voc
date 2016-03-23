@@ -16,6 +16,15 @@ class IntTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_abs(self):
+        self.assertCodeExecution("""
+            x = 37
+            print(abs(x))
+            x = -42
+            print(abs(x))
+            print('Done.')
+            """)
+
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['42', '0', '-37']
