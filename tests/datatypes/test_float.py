@@ -53,6 +53,7 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_complex',
         'test_and_frozenset',
 
+        'test_eq_bool',
         'test_eq_bytearray',
         'test_eq_bytes',
         'test_eq_class',
@@ -116,9 +117,7 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_le_class',
         'test_le_complex',
         'test_le_dict',
-        'test_le_float',
         'test_le_frozenset',
-        'test_le_int',
         'test_le_list',
         'test_le_none',
         'test_le_set',
