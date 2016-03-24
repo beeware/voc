@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
@@ -42,6 +44,27 @@ class IntTests(TranspileTestCase):
             print('Done.')
             """)
 
+    @expectedFailure
+    def test_round(self):
+        self.assertCodeExecution("""
+            x = 371
+            print(round(x))
+            print(round(x, 2))
+            print(round(x, 1))
+            print(round(x, 0))
+            print(round(x, -1))
+            print(round(x, -2))
+            print(round(x, -3))
+            y = -428
+            print(round(y))
+            print(round(y, 2))
+            print(round(y, 1))
+            print(round(y, 0))
+            print(round(y, -1))
+            print(round(y, -2))
+            print(round(y, -3))
+            print('Done.')
+            """)
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['42', '0', '-37']
