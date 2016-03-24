@@ -1215,9 +1215,14 @@ public class Python {
             "\n" +
             "Round a number to a given precision in decimal digits (default 0 digits).\n" +
             "This returns an int when called with one argument, otherwise the\n" +
-            "same type as the number. ndigits may be negative.\n"
+            "same type as the number. ndigits may be negative.\n",
+        args = {"number"},
+        default_args = {"ndigits"}
     )
     public static org.python.Object round(org.python.Object number, org.python.Object ndigits) {
+        if (ndigits == null) {
+            return number.__round__(new org.python.types.Int(0));
+        }
         return number.__round__(ndigits);
     }
 
