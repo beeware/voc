@@ -290,14 +290,14 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.NotImplementedError("float.__neg__() has not been implemented.");
+        return new org.python.types.Float(-this.value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.NotImplementedError("float.__pos__() has not been implemented.");
+        return new org.python.types.Float(this.value);
     }
 
     @org.python.Method(

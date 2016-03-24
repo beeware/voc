@@ -23,6 +23,7 @@ class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_unary_positive',
         'test_unary_negative',
+        'test_unary_not',
         'test_unary_invert',
     ]
 
@@ -52,7 +53,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_complex',
         'test_and_frozenset',
 
-        'test_eq_bool',
         'test_eq_bytearray',
         'test_eq_bytes',
         'test_eq_class',
