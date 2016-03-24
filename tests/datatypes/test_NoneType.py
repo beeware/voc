@@ -18,14 +18,14 @@ class NoneTypeTests(TranspileTestCase):
 
 
 class UnaryNoneTypeOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = [None]
+    values = ['None']
 
     not_implemented = [
     ]
 
 
 class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = [None]
+    values = ['None']
 
     not_implemented = [
         'test_add_bytearray',
@@ -144,7 +144,7 @@ class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = [None]
+    values = ['None']
 
     not_implemented = [
         'test_add_bytes',
