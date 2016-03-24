@@ -265,7 +265,8 @@ public class Python {
             "\n" +
             "Returns True when the argument x is true, False otherwise.\n" +
             "The builtins True and False are the only two instances of the class bool.\n" +
-            "The class bool is a subclass of the class int, and cannot be subclassed.\n"
+            "The class bool is a subclass of the class int, and cannot be subclassed.\n",
+        args = {"x"}
     )
     public static org.python.types.Bool bool(org.python.Object x) {
         return (org.python.types.Bool) x.__bool__();
