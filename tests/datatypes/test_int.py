@@ -25,6 +25,23 @@ class IntTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_bool(self):
+        self.assertCodeExecution("""
+            x = 42
+            print(bool(x))
+            x = 37
+            print(bool(x))
+            x = 1
+            print(bool(x))
+            x = 0
+            print(bool(x))
+            x = -1
+            print(bool(x))
+            x = -2
+            print(bool(x))
+            print('Done.')
+            """)
+
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['42', '0', '-37']
