@@ -286,7 +286,7 @@ class TranspileTestCase(TestCase):
         setUpSuite()
         global _jvm
         test_dir = os.path.join(os.path.dirname(__file__))
-        classpath = os.path.join('..', 'dist', 'python-java-testdaemon.jar'),
+        classpath = os.path.join('..', 'dist', 'python-java-testdaemon.jar')
         _jvm = subprocess.Popen(
             ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
             stdin=subprocess.PIPE,
