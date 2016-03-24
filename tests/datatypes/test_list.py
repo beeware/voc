@@ -57,9 +57,6 @@ class ListTests(TranspileTestCase):
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['[]', '[1, 2, 3, 4, 5]']
 
-    not_implemented = [
-    ]
-
 
 class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
     values = ['[]', '[1, 2, 3, 4, 5]']
