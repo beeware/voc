@@ -192,7 +192,6 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_float',
         'test_add_frozenset',
         'test_add_int',
-        'test_add_list',
         'test_add_none',
         'test_add_set',
         'test_add_str',
