@@ -291,7 +291,7 @@ class TranspileTestCase(TestCase):
 
     def tearDownClass():
         global _jvm
-        if _jvm is None:
+        if _jvm is not None:
             # use communicate here to wait for process to exit
             _jvm.communicate("exit".encode("utf-8"))
 
