@@ -18,53 +18,6 @@ class IntTests(TranspileTestCase):
             print('Done.')
             """)
 
-    def test_abs(self):
-        self.assertCodeExecution("""
-            x = 37
-            print(abs(x))
-            x = -42
-            print(abs(x))
-            print('Done.')
-            """)
-
-    def test_bool(self):
-        self.assertCodeExecution("""
-            x = 42
-            print(bool(x))
-            x = 37
-            print(bool(x))
-            x = 1
-            print(bool(x))
-            x = 0
-            print(bool(x))
-            x = -1
-            print(bool(x))
-            x = -2
-            print(bool(x))
-            print('Done.')
-            """)
-
-    @expectedFailure
-    def test_round(self):
-        self.assertCodeExecution("""
-            x = 371
-            print(round(x))
-            print(round(x, 2))
-            print(round(x, 1))
-            print(round(x, 0))
-            print(round(x, -1))
-            print(round(x, -2))
-            print(round(x, -3))
-            y = -428
-            print(round(y))
-            print(round(y, 2))
-            print(round(y, 1))
-            print(round(y, 0))
-            print(round(y, -1))
-            print(round(y, -2))
-            print(round(y, -3))
-            print('Done.')
-            """)
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['42', '0', '-37']
