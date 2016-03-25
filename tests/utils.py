@@ -624,3 +624,34 @@ class InplaceOperationTestCase:
         vars()['test_and_%s' % datatype] = _inplace_test('test_and_%s' % datatype, 'x &= y', examples)
         vars()['test_xor_%s' % datatype] = _inplace_test('test_xor_%s' % datatype, 'x ^= y', examples)
         vars()['test_or_%s' % datatype] = _inplace_test('test_or_%s' % datatype, 'x |= y', examples)
+
+
+def _builtin_test(test_name, operation, examples):
+    def func(self):
+        for function in self.functions:
+            for example in examples:
+                self.assertBuiltinFunction(x=example, f=function, operation=operation, format=self.format)
+    return func
+
+
+class BuiltinFunctionTestCase:
+    format = ''
+
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        return super().run(result=result)
+
+    def assertBuiltinFunction(self, **kwargs):
+        self.assertCodeExecution("""
+            f = %(f)s
+            x = %(x)s
+            print(%(format)s%(operation)s)
+            """ % kwargs, "Error running %(operation)s with x=%(x)s" % kwargs)
+    
+    for datatype, examples in SAMPLE_DATA:
+        vars()['test_%s' % datatype] = _builtin_test('test_%s' % datatype, 'f(x)', examples)
+
