@@ -18,8 +18,6 @@ class BuiltinSetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_float',
         'test_frozenset',
         'test_int',
-        'test_list',
-        'test_set',
         'test_str',
         'test_tuple',
     ]
