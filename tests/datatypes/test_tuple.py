@@ -261,7 +261,6 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_none',
         'test_multiply_set',
         'test_multiply_str',
-        'test_multiply_tuple',
 
         'test_or_bool',
         'test_or_bytearray',
