@@ -163,8 +163,13 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
             except IOError:
                 continue
     else:
+        classpath = os.pathsep.join([
+            os.path.join('..', '..', 'dist', 'python-java.jar'),
+            os.path.join('..', 'java'),
+            os.curdir,
+        ])
         proc = subprocess.Popen(
-            ["java", "-classpath", "../../dist/python-java.jar:../java:.", "python.test.__init__"] + args,
+            ["java", "-classpath", classpath, "python.test.__init__"] + args,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -281,8 +286,9 @@ class TranspileTestCase(TestCase):
         setUpSuite()
         global _jvm
         test_dir = os.path.join(os.path.dirname(__file__))
+        classpath = os.path.join('..', 'dist', 'python-java-testdaemon.jar')
         _jvm = subprocess.Popen(
-            ["java", "-classpath", "../dist/python-java-testdaemon.jar", "python.testdaemon.TestDaemon"],
+            ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -501,7 +507,8 @@ class UnaryOperationTestCase:
         # when the test case runs.
         for test_name in dir(self):
             if test_name.startswith('test_'):
-                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+                expect_failure = hasattr(self, 'not_implemented') and test_name in self.not_implemented
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = expect_failure
         return super().run(result=result)
 
     def assertUnaryOperation(self, **kwargs):
