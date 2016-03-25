@@ -5,7 +5,7 @@ public class Tuple extends org.python.types.Object {
 
     /**
      * A utility method to update the internal value of this object.
-     *
+     * <p>
      * Used by __i*__ operations to do an in-place operation.
      * obj must be of type org.python.types.Tuple
      */
@@ -45,7 +45,7 @@ public class Tuple extends org.python.types.Object {
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("(");
         boolean first = true;
-        for (org.python.Object obj: this.value) {
+        for (org.python.Object obj : this.value) {
             if (first) {
                 first = false;
             } else {
@@ -67,43 +67,176 @@ public class Tuple extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'tuple'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'tuple'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'tuple'");
+    }
+
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(!this.value.isEmpty());
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__lt__() has not been implemented.");
+        if (other instanceof org.python.types.Tuple) {
+            org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
+            int size = this.value.size();
+            int otherSize = otherTuple.value.size();
+            int count = Math.min(size, otherSize);
+
+            boolean cmp = false;
+            for (int i = 0; i < count; i++) {
+                org.python.types.Bool b =
+                    (org.python.types.Bool) this.value.get(i).__lt__(otherTuple.value.get(i));
+
+                cmp = cmp & b.value;
+            }
+
+            if (cmp) {
+                return new org.python.types.Bool(cmp);
+            }
+
+            // At this point the lists are different sizes or every comparison is true.
+            return new org.python.types.Bool(size < otherSize);
+
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("unorderable types: tuple() < %s()",
+                    org.Python.typeName(other.getClass())));
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__le__() has not been implemented.");
+        if (other instanceof org.python.types.Tuple) {
+            org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
+            int size = this.value.size();
+            int otherSize = otherTuple.value.size();
+            int count = Math.min(size, otherSize);
+
+            boolean cmp = false;
+            for (int i = 0; i < count; i++) {
+                org.python.types.Bool b =
+                    (org.python.types.Bool) this.value.get(i).__le__(otherTuple.value.get(i));
+
+                cmp = cmp & b.value;
+            }
+
+            if (cmp) {
+                return new org.python.types.Bool(cmp);
+            }
+
+            // At this point the lists are different sizes or every comparison is true.
+            return new org.python.types.Bool(size <= otherSize);
+
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("unorderable types: tuple() <= %s()",
+                    org.Python.typeName(other.getClass())));
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__eq__() has not been implemented.");
+        boolean eq = false;
+        if (other instanceof org.python.types.Tuple) {
+            org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
+            eq = this.value.equals(otherTuple.value);
+        }
+        return new org.python.types.Bool(eq);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__ne__() has not been implemented.");
+        return new org.python.types.Bool(!((org.python.types.Bool) this.__eq__(other)).value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__gt__() has not been implemented.");
+        if (other instanceof org.python.types.Tuple) {
+            org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
+            int size = this.value.size();
+            int otherSize = otherTuple.value.size();
+            int count = Math.min(size, otherSize);
+
+            boolean cmp = true;
+            for (int i = 0; i < count; i++) {
+                org.python.types.Bool b =
+                    (org.python.types.Bool) this.value.get(i).__gt__(otherTuple.value.get(i));
+
+                cmp = cmp & b.value;
+            }
+            if (!cmp) {
+                return new org.python.types.Bool(cmp);
+            }
+
+            // At this point the lists are different sizes or every comparison is true.
+            return new org.python.types.Bool(size > otherSize);
+
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("unorderable types: tuple() > %s()",
+                    org.Python.typeName(other.getClass())));
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__ge__() has not been implemented.");
+        if (other instanceof org.python.types.Tuple) {
+            org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
+            int size = this.value.size();
+            int otherSize = otherTuple.value.size();
+            int count = Math.min(size, otherSize);
+
+            boolean cmp = true;
+            for (int i = 0; i < count; i++) {
+                org.python.types.Bool b =
+                    (org.python.types.Bool) this.value.get(i).__ge__(otherTuple.value.get(i));
+
+                cmp = cmp & b.value;
+            }
+
+            if (!cmp) {
+                return new org.python.types.Bool(cmp);
+            }
+
+            // At this point the lists are different sizes or every comparison is true.
+            return new org.python.types.Bool(size >= otherSize);
+
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("unorderable types: tuple() >= %s()",
+                    org.Python.typeName(other.getClass())));
+        }
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
@@ -136,8 +269,7 @@ public class Tuple extends org.python.types.Object {
 
                 if (slice.start == null && slice.stop == null && slice.step == null) {
                     sliced.addAll(this.value);
-                }
-                else {
+                } else {
                     long start;
                     if (slice.start != null) {
                         start = slice.start.value;
@@ -160,13 +292,13 @@ public class Tuple extends org.python.types.Object {
                     }
 
                     for (long i = start; i < stop; i += step) {
-                        sliced.add(this.value.get((int)i));
+                        sliced.add(this.value.get((int) i));
                     }
                 }
                 return new org.python.types.Tuple(sliced);
 
             } else {
-                int idx = (int)((org.python.types.Int) index).value;
+                int idx = (int) ((org.python.types.Int) index).value;
                 if (idx < 0) {
                     if (-idx > this.value.size()) {
                         throw new org.python.exceptions.IndexError("tuple index out of range");
@@ -235,14 +367,37 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__add__() has not been implemented.");
+        if (other instanceof org.python.types.Tuple) {
+            org.python.types.Tuple result = new org.python.types.Tuple();
+            result.value.addAll(this.value);
+            result.value.addAll(((org.python.types.Tuple) other).value);
+            return result;
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("can only concatenate tuple (not \"%s\") to tuple", org.Python.typeName(other.getClass())));
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__mul__() has not been implemented.");
+        if (other instanceof org.python.types.Int) {
+            long count = ((org.python.types.Int) other).value;
+            org.python.types.Tuple result = new org.python.types.Tuple();
+            for (long i = 0; i < count; i++) {
+                result.value.addAll(this.value);
+            }
+            return result;
+        } else if (other instanceof org.python.types.Bool) {
+            boolean count = ((org.python.types.Bool) other).value;
+            org.python.types.Tuple result = new org.python.types.Tuple();
+            if (count) {
+                result.value.addAll(this.value);
+            }
+            return result;
+        }
+        throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
     }
 
     @org.python.Method(
