@@ -59,7 +59,7 @@ class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
 
 
 class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['[]', '[1, 2, 3, 4, 5]']
+    values = ['[]', '[1, 2, 3, 4, 5]', "['a','b','c']"]
 
     not_implemented = [
         'test_add_bytearray',

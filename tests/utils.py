@@ -505,10 +505,10 @@ class UnaryOperationTestCase:
     def run(self, result=None):
         # Override the run method to inject the "expectingFailure" marker
         # when the test case runs.
-        if hasattr(self, 'not_implemented'):
-            for test_name in dir(self):
-                if test_name.startswith('test_'):
-                    getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                expect_failure = hasattr(self, 'not_implemented') and test_name in self.not_implemented
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = expect_failure
         return super().run(result=result)
 
     def assertUnaryOperation(self, **kwargs):
