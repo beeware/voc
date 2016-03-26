@@ -213,7 +213,11 @@ public class Python {
         args = {"number"}
     )
     public static org.python.Object abs(org.python.Object number) {
-        return number.__abs__();
+        try {
+            return number.__abs__();
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("bad operand type for abs(): '" + number.typeName() + "'");
+        }
     }
 
     @org.python.Method(
