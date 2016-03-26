@@ -2,7 +2,43 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class BoolTests(TranspileTestCase):
-    pass
+    def test_bool_like(self):
+        self.assertCodeExecution("""
+            class BoolLike:
+                def __init__(self, val):
+                    self.val = val
+
+                def __bool__(self):
+                    return self.val == 1
+
+            print(bool(BoolLike(0)))
+            print(bool(BoolLike(1)))
+            """)
+
+    def test_len_only(self):
+        self.assertCodeExecution("""
+            class LenButNoBool:
+                def __init__(self, val):
+                    self.val = val
+
+                def __len__(self):
+                    return self.val
+
+            print(bool(LenButNoBool(0)))
+            print(bool(LenButNoBool(1)))
+            """)
+
+    def test_no_bool_no_len(self):
+        self.assertCodeExecution("""
+            class NoLenNoBool:
+                def __init__(self, val):
+                    self.val = val
+
+            print(bool(NoLenNoBool(0)))
+            print(bool(NoLenNoBool(1)))
+            print(bool(NoLenNoBool(42)))
+            print(bool(NoLenNoBool(-2)))
+            """)
 
 
 class BuiltinBoolFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
@@ -13,10 +49,8 @@ class BuiltinBoolFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_bytes',
         'test_class',
         'test_complex',
-        'test_dict',
         'test_float',
         'test_frozenset',
-        'test_list',
         'test_set',
         'test_tuple',
     ]

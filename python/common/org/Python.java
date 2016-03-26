@@ -269,7 +269,15 @@ public class Python {
         args = {"x"}
     )
     public static org.python.types.Bool bool(org.python.Object x) {
-        return (org.python.types.Bool) x.__bool__();
+        try {
+            return (org.python.types.Bool) x.__bool__();
+        } catch (org.python.exceptions.AttributeError ae) {
+            try {
+                return new org.python.types.Bool(((org.python.types.Int) x.__len__()).value != 0);
+            } catch (org.python.exceptions.AttributeError ae2) {
+                return new org.python.types.Bool(true);
+            }
+        }
     }
 
     @org.python.Method(
