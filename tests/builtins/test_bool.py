@@ -2,6 +2,11 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class BoolTests(TranspileTestCase):
+    def test_bool_omitted(self):
+        self.assertCodeExecution("""
+            print(bool())
+            """)
+
     def test_bool_like(self):
         self.assertCodeExecution("""
             class BoolLike:
