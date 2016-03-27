@@ -314,11 +314,13 @@ public class Str extends org.python.types.Object {
             for (org.python.Object obj: oth.value) {
                 format_args.add(obj.toJava());
             }
+        } else if (other instanceof org.python.types.NoneType) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         } else {
             format_args.add(other.toJava());
         }
 
-        return new org.python.types.Str(String.format(this.value, format_args.toArray()));
+        return new org.python.types.Str(java.lang.String.format(this.value, format_args.toArray()));
     }
 
     @org.python.Method(
@@ -361,6 +363,16 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmod__() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public void __imod__(org.python.Object other) {
+        if (other instanceof org.python.types.NoneType) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        }
+        super.__imod__(other);
     }
 
 }
