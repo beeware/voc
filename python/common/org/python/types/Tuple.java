@@ -60,6 +60,13 @@ public class Tuple extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.types.Bool __bool__() {
+        return new org.python.types.Bool(!this.value.isEmpty());
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Str __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
     }

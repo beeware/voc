@@ -127,7 +127,7 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Bool __bool__() {
-        throw new org.python.exceptions.NotImplementedError("float.__bool__() has not been implemented.");
+        return new org.python.types.Bool(this.value != 0.0);
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
