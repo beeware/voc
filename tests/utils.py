@@ -651,8 +651,8 @@ class BuiltinFunctionTestCase:
             x = %(x)s
             print(%(format)s%(operation)s)
             """ % kwargs, "Error running %(operation)s with x=%(x)s" % kwargs)
-    
+
     for datatype, examples in SAMPLE_DATA:
-        if datatype != 'set':
+        if datatype != 'set' and datatype != 'frozenset' and datatype != 'dict':
             vars()['test_%s' % datatype] = _builtin_test('test_%s' % datatype, 'f(x)', examples)
 
