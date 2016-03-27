@@ -519,7 +519,7 @@ public class Python {
                     }
                     return new org.python.types.Dict(generated);
                 } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
                 }
             }
         }
@@ -867,7 +867,7 @@ public class Python {
                     }
                     return new org.python.types.List(generated);
                 } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
                 }
             }
         }
@@ -1298,7 +1298,7 @@ public class Python {
                     }
                     return new org.python.types.Set(generated);
                 } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
                 }
             }
         }
