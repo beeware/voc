@@ -816,7 +816,11 @@ public class Python {
         args = {"object"}
     )
     public static org.python.types.Int len(org.python.Object object) {
-        return (org.python.types.Int) object.__len__();
+        try {
+            return (org.python.types.Int) object.__len__();
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("object of type '" + object.typeName() + "' has no len()");
+        }
     }
 
     @org.python.Method(
