@@ -224,10 +224,25 @@ public class Python {
         __doc__ = "all(iterable) -> bool" +
             "\n" +
             "Return True if bool(x) is True for all values x in the iterable.\n" +
-            "If the iterable is empty, return True.\n"
+            "If the iterable is empty, return True.\n",
+        args = {"iterable"}
     )
-    public static org.python.types.Bool all() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'all' not implemented");
+    public static org.python.types.Bool all(org.python.Object iterable) {
+        try {
+            org.python.Iterable iter = iterable.__iter__();
+            try {
+                while (true) {
+                    org.python.Object next = iter.__next__();
+                    if (!((org.python.types.Bool) next.__bool__()).value) {
+                        return new org.python.types.Bool(false);
+                    }
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(true);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
