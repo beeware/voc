@@ -15,8 +15,5 @@ class BuiltinIntFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_complex',
         'test_dict',
         'test_frozenset',
-        'test_list',
-        'test_none',
         'test_set',
-        'test_tuple',
     ]

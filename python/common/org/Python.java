@@ -792,7 +792,11 @@ public class Python {
         if (x == null) {
             return new org.python.types.Int(0);
         } else if (base == null) {
-            return (org.python.types.Int) x.__int__();
+            try {
+                return (org.python.types.Int) x.__int__();
+            } catch (org.python.exceptions.AttributeError ae) {
+                throw new org.python.exceptions.TypeError("int() argument must be a string, a bytes-like object or a number, not '" + x.typeName() + "'");
+            }
         } else {
             throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
         }
