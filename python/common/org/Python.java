@@ -249,10 +249,25 @@ public class Python {
         __doc__ = "any(iterable) -> bool" +
             "\n" +
             "Return True if bool(x) is True for any x in the iterable.\n" +
-            "If the iterable is empty, return False.\n"
+            "If the iterable is empty, return False.\n",
+        args = {"iterable"}
     )
-    public static org.python.types.Bool any() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'any' not implemented");
+    public static org.python.types.Bool any(org.python.Object iterable) {
+        try {
+            org.python.Iterable iter = iterable.__iter__();
+            try {
+                while (true) {
+                    org.python.Object next = iter.__next__();
+                    if (((org.python.types.Bool) next.__bool__()).value) {
+                        return new org.python.types.Bool(true);
+                    }
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(false);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
