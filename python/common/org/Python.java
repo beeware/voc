@@ -213,17 +213,36 @@ public class Python {
         args = {"number"}
     )
     public static org.python.Object abs(org.python.Object number) {
-        return number.__abs__();
+        try {
+            return number.__abs__();
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("bad operand type for abs(): '" + number.typeName() + "'");
+        }
     }
 
     @org.python.Method(
         __doc__ = "all(iterable) -> bool" +
             "\n" +
             "Return True if bool(x) is True for all values x in the iterable.\n" +
-            "If the iterable is empty, return True.\n"
+            "If the iterable is empty, return True.\n",
+        args = {"iterable"}
     )
-    public static org.python.types.Bool all() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'all' not implemented");
+    public static org.python.types.Bool all(org.python.Object iterable) {
+        try {
+            org.python.Iterable iter = iterable.__iter__();
+            try {
+                while (true) {
+                    org.python.Object next = iter.__next__();
+                    if (!((org.python.types.Bool) next.__bool__()).value) {
+                        return new org.python.types.Bool(false);
+                    }
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(true);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
@@ -265,10 +284,22 @@ public class Python {
             "\n" +
             "Returns True when the argument x is true, False otherwise.\n" +
             "The builtins True and False are the only two instances of the class bool.\n" +
-            "The class bool is a subclass of the class int, and cannot be subclassed.\n"
+            "The class bool is a subclass of the class int, and cannot be subclassed.\n",
+        default_args = {"x"}
     )
     public static org.python.types.Bool bool(org.python.Object x) {
-        return (org.python.types.Bool) x.__bool__();
+        if (x == null) {
+            return new org.python.types.Bool(false);
+        }
+        try {
+            return (org.python.types.Bool) x.__bool__();
+        } catch (org.python.exceptions.AttributeError ae) {
+            try {
+                return new org.python.types.Bool(((org.python.types.Int) x.__len__()).value != 0);
+            } catch (org.python.exceptions.AttributeError ae2) {
+                return new org.python.types.Bool(true);
+            }
+        }
     }
 
     @org.python.Method(
@@ -488,7 +519,7 @@ public class Python {
                     }
                     return new org.python.types.Dict(generated);
                 } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
                 }
             }
         }
@@ -785,7 +816,11 @@ public class Python {
         args = {"object"}
     )
     public static org.python.types.Int len(org.python.Object object) {
-        return (org.python.types.Int) object.__len__();
+        try {
+            return (org.python.types.Int) object.__len__();
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("object of type '" + object.typeName() + "' has no len()");
+        }
     }
 
     @org.python.Method(
@@ -836,7 +871,7 @@ public class Python {
                     }
                     return new org.python.types.List(generated);
                 } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
                 }
             }
         }
@@ -1214,9 +1249,14 @@ public class Python {
             "\n" +
             "Round a number to a given precision in decimal digits (default 0 digits).\n" +
             "This returns an int when called with one argument, otherwise the\n" +
-            "same type as the number. ndigits may be negative.\n"
+            "same type as the number. ndigits may be negative.\n",
+        args = {"number"},
+        default_args = {"ndigits"}
     )
     public static org.python.Object round(org.python.Object number, org.python.Object ndigits) {
+        if (ndigits == null) {
+            return number.__round__(new org.python.types.Int(0));
+        }
         return number.__round__(ndigits);
     }
 
@@ -1262,7 +1302,7 @@ public class Python {
                     }
                     return new org.python.types.Set(generated);
                 } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + org.python.types.Type.pythonType(iterable.getClass()) + "' object is not iterable");
+                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
                 }
             }
         }
