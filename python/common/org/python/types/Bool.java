@@ -133,7 +133,7 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Float) other).value);
-        }          
+        }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'bool' and '" + other.typeName() + "'");
     }
 
@@ -344,7 +344,7 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Int __int__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__int__() has not been implemented.");
+        return new org.python.types.Int(this.value ? 1 : 0);
     }
 
     @org.python.Method(
@@ -359,6 +359,13 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.NotImplementedError("bool.__round__() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __index__() {
+        return new org.python.types.Int(this.value ? 1 : 0);
     }
 
 }
