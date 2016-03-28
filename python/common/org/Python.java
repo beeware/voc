@@ -386,11 +386,23 @@ public class Python {
         args = {"i"}
     )
     public static org.python.types.Str chr(org.python.Object i) {
+        if (i instanceof org.python.types.Float) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + i.typeName() + "");
+        }
+
         try {
-            long value = ((org.python.types.Int) i).value;
-            return new org.python.types.Str(Character.toChars((int) value).toString());
-        } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("integer argument expected, got " + i.typeName() + " found");
+            if (!(i instanceof org.python.types.Int)) {
+                i.__index__();
+            }
+
+            long value = ((org.python.types.Int) i.__int__()).value;
+            if (value < 0) {
+                throw new org.python.exceptions.ValueError("chr() arg not in range(" + String.format("0x%x", (int) int_cast(i, null).value) + ")");
+            }
+
+            return new org.python.types.Str(Character.toChars((int) value)[0]);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("an integer is required (got type " + i.typeName() + ")");
         }
     }
 
