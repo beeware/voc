@@ -288,10 +288,25 @@ public class Python {
             "Return the binary representation of an integer.\n" +
             "\n" +
             "  >>> bin(2796202)\n" +
-            "  '0b1010101010101010101010'\n"
+            "  '0b1010101010101010101010'\n",
+        args = {"number"}
     )
     public static org.python.types.Str bin(org.python.Object number) {
-        return new org.python.types.Str(java.lang.String.format("0b%b", int_cast(number, null).value));
+        try {
+            if (!(number instanceof org.python.types.Int)) {
+                number.__index__();
+            }
+
+            String s = Long.toString(int_cast(number, null).value, 2);
+            if (s.charAt(0) == '-') {
+                s = "-0b" + s.substring(1);
+            } else {
+                s = "0b" + s;
+            }
+            return new org.python.types.Str(s);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + number.typeName() + "' object cannot be interpreted as an integer");
+        }
     }
 
     @org.python.Method(
