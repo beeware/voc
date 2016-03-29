@@ -649,13 +649,18 @@ public class Python {
     }
 
     @org.python.Method(
+        name = "float",
         __doc__ = "float(x) -> floating point number" +
             "\n" +
             "Convert a string or number to a floating point number, if possible.\n",
         args = {"x"}
     )
     public static org.python.types.Float float_cast(org.python.Object x) {
-        return (org.python.types.Float) x.__float__();
+        try {
+            return (org.python.types.Float) x.__float__();
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("float() argument must be a string or a number, not '" + x.typeName() + "'");
+        }
     }
 
     @org.python.Method(

@@ -351,7 +351,7 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Float __float__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__float__() has not been implemented.");
+        return new org.python.types.Float(this.value ? 1 : 0);
     }
 
     @org.python.Method(

@@ -80,7 +80,7 @@ public class Str extends org.python.types.Object {
         try {
             return new org.python.types.Float(Double.parseDouble(this.value));
         } catch (NumberFormatException e) {
-            throw new org.python.exceptions.ValueError("could not convert string to float: '" + this.value + "'");
+            throw new org.python.exceptions.ValueError("could not convert string to float: " + this.value + "");
         }
     }
 
