@@ -21,8 +21,6 @@ class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
 
     not_implemented = [
-        'test_unary_positive',
-        'test_unary_negative',
         'test_unary_not',
         'test_unary_invert',
     ]
@@ -93,15 +91,12 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ge_str',
         'test_ge_tuple',
 
-        'test_gt_bool',
         'test_gt_bytearray',
         'test_gt_bytes',
         'test_gt_class',
         'test_gt_complex',
         'test_gt_dict',
-        'test_gt_float',
         'test_gt_frozenset',
-        'test_gt_int',
         'test_gt_list',
         'test_gt_none',
         'test_gt_set',
