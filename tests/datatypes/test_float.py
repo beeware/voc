@@ -218,15 +218,12 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
 
     not_implemented = [
-        'test_add_bool',
         'test_add_bytearray',
         'test_add_bytes',
         'test_add_class',
         'test_add_complex',
         'test_add_dict',
-        'test_add_float',
         'test_add_frozenset',
-        'test_add_int',
         'test_add_list',
         'test_add_none',
         'test_add_set',
