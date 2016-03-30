@@ -106,10 +106,12 @@ public class Float extends org.python.types.Object {
         } else if (other instanceof Float) {
             return new org.python.types.Bool(this.value == ((org.python.types.Float) other).value);
         } else if (other instanceof Bool) {
-            return new org.python.types.Bool(
-                (this.value == 0.0 && !((org.python.types.Bool) other).value)
-                || (this.value != 0.0 && ((org.python.types.Bool) other).value)
-            );
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Bool(this.value == 1.0);
+            }
+            else {
+                return new org.python.types.Bool(this.value == 0.0);
+            }
         }
         throw new org.python.exceptions.TypeError("unorderable types: float() == " + other.typeName() + "()");
     }
