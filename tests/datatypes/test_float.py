@@ -111,7 +111,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_str',
         'test_gt_tuple',
 
-        'test_le_bool',
         'test_le_bytearray',
         'test_le_bytes',
         'test_le_class',
