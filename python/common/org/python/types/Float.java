@@ -185,16 +185,13 @@ public class Float extends org.python.types.Object {
         if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
             return new org.python.types.Float(this.value + ((double) other_val));
-        } else if (other instanceof org.python.types.Float) {
-            double other_val = ((org.python.types.Float) other).value;
-            return new org.python.types.Float(this.value + other_val);
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Float(this.value + 1.0);
             }
             return new org.python.types.Float(this.value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for : 'float' + '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -213,7 +210,7 @@ public class Float extends org.python.types.Object {
             }
             return new org.python.types.Float(this.value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' - '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
