@@ -33,15 +33,8 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_add_bytes',
         'test_add_class',
         'test_add_complex',
-        'test_add_dict',
-        'test_add_float',
         'test_add_frozenset',
-        'test_add_list',
-        'test_add_none',
-        'test_add_set',
-        'test_add_str',
-        'test_add_tuple',
-
+        
         'test_and_bytearray',
         'test_and_bytes',
         'test_and_class',
@@ -190,14 +183,8 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subtract_bytes',
         'test_subtract_class',
         'test_subtract_complex',
-        'test_subtract_dict',
         'test_subtract_frozenset',
-        'test_subtract_list',
-        'test_subtract_none',
-        'test_subtract_set',
-        'test_subtract_str',
-        'test_subtract_tuple',
-
+        
         'test_true_divide_bytearray',
         'test_true_divide_bytes',
         'test_true_divide_class',
@@ -219,7 +206,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_bytearray',
         'test_add_bytes',
         'test_add_class',
-        'test_add_float',
         'test_add_complex',
         'test_add_frozenset',
         

@@ -185,6 +185,9 @@ public class Float extends org.python.types.Object {
         if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
             return new org.python.types.Float(this.value + ((double) other_val));
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            return new org.python.types.Float(this.value + other_val);
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Float(this.value + 1.0);
