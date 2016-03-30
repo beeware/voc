@@ -16,5 +16,4 @@ class BuiltinFloatFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_dict',
         'test_frozenset',
         'test_set',
-        'test_str',
     ]
