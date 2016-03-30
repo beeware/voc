@@ -125,16 +125,38 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__gt__() has not been implemented.");
+        if (other instanceof org.python.types.Int) {
+            return new org.python.types.Bool(this.value > ((double)((org.python.types.Int) other).value));
+        } else if (other instanceof Float) {
+            return new org.python.types.Bool(this.value > ((org.python.types.Float) other).value);
+        } else if(other instanceof Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Bool(this.value > 1.0);
+            }
+            else {
+                return new org.python.types.Bool(this.value > 0.0);
+            }
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: float() > " + other.typeName() + "()");
     }
-
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__ge__() has not been implemented.");
+        if (other instanceof org.python.types.Int) {
+            return new org.python.types.Bool(this.value >= ((double)((org.python.types.Int) other).value));
+        } else if (other instanceof Float) {
+            return new org.python.types.Bool(this.value >= ((org.python.types.Float) other).value);
+        } else if(other instanceof Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Bool(this.value >= 1.0);
+            }
+            else {
+                return new org.python.types.Bool(this.value >= 0.0);
+            }
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: float() >= " + other.typeName() + "()");
     }
-
     @org.python.Method(
         __doc__ = ""
     )
