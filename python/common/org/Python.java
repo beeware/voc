@@ -593,10 +593,15 @@ public class Python {
     @org.python.Method(
         __doc__ = "divmod(x, y) -> (div, mod)" +
             "\n" +
-            "Return the tuple ((x-x%y)/y, x%y).  Invariant: div*y + mod == x.\n"
+            "Return the tuple ((x-x%y)/y, x%y).  Invariant: div*y + mod == x.\n",
+        args = {"a", "b"}
     )
-    public static org.python.types.Tuple divmod() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'divmod' not implemented");
+    public static org.python.types.Tuple divmod(org.python.Object a, org.python.Object b) {
+        try {
+            return (org.python.types.Tuple) a.__divmod__(b);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + a.typeName() + "' and '" + b.typeName() + "'");
+        }
     }
 
     @org.python.Method(

@@ -2,7 +2,13 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class DivmodTests(TranspileTestCase):
-    pass
+    def test_none_none(self):
+        self.assertCodeExecution("""
+            x = None
+            y = None
+            print(divmod(x, y))
+            print('Done.')
+            """)
 
 
 class BuiltinDivmodFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
