@@ -206,14 +206,77 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__floordiv__() has not been implemented.");
+        if (other instanceof org.python.types.Int) {
+            if (((org.python.types.Int) other).value == 0) {
+                throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+            }
+            return new org.python.types.Float((long) Math.floor((double) this.value / ((org.python.types.Int) other).value));
+        } else if (other instanceof org.python.types.Float) {
+            if (((org.python.types.Float) other).value == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("float divmod()");
+            }
+            return new org.python.types.Float(Math.floor(this.value / ((org.python.types.Float) other).value));
+        } else if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Float((long) this.value);
+            } else {
+                throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+            }
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__mod__() has not been implemented.");
+        try {
+            if (other instanceof org.python.types.Bool) {
+                if (((org.python.types.Bool) other).value) {
+                    return new org.python.types.Float(this.value - (long) this.value);
+                } else {
+                    throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                }
+            } else if (other instanceof org.python.types.Int) {
+                long other_val = ((org.python.types.Int) other).value;
+                if (other_val == 0) {
+                    throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                } else {
+                    double result = this.value % other_val;
+                    if (other_val > 0 && result < 0) {
+                        // second operand is positive, ensure that result is positive
+                        result += other_val;
+                    } else if (other_val < 0 && result > 0) {
+                        // second operand is negative, ensure that result is negative
+                        result += other_val; // subtract other_val, which is negative
+                    }
+                    return new org.python.types.Float(result);
+                }
+            } else if (other instanceof org.python.types.Float) {
+                double other_val = ((org.python.types.Float) other).value;
+                if (other_val == 0.0) {
+                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
+                } else {
+                    double result = ((double) this.value) % other_val;
+                    if (other_val > 0.0 && result < 0.0) {
+                        // second operand is positive, ensure that result is positive
+                        result += other_val;
+                    } else if (other_val < 0.0 && result > 0.0) {
+                        // second operand is negative, ensure that result is negative
+                        result += other_val; // subtract other_val, which is negative
+                    }
+                    // edge case where operands are 0 and -0.0:
+                    // need to force sign to negative as adding -0.0 to 0.0 doesn't yield the expected -0.0
+                    if (other_val < 0.0 && result >= 0.0) {
+                        result *= -1;
+                    }
+                    return new org.python.types.Float(result);
+                }
+            }
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.typeName() + "'");
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
