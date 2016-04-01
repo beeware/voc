@@ -66,10 +66,50 @@ class DivmodTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_float_float(self):
+        self.assertCodeExecution("""
+            x = 7.7
+            y = 1.2
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_float_int(self):
+        self.assertCodeExecution("""
+            x = 7.7
+            y = 2
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_float_bool(self):
+        self.assertCodeExecution("""
+            x = 7.7
+            y = True
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_float_none(self):
+        self.assertCodeExecution("""
+            x = 7.7
+            y = None
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
     def test_none_int(self):
         self.assertCodeExecution("""
             x = None
             y = 7
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_none_float(self):
+        self.assertCodeExecution("""
+            x = None
+            y = 7.7
             print(divmod(x, y))
             print('Done.')
             """)

@@ -283,7 +283,10 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__divmod__() has not been implemented.");
+        java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+        data.add(this.__floordiv__(other));
+        data.add(this.__mod__(other));
+        return new org.python.types.Tuple(data);
     }
 
     @org.python.Method(
