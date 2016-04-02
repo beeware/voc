@@ -283,10 +283,14 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __divmod__(org.python.Object other) {
-        java.util.List<org.python.Object> data = new java.util.ArrayList<>();
-        data.add(this.__floordiv__(other));
-        data.add(this.__mod__(other));
-        return new org.python.types.Tuple(data);
+        try {
+            java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+            data.add(this.__floordiv__(other));
+            data.add(this.__mod__(other));
+            return new org.python.types.Tuple(data);
+        } catch (org.python.exceptions.TypeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
