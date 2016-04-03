@@ -18,10 +18,18 @@ class DivmodTests(TranspileTestCase):
             print('Done.')
             """)
 
-    def test_int_float(self):
+    def test_int_int_zero_divisor(self):
         self.assertCodeExecution("""
             x = 7
-            y = 3.3
+            y = 0
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_int_int_zero_dividend(self):
+        self.assertCodeExecution("""
+            x = 0
+            y = 3
             print(divmod(x, y))
             print('Done.')
             """)
@@ -33,11 +41,34 @@ class DivmodTests(TranspileTestCase):
             print(divmod(x, y))
             print('Done.')
             """)
+    def test_int_float(self):
+        self.assertCodeExecution("""
+            x = 7
+            y = 3.3
+            print(divmod(x, y))
+            print('Done.')
+            """)
 
-    def test_int_list(self):
+    def test_int_list_2(self):
         self.assertCodeExecution("""
             x = 7
             y = [3, 4]
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_int_list_1(self):
+        self.assertCodeExecution("""
+            x = 7
+            y = [3]
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_int_list_0(self):
+        self.assertCodeExecution("""
+            x = 7
+            y = []
             print(divmod(x, y))
             print('Done.')
             """)
@@ -74,14 +105,6 @@ class DivmodTests(TranspileTestCase):
             print('Done.')
             """)
 
-    def test_float_int(self):
-        self.assertCodeExecution("""
-            x = 7.7
-            y = 2
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
     def test_float_bool(self):
         self.assertCodeExecution("""
             x = 7.7
@@ -90,10 +113,58 @@ class DivmodTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_float_int(self):
+        self.assertCodeExecution("""
+            x = 7.7
+            y = 2
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_float_list(self):
+        self.assertCodeExecution("""
+            x = 7.7
+            y = [3, 4]
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
     def test_float_none(self):
         self.assertCodeExecution("""
             x = 7.7
             y = None
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_float_str(self):
+        self.assertCodeExecution("""
+            x = 7.7
+            y = 'abc'
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_list_list(self):
+        self.assertCodeExecution("""
+            x = [1, 2]
+            y = [3, 4]
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_none_none(self):
+        self.assertCodeExecution("""
+            x = None
+            y = None
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_none_bool(self):
+        self.assertCodeExecution("""
+            x = None
+            y = True
             print(divmod(x, y))
             print('Done.')
             """)
@@ -114,10 +185,34 @@ class DivmodTests(TranspileTestCase):
             print('Done.')
             """)
 
-    def test_none_none(self):
+    def test_none_str(self):
         self.assertCodeExecution("""
             x = None
-            y = None
+            y = 'abc'
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_set_set(self):
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = {3, 4}
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_str_str(self):
+        self.assertCodeExecution("""
+            x = 'abc'
+            y = 'def'
+            print(divmod(x, y))
+            print('Done.')
+            """)
+
+    def test_tuple_tuple(self):
+        self.assertCodeExecution("""
+            x = (1, 2)
+            y = (3, 4)
             print(divmod(x, y))
             print('Done.')
             """)
