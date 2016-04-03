@@ -1,6 +1,7 @@
 package org.python.types;
 
 public class Float extends org.python.types.Object {
+    private static final long NEGATIVE_ZERO_RAW_BITS = Double.doubleToRawLongBits(-0.0);
     public double value;
 
     /**
@@ -208,9 +209,9 @@ public class Float extends org.python.types.Object {
     public org.python.Object __floordiv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             if (((org.python.types.Int) other).value == 0) {
-                throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                throw new org.python.exceptions.ZeroDivisionError("float divmod()");
             }
-            return new org.python.types.Float((long) Math.floor((double) this.value / ((org.python.types.Int) other).value));
+            return new org.python.types.Float(Math.floor((double) this.value / ((org.python.types.Int) other).value));
         } else if (other instanceof org.python.types.Float) {
             if (((org.python.types.Float) other).value == 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("float divmod()");
@@ -218,9 +219,9 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Float(Math.floor(this.value / ((org.python.types.Float) other).value));
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
-                return new org.python.types.Float((long) this.value);
+                return new org.python.types.Float(Math.floor(this.value));
             } else {
-                throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                throw new org.python.exceptions.ZeroDivisionError("float divmod()");
             }
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'float' and '" + other.typeName() + "'");
@@ -233,7 +234,7 @@ public class Float extends org.python.types.Object {
         try {
             if (other instanceof org.python.types.Bool) {
                 if (((org.python.types.Bool) other).value) {
-                    return new org.python.types.Float(this.value - (long) this.value);
+                    return new org.python.types.Float(this.value - Math.floor(this.value));
                 } else {
                     throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
                 }
@@ -250,6 +251,10 @@ public class Float extends org.python.types.Object {
                         // second operand is negative, ensure that result is negative
                         result += other_val; // subtract other_val, which is negative
                     }
+                    if (other_val < 0 && result >= 0
+                            && Double.doubleToRawLongBits(result) != NEGATIVE_ZERO_RAW_BITS) {
+                        result *= -1;
+                    }
                     return new org.python.types.Float(result);
                 }
             } else if (other instanceof org.python.types.Float) {
@@ -265,9 +270,10 @@ public class Float extends org.python.types.Object {
                         // second operand is negative, ensure that result is negative
                         result += other_val; // subtract other_val, which is negative
                     }
-                    // edge case where operands are 0 and -0.0:
-                    // need to force sign to negative as adding -0.0 to 0.0 doesn't yield the expected -0.0
-                    if (other_val < 0.0 && result >= 0.0) {
+                    // edge case where adding -0.0 to 0.0 doesn't yield the expected -0.0
+                    // do this only if it is definitely not -0.0 already
+                    if (other_val < 0.0 && result >= 0.0
+                            && Double.doubleToRawLongBits(result) != NEGATIVE_ZERO_RAW_BITS) {
                         result *= -1;
                     }
                     return new org.python.types.Float(result);
