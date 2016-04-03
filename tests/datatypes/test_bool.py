@@ -208,14 +208,11 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_or_str',
         'test_or_tuple',
 
-        'test_power_bool',
         'test_power_bytearray',
         'test_power_bytes',
         'test_power_class',
         'test_power_complex',
-        'test_power_float',
         'test_power_frozenset',
-        'test_power_int',
 
         'test_rshift_bool',
         'test_rshift_bytearray',
