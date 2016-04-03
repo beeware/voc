@@ -173,7 +173,33 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__mod__() has not been implemented.");
+        if (other instanceof org.python.types.Bool) {
+            boolean other_val = ((org.python.types.Bool) other).value;
+            if (!other_val) {
+                throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+            }
+            if (this.value) {
+                return new org.python.types.Int(0);
+            } else {
+                return new org.python.types.Bool(false);
+            }
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val == 0) {
+                throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+            }
+
+            if (!this.value) {
+                return new org.python.types.Bool(false);
+            } else if (other_val > 1) {
+                return new org.python.types.Bool(this.value);
+            }
+        }
+        try {
+            return new org.python.types.Int(this.value ? 1 : 0).__mod__(other);
+        } catch (org.python.exceptions.TypeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
