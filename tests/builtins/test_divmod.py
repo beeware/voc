@@ -1,221 +1,8 @@
-from .. utils import TranspileTestCase, BuiltinFunctionTestCase
+from .. utils import TranspileTestCase, BuiltinFunctionTestCase, BuiltinTwoargFunctionTestCase
 
 
 class DivmodTests(TranspileTestCase):
-    def test_int_int_zero_rem(self):
-        self.assertCodeExecution("""
-            x = 4
-            y = 2
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_int_one_rem(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = 3
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_int_zero_divisor(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = 0
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_int_zero_dividend(self):
-        self.assertCodeExecution("""
-            x = 0
-            y = 3
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_bool(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = True
-            print(divmod(x, y))
-            print('Done.')
-            """)
-    def test_int_float(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = 3.3
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_list_2(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = [3, 4]
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_list_1(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = [3]
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_list_0(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = []
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_none(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = None
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_str(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = 'abc'
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_int_str_empty(self):
-        self.assertCodeExecution("""
-            x = 7
-            y = ''
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_float_float(self):
-        self.assertCodeExecution("""
-            x = 7.7
-            y = 1.2
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_float_bool(self):
-        self.assertCodeExecution("""
-            x = 7.7
-            y = True
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_float_int(self):
-        self.assertCodeExecution("""
-            x = 7.7
-            y = 2
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_float_list(self):
-        self.assertCodeExecution("""
-            x = 7.7
-            y = [3, 4]
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_float_none(self):
-        self.assertCodeExecution("""
-            x = 7.7
-            y = None
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_float_str(self):
-        self.assertCodeExecution("""
-            x = 7.7
-            y = 'abc'
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_list_list(self):
-        self.assertCodeExecution("""
-            x = [1, 2]
-            y = [3, 4]
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_none_none(self):
-        self.assertCodeExecution("""
-            x = None
-            y = None
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_none_bool(self):
-        self.assertCodeExecution("""
-            x = None
-            y = True
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_none_int(self):
-        self.assertCodeExecution("""
-            x = None
-            y = 7
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_none_float(self):
-        self.assertCodeExecution("""
-            x = None
-            y = 7.7
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_none_str(self):
-        self.assertCodeExecution("""
-            x = None
-            y = 'abc'
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_set_set(self):
-        self.assertCodeExecution("""
-            x = {1, 2}
-            y = {3, 4}
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_str_str(self):
-        self.assertCodeExecution("""
-            x = 'abc'
-            y = 'def'
-            print(divmod(x, y))
-            print('Done.')
-            """)
-
-    def test_tuple_tuple(self):
-        self.assertCodeExecution("""
-            x = (1, 2)
-            y = (3, 4)
-            print(divmod(x, y))
-            print('Done.')
-            """)
+    pass
 
 
 class BuiltinDivmodFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
@@ -236,4 +23,38 @@ class BuiltinDivmodFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_set',
         'test_str',
         'test_tuple',
+    ]
+
+
+class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
+    functions = ["divmod"]
+
+    not_implemented = [
+        'test_bool_bytearray',
+        'test_bool_bytes',
+        'test_bool_class',
+        'test_bool_complex',
+        'test_bool_dict',
+        'test_bool_frozenset',
+        'test_bool_set',
+        'test_bytes_bool',
+        'test_bytes_bytearray',
+        'test_bytes_bytes',
+        'test_bytes_class',
+        'test_bytes_complex',
+        'test_bytes_dict',
+        'test_bytes_float',
+        'test_bytes_frozenset',
+        'test_bytes_int',
+        'test_bytes_list',
+        'test_bytes_none',
+        'test_bytes_set',
+        'test_bytes_str',
+        'test_bytes_tuple',
+        'test_float_bytes',
+        'test_int_bytes',
+        'test_list_bytes',
+        'test_none_bytes',
+        'test_str_bytes',
+        'test_tuple_bytes',
     ]
