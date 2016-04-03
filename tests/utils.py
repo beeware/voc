@@ -658,7 +658,7 @@ class BuiltinFunctionTestCase:
             f = %(f)s
             x = %(x)s
             print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with x=%(x)s" % kwargs)
+            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s" % kwargs)
 
     for datatype, examples in SAMPLE_DATA:
         if datatype != 'set' and datatype != 'frozenset' and datatype != 'dict':
@@ -690,7 +690,7 @@ class BuiltinTwoargFunctionTestCase:
             x = %(x)s
             y = %(y)s
             print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs)
+            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s and y=%(y)s" % kwargs)
 
     EXCLUDED_DATATYPES = ['set', 'frozenset', 'dict']
     for datatype1, examples1 in SAMPLE_DATA:
