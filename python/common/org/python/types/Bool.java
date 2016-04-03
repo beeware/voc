@@ -182,8 +182,12 @@ public class Bool extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __pow__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__pow__() has not been implemented.");
+    public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
+        try {
+            return new org.python.types.Int(this.value ? 1 : 0).__pow__(other, modulo);
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(

@@ -296,8 +296,42 @@ public class Float extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __pow__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__pow__() has not been implemented.");
+    public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
+        if (modulo != null) {
+            throw new org.python.exceptions.NotImplementedError("float.__pow__() with modulo has not been implemented");
+        }
+
+        if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                if (this.value == 0) {
+                    throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
+                }
+
+                double result = 1.0;
+                for (long count = 0; count < -other_val; count++) {
+                    result *= this.value;
+                }
+                return new org.python.types.Float(1.0 / result);
+            } else {
+                return new org.python.types.Float(java.lang.Math.pow(this.value, other_val));
+            }
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            if (this.value == 0 && other_val < 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
+            }
+            // TODO: if this.value < 0 && other_val is not an integer, this will be a Complex result, so change this.value to Complex and delegate it out
+            // return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
+            return new org.python.types.Float(java.lang.Math.pow(this.value, other_val));
+        } else if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Float(this.value);
+            } else {
+                return new org.python.types.Float(1);
+            }
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(

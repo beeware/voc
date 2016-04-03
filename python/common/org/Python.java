@@ -1206,9 +1206,16 @@ public class Python {
             "\n" +
             "With two arguments, equivalent to x**y.  With three arguments,\n" +
             "equivalent to (x**y) % z, but may be more efficient (e.g. for ints).\n",
-        default_args={"z"}
+        args = {"x", "y"},
+        default_args = {"z"}
     )
     public static org.python.Object pow(org.python.Object x, org.python.Object y, org.python.Object z) {
+        if (z != null && !((x instanceof org.python.types.Int) && (y instanceof org.python.types.Int))) {
+            throw new org.python.exceptions.TypeError("pow() 3rd argument not allowed unless all arguments are integers");
+        }
+        if (z != null && ((org.python.types.Int) y).value < 0) {
+            throw new org.python.exceptions.TypeError("pow() 2nd argument cannot be negative when 3rd argument specified");
+        }
         return x.__pow__(y, z);
     }
 
