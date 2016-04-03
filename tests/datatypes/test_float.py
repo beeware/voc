@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
@@ -14,6 +16,23 @@ class FloatTests(TranspileTestCase):
             x = 3.14159
             print(x.attr)
             print('Done.')
+            """)
+
+    @expectedFailure
+    def test_repr(self):
+        self.assertCodeExecution("""
+            x = 0.35
+            print(x)
+            x = 0.035
+            print(x)
+            x = 0.0035
+            print(x)
+            x = 0.00035
+            print(x)
+            x = 0.000035
+            print(x)
+            x = 0.0000035
+            print(x)
             """)
 
 
