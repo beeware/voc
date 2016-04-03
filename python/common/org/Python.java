@@ -753,7 +753,21 @@ public class Python {
         args = {"number"}
     )
     public static org.python.types.Str hex(org.python.Object number) {
-        return new org.python.types.Str(String.format("0x%x", int_cast(number, null).value));
+        try {
+            if (!(number instanceof org.python.types.Int)) {
+                number.__index__();
+            }
+
+            String s = Long.toString(int_cast(number, null).value, 16);
+            if (s.charAt(0) == '-') {
+                s = "-0x" + s.substring(1);
+            } else {
+                s = "0x" + s;
+            }
+            return new org.python.types.Str(s);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + number.typeName() + "' object cannot be interpreted as an integer");
+        }
     }
 
     @org.python.Method(
