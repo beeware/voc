@@ -162,7 +162,11 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__floordiv__() has not been implemented.");
+        try {
+            return new org.python.types.Int(this.value ? 1 : 0).__floordiv__(other);
+        } catch (org.python.exceptions.TypeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -176,7 +180,14 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__divmod__() has not been implemented.");
+        try {
+            java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+            data.add(this.__floordiv__(other));
+            data.add(this.__mod__(other));
+            return new org.python.types.Tuple(data);
+        } catch (org.python.exceptions.TypeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
