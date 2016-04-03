@@ -1028,7 +1028,21 @@ public class Python {
         args = {"number"}
     )
     public static org.python.types.Str oct(org.python.Object number) {
-        return new org.python.types.Str(String.format("0o%o", int_cast(number, null).value));
+        try {
+            if (!(number instanceof org.python.types.Int)) {
+                number.__index__();
+            }
+
+            String s = Long.toString(int_cast(number, null).value, 8);
+            if (s.charAt(0) == '-') {
+                s = "-0o" + s.substring(1);
+            } else {
+                s = "0o" + s;
+            }
+            return new org.python.types.Str(s);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + number.typeName() + "' object cannot be interpreted as an integer");
+        }
     }
 
     @org.python.Method(
