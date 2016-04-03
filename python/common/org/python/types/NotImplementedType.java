@@ -90,7 +90,7 @@ public class NotImplementedType extends org.python.types.Object {
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NoneType'");
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NotImplementedType'");
         } else {
             throw new org.python.exceptions.TypeError(
                 String.format("unsupported operand type(s) for *: 'NotImplementedType' and '%s'",

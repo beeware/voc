@@ -11,9 +11,6 @@ class UnaryNotImplementedOperationTests(UnaryOperationTestCase, TranspileTestCas
     values = ['NotImplemented']
 
     not_implemented = [
-        # 'test_unary_positive',
-        # 'test_unary_negative',
-        # 'test_unary_invert',
     ]
 
 class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestCase):
@@ -85,9 +82,6 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',
-        'test_multiply_list',
-        'test_multiply_str',
-        'test_multiply_tuple',
 
         'test_ne_bytearray',
         'test_ne_bytes',
