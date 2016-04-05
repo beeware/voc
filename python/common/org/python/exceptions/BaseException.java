@@ -479,6 +479,10 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         throw new org.python.exceptions.AttributeError(this, "__round__");
     }
 
+    public org.python.Object __index__() {
+        throw new org.python.exceptions.AttributeError(this, "__index__");
+    }
+
 
     /**
      * Section 3.3.8 - With statement context
