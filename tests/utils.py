@@ -163,8 +163,13 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
             except IOError:
                 continue
     else:
+        classpath = os.pathsep.join([
+            os.path.join('..', '..', 'dist', 'python-java.jar'),
+            os.path.join('..', 'java'),
+            os.curdir,
+        ])
         proc = subprocess.Popen(
-            ["java", "-classpath", "../../dist/python-java.jar:../java:.", "python.test.__init__"] + args,
+            ["java", "-classpath", classpath, "python.test.__init__"] + args,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -277,14 +282,13 @@ def cleanse_python(input):
 
 
 class TranspileTestCase(TestCase):
-    def setUp(self):
-        setUpSuite()
-
     def setUpClass():
+        setUpSuite()
         global _jvm
         test_dir = os.path.join(os.path.dirname(__file__))
+        classpath = os.path.join('..', 'dist', 'python-java-testdaemon.jar')
         _jvm = subprocess.Popen(
-            ["java", "-classpath", "../dist/python-java-testdaemon.jar", "python.testdaemon.TestDaemon"],
+            ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -293,7 +297,7 @@ class TranspileTestCase(TestCase):
 
     def tearDownClass():
         global _jvm
-        if _jvm is None:
+        if _jvm is not None:
             # use communicate here to wait for process to exit
             _jvm.communicate("exit".encode("utf-8"))
 
@@ -503,7 +507,8 @@ class UnaryOperationTestCase:
         # when the test case runs.
         for test_name in dir(self):
             if test_name.startswith('test_'):
-                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+                expect_failure = hasattr(self, 'not_implemented') and test_name in self.not_implemented
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = expect_failure
         return super().run(result=result)
 
     def assertUnaryOperation(self, **kwargs):
@@ -532,6 +537,7 @@ SAMPLE_DATA = [
     ('set', ["set()", "{1, 2.3456, 'another'}"]),
     ('str', ['""', '"This is another string"']),
     ('tuple', ["(1, 2.3456, 'another')"]),
+    ('none', ['None']),
 ]
 
 
@@ -626,3 +632,35 @@ class InplaceOperationTestCase:
         vars()['test_and_%s' % datatype] = _inplace_test('test_and_%s' % datatype, 'x &= y', examples)
         vars()['test_xor_%s' % datatype] = _inplace_test('test_xor_%s' % datatype, 'x ^= y', examples)
         vars()['test_or_%s' % datatype] = _inplace_test('test_or_%s' % datatype, 'x |= y', examples)
+
+
+def _builtin_test(test_name, operation, examples):
+    def func(self):
+        for function in self.functions:
+            for example in examples:
+                self.assertBuiltinFunction(x=example, f=function, operation=operation, format=self.format)
+    return func
+
+
+class BuiltinFunctionTestCase:
+    format = ''
+
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        return super().run(result=result)
+
+    def assertBuiltinFunction(self, **kwargs):
+        self.assertCodeExecution("""
+            f = %(f)s
+            x = %(x)s
+            print(%(format)s%(operation)s)
+            """ % kwargs, "Error running %(operation)s with x=%(x)s" % kwargs)
+
+    for datatype, examples in SAMPLE_DATA:
+        if datatype != 'set' and datatype != 'frozenset' and datatype != 'dict':
+            vars()['test_%s' % datatype] = _builtin_test('test_%s' % datatype, 'f(x)', examples)
+

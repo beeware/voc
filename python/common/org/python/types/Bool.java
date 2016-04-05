@@ -330,7 +330,7 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __abs__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__abs__() has not been implemented.");
+        return new org.python.types.Int(this.value ? 1 : 0);
     }
 
     @org.python.Method(
