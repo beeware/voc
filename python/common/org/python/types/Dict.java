@@ -6,7 +6,7 @@ public class Dict extends org.python.types.Object {
 
     /**
      * A utility method to update the internal value of this object.
-     *
+     * <p>
      * Used by __i*__ operations to do an in-place operation.
      * obj must be of type org.python.types.Dict
      */
@@ -20,6 +20,11 @@ public class Dict extends org.python.types.Object {
 
     public int hashCode() {
         return this.value.hashCode();
+    }
+
+    @Override
+    public org.python.Object __hash__() {
+        throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
     public Dict() {
@@ -51,7 +56,7 @@ public class Dict extends org.python.types.Object {
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("{");
         boolean first = true;
-        for (org.python.Object key: this.value.keySet()) {
+        for (org.python.Object key : this.value.keySet()) {
             if (first) {
                 first = false;
             } else {
@@ -75,43 +80,85 @@ public class Dict extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'dict'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'dict'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'dict'");
+    }
+
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(!this.value.isEmpty());
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__lt__() has not been implemented.");
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: dict() < %s()",
+                org.Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__le__() has not been implemented.");
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: dict() <= %s()",
+                org.Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__eq__() has not been implemented.");
+        boolean eq = false;
+        if (other instanceof org.python.types.Dict) {
+            org.python.types.Dict otherDict = (org.python.types.Dict) other;
+            eq = this.value.equals(otherDict.value);
+        }
+        return new org.python.types.Bool(eq);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__ne__() has not been implemented.");
+        return new org.python.types.Bool(!((org.python.types.Bool) this.__eq__(other)).value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__gt__() has not been implemented.");
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: dict() > %s()",
+                org.Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__ge__() has not been implemented.");
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: dict() >= %s()",
+                org.Python.typeName(other.getClass())));
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
@@ -137,18 +184,39 @@ public class Dict extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __getitem__(org.python.Object item) {
-        org.python.Object value = this.value.get(item);
-        if (value == null) {
-            throw new org.python.exceptions.KeyError(item);
+        try {
+            // While hashcode is not used, it is not a redundant line.
+            // We are determining if the item is hashable by seeing if an
+            // exception is thrown.
+            org.python.Object hashcode = item.__hash__();
+
+            org.python.Object value = this.value.get(item);
+            if (value == null) {
+                throw new org.python.exceptions.KeyError(item);
+            }
+            return value;
+
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError(
+                String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
         }
-        return value;
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public void __setitem__(org.python.Object item, org.python.Object value) {
-        this.value.put(item, value);
+        try {
+            // While hashcode is not used, it is not a redundant line.
+            // We are determining if the item is hashable by seeing if an
+            // exception is thrown.
+            org.python.Object hashcode = item.__hash__();
+
+            this.value.put(item, value);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError(
+                String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
+        }
     }
 
     @org.python.Method(
