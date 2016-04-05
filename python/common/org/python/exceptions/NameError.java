@@ -8,4 +8,8 @@ public class NameError extends org.python.exceptions.Exception {
     NameError(String msg_or_var, boolean raw_msg) {
         super(msg_or_var);
     }
+
+    public NameError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super("name '" + args[0] + "' is not defined");
+    }
 }

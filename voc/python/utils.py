@@ -414,6 +414,8 @@ class ForLoop:
         self.loop_commands = []
         self.commands = []
 
+        self.modifier = ''
+
     def __repr__(self):
         return '<For %s: %s-%s>' % (
             self.start,
@@ -444,7 +446,7 @@ class ForLoop:
                 self.starts_line if self.starts_line is not None else '    ',
                 self.start_offset,
             ) + '    ' * depth,
-            'FOR:'
+            '%sFOR:' % self.modifier
         )
 
         for command in self.loop_commands:
@@ -462,7 +464,7 @@ class ForLoop:
         print ('     :%4d      ' % (
                 self.end_offset,
             ) + '    ' * depth,
-            'END FOR'
+            'END %sFOR' % self.modifier
         )
 
     def extract(self, instructions, blocks):
@@ -543,23 +545,30 @@ class ForLoop:
 class ComprehensionForLoop(ForLoop):
     def __init__(self, start, loop, varname, end, start_offset, for_offset, loop_offset, end_offset, starts_line):
         super().__init__(start, loop, varname, end, start_offset, for_offset, loop_offset, end_offset, starts_line)
+        self.modifier = 'COMPREHENSION '
 
     def pre_loop(self, context):
+        if context.generator is None:
+            context.add_opcodes(
+                opcodes.ASTORE_name(context, '#for-accumulator-%x' % id(self)),
+            )
+
         context.add_opcodes(
-            opcodes.ASTORE_name(context, '#for-%x' % id(self)),
             opcodes.ALOAD_name(context, '.0'),
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
         )
 
     def pre_iteration(self, context):
-        context.add_opcodes(
-            opcodes.ALOAD_name(context, '#for-%x' % id(self)),
-        )
+        if context.generator is None:
+            context.add_opcodes(
+                opcodes.ALOAD_name(context, '#for-accumulator-%x' % id(self)),
+            )
 
     def post_loop(self, context):
-        context.add_opcodes(
-            opcodes.ALOAD_name(context, '#for-%x' % id(self)),
-        )
+        if context.generator is None:
+            context.add_opcodes(
+                opcodes.ALOAD_name(context, '#for-accumulator-%x' % id(self)),
+            )
 
 
 class WhileLoop:
@@ -901,7 +910,7 @@ def find_blocks(instructions):
                 starts_line=instruction.starts_line
             )
 
-            blocks[end_index + 1] = block
+            blocks[end_index] = block
             i = i + 1
 
         else:
@@ -929,9 +938,6 @@ def extract_command(instructions, blocks, i, start_index=0, literal=False):
     # into the instruction argument we've already read.
     if i > 0 and instructions[i - 1].opname == 'EXTENDED_ARG':
         i = i - 1
-        extended = instructions[i]
-
-        argval = argval | extended.argval
 
     try:
         if literal:

@@ -1,6 +1,21 @@
 package org.python.types;
 
 public class Code extends org.python.types.Object {
+    org.python.types.Int co_argcount;
+    org.python.types.Tuple co_cellvars;
+    org.python.types.Bytes co_code;
+    org.python.types.Tuple co_consts;
+    org.python.types.Str co_filename;
+    org.python.types.Int co_firstlineno;
+    org.python.types.Int co_flags;
+    org.python.types.Tuple co_freevars;
+    org.python.types.Int co_kwonlyargcount;
+    org.python.types.Bytes co_lnotab;
+    org.python.types.Str co_name;
+    org.python.types.Tuple co_names;
+    org.python.types.Int co_nlocals;
+    org.python.types.Int co_stacksize;
+    org.python.types.Tuple co_varnames;
 
     /**
      * A utility method to update the internal value of this object.
@@ -10,21 +25,21 @@ public class Code extends org.python.types.Object {
      */
     void setValue(org.python.Object obj) {
         org.python.types.Object object = (org.python.types.Object) obj;
-        this.attrs.put("co_argcount", object.attrs.get("co_argcount"));
-        this.attrs.put("co_cellvars", object.attrs.get("co_cellvars"));
-        this.attrs.put("co_code", object.attrs.get("co_code"));
-        this.attrs.put("co_consts", object.attrs.get("co_consts"));
-        this.attrs.put("co_filename", object.attrs.get("co_filename"));
-        this.attrs.put("co_firstlineno", object.attrs.get("co_firstlineno"));
-        this.attrs.put("co_flags", object.attrs.get("co_flags"));
-        this.attrs.put("co_freevars", object.attrs.get("co_freevars"));
-        this.attrs.put("co_kwonlyargcount", object.attrs.get("co_kwonlyargcount"));
-        this.attrs.put("co_lnotab", object.attrs.get("co_lnotab"));
-        this.attrs.put("co_name", object.attrs.get("co_name"));
-        this.attrs.put("co_names", object.attrs.get("co_names"));
-        this.attrs.put("co_nlocals", object.attrs.get("co_nlocals"));
-        this.attrs.put("co_stacksize", object.attrs.get("co_stacksize"));
-        this.attrs.put("co_varnames", object.attrs.get("co_varnames"));
+        this.co_argcount = (org.python.types.Int) object.__getattribute__("co_argcount");
+        this.co_cellvars = (org.python.types.Tuple) object.__getattribute__("co_cellvars");
+        this.co_code = (org.python.types.Bytes) object.__getattribute__("co_code");
+        this.co_consts = (org.python.types.Tuple) object.__getattribute__("co_consts");
+        this.co_filename = (org.python.types.Str) object.__getattribute__("co_filename");
+        this.co_firstlineno = (org.python.types.Int) object.__getattribute__("co_firstlineno");
+        this.co_flags = (org.python.types.Int) object.__getattribute__("co_flags");
+        this.co_freevars = (org.python.types.Tuple) object.__getattribute__("co_freevars");
+        this.co_kwonlyargcount = (org.python.types.Int) object.__getattribute__("co_kwonlyargcount");
+        this.co_lnotab = (org.python.types.Bytes) object.__getattribute__("co_lnotab");
+        this.co_name = (org.python.types.Str) object.__getattribute__("co_name");
+        this.co_names = (org.python.types.Tuple) object.__getattribute__("co_names");
+        this.co_nlocals = (org.python.types.Int) object.__getattribute__("co_nlocals");
+        this.co_stacksize = (org.python.types.Int) object.__getattribute__("co_stacksize");
+        this.co_varnames = (org.python.types.Tuple) object.__getattribute__("co_varnames");
     }
 
     public Code(
@@ -46,30 +61,35 @@ public class Code extends org.python.types.Object {
         ) {
         super();
 
-        this.attrs.put("co_argcount", co_argcount);
-        this.attrs.put("co_cellvars", co_cellvars);
-        this.attrs.put("co_code", co_code);
-        this.attrs.put("co_consts", co_consts);
-        this.attrs.put("co_filename", co_filename);
-        this.attrs.put("co_firstlineno", co_firstlineno);
-        this.attrs.put("co_flags", co_flags);
-        this.attrs.put("co_freevars", co_freevars);
-        this.attrs.put("co_kwonlyargcount", co_kwonlyargcount);
-        this.attrs.put("co_lnotab", co_lnotab);
-        this.attrs.put("co_name", co_name);
-        this.attrs.put("co_names", co_names);
-        this.attrs.put("co_nlocals", co_nlocals);
-        this.attrs.put("co_stacksize", co_stacksize);
-        this.attrs.put("co_varnames", co_varnames);
+        this.co_argcount = co_argcount;
+        this.co_cellvars = co_cellvars;
+        this.co_code = co_code;
+        this.co_consts = co_consts;
+        this.co_filename = co_filename;
+        this.co_firstlineno = co_firstlineno;
+        this.co_flags = co_flags;
+        this.co_freevars = co_freevars;
+        this.co_kwonlyargcount = co_kwonlyargcount;
+        this.co_lnotab = co_lnotab;
+        this.co_name = co_name;
+        this.co_names = co_names;
+        this.co_nlocals = co_nlocals;
+        this.co_stacksize = co_stacksize;
+        this.co_varnames = co_varnames;
     }
 
     public org.python.types.Str __repr__() {
+        java.lang.String location;
+        if (this.co_filename == null) {
+            location = "builtin function";
+        } else {
+            location = String.format("file \"%s\", line %s", this.co_filename, this.co_firstlineno);
+        }
         return new org.python.types.Str(
-            String.format("<%s object at %x, file \"%s\", line %s>",
+            String.format("<%s object at 0x%x, %s>",
                 this.typeName(),
                 this.hashCode(),
-                this.attrs.get("co_filename"),
-                this.attrs.get("co_firstlineno")
+                location
             )
         );
     }

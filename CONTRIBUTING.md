@@ -1,8 +1,7 @@
 # Contributing
 
-PyBee <3's contributions! 
+PyBee <3's contributions!
 
-Please be aware, PyBee operates under a Code of Conduct. 
+Please be aware, PyBee operates under a Code of Conduct.
 
-See [CONTRIBUTING to PyBee](pybee.org/contributing) for details.
-
+See [CONTRIBUTING to PyBee](http://pybee.org/contributing) for details.

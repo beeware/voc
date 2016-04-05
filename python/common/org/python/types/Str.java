@@ -17,6 +17,10 @@ public class Str extends org.python.types.Object {
         return this.value;
     }
 
+    public org.python.Object byValue() {
+        return new org.python.types.Str(this.value);
+    }
+
     public int hashCode() {
         return this.value.hashCode();
     }
@@ -30,25 +34,37 @@ public class Str extends org.python.types.Object {
     }
 
     // public org.python.Object __new__() {
-    //     throw new org.python.exceptions.NotImplementedError("str.__new__() has not been implemented.");
+    //     throw new org.python.exceptions.NotImplementedError("__new__() has not been implemented.");
     // }
 
     // public org.python.Object __init__() {
-    //     throw new org.python.exceptions.NotImplementedError("str.__init__() has not been implemented.");
+    //     throw new org.python.exceptions.NotImplementedError("__init__() has not been implemented.");
     // }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Str __repr__() {
         return new org.python.types.Str("'" + this.value + "'");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Str __str__() {
         return new org.python.types.Str(this.value);
     }
 
-    public org.python.types.Str __format__() {
-        throw new org.python.exceptions.NotImplementedError("str.__format__() has not been implemented.");
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Str __format__(org.python.Object format_string) {
+        throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Int __int__() {
         try {
             return new org.python.types.Int(Long.parseLong(this.value));
@@ -57,14 +73,24 @@ public class Str extends org.python.types.Object {
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Float __float__() {
         try {
             return new org.python.types.Float(Double.parseDouble(this.value));
         } catch (NumberFormatException e) {
-            throw new org.python.exceptions.ValueError("could not convert string to float: '" + this.value + "'");
+            String value = this.value;
+            if (value.length() > 0) {
+                value = "'" + value + "'";
+            }
+            throw new org.python.exceptions.ValueError("could not convert string to float: " + value);
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
@@ -74,6 +100,9 @@ public class Str extends org.python.types.Object {
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
@@ -83,6 +112,9 @@ public class Str extends org.python.types.Object {
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
@@ -92,6 +124,9 @@ public class Str extends org.python.types.Object {
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __ne__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
@@ -101,6 +136,9 @@ public class Str extends org.python.types.Object {
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
@@ -110,6 +148,9 @@ public class Str extends org.python.types.Object {
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
@@ -119,26 +160,29 @@ public class Str extends org.python.types.Object {
         }
     }
 
-    public org.python.Object __getattribute__(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("str.__getattribute__() has not been implemented.");
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
+        // Builtin types can't have attributes set on them.
+        return false;
     }
 
-    public void __setattr__(java.lang.String name, org.python.Object value) {
-        throw new org.python.exceptions.NotImplementedError("str.__setattr__() has not been implemented.");
-    }
-
-    public void __delattr__(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("str.__delattr__() has not been implemented.");
-    }
-
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.List __dir__() {
-        throw new org.python.exceptions.NotImplementedError("str.__dir__() has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.NotImplementedError("str.__len__() has not been implemented.");
+        // throw new org.python.exceptions.NotImplementedError("__len__() has not been implemented.");
+        return new org.python.types.Int(this.value.length());
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
@@ -203,27 +247,39 @@ public class Str extends org.python.types.Object {
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Iterable __iter__() {
-        throw new org.python.exceptions.NotImplementedError("str.__iter__() has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("__iter__() has not been implemented.");
     }
 
-    public org.python.types.Int __contains__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__contains__() has not been implemented.");
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Int __contains__(org.python.Object item) {
+        throw new org.python.exceptions.NotImplementedError("__contains__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
-            Str other_str = (Str)other;
+            org.python.types.Str other_str = (org.python.types.Str)other;
             if (0 == other_str.value.length()) {
                 return this;
             }
             java.lang.StringBuffer sb = new java.lang.StringBuffer(value);
             sb.append(other_str.value);
-            return new Str(sb.toString());
+            return new org.python.types.Str(sb.toString());
         }
         throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             long other_int = ((org.python.types.Int)other).value;
@@ -236,34 +292,91 @@ public class Str extends org.python.types.Object {
             }
             return new Str(res.toString());
         }
-        throw new org.python.exceptions.NotImplementedError("str.__mul__() has not been implemented.");
+        else if (other instanceof org.python.types.Bool) {
+                boolean other_bool = ((org.python.types.Bool)other).value;
+                if (other_bool) {
+                        return new Str(value);
+                } else {
+                        return new Str("");
+                }
+        }
+        throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __mod__(org.python.Object other) {
-        java.util.List<java.lang.Object> args = new java.util.ArrayList<java.lang.Object>();
+        java.util.List<java.lang.Object> format_args = new java.util.ArrayList<java.lang.Object>();
         if (other instanceof org.python.types.List) {
             org.python.types.List oth = (org.python.types.List) other;
             for (org.python.Object obj: oth.value) {
-                args.add(obj.toJava());
+                format_args.add(obj.toJava());
             }
         } else if (other instanceof org.python.types.Tuple) {
             org.python.types.Tuple oth = (org.python.types.Tuple) other;
             for (org.python.Object obj: oth.value) {
-                args.add(obj.toJava());
+                format_args.add(obj.toJava());
             }
+        } else if (other instanceof org.python.types.NoneType) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         } else {
-            args.add(other.toJava());
+            format_args.add(other.toJava());
         }
 
-        return new org.python.types.Str(String.format(this.value, args.toArray()));
+        return new org.python.types.Str(java.lang.String.format(this.value, format_args.toArray()));
     }
 
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'str'");
+    }
+
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'str'");
+    }
+
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'str'");
+    }
+
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(this.value.length() > 0);
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __rmul__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__rmul__() has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __rmod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("str.__rmod__() has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("__rmod__() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public void __imod__(org.python.Object other) {
+        if (other instanceof org.python.types.NoneType) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        }
+        super.__imod__(other);
     }
 
 }

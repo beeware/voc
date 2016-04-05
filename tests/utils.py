@@ -16,6 +16,39 @@ from voc.java.attributes import Code as JavaCode
 from voc.transpiler import Transpiler
 
 
+# A state variable to determine if the test environment has been configured.
+_suite_configured = False
+
+def setUpSuite():
+    """Configure the entire test suite.
+
+    This only needs to be run once, prior to the first test.
+    """
+    global _suite_configured
+    if _suite_configured:
+        return
+
+    proc = subprocess.Popen(
+        "ant java",
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        shell=True,
+    )
+
+    try:
+        out, err = proc.communicate(timeout=15)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        out, err = proc.communicate()
+        raise
+
+    if proc.returncode != 0:
+        raise Exception("Error compiling java sources: " + out.decode('ascii'))
+
+    _suite_configured = True
+
+
 @contextlib.contextmanager
 def capture_output(redirect_stderr=True):
     oldout, olderr = sys.stdout, sys.stderr
@@ -84,7 +117,7 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, arg
         args = []
 
     proc = subprocess.Popen(
-        ["python", "test.py"] + args,
+        [sys.executable, "test.py"] + args,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -98,7 +131,7 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, arg
 def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
     """Run a block of Python code as a Java program."""
     # Output source code into test directory
-    transpiler = Transpiler()
+    transpiler = Transpiler(verbosity=0)
 
     # Don't redirect stderr; we want to see any errors from the transpiler
     # as top level test failures.
@@ -109,17 +142,79 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
             for name, code in extra_code.items():
                 transpiler.transpile_string("%s.py" % name.replace('.', os.path.sep), adjust(code))
 
-    transpiler.write(test_dir, verbosity=0)
+    transpiler.write(test_dir)
 
     if args is None:
         args = []
 
+    if len(args) == 0:
+        global _jvm
+        # encode to turn str into bytes-like object
+        _jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
+        _jvm.stdin.flush()
+        out = ""
+        while True:
+            try:
+                line = _jvm.stdout.readline().decode("utf-8")
+                if line == ".{0}".format(os.linesep):
+                    break
+                else:
+                    out += line
+            except IOError:
+                continue
+    else:
+        classpath = os.pathsep.join([
+            os.path.join('..', '..', 'dist', 'python-java.jar'),
+            os.path.join('..', 'java'),
+            os.curdir,
+        ])
+        proc = subprocess.Popen(
+            ["java", "-classpath", classpath, "python.test.__init__"] + args,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=test_dir
+        )
+        out = proc.communicate()[0].decode('utf8')
+
+    return out
+
+
+def compileJava(java_dir, java):
+    if not java:
+        return None
+
+    sources = []
+    with capture_output():
+        for descriptor, code in java.items():
+            parts = descriptor.split('/')
+
+            class_dir = os.path.sep.join(parts[:-1])
+            class_file = os.path.join(class_dir, "%s.java" % parts[-1])
+
+            full_dir = os.path.join(java_dir, class_dir)
+            full_path = os.path.join(java_dir, class_file)
+
+            try:
+                os.makedirs(full_dir)
+            except FileExistsError:
+                pass
+
+            with open(full_path, 'w') as java_source:
+                java_source.write(adjust(code))
+
+            sources.append(class_file)
+
+    classpath = os.pathsep.join([
+        os.path.join('..', '..', 'dist', 'python-java.jar'),
+        os.curdir,
+    ])
     proc = subprocess.Popen(
-        ["java", "-classpath", "../../dist/python-java.jar:.", "-XX:-UseSplitVerifier", "python.test"] + args,
+        ["javac", "-classpath", classpath] + sources,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        cwd=test_dir,
+        cwd=java_dir,
     )
     out = proc.communicate()
 
@@ -127,56 +222,85 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
 
 
 JAVA_EXCEPTION = re.compile(
-    '((Exception in thread "\w+" org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\n]+))|' +
-    '(Exception in thread "\w+" [^\n]+\n' +
-    'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\n]+)))\n' +
-    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\n)+)'
+    '(((Exception in thread "[\w-]+" )?org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\r?\n]+))|' +
+    '([^\r\n]*?\r?\n((    |\t)at[^\r\n]*?\r?\n)*' +
+    'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\r?\n]+)))\r?\n' +
+    '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)(.*\r?\n)*' +
+    '(Exception in thread "\w+" )?'
 )
-JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)')
+JAVA_STACK = re.compile('^\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)\r?\n', re.MULTILINE)
 JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 
 # PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
-PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n)+(?P<exception>.*?): (?P<message>.*\n)')
-PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\n    .*\n')
+PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n)+(?P<exception>.*?): (?P<message>.*\r?\n)')
+PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n')
 PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
+
+MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,8}')
 
 
 def cleanse_java(input):
     try:
-        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception2>: \\g<message2>\n\\g<trace>', input)
+        out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception2>: \\g<message2>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
     except:
-        out = JAVA_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception1>: \\g<message1>\n\\g<trace>', input)
+        out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception1>: \\g<message1>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
+
     stack = JAVA_STACK.findall(out)
     out = JAVA_STACK.sub('', out)
     out = '%s%s%s' % (
         out,
-        '\n'.join([
+        os.linesep.join([
             "    %s:%s" % (s[3], s[5])
             for s in stack[::-1]
             if s[0].startswith('python.') and not s[0].endswith('.<init>')
         ]),
-        '\n' if stack else ''
+        os.linesep if stack else ''
     )
-    return JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test'", '***EXECUTABLE***')
+    out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
+    out = JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***').replace("'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
+    out = out.replace('\r\n', '\n')
+    return out
 
 
 def cleanse_python(input):
-    out = PYTHON_EXCEPTION.sub('### EXCEPTION ###\n\\g<exception>: \\g<message>', input)
+    out = PYTHON_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception>: \\g<message>'.format(linesep=os.linesep), input)
     stack = PYTHON_STACK.findall(input)
     out = '%s%s%s' % (
         out,
-        '\n'.join(
+        os.linesep.join(
             [
                 "    %s:%s" % (s[0], s[1])
                 for s in stack
             ]
         ),
-        '\n' if stack else ''
+        os.linesep if stack else ''
     )
-    return PYTHON_FLOAT.sub('\\1e\\2\\3', out).replace("'test.py'", '***EXECUTABLE***')
+    out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
+    out = PYTHON_FLOAT.sub('\\1e\\2\\3', out).replace("'test.py'", '***EXECUTABLE***')
+    out = out.replace('\r\n', '\n')
+    return out
 
 
 class TranspileTestCase(TestCase):
+    def setUpClass():
+        setUpSuite()
+        global _jvm
+        test_dir = os.path.join(os.path.dirname(__file__))
+        classpath = os.path.join('..', 'dist', 'python-java-testdaemon.jar')
+        _jvm = subprocess.Popen(
+            ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=test_dir,
+        )
+
+    def tearDownClass():
+        global _jvm
+        if _jvm is not None:
+            # use communicate here to wait for process to exit
+            _jvm.communicate("exit".encode("utf-8"))
+
     def assertBlock(self, python, java):
         self.maxDiff = None
         dump = False
@@ -282,67 +406,90 @@ class TranspileTestCase(TestCase):
                 context = 'Function context'
             self.assertEqual(java_out, py_out, context)
 
-    def assertJavaExecution(self, code, py_out, extra_code=None, run_in_global=True, run_in_function=True, args=None):
+    def assertJavaExecution(self, code, out, extra_code=None, java=None, run_in_global=True, run_in_function=True, args=None):
         "Run code under Java and check the output is as expected"
         self.maxDiff = None
-        #==================================================
-        # Pass 1 - run the code in the global context
-        #==================================================
-        if run_in_global:
+        try:
+            #==================================================
+            # Prep - compile any required Java sources
+            #==================================================
+            # Create the temp directory into which code will be placed
+            java_dir = os.path.join(os.path.dirname(__file__), 'java')
+
             try:
-                # Create the temp directory into which code will be placed
-                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
-                try:
-                    os.mkdir(test_dir)
-                except FileExistsError:
-                    pass
+                os.mkdir(java_dir)
+            except FileExistsError:
+                pass
 
-                # Run the code as Java.
-                java_out = runAsJava(test_dir, code, extra_code, False, args=args)
-            except Exception as e:
-                self.fail(e)
-            finally:
-                # Clean up the test directory where the class file was written.
-                shutil.rmtree(test_dir)
-                # print(java_out)
+            # Compile the java support code
+            java_compile_out = compileJava(java_dir, java)
 
+            if java_compile_out:
+                self.fail(java_compile_out)
 
-            # Cleanse the Python and Java output, producing a simple
+            # Cleanse the Python output, producing a simple
             # normalized format for exceptions, floats etc.
-            java_out = cleanse_java(java_out)
-            py_out = adjust(py_out)
+            py_out = adjust(out)
 
-            # Confirm that the output of the Java code is the same as the Python code.
-            self.assertEqual(java_out, py_out, 'Global context')
-
-        #==================================================
-        # Pass 2 - run the code in a function's context
-        #==================================================
-        if run_in_function:
-            try:
-                # Create the temp directory into which code will be placed
-                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+            #==================================================
+            # Pass 1 - run the code in the global context
+            #==================================================
+            if run_in_global:
                 try:
-                    os.mkdir(test_dir)
-                except FileExistsError:
-                    pass
+                    # Create the temp directory into which code will be placed
+                    test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+                    try:
+                        os.mkdir(test_dir)
+                    except FileExistsError:
+                        pass
 
-                # Run the code as Java.
-                java_out = runAsJava(test_dir, code, extra_code, True, args=args)
-            except Exception as e:
-                self.fail(e)
-            finally:
-                # Clean up the test directory where the class file was written.
-                shutil.rmtree(test_dir)
-                # print(java_out)
+                    # Run the code as Java.
+                    java_out = runAsJava(test_dir, code, extra_code, False, args=args)
+                except Exception as e:
+                    self.fail(e)
+                finally:
+                    # Clean up the test directory where the class file was written.
+                    shutil.rmtree(test_dir)
+                    # print(java_out)
 
-            # Cleanse the Python and Java output, producing a simple
-            # normalized format for exceptions, floats etc.
-            java_out = cleanse_java(java_out)
-            py_out = adjust(py_out)
+                # Cleanse the Java output, producing a simple
+                # normalized format for exceptions, floats etc.
+                java_out = cleanse_java(java_out)
 
-            # Confirm that the output of the Java code is the same as the Python code.
-            self.assertEqual(java_out, py_out, 'Function context')
+                # Confirm that the output of the Java code is the same as the Python code.
+                self.assertEqual(java_out, py_out, 'Global context')
+
+            #==================================================
+            # Pass 2 - run the code in a function's context
+            #==================================================
+            if run_in_function:
+                try:
+                    # Create the temp directory into which code will be placed
+                    test_dir = os.path.join(os.path.dirname(__file__), 'temp')
+                    try:
+                        os.mkdir(test_dir)
+                    except FileExistsError:
+                        pass
+
+                    # Run the code as Java.
+                    java_out = runAsJava(test_dir, code, extra_code, True, args=args)
+                except Exception as e:
+                    self.fail(e)
+                finally:
+                    # Clean up the test directory where the class file was written.
+                    shutil.rmtree(test_dir)
+                    # print(java_out)
+
+                # Cleanse the Java output, producing a simple
+                # normalized format for exceptions, floats etc.
+                java_out = cleanse_java(java_out)
+
+                # Confirm that the output of the Java code is the same as the Python code.
+                self.assertEqual(java_out, py_out, 'Function context')
+
+        finally:
+            # Clean up the java directory where the class file was written.
+            shutil.rmtree(java_dir)
 
 
 def _unary_test(test_name, operation):
@@ -360,13 +507,14 @@ class UnaryOperationTestCase:
         # when the test case runs.
         for test_name in dir(self):
             if test_name.startswith('test_'):
-                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+                expect_failure = hasattr(self, 'not_implemented') and test_name in self.not_implemented
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = expect_failure
         return super().run(result=result)
 
-    def assertUnaryOperator(self, **kwargs):
+    def assertUnaryOperation(self, **kwargs):
         self.assertCodeExecution("""
             x = %(x)s
-            print(%(format)s%(operand)sx)
+            print(%(format)s%(operation)sx)
             """ % kwargs)
 
     test_unary_positive = _unary_test('test_unary_positive', '+')
@@ -389,6 +537,7 @@ SAMPLE_DATA = [
     ('set', ["set()", "{1, 2.3456, 'another'}"]),
     ('str', ['""', '"This is another string"']),
     ('tuple', ["(1, 2.3456, 'another')"]),
+    ('none', ['None']),
 ]
 
 
@@ -445,7 +594,7 @@ class BinaryOperationTestCase:
 def _inplace_test(test_name, operation, examples):
     def func(self):
         for value in self.values:
-            for example in self.examples:
+            for example in examples:
                 self.assertInplaceOperation(x=value, y=example, operation=operation, format=self.format)
     return func
 
@@ -483,3 +632,70 @@ class InplaceOperationTestCase:
         vars()['test_and_%s' % datatype] = _inplace_test('test_and_%s' % datatype, 'x &= y', examples)
         vars()['test_xor_%s' % datatype] = _inplace_test('test_xor_%s' % datatype, 'x ^= y', examples)
         vars()['test_or_%s' % datatype] = _inplace_test('test_or_%s' % datatype, 'x |= y', examples)
+
+
+def _builtin_test(test_name, operation, examples):
+    def func(self):
+        for function in self.functions:
+            for example in examples:
+                self.assertBuiltinFunction(x=example, f=function, operation=operation, format=self.format)
+    return func
+
+
+class BuiltinFunctionTestCase:
+    format = ''
+
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        return super().run(result=result)
+
+    def assertBuiltinFunction(self, **kwargs):
+        self.assertCodeExecution("""
+            f = %(f)s
+            x = %(x)s
+            print(%(format)s%(operation)s)
+            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s" % kwargs)
+
+    for datatype, examples in SAMPLE_DATA:
+        if datatype != 'set' and datatype != 'frozenset' and datatype != 'dict':
+            vars()['test_%s' % datatype] = _builtin_test('test_%s' % datatype, 'f(x)', examples)
+
+def _builtin_twoarg_test(test_name, operation, examples1, examples2):
+    def func(self):
+        for function in self.functions:
+            for example1 in examples1:
+                for example2 in examples2:
+                    self.assertBuiltinTwoargFunction(x=example1, y=example2, f=function, operation=operation, format=self.format)
+    return func
+
+
+class BuiltinTwoargFunctionTestCase:
+    format = ''
+
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        return super().run(result=result)
+
+    def assertBuiltinTwoargFunction(self, **kwargs):
+        self.assertCodeExecution("""
+            f = %(f)s
+            x = %(x)s
+            y = %(y)s
+            print(%(format)s%(operation)s)
+            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s and y=%(y)s" % kwargs)
+
+    EXCLUDED_DATATYPES = ['set', 'frozenset', 'dict']
+    for datatype1, examples1 in SAMPLE_DATA:
+        for datatype2, examples2 in SAMPLE_DATA:
+            if datatype1 not in EXCLUDED_DATATYPES and datatype2 not in EXCLUDED_DATATYPES:
+                vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test('test_%s_%s' % (datatype1, datatype2), 'f(x, y)', examples1, examples2)
+
+

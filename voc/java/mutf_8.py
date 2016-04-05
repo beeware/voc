@@ -203,14 +203,6 @@ class IncrementalEncoder(UTF8IncrementalEncoder):
 
         if index1 == 0:
             # Encode a six-byte sequence starting with 0xed.
-            print([
-                    0xED,
-                    0xA0 | (((ord(input[0]) >> 16) - 1) & 0x0f),
-                    0x80 | ((ord(input[0]) >> 10) & 0x3f),
-                    0xED,
-                    0xB0 | ((ord(input[0]) >> 6) & 0x0f),
-                    0x80 | (ord(input[0]) & 0x3f),
-                ])
             return bytes(bytearray([
                     0xED,
                     0xA0 | (((ord(input[0]) >> 16) - 1) & 0x0f),

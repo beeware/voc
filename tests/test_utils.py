@@ -1,6 +1,6 @@
 import unittest
 
-from .utils import adjust, cleanse_java, cleanse_python
+from .utils import adjust, cleanse_java, cleanse_python, TranspileTestCase
 
 
 class AdjustTests(unittest.TestCase):
@@ -76,10 +76,68 @@ class JavaNormalizationTests(unittest.TestCase):
             """
         )
 
+    def test_exception_in_clinit_after_output_windows(self):
+        self.assertNormalized(
+            """
+            Hello, world.
+            java.lang.ExceptionInInitializerError
+            Caused by: org.python.exceptions.IndexError: list index out of range
+                at org.python.types.List.__getitem__(List.java:100)
+                at org.python.types.List.__getitem__(List.java:85)
+                at python.test.<clinit>(test.py:2)
+            """,
+            """
+            Hello, world.
+            ### EXCEPTION ###
+            IndexError: list index out of range
+                test.py:2
+            """
+        )
+
+    def test_exception_in_clinit_after_output_testdaemon(self):
+        self.assertNormalized(
+            """
+            False
+            True
+            Exception in thread "main" java.lang.ExceptionInInitializerError
+            \tat sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+            \tat sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+            \tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+            \tat java.lang.reflect.Method.invoke(Method.java:497)
+            \tat python.testdaemon.TestDaemon.main(TestDaemon.java:66)
+            Caused by: org.python.exceptions.KeyError: 'c'
+                at org.python.types.Dict.__getitem__(Dict.java:142)
+                at python.test.__init__.<clinit>(test.py:4)
+                ... 5 more
+            """,
+            """
+            False
+            True
+            ### EXCEPTION ###
+            KeyError: 'c'
+                test.py:4
+            """
+        )
+
     def test_exception_in_method(self):
         self.assertNormalized(
             """
             Exception in thread "main" org.python.exceptions.IndexError: list index out of range
+                at org.python.types.List.__getitem__(List.java:100)
+                at org.python.types.List.__getitem__(List.java:85)
+                at python.test.main(test.py:3)
+            """,
+            """
+            ### EXCEPTION ###
+            IndexError: list index out of range
+                test.py:3
+            """
+        )
+
+    def test_exception_in_method_windows(self):
+        self.assertNormalized(
+            """
+            org.python.exceptions.IndexError: list index out of range
                 at org.python.types.List.__getitem__(List.java:100)
                 at org.python.types.List.__getitem__(List.java:85)
                 at python.test.main(test.py:3)
@@ -96,6 +154,23 @@ class JavaNormalizationTests(unittest.TestCase):
             """
             Hello, world.
             Exception in thread "main" org.python.exceptions.IndexError: list index out of range
+                at org.python.types.List.__getitem__(List.java:100)
+                at org.python.types.List.__getitem__(List.java:85)
+                at python.test.main(test.py:3)
+            """,
+            """
+            Hello, world.
+            ### EXCEPTION ###
+            IndexError: list index out of range
+                test.py:3
+            """
+        )
+
+    def test_exception_in_method_after_output_windows(self):
+        self.assertNormalized(
+            """
+            Hello, world.
+            org.python.exceptions.IndexError: list index out of range
                 at org.python.types.List.__getitem__(List.java:100)
                 at org.python.types.List.__getitem__(List.java:85)
                 at python.test.main(test.py:3)
@@ -137,6 +212,24 @@ class JavaNormalizationTests(unittest.TestCase):
 
     def test_float(self):
         self.assertNormalized('7.950899459780156E-6', '7.950899459780156e-6')
+
+    def test_memory_reference(self):
+        self.assertNormalized(
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0x1eb19f4e>>
+            Hello from the instance!
+            Done.
+            """,
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+            Hello from the instance!
+            Done.
+            """
+        )
 
 
 class PythonNormalizationTests(unittest.TestCase):
@@ -187,3 +280,52 @@ class PythonNormalizationTests(unittest.TestCase):
 
     def test_float(self):
         self.assertNormalized('7.950899459780156e-06', '7.950899459780156e-6')
+
+    def test_memory_reference(self):
+        self.assertNormalized(
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0x1eb19f4e>>
+            Hello from the instance!
+            Done.
+            """,
+            """
+            Class is <class 'com.example.MyClass'>
+            Method is <native function com.example.MyClass.method>
+            Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+            Hello from the instance!
+            Done.
+            """
+        )
+
+
+class JavaBootstrapTests(TranspileTestCase):
+    def test_java_code(self):
+        "You can supply Java code and use it from within Python"
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
+
+            obj = MyClass()
+
+            obj.doStuff()
+
+            print("Done.")
+            """,
+            java={
+                'com/example/MyClass': """
+                package com.example;
+
+                public class MyClass {
+                    public void doStuff() {
+                        System.out.println("Hello from Java");
+                    }
+                }
+                """
+            },
+            out="""
+            Hello from Java
+            Done.
+            """,
+        )

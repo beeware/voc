@@ -408,27 +408,42 @@ class ATHROW(Opcode):
 
 
 class BALOAD(Opcode):
+    # Load a byte or Boolean value from an array
+    # Stack: arrayref, index → value
     code = 0x33
 
     def __init__(self):
         super(BALOAD, self).__init__()
-# arrayref, index → value
-# Load a byte or Boolean value from an array
 
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 3
 
 class BASTORE(Opcode):
+    # Store a byte or Boolean value into an array
+    # Stack: arrayref, index, value →
     code = 0x54
 
     def __init__(self):
         super(BASTORE, self).__init__()
-# arrayref, index, value →
-# Store a byte or Boolean value into an array
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 3
 
 
 class BIPUSH(Opcode):
-    # Args(1) byte
-    # → value
     # Push a byte onto the stack as an integer value
+    # Args(1) byte
+    # Stack: → value
     code = 0x10
 
     def __init__(self, const):
@@ -459,29 +474,45 @@ class BIPUSH(Opcode):
 
 
 class BREAKPOINT(Opcode):
+    # Reserved for breakpoints in Java debuggers; should not appear in any class file
     code = 0xca
 
     def __init__(self):
         super(BREAKPOINT, self).__init__()
-# Reserved for breakpoints in Java debuggers; should not appear in any class file
 
 
 class CALOAD(Opcode):
+    # Load a char from an array
+    # Stack: arrayref, index → value
     code = 0x34
 
     def __init__(self):
         super(CALOAD, self).__init__()
-# arrayref, index → value
-# Load a char from an array
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class CASTORE(Opcode):
+    # Store a char into an array
+    # Stack: arrayref, index, value →
     code = 0x55
 
     def __init__(self):
         super(CASTORE, self).__init__()
-# arrayref, index, value →
-# Store a char into an array
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 3
 
 
 class CHECKCAST(Opcode):
@@ -522,238 +553,497 @@ class CHECKCAST(Opcode):
 
 
 class D2F(Opcode):
+    # Convert a double to a float
+    # Stack: value → result
     code = 0x90
 
     def __init__(self):
         super(D2F, self).__init__()
-# value → result
-# Convert a double to a float
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class D2I(Opcode):
+    # Convert a double to an int
+    # Stack: value → result
     code = 0x8e
 
     def __init__(self):
         super(D2I, self).__init__()
-# value → result
-# Convert a double to an int
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class D2L(Opcode):
+    # Convert a double to a long
+    # Stack: value → result
     code = 0x8f
 
     def __init__(self):
         super(D2L, self).__init__()
-# value → result
-# Convert a double to a long
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class DADD(Opcode):
+    # Add two doubles
+    # Stack: value1, value2 → result
     code = 0x63
 
     def __init__(self):
         super(DADD, self).__init__()
-# value1, value2 → result
-# Add two doubles
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DALOAD(Opcode):
+    # Load a double from an array
+    # Stack: arrayref, index → value
     code = 0x31
 
     def __init__(self):
         super(DALOAD, self).__init__()
-# arrayref, index → value
-# Load a double from an array
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DASTORE(Opcode):
+    # Store a double into an array
+    # Stack: arrayref, index, value →
     code = 0x52
 
     def __init__(self):
         super(DASTORE, self).__init__()
-# arrayref, index, value →
-# Store a double into an array
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 3
 
 
 class DCMPG(Opcode):
+    # Compare two doubles
+    # Stack: value1, value2 → result
     code = 0x98
 
     def __init__(self):
         super(DCMPG, self).__init__()
-# value1, value2 → result
-# Compare two doubles
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DCMPL(Opcode):
+    # Compare two doubles
+    # Stack: value1, value2 → result
     code = 0x97
 
     def __init__(self):
         super(DCMPL, self).__init__()
-# value1, value2 → result
-# Compare two doubles
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DCONST_0(Opcode):
+    # Push the constant 0.0 onto the stack
+    # Stack: → 0.0
     code = 0x0e
 
     def __init__(self):
         super(DCONST_0, self).__init__()
-# → 0.0
-# Push the constant 0.0 onto the stack
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DCONST_1(Opcode):
+    # Push the constant 1.0 onto the stack
+    # Stack:  → 1.0
     code = 0x0f
 
     def __init__(self):
         super(DCONST_1, self).__init__()
-# → 1.0
-# Push the constant 1.0 onto the stack
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DDIV(Opcode):
+    # Divide two doubles
+    # Stack: value1, value2 → result
     code = 0x6f
 
     def __init__(self):
         super(DDIV, self).__init__()
-# value1, value2 → result
-# Divide two doubles
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DLOAD(Opcode):
+    # Load a double value from a local variable #index
+    # Args(1): index
+    # Stack: → value
     code = 0x18
 
-    def __init__(self):
+    def __init__(self, var):
         super(DLOAD, self).__init__()
-# 1: index
-# → value
-# Load a double value from a local variable #index
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DLOAD_0(Opcode):
+    # Load a double from local variable 0
+    # Stack: → value
     code = 0x26
 
-    def __init__(self):
+    def __init__(self, var):
         super(DLOAD_0, self).__init__()
-# → value
-# Load a double from local variable 0
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DLOAD_1(Opcode):
+    # Load a double from local variable 1
+    # Stack: → value
     code = 0x27
 
     def __init__(self):
         super(DLOAD_1, self).__init__()
-# → value
-# Load a double from local variable 1
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DLOAD_2(Opcode):
+    # Load a double from local variable 2
+    # Stack: → value
     code = 0x28
 
     def __init__(self):
         super(DLOAD_2, self).__init__()
-# → value
-# Load a double from local variable 2
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DLOAD_3(Opcode):
+    # Load a double from local variable 3
+    # Stack: → value
     code = 0x29
 
     def __init__(self):
         super(DLOAD_3, self).__init__()
-# → value
-# Load a double from local variable 3
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class DMUL(Opcode):
+    # Multiply two doubles
+    # Stack: value1, value2 → result
     code = 0x6b
 
     def __init__(self):
         super(DMUL, self).__init__()
-# value1, value2 → result multiply two doubles
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DNEG(Opcode):
+    # Negate a double
+    # Stack: value → result
     code = 0x77
 
     def __init__(self):
         super(DNEG, self).__init__()
-# value → result  negate a double
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class DREM(Opcode):
+    # Get the remainder from a division between two doubles
+    # value1, value2 → result
     code = 0x73
 
     def __init__(self):
         super(DREM, self).__init__()
-# value1, value2 → result get the remainder from a division between two doubles
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DRETURN(Opcode):
+    # Return a double from a method
+    # Stack:value → [empty]
     code = 0xaf
 
     def __init__(self):
         super(DRETURN, self).__init__()
-# value → [empty] return a double from a method
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class DSTORE(Opcode):
+    # Store a double value into a local variable #index
+    # Args(1): index
+    # Stack: value →
     code = 0x39
 
-    def __init__(self):
+    def __init__(self, var):
         super(DSTORE, self).__init__()
-# 1: index
-# value →
-# Store a double value into a local variable #index
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class DSTORE_0(Opcode):
+    # Store a double into local variable 0
+    # Stack: value →
     code = 0x47
 
     def __init__(self):
         super(DSTORE_0, self).__init__()
-# value →
-# Store a double into local variable 0
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class DSTORE_1(Opcode):
+    # Store a double into local variable 1
+    # Stack: value →
     code = 0x48
 
     def __init__(self):
         super(DSTORE_1, self).__init__()
-# value →
-# Store a double into local variable 1
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class DSTORE_2(Opcode):
+    # Store a double into local variable 2
+    # Stack: value →
     code = 0x49
 
     def __init__(self):
         super(DSTORE_2, self).__init__()
-# value →
-# Store a double into local variable 2
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class DSTORE_3(Opcode):
+    # Store a double into local variable 3
+    # Stack: value →
     code = 0x4a
 
     def __init__(self):
         super(DSTORE_3, self).__init__()
-# value →
-# Store a double into local variable 3
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class DSUB(Opcode):
+    # Subtract a double from another
+    # Stack: value1, value2 → result
     code = 0x67
 
     def __init__(self):
         super(DSUB, self).__init__()
-# value1, value2 → result subtract a double from another
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DUP(Opcode):
-    # value → value, value    duplicate the value on top of the stack
+    # Duplicate the value on top of the stack
+    # value → value, value
     code = 0x59
 
     def __init__(self):
@@ -769,34 +1059,58 @@ class DUP(Opcode):
 
 
 class DUP_X1(Opcode):
+    # Insert a copy of the top value into the stack two values from the top. value1
+    # and value2 must not be of the type double or long.
+    # Stack: value2, value1 → value1, value2, value1
     code = 0x5a
 
     def __init__(self):
         super(DUP_X1, self).__init__()
-# value2, value1 → value1, value2, value1
-# Insert a copy of the top value into the stack two values from the top. value1
-# and value2 must not be of the type double or long.
+
+    @property
+    def produce_count(self):
+        return 3
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DUP_X2(Opcode):
+    # Insert a copy of the top value into the stack two (if value2 is double or long
+    # it takes up the entry of value3, too) or three values (if value2 is neither
+    # double nor long) from the top
+    # Stack: value3, value2, value1 → value1, value3, value2, value1
     code = 0x5b
 
     def __init__(self):
         super(DUP_X2, self).__init__()
-# value3, value2, value1 → value1, value3, value2, value1
-# Insert a copy of the top value into the stack two (if value2 is double or long
-# it takes up the entry of value3, too) or three values (if value2 is neither
-# double nor long) from the top
+
+    @property
+    def produce_count(self):
+        return 4
+
+    @property
+    def consume_count(self):
+        return 3
 
 
 class DUP2(Opcode):
+    # Duplicate top two stack words (two values, if value1 is not double nor long; a
+    # single value, if value1 is double or long)
+    # Stack: {value2, value1} → {value2, value1}, {value2, value1}
     code = 0x5c
 
     def __init__(self):
         super(DUP2, self).__init__()
-# {value2, value1} → {value2, value1}, {value2, value1}
-# Duplicate top two stack words (two values, if value1 is not double nor long; a
-# single value, if value1 is double or long)
+
+    @property
+    def produce_count(self):
+        return 4
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class DUP2_X1(Opcode):
@@ -807,254 +1121,523 @@ class DUP2_X1(Opcode):
 # value3, {value2, value1} → {value2, value1}, value3, {value2, value1}
 # Duplicate two words and insert beneath third word (see explanation above)
 
+    @property
+    def produce_count(self):
+        return 4
+
+    @property
+    def consume_count(self):
+        return 3
+
 
 class DUP2_X2(Opcode):
+    # Duplicate two words and insert beneath fourth word
+    # Stack: {value4, value3}, {value2, value1} → {value2, value1}, {value4, value3}, {value2, value1}
     code = 0x5e
 
     def __init__(self):
         super(DUP2_X2, self).__init__()
-# {value4, value3}, {value2, value1} → {value2, value1}, {value4, value3}, {value2, value1}
-# Duplicate two words and insert beneath fourth word
+
+    @property
+    def produce_count(self):
+        return 6
+
+    @property
+    def consume_count(self):
+        return 4
 
 
 class F2D(Opcode):
+    # Convert a float to a double
+    # Stack: value → result
     code = 0x8d
 
     def __init__(self):
         super(F2D, self).__init__()
-# value → result
-# Convert a float to a double
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class F2I(Opcode):
+    # Convert a float to an int
+    # Stack: value → result
     code = 0x8b
 
     def __init__(self):
         super(F2I, self).__init__()
-# value → result
-# Convert a float to an int
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class F2L(Opcode):
+    # Convert a float to a long
+    # Stack: value → result
     code = 0x8c
 
     def __init__(self):
         super(F2L, self).__init__()
-# value → result
-# Convert a float to a long
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class FADD(Opcode):
+    # Add two floats
+    # value1, value2 → result
     code = 0x62
 
     def __init__(self):
-
         super(FADD, self).__init__()
-# value1, value2 → result add two floats
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class FALOAD(Opcode):
+    # Load a float from an array
+    # Stack: arrayref, index → value
     code = 0x30
 
     def __init__(self):
         super(FALOAD, self).__init__()
-# arrayref, index → value
-# Load a float from an array
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class FASTORE(Opcode):
+    # Store a float in an array
+    # Stack: arrayref, index, value →
     code = 0x51
 
     def __init__(self):
         super(FASTORE, self).__init__()
-# arrayref, index, value →
-# Store a float in an array
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 3
 
 
 class FCMPG(Opcode):
+    # Compare two floats
+    # Stack: value1, value2 → result
     code = 0x96
 
     def __init__(self):
         super(FCMPG, self).__init__()
-# value1, value2 → result
-# Compare two floats
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class FCMPL(Opcode):
+    # Compare two floats
+    # Stack: value1, value2 → result
     code = 0x95
 
     def __init__(self):
         super(FCMPL, self).__init__()
-# value1, value2 → result
-# Compare two floats
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class FCONST_0(Opcode):
+    # Push 0.0f on the stack
+    # Stack: → 0.0f
     code = 0x0b
 
     def __init__(self):
         super(FCONST_0, self).__init__()
-# → 0.0f
-# Push 0.0f on the stack
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class FCONST_1(Opcode):
+    # Push 1.0f on the stack
+    # Stack: → 1.0f
     code = 0x0c
 
     def __init__(self):
         super(FCONST_1, self).__init__()
-# → 1.0f
-# Push 1.0f on the stack
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class FCONST_2(Opcode):
+    # Push 2.0f on the stack
+    # Stack: → 2.0f
     code = 0x0d
 
     def __init__(self):
         super(FCONST_2, self).__init__()
-# → 2.0f
-# Push 2.0f on the stack
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class FDIV(Opcode):
+    # Divide two floats
+    # Stack: value1, value2 → result
     code = 0x6e
 
     def __init__(self):
         super(FDIV, self).__init__()
-# value1, value2 → result
-# Divide two floats
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class FLOAD(Opcode):
+    # Load a float value from a local variable #index
+    # Args(1): index
+    # Stack: → value
     code = 0x17
 
-    def __init__(self):
+    def __init__(self, var):
         super(FLOAD, self).__init__()
-# 1: index
-# → value
-# Load a float value from a local variable #index
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class FLOAD_0(Opcode):
+    # Load a float value from local variable 0
+    # Stack: → value
     code = 0x22
 
     def __init__(self):
         super(FLOAD_0, self).__init__()
-# → value
-# Load a float value from local variable 0
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class FLOAD_1(Opcode):
+    # Load a float value from local variable 1
+    # Stack: → value
     code = 0x23
 
     def __init__(self):
         super(FLOAD_1, self).__init__()
-# → value
-# Load a float value from local variable 1
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
+
 
 
 class FLOAD_2(Opcode):
+    # Load a float value from local variable 2
+    # Stack: → value
     code = 0x24
 
     def __init__(self):
         super(FLOAD_2, self).__init__()
-# → value
-# Load a float value from local variable 2
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
+
 
 
 class FLOAD_3(Opcode):
+    # Load a float value from local variable 3
+    # Stack: → value
     code = 0x25
 
     def __init__(self):
         super(FLOAD_3, self).__init__()
-# → value
-# Load a float value from local variable 3
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class FMUL(Opcode):
+    # Multiply two floats
+    # Stack: value1, value2 → result
     code = 0x6a
 
     def __init__(self):
         super(FMUL, self).__init__()
-# value1, value2 → result multiply two floats
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class FNEG(Opcode):
+    # Negate a float
+    # Stack: value → result
     code = 0x76
 
     def __init__(self):
         super(FNEG, self).__init__()
-# value → result  negate a float
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class FREM(Opcode):
+    # Get the remainder from a division between two floats
+    # Stack: value1, value2 → result
     code = 0x72
 
     def __init__(self):
         super(FREM, self).__init__()
-# value1, value2 → result get the remainder from a division between two floats
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class FRETURN(Opcode):
+    # Return a float
+    # Stack: value → [empty]
     code = 0xae
 
     def __init__(self):
         super(FRETURN, self).__init__()
-# value → [empty] return a float
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class FSTORE(Opcode):
+    # Store a float value into a local variable #index
+    # Args(1): index
+    # Stack: value →
     code = 0x38
 
-    def __init__(self):
+    def __init__(self, var):
         super(FSTORE, self).__init__()
-# 1: index
-# value →
-# Store a float value into a local variable #index
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class FSTORE_0(Opcode):
+    # Store a float value into local variable 0
+    # Stack: value →
     code = 0x43
 
     def __init__(self):
         super(FSTORE_0, self).__init__()
-# value →
-# Store a float value into local variable 0
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class FSTORE_1(Opcode):
+    # Store a float value into local variable 1
+    # Stack: value →
     code = 0x44
 
     def __init__(self):
         super(FSTORE_1, self).__init__()
-# value →
-# Store a float value into local variable 1
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class FSTORE_2(Opcode):
+    # Store a float value into local variable 2
+    # Stack: value →
     code = 0x45
 
     def __init__(self):
         super(FSTORE_2, self).__init__()
-# value →
-# Store a float value into local variable 2
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class FSTORE_3(Opcode):
+    # Store a float value into local variable 3
+    # Stack: value →
     code = 0x46
 
     def __init__(self):
         super(FSTORE_3, self).__init__()
-# value →
-# Store a float value into local variable 3
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class FSUB(Opcode):
+    # Subtract two floats
+    # Stack: value1, value2 → result
     code = 0x66
 
     def __init__(self):
         super(FSUB, self).__init__()
-# value1, value2 → result subtract two floats
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class GETFIELD(Opcode):
@@ -1174,104 +1757,208 @@ class GOTO(Opcode):
 
 
 class GOTO_W(Opcode):
+    # Goes to another instruction at branchoffset (signed int constructed from
+    # unsigned bytes branchbyte1 << 24 + branchbyte2 << 16 + branchbyte3 << 8 +
+    # branchbyte4)
+    # Args(4): branchbyte1, branchbyte2, branchbyte3, branchbyte4
+    # Stack: [no change]
     code = 0xc8
 
-    def __init__(self):
+    def __init__(self, offset):
         super(GOTO_W, self).__init__()
-# 4: branchbyte1, branchbyte2, branchbyte3, branchbyte4
-# [no change]
-# Goes to another instruction at branchoffset (signed int constructed from
-# unsigned bytes branchbyte1 << 24 + branchbyte2 << 16 + branchbyte3 << 8 +
-# branchbyte4)
+        self.offset = offset
+
+    def __len__(self):
+        return 5
+
+    def __arg_repr__(self):
+        return ' %s' % self.offset
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        offset = reader.read_s4()
+        return cls(offset)
+
+    def write_extra(self, writer):
+        writer.write_s4(self.offset)
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class I2B(Opcode):
+    # Convert an int into a byte
+    # Stack: value → result
     code = 0x91
 
     def __init__(self):
         super(I2B, self).__init__()
-# value → result
-# Convert an int into a byte
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class I2C(Opcode):
+    # Convert an int into a character
+    # Stack: value → result
     code = 0x92
 
     def __init__(self):
         super(I2C, self).__init__()
-# value → result
-# Convert an int into a character
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class I2D(Opcode):
+    # Convert an int into a double
+    # Stack: value → result
     code = 0x87
 
     def __init__(self):
         super(I2D, self).__init__()
-# value → result
-# Convert an int into a double
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class I2F(Opcode):
+    # Convert an int into a float
+    # Stack: value → result
     code = 0x86
 
     def __init__(self):
         super(I2F, self).__init__()
-# value → result
-# Convert an int into a float
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class I2L(Opcode):
+    # Convert an int into a long
+    # Stack: value → result
     code = 0x85
 
     def __init__(self):
         super(I2L, self).__init__()
-# value → result
-# Convert an int into a long
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class I2S(Opcode):
+    # Convert an int into a short
+    # Stack: value → result
     code = 0x93
 
     def __init__(self):
         super(I2S, self).__init__()
-# value → result
-# Convert an int into a short
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class IADD(Opcode):
+    # Add two ints
+    # Stack: value1, value2 → result
     code = 0x60
 
     def __init__(self):
         super(IADD, self).__init__()
-# value1, value2 → result add two ints
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IALOAD(Opcode):
+    # Load an int from an array
+    # Stack: arrayref, index → value
     code = 0x2e
 
     def __init__(self):
         super(IALOAD, self).__init__()
-# arrayref, index → value
-# Load an int from an array
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IAND(Opcode):
+    # Perform a bitwise and on two integers
+    # Stack: value1, value2 → result
     code = 0x7e
 
     def __init__(self):
         super(IAND, self).__init__()
-# value1, value2 → result
-# Perform a bitwise and on two integers
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IASTORE(Opcode):
+    # Store an int into an array
+    # Stack: arrayref, index, value →
     code = 0x4f
 
     def __init__(self):
         super(IASTORE, self).__init__()
-# arrayref, index, value →
-# Store an int into an array
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 3
 
 
 class ICONST_M1(Opcode):
@@ -1394,12 +2081,20 @@ class ICONST_5(Opcode):
 
 
 class IDIV(Opcode):
+    # Divide two integers
+    # Stack: value1, value2 → result
     code = 0x6c
 
     def __init__(self):
         super(IDIV, self).__init__()
-# value1, value2 → result
-# Divide two integers
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IF_ACMPEQ(Opcode):
@@ -2086,50 +2781,94 @@ class ILOAD_3(Opcode):
 
 
 class IMPDEP1(Opcode):
+    # Reserved for implementation-dependent operations within debuggers; should not
+    # appear in any class file
     code = 0xfe
 
     def __init__(self):
         super(IMPDEP1, self).__init__()
-# Reserved for implementation-dependent operations within debuggers; should not
-# appear in any class file
 
 
 class IMPDEP2(Opcode):
+    # Reserved for implementation-dependent operations within debuggers; should not
+    # appear in any class file
     code = 0xff
 
     def __init__(self):
         super(IMPDEP2, self).__init__()
-# Reserved for implementation-dependent operations within debuggers; should not
-# appear in any class file
 
 
 class IMUL(Opcode):
+    # Multiply two integers
+    # Stack: value1, value2 → result
     code = 0x68
 
     def __init__(self):
         super(IMUL, self).__init__()
-# value1, value2 → result
-# Multiply two integers
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class INEG(Opcode):
+    # Negate int
+    # Stack: value → result
     code = 0x74
 
     def __init__(self):
         super(INEG, self).__init__()
-# value → result
-# Negate int
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class INSTANCEOF(Opcode):
+    # Determines if an object objectref is of a given type, identified by class
+    # reference index in constant pool (indexbyte1 << 8 + indexbyte2)
+    # Args(2): indexbyte1, indexbyte2
+    # Stack: objectref → result
     code = 0xc1
 
-    def __init__(self):
+    def __init__(self, class_name):
         super(INSTANCEOF, self).__init__()
-# 2: indexbyte1, indexbyte2
-# objectref → result
-# Determines if an object objectref is of a given type, identified by class
-# reference index in constant pool (indexbyte1 << 8 + indexbyte2)
+        self.klass = Classref(class_name)
+
+    def __arg_repr__(self):
+        return ' %s' % self.klass.class_name
+
+    def __len__(self):
+        return 3
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        klass = reader.constant_pool[reader.read_u2()]
+        return cls(
+            klass.name.bytes.decode('mutf-8'),
+        )
+
+    def write_extra(self, writer):
+        writer.write_u2(writer.constant_pool.index(self.klass))
+
+    def resolve(self, constant_pool):
+        self.klass.resolve(constant_pool)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class INVOKEDYNAMIC(Opcode):
@@ -2361,48 +3100,80 @@ class INVOKEVIRTUAL(Opcode):
 
 
 class IOR(Opcode):
+    # Bitwise int or
+    # Stack: value1, value2 → result
     code = 0x80
 
     def __init__(self):
         super(IOR, self).__init__()
-# value1, value2 → result
-# Bitwise int or
 
 
 class IREM(Opcode):
+    # Logical int remainder
+    # Stack: value1, value2 → result
     code = 0x70
 
     def __init__(self):
         super(IREM, self).__init__()
-# value1, value2 → result
-# Logical int remainder
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IRETURN(Opcode):
+    # Return an integer from a method
+    # Stack: value → [empty]
     code = 0xac
 
     def __init__(self):
         super(IRETURN, self).__init__()
-# value → [empty]
-# Return an integer from a method
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class ISHL(Opcode):
+    # Int shift left
+    # Stack: value1, value2 → result
     code = 0x78
 
     def __init__(self):
         super(ISHL, self).__init__()
-# value1, value2 → result
-# int shift left
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class ISHR(Opcode):
+    # Int arithmetic shift right
+    # Stack: value1, value2 → result
     code = 0x7a
 
     def __init__(self):
         super(ISHR, self).__init__()
-# value1, value2 → result
-# int arithmetic shift right
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class ISTORE(Opcode):
@@ -2507,7 +3278,8 @@ class ISTORE_3(Opcode):
 
 
 class ISUB(Opcode):
-# value1, value2 → result int subtract
+    # Int subtract
+    # Stack: value1, value2 → result
     code = 0x64
 
     def __init__(self):
@@ -2523,19 +3295,37 @@ class ISUB(Opcode):
 
 
 class IUSHR(Opcode):
+    # Int logical shift right
+    # Stack: value1, value2 → result
     code = 0x7c
 
     def __init__(self):
         super(IUSHR, self).__init__()
-# value1, value2 → result int logical shift right
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class IXOR(Opcode):
+    # Int xor
+    # Stack: value1, value2 → result
     code = 0x82
 
     def __init__(self):
         super(IXOR, self).__init__()
-# value1, value2 → result int xor
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class JSR(Opcode):
@@ -2561,91 +3351,173 @@ class JSR_W(Opcode):
 
 
 class L2D(Opcode):
+    # Convert a long to a double
+    # Stack: value → result
     code = 0x8a
 
     def __init__(self):
         super(L2D, self).__init__()
-# value → result
-# Convert a long to a double
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class L2F(Opcode):
+    # Convert a long to a float
+    # Stack: value → result
     code = 0x89
 
     def __init__(self):
         super(L2F, self).__init__()
-# value → result
-# Convert a long to a float
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class L2I(Opcode):
+    # Convert a long to a int
+    # Stack: value → result
     code = 0x88
 
     def __init__(self):
         super(L2I, self).__init__()
-# value → result
-# Convert a long to a int
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class LADD(Opcode):
+    # add two longs
+    # Stack: value1, value2 → result
     code = 0x61
 
     def __init__(self):
         super(LADD, self).__init__()
-# value1, value2 → result add two longs
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class LALOAD(Opcode):
+    # Load a long from an array
+    # Stack: arrayref, index → value
     code = 0x2f
 
     def __init__(self):
         super(LALOAD, self).__init__()
-# arrayref, index → value
-# Load a long from an array
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class LAND(Opcode):
+    # bitwise and of two longs
+    # Stack: value1, value2 → result
     code = 0x7f
 
     def __init__(self):
         super(LAND, self).__init__()
-# value1, value2 → result bitwise and of two longs
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class LASTORE(Opcode):
+    # Store a long to an array
+    # Stack: arrayref, index, value →
     code = 0x50
 
     def __init__(self):
         super(LASTORE, self).__init__()
-# arrayref, index, value →
-# Store a long to an array
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 3
 
 
 class LCMP(Opcode):
+    # Compare two longs values
+    # Stack: value1, value2 → result
     code = 0x94
 
     def __init__(self):
         super(LCMP, self).__init__()
-# value1, value2 → result
-# Compare two longs values
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class LCONST_0(Opcode):
+    # Push the long 0 onto the stack
+    # Stack: → 0L
     code = 0x09
 
     def __init__(self):
         super(LCONST_0, self).__init__()
-# → 0L
-# Push the long 0 onto the stack
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LCONST_1(Opcode):
+    # Push the long 1 onto the stack
+    # Stack: → 1L
     code = 0x0a
 
     def __init__(self):
         super(LCONST_1, self).__init__()
-# → 1L
-# Push the long 1 onto the stack
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LDC(Opcode):
@@ -2789,74 +3661,155 @@ class LDC2_W(Opcode):
 
 
 class LDIV(Opcode):
+    # Divide two longs
+    # Stack: value1, value2 → result
     code = 0x6d
 
     def __init__(self):
         super(LDIV, self).__init__()
-# value1, value2 → result
-# Divide two longs
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class LLOAD(Opcode):
+    # Load a long value from a local variable #index
+    # Args(1): index
+    # Stack: → value
     code = 0x16
 
-    def __init__(self):
+    def __init__(self, var):
         super(LLOAD, self).__init__()
-# 1: index
-# → value
-# Load a long value from a local variable #index
+        self.var = var
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.var
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        var = reader.read_u1()
+        return cls(var)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.var)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LLOAD_0(Opcode):
+    # Load a long value from a local variable 0
+    # Stack: → value
     code = 0x1e
 
     def __init__(self):
         super(LLOAD_0, self).__init__()
-# → value
-# Load a long value from a local variable 0
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LLOAD_1(Opcode):
+    # Load a long value from a local variable 1
+    # Stack: → value
     code = 0x1f
 
     def __init__(self):
         super(LLOAD_1, self).__init__()
-# → value
-# Load a long value from a local variable 1
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LLOAD_2(Opcode):
+    # Load a long value from a local variable 2
+    # Stack: → value
     code = 0x20
 
     def __init__(self):
         super(LLOAD_2, self).__init__()
-# → value
-# Load a long value from a local variable 2
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LLOAD_3(Opcode):
+    # Load a long value from a local variable 3
+    # Stack: → value
     code = 0x21
 
     def __init__(self):
         super(LLOAD_3, self).__init__()
-# → value
-# Load a long value from a local variable 3
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 0
 
 
 class LMUL(Opcode):
+    # Multiply two longs
+    # Stack: value1, value2 → result
     code = 0x69
 
     def __init__(self):
         super(LMUL, self).__init__()
-# value1, value2 → result multiply two longs
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class LNEG(Opcode):
+    # Negate a long
+    # Stack: value → result
     code = 0x75
 
     def __init__(self):
         super(LNEG, self).__init__()
-# value → result  negate a long
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class LOOKUPSWITCH(Opcode):
@@ -2871,29 +3824,54 @@ class LOOKUPSWITCH(Opcode):
 
 
 class LOR(Opcode):
+    # Bitwise or of two longs
+    # Stack: value1, value2 → result
     code = 0x81
 
     def __init__(self):
         super(LOR, self).__init__()
-# value1, value2 → result
-# Bitwise or of two longs
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class LREM(Opcode):
+    # Remainder of division of two longs
+    # Stack: value1, value2 → result
     code = 0x71
 
     def __init__(self):
         super(LREM, self).__init__()
-# value1, value2 → result
-# Remainder of division of two longs
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 2
 
 
 class LRETURN(Opcode):
+    # Return a long value
+    # Stack: value → [empty]
     code = 0xad
 
     def __init__(self):
         super(LRETURN, self).__init__()
-# value → [empty] return a long value
+
+    @property
+    def produce_count(self):
+        return 0
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class LSHL(Opcode):
@@ -2916,49 +3894,49 @@ class LSHR(Opcode):
 
 
 class LSTORE(Opcode):
+    # Store a long value in a local variable #index
+    # Args(1): index
+    # Stack: value →
     code = 0x37
 
     def __init__(self):
         super(LSTORE, self).__init__()
-# 1: index
-# value →
-# Store a long value in a local variable #index
 
 
 class LSTORE_0(Opcode):
+    # Store a long value in a local variable 0
+    # Stack: value →
     code = 0x3f
 
     def __init__(self):
         super(LSTORE_0, self).__init__()
-# value →
-# Store a long value in a local variable 0
 
 
 class LSTORE_1(Opcode):
+    # Store a long value in a local variable 1
+    # Stack: value →
     code = 0x40
 
     def __init__(self):
         super(LSTORE_1, self).__init__()
-# value →
-# Store a long value in a local variable 1
 
 
 class LSTORE_2(Opcode):
+    # Store a long value in a local variable 2
+    # Stack: value →
     code = 0x41
 
     def __init__(self):
         super(LSTORE_2, self).__init__()
-# value →
-# Store a long value in a local variable 2
 
 
 class LSTORE_3(Opcode):
+    # Store a long value in a local variable 3
+    # Stack: value →
     code = 0x42
 
     def __init__(self):
         super(LSTORE_3, self).__init__()
-# value →
-# Store a long value in a local variable 3
 
 
 class LSUB(Opcode):

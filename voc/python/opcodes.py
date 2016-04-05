@@ -437,7 +437,7 @@ class CATCH:
                     command.transpile(context)
 
             try_catch.handlers[-1].jump_op = end_jump
-            try_catch.handlers[-1].end_op = context.code[-1]
+            try_catch.handlers[-1].end_op = context.opcodes[-1]
 
         context.add_opcodes(end_jump)
         jump(end_jump, context, try_catch, Opcode.NEXT)
@@ -509,7 +509,7 @@ class FINALLY:
                     command.transpile(context)
 
             try_catch.handlers[-1].jump_op = end_jump
-            try_catch.handlers[-1].end_op = context.code[-1]
+            try_catch.handlers[-1].end_op = context.opcodes[-1]
 
         context.add_opcodes(end_jump)
         jump(end_jump, context, try_catch, Opcode.NEXT)
@@ -542,11 +542,11 @@ class END_TRY:
         # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
 
         if try_catch.finally_handler:
-            try_catch.finally_handler.end_op = context.code[-1]
+            try_catch.finally_handler.end_op = context.opcodes[-1]
         elif len(try_catch.handlers) > 0:
-            try_catch.handlers[-1].end_op = context.code[-1]
+            try_catch.handlers[-1].end_op = context.opcodes[-1]
 
-        try_catch.end_op = context.code[-1]
+        try_catch.end_op = context.opcodes[-1]
 
         # The next opcode is the end of the try-catch block.
         context.next_resolve_list.append((try_catch, 'next_op'))
@@ -693,6 +693,78 @@ def IINC_name(context, name, value):
     return JavaOpcodes.IINC(index, value)
 
 
+def LLOAD_name(context, name):
+    """Generate the opcode to load a long variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD LVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.LLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.LLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.LLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.LLOAD_3()
+    else:
+        return JavaOpcodes.LLOAD(index)
+
+
+def FLOAD_name(context, name):
+    """Generate the opcode to load a float variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD FVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.FLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.FLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.FLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.FLOAD_3()
+    else:
+        return JavaOpcodes.FLOAD(index)
+
+
+def DLOAD_name(context, name):
+    """Generate the opcode to load a double variable with the given name onto the stack.
+
+    This looks up the local variable dictionary to find which
+    register is being used for that variable, using the optimized
+    register operations for the first 4 local variables.
+    """
+    index = context.local_vars[name]
+
+    # print("LOAD LVAR NAME", context, name, index)
+    # print("locals: ", context.local_vars)
+
+    if index == 0:
+        return JavaOpcodes.DLOAD_0()
+    elif index == 1:
+        return JavaOpcodes.DLOAD_1()
+    elif index == 2:
+        return JavaOpcodes.DLOAD_2()
+    elif index == 3:
+        return JavaOpcodes.DLOAD_3()
+    else:
+        return JavaOpcodes.DLOAD(index)
+
+
 def free_name(context, name):
     """Remove a name from the local variable pool
     """
@@ -778,6 +850,10 @@ class Ref:
     def next_op(self):
         return self.context.jump_targets[self.target].next_op
 
+    @property
+    def yield_op(self):
+        return self.context.jump_targets[self.target].yield_op
+
 
 def jump(opcode, context, target, position):
     """Define a jump operation.
@@ -808,6 +884,8 @@ def resolve_jump(opcode, context, target, position):
         opcode.jump_op = target.end_op
     elif position == Opcode.NEXT:
         opcode.jump_op = target.next_op
+    elif position == Opcode.YIELD:
+        opcode.jump_op = target.yield_op
     else:
         raise Exception("Unknown opcode position")
     # print("JUMP OP IS", opcode.jump_op)
@@ -832,6 +910,7 @@ class Opcode:
     START = 10
     END = 20
     NEXT = 30
+    YIELD = 40
 
     def __init__(self, python_offset, starts_line, is_jump_target):
         self.python_offset = python_offset
@@ -850,7 +929,7 @@ class Opcode:
 
     def materialize(self, context, arguments):
         for argument in arguments:
-            argument.operation.materialize(context, argument.arguments)
+            argument.materialize(context)
 
     def transpile(self, context, arguments):
         # print ("TRANSPILE", self.python_offset, self)
@@ -860,22 +939,22 @@ class Opcode:
         if self.starts_line:
             context.next_opcode_starts_line = self.starts_line
 
-        n_ops = len(context.code)
+        n_ops = len(context.opcodes)
 
         # Actually convert the opcode. This is recursive down the Command sequence.
         self.convert(context, arguments)
 
-        if len(context.code) == n_ops:
+        if len(context.opcodes) == n_ops:
             context.next_resolve_list.append((self, 'end_op'))
         else:
-            self.end_op = context.code[-1]
+            self.end_op = context.opcodes[-1]
         context.next_resolve_list.append((self, 'next_op'))
 
         context.jump_targets[self.jump_target(arguments)] = self
 
     def convert_args(self, context, arguments):
         for argument in arguments:
-            argument.operation.transpile(context, argument.arguments)
+            argument.transpile(context)
 
     def convert(self, context, arguments):
         self.convert_args(context, arguments)
@@ -1046,8 +1125,24 @@ class UNARY_INVERT(UnaryOpcode):
     __method__ = '__invert__'
 
 
-class BINARY_POWER(BinaryOpcode):
-    __method__ = '__pow__'
+class BINARY_POWER(Opcode):
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert_opcode(self, context, arguments):
+        context.add_opcodes(
+            JavaOpcodes.ACONST_NULL(),
+            JavaOpcodes.INVOKEINTERFACE(
+                'org/python/Object',
+                '__pow__',
+                '(Lorg/python/Object;Lorg/python/Object;)Lorg/python/Object;'
+            )
+        )
 
 
 class BINARY_MULTIPLY(BinaryOpcode):
@@ -1221,31 +1316,15 @@ class GET_ITER(Opcode):
 
     def convert_opcode(self, context, arguments):
         context.add_opcodes(
-            ASTORE_name(context, '#temp-%x' % id(self)),
-
-            JavaOpcodes.NEW('java/util/ArrayList'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
-
-            JavaOpcodes.DUP(),
-            ALOAD_name(context, '#temp-%x' % id(self)),
-            JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
-            JavaOpcodes.POP(),
-
-            # No kwargs needed.
             JavaOpcodes.ACONST_NULL(),
-
             JavaOpcodes.INVOKESTATIC(
                 'org/Python',
                 'iter',
-                '(Ljava/util/List;Ljava/util/Map;)Lorg/python/Iterable;'
+                '(Lorg/python/Object;Lorg/python/Object;)Lorg/python/Iterable;'
             ),
 
             JavaOpcodes.CHECKCAST('org/python/Iterable'),
         )
-
-        # Clean up temp variable
-        free_name(context, '#temp-%x' % id(self)),
 
 
 class PRINT_EXPR(Opcode):
@@ -1259,6 +1338,8 @@ class PRINT_EXPR(Opcode):
 
 
 class LOAD_BUILD_CLASS(Opcode):
+    # This opcode isn't needed; it's handled as a special case of MAKE_FUNCTION.
+    # However, the opcode definition is required for parsing purposes.
     @property
     def consume_count(self):
         return 0
@@ -1322,7 +1403,39 @@ class RETURN_VALUE(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
-        context.add_opcodes(JavaOpcodes.ARETURN())
+        return_type = context.returns['annotation']
+
+        if context.generator:
+            # Inside a generator, a return is converted to a StopIteration.
+            if return_type is None:
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/StopIteration', '<init>', '()V'),
+                    JavaOpcodes.ATHROW(),
+                )
+            else:
+                context.add_opcodes(
+                    ASTORE_name(context, '#return-%x' % id(self)),
+                    JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
+                    JavaOpcodes.DUP(),
+                    ALOAD_name(context, '#return-%x' % id(self)),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/StopIteration', '<init>', '(Lorg/python/Object;)V'),
+                    JavaOpcodes.ATHROW(),
+                )
+                free_name(context, '#return-%x' % id(self))
+        else:
+            if return_type is None:
+                context.add_opcodes(
+                    JavaOpcodes.POP(),
+                    JavaOpcodes.RETURN()
+                )
+            else:
+                context.add_opcodes(
+                    # Convert to a new value for return purposes
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', '()Lorg/python/Object;'),
+                    JavaOpcodes.ARETURN()
+                )
 
 
 class IMPORT_STAR(Opcode):
@@ -1339,11 +1452,64 @@ class IMPORT_STAR(Opcode):
         context.add_opcodes(
             JavaOpcodes.INVOKESTATIC('org/python/ImportLib', 'importAll', '(Lorg/python/types/Module;)Ljava/util/Map;')
         )
-        # Add all the exported sympbols to the currrent context
+        # Add all the exported symbols to the currrent context
         context.store_dynamic()
 
 
-# class YIELD_VALUE(Opcode):
+class YIELD_VALUE(Opcode):
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 1
+
+    def convert_opcode(self, context, arguments):
+        n_vars = len(context.local_vars) + len(context.deleted_vars)
+        context.add_opcodes(
+            # Convert to a new value for return purposes
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', '()Lorg/python/Object;'),
+
+            # Save the current stack and yield index
+            ALOAD_name(context, '<generator>'),
+            ICONST_val(n_vars - 1),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+        for i in range(1, n_vars):
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i - 1),
+                JavaOpcodes.ALOAD(i),
+                JavaOpcodes.AASTORE(),
+            )
+
+        yield_point = len(context.yield_points) + 1
+        context.add_opcodes(
+            ICONST_val(yield_point),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Generator', 'yield', '([Lorg/python/Object;I)V'),
+
+            # "yield" by returning from the generator method.
+            JavaOpcodes.ARETURN()
+        )
+
+        # On restore, the next instruction is the target
+        # for the restore jump.
+        context.yield_points.append(self.python_offset)
+        context.next_resolve_list.append((self, 'yield_op'))
+
+        #  First thing to do is restore the state of the stack.
+        context.add_opcodes(
+            ALOAD_name(context, '<generator>'),
+            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', '[Lorg/python/Object;'),
+        )
+        for i in range(1, n_vars):
+            context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i - 1),
+                JavaOpcodes.AALOAD(),
+                JavaOpcodes.ASTORE(i),
+            )
 
 
 class POP_BLOCK(Opcode):
@@ -1505,6 +1671,7 @@ class STORE_ATTR(Opcode):
         context.add_opcodes(
             JavaOpcodes.LDC_W(self.name),
             ALOAD_name(context, '#value-%x' % id(self)),
+
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
         )
         free_name(context, '#value-%x' % id(self))
@@ -1816,7 +1983,7 @@ class BUILD_MAP(Opcode):
 
     @property
     def consume_count(self):
-        return self.count
+        return 0
 
     @property
     def product_count(self):
@@ -1870,9 +2037,9 @@ class LOAD_ATTR(Opcode):
         # print("LOAD_ATTR", context, arguments)
         context.next_resolve_list.append((self, 'start_op'))
         arguments[0].operation.transpile(context, arguments[0].arguments)
-        context.add_opcodes(JavaOpcodes.LDC_W(self.name))
 
         context.add_opcodes(
+            JavaOpcodes.LDC_W(self.name),
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
@@ -2081,7 +2248,8 @@ class JUMP_IF_FALSE_OR_POP(Opcode):
         context.add_opcodes(
             IF([
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
                     JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
                     ], JavaOpcodes.IFNE),
                 jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START),
@@ -2111,7 +2279,8 @@ class JUMP_IF_TRUE_OR_POP(Opcode):
         context.add_opcodes(
             IF([
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
                     JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
                     ], JavaOpcodes.IFEQ),
                 jump(JavaOpcodes.GOTO(0), context, Ref(context, self.target), Opcode.START),
@@ -2160,9 +2329,18 @@ class POP_JUMP_IF_FALSE(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
+        # Most common use of POP_JUMP_IF_FALSE is as part of an
+        # if statement, in which case the COMPARE_OP will have
+        # already produced a boolean. If that's the case, don't
+        # try to convert the top of stack into a bool; just use it.
+        if arguments[0].operation.opname != 'COMPARE_OP':
+            context.add_opcodes(
+                # (bool) TOS.value
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+            )
+
         context.add_opcodes(
-            # (bool) TOS.value
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Bool'),
             JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
 
             # Jump if false
@@ -2184,9 +2362,17 @@ class POP_JUMP_IF_TRUE(Opcode):
         return 0
 
     def convert_opcode(self, context, arguments):
+        # Most common use of POP_JUMP_IF_FALSE is as part of an
+        # if statement, in which case the COMPARE_OP will have
+        # already produced a boolean. If that's the case, don't
+        # try to convert the top of stack into a bool; just use it.
+        if arguments[0].operation.opname != 'COMPARE_OP':
+            context.add_opcodes(
+                # (bool) TOS.value
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+            )
         context.add_opcodes(
-            # (bool) TOS.value
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/types/Bool;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Bool'),
             JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
 
             # Jump if not false
@@ -2354,7 +2540,53 @@ class DELETE_FAST(Opcode):
         free_name(self.name)
 
 
-# class RAISE_VARARGS(Opcode):
+class RAISE_VARARGS(Opcode):
+    def __init__(self, argc, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.argc = argc
+
+    def __arg_repr__(self):
+        return '%s args' % (
+            self.argc,
+        )
+
+    @property
+    def consume_count(self):
+        return self.argc
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert_opcode(self, context, arguments):
+        if self.argc != 1:
+            raise Exception("Don't know how to handle exception with multiple arguments")
+
+        context.add_opcodes(
+            JavaOpcodes.CHECKCAST('java/lang/Throwable'),
+            JavaOpcodes.ATHROW()
+        )
+
+
+def extract_constant(arg):
+    if arg.operation.opname == 'LOAD_CONST':
+        value = arg.operation.const
+    elif arg.operation.opname == 'LOAD_NAME':
+        value = arg.operation.name
+    elif arg.operation.opname == 'LOAD_FAST':
+        value = arg.operation.name
+    elif arg.operation.opname == 'BINARY_SUBSCR':
+        value = extract_constant(arg.arguments[0]) + "$" + arg.arguments[1].operation.name
+    elif arg.operation.opname in ('BUILD_LIST', 'BUILD_TUPLE'):
+        value = [
+            extract_constant(a)
+            for a in arg.arguments
+        ]
+    elif arg.operation.opname == 'LOAD_ATTR':
+        value = '.'.join([extract_constant(arg.arguments[0]), arg.operation.name])
+    else:
+        raise Exception("Don't know how to extract constant from " + arg.operation.opname)
+    return value
 
 
 class CALL_FUNCTION(Opcode):
@@ -2381,16 +2613,47 @@ class CALL_FUNCTION(Opcode):
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # Construct a class.
             from .klass import Class
-            code = arguments[1].arguments[0].operation.const
-            class_name = arguments[1].arguments[1].operation.const
-            if len(arguments) == 4:
-                super_name = arguments[2].operation.const
-            else:
-                super_name = None
+            code = extract_constant(arguments[1].arguments[0])
+            class_name = extract_constant(arguments[2])
 
-            self.klass = Class(context.parent, class_name, super_name=super_name)
+            bases = [
+                extract_constant(arg).replace('.', '/')
+                for arg in arguments[3:self.args+1]
+            ]
+
+            extends = None
+            implements = []
+
+            for key_arg, value_arg in zip(arguments[self.args+1::2], arguments[self.args+2::2]):
+                key = extract_constant(key_arg)
+                value = extract_constant(value_arg)
+
+                if key == "metaclass":
+                    raise Exception("Can't handle metaclasses")
+                elif key == "extends":
+                    extends = value.replace('.', '/')
+                elif key == "implements":
+                    if isinstance(value, list):
+                        implements = [
+                            v.replace('.', '/')
+                            for v in value
+                        ]
+                    else:
+                        implements = [value.replace('.', '/')]
+                else:
+                    raise Exception("Unknown meta keyword " + str(key))
+
+            self.klass = Class(
+                context.parent,
+                class_name,
+                bases=bases,
+                extends=extends,
+                implements=implements,
+                verbosity=context.parent.verbosity
+            )
             self.klass.extract(code)
             context.parent.classes.append(self.klass)
+
         else:
             if arguments[0].operation.opname == 'MAKE_FUNCTION':
                 arguments[0].operation.materialize(context, arguments[0].arguments)
@@ -2405,54 +2668,93 @@ class CALL_FUNCTION(Opcode):
         context.next_resolve_list.append((self, 'start_op'))
         if arguments[0].operation.opname == 'LOAD_BUILD_CLASS':
             # print("DESCRIPTOR", klass.descriptor)
-            # Push a callable onto the stack so that it can be stored
-            # in globals and subsequently retrieved and run.
+            # Force the load of the class module, and then push the type
+            # object onto the stack so that it can be stored in globals
+            # and subsequently retrieved and invoked to create new instances.
             context.add_opcodes(
-                # Get a Method representing the new function
-                TRY(),
-                    JavaOpcodes.LDC_W(Classref(self.klass.descriptor)),
+                # JavaOpcodes.LDC_W("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+                # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
-                    JavaOpcodes.ICONST_2(),
-                    JavaOpcodes.ANEWARRAY('java/lang/Class'),
+                JavaOpcodes.LDC_W(self.klass.descriptor.replace('/', '.')),
+                JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
 
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.ICONST_0(),
-                    JavaOpcodes.LDC_W(Classref('java/util/List')),
-                    JavaOpcodes.AASTORE(),
-
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.ICONST_1(),
-                    JavaOpcodes.LDC_W(Classref('java/util/Map')),
-                    JavaOpcodes.AASTORE(),
-
-                    JavaOpcodes.INVOKEVIRTUAL(
-                        'java/lang/Class',
-                        'getConstructor',
-                        '([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;'
-                    ),
-                    ASTORE_name(context, '#CONSTRUCTOR'),
-
-                    # Then wrap that Constructor into a Callable.
-                    JavaOpcodes.NEW('org/python/types/Constructor'),
-                    JavaOpcodes.DUP(),
-                    ALOAD_name(context, '#CONSTRUCTOR'),
-
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Constructor', '<init>', '(Ljava/lang/reflect/Constructor;)V'),
-
-                CATCH('java/lang/NoSuchMethodError'),
-                    ASTORE_name(context, '#EXCEPTION'),
-                    JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W('Unable to find class %s' % (self.klass.descriptor)),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
-                    JavaOpcodes.ATHROW(),
-                END_TRY()
+                JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
             )
-            free_name(context, '#CONSTRUCTOR')
-            free_name(context, '#EXCEPTION')
+
+        elif arguments[0].operation.opname == 'LOAD_GLOBAL' \
+                and arguments[0].operation.name == 'super':
+
+            # context.add_opcodes(
+            #     JavaOpcodes.LDC_W("ATTRIBUTE ON SUPER"),
+            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+            # )
+
+            if len(arguments) == 1:
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
+
+                    # The super class to bind to.
+                    JavaOpcodes.LDC_W(Classref(context.klass.descriptor)),
+                    JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+
+                    # Bind to self. Since we know we are in a class building context,
+                    # we can be certain that register 0 contains self.
+                    JavaOpcodes.ALOAD_0(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                )
+
+            elif len(arguments) == 2:  # Unbound super
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
+                )
+
+                # The super class to bind to.
+                arguments[1].operation.transpile(context, arguments[1].arguments)
+
+                context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;)V'),
+                )
+
+            elif len(arguments) == 3:  # Bound super
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
+                )
+
+                # The super class to bind to.
+                arguments[1].operation.transpile(context, arguments[1].arguments)
+
+                # The instance to bind to.
+                arguments[2].operation.transpile(context, arguments[2].arguments)
+
+                context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                )
+
+            else:
+                raise Exception("Invalid number of arguments to super()")
+
+            # context.add_opcodes(
+            #     JavaOpcodes.DUP(),
+            #     JavaOpcodes.LDC_W("SUPER is"),
+            #     JavaOpcodes.SWAP(),
+            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
+            # )
+
+        # elif arguments[0].operation.opname == 'LOAD_ATTR' \
+        #         and len(arguments[0].arguments) > 0 \
+        #         and arguments[0].arguments[0].operation.opname == 'CALL_FUNCTION' \
+        #         and arguments[0].arguments[0].arguments[0].operation.opname == 'LOAD_GLOBAL' \
+        #         and arguments[0].arguments[0].arguments[0].operation.name == 'super':
+        #     print("CALL FUNCTION %s on SUPER" % arguments[0].operation.name)
+
+        #     arguments[0].operation.transpile(context, arguments[0].arguments)
+
         else:
             if arguments[0].operation.opname == 'MAKE_FUNCTION':
-                # If this is an comprehension, the line of code
+                # If this is a comprehension, the line of code
                 # defining the inline function will be associated with the
                 # class that is created; pull out that line of code and
                 # associate it with the use of the function, too.
@@ -2464,44 +2766,24 @@ class CALL_FUNCTION(Opcode):
 
             context.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/Callable'),
-                ASTORE_name(context, '#function-%x' % id(self)),
             )
-
-            # Evaluate all the arguments
-            for i, argument in enumerate(arguments[1:self.args+1]):
-                argument.operation.transpile(context, argument.arguments)
-                context.add_opcodes(
-                    ASTORE_name(context, '#arg-%d-%x' % (i, id(self)))
-                )
 
             # Create and populate the array of arguments to pass to invoke()
             context.add_opcodes(
-                JavaOpcodes.NEW('java/util/ArrayList'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+                ICONST_val(self.args),
+                JavaOpcodes.ANEWARRAY('org/python/Object'),
             )
             for i, argument in enumerate(arguments[1:self.args+1]):
                 context.add_opcodes(
                     JavaOpcodes.DUP(),
 
-                    ALOAD_name(context, '#arg-%d-%x' % (i, id(self))),
-                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
-                    JavaOpcodes.POP(),
-
+                    ICONST_val(i),
                 )
-                # Clean up temporary storage for arg.
-                free_name(context, '#arg-%d-%x' % (i, id(self)))
 
-            # Store the arguments for later.
-            context.add_opcodes(
-                ASTORE_name(context, '#args-%x' % id(self)),
-            )
-
-            # Evaluate all the keyword arguments
-            for i, (name, argument) in enumerate(zip(arguments[self.args+1::2], arguments[self.args+2::2])):
                 argument.operation.transpile(context, argument.arguments)
+
                 context.add_opcodes(
-                    ASTORE_name(context, '#kwarg-%d-%x' % (i, id(self)))
+                    JavaOpcodes.AASTORE(),
                 )
 
             # Create and populate the map of kwargs to pass to invoke().
@@ -2515,30 +2797,19 @@ class CALL_FUNCTION(Opcode):
                 context.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(name.operation.const),
-                    ALOAD_name(context, '#kwarg-%d-%x' % (i, id(self))),
+                )
+
+                argument.operation.transpile(context, argument.arguments)
+
+                context.add_opcodes(
                     JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                     JavaOpcodes.POP()
                 )
-                free_name(context, '#kwarg-%d-%x' % (i, id(self)))
-
-            # Store the keyword arguments for later.
-            context.add_opcodes(
-                ASTORE_name(context, '#kwargs-%x' % id(self)),
-            )
 
             # Set up the stack and invoke the callable
             context.add_opcodes(
-                ALOAD_name(context, '#function-%x' % id(self)),
-                ALOAD_name(context, '#args-%x' % id(self)),
-                ALOAD_name(context, '#kwargs-%x' % id(self)),
-
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '(Ljava/util/List;Ljava/util/Map;)Lorg/python/Object;'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
             )
-
-            # Clean up temporary storage.
-            free_name(context, '#function-%x' % id(self))
-            free_name(context, '#args-%x' % id(self))
-            free_name(context, '#kwargs-%x' % id(self))
 
 
 class MAKE_FUNCTION(Opcode):
@@ -2546,9 +2817,14 @@ class MAKE_FUNCTION(Opcode):
 
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.default_args = argc & 0xff
-        self.default_kwargs = ((argc >> 8) & 0xFF)
         self.annotations = (argc >> 16) & 0x7FFF
+        self.default_kwargs = ((argc >> 8) & 0xFF)
+        self.default_args = argc & 0xff
+
+        # if we have annotations, the value wil be one more
+        # than it should be.
+        if self.annotations:
+            self.annotations = self.annotations - 1
 
     def __arg_repr__(self):
         return '%s default args, %s default kwargs, %s annotations' % (
@@ -2560,7 +2836,7 @@ class MAKE_FUNCTION(Opcode):
     @property
     def consume_count(self):
         if self.annotations:
-            return 2 + self.annotations
+            return 3 + self.annotations + self.default_args + (2 * self.default_kwargs)
         else:
             return 2 + self.default_args + (2 * self.default_kwargs)
 
@@ -2573,61 +2849,30 @@ class MAKE_FUNCTION(Opcode):
         code = arguments[-2].operation.const
         full_method_name = arguments[-1].operation.const
 
-        if full_method_name == '<listcomp>':
-            full_method_name = 'listcomp_%x' % id(self)
-        self.method = context.add_method(full_method_name, code)
+        full_method_name = full_method_name.replace('.<locals>.', '$')
+        if full_method_name.endswith('<listcomp>'):
+            full_method_name = full_method_name.replace('<listcomp>', 'listcomp_%x' % id(self))
+        elif full_method_name.endswith('<dictcomp>'):
+            full_method_name = full_method_name.replace('<dictcomp>', 'dictcomp_%x' % id(self))
+        elif full_method_name.endswith('<setcomp>'):
+            full_method_name = full_method_name.replace('<setcomp>', 'setcomp_%x' % id(self))
+        elif full_method_name.endswith('<genexpr>'):
+            full_method_name = full_method_name.replace('<genexpr>', 'genexpr_%x' % id(self))
+
+        annotations = {}
+        if self.annotations:
+            values = []
+            for argument in arguments[self.default_args + self.default_kwargs * 2:self.default_args + self.default_kwargs * 2 + self.annotations]:
+                values.append(extract_constant(argument))
+
+            keys = extract_constant(arguments[self.default_args + self.default_kwargs * 2 + self.annotations])
+            annotations = dict(zip(keys, values))
+
+        self.method = context.add_method(full_method_name, code=code, annotations=annotations)
 
     def convert(self, context, arguments):
         full_method_name = arguments[-1].operation.const
         context.next_resolve_list.append((self, 'start_op'))
-
-        context.add_opcodes(
-            JavaOpcodes.NEW('java/util/ArrayList'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
-        )
-
-        # Evaluate and store default args
-        for argument in arguments[:self.default_args]:
-            context.add_opcodes(
-                JavaOpcodes.DUP(),
-            )
-            argument.operation.transpile(context, argument.arguments)
-
-            context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
-                JavaOpcodes.POP(),
-            )
-        context.add_opcodes(
-            ASTORE_name(context, '#default_args-%x' % id(self.method))
-        )
-
-        # Evaluate and store default kwargs
-        context.add_opcodes(
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
-        )
-
-        for name, argument in zip(
-                        arguments[self.default_args:self.default_args + self.default_kwargs * 2:2],
-                        arguments[self.default_args + 1:self.default_args + self.default_kwargs * 2 + 1:2]):
-            context.add_opcodes(
-                JavaOpcodes.DUP(),
-            )
-
-            context.add_opcodes(
-                JavaOpcodes.LDC_W(name.operation.const),
-            )
-            argument.operation.transpile(context, argument.arguments)
-
-            context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-                JavaOpcodes.POP(),
-            )
-        context.add_opcodes(
-            ASTORE_name(context, '#default_kwargs-%x' % id(self.method))
-        )
 
         # Build the callable to invoke the method
         if self.method.is_constructor:
@@ -2639,40 +2884,31 @@ class MAKE_FUNCTION(Opcode):
                 JavaOpcodes.NEW(self.method.parent.descriptor),
                 JavaOpcodes.DUP(),
 
-                # No args needed.
+                # These are the args and kwargs for the closure class
+                JavaOpcodes.ACONST_NULL(),
                 JavaOpcodes.ACONST_NULL(),
 
-                # No kwargs needed.
-                JavaOpcodes.ACONST_NULL(),
-
-                JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '(Ljava/util/List;Ljava/util/Map;)V'),
-            )
-
-            add_callable(context, self.method, self.method.name)
-
-            context.add_opcodes(
-                ASTORE_name(context, '#closure-%x' % id(self.method)),
+                JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
 
                 JavaOpcodes.LDC_W(Classref(self.method.parent.descriptor)),
                 JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
 
                 JavaOpcodes.LDC_W(self.method.name),
-                ALOAD_name(context, '#closure-%x' % id(self.method)),
+            )
+
+            add_callable(self, context, arguments, self.method.name)
+
+            context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
 
                 JavaOpcodes.LDC_W(self.method.name),
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;')
             )
 
-            free_name(context, '#closure-%x' % id(self.method))
-
         else:
             # Push a callable onto the stack so that it can be stored
             # in globals and subsequently retrieved and run.
-            add_callable(context, self.method, full_method_name)
-
-        free_name(context, '#default_args-%x' % id(self.method)),
-        free_name(context, '#default_kwargs-%x' % id(self.method)),
+            add_callable(self, context, arguments, full_method_name)
 
 
 def add_tuple(context, data):
@@ -2769,43 +3005,12 @@ def add_int(context, value):
     )
 
 
-def add_callable(context, method, full_method_name):
+def add_callable(opcode, context, arguments, full_method_name, closure=False):
+    method = opcode.method
+
     context.add_opcodes(
-        # # Get a Method representing the new function
         TRY(),
-            JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
-            JavaOpcodes.LDC_W(method.name),
-            ICONST_val(4),
-            JavaOpcodes.ANEWARRAY('java/lang/Class'),
-
-            JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_0(),
-            JavaOpcodes.LDC_W(Classref('Ljava/util/List;')),
-            JavaOpcodes.AASTORE(),
-
-            JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_1(),
-            JavaOpcodes.LDC_W(Classref('Ljava/util/Map;')),
-            JavaOpcodes.AASTORE(),
-
-            JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_2(),
-            JavaOpcodes.LDC_W(Classref('Ljava/util/List;')),
-            JavaOpcodes.AASTORE(),
-
-            JavaOpcodes.DUP(),
-            JavaOpcodes.ICONST_3(),
-            JavaOpcodes.LDC_W(Classref('Ljava/util/Map;')),
-            JavaOpcodes.AASTORE(),
-
-            JavaOpcodes.INVOKEVIRTUAL(
-                'java/lang/Class',
-                'getMethod',
-                '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'
-            ),
-            ASTORE_name(context, '#method'),
-
-            # Then wrap that Method into a Callable.
+            # Wrap that Method into a Callable.
             JavaOpcodes.NEW('org/python/types/Function'),
             JavaOpcodes.DUP(),
     )
@@ -2818,51 +3023,117 @@ def add_callable(context, method, full_method_name):
             JavaOpcodes.DUP(),
     )
 
-    add_int(context, method.code_obj.co_argcount)
-    add_tuple(context, method.code_obj.co_cellvars)
+    add_int(context, method.code.co_argcount)
+    add_tuple(context, method.code.co_cellvars)
 
     context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # co_code
     )
 
-    # add_tuple(context, method.code_obj.co_consts)
+    # add_tuple(context, method.code.co_consts)
     context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # co_consts
     )
 
-    add_str(context, method.code_obj.co_filename)
-    add_int(context, method.code_obj.co_firstlineno)
-    add_int(context, method.code_obj.co_flags)
-    add_tuple(context, method.code_obj.co_freevars)
-    add_int(context, method.code_obj.co_kwonlyargcount)
+    add_str(context, method.code.co_filename)
+    add_int(context, method.code.co_firstlineno)
+    add_int(context, method.code.co_flags)
+    add_tuple(context, method.code.co_freevars)
+    add_int(context, method.code.co_kwonlyargcount)
 
     context.add_opcodes(
             JavaOpcodes.ACONST_NULL(),  # co_lnotab
     )
 
-    add_str(context, method.code_obj.co_name)
-    add_tuple(context, method.code_obj.co_names)
-    add_int(context, method.code_obj.co_nlocals)
-    add_int(context, method.code_obj.co_stacksize)
-    add_tuple(context, method.code_obj.co_varnames)
+    add_str(context, method.code.co_name)
+    add_tuple(context, method.code.co_names)
+    add_int(context, method.code.co_nlocals)
+    add_int(context, method.code.co_stacksize)
+    add_tuple(context, method.code.co_varnames)
 
     context.add_opcodes(
             JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
 
-            ALOAD_name(context, '#method'),
+            # Get a Method representing the new function
+            JavaOpcodes.LDC_W(Classref(method.parent.class_descriptor)),
+            JavaOpcodes.LDC_W(method.name),
 
-        #     # globals
-        #     # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-        #     # JavaOpcodes.LDC_W(method.module.descriptor),
-        #     # JavaOpcodes.GETSTATIC(method.module.descriptor, 'attrs', 'Ljava/util/Map;'),
+            ICONST_val(len(method.parameters)),
+            JavaOpcodes.ANEWARRAY('java/lang/Class'),
+    )
+
+    for i, param in enumerate(method.parameters):
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+            ICONST_val(i),
+            JavaOpcodes.LDC_W(Classref('org/python/Object')),
+            JavaOpcodes.AASTORE(),
+        )
+
+    context.add_opcodes(
+            JavaOpcodes.INVOKEVIRTUAL(
+                'java/lang/Class',
+                'getMethod',
+                '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'
+            ),
+
+            # globals
+            # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
+            # JavaOpcodes.LDC_W(method.module.descriptor),
+            # JavaOpcodes.GETSTATIC(method.module.descriptor, 'attrs', 'Ljava/util/Map;'),
             JavaOpcodes.ACONST_NULL(),  # globals
 
-            ALOAD_name(context, '#default_args-%x' % id(method)),
+            # Default args
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+    )
 
-            ALOAD_name(context, '#default_kwargs-%x' % id(method)),
+    # Default arguments list
+    for argument in arguments[:opcode.default_args]:
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+        )
 
-            JavaOpcodes.ACONST_NULL(),  # closure
+        argument.operation.transpile(context, argument.arguments)
 
+        context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+            JavaOpcodes.POP(),
+        )
+
+    # Default keyword arguments list
+    context.add_opcodes(
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+    )
+
+    for name, argument in zip(
+                    arguments[opcode.default_args:opcode.default_args + opcode.default_kwargs * 2:2],
+                    arguments[opcode.default_args + 1:opcode.default_args + opcode.default_kwargs * 2 + 1:2]):
+        context.add_opcodes(
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(name.operation.const),
+        )
+
+        argument.operation.transpile(context, argument.arguments)
+
+        context.add_opcodes(
+            JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.POP(),
+        )
+
+    # Closure
+    if closure:
+        closure_arg = arguments[-3]
+        closure_arg.operation.transpile(context, closure_arg.arguments)
+    else:
+        context.add_opcodes(
+            JavaOpcodes.ACONST_NULL(),
+        )
+
+    context.add_opcodes(
             JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;Ljava/util/List;)V'),
 
         CATCH('java/lang/NoSuchMethodError'),
@@ -2920,29 +3191,105 @@ class BUILD_SLICE(Opcode):
 
 
 class MAKE_CLOSURE(Opcode):
+    prefaced = 0
+
     def __init__(self, argc, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.argc = argc
+        self.annotations = (argc >> 16) & 0x7FFF
+        self.default_kwargs = ((argc >> 8) & 0xFF)
+        self.default_args = argc & 0xff
+
+        # if we have annotations, the value wil be one more
+        # than it should be.
+        if self.annotations:
+            self.annotations = self.annotations - 1
 
     def __arg_repr__(self):
-        return '%s' % (self.argc)
+        return '%s default args, %s default kwargs, %s annotations' % (
+            self.default_args,
+            self.default_kwargs,
+            self.annotations,
+        )
 
     @property
     def consume_count(self):
-        return 3 + self.argc
+        if self.annotations:
+            return 4 + self.annotations + self.default_args + (2 * self.default_kwargs)
+        else:
+            return 3 + self.default_args + (2 * self.default_kwargs)
 
     @property
     def product_count(self):
         return 1
 
+    def materialize(self, context, arguments):
+        # Add a new method definition to the context class/module
+        code = arguments[-2].operation.const
+        full_method_name = arguments[-1].operation.const
+
+        # if full_method_name == '<listcomp>':
+        #     full_method_name = 'listcomp_%x' % id(self)
+
+        annotations = {}
+        if self.annotations:
+            values = []
+            for argument in arguments[self.default_args + self.default_kwargs * 2:self.default_args + self.default_kwargs * 2 + self.annotations]:
+                values.append(extract_constant(argument))
+
+            keys = extract_constant(arguments[self.default_args + self.default_kwargs * 2 + self.annotations])
+            annotations = dict(zip(keys, values))
+
+        self.method = context.add_method(full_method_name, code=code, annotations=annotations)
+
+    def convert(self, context, arguments):
+        full_method_name = arguments[-1].operation.const
+        context.next_resolve_list.append((self, 'start_op'))
+
+        # # Build the callable to invoke the method
+        # if self.method.is_constructor:
+        #     pass
+        #     # Nothing needed on stack; class construction is self contained.
+
+        # elif self.method.is_closuremethod:
+        #     context.add_opcodes(
+        #         JavaOpcodes.NEW(self.method.parent.descriptor),
+        #         JavaOpcodes.DUP(),
+
+        #         # These are the args and kwargs for the closure class
+        #         JavaOpcodes.ACONST_NULL(),
+        #         JavaOpcodes.ACONST_NULL(),
+
+        #         JavaOpcodes.INVOKESPECIAL(self.method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+
+        #         JavaOpcodes.LDC_W(Classref(self.method.parent.descriptor)),
+        #         JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+
+        #         JavaOpcodes.LDC_W(self.method.name),
+        #     )
+
+        #     add_callable(self, context, arguments, self.method.name)
+
+        #     context.add_opcodes(
+        #         JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+
+        #         JavaOpcodes.LDC_W(self.method.name),
+        #         JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;')
+        #     )
+
+        # else:
+
+        # Push a callable onto the stack so that it can be stored
+        # in globals and subsequently retrieved and run.
+        add_callable(self, context, arguments, full_method_name, closure=True)
+
 
 class LOAD_CLOSURE(Opcode):
-    def __init__(self, i, python_offset, starts_line, is_jump_target):
+    def __init__(self, name, python_offset, starts_line, is_jump_target):
         super().__init__(python_offset, starts_line, is_jump_target)
-        self.i = i
+        self.name = name
 
     def __arg_repr__(self):
-        return '%s' % (self.i)
+        return str(self.name)
 
     @property
     def consume_count(self):
@@ -2952,8 +3299,10 @@ class LOAD_CLOSURE(Opcode):
     def product_count(self):
         return 1
 
-    # def convert_opcode(self, context, arguments):
-    #     return []
+    def convert_opcode(self, context, arguments):
+        # Depending on context, this might mean loading from local
+        # variables, class attributes, or the global context.
+        context.load_name(self.name, use_locals=True)
 
 
 class LOAD_DEREF(Opcode):
@@ -3057,7 +3406,80 @@ class LIST_APPEND(Opcode):
         else:
             raise RuntimeError("Don't know how to handle LIST_APPEND at index %d" % self.index)
 
-# class SET_ADD(Opcode):
-# class MAP_ADD(Opcode):
+
+class SET_ADD(Opcode):
+    prefaced = 0
+
+    def __init__(self, index, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.index = index
+
+    def __arg_repr__(self):
+        return str(self.index)
+
+    @property
+    def consume_count(self):
+        return 1
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+
+        if self.index == 2:
+            context.add_opcodes(
+                JavaOpcodes.GETFIELD('org/python/types/Set', 'value', 'Ljava/util/Set;'),
+            )
+
+            for argument in arguments:
+                argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/Set', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+        else:
+            raise RuntimeError("Don't know how to handle SET_ADD at index %d" % self.index)
+
+
+class MAP_ADD(Opcode):
+    prefaced = 0
+
+    def __init__(self, index, python_offset, starts_line, is_jump_target):
+        super().__init__(python_offset, starts_line, is_jump_target)
+        self.index = index
+
+    def __arg_repr__(self):
+        return str(self.index)
+
+    @property
+    def consume_count(self):
+        return 2
+
+    @property
+    def product_count(self):
+        return 0
+
+    def convert(self, context, arguments):
+        context.next_resolve_list.append((self, 'start_op'))
+
+        if self.index == 2:
+            context.add_opcodes(
+                JavaOpcodes.GETFIELD('org/python/types/Dict', 'value', 'Ljava/util/Map;'),
+            )
+
+            for argument in arguments:
+                argument.operation.transpile(context, argument.arguments)
+
+            context.add_opcodes(
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.POP(),
+            )
+        else:
+            raise RuntimeError("Don't know how to handle MAP_ADD at index %d" % self.index)
+
 
 # class LOAD_CLASSDEREF(Opcode):

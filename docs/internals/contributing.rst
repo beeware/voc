@@ -12,39 +12,66 @@ If you experience problems with VOC, `log them on GitHub`_. If you want to contr
 Setting up your development environment
 ---------------------------------------
 
-The recommended way of setting up your development envrionment for VOC
-is to install a virtual environment, install the required dependencies and
-start coding. Assuming that you are using ``virtualenvwrapper``, you only have
-to run::
+The process of setting up a development environment is very similar to
+the :doc:`/intro/getting-started` process. The biggest difference is that
+instead of using the official PyBee repository, you'll be using your own
+Github fork .
 
-    $ git clone git@github.com:pybee/voc.git
-    $ cd voc
-    $ mkvirtualenv voc
-    # or if you use python2 by default
-    # mkvirtualenv -p /usr/bin/python3 voc
+As with the getting started guide, these instructions will assume that you
+have Python3, a Java 7 or Java 8 JDK, and Apache ANT installed, and have virtualenv available for use.
 
-VOC uses ``unittest`` for its own test
-suite as well as additional helper modules for testing. To install all the
-requirements for VOC, you have to run the following commands within your
-virutal envrionment::
+Start by forking VOC into your own Github repository; then
+check out your fork to your own computer into a development directory:
 
+.. code-block:: bash
+
+    $ mkdir voc-dev
+    $ cd voc-dev
+    $ git clone git@github.com:<your github username>/voc.git
+
+Then create a virtual environment and install VOC into it:
+
+.. code-block:: bash
+
+    $ virtualenv -p $(which python3) env
+    $ . env/bin/activate
     $ pip install -e .
 
-Now you are ready to start hacking! Have fun!
+You're now ready to run the test suite!
 
-Java
-----
+Running the test suite
+----------------------
 
-Java 7 is needed to run the tests because java 8 removed the option
-    
-    -XX:-UseSplitVerifier
+To run the entire test suite, type:
 
-You can use java 8 if you have to. In that case go into the
-tests/utils.py and edit replace 
+.. code-block:: bash
 
-    -XX:-UseSplitVerifier
+    $ cd voc
+    $ python setup.py test
 
-with
+This will take quite a while - it takes 40 minutes on the CI server. If you just want to run a single test, or a single group of tests, you can provide command-line arguments.
 
-    -noverify
+To run a single test, provide the full dotted-path to the test:
+
+.. code-block:: bash
+
+    $ python setup.py test -s tests.datatypes.test_str.BinaryStrOperationTests.test_add_bool
+
+To run a full test case, do the same, but stop at the test case name:
+
+.. code-block:: bash
+
+    $ python setup.py test -s tests.datatypes.test_str.BinaryStrOperationTests
+
+Or, to run all the Str datatype tests:
+
+.. code-block:: bash
+
+    $ python setup.py test -s tests.datatypes.test_str
+
+Or, to run all the datatypes tests:
+
+.. code-block:: bash
+
+    $ python setup.py test -s tests.datatypes
 

@@ -43,6 +43,9 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         // value = attrs;
     }
 
+    @org.python.Method(
+        __doc__ = "Implement iter(self)."
+    )
     public org.python.types.Str __repr__() {
         if (this.step == 1) {
             return new org.python.types.Str(String.format("range(%d, %d)", this.start, this.stop));
@@ -58,6 +61,9 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         return this;
     }
 
+    @org.python.Method(
+        __doc__ = "Implement iter(self)."
+    )
     public org.python.Object __next__() {
         if (this.step > 0 && this.index >= this.stop) {
             throw new org.python.exceptions.StopIteration();
@@ -70,6 +76,10 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         return result;
     }
 
+    @org.python.Method(
+        __doc__ = "Implement __getitem__(self).",
+        args = {"index"}
+    )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {

@@ -31,14 +31,23 @@ public class Dict extends org.python.types.Object {
         this.value = dict;
     }
 
+    // @org.python.Method(
+    //     __doc__ = ""
+    // )
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("dict.__new__() has not been implemented.");
     // }
 
+    // @org.python.Method(
+    //     __doc__ = ""
+    // )
     // public org.python.Object __init__() {
     //     throw new org.python.exceptions.NotImplementedError("dict.__init__() has not been implemented.");
     // }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("{");
         boolean first = true;
@@ -48,143 +57,205 @@ public class Dict extends org.python.types.Object {
             } else {
                 buffer.append(", ");
             }
-            buffer.append(String.format("%s: %s", key.__repr__(), value.get(key).__repr__()));
+            buffer.append(
+                String.format("%s: %s", key.__repr__(), value.get(key).__repr__())
+            );
         }
         buffer.append("}");
         return new org.python.types.Str(buffer.toString());
     }
 
-    public org.python.types.Str __format__() {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Str __format__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.__format__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __lt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.__lt__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __le__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.__le__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __eq__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.__eq__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __ne__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.__ne__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __gt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.__gt__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __ge__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.__ge__() has not been implemented.");
     }
 
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
+        // Builtin types can't have attributes set on them.
+        return false;
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("dict.__dir__() has not been implemented.");
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.NotImplementedError("dict.__len__() has not been implemented.");
+        return new org.python.types.Int(this.value.size());
     }
 
-    public org.python.Object __getitem__(org.python.Object index) {
-        org.python.Object value = this.value.get(index);
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __getitem__(org.python.Object item) {
+        org.python.Object value = this.value.get(item);
         if (value == null) {
-            throw new org.python.exceptions.KeyError(index);
+            throw new org.python.exceptions.KeyError(item);
         }
         return value;
     }
 
-    public void __setitem__(org.python.Object index, org.python.Object value) {
-        this.value.put(index, value);
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public void __setitem__(org.python.Object item, org.python.Object value) {
+        this.value.put(item, value);
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public void __delitem__(org.python.Object item) {
+        org.python.Object value = this.value.remove(item);
+        if (value == null) {
+            throw new org.python.exceptions.KeyError(item);
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Iterable __iter__() {
         throw new org.python.exceptions.NotImplementedError("dict.__iter__() has not been implemented.");
     }
 
-    public org.python.Object __contains__(org.python.Object key) {
-        return new org.python.types.Bool(this.value.get(key) != null);
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __contains__(org.python.Object item) {
+        return new org.python.types.Bool(this.value.get(item) != null);
     }
 
-    public org.python.Object __not_contains__(org.python.Object key) {
-        return new org.python.types.Bool(this.value.get(key) == null);
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __not_contains__(org.python.Object item) {
+        return new org.python.types.Bool(this.value.get(item) == null);
     }
 
     @org.python.Method(
         __doc__ = "D.clear() -> None.  Remove all items from D."
     )
-    public org.python.Object clear(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() > 0) {
-            throw new org.python.exceptions.TypeError("clear() takes no keyword arguments");
-        }
-        if (args != null && args.size() > 0) {
-            throw new org.python.exceptions.TypeError("clear() takes no arguments (" + args.size() + " given)");
-        }
-        this.clear();
-        return org.python.types.NoneType.NONE;
-    }
-
     public org.python.Object clear() {
         this.value.clear();
         return org.python.types.NoneType.NONE;
     }
 
-    public org.python.Object copy(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("dict.copy() has not been implemented.");
-    }
-
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object copy() {
         throw new org.python.exceptions.NotImplementedError("dict.copy() has not been implemented.");
     }
 
-    public org.python.Object fromkeys(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object fromkeys(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.fromkeys() has not been implemented.");
     }
 
-    public org.python.Object get(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object get(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.get() has not been implemented.");
     }
 
-    public org.python.Object items(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("dict.items() has not been implemented.");
-    }
-
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object items() {
         throw new org.python.exceptions.NotImplementedError("dict.items() has not been implemented.");
     }
 
-    public org.python.Object keys(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("dict.keys() has not been implemented.");
-    }
-
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object keys() {
         throw new org.python.exceptions.NotImplementedError("dict.keys() has not been implemented.");
     }
 
-    public org.python.Object pop(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object pop(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.pop() has not been implemented.");
     }
 
-    public org.python.Object popitem(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object popitem(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.popitem() has not been implemented.");
     }
 
-    public org.python.Object setdefault(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object setdefault(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.setdefault() has not been implemented.");
     }
 
-    public org.python.Object update(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object update(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.update() has not been implemented.");
     }
 
-    public org.python.Object values(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("dict.values() has not been implemented.");
-    }
-
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object values() {
         throw new org.python.exceptions.NotImplementedError("dict.values() has not been implemented.");
     }

@@ -141,7 +141,19 @@
         </do-only-if-manifest-hasCode>
     </target>
 
-    <target name="dist" depends="-compile, -post-compile, -obfuscate" />
+    <target name="dist" depends="-compile, -post-compile, -obfuscate">
+        <!-- Put the jar file into a /libs directory in the tarball.
+             We also create a src directory in the tarball to fool the
+             installer into thinking there isn't a common filename
+             prefix, so the libs directory will be unrolled. -->
+
+        <mkdir dir="${out.absolute.dir}/android/libs"/>
+        <mkdir dir="${out.absolute.dir}/android/src"/>
+        <move file="${out.absolute.dir}/${out.jar.name}.jar"
+             todir="${out.absolute.dir}/android/libs" />
+        <tar destfile="${out.absolute.dir}/Python-Android-${python-version}-b${release}.tar.gz"
+             basedir="${out.absolute.dir}/android" />
+    </target>
 
     <!--
         Import per project custom build rules if present at the root of the project.
