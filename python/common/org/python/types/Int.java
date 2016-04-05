@@ -108,9 +108,16 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Bool(((double) this.value) == ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool(
-                (this.value == 0 && !((org.python.types.Bool) other).value)
-            );
+            if (this.value==0){
+                return new org.python.types.Bool(
+                    (!((org.python.types.Bool) other).value)
+                );
+            }
+            else if (this.value==1){
+                return new org.python.types.Bool(
+                    (((org.python.types.Bool) other).value)
+                );
+            }
         }
         return new org.python.types.Bool(false);
     }
