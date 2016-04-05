@@ -40,8 +40,6 @@ class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
 
     not_implemented = [
-        'test_unary_positive',
-        'test_unary_negative',
         'test_unary_invert',
     ]
 
@@ -50,28 +48,19 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
 
     not_implemented = [
-        'test_add_bool',
         'test_add_bytearray',
         'test_add_bytes',
         'test_add_class',
-        'test_add_complex',
-        'test_add_dict',
         'test_add_float',
+        'test_add_complex',
         'test_add_frozenset',
-        'test_add_int',
-        'test_add_list',
-        'test_add_none',
-        'test_add_set',
-        'test_add_str',
-        'test_add_tuple',
-
+        
         'test_and_bytearray',
         'test_and_bytes',
         'test_and_class',
         'test_and_complex',
         'test_and_frozenset',
 
-        'test_eq_bool',
         'test_eq_bytearray',
         'test_eq_bytes',
         'test_eq_class',
@@ -90,51 +79,24 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_floor_divide_complex',
         'test_floor_divide_frozenset',
 
-        'test_ge_bool',
         'test_ge_bytearray',
         'test_ge_bytes',
         'test_ge_class',
         'test_ge_complex',
-        'test_ge_dict',
-        'test_ge_float',
         'test_ge_frozenset',
-        'test_ge_int',
-        'test_ge_list',
-        'test_ge_none',
-        'test_ge_set',
-        'test_ge_str',
-        'test_ge_tuple',
 
-        'test_gt_bool',
         'test_gt_bytearray',
         'test_gt_bytes',
         'test_gt_class',
         'test_gt_complex',
-        'test_gt_dict',
-        'test_gt_float',
         'test_gt_frozenset',
-        'test_gt_int',
-        'test_gt_list',
-        'test_gt_none',
-        'test_gt_set',
-        'test_gt_str',
-        'test_gt_tuple',
 
-        'test_le_bool',
         'test_le_bytearray',
         'test_le_bytes',
         'test_le_class',
         'test_le_complex',
-        'test_le_dict',
-        'test_le_float',
         'test_le_frozenset',
-        'test_le_int',
-        'test_le_list',
-        'test_le_none',
-        'test_le_set',
-        'test_le_str',
-        'test_le_tuple',
-
+    
         'test_lshift_bytearray',
         'test_lshift_bytes',
         'test_lshift_class',
@@ -231,14 +193,8 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subtract_bytes',
         'test_subtract_class',
         'test_subtract_complex',
-        'test_subtract_dict',
         'test_subtract_frozenset',
-        'test_subtract_list',
-        'test_subtract_none',
-        'test_subtract_set',
-        'test_subtract_str',
-        'test_subtract_tuple',
-
+        
         'test_true_divide_bytearray',
         'test_true_divide_bytes',
         'test_true_divide_class',
@@ -257,21 +213,13 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
 
     not_implemented = [
-        'test_add_bool',
         'test_add_bytearray',
         'test_add_bytes',
+        'test_add_float',
         'test_add_class',
         'test_add_complex',
-        'test_add_dict',
-        'test_add_float',
         'test_add_frozenset',
-        'test_add_int',
-        'test_add_list',
-        'test_add_none',
-        'test_add_set',
-        'test_add_str',
-        'test_add_tuple',
-
+        
         'test_and_bool',
         'test_and_bytearray',
         'test_and_bytes',
