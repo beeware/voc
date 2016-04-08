@@ -96,7 +96,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -106,8 +107,14 @@ public class List extends org.python.types.Object {
             int count = Math.min(size, otherSize);
 
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__lt__(otherList.value.get(i));
+                org.python.Object result = this.value.get(i).__lt__(otherList.value.get(i));
+                if (result instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() < %s()",
+                            this.value.get(i).typeName(),
+                            otherList.value.get(i).typeName()));
+                }
+                org.python.types.Bool b = (org.python.types.Bool) result;
 
                 if (b.value) {
                     return b;
@@ -118,14 +125,13 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size < otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() < %s()",
-                    Python.typeName(other.getClass())));
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -135,8 +141,14 @@ public class List extends org.python.types.Object {
             int count = Math.min(size, otherSize);
 
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__le__(otherList.value.get(i));
+                org.python.Object result = this.value.get(i).__le__(otherList.value.get(i));
+                if (result instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() <= %s()",
+                            this.value.get(i).typeName(),
+                            otherList.value.get(i).typeName()));
+                }
+                org.python.types.Bool b = (org.python.types.Bool) result;
 
                 if (b.value) {
                     return b;
@@ -147,33 +159,37 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size <= otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() <= %s()",
-                    Python.typeName(other.getClass())));
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        boolean eq = false;
         if (other instanceof org.python.types.List) {
             org.python.types.List otherList = (org.python.types.List) other;
-            eq = this.value.equals(otherList.value);
+            return new org.python.types.Bool(this.value.equals(otherList.value));
         }
-        return new org.python.types.Bool(eq);
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(!((org.python.types.Bool) this.__eq__(other)).value);
+        org.python.Object result = this.__eq__(other);
+        if (result instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(!((org.python.types.Bool) result).value);
+        }
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -183,8 +199,14 @@ public class List extends org.python.types.Object {
             int count = Math.min(size, otherSize);
 
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__gt__(otherList.value.get(i));
+                org.python.Object result = this.value.get(i).__gt__(otherList.value.get(i));
+                if (result instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() > %s()",
+                            this.value.get(i).typeName(),
+                            otherList.value.get(i).typeName()));
+                }
+                org.python.types.Bool b = (org.python.types.Bool) result;
 
                 if (!b.value) {
                     return b;
@@ -195,14 +217,13 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size > otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() > %s()",
-                    Python.typeName(other.getClass())));
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -212,8 +233,14 @@ public class List extends org.python.types.Object {
             int count = Math.min(size, otherSize);
 
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__ge__(otherList.value.get(i));
+                org.python.Object result = this.value.get(i).__ge__(otherList.value.get(i));
+                if (result instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() >= %s()",
+                            this.value.get(i).typeName(),
+                            otherList.value.get(i).typeName()));
+                }
+                org.python.types.Bool b = (org.python.types.Bool) result;
 
                 if (!b.value) {
                     return b;
@@ -224,9 +251,7 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size >= otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() >= %s()",
-                    Python.typeName(other.getClass())));
+            return new org.python.types.NotImplementedType();
         }
     }
 
