@@ -140,42 +140,48 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     @org.python.Method(
-        __doc__ = "Return self<value."
+        __doc__ = "Return self<value.",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__lt__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "Return self<=value."
+        __doc__ = "Return self<=value.",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__le__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "Return self==value."
+        __doc__ = "Return self==value.",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__eq__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "Return self!=value."
+        __doc__ = "Return self!=value.",
+        args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__ne__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "Return self>value."
+        __doc__ = "Return self>value.",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__gt__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "Return self>=value."
+        __doc__ = "Return self>=value.",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__ge__' has not been implemented");
