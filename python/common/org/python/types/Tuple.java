@@ -94,7 +94,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -105,10 +106,15 @@ public class Tuple extends org.python.types.Object {
 
             boolean cmp = false;
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__lt__(otherTuple.value.get(i));
+                org.python.Object r = this.value.get(i).__lt__(otherTuple.value.get(i));
+                if (r instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() < %s()",
+                            this.value.get(i).typeName(),
+                            otherTuple.value.get(i).typeName()));
+                }
 
-                cmp = cmp & b.value;
+                cmp = cmp & ((org.python.types.Bool) r).value;
             }
 
             if (cmp) {
@@ -117,16 +123,14 @@ public class Tuple extends org.python.types.Object {
 
             // At this point the lists are different sizes or every comparison is true.
             return new org.python.types.Bool(size < otherSize);
-
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: tuple() < %s()",
-                    org.Python.typeName(other.getClass())));
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -137,10 +141,15 @@ public class Tuple extends org.python.types.Object {
 
             boolean cmp = false;
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__le__(otherTuple.value.get(i));
+                org.python.Object r = this.value.get(i).__le__(otherTuple.value.get(i));
+                if (r instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() <= %s()",
+                            this.value.get(i).typeName(),
+                            otherTuple.value.get(i).typeName()));
+                }
 
-                cmp = cmp & b.value;
+                cmp = cmp & ((org.python.types.Bool) r).value;
             }
 
             if (cmp) {
@@ -149,35 +158,40 @@ public class Tuple extends org.python.types.Object {
 
             // At this point the lists are different sizes or every comparison is true.
             return new org.python.types.Bool(size <= otherSize);
-
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: tuple() <= %s()",
-                    org.Python.typeName(other.getClass())));
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        boolean eq = false;
         if (other instanceof org.python.types.Tuple) {
             org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
-            eq = this.value.equals(otherTuple.value);
+            System.err.println(otherTuple.value.getClass().toString());
+            System.err.println(this.value.equals(otherTuple.value));
+            return new org.python.types.Bool(this.value.equals(otherTuple.value));
         }
-        return new org.python.types.Bool(eq);
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(!((org.python.types.Bool) this.__eq__(other)).value);
+        org.python.Object result = this.__eq__(other);
+        if (result instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(!((org.python.types.Bool) result).value);
+        }
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -188,10 +202,15 @@ public class Tuple extends org.python.types.Object {
 
             boolean cmp = true;
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__gt__(otherTuple.value.get(i));
+                org.python.Object r = this.value.get(i).__gt__(otherTuple.value.get(i));
+                if (r instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() > %s()",
+                            this.value.get(i).typeName(),
+                            otherTuple.value.get(i).typeName()));
+                }
 
-                cmp = cmp & b.value;
+                cmp = cmp & ((org.python.types.Bool) r).value;
             }
             if (!cmp) {
                 return new org.python.types.Bool(cmp);
@@ -201,14 +220,13 @@ public class Tuple extends org.python.types.Object {
             return new org.python.types.Bool(size > otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: tuple() > %s()",
-                    org.Python.typeName(other.getClass())));
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -219,10 +237,15 @@ public class Tuple extends org.python.types.Object {
 
             boolean cmp = true;
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__ge__(otherTuple.value.get(i));
+                org.python.Object r = this.value.get(i).__ge__(otherTuple.value.get(i));
+                if (r instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() >= %s()",
+                            this.value.get(i).typeName(),
+                            otherTuple.value.get(i).typeName()));
+                }
 
-                cmp = cmp & b.value;
+                cmp = cmp & ((org.python.types.Bool) r).value;
             }
 
             if (!cmp) {
@@ -231,11 +254,8 @@ public class Tuple extends org.python.types.Object {
 
             // At this point the lists are different sizes or every comparison is true.
             return new org.python.types.Bool(size >= otherSize);
-
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: tuple() >= %s()",
-                    org.Python.typeName(other.getClass())));
+            return new org.python.types.NotImplementedType();
         }
     }
 
