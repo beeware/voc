@@ -42,7 +42,11 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     // @SuppressWarnings("unchecked")
     public boolean equals(java.lang.Object other) {
         try {
-            return ((org.python.types.Bool) __eq__((org.python.types.Object) other)).value;
+            org.python.Object result = this.__eq__((org.python.Object) other);
+            if (result instanceof org.python.types.NotImplementedType) {
+                return false;
+            }
+            return ((org.python.types.Bool) result).value;
         } catch (ClassCastException e) {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
         }

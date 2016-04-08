@@ -52,7 +52,11 @@ public class Super implements org.python.Object {
      */
     public boolean equals(java.lang.Object other) {
         try {
-            return ((org.python.types.Bool) this.__eq__((org.python.Object) other)).value;
+            org.python.Object result = this.__eq__((org.python.Object) other);
+            if (result instanceof org.python.types.NotImplementedType) {
+                return false;
+            }
+            return ((org.python.types.Bool) result).value;
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
         }
