@@ -38,39 +38,59 @@ public class NoneType extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: NoneType() >= %s()",
-                Python.typeName(other.getClass())));
+        return new org.python.types.NotImplementedType();
     }
 
-        @org.python.Method(
-        __doc__ = ""
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: NoneType() > %s()",
-                Python.typeName(other.getClass())));
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __eq__(org.python.Object other) {
+        if (other instanceof org.python.types.NoneType) {
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.NotImplementedType();
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __ne__(org.python.Object other) {
+        org.python.Object result = this.__eq__(other);
+        if (result instanceof org.python.types.NotImplementedType) {
+            return new org.python.types.Bool(true);
+        } else {
+            return new org.python.types.Bool(!((org.python.types.Bool) result).value);
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: NoneType() < %s()",
-                Python.typeName(other.getClass())));
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: NoneType() <= %s()",
-                Python.typeName(other.getClass())));
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(

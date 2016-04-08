@@ -72,91 +72,85 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value < ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool(((double) this.value) < ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) < (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() < " + other.typeName() + "()");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value <= ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool(((double) this.value) <= ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) <= (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() <= " + other.typeName() + "()");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value == ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool(((double) this.value) == ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(
                 (this.value == 0 && !((org.python.types.Bool) other).value)
             );
         }
-        return new org.python.types.Bool(false);
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value != ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool(((double) this.value) != ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(
                 (this.value != 0 || ((org.python.types.Bool) other).value)
             );
         }
-        return new org.python.types.Bool(true);
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value > ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool(((double) this.value) > ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) > (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() > " + other.typeName() + "()");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value >= ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool(((double) this.value) >= ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) >= (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() >= " + other.typeName() + "()");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(

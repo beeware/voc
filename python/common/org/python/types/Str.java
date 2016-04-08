@@ -85,74 +85,80 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) < 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() < " + other.typeName() + "()");
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) <= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() <= " + other.typeName() + "()");
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.equals(value));
         } else {
-            return new org.python.types.Bool(false);
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(!this.value.equals(value));
         } else {
-            return new org.python.types.Bool(true);
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) > 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() > " + other.typeName() + "()");
+            return new org.python.types.NotImplementedType();
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) >= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() >= " + other.typeName() + "()");
+            return new org.python.types.NotImplementedType();
         }
     }
 
