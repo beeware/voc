@@ -137,6 +137,9 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_complex',
         'test_and_frozenset',
 
+        'test_direct_eq_dict',
+        'test_direct_ne_dict',
+
         'test_eq_bool',
         'test_eq_bytearray',
         'test_eq_bytes',

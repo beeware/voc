@@ -76,6 +76,13 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_frozenset',
         'test_and_set',
 
+        'test_direct_eq_set',
+        'test_direct_ge_set',
+        'test_direct_gt_set',
+        'test_direct_le_set',
+        'test_direct_lt_set',
+        'test_direct_ne_set',
+
         'test_eq_bool',
         'test_eq_bytearray',
         'test_eq_bytes',

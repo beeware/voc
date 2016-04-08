@@ -73,45 +73,51 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__lt__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__le__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__eq__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__ne__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__gt__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__ge__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
