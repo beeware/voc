@@ -62,45 +62,51 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__lt__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__le__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__eq__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__ne__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__gt__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__ge__() has not been implemented.");
+        return new org.python.types.NotImplementedType();
     }
 
     @org.python.Method(
@@ -133,7 +139,7 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Float) other).value);
-        }          
+        }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'bool' and '" + other.typeName() + "'");
     }
 
