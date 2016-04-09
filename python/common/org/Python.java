@@ -1477,26 +1477,24 @@ public class Python {
             "of parameter 'start' (which defaults to 0).  When the iterable is\n" +
             "empty, return start.\n"
     )
-    public static org.python.Object sum() {
+    public static org.python.Object sum(org.python.Object iterable, org.python.Object start) {
         try {
             org.python.Iterable iter = iterable.__iter__();
+            org.python.Object result = start;
             try {
                 while (true) {
                     org.python.Object next = iter.__next__();
-                    if(!(next instanceof org.python.types.Int)){
-                        throw new org.python.exceptions.TypeError("sum() can't sum strings [use ''.join(seq) instead]")
+                    if(next instanceof org.python.types.Str){
+                        throw new org.python.exceptions.TypeError("sum() can't sum strings [use ''.join(seq) instead]");
                     }
+                    result = result.__add__(next);
                 }
-                    if (!((org.python.types.Int) next.__bool__()).value) {
-                        return new org.python.types.Int(false);
-                    }
             } catch (org.python.exceptions.StopIteration si) {
             }
-            return new org.python.types.Bool(true);
+            return result;
         } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
         }
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'sum' not implemented");
     }
 
     @org.python.Method(
