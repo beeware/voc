@@ -249,10 +249,25 @@ public class Python {
         __doc__ = "any(iterable) -> bool" +
             "\n" +
             "Return True if bool(x) is True for any x in the iterable.\n" +
-            "If the iterable is empty, return False.\n"
+            "If the iterable is empty, return False.\n",
+        args = {"iterable"}
     )
-    public static org.python.types.Bool any() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'any' not implemented");
+    public static org.python.types.Bool any(org.python.Object iterable) {
+        try {
+            org.python.Iterable iter = iterable.__iter__();
+            try {
+                while (true) {
+                    org.python.Object next = iter.__next__();
+                    if (((org.python.types.Bool) next.__bool__()).value) {
+                        return new org.python.types.Bool(true);
+                    }
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(false);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
@@ -273,10 +288,25 @@ public class Python {
             "Return the binary representation of an integer.\n" +
             "\n" +
             "  >>> bin(2796202)\n" +
-            "  '0b1010101010101010101010'\n"
+            "  '0b1010101010101010101010'\n",
+        args = {"number"}
     )
     public static org.python.types.Str bin(org.python.Object number) {
-        return new org.python.types.Str(java.lang.String.format("0b%b", int_cast(number, null).value));
+        try {
+            if (!(number instanceof org.python.types.Int)) {
+                number.__index__();
+            }
+
+            String s = Long.toString(int_cast(number, null).value, 2);
+            if (s.charAt(0) == '-') {
+                s = "-0b" + s.substring(1);
+            } else {
+                s = "0b" + s;
+            }
+            return new org.python.types.Str(s);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + number.typeName() + "' object cannot be interpreted as an integer");
+        }
     }
 
     @org.python.Method(
@@ -356,11 +386,23 @@ public class Python {
         args = {"i"}
     )
     public static org.python.types.Str chr(org.python.Object i) {
+        if (i instanceof org.python.types.Float) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + i.typeName() + "");
+        }
+
         try {
-            long value = ((org.python.types.Int) i).value;
-            return new org.python.types.Str(Character.toChars((int) value).toString());
-        } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("integer argument expected, got " + i.typeName() + " found");
+            if (!(i instanceof org.python.types.Int)) {
+                i.__index__();
+            }
+
+            long value = ((org.python.types.Int) i.__int__()).value;
+            if (value < 0) {
+                throw new org.python.exceptions.ValueError("chr() arg not in range(" + String.format("0x%x", (int) int_cast(i, null).value) + ")");
+            }
+
+            return new org.python.types.Str(Character.toChars((int) value)[0]);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("an integer is required (got type " + i.typeName() + ")");
         }
     }
 
@@ -551,10 +593,15 @@ public class Python {
     @org.python.Method(
         __doc__ = "divmod(x, y) -> (div, mod)" +
             "\n" +
-            "Return the tuple ((x-x%y)/y, x%y).  Invariant: div*y + mod == x.\n"
+            "Return the tuple ((x-x%y)/y, x%y).  Invariant: div*y + mod == x.\n",
+        args = {"a", "b"}
     )
-    public static org.python.types.Tuple divmod() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'divmod' not implemented");
+    public static org.python.types.Tuple divmod(org.python.Object a, org.python.Object b) {
+        try {
+            return (org.python.types.Tuple) a.__divmod__(b);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + a.typeName() + "' and '" + b.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -607,13 +654,18 @@ public class Python {
     }
 
     @org.python.Method(
+        name = "float",
         __doc__ = "float(x) -> floating point number" +
             "\n" +
             "Convert a string or number to a floating point number, if possible.\n",
         args = {"x"}
     )
     public static org.python.types.Float float_cast(org.python.Object x) {
-        return (org.python.types.Float) x.__float__();
+        try {
+            return (org.python.types.Float) x.__float__();
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("float() argument must be a string or a number, not '" + x.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -701,7 +753,21 @@ public class Python {
         args = {"number"}
     )
     public static org.python.types.Str hex(org.python.Object number) {
-        return new org.python.types.Str(String.format("0x%x", int_cast(number, null).value));
+        try {
+            if (!(number instanceof org.python.types.Int)) {
+                number.__index__();
+            }
+
+            String s = Long.toString(int_cast(number, null).value, 16);
+            if (s.charAt(0) == '-') {
+                s = "-0x" + s.substring(1);
+            } else {
+                s = "0x" + s;
+            }
+            return new org.python.types.Str(s);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + number.typeName() + "' object cannot be interpreted as an integer");
+        }
     }
 
     @org.python.Method(
@@ -762,7 +828,11 @@ public class Python {
         if (x == null) {
             return new org.python.types.Int(0);
         } else if (base == null) {
-            return (org.python.types.Int) x.__int__();
+            try {
+                return (org.python.types.Int) x.__int__();
+            } catch (org.python.exceptions.AttributeError ae) {
+                throw new org.python.exceptions.TypeError("int() argument must be a string or a number, not '" + x.typeName() + "'");
+            }
         } else {
             throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
         }
@@ -958,7 +1028,21 @@ public class Python {
         args = {"number"}
     )
     public static org.python.types.Str oct(org.python.Object number) {
-        return new org.python.types.Str(String.format("0o%o", int_cast(number, null).value));
+        try {
+            if (!(number instanceof org.python.types.Int)) {
+                number.__index__();
+            }
+
+            String s = Long.toString(int_cast(number, null).value, 8);
+            if (s.charAt(0) == '-') {
+                s = "-0o" + s.substring(1);
+            } else {
+                s = "0o" + s;
+            }
+            return new org.python.types.Str(s);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + number.typeName() + "' object cannot be interpreted as an integer");
+        }
     }
 
     @org.python.Method(
@@ -1122,9 +1206,16 @@ public class Python {
             "\n" +
             "With two arguments, equivalent to x**y.  With three arguments,\n" +
             "equivalent to (x**y) % z, but may be more efficient (e.g. for ints).\n",
-        default_args={"z"}
+        args = {"x", "y"},
+        default_args = {"z"}
     )
     public static org.python.Object pow(org.python.Object x, org.python.Object y, org.python.Object z) {
+        if (z != null && !((x instanceof org.python.types.Int) && (y instanceof org.python.types.Int))) {
+            throw new org.python.exceptions.TypeError("pow() 3rd argument not allowed unless all arguments are integers");
+        }
+        if (z != null && ((org.python.types.Int) y).value < 0) {
+            throw new org.python.exceptions.TypeError("pow() 2nd argument cannot be negative when 3rd argument specified");
+        }
         return x.__pow__(y, z);
     }
 

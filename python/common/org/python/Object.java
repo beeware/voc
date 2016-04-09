@@ -142,6 +142,13 @@ public interface Object {
     public void __itruediv__(org.python.Object other);
     public void __ifloordiv__(org.python.Object other);
     public void __imod__(org.python.Object other);
+    public void __idivmod__(org.python.Object other);
+    public void __ipow__(org.python.Object other);
+    public void __ilshift__(org.python.Object other);
+    public void __irshift__(org.python.Object other);
+    public void __iand__(org.python.Object other);
+    public void __ixor__(org.python.Object other);
+    public void __ior__(org.python.Object other);
 
     public org.python.Object __neg__();
     public org.python.Object __pos__();
@@ -155,6 +162,8 @@ public interface Object {
     public org.python.Object __int__();
     public org.python.Object __float__();
     public org.python.Object __round__(org.python.Object ndigits);
+
+    public org.python.Object __index__();
 
     // /**
     //  * Section 3.3.8 - With statement context

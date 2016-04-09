@@ -435,7 +435,35 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
     public void __imod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__im__");
+        throw new org.python.exceptions.AttributeError(this, "__imod__");
+    }
+
+    public void __idivmod__(org.python.Object other) {
+        throw new org.python.exceptions.AttributeError(this, "__idivmod__");
+    }
+
+    public void __ipow__(org.python.Object other) {
+        throw new org.python.exceptions.AttributeError(this, "__ipow__");
+    }
+
+    public void __ilshift__(org.python.Object other) {
+        throw new org.python.exceptions.AttributeError(this, "__ilshift__");
+    }
+
+    public void __irshift__(org.python.Object other) {
+        throw new org.python.exceptions.AttributeError(this, "__irshift__");
+    }
+
+    public void __iand__(org.python.Object other) {
+        throw new org.python.exceptions.AttributeError(this, "__iand__");
+    }
+
+    public void __ixor__(org.python.Object other) {
+        throw new org.python.exceptions.AttributeError(this, "__ixor__");
+    }
+
+    public void __ior__(org.python.Object other) {
+        throw new org.python.exceptions.AttributeError(this, "__ior__");
     }
 
 
@@ -477,6 +505,10 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
 
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.AttributeError(this, "__round__");
+    }
+
+    public org.python.Object __index__() {
+        throw new org.python.exceptions.AttributeError(this, "__index__");
     }
 
 
