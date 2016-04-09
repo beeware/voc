@@ -1478,6 +1478,24 @@ public class Python {
             "empty, return start.\n"
     )
     public static org.python.Object sum() {
+        try {
+            org.python.Iterable iter = iterable.__iter__();
+            try {
+                while (true) {
+                    org.python.Object next = iter.__next__();
+                    if(!(next instanceof org.python.types.Int)){
+                        throw new org.python.exceptions.TypeError("sum() can't sum strings [use ''.join(seq) instead]")
+                    }
+                }
+                    if (!((org.python.types.Int) next.__bool__()).value) {
+                        return new org.python.types.Int(false);
+                    }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(true);
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        }
         throw new org.python.exceptions.NotImplementedError("Builtin function 'sum' not implemented");
     }
 
