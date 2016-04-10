@@ -1475,7 +1475,10 @@ public class Python {
             "\n" +
             "Return the sum of an iterable of numbers (NOT strings) plus the value\n" +
             "of parameter 'start' (which defaults to 0).  When the iterable is\n" +
-            "empty, return start.\n"
+            "empty, return start.\n",
+
+        args = {"iterable"},
+        default_args = {"start"}
     )
     public static org.python.Object sum(org.python.Object iterable, org.python.Object start) {
         try {
