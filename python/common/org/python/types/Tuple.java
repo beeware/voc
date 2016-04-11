@@ -420,4 +420,12 @@ public class Tuple extends org.python.types.Object {
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         throw new org.python.exceptions.NotImplementedError("tuple.index() has not been implemented.");
     }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
+           
+         throw new org.python.exceptions.TypeError("type tuple doesn't define __round__ method");    
+        
+    }
 }

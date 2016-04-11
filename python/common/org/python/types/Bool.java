@@ -474,7 +474,10 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.NotImplementedError("bool.__round__() has not been implemented.");
+        if (ndigits instanceof org.python.types.Int){
+               return new org.python.types.Int(this.value? 1:0);
+        }
+         throw new org.python.exceptions.TypeError("'"+ndigits.typeName()+"' object cannot be interpreted as an integer");
     }
 
     @org.python.Method(
