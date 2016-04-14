@@ -76,7 +76,7 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Bool(this.value < 0.0);
             }
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -98,7 +98,7 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Bool(this.value <= 0.0);
             }
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -115,7 +115,7 @@ public class Float extends org.python.types.Object {
                 (this.value == 0.0 && !((org.python.types.Bool) other).value)
             );
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -132,7 +132,7 @@ public class Float extends org.python.types.Object {
                 (this.value != 0.0 || ((org.python.types.Bool) other).value)
             );
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -154,7 +154,7 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Bool(this.value > 0.0);
             }
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -176,7 +176,7 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Bool(this.value >= 0.0);
             }
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(

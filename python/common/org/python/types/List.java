@@ -125,7 +125,7 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size < otherSize);
 
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -159,7 +159,7 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size <= otherSize);
 
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -172,7 +172,7 @@ public class List extends org.python.types.Object {
             org.python.types.List otherList = (org.python.types.List) other;
             return new org.python.types.Bool(this.value.equals(otherList.value));
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -184,7 +184,7 @@ public class List extends org.python.types.Object {
         if (result instanceof org.python.types.Bool) {
             return new org.python.types.Bool(!((org.python.types.Bool) result).value);
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -217,7 +217,7 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size > otherSize);
 
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -251,7 +251,7 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size >= otherSize);
 
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 

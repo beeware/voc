@@ -93,7 +93,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) < 0);
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -106,7 +106,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) <= 0);
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -119,7 +119,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.equals(value));
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -132,7 +132,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(!this.value.equals(value));
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -145,7 +145,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) > 0);
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -158,7 +158,7 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) >= 0);
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 

@@ -81,7 +81,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) < (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -94,7 +94,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) <= (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -109,7 +109,7 @@ public class Int extends org.python.types.Object {
                 (this.value == 0 && !((org.python.types.Bool) other).value)
             );
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -124,7 +124,7 @@ public class Int extends org.python.types.Object {
                 (this.value != 0 || ((org.python.types.Bool) other).value)
             );
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -137,7 +137,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) > (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -150,7 +150,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) >= (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(

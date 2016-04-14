@@ -124,7 +124,7 @@ public class Tuple extends org.python.types.Object {
             // At this point the lists are different sizes or every comparison is true.
             return new org.python.types.Bool(size < otherSize);
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -159,7 +159,7 @@ public class Tuple extends org.python.types.Object {
             // At this point the lists are different sizes or every comparison is true.
             return new org.python.types.Bool(size <= otherSize);
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -174,7 +174,7 @@ public class Tuple extends org.python.types.Object {
             System.err.println(this.value.equals(otherTuple.value));
             return new org.python.types.Bool(this.value.equals(otherTuple.value));
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -186,7 +186,7 @@ public class Tuple extends org.python.types.Object {
         if (result instanceof org.python.types.Bool) {
             return new org.python.types.Bool(!((org.python.types.Bool) result).value);
         }
-        return new org.python.types.NotImplementedType();
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -220,7 +220,7 @@ public class Tuple extends org.python.types.Object {
             return new org.python.types.Bool(size > otherSize);
 
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -255,7 +255,7 @@ public class Tuple extends org.python.types.Object {
             // At this point the lists are different sizes or every comparison is true.
             return new org.python.types.Bool(size >= otherSize);
         } else {
-            return new org.python.types.NotImplementedType();
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
