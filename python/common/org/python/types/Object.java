@@ -32,6 +32,85 @@ public class Object implements org.python.Object {
         return org.Python.typeName(this.getClass());
     }
 
+    static final java.util.Map<java.lang.String, java.lang.String> COMPARISON_OPERATORS_TO_FUNCTION_NAME = new java.util.HashMap<java.lang.String, java.lang.String>();
+    static final java.util.Map<java.lang.String, java.lang.String> COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME = new java.util.HashMap<java.lang.String, java.lang.String>();
+    static {
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("<", "__lt__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("<=", "__le__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put(">", "__gt__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put(">=", "__ge__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("==", "__eq__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("!=", "__ne__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("is", "__eq__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("is not", "__ne__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("exception match", "__eq__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("in", "__contains__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("not in", "__contains__");
+        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("not in", "__not_contains__");
+
+        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("<", "__gt__");
+        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("<=", "__ge__");
+        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put(">", "__lt__");
+        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put(">=", "__le__");
+        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("==", "__eq__");
+        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("!=", "__ne__");
+    }
+
+    public org.python.Object comparison(org.python.Object other, String operator) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = false;
+
+        if (this.getClass() != other.getClass() && this.getClass().isInstance(other)) {
+            reflectedChecked = true;
+            result = invokeComparison(other, this, COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.get(operator));
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
+        }
+
+        result = invokeComparison(this, other, COMPARISON_OPERATORS_TO_FUNCTION_NAME.get(operator));
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        if (!reflectedChecked) {
+            result = invokeComparison(other, this, COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.get(operator));
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
+        }
+
+        // 4.3: Objects of different types, except different numeric types, never compare equal.
+        if (operator.equals("==")) {
+            return new org.python.types.Bool(false);
+        } else if (operator.equals("!=")) {
+            // Non-identical instances of a class normally compare as non-equal unless the class defines the __eq__() method.
+            return new org.python.types.Bool(true);
+        }
+        // 4.3: The <, <=, > and >= operators will raise a TypeError exception when comparing a complex number with another built-in numeric type, when the objects are of different types that cannot be compared, or in other cases where there is no defined ordering.
+        throw new org.python.exceptions.TypeError(String.format(
+        "unorderable types: %s() %s %s()", this.typeName(), operator, other.typeName()));
+    }
+
+    private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        if (methodName == null) {
+            return result;
+        }
+        org.python.Object comparator = x.__getattribute_null(methodName);
+        if (comparator != null) {
+            org.python.Object[] args = new org.python.Object[1];
+            java.util.Map<java.lang.String, org.python.Object> kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
+
+            args[0] = y;
+            result = (org.python.Object) ((org.python.types.Method) comparator).invoke(args, kwargs);
+            // } catch (ClassCastException e) {
+            //     throw new org.python.exceptions.RuntimeError(String.format("%s method of %s object is not callable", comparatorName, other.getClass()));
+            // }
+        }
+        return result;
+    }
+
     /**
      * Construct a new object instance.
      *

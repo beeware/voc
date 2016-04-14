@@ -2122,7 +2122,8 @@ class COMPARE_OP(Opcode):
                 )
 
             context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', comparator, '(Lorg/python/Object;)Lorg/python/Object;')
+                JavaOpcodes.LDC_W(self.comparison),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'comparison', '(Lorg/python/Object;Ljava/lang/String;)Lorg/python/Object;')
             )
 
 

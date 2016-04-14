@@ -35,6 +35,10 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         return org.Python.typeName(this.getClass());
     }
 
+    public org.python.Object comparison(org.python.Object other, String operator) {
+        return null;
+    }
+
     /**
      * Proxy Java object methods onto their Python counterparts.
      */

@@ -32,6 +32,11 @@ public interface Object {
     public org.python.Object byValue();
 
     /**
+     * Perform the appropriate reflected comparison operation
+     */
+    public org.python.Object comparison(org.python.Object other, String operator);
+
+    /**
      * Python interface compatibility
      * Section 3.3.1 - Basic customization
      */
