@@ -585,7 +585,10 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.NotImplementedError("int.__round__() has not been implemented");
+        if (ndigits instanceof org.python.types.Int){
+               return new org.python.types.Int(this.value);
+        }
+        throw new org.python.exceptions.TypeError("'"+ndigits.typeName()+"' object cannot be interpreted as an integer");
     }
 
 }

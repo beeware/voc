@@ -384,5 +384,13 @@ public class Str extends org.python.types.Object {
         }
         super.__imod__(other);
     }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
+           
+         throw new org.python.exceptions.TypeError("type str doesn't define __round__ method");    
+        
+    }
 
 }
