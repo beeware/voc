@@ -45,7 +45,6 @@ public class Object implements org.python.Object {
         COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("is not", "__ne__");
         COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("exception match", "__eq__");
         COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("in", "__contains__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("not in", "__contains__");
         COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("not in", "__not_contains__");
 
         COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("<", "__gt__");
