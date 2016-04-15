@@ -55,7 +55,7 @@ public class Object implements org.python.Object {
         COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("!=", "__ne__");
     }
 
-    public org.python.Object comparison(org.python.Object other, String operator) {
+    public org.python.Object __cmp__(org.python.Object other, String operator) {
         org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         boolean reflectedChecked = false;
 
@@ -88,7 +88,7 @@ public class Object implements org.python.Object {
         }
         // 4.3: The <, <=, > and >= operators will raise a TypeError exception when comparing a complex number with another built-in numeric type, when the objects are of different types that cannot be compared, or in other cases where there is no defined ordering.
         throw new org.python.exceptions.TypeError(String.format(
-        "unorderable types: %s() %s %s()", this.typeName(), operator, other.typeName()));
+            "unorderable types: %s() %s %s()", this.typeName(), operator, other.typeName()));
     }
 
     private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {

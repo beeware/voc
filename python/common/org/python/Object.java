@@ -34,7 +34,7 @@ public interface Object {
     /**
      * Perform the appropriate reflected comparison operation
      */
-    public org.python.Object comparison(org.python.Object other, String operator);
+    public org.python.Object __cmp__(org.python.Object other, String operator);
 
     /**
      * Python interface compatibility

@@ -31,7 +31,7 @@ public class Super implements org.python.Object {
         return "super";
     }
 
-    public org.python.Object comparison(org.python.Object other, String operator) {
+    public org.python.Object __cmp__(org.python.Object other, String operator) {
         return null;
     }
 
