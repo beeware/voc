@@ -170,8 +170,6 @@ public class Tuple extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
             org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
-            System.err.println(otherTuple.value.getClass().toString());
-            System.err.println(this.value.equals(otherTuple.value));
             return new org.python.types.Bool(this.value.equals(otherTuple.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
