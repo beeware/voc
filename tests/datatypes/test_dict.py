@@ -113,13 +113,6 @@ class DictTests(TranspileTestCase):
 class UnaryDictOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ["{}", "{'a': 1, 'b': 'value', 'c': 1.2345}"]
 
-    not_implemented = [
-        'test_unary_positive',
-        'test_unary_negative',
-        'test_unary_not',
-        'test_unary_invert',
-    ]
-
 
 class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
     values = ["{}", "{'a': 1, 'b': 'value', 'c': 1.2345}"]
@@ -138,19 +131,16 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_frozenset',
 
         'test_direct_eq_bytes',
-        'test_direct_eq_dict',
         'test_direct_ge_bytes',
         'test_direct_gt_bytes',
         'test_direct_le_bytes',
         'test_direct_lt_bytes',
         'test_direct_ne_bytes',
-        'test_direct_ne_dict',
 
         'test_eq_bytearray',
         'test_eq_bytes',
         'test_eq_class',
         'test_eq_complex',
-        'test_eq_dict',
         'test_eq_frozenset',
 
         'test_floor_divide_bytearray',
@@ -208,7 +198,6 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_bytes',
         'test_ne_class',
         'test_ne_complex',
-        'test_ne_dict',
         'test_ne_frozenset',
 
         'test_or_bytearray',
@@ -233,10 +222,7 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_bytes',
         'test_subscr_class',
         'test_subscr_complex',
-        'test_subscr_dict',
         'test_subscr_frozenset',
-        'test_subscr_list',
-        'test_subscr_set',
 
         'test_subtract_bytearray',
         'test_subtract_bytes',
@@ -268,20 +254,11 @@ class InplaceDictOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_complex',
         'test_add_frozenset',
 
-        'test_and_bool',
         'test_and_bytearray',
         'test_and_bytes',
         'test_and_class',
         'test_and_complex',
-        'test_and_dict',
-        'test_and_float',
         'test_and_frozenset',
-        'test_and_int',
-        'test_and_list',
-        'test_and_none',
-        'test_and_set',
-        'test_and_str',
-        'test_and_tuple',
 
         'test_floor_divide_bytearray',
         'test_floor_divide_bytes',
@@ -289,20 +266,11 @@ class InplaceDictOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_complex',
         'test_floor_divide_frozenset',
 
-        'test_lshift_bool',
         'test_lshift_bytearray',
         'test_lshift_bytes',
         'test_lshift_class',
         'test_lshift_complex',
-        'test_lshift_dict',
-        'test_lshift_float',
         'test_lshift_frozenset',
-        'test_lshift_int',
-        'test_lshift_list',
-        'test_lshift_none',
-        'test_lshift_set',
-        'test_lshift_str',
-        'test_lshift_tuple',
 
         'test_modulo_bytearray',
         'test_modulo_bytes',
@@ -316,20 +284,11 @@ class InplaceDictOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_complex',
         'test_multiply_frozenset',
 
-        'test_or_bool',
         'test_or_bytearray',
         'test_or_bytes',
         'test_or_class',
         'test_or_complex',
-        'test_or_dict',
-        'test_or_float',
         'test_or_frozenset',
-        'test_or_int',
-        'test_or_list',
-        'test_or_none',
-        'test_or_set',
-        'test_or_str',
-        'test_or_tuple',
 
         'test_power_bool',
         'test_power_bytearray',
@@ -346,20 +305,11 @@ class InplaceDictOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_str',
         'test_power_tuple',
 
-        'test_rshift_bool',
         'test_rshift_bytearray',
         'test_rshift_bytes',
         'test_rshift_class',
         'test_rshift_complex',
-        'test_rshift_dict',
-        'test_rshift_float',
         'test_rshift_frozenset',
-        'test_rshift_int',
-        'test_rshift_list',
-        'test_rshift_none',
-        'test_rshift_set',
-        'test_rshift_str',
-        'test_rshift_tuple',
 
         'test_subtract_bytearray',
         'test_subtract_bytes',
@@ -373,18 +323,9 @@ class InplaceDictOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_true_divide_complex',
         'test_true_divide_frozenset',
 
-        'test_xor_bool',
         'test_xor_bytearray',
         'test_xor_bytes',
         'test_xor_class',
         'test_xor_complex',
-        'test_xor_dict',
-        'test_xor_float',
         'test_xor_frozenset',
-        'test_xor_int',
-        'test_xor_list',
-        'test_xor_none',
-        'test_xor_set',
-        'test_xor_str',
-        'test_xor_tuple',
     ]

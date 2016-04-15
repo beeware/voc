@@ -23,6 +23,11 @@ public class List extends org.python.types.Object {
         return this.value.hashCode();
     }
 
+    @Override
+    public org.python.Object __hash__() {
+        throw new org.python.exceptions.AttributeError(this, "__hash__");
+    }
+
     public List() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();

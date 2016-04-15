@@ -228,7 +228,7 @@ JAVA_EXCEPTION = re.compile(
     '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)(.*\r?\n)*' +
     '(Exception in thread "\w+" )?'
 )
-JAVA_STACK = re.compile('\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)')
+JAVA_STACK = re.compile('^\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)\r?\n', re.MULTILINE)
 JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 
 # PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
@@ -665,9 +665,44 @@ class BuiltinFunctionTestCase:
             f = %(f)s
             x = %(x)s
             print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with x=%(x)s" % kwargs)
+            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s" % kwargs)
 
     for datatype, examples in SAMPLE_DATA:
         if datatype != 'set' and datatype != 'frozenset' and datatype != 'dict':
             vars()['test_%s' % datatype] = _builtin_test('test_%s' % datatype, 'f(x)', examples)
+
+def _builtin_twoarg_test(test_name, operation, examples1, examples2):
+    def func(self):
+        for function in self.functions:
+            for example1 in examples1:
+                for example2 in examples2:
+                    self.assertBuiltinTwoargFunction(x=example1, y=example2, f=function, operation=operation, format=self.format)
+    return func
+
+
+class BuiltinTwoargFunctionTestCase:
+    format = ''
+
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        for test_name in dir(self):
+            if test_name.startswith('test_'):
+                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
+        return super().run(result=result)
+
+    def assertBuiltinTwoargFunction(self, **kwargs):
+        self.assertCodeExecution("""
+            f = %(f)s
+            x = %(x)s
+            y = %(y)s
+            print(%(format)s%(operation)s)
+            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s and y=%(y)s" % kwargs)
+
+    EXCLUDED_DATATYPES = ['set', 'frozenset', 'dict']
+    for datatype1, examples1 in SAMPLE_DATA:
+        for datatype2, examples2 in SAMPLE_DATA:
+            if datatype1 not in EXCLUDED_DATATYPES and datatype2 not in EXCLUDED_DATATYPES:
+                vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test('test_%s_%s' % (datatype1, datatype2), 'f(x, y)', examples1, examples2)
+
 

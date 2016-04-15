@@ -324,8 +324,15 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __divmod__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("int.__divmod__() has not been implemented");
+    public org.python.Object __divmod__(org.python.Object other) {
+        try {
+            java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+            data.add(this.__floordiv__(other));
+            data.add(this.__mod__(other));
+            return new org.python.types.Tuple(data);
+        } catch (org.python.exceptions.TypeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(

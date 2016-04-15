@@ -867,6 +867,19 @@ public class Object implements org.python.Object {
         __doc__ = "",
         args = {"other"}
     )
+    public void __idivmod__(org.python.Object other) {
+        try {
+            this.setValue(this.__pow__(other, null));
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //=: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        }
+    }
+
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
     public void __ipow__(org.python.Object other) {
         try {
             this.setValue(this.__pow__(other, null));
@@ -995,6 +1008,13 @@ public class Object implements org.python.Object {
     )
     public org.python.Object __float__() {
         throw new org.python.exceptions.AttributeError(this, "__float__");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __index__() {
+        throw new org.python.exceptions.AttributeError(this, "__index__");
     }
 
     @org.python.Method(
