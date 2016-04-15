@@ -175,14 +175,16 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
         return new org.python.types.Bool(this.value.get(item) != null);
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object __not_contains__(org.python.Object item) {
         return new org.python.types.Bool(this.value.get(item) == null);

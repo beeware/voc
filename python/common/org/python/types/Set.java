@@ -144,14 +144,16 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object other) {
         return new org.python.types.Bool(this.value.contains(other));
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object __not_contains__(org.python.Object other) {
         return new org.python.types.Bool(!this.value.contains(other));
