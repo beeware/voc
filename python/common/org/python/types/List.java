@@ -23,6 +23,11 @@ public class List extends org.python.types.Object {
         return this.value.hashCode();
     }
 
+    @Override
+    public org.python.Object __hash__() {
+        throw new org.python.exceptions.AttributeError(this, "__hash__");
+    }
+
     public List() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();
@@ -485,5 +490,12 @@ public class List extends org.python.types.Object {
     public org.python.Object sort() {
         throw new org.python.exceptions.NotImplementedError("list.sort() has not been implemented.");
     }
-
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
+           
+         throw new org.python.exceptions.TypeError("type list doesn't define __round__ method");    
+        
+    }
 }

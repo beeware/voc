@@ -929,6 +929,13 @@ public class Object implements org.python.Object {
     }
 
     @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __index__() {
+        throw new org.python.exceptions.AttributeError(this, "__index__");
+    }
+
+    @org.python.Method(
         __doc__ = "",
         args = {"ndigits"}
     )

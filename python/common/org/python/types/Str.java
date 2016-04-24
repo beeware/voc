@@ -80,7 +80,11 @@ public class Str extends org.python.types.Object {
         try {
             return new org.python.types.Float(Double.parseDouble(this.value));
         } catch (NumberFormatException e) {
-            throw new org.python.exceptions.ValueError("could not convert string to float: '" + this.value + "'");
+            String value = this.value;
+            if (value.length() > 0) {
+                value = "'" + value + "'";
+            }
+            throw new org.python.exceptions.ValueError("could not convert string to float: " + value);
         }
     }
 
@@ -373,6 +377,14 @@ public class Str extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         }
         super.__imod__(other);
+    }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
+           
+         throw new org.python.exceptions.TypeError("type str doesn't define __round__ method");    
+        
     }
 
 }
