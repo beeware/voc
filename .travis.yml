@@ -1,6 +1,6 @@
 language: python
 python:
-  - "3.4"
+  - "3.4.4"
 install:
   - "pip install ."
   - "ant java"
