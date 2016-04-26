@@ -831,7 +831,7 @@ public class Python {
             try {
                 return (org.python.types.Int) x.__int__();
             } catch (org.python.exceptions.AttributeError ae) {
-                throw new org.python.exceptions.TypeError("int() argument must be a string or a number, not '" + x.typeName() + "'");
+                throw new org.python.exceptions.TypeError("int() argument must be a string, a bytes-like object or a number, not '" + x.typeName() + "'");
             }
         } else {
             throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
