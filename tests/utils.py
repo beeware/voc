@@ -280,8 +280,8 @@ def cleanse_python(input):
 
     # Python 3.4.4 changed the error message returned by int()
     out = out.replace(
-        'argument must be a string or a number, not',
-        'argument must be a string, a bytes-like object or a number, not'
+        'int() argument must be a string or a number, not',
+        'int() argument must be a string, a bytes-like object or a number, not'
     )
 
     out = out.replace('\r\n', '\n')
