@@ -30,8 +30,12 @@ Tutorial
 To take VOC for a spin, run through the `Getting Started guide`_, then start
 with `the first tutorial`_.
 
+If you'd like to contribute to VOC development, we have a `guide for first time contributors`_.
+
 .. _Getting Started guide: http://voc.readthedocs.org/en/latest/intro/getting-started.html
 .. _the first tutorial: http://voc.readthedocs.org/en/latest/tutorials/tutorial-0.html
+
+.. _guide for first time contributors: https://github.com/pybee/voc/wiki/Your-first-VOC-contribution
 
 Documentation
 -------------
