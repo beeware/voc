@@ -18,6 +18,8 @@ from voc.transpiler import Transpiler
 
 # A state variable to determine if the test environment has been configured.
 _suite_configured = False
+_jvm = None
+
 
 def setUpSuite():
     """Configure the entire test suite.
@@ -149,6 +151,7 @@ def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=
 
     if len(args) == 0:
         global _jvm
+
         # encode to turn str into bytes-like object
         _jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
         _jvm.stdin.flush()
@@ -304,6 +307,7 @@ class TranspileTestCase(TestCase):
 
     def tearDownClass():
         global _jvm
+
         if _jvm is not None:
             # use communicate here to wait for process to exit
             _jvm.communicate("exit".encode("utf-8"))
@@ -365,7 +369,6 @@ class TranspileTestCase(TestCase):
                 # Clean up the test directory where the class file was written.
                 shutil.rmtree(test_dir)
                 # print(java_out)
-
 
             # Cleanse the Python and Java output, producing a simple
             # normalized format for exceptions, floats etc.
@@ -671,6 +674,7 @@ class BuiltinFunctionTestCase:
         if datatype != 'set' and datatype != 'frozenset' and datatype != 'dict':
             vars()['test_%s' % datatype] = _builtin_test('test_%s' % datatype, 'f(x)', examples)
 
+
 def _builtin_twoarg_test(test_name, operation, examples1, examples2):
     def func(self):
         for function in self.functions:
@@ -704,5 +708,3 @@ class BuiltinTwoargFunctionTestCase:
         for datatype2, examples2 in SAMPLE_DATA:
             if datatype1 not in EXCLUDED_DATATYPES and datatype2 not in EXCLUDED_DATATYPES:
                 vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test('test_%s_%s' % (datatype1, datatype2), 'f(x, y)', examples1, examples2)
-
-
