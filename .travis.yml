@@ -1,6 +1,9 @@
 language: python
-python:
-  - "3.4"
+matrix:
+  include:
+    python:
+      - "3.4.4"
+      - "3.4.2"
 install:
   - "pip install ."
   - "ant java"
