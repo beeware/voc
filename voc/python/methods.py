@@ -739,7 +739,7 @@ class InstanceMethod(Method):
                     'char': JavaOpcodes.IRETURN(),
                     'short': JavaOpcodes.IRETURN(),
                     'int': JavaOpcodes.IRETURN(),
-                    'long': JavaOpcodes.IRETURN(),
+                    'long': JavaOpcodes.LRETURN(),
                     'float': JavaOpcodes.FRETURN(),
                     'double': JavaOpcodes.DRETURN(),
                 }.get(self.returns['annotation'], JavaOpcodes.ARETURN()),
