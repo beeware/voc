@@ -93,7 +93,7 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __eq__(org.python.Object other) {
-        
+
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) == ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
@@ -129,7 +129,7 @@ public class Bool extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) > (((org.python.types.Float) other).value));
         }
-        
+
         throw new org.python.exceptions.TypeError("unorderable types: bool() > " + other.typeName() + "()");
     }
 
@@ -211,7 +211,7 @@ public class Bool extends org.python.types.Object {
             }
             else{
                 return new org.python.types.Str("");
-                
+
             }
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'bool' and '" + other.typeName() + "'");
@@ -273,7 +273,7 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
-            java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+            java.util.List<org.python.Object> data = new java.util.ArrayList<org.python.Object>();
             data.add(this.__floordiv__(other));
             data.add(this.__mod__(other));
             return new org.python.types.Tuple(data);
