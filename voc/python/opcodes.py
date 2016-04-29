@@ -3080,7 +3080,7 @@ def add_callable(opcode, context, arguments, full_method_name, closure=False):
             # globals
             # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
             # JavaOpcodes.LDC_W(method.module.descriptor),
-            # JavaOpcodes.GETSTATIC(method.module.descriptor, 'attrs', 'Ljava/util/Map;'),
+            # JavaOpcodes.GETSTATIC(method.module.descriptor, '__dict__', 'Ljava/util/Map;'),
             JavaOpcodes.ACONST_NULL(),  # globals
 
             # Default args

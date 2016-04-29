@@ -302,7 +302,7 @@ public class Super implements org.python.Object {
         org.python.Object attr = this.klass.__getattribute_null(name);
 
         // if (attr == null) {
-        //     this.attrs.put(name, value);
+        //     this.__dict__.put(name, value);
         // } else {
         //     attr.__set__(this, value);
         // }
@@ -330,7 +330,7 @@ public class Super implements org.python.Object {
     }
 
     public boolean __delattr_null(java.lang.String name) {
-        // org.python.Object result = attrs.remove(name);
+        // org.python.Object result = __dict__.remove(name);
         // return (result != null);
         return false;
     }
@@ -341,7 +341,7 @@ public class Super implements org.python.Object {
     public org.python.Object __dir__() {
         org.python.types.List names = new org.python.types.List(new java.util.ArrayList());
 
-        // names.extend(this.attrs.get("__class__").__dir__());
+        // names.extend(this.__dict__.get("__class__").__dir__());
         // names.sort();
 
         return names;

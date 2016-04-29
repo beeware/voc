@@ -180,11 +180,11 @@ public class ImportLib {
         java.util.Map<java.lang.String, org.python.Object> exports = new java.util.HashMap<java.lang.String, org.python.Object>();
         org.python.types.Type module = org.python.types.Type.pythonType(module_instance.getClass());
 
-        org.python.Object all_obj = module.attrs.get("__all__");
+        org.python.Object all_obj = module.__dict__.get("__all__");
         if (all_obj == null) {
-            for (java.lang.String name: module.attrs.keySet()) {
+            for (java.lang.String name: module.__dict__.keySet()) {
                 if (!name.startsWith("_")) {
-                    exports.put(name, module.attrs.get(name));
+                    exports.put(name, module.__dict__.get(name));
                 }
             }
         } else {
@@ -192,7 +192,7 @@ public class ImportLib {
             try {
                 while (true) {
                     java.lang.String name = ((org.python.types.Str) iter.__next__()).value;
-                    exports.put(name, module.attrs.get(name));
+                    exports.put(name, module.__dict__.get(name));
                 }
             } catch (org.python.exceptions.StopIteration e) {}
         }

@@ -140,13 +140,13 @@ public class Type extends org.python.types.Object implements org.python.Callable
         if (origin != Origin.PLACEHOLDER) {
             this.klass = klass;
 
-            this.attrs.put("__name__", new org.python.types.Str(this.klass.getName()));
-            this.attrs.put("__qualname__", new org.python.types.Str(this.klass.getName()));
-            // this.attrs.put("__module__", );
+            this.__dict__.put("__name__", new org.python.types.Str(this.klass.getName()));
+            this.__dict__.put("__qualname__", new org.python.types.Str(this.klass.getName()));
+            // this.__dict__.put("__module__", );
         }
 
         if (origin == Origin.BUILTIN) {
-            org.Python.initializeModule(klass, this.attrs);
+            org.Python.initializeModule(klass, this.__dict__);
         } else if (origin == Origin.PYTHON || origin == Origin.EXTENSION) {
             try {
                 this.constructor = this.klass.getConstructor(org.python.Object[].class, java.util.Map.class);
@@ -173,8 +173,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
     public org.python.Object __getattribute_null(java.lang.String name) {
         // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name);
-        // System.out.println("CLASS ATTRS " + this.attrs);
-        org.python.Object value = this.attrs.get(name);
+        // System.out.println("CLASS ATTRS " + this.__dict__);
+        org.python.Object value = this.__dict__.get(name);
 
         if (value == null) {
             // The class attributes didn't contain a value for the attribute
@@ -186,7 +186,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
             } catch (java.lang.NoSuchFieldException e) {
                 value = new org.python.exceptions.AttributeError(this.klass, name);
             }
-            this.attrs.put(name, value);
+            this.__dict__.put(name, value);
         }
 
         // If the result of the lookup is an AttributeError, there's
@@ -210,14 +210,14 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // System.out.println("SETATTRIBUTE TYPE " + name + " = " + value);
-        // System.out.println("class attrs = " + this.attrs);
+        // System.out.println("class __dict__ = " + this.__dict__);
 
         // Can't set attributes of builtin types.
         if (this.origin == Origin.BUILTIN) {
             return false;
         }
 
-        this.attrs.put(name, value);
+        this.__dict__.put(name, value);
         return true;
     }
 

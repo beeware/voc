@@ -56,11 +56,11 @@ public class Object extends org.python.types.Object {
     // public org.python.Object __getattribute__(java.lang.String name) {
     //     // System.out.println("GETATTRIBUTE NATIVE OBJECT " + this + " " + name);
     //     // Look for a cached attribute.
-    //     org.python.Object value = this.attrs.get(name);
+    //     org.python.Object value = this.__dict__.get(name);
 
     //     if (value == null) {
     //         // Look for a cached class-level attribute.
-    //         org.python.types.Type klass = (org.python.types.Type) this.attrs.get("__class__");
+    //         org.python.types.Type klass = (org.python.types.Type) this.__dict__.get("__class__");
     //         value = klass.__getattribute__(name).__get__(this, klass);
     //     }
 
@@ -81,7 +81,7 @@ public class Object extends org.python.types.Object {
     //     } catch(org.python.exceptions.AttributeError e) {
     //     }
 
-    //     this.attrs.put(name, value);
+    //     this.__dict__.put(name, value);
     // }
 
 }

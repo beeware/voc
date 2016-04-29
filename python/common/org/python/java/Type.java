@@ -158,9 +158,9 @@ public class Type extends org.python.types.Type {
 
     public org.python.Object __getattribute_null(java.lang.String name) {
         // org.Python.debug(String.format("GETATTRIBUTE %s FROM NATIVE TYPE", name), this.klass);
-        org.python.Object value = this.attrs.get(name);
+        org.python.Object value = this.__dict__.get(name);
 
-        // On a native type, attrs is a cache of lookups on actual functions.
+        // On a native type, __dict__ is a cache of lookups on actual functions.
         // If there's no hit, then we need to reflect on the underyling class
         // and populate the cache.
         if (value == null) {
@@ -168,7 +168,7 @@ public class Type extends org.python.types.Type {
             // and "value is null"; so since we know the value is null, check
             // to see if it is an explicit null (i.e., attribute doesn't exist)
             // org.Python.debug("No class attr");
-            if (!this.attrs.containsKey(name)) {
+            if (!this.__dict__.containsKey(name)) {
                 // org.Python.debug("doing lookup...");
                 try {
                     // org.Python.debug("Declared method", this.klass);
@@ -210,7 +210,7 @@ public class Type extends org.python.types.Type {
                 // If the field doesn't exist, store a value of null
                 // so that we don't try to look up the field again.
                 // If it does, store the field.
-                this.attrs.put(name, value);
+                this.__dict__.put(name, value);
             }
         }
 
@@ -227,10 +227,10 @@ public class Type extends org.python.types.Type {
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // System.out.println("SETATTRIBUTE NATIVE TYPE " + this + " " + name + " = " + value);
         org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
-        // System.out.println("instance attrs = " + this.attrs);
-        // System.out.println("class attrs = " + cls.attrs);
+        // System.out.println("instance __dict__ = " + this.__dict__);
+        // System.out.println("class __dict__ = " + cls.__dict__);
 
-        cls.attrs.put(name, value);
+        cls.__dict__.put(name, value);
         return true;
     }
 

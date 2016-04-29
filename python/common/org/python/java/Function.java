@@ -432,8 +432,8 @@ public class Function extends org.python.types.Object implements org.python.Call
             clazz = clazz.getSuperclass();
         }
         // org.Python.debug("methods: ", this.methods);
-        this.attrs.put("__name__", new org.python.types.Str(this.name));
-        this.attrs.put("__qualname__", new org.python.types.Str(this.name));
+        this.__dict__.put("__name__", new org.python.types.Str(this.name));
+        this.__dict__.put("__qualname__", new org.python.types.Str(this.name));
     }
 
     @org.python.Method(

@@ -20,16 +20,16 @@ public class Module extends org.python.types.Module {
     public org.python.Object __getattribute__(java.lang.String name) {
         // System.out.println("GETATTRIBUTE NATIVE MODULE " + this + " " + name);
         org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
-        // System.out.println("instance attrs = " + this.attrs);
-        // System.out.println("class attrs = " + cls.attrs);
+        // System.out.println("instance __dict__ = " + this.__dict__);
+        // System.out.println("class __dict__ = " + cls.__dict__);
         org.python.Object value;
 
-        value = cls.attrs.get(name);
+        value = cls.__dict__.get(name);
         if (value == null) {
             try {
                 java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(java_namespace + "." + name);
                 value = new org.python.java.Type(org.python.types.Type.Origin.JAVA, java_class);
-                cls.attrs.put(name, value);
+                cls.__dict__.put(name, value);
             } catch (java.lang.ClassNotFoundException e) {
                 throw new org.python.exceptions.NameError(name);
             }
@@ -41,9 +41,9 @@ public class Module extends org.python.types.Module {
         // The base object can't have attribute set on it unless the attribute already exists.
         // System.out.println("SETATTRIBUTE NATIVE MODULE " + this + " " + name + " = " + value);
         org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
-        // System.out.println("instance attrs = " + this.attrs);
-        // System.out.println("class attrs = " + cls.attrs);
+        // System.out.println("instance __dict__ = " + this.__dict__);
+        // System.out.println("class __dict__ = " + cls.__dict__);
 
-        cls.attrs.put(name, value);
+        cls.__dict__.put(name, value);
     }
 }
