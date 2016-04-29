@@ -1427,8 +1427,11 @@ class RETURN_VALUE(Opcode):
         else:
             if return_type is None:
                 context.add_opcodes(
-                    JavaOpcodes.POP(),
                     JavaOpcodes.RETURN()
+                )
+            elif return_type == 'void':
+                context.add_opcodes(
+                    JavaOpcodes.ARETURN()
                 )
             else:
                 context.add_opcodes(

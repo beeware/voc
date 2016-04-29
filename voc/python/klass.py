@@ -85,12 +85,16 @@ class ClassBlock(Block):
         if code.co_flags & CO_GENERATOR:
             raise Exception("Can't handle Generator instance methods (yet)")
         else:
+            return_type = annotations.get('return', 'org.python.Object')
+            if return_type is None:
+                return_type = 'void'
+
             method = InstanceMethod(
                 self.klass,
                 name=method_name,
                 parameters=parameters,
                 returns={
-                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+                    'annotation': return_type
                 },
                 static=True,
                 verbosity=self.klass.verbosity
