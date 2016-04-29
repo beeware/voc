@@ -374,7 +374,7 @@ class InstanceMethod(Method):
 
             JavaOpcodes.ALOAD_0(),
             JavaOpcodes.INSTANCEOF('org/python/Object'),
-            JavaOpcodes.IFNE(36),  # 3
+            JavaOpcodes.IFNE(66),  # 3
 
             # JavaOpcodes.LDC_W("CHECK FOR __VOC__ FIELD"),  # 3
             # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
@@ -385,8 +385,12 @@ class InstanceMethod(Method):
                 JavaOpcodes.LDC_W("__VOC__"),  # 3
                 JavaOpcodes.INVOKEVIRTUAL('java/lang/Class', 'getField', '(Ljava/lang/String;)Ljava/lang/reflect/Field;'),  # 3
 
+                # if hasattr(obj, '__VOC__')
                 JavaOpcodes.DUP(),  # 1
-                JavaOpcodes.IFNONNULL(10),  # 3
+                JavaOpcodes.IFNULL(40),  # 3
+
+                    JavaOpcodes.DUP(),  # 1
+                    JavaOpcodes.DUP(),  # 1
 
                     # JavaOpcodes.LDC_W("NON NULL FIELD VALUE"),  # 3
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
@@ -394,10 +398,32 @@ class InstanceMethod(Method):
                     JavaOpcodes.ALOAD_0(),  # 1
                     JavaOpcodes.INVOKEVIRTUAL('java/lang/reflect/Field', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),  # 3
 
-                    JavaOpcodes.GOTO(16),  # 3
+                    # if obj.__VOC__ is None
+                    JavaOpcodes.DUP(),  # 1
+                    JavaOpcodes.IFNONNULL(23),  # 3
+                        JavaOpcodes.POP(),  # 1
+
+                        JavaOpcodes.ALOAD_0(),  # 1
+
+                        JavaOpcodes.NEW('org/python/java/Object'),  # 3
+                        JavaOpcodes.DUP(),  # 1
+                        JavaOpcodes.ALOAD_0(),  # 1
+                        JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),  # 3
+
+                        JavaOpcodes.INVOKEVIRTUAL('java/lang/reflect/Field', 'set', '(Ljava/lang/Object;Ljava/lang/Object;)V'),  # 3
+
+                        JavaOpcodes.ALOAD_0(),  # 1
+                        JavaOpcodes.INVOKEVIRTUAL('java/lang/reflect/Field', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),  # 3
+
+                        JavaOpcodes.GOTO(23),  # 3
+                    # else
+                        JavaOpcodes.SWAP(),  # 1
+                        JavaOpcodes.POP(),  # 1
+                        JavaOpcodes.SWAP(),  # 1
+                        JavaOpcodes.POP(),  # 1
+                        JavaOpcodes.GOTO(16),  # 3
 
                 # else
-
                     # JavaOpcodes.LDC_W("NULL FIELD VALUE"),  # 3
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
 
@@ -695,7 +721,7 @@ class InstanceMethod(Method):
                 self.bound_signature,
                 attributes=[
                     JavaCode(
-                        max_stack=len(self.parameters) + 4,
+                        max_stack=len(self.parameters) + 5,
                         max_locals=len(self.parameters),
                         code=binding_opcodes
                     )
