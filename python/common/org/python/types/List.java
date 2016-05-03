@@ -490,5 +490,12 @@ public class List extends org.python.types.Object {
     public org.python.Object sort() {
         throw new org.python.exceptions.NotImplementedError("list.sort() has not been implemented.");
     }
-
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
+           
+         throw new org.python.exceptions.TypeError("type list doesn't define __round__ method");    
+        
+    }
 }
