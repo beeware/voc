@@ -302,23 +302,46 @@ class InitMethod(Method):
     def transpile_setup(self):
         if self.klass.extends:
             super_class = self.klass.extends
+        else:
+            super_class = 'org/python/types/Object'
 
+        # Get the __init__ method for the class...
+        if self.klass.extends:
             self.add_opcodes(
+                # Create the instance
                 JavaOpcodes.ALOAD_0(),
+                JavaOpcodes.DUP(),
                 # TODO - this only allows using the default constructor
                 # for extended Java classes.
                 JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '()V'),
             )
-
         else:
-            super_class = 'org/python/types/Object'
-
             self.add_opcodes(
                 JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.ALOAD_1(),
-                JavaOpcodes.ALOAD_2(),
-                JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '()V'),
             )
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'toPython', '(Ljava/lang/Object;)Lorg/python/Object;'),
+
+            JavaOpcodes.LDC('__init__'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute_null', '(Ljava/lang/String;)Lorg/python/Object;'),
+
+            # If no __init__ exists, just return.
+            JavaOpcodes.DUP(),
+            JavaOpcodes.IFNULL(13),  # 3
+
+            # Check that it is a callable
+            JavaOpcodes.CHECKCAST('org/python/Callable'),  # 3
+
+            # ...and invoke it
+            JavaOpcodes.ALOAD_1(),  # 1
+            JavaOpcodes.ALOAD_2(),  # 1
+            JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),  # 5
+
+            JavaOpcodes.POP()  # 1
+        )
 
     def transpile_teardown(self):
         self.add_opcodes(
@@ -373,70 +396,7 @@ class InstanceMethod(Method):
             # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
 
             JavaOpcodes.ALOAD_0(),
-            JavaOpcodes.INSTANCEOF('org/python/Object'),
-            JavaOpcodes.IFNE(66),  # 3
-
-            # JavaOpcodes.LDC_W("CHECK FOR __VOC__ FIELD"),  # 3
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
-
-                JavaOpcodes.ALOAD_0(),  # 1
-
-                JavaOpcodes.INVOKEVIRTUAL('java/lang/Object', 'getClass', '()Ljava/lang/Class;'),  # 3
-                JavaOpcodes.LDC_W("__VOC__"),  # 3
-                JavaOpcodes.INVOKEVIRTUAL('java/lang/Class', 'getField', '(Ljava/lang/String;)Ljava/lang/reflect/Field;'),  # 3
-
-                # if hasattr(obj, '__VOC__')
-                JavaOpcodes.DUP(),  # 1
-                JavaOpcodes.IFNULL(40),  # 3
-
-                    JavaOpcodes.DUP(),  # 1
-                    JavaOpcodes.DUP(),  # 1
-
-                    # JavaOpcodes.LDC_W("NON NULL FIELD VALUE"),  # 3
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
-
-                    JavaOpcodes.ALOAD_0(),  # 1
-                    JavaOpcodes.INVOKEVIRTUAL('java/lang/reflect/Field', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),  # 3
-
-                    # if obj.__VOC__ is None
-                    JavaOpcodes.DUP(),  # 1
-                    JavaOpcodes.IFNONNULL(23),  # 3
-                        JavaOpcodes.POP(),  # 1
-
-                        JavaOpcodes.ALOAD_0(),  # 1
-
-                        JavaOpcodes.NEW('org/python/java/Object'),  # 3
-                        JavaOpcodes.DUP(),  # 1
-                        JavaOpcodes.ALOAD_0(),  # 1
-                        JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),  # 3
-
-                        JavaOpcodes.INVOKEVIRTUAL('java/lang/reflect/Field', 'set', '(Ljava/lang/Object;Ljava/lang/Object;)V'),  # 3
-
-                        JavaOpcodes.ALOAD_0(),  # 1
-                        JavaOpcodes.INVOKEVIRTUAL('java/lang/reflect/Field', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),  # 3
-
-                        JavaOpcodes.GOTO(23),  # 3
-                    # else
-                        JavaOpcodes.SWAP(),  # 1
-                        JavaOpcodes.POP(),  # 1
-                        JavaOpcodes.SWAP(),  # 1
-                        JavaOpcodes.POP(),  # 1
-                        JavaOpcodes.GOTO(16),  # 3
-
-                # else
-                    # JavaOpcodes.LDC_W("NULL FIELD VALUE"),  # 3
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),  # 3
-
-                    JavaOpcodes.POP(),  # 1
-                    JavaOpcodes.NEW('org/python/java/Object'),  # 3
-                    JavaOpcodes.DUP(),  # 1
-                    JavaOpcodes.ALOAD_0(),  # 1
-                    JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),  # 3
-
-                    JavaOpcodes.GOTO(4),  # 3
-
-            # else
-                JavaOpcodes.ALOAD_0(),  # 1
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'toPython', '(Ljava/lang/Object;)Lorg/python/Object;'),  # 3
 
             # JavaOpcodes.DUP(),
             # JavaOpcodes.LDC_W("BINDING SELF OUT"),
@@ -455,170 +415,87 @@ class InstanceMethod(Method):
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
+                    JavaOpcodes.NEW('org/python/types/Bool'),
+                    JavaOpcodes.DUP(),
                     ILOAD_name(self, param['name']),
-                    JavaOpcodes.IFNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Bool'),
-                        JavaOpcodes.DUP(),
-                        ILOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
-                    # endif
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
                 ])
             elif annotation == "byte":
                 binding_opcodes.extend([
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
                     ILOAD_name(self, param['name']),
-                    JavaOpcodes.IFNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Int'),
-                        JavaOpcodes.DUP(),
-                        ILOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(B)V'),
-                    # endif
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(B)V'),
                 ])
             elif annotation == 'char':
                 binding_opcodes.extend([
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
+                    JavaOpcodes.NEW('org/python/types/Str'),
+                    JavaOpcodes.DUP(),
                     ILOAD_name(self, param['name']),
-                    JavaOpcodes.IFNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Str'),
-                        JavaOpcodes.DUP(),
-                        ILOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(C)V'),
-                    # endif
-                    # ASTORE_name(self, param['name'])
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(C)V'),
                 ])
             elif annotation == "short":
                 binding_opcodes.extend([
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
                     ILOAD_name(self, param['name']),
-                    JavaOpcodes.IFNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Int'),
-                        JavaOpcodes.DUP(),
-                        ILOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(S)V'),
-                    # endif
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(S)V'),
                 ])
             elif annotation == "int":
                 binding_opcodes.extend([
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
                     ILOAD_name(self, param['name']),
-                    JavaOpcodes.IFNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Int'),
-                        JavaOpcodes.DUP(),
-                        ILOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
-                    # endif
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
                 ])
             elif annotation == "long":
                 binding_opcodes.extend([
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
+                    JavaOpcodes.NEW('org/python/types/Int'),
+                    JavaOpcodes.DUP(),
                     ILOAD_name(self, param['name']),
-                    JavaOpcodes.IFNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Int'),
-                        JavaOpcodes.DUP(),
-                        ILOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
-                    # endif
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
                 ])
             elif annotation == "float":
                 binding_opcodes.extend([
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
+                    JavaOpcodes.NEW('org/python/types/Float'),
+                    JavaOpcodes.DUP(),
                     FLOAD_name(self, param['name']),
-                    JavaOpcodes.IFNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Float'),
-                        JavaOpcodes.DUP(),
-                        FLOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(F)V'),
-                    # endif
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(F)V'),
                 ])
             elif annotation == "double":
                 binding_opcodes.extend([
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
+                    JavaOpcodes.NEW('org/python/types/Float'),
+                    JavaOpcodes.DUP(),
                     DLOAD_name(self, param['name']),
-                    JavaOpcodes.IFNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Float'),
-                        JavaOpcodes.DUP(),
-                        DLOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
-                    # endif
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
                 ])
-            elif annotation == "java/lang/String":
+            else:
                 binding_opcodes.extend([
                     # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
                     # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-
                     ALOAD_name(self, param['name']),
-                    JavaOpcodes.ACONST_NULL(),
-                    JavaOpcodes.IF_ACMPNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/types/Str'),
-                        JavaOpcodes.DUP(),
-                        ALOAD_name(self, param['name']),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-                    # endif
-                ])
-            elif annotation != 'org/python/Object':
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT generic %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-
-                    ALOAD_name(self, param['name']),
-                    JavaOpcodes.ACONST_NULL(),
-                    JavaOpcodes.IF_ACMPNE(9),
-                        JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
-                        JavaOpcodes.GOTO(11),
-                    # else
-                        JavaOpcodes.NEW('org/python/java/Object'),
-                        JavaOpcodes.DUP(),
-                        ALOAD_name(self, param['name']),
-                        # JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
-                        JavaOpcodes.INVOKESPECIAL('org/python/java/Object', '<init>', '(Ljava/lang/Object;)V'),
-                    # endif
-                ])
-            else:  # org/python/Object; no transformation required
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s - PASS AS IS" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-                    ALOAD_name(self, param['name']),
+                    JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'toPython', '(Ljava/lang/Object;)Lorg/python/Object;'),
                 ])
 
             # self.add_opcodes(
@@ -748,11 +625,6 @@ class InstanceMethod(Method):
                         'double': JavaOpcodes.DLOAD(i + 1),
                     }.get(param['annotation'], JavaOpcodes.ALOAD(i + 1))
                 )
-
-                # super_opcodes.extend([
-                #     JavaOpcodes.LDC_W("SUPER WRAPPER ARGUMENT %s to type %s" % (i, param['annotation'])),
-                #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-                # ])
 
             # Then call the method, and process the return type.
             super_opcodes.extend([

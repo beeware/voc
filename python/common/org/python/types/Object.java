@@ -62,16 +62,10 @@ public class Object implements org.python.Object {
 
     public Object(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         this(org.python.types.Type.Origin.PYTHON, null);
-
-        // System.out.println("CONSTRUCT OBJECT " + this.getClass());
-        org.python.Object init = this.__getattribute_null("__init__");
-        if (init != null) {
-            // System.out.println("CALL INIT ");
-            try {
-                ((org.python.types.Method) init).invoke(args, kwargs);
-            } catch (ClassCastException e) {
-                throw new org.python.exceptions.RuntimeError(String.format("__init__ method of %s object is not callable", this.getClass()));
-            }
+        if (args != null && args.length > 0) {
+            throw new org.python.exceptions.TypeError("object() takes no parameters");
+        } else if (kwargs != null && kwargs.size() > 0) {
+            throw new org.python.exceptions.TypeError("object() takes no parameters");
         }
     }
 
@@ -338,6 +332,7 @@ public class Object implements org.python.Object {
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // org.Python.debug(String.format("SETATTR %s", name), value);
         // org.Python.debug("SELF ", this.__repr__());
+        // org.Python.debug("ATTRS ", this.__dict__);
         org.python.types.Type cls = (org.python.types.Type) this.__dict__.get("__class__");
 
         // If the attribute already exists, then it's OK to set it.
@@ -354,6 +349,7 @@ public class Object implements org.python.Object {
         } else {
             attr.__set__(this, value);
         }
+        // org.Python.debug("POST SET ATTRS ", this.__dict__);
         return true;
     }
 

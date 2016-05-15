@@ -85,7 +85,7 @@ class ClassBlock(Block):
         if code.co_flags & CO_GENERATOR:
             raise Exception("Can't handle Generator instance methods (yet)")
         else:
-            return_type = annotations.get('return', 'org.python.Object')
+            return_type = annotations.get('return', 'org/python/Object')
             if return_type is None:
                 return_type = 'void'
 
@@ -105,12 +105,10 @@ class ClassBlock(Block):
         return method
 
     def transpile_setup(self):
-        base_namespace = self.parent.namespace.replace('.', '/') + '/'
-
         if self.klass.extends:
             base_descriptor = self.klass.extends.replace('.', '/')
         else:
-            base_descriptor = self.klass.bases[0] if self.klass.bases[0].startswith('org/python/') else base_namespace + self.klass.bases[0]
+            base_descriptor = 'org/python/types/Object'
 
         self.add_opcodes(
             # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor),
@@ -197,18 +195,21 @@ class Class(Block):
     def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0):
         super().__init__(module, verbosity=verbosity)
         self.name = name
-        self.bases = bases if bases else ['org/python/types/Object']
+        if namespace is None:
+            self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
+        else:
+            self.namespace = namespace
+
+        self.bases = bases if bases else []
         self.extends = extends
+
         self.implements = implements if implements else []
         self.public = public
         self.final = final
         self.methods = methods if methods else []
         self.fields = fields if fields else {}
         self.init = init
-        if namespace is None:
-            self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
-        else:
-            self.namespace = namespace
+
         self.anonymous_inner_class_count = 0
 
         # Track constructors when they are added
@@ -297,25 +298,32 @@ class Class(Block):
         for method in self.methods:
             classfile.methods.extend(method.transpile())
 
+        # Ensure the class has a class protected, no-args init() so that
+        # instances can be instantiated.
         if self.extends:
-            classfile.methods.append(
-                JavaMethod(
-                    '<init>',
-                    '()V',
-                    static=False,
-                    attributes=[
-                        JavaCode(
-                            max_stack=1,
-                            max_locals=1,
-                            code=[
-                                JavaOpcodes.ALOAD_0(),
-                                JavaOpcodes.INVOKESPECIAL(self.extends, '<init>', '()V'),
-                                JavaOpcodes.RETURN(),
-                            ]
-                        )
-                    ]
-                )
+            base_descriptor = self.extends.replace('.', '/')
+        else:
+            base_descriptor = 'org/python/types/Object'
+
+        classfile.methods.append(
+            JavaMethod(
+                '<init>',
+                '()V',
+                public=False,
+                static=False,
+                attributes=[
+                    JavaCode(
+                        max_stack=1,
+                        max_locals=1,
+                        code=[
+                            JavaOpcodes.ALOAD_0(),
+                            JavaOpcodes.INVOKESPECIAL(base_descriptor, '<init>', '()V'),
+                            JavaOpcodes.RETURN(),
+                        ]
+                    )
+                ]
             )
+        )
 
         return self.namespace, self.name, classfile
 

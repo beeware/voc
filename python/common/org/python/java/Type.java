@@ -6,6 +6,10 @@ import org.python.java.Function;
 public class Type extends org.python.types.Type {
     java.util.Map<java.lang.String, java.lang.reflect.Constructor> constructors;
 
+    public java.lang.Object toJava() {
+        return this.klass;
+    }
+
     public Type(org.python.types.Type.Origin origin, java.lang.Class klass) {
         super(origin, klass);
 
@@ -248,7 +252,13 @@ public class Type extends org.python.types.Type {
             if (this.origin == org.python.types.Type.Origin.EXTENSION) {
                 constructor = this.constructor;
 
-                return new org.python.java.Object(constructor.newInstance(args, kwargs));
+                java.lang.Object instance = constructor.newInstance(args, kwargs);
+                try {
+                    java.lang.reflect.Field voc_field = instance.getClass().getField("__VOC__");
+                    return (org.python.Object) voc_field.get(instance);
+                } catch (java.lang.NoSuchFieldException nsf) {
+                    throw new org.python.exceptions.RuntimeError("Extension class " + this.klass.getName() + " has no __VOC__ attribute");
+                }
             } else {
                 constructor = this.selectConstructor(args, kwargs);
                 java.lang.Object [] adjusted_args = this.adjustArguments(constructor, args, kwargs);

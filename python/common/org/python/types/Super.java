@@ -40,6 +40,7 @@ public class Super implements org.python.Object {
 
     public Super(org.python.Object klass, org.python.Object instance) {
         try {
+            // System.out.println("CREATE SUPER" + klass + " " + instance);
             this.klass = (org.python.types.Type) klass;
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError(java.lang.String.format("must be type, not %s", klass.typeName()));
@@ -255,10 +256,24 @@ public class Super implements org.python.Object {
         // If no super proxy exists, check the base class.
         if (value == null) {
             // org.Python.debug("no instance attributes on super;");
-            // org.Python.debug("    look to super of ", this.klass);
-            // org.Python.debug("    which is ", this.klass.__base__);
-            value = this.klass.__base__.__getattribute_null(name);
+            // org.Python.debug("    look to supers of ", this.klass);
+            // org.Python.debug("            which are ", this.klass.__bases__);
+
+            java.util.List<org.python.Object> bases = (java.util.ArrayList) this.klass.__bases__.toJava();
+            for (org.python.Object base: bases) {
+                // The extends class will be the first base; ignore it,
+                // as that will be a circular reference.
+                if (base != this.klass.__base__) {
+                    org.python.Object base_klass = org.python.types.Type.pythonType(base.toString());
+                    // org.Python.debug("            check ", base_klass);
+                    value = base_klass.__getattribute_null(name);
+                    if (value != null) {
+                        break;
+                    }
+                }
+            }
         }
+
         if (value == null) {
             throw new org.python.exceptions.NotImplementedError("Can't get attributes on super() (yet!)");
         }
