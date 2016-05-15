@@ -218,7 +218,7 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
-        
+
         if (other instanceof org.python.types.Str) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + "float" + "'");
         } else if (other instanceof org.python.types.Int) {
@@ -233,7 +233,7 @@ public class Float extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
         } else if (other instanceof org.python.types.Set) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } 
+        }
         throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
     }
 
@@ -351,7 +351,7 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
-            java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+            java.util.List<org.python.Object> data = new java.util.ArrayList<org.python.Object>();
             data.add(this.__floordiv__(other));
             data.add(this.__mod__(other));
             return new org.python.types.Tuple(data);

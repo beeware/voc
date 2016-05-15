@@ -23,16 +23,16 @@ public class Function extends org.python.types.Object implements org.python.Call
 
     private void populateAttrs() {
         org.python.types.Str name = new org.python.types.Str(method.getName());
-        this.attrs.put("__name__", this.name);
+        this.__dict__.put("__name__", this.name);
 
         if (this.name != null) {
-            this.attrs.put("__qualname__", this.name);
+            this.__dict__.put("__qualname__", this.name);
         } else {
-            org.python.Object co_name = this.code.attrs.get("co_consts");
-            this.attrs.put("__qualname__", co_name);
+            org.python.Object co_name = this.code.__dict__.get("co_consts");
+            this.__dict__.put("__qualname__", co_name);
         }
 
-        this.attrs.put("__code__", this.code);
+        this.__dict__.put("__code__", this.code);
 
         // org.python.Object doc;
         // try {
@@ -47,9 +47,9 @@ public class Function extends org.python.types.Object implements org.python.Call
         // } catch (java.lang.IndexOutOfBoundsException e) {
         //     doc = null;
         // }
-        // this.attrs.put("__doc__", doc);
+        // this.__dict__.put("__doc__", doc);
 
-        // this.attrs.put("__call__")
+        // this.__dict__.put("__call__")
     }
 
     // Constructor for builtins
@@ -246,7 +246,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             // org.Python.debug("   default args: ", this.default_args);
             // org.Python.debug(" default kwargs: ", this.default_kwargs);
 
-            // if this.attrs.__code__.co_flags & CO_GENERATOR:
+            // if this.__dict__.__code__.co_flags & CO_GENERATOR:
             //     gen = Generator(frame, self._vm)
             //     frame.generator = gen
             //     retval = gen

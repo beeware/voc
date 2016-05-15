@@ -1418,7 +1418,6 @@ class FLOAD_1(Opcode):
         return 0
 
 
-
 class FLOAD_2(Opcode):
     # Load a float value from local variable 2
     # Stack: → value
@@ -1434,7 +1433,6 @@ class FLOAD_2(Opcode):
     @property
     def consume_count(self):
         return 0
-
 
 
 class FLOAD_3(Opcode):

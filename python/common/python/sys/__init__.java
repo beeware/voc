@@ -4,7 +4,7 @@ package python.sys;
 public class __init__ extends org.python.types.Module {
     static {
         org.python.types.Type cls = org.python.types.Type.pythonType(python.sys.__init__.class);
-        org.Python.initializeModule(python.sys.__init__.class, cls.attrs);
+        org.Python.initializeModule(python.sys.__init__.class, cls.__dict__);
     }
 
     @org.python.Method(
@@ -22,7 +22,7 @@ public class __init__ extends org.python.types.Module {
             arg_list.add(new org.python.types.Str(arg));
         }
 
-        cls.attrs.put("argv", new org.python.types.List(arg_list));
+        cls.__dict__.put("argv", new org.python.types.List(arg_list));
         return cls;
     }
 
