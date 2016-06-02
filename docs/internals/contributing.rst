@@ -20,6 +20,9 @@ Github fork .
 As with the getting started guide, these instructions will assume that you
 have Python3, a Java 7 or Java 8 JDK, and Apache ANT installed, and have virtualenv available for use.
 
+**Note:** If you are on Ubuntu, you will need to install ``libpython3.4-testsuite`` to be able to run the test suite.
+This can be done by running ``apt-get install libpython3.4-testsuite``.
+
 Start by forking VOC into your own Github repository; then
 check out your fork to your own computer into a development directory:
 
