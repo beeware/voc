@@ -129,9 +129,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',
-        'test_multiply_list',
-        'test_multiply_str',
-        'test_multiply_tuple',
 
         'test_ne_bytearray',
         'test_ne_bytes',
