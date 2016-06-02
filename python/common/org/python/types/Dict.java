@@ -161,6 +161,20 @@ public class Dict extends org.python.types.Object {
                 org.Python.typeName(other.getClass())));
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __mul__(org.python.Object other) {
+        if (other instanceof org.python.types.List) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        } else if (other instanceof org.python.types.Tuple) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        } else if (other instanceof org.python.types.Str) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        }
+        return super.__mul__(other);
+    }
+
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // Builtin types can't have attributes set on them.
         return false;
