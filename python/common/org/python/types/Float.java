@@ -502,4 +502,12 @@ public class Float extends org.python.types.Object {
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.NotImplementedError("float.__round__() has not been implemented.");
     }
+
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'float'");
+    }
 }

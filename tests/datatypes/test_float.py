@@ -39,10 +39,6 @@ class FloatTests(TranspileTestCase):
 class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
 
-    not_implemented = [
-        'test_unary_invert',
-    ]
-
 
 class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
