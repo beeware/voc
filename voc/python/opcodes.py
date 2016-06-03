@@ -1777,13 +1777,25 @@ class LOAD_CONST(Opcode):
                     JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
                 )
 
-            # elif isinstance(const, bytes):
-            #     context.add_opcodes(
-            #         JavaOpcodes.NEW('org/python/types/Bytes'),
-            #         JavaOpcodes.DUP(),
-            #         JavaOpcodes.LDC_W(const),
-            #         JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
-            #     )
+            elif isinstance(const, bytes):
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Bytes'),
+                    JavaOpcodes.DUP(),
+                    ICONST_val(len(const)),
+                    JavaOpcodes.NEWARRAY(JavaOpcodes.NEWARRAY.T_BYTE),
+                )
+
+                for i, b in enumerate(const):
+                    context.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        ICONST_val(i),
+                        JavaOpcodes.BIPUSH(b),
+                        JavaOpcodes.BASTORE(),
+                    )
+
+                context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '([B)V'),
+                )
 
             elif isinstance(const, tuple):
                 context.add_opcodes(
