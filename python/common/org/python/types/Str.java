@@ -385,6 +385,14 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public void __imul__(org.python.Object other) {
+        this.setValue(this.__mul__(other));
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
     public void __imod__(org.python.Object other) {
