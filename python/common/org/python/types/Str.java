@@ -378,6 +378,19 @@ public class Str extends org.python.types.Object {
         }
         super.__imod__(other);
     }
+
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public void __iadd__(org.python.Object other) {
+        try {
+            this.setValue(this.__add__(other));
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to " + this.typeName() + " implicitly");
+        }
+    }
     @org.python.Method(
         __doc__ = ""
     )
