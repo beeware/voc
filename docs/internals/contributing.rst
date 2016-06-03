@@ -51,8 +51,12 @@ To run the entire test suite, type:
 
     $ cd voc
     $ python setup.py test
+    
+To capture unexpected successes in test:
 
-This will take quite a while - it takes 40 minutes on the CI server. If you just want to run a single test, or a single group of tests, you can provide command-line arguments.
+    $ python setup.py test | grep success
+
+Running the full test suite will take quite a while - it takes 40 minutes on the CI server. If you just want to run a single test, or a single group of tests, you can provide command-line arguments.
 
 To run a single test, provide the full dotted-path to the test:
 
