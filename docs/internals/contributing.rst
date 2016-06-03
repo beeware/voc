@@ -20,6 +20,9 @@ Github fork .
 As with the getting started guide, these instructions will assume that you
 have Python3, a Java 7 or Java 8 JDK, and Apache ANT installed, and have virtualenv available for use.
 
+**Note:** If you are on Ubuntu, you will need to install ``libpython3.4-testsuite`` to be able to run the test suite.
+This can be done by running ``apt-get install libpython3.4-testsuite``.
+
 Start by forking VOC into your own Github repository; then
 check out your fork to your own computer into a development directory:
 
@@ -48,8 +51,12 @@ To run the entire test suite, type:
 
     $ cd voc
     $ python setup.py test
+    
+To capture unexpected successes in test:
 
-This will take quite a while - it takes 40 minutes on the CI server. If you just want to run a single test, or a single group of tests, you can provide command-line arguments.
+    $ python setup.py test | grep success
+
+Running the full test suite will take quite a while - it takes 40 minutes on the CI server. If you just want to run a single test, or a single group of tests, you can provide command-line arguments.
 
 To run a single test, provide the full dotted-path to the test:
 

@@ -280,6 +280,13 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public void __iadd__(org.python.Object other) {
+        value = ((org.python.types.Str) __add__(other)).value;
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             long other_int = ((org.python.types.Int)other).value;

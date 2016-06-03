@@ -1005,10 +1005,24 @@ public class Python {
         __doc__ = "next(iterator[, default])" +
             "\n" +
             "Return the next item from the iterator. If default is given and the iterator\n" +
-            "is exhausted, it is returned instead of raising StopIteration.\n"
+            "is exhausted, it is returned instead of raising StopIteration.\n",
+        args = {"iterator"},
+        default_args = {"_default"}
     )
-    public static org.python.Object next() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'next' not implemented");
+    public static org.python.Object next(org.python.Object iterator, org.python.Object _default) {
+        if (iterator instanceof org.python.Iterable) {
+            try {
+                return ((org.python.Iterable) iterator).__next__();
+            } catch (org.python.exceptions.StopIteration si) {
+                if (_default != null) {
+                    return _default;
+                } else {
+                    throw si;
+                }
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("'" + iterator.typeName() + "' object is not an iterator");
+        }
     }
 
     @org.python.Method(

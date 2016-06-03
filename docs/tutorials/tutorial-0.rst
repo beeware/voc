@@ -19,14 +19,20 @@ This tutorial assumes you've read and followed the instructions in
 Start a new project
 -------------------
 
-Let's start by creating a ``tutorial0`` directory alongside the ``voc`` directory you just cloned into:
+Let's start by creating a ``tutorial0`` directory in the tutorial directory alongside the ``voc`` directory you just cloned into:
 
 .. code-block:: bash
 
     $ mkdir tutorial0
     $ cd tutorial0
 
-Then create a file called ``example.py`` in this directory.
+So that your directory structure looks like:
+
+        `tutorial`
+           `        voc`  
+          `    tutorial0`
+
+Then create a file called ``example.py`` in this ``tutorial0`` directory.
 Add the following Python code to ``example.py``:
 
 .. code-block:: python
