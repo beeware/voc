@@ -335,6 +335,14 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public void __ipow__(org.python.Object other) {
+        this.setValue(this.__pow__(other, null));
+    }
+
+    @org.python.Method(
         __doc__=""
     )
     public org.python.Object __pos__() {
