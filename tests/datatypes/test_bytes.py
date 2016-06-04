@@ -4,7 +4,6 @@ from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationT
 
 
 class BytesTests(TranspileTestCase):
-    @expectedFailure
     def test_setattr(self):
         self.assertCodeExecution("""
             x = b'hello, world'
@@ -12,7 +11,6 @@ class BytesTests(TranspileTestCase):
             print('Done.')
             """)
 
-    @expectedFailure
     def test_getattr(self):
         self.assertCodeExecution("""
             x = b'hello, world'
