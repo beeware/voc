@@ -78,6 +78,17 @@ public class Set extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __getitem__(org.python.Object index) {
+        if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
+            throw new org.python.exceptions.TypeError("'set' object does not support indexing");
+        } else {
+            throw new org.python.exceptions.TypeError("'set' object is not subscriptable");
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
