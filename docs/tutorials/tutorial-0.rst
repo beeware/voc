@@ -62,7 +62,7 @@ This classfile can run on any Java 6 (or higher) VM. To run the project, type:
 .. code-block:: bash
 
     $ java -classpath ../voc/dist/python-java.jar:. python.example.__init__
-    Hello, World
+    Hello World!
 
 Congratulations! You've just run your first Python program under Java using
 VOC! Now you're ready to get a little more adventurous.
