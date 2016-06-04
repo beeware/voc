@@ -322,7 +322,7 @@ public class Bool extends org.python.types.Object {
             }
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) >> other_val);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: 'bool' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
