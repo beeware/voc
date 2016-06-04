@@ -5,6 +5,31 @@ In this guide we will walk you through setting up your VOC environment for
 development and testing. We will assume that you have a working Python 3, JDK,
 Apache ANT installation and use virtualenv.
 
+Checking Dependencies
+---------------------
+
+To check if you have Python installed, run ``python --version`` at the command line
+
+.. code-block:: bash
+
+	$ python --version
+	Python 3.5.1
+
+To check if you have the JDK installed, run ``javac -version``
+
+.. code-block:: bash
+
+	$ javac -version
+	javac 1.7.0_101
+
+To check if Apache ANT is installed, run ``ant -version``
+
+.. code-block:: bash
+
+	$ ant -version
+	Apache Ant(TM) version 1.9.7 compiled on April 24 2016
+
+
 Get a copy of VOC
 -----------------
 
