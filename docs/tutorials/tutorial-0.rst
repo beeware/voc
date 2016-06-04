@@ -26,11 +26,11 @@ Let's start by creating a ``tutorial0`` directory in the tutorial directory alon
     $ mkdir tutorial0
     $ cd tutorial0
 
-So that your directory structure looks like:
+So that your directory structure looks like::
 
-        `tutorial`
-           `        voc`  
-          `    tutorial0`
+    tutorial
+    ├── tutorial0
+    └── voc
 
 Then create a file called ``example.py`` in this ``tutorial0`` directory.
 Add the following Python code to ``example.py``:
