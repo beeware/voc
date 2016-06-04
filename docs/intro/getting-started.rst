@@ -13,7 +13,7 @@ To check if you have Python installed, run ``python --version`` at the command l
 .. code-block:: bash
 
 	$ python --version
-	Python 3.5.1
+	Python 3.4.4
 
 To check if you have the JDK installed, run ``javac -version``
 
