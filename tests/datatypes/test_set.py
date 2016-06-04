@@ -51,13 +51,6 @@ class SetTests(TranspileTestCase):
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ["set()", "{1, 'value', 1.2345}"]
 
-    not_implemented = [
-        'test_unary_positive',
-        'test_unary_negative',
-        'test_unary_not',
-        'test_unary_invert',
-    ]
-
 
 class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
     values = ["set()", "{1, 'value', 1.2345}"]
