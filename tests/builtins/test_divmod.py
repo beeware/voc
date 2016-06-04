@@ -30,7 +30,6 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
 
     not_implemented = [
         'test_bool_bytearray',
-        'test_bool_bytes',
         'test_bool_class',
         'test_bool_complex',
         'test_bool_dict',
