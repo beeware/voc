@@ -213,6 +213,10 @@ public class Bool extends org.python.types.Object {
                 return new org.python.types.Str("");
 
             }
+        } else if (other instanceof org.python.types.List) {
+            return other.__mul__(this);
+        } else if (other instanceof org.python.types.Tuple) {
+            return other.__mul__(this);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'bool' and '" + other.typeName() + "'");
     }
@@ -297,14 +301,32 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__lshift__() has not been implemented.");
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) << (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) << other_val);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__rshift__() has not been implemented.");
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) >> (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) >> other_val);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(

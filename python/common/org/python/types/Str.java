@@ -225,7 +225,21 @@ public class Str extends org.python.types.Object {
                     }
                 }
                 return new org.python.types.Str(sliced);
+            } else if (index instanceof org.python.types.Bool) {
+                boolean slice = ((org.python.types.Bool) index).value;
+                java.lang.String sliced;
 
+                if (this.value.length() == 0) {
+                    throw new org.python.exceptions.IndexError("string index out of range");
+                } else {
+                    if (slice) {
+                       sliced = this.value.substring(1, 2);
+                    }
+                    else {
+                       sliced = this.value.substring(0, 1);
+                    }
+                    return new org.python.types.Str(sliced);
+                }
             } else {
                 int idx = (int)((org.python.types.Int) index).value;
                 if (idx < 0) {
@@ -335,6 +349,14 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public void __ipow__(org.python.Object other) {
+        this.setValue(this.__pow__(other, null));
+    }
+
+    @org.python.Method(
         __doc__=""
     )
     public org.python.Object __pos__() {
@@ -374,6 +396,14 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmod__() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public void __imul__(org.python.Object other) {
+        this.setValue(this.__mul__(other));
     }
 
     @org.python.Method(
