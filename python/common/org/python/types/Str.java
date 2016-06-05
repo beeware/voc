@@ -77,15 +77,27 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Float __float__() {
+        double result;
         try {
-            return new org.python.types.Float(Double.parseDouble(this.value));
+            result = Double.parseDouble(this.value);
         } catch (NumberFormatException e) {
-            String value = this.value;
-            if (value.length() > 0) {
-                value = "'" + value + "'";
+            String trimmed = this.value.trim();
+            if (trimmed == "inf") {
+                result = Double.POSITIVE_INFINITY;
+            } else if (trimmed == "-inf") {
+                result = Double.NEGATIVE_INFINITY;
+            } else if (trimmed == "nan") {
+                result = Double.NaN;
+            } else {
+                String value = this.value;
+                if (value.length() > 0) {
+                    value = "'" + value + "'";
+                }
+                throw new org.python.exceptions.ValueError(
+                    "could not convert string to float: " + value);
             }
-            throw new org.python.exceptions.ValueError("could not convert string to float: " + value);
         }
+        return new org.python.types.Float(result);
     }
 
     @org.python.Method(

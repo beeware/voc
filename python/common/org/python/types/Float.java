@@ -48,7 +48,20 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(java.lang.Double.toString(this.value));
+        double value = this.value;
+        String result;
+        if (Double.isNaN(value)) {
+            result = "nan";
+        } else if (Double.isInfinite(value)) {
+            if (value > 0) {
+                result = "inf";
+            } else {
+                result = "-inf";
+            }
+        } else {
+            result = java.lang.Double.toString(this.value);
+        }
+        return new org.python.types.Str(result);
     }
 
     @org.python.Method(
