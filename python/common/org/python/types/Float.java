@@ -1,4 +1,5 @@
 package org.python.types;
+import java.util.Locale;
 
 public class Float extends org.python.types.Object {
     private static final long NEGATIVE_ZERO_RAW_BITS = Double.doubleToRawLongBits(-0.0);
@@ -60,6 +61,40 @@ public class Float extends org.python.types.Object {
             }
         } else {
             result = java.lang.Double.toString(this.value);
+            String format = "%.17g";
+            result = String.format(Locale.US, format, value);
+            int dot_pos = result.indexOf(".");
+            int e_pos = result.indexOf("e");
+            if (dot_pos != -1) {
+                // Remove trailing zeroes in the fractional part
+                int last_zero = -1;
+                int i;
+                for (i = dot_pos + 1; i < result.length(); i++) {
+                    char c = result.charAt(i);
+                    if (i == e_pos) {
+                        break;
+                    } else if (c == '0') {
+                        if (last_zero == -1) {
+                            last_zero = i;
+                        }
+                    } else {
+                        last_zero = -1;
+                    }
+                }
+                if (last_zero != -1) {
+                    if (last_zero == dot_pos + 1) {
+                        // Everything after the dot is zeros
+                        if (e_pos == -1) {
+                            // If there's no "e", leave ".0" at the end
+                            last_zero += 1;
+                        } else {
+                            // If there is an "e", nuke the dot as well
+                            last_zero -= 1;
+                        }
+                    }
+                    result = result.substring(0, last_zero) + result.substring(i);
+                }
+            }
         }
         return new org.python.types.Str(result);
     }
