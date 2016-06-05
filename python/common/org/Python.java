@@ -886,6 +886,9 @@ public class Python {
             throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with callable/sentinel not implemented");
         }
     }
+    public static org.python.Iterable iter(org.python.Object iterable) {
+        return org.Python.iter(iterable, null);
+    }
 
     @org.python.Method(
         __doc__ = "len(object)" +
