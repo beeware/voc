@@ -134,8 +134,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_rshift_complex',
         'test_rshift_frozenset',
 
-        'test_subscr_bytes',
-
         'test_subtract_bytearray',
         'test_subtract_class',
         'test_subtract_complex',
