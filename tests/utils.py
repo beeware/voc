@@ -702,8 +702,6 @@ class BuiltinTwoargFunctionTestCase:
             print(%(format)s%(operation)s)
             """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s and y=%(y)s" % kwargs)
 
-    EXCLUDED_DATATYPES = ['set', 'frozenset', 'dict']
     for datatype1, examples1 in SAMPLE_DATA:
         for datatype2, examples2 in SAMPLE_DATA:
-            if datatype1 not in EXCLUDED_DATATYPES and datatype2 not in EXCLUDED_DATATYPES:
-                vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test('test_%s_%s' % (datatype1, datatype2), 'f(x, y)', examples1, examples2)
+            vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test('test_%s_%s' % (datatype1, datatype2), 'f(x, y)', examples1, examples2)
