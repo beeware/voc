@@ -21,7 +21,7 @@ public class TestDaemon {
         URL runtime2;
         try {
             // load the voc jar here so that they can see the runtime classes
-            voc = new URL("file:" + System.getProperty("user.dir") + "/../../dist/python-java.jar");
+            voc = new URL("file:" + System.getProperty("user.dir") + "/dist/python-java.jar");
             // need the trailing slash so that the ClassLoader knows it's a
             // directory instead of a jar file
             runtime1 = new URL("file:" + System.getProperty("user.dir") + "/temp/");
