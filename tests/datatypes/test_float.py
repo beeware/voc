@@ -18,7 +18,6 @@ class FloatTests(TranspileTestCase):
             print('Done.')
             """)
 
-    @expectedFailure
     def test_repr(self):
         self.assertCodeExecution("""
             x = 0.35
@@ -27,21 +26,36 @@ class FloatTests(TranspileTestCase):
             print(x)
             x = 0.0035
             print(x)
-            x = 0.00035
-            print(x)
             x = 0.000035
             print(x)
             x = 0.0000035
+            print(x)
+
+            x = 0.0
+            print(x)
+            x = float('-0.0')
+            print(x)
+            x = float('nan')
+            print(x)
+            x = float('inf')
+            print(x)
+            x = float('-inf')
+            print(x)
+            """)
+
+    @expectedFailure
+    def test_repr_failure(self):
+        # Merge these cases into test_repr when they pass
+        self.assertCodeExecution("""
+            x = -0.0
+            print(x)
+            x = 0.00035
             print(x)
             """)
 
 
 class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     values = ['1.2345', '0.0', '-2.345']
-
-    not_implemented = [
-        'test_unary_invert',
-    ]
 
 
 class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
