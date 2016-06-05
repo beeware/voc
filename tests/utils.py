@@ -5,6 +5,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import traceback
 from unittest import TestCase
 
@@ -15,10 +16,11 @@ from voc.java.klass import ClassFileReader, ClassFileWriter
 from voc.java.attributes import Code as JavaCode
 from voc.transpiler import Transpiler
 
+# get path to `tests` directory
+tests_dir = os.path.dirname(__file__)
 
 # A state variable to determine if the test environment has been configured.
 _suite_configured = False
-_jvm = None
 
 
 def setUpSuite():
@@ -130,59 +132,6 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, arg
     return out[0].decode('utf8')
 
 
-def runAsJava(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
-    """Run a block of Python code as a Java program."""
-    # Output source code into test directory
-    transpiler = Transpiler(verbosity=0)
-
-    # Don't redirect stderr; we want to see any errors from the transpiler
-    # as top level test failures.
-    with capture_output(redirect_stderr=False):
-        transpiler.transpile_string("test.py", adjust(main_code, run_in_function=run_in_function))
-
-        if extra_code:
-            for name, code in extra_code.items():
-                transpiler.transpile_string("%s.py" % name.replace('.', os.path.sep), adjust(code))
-
-    transpiler.write(test_dir)
-
-    if args is None:
-        args = []
-
-    if len(args) == 0:
-        global _jvm
-
-        # encode to turn str into bytes-like object
-        _jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
-        _jvm.stdin.flush()
-        out = ""
-        while True:
-            try:
-                line = _jvm.stdout.readline().decode("utf-8")
-                if line == ".{0}".format(os.linesep):
-                    break
-                else:
-                    out += line
-            except IOError:
-                continue
-    else:
-        classpath = os.pathsep.join([
-            os.path.join('..', '..', 'dist', 'python-java.jar'),
-            os.path.join('..', 'java'),
-            os.curdir,
-        ])
-        proc = subprocess.Popen(
-            ["java", "-classpath", classpath, "python.test.__init__"] + args,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            cwd=test_dir
-        )
-        out = proc.communicate()[0].decode('utf8')
-
-    return out
-
-
 def compileJava(java_dir, java):
     if not java:
         return None
@@ -292,25 +241,32 @@ def cleanse_python(input):
 
 
 class TranspileTestCase(TestCase):
-    def setUpClass():
+
+    @classmethod
+    def setUpClass(cls):
         setUpSuite()
-        global _jvm
-        test_dir = os.path.join(os.path.dirname(__file__))
-        classpath = os.path.join('..', 'dist', 'python-java-testdaemon.jar')
-        _jvm = subprocess.Popen(
+        tests_dir = os.path.join(os.path.dirname(__file__))
+        cls.output_dir = tempfile.mkdtemp(dir=tests_dir)
+        cls.temp_dir = os.path.join(cls.output_dir, 'temp')
+        classpath = os.path.join('..', '..', 'dist', 'python-java-testdaemon.jar')
+        with open('/Users/jeremy/Downloads/classpath.txt', 'w') as f:
+            f.write(classpath)
+        cls.jvm = subprocess.Popen(
             ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            cwd=test_dir,
+            cwd=cls.output_dir,
         )
+        with open('/Users/jeremy/Downloads/voc.txt', 'w') as f:
+            f.write('Running JVM from ' + cls.temp_dir)
 
-    def tearDownClass():
-        global _jvm
-
-        if _jvm is not None:
+    @classmethod
+    def tearDownClass(cls):
+        if cls.jvm is not None:
             # use communicate here to wait for process to exit
-            _jvm.communicate("exit".encode("utf-8"))
+            cls.jvm.communicate("exit".encode("utf-8"))
+        shutil.rmtree(cls.output_dir)
 
     def assertBlock(self, python, java):
         self.maxDiff = None
@@ -353,21 +309,15 @@ class TranspileTestCase(TestCase):
         #==================================================
         if run_in_global:
             try:
-                # Create the temp directory into which code will be placed
-                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
-                try:
-                    os.mkdir(test_dir)
-                except FileExistsError:
-                    pass
-
+                self.makeTempDir()
                 # Run the code as Python and as Java.
-                py_out = runAsPython(test_dir, code, extra_code, False, args=args)
-                java_out = runAsJava(test_dir, code, extra_code, False, args=args)
+                py_out = runAsPython(self.temp_dir, code, extra_code, False, args=args)
+                java_out = self.runAsJava(code, extra_code, False, args=args)
             except Exception as e:
                 self.fail(e)
             finally:
                 # Clean up the test directory where the class file was written.
-                shutil.rmtree(test_dir)
+                shutil.rmtree(self.temp_dir)
                 # print(java_out)
 
             # Cleanse the Python and Java output, producing a simple
@@ -387,21 +337,15 @@ class TranspileTestCase(TestCase):
         #==================================================
         if run_in_function:
             try:
-                # Create the temp directory into which code will be placed
-                test_dir = os.path.join(os.path.dirname(__file__), 'temp')
-                try:
-                    os.mkdir(test_dir)
-                except FileExistsError:
-                    pass
-
+                self.makeTempDir()
                 # Run the code as Python and as Java.
-                py_out = runAsPython(test_dir, code, extra_code, True, args=args)
-                java_out = runAsJava(test_dir, code, extra_code, True, args=args)
+                py_out = runAsPython(self.temp_dir, code, extra_code, True, args=args)
+                java_out = self.runAsJava(code, extra_code, True, args=args)
             except Exception as e:
                 self.fail(e)
             finally:
                 # Clean up the test directory where the class file was written.
-                shutil.rmtree(test_dir)
+                shutil.rmtree(self.temp_dir)
                 # print(java_out)
 
             # Cleanse the Python and Java output, producing a simple
@@ -424,10 +368,10 @@ class TranspileTestCase(TestCase):
             # Prep - compile any required Java sources
             #==================================================
             # Create the temp directory into which code will be placed
-            java_dir = os.path.join(os.path.dirname(__file__), 'java')
+            java_dir = os.path.join(self.output_dir, 'java')
 
             try:
-                os.mkdir(java_dir)
+                os.makedirs(java_dir)
             except FileExistsError:
                 pass
 
@@ -446,20 +390,14 @@ class TranspileTestCase(TestCase):
             #==================================================
             if run_in_global:
                 try:
-                    # Create the temp directory into which code will be placed
-                    test_dir = os.path.join(os.path.dirname(__file__), 'temp')
-                    try:
-                        os.mkdir(test_dir)
-                    except FileExistsError:
-                        pass
-
+                    self.makeTempDir()
                     # Run the code as Java.
-                    java_out = runAsJava(test_dir, code, extra_code, False, args=args)
+                    java_out = self.runAsJava(code, extra_code, False, args=args)
                 except Exception as e:
                     self.fail(e)
                 finally:
                     # Clean up the test directory where the class file was written.
-                    shutil.rmtree(test_dir)
+                    shutil.rmtree(self.temp_dir)
                     # print(java_out)
 
                 # Cleanse the Java output, producing a simple
@@ -474,20 +412,14 @@ class TranspileTestCase(TestCase):
             #==================================================
             if run_in_function:
                 try:
-                    # Create the temp directory into which code will be placed
-                    test_dir = os.path.join(os.path.dirname(__file__), 'temp')
-                    try:
-                        os.mkdir(test_dir)
-                    except FileExistsError:
-                        pass
-
+                    self.makeTempDir()
                     # Run the code as Java.
-                    java_out = runAsJava(test_dir, code, extra_code, True, args=args)
+                    java_out = self.runAsJava(code, extra_code, True, args=args)
                 except Exception as e:
                     self.fail(e)
                 finally:
                     # Clean up the test directory where the class file was written.
-                    shutil.rmtree(test_dir)
+                    shutil.rmtree(self.temp_dir)
                     # print(java_out)
 
                 # Cleanse the Java output, producing a simple
@@ -499,7 +431,65 @@ class TranspileTestCase(TestCase):
 
         finally:
             # Clean up the java directory where the class file was written.
-            shutil.rmtree(java_dir)
+            if os.path.exists(java_dir):
+                shutil.rmtree(java_dir)
+
+    def makeTempDir(self):
+        """Create a "temp" subdirectory in the class's generated temporary directory if it doesn't currently exist."""
+        try:
+            os.mkdir(self.temp_dir)
+        except FileExistsError:
+            pass
+
+    def runAsJava(self, main_code, extra_code=None, run_in_function=False, args=None):
+        """Run a block of Python code as a Java program."""
+        # Output source code into test directory
+        transpiler = Transpiler(verbosity=0)
+
+        # Don't redirect stderr; we want to see any errors from the transpiler
+        # as top level test failures.
+        with capture_output(redirect_stderr=False):
+            transpiler.transpile_string("test.py", adjust(main_code, run_in_function=run_in_function))
+
+            if extra_code:
+                for name, code in extra_code.items():
+                    transpiler.transpile_string("%s.py" % name.replace('.', os.path.sep), adjust(code))
+
+        transpiler.write(self.temp_dir)
+
+        if args is None:
+            args = []
+
+        if len(args) == 0:
+            # encode to turn str into bytes-like object
+            self.jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
+            self.jvm.stdin.flush()
+            out = ""
+            while True:
+                try:
+                    line = self.jvm.stdout.readline().decode("utf-8")
+                    if line == ".{0}".format(os.linesep):
+                        break
+                    else:
+                        out += line
+                except IOError:
+                    continue
+        else:
+            classpath = os.pathsep.join([
+                os.path.join('..', '..', '..', 'dist', 'python-java.jar'),
+                os.path.join('..', '..', 'java'),
+                os.curdir,
+            ])
+            proc = subprocess.Popen(
+                ["java", "-classpath", classpath, "python.test.__init__"] + args,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                cwd=self.temp_dir
+            )
+            out = proc.communicate()[0].decode('utf8')
+
+        return out
 
 
 def _unary_test(test_name, operation):
