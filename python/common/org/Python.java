@@ -873,7 +873,12 @@ public class Python {
     )
     public static org.python.Iterable iter(org.python.Object iterable, org.python.Object sentinel) {
         if (sentinel == null) {
-            return iterable.__iter__();
+            try {
+                return iterable.__iter__();
+            } catch (org.python.exceptions.AttributeError e) {
+                // No __iter__ == not iterable
+                throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+            }
         } else {
             throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with callable/sentinel not implemented");
         }
