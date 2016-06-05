@@ -237,7 +237,7 @@ JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 # PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
 PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n)+(?P<exception>.*?): (?P<message>.*\r?\n)')
 PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n')
-PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
+PYTHON_FLOAT = re.compile('(\d+)e(-?)0?(\d+)')
 
 MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,8}')
 
