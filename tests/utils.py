@@ -263,8 +263,6 @@ class TranspileTestCase(TestCase):
         setUpSuite()
         cls.temp_dir = os.path.join(_output_dir, 'temp')
         classpath = os.path.join('dist', 'python-java-testdaemon.jar')
-        with open('/Users/jeremy/Downloads/classpath.txt', 'w') as f:
-            f.write(classpath)
         cls.jvm = subprocess.Popen(
             ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
             stdin=subprocess.PIPE,
@@ -272,8 +270,6 @@ class TranspileTestCase(TestCase):
             stderr=subprocess.STDOUT,
             cwd=_output_dir,
         )
-        with open('/Users/jeremy/Downloads/voc.txt', 'w') as f:
-            f.write('Running JVM from ' + cls.temp_dir)
 
     @classmethod
     def tearDownClass(cls):
