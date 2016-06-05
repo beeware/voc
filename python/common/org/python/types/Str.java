@@ -332,6 +332,14 @@ public class Str extends org.python.types.Object {
             for (org.python.Object obj: oth.value) {
                 format_args.add(obj.toJava());
             }
+        } else if (other instanceof org.python.types.Float) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Str) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Int) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Bool) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         } else if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         } else {
@@ -404,6 +412,16 @@ public class Str extends org.python.types.Object {
     )
     public void __imod__(org.python.Object other) {
         if (other instanceof org.python.types.NoneType) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Float) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Bool) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Int) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Tuple) {
+            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Str) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         }
         super.__imod__(other);
