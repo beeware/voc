@@ -644,12 +644,15 @@ public class Python {
     }
 
     @org.python.Method(
+        name = "filter",
         __doc__ = "filter(function or None, iterable) --> filter object" +
             "\n" +
             "Return an iterator yielding those items of iterable for which function(item)\n" +
-            "is true. If function is None, return the items that are true.\n"
+            "is true. If function is None, return the items that are true.\n",
+        args = {"function", "iterable"}
     )
-    public static org.python.Object filter() {
+    public static org.python.Object filter(org.python.Object function, org.python.Object iterable) {
+        org.python.Iterable iterator = org.Python.iter(iterable, null);
         throw new org.python.exceptions.NotImplementedError("Builtin function 'filter' not implemented");
     }
 
