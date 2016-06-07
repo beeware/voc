@@ -18,14 +18,11 @@ class NoneTypeTests(TranspileTestCase):
 
 
 class UnaryNoneTypeOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = ['None']
-
-    not_implemented = [
-    ]
+    data_type = 'None'
 
 
 class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['None']
+    data_type = 'None'
 
     not_implemented = [
         'test_add_bytearray',
@@ -78,8 +75,8 @@ class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_complex',
         'test_modulo_frozenset',
 
-        'test_multiply_bytearray',
         'test_multiply_bytes',
+        'test_multiply_bytearray',
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',
@@ -107,6 +104,7 @@ class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_bytearray',
         'test_subscr_class',
         'test_subscr_complex',
+        'test_subscr_frozenset',
 
         'test_subtract_bytearray',
         'test_subtract_class',
@@ -126,7 +124,7 @@ class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = ['None']
+    data_type = 'None'
 
     not_implemented = [
         'test_add_bytearray',
@@ -154,8 +152,8 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
         'test_modulo_complex',
         'test_modulo_frozenset',
 
-        'test_multiply_bytearray',
         'test_multiply_bytes',
+        'test_multiply_bytearray',
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',
@@ -168,20 +166,10 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
         'test_or_complex',
         'test_or_frozenset',
 
-        'test_power_bool',
         'test_power_bytearray',
-        'test_power_bytes',
         'test_power_class',
         'test_power_complex',
-        'test_power_dict',
-        'test_power_float',
         'test_power_frozenset',
-        'test_power_int',
-        'test_power_list',
-        'test_power_none',
-        'test_power_set',
-        'test_power_str',
-        'test_power_tuple',
 
         'test_rshift_bytearray',
         'test_rshift_class',
