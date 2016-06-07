@@ -232,12 +232,10 @@ JAVA_EXCEPTION = re.compile(
     '(Exception in thread "\w+" )?'
 )
 JAVA_STACK = re.compile('^\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)\r?\n', re.MULTILINE)
-JAVA_FLOAT = re.compile('(\d+)E(-)?(\d+)')
 
 # PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
 PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n)+(?P<exception>.*?): (?P<message>.*\r?\n)')
 PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n')
-PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
 
 MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,8}')
 
@@ -260,7 +258,7 @@ def cleanse_java(input):
         os.linesep if stack else ''
     )
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
-    out = JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***').replace("'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
+    out = out.replace("'python.test.__init__'", '***EXECUTABLE***').replace("'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
     out = out.replace('\r\n', '\n')
     return out
 
@@ -279,7 +277,7 @@ def cleanse_python(input):
         os.linesep if stack else ''
     )
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
-    out = PYTHON_FLOAT.sub('\\1e\\2\\3', out).replace("'test.py'", '***EXECUTABLE***')
+    out = out.replace("'test.py'", '***EXECUTABLE***')
 
     # Python 3.4.4 changed the error message returned by int()
     out = out.replace(
