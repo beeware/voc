@@ -210,9 +210,6 @@ class JavaNormalizationTests(unittest.TestCase):
             """
         )
 
-    def test_float(self):
-        self.assertNormalized('7.950899459780156E-6', '7.950899459780156e-6')
-
     def test_memory_reference(self):
         self.assertNormalized(
             """
@@ -277,9 +274,6 @@ class PythonNormalizationTests(unittest.TestCase):
                 test.py:3
             """
         )
-
-    def test_float(self):
-        self.assertNormalized('7.950899459780156e-06', '7.950899459780156e-6')
 
     def test_memory_reference(self):
         self.assertNormalized(

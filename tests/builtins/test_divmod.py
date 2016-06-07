@@ -31,11 +31,6 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
     functions = ["divmod"]
 
     not_implemented = [
-        'test_bool_bytearray',
-        'test_bool_class',
-        'test_bool_complex',
-        'test_bool_frozenset',
-
         'test_bytearray_bool',
         'test_bytearray_bytearray',
         'test_bytearray_bytes',
@@ -56,6 +51,11 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
         'test_bytes_class',
         'test_bytes_complex',
         'test_bytes_frozenset',
+
+        'test_bool_bytearray',
+        'test_bool_class',
+        'test_bool_complex',
+        'test_bool_frozenset',
 
         'test_class_bool',
         'test_class_bytearray',
