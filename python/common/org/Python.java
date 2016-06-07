@@ -228,21 +228,17 @@ public class Python {
         args = {"iterable"}
     )
     public static org.python.types.Bool all(org.python.Object iterable) {
+        org.python.Iterable iter = org.Python.iter(iterable);
         try {
-            org.python.Iterable iter = iterable.__iter__();
-            try {
-                while (true) {
-                    org.python.Object next = iter.__next__();
-                    if (!((org.python.types.Bool) next.__bool__()).value) {
-                        return new org.python.types.Bool(false);
-                    }
+            while (true) {
+                org.python.Object next = iter.__next__();
+                if (!((org.python.types.Bool) next.__bool__()).value) {
+                    return new org.python.types.Bool(false);
                 }
-            } catch (org.python.exceptions.StopIteration si) {
             }
-            return new org.python.types.Bool(true);
-        } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        } catch (org.python.exceptions.StopIteration si) {
         }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -253,21 +249,17 @@ public class Python {
         args = {"iterable"}
     )
     public static org.python.types.Bool any(org.python.Object iterable) {
+        org.python.Iterable iter = org.Python.iter(iterable);
         try {
-            org.python.Iterable iter = iterable.__iter__();
-            try {
-                while (true) {
-                    org.python.Object next = iter.__next__();
-                    if (((org.python.types.Bool) next.__bool__()).value) {
-                        return new org.python.types.Bool(true);
-                    }
+            while (true) {
+                org.python.Object next = iter.__next__();
+                if (((org.python.types.Bool) next.__bool__()).value) {
+                    return new org.python.types.Bool(true);
                 }
-            } catch (org.python.exceptions.StopIteration si) {
             }
-            return new org.python.types.Bool(false);
-        } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        } catch (org.python.exceptions.StopIteration si) {
         }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -529,40 +521,36 @@ public class Python {
                     )
                 );
             } else {
+                org.python.Iterable iterator = org.Python.iter(iterable);
+                java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
                 try {
-                    org.python.Iterable iterator = iterable.__iter__();
-                    java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
-                    try {
-                        while (true) {
-                            org.python.Object next = iterator.__next__();
-                            java.util.List<org.python.Object> data;
-                            if (next instanceof org.python.types.Tuple) {
-                                data = ((org.python.types.Tuple) next).value;
-                            } else if (next instanceof org.python.types.List) {
-                                data = ((org.python.types.List) next).value;
-                            } else {
-                                throw new org.python.exceptions.TypeError(
-                                    "cannot convert dictionary update sequence element #" + generated.size() +
-                                        " to a sequence"
-                                );
-                            }
-
-                            if (data.size() != 2) {
-                                throw new org.python.exceptions.ValueError(
-                                    "dictionary update sequence element #" + generated.size() +
-                                        " has length " + data.size() +
-                                        "; 2 is required"
-                                );
-                            }
-
-                            generated.put(data.get(0), data.get(1));
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        java.util.List<org.python.Object> data;
+                        if (next instanceof org.python.types.Tuple) {
+                            data = ((org.python.types.Tuple) next).value;
+                        } else if (next instanceof org.python.types.List) {
+                            data = ((org.python.types.List) next).value;
+                        } else {
+                            throw new org.python.exceptions.TypeError(
+                                "cannot convert dictionary update sequence element #" + generated.size() +
+                                    " to a sequence"
+                            );
                         }
-                    } catch (org.python.exceptions.StopIteration si) {
+
+                        if (data.size() != 2) {
+                            throw new org.python.exceptions.ValueError(
+                                "dictionary update sequence element #" + generated.size() +
+                                    " has length " + data.size() +
+                                    "; 2 is required"
+                            );
+                        }
+
+                        generated.put(data.get(0), data.get(1));
                     }
-                    return new org.python.types.Dict(generated);
-                } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+                } catch (org.python.exceptions.StopIteration si) {
                 }
+                return new org.python.types.Dict(generated);
             }
         }
     }
@@ -644,12 +632,15 @@ public class Python {
     }
 
     @org.python.Method(
+        name = "filter",
         __doc__ = "filter(function or None, iterable) --> filter object" +
             "\n" +
             "Return an iterator yielding those items of iterable for which function(item)\n" +
-            "is true. If function is None, return the items that are true.\n"
+            "is true. If function is None, return the items that are true.\n",
+        args = {"function", "iterable"}
     )
-    public static org.python.Object filter() {
+    public static org.python.Object filter(org.python.Object function, org.python.Object iterable) {
+        org.python.Iterable iterator = org.Python.iter(iterable);
         throw new org.python.exceptions.NotImplementedError("Builtin function 'filter' not implemented");
     }
 
@@ -873,10 +864,18 @@ public class Python {
     )
     public static org.python.Iterable iter(org.python.Object iterable, org.python.Object sentinel) {
         if (sentinel == null) {
-            return iterable.__iter__();
+            try {
+                return iterable.__iter__();
+            } catch (org.python.exceptions.AttributeError e) {
+                // No __iter__ == not iterable
+                throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+            }
         } else {
             throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with callable/sentinel not implemented");
         }
+    }
+    public static org.python.Iterable iter(org.python.Object iterable) {
+        return org.Python.iter(iterable, null);
     }
 
     @org.python.Method(
@@ -929,20 +928,16 @@ public class Python {
                     )
                 );
             } else {
+                org.python.Iterable iterator = org.Python.iter(iterable);
+                java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
                 try {
-                    org.python.Iterable iterator = iterable.__iter__();
-                    java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
-                    try {
-                        while (true) {
-                            org.python.Object next = iterator.__next__();
-                            generated.add(next);
-                        }
-                    } catch (org.python.exceptions.StopIteration si) {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        generated.add(next);
                     }
-                    return new org.python.types.List(generated);
-                } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+                } catch (org.python.exceptions.StopIteration si) {
                 }
+                return new org.python.types.List(generated);
             }
         }
     }
@@ -1395,20 +1390,16 @@ public class Python {
                     )
                 );
             } else {
+                org.python.Iterable iterator = org.Python.iter(iterable);
+                java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
                 try {
-                    org.python.Iterable iterator = iterable.__iter__();
-                    java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
-                    try {
-                        while (true) {
-                            org.python.Object next = iterator.__next__();
-                            generated.add(next);
-                        }
-                    } catch (org.python.exceptions.StopIteration si) {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        generated.add(next);
                     }
-                    return new org.python.types.Set(generated);
-                } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+                } catch (org.python.exceptions.StopIteration si) {
                 }
+                return new org.python.types.Set(generated);
             }
         }
     }

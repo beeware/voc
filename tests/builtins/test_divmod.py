@@ -33,13 +33,9 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
         'test_bool_bytearray',
         'test_bool_class',
         'test_bool_complex',
-        'test_bool_dict',
         'test_bool_frozenset',
-        'test_bool_set',
         'test_bytes_bytearray',
         'test_bytes_class',
         'test_bytes_complex',
-        'test_bytes_dict',
         'test_bytes_frozenset',
-        'test_bytes_set',
     ]

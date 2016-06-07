@@ -237,8 +237,7 @@ JAVA_STACK = re.compile('^\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?
 PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n)+(?P<exception>.*?): (?P<message>.*\r?\n)')
 PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n')
 
-MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,8}')
-
+MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,12}')
 
 def cleanse_java(input):
     try:
@@ -701,8 +700,6 @@ class BuiltinTwoargFunctionTestCase:
             print(%(format)s%(operation)s)
             """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s and y=%(y)s" % kwargs)
 
-    EXCLUDED_DATATYPES = ['set', 'frozenset', 'dict']
     for datatype1, examples1 in SAMPLE_DATA:
         for datatype2, examples2 in SAMPLE_DATA:
-            if datatype1 not in EXCLUDED_DATATYPES and datatype2 not in EXCLUDED_DATATYPES:
-                vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test('test_%s_%s' % (datatype1, datatype2), 'f(x, y)', examples1, examples2)
+            vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test('test_%s_%s' % (datatype1, datatype2), 'f(x, y)', examples1, examples2)
