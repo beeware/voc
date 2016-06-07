@@ -16,8 +16,6 @@ class BuiltinIterFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_dict',
         'test_frozenset',
         'test_list',
-        'test_None',
-        'test_NotImplemented',
         'test_set',
         'test_str',
         'test_tuple',
