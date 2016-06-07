@@ -77,15 +77,27 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Float __float__() {
+        double result;
         try {
-            return new org.python.types.Float(Double.parseDouble(this.value));
+            result = Double.parseDouble(this.value);
         } catch (NumberFormatException e) {
-            String value = this.value;
-            if (value.length() > 0) {
-                value = "'" + value + "'";
+            String trimmed = this.value.trim();
+            if (trimmed == "inf") {
+                result = Double.POSITIVE_INFINITY;
+            } else if (trimmed == "-inf") {
+                result = Double.NEGATIVE_INFINITY;
+            } else if (trimmed == "nan") {
+                result = Double.NaN;
+            } else {
+                String value = this.value;
+                if (value.length() > 0) {
+                    value = "'" + value + "'";
+                }
+                throw new org.python.exceptions.ValueError(
+                    "could not convert string to float: " + value);
             }
-            throw new org.python.exceptions.ValueError("could not convert string to float: " + value);
         }
+        return new org.python.types.Float(result);
     }
 
     @org.python.Method(
@@ -294,13 +306,6 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public void __iadd__(org.python.Object other) {
-        value = ((org.python.types.Str) __add__(other)).value;
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             long other_int = ((org.python.types.Int)other).value;
@@ -415,13 +420,26 @@ public class Str extends org.python.types.Object {
         }
         super.__imod__(other);
     }
+
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public void __iadd__(org.python.Object other) {
+        try {
+            this.setValue(this.__add__(other));
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to " + this.typeName() + " implicitly");
+        }
+    }
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-           
-         throw new org.python.exceptions.TypeError("type str doesn't define __round__ method");    
-        
+
+         throw new org.python.exceptions.TypeError("type str doesn't define __round__ method");
+
     }
 
 }
