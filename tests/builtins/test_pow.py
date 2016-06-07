@@ -81,6 +81,7 @@ class BuiltinPowFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_tuple',
     ]
 
+
 class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
     functions = ["pow"]
 
@@ -100,6 +101,4 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         # complex result
         'test_float_float',
         'test_int_float',
-        # float.__repr__() issue
-        'test_int_int'
     ]
