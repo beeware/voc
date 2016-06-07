@@ -37,7 +37,7 @@ class FloatTests(TranspileTestCase):
 
 
 class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = ['1.2345', '0.0', '-2.345']
+    data_type = 'float'
 
     not_implemented = [
         'test_unary_invert',
@@ -45,7 +45,7 @@ class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
 
 
 class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['1.2345', '0.0', '-2.345']
+    data_type = 'float'
 
     not_implemented = [
         'test_add_bytearray',
@@ -66,7 +66,8 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_dict',
         'test_eq_frozenset',
         'test_eq_list',
-        'test_eq_none',
+        'test_eq_None',
+        'test_eq_NotImplemented',
         'test_eq_set',
         'test_eq_str',
         'test_eq_tuple',
@@ -107,11 +108,11 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_class',
         'test_modulo_complex',
         'test_modulo_dict',
-        'test_modulo_float',
         'test_modulo_frozenset',
         'test_modulo_int',
         'test_modulo_list',
-        'test_modulo_none',
+        'test_modulo_None',
+        'test_modulo_NotImplemented',
         'test_modulo_set',
         'test_modulo_str',
         'test_modulo_tuple',
@@ -122,6 +123,7 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_complex',
         'test_multiply_frozenset',
         'test_multiply_list',
+        'test_multiply_NotImplemented',
         'test_multiply_tuple',
 
         'test_ne_bool',
@@ -134,7 +136,8 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_frozenset',
         'test_ne_int',
         'test_ne_list',
-        'test_ne_none',
+        'test_ne_None',
+        'test_ne_NotImplemented',
         'test_ne_set',
         'test_ne_str',
         'test_ne_tuple',
@@ -149,7 +152,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_power_complex',
         'test_power_float',
         'test_power_frozenset',
-        'test_power_int',
 
         'test_rshift_bytearray',
         'test_rshift_class',
@@ -166,7 +168,8 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_frozenset',
         'test_subscr_int',
         'test_subscr_list',
-        'test_subscr_none',
+        'test_subscr_None',
+        'test_subscr_NotImplemented',
         'test_subscr_set',
         'test_subscr_str',
         'test_subscr_tuple',
@@ -189,7 +192,7 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = ['1.2345', '0.0', '-2.345']
+    data_type = 'float'
 
     not_implemented = [
         'test_add_bytearray',
@@ -217,7 +220,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_bytearray',
         'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_float',
         'test_modulo_frozenset',
         'test_modulo_int',
 
@@ -227,6 +229,7 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_complex',
         'test_multiply_frozenset',
         'test_multiply_list',
+        'test_multiply_NotImplemented',
         'test_multiply_str',
         'test_multiply_tuple',
 
@@ -236,18 +239,10 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_or_frozenset',
 
         'test_power_bytearray',
-        'test_power_bytes',
         'test_power_class',
         'test_power_complex',
-        'test_power_dict',
         'test_power_float',
         'test_power_frozenset',
-        'test_power_int',
-        'test_power_list',
-        'test_power_none',
-        'test_power_set',
-        'test_power_str',
-        'test_power_tuple',
 
         'test_rshift_bytearray',
         'test_rshift_class',

@@ -1,5 +1,6 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
+
 class NotImplementedTests(TranspileTestCase):
     def test_truth(self):
         self.assertCodeExecution("""
@@ -7,14 +8,13 @@ class NotImplementedTests(TranspileTestCase):
             print(x == True)
             """)
 
-class UnaryNotImplementedOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = ['NotImplemented']
 
-    not_implemented = [
-    ]
+class UnaryNotImplementedOperationTests(UnaryOperationTestCase, TranspileTestCase):
+    data_type = 'NotImplemented'
+
 
 class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['NotImplemented']
+    data_type = 'NotImplemented'
 
     not_implemented = [
         'test_add_bytearray',
@@ -67,8 +67,8 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_modulo_complex',
         'test_modulo_frozenset',
 
-        'test_multiply_bytearray',
         'test_multiply_bytes',
+        'test_multiply_bytearray',
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',
@@ -114,8 +114,9 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_xor_frozenset',
     ]
 
+
 class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = ['NotImplemented']
+    data_type = 'NotImplemented'
 
     not_implemented = [
         'test_add_bytearray',
@@ -168,8 +169,8 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_modulo_complex',
         'test_modulo_frozenset',
 
-        'test_multiply_bytearray',
         'test_multiply_bytes',
+        'test_multiply_bytearray',
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',
@@ -187,20 +188,10 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_or_complex',
         'test_or_frozenset',
 
-        'test_power_bool',
         'test_power_bytearray',
-        'test_power_bytes',
         'test_power_class',
         'test_power_complex',
-        'test_power_dict',
-        'test_power_float',
         'test_power_frozenset',
-        'test_power_int',
-        'test_power_list',
-        'test_power_none',
-        'test_power_set',
-        'test_power_str',
-        'test_power_tuple',
 
         'test_rshift_bytearray',
         'test_rshift_class',

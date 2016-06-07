@@ -30,7 +30,7 @@ print('Done.')
 
 class JavaNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
-        self.assertEqual(cleanse_java(adjust(actual)), adjust(expected))
+        self.assertEqual(cleanse_java(adjust(actual), None), adjust(expected))
 
     def test_no_exception(self):
         self.assertNormalized(
@@ -234,7 +234,7 @@ class JavaNormalizationTests(unittest.TestCase):
 
 class PythonNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
-        self.assertEqual(cleanse_python(adjust(actual)), adjust(expected))
+        self.assertEqual(cleanse_python(adjust(actual), None), adjust(expected))
 
     def test_no_exception(self):
         self.assertNormalized(

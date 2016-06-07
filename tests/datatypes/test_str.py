@@ -16,17 +16,23 @@ class StrTests(TranspileTestCase):
             print('Done.')
             """)
 
+
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = ['""', '"This is a string"']
+    data_type = 'str'
 
     not_implemented = [
     ]
 
 
 class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['""', '"This is a string"']
+    data_type = 'str'
 
     not_implemented = [
+        'test_add_bytearray',
+        'test_add_class',
+        'test_add_complex',
+        'test_add_frozenset',
+
         'test_and_bytearray',
         'test_and_class',
         'test_and_complex',
@@ -68,15 +74,25 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_lt_frozenset',
 
         'test_modulo_bool',
+        'test_modulo_bytes',
         'test_modulo_bytearray',
         'test_modulo_class',
         'test_modulo_complex',
+        'test_modulo_dict',
         'test_modulo_float',
         'test_modulo_frozenset',
         'test_modulo_int',
+        'test_modulo_list',
+        'test_modulo_None',
+        'test_modulo_NotImplemented',
         'test_modulo_set',
         'test_modulo_str',
         'test_modulo_tuple',
+
+        'test_multiply_bytearray',
+        'test_multiply_class',
+        'test_multiply_complex',
+        'test_multiply_frozenset',
 
         'test_ne_bytearray',
         'test_ne_class',
@@ -106,7 +122,8 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_float',
         'test_subscr_frozenset',
         'test_subscr_list',
-        'test_subscr_none',
+        'test_subscr_None',
+        'test_subscr_NotImplemented',
         'test_subscr_set',
         'test_subscr_str',
         'test_subscr_tuple',
@@ -129,7 +146,7 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = ['""', '"This is a string"']
+    data_type = 'str'
 
     not_implemented = [
         'test_add_bytearray',
@@ -153,12 +170,17 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_lshift_frozenset',
 
         'test_modulo_bool',
+        'test_modulo_bytes',
         'test_modulo_bytearray',
         'test_modulo_class',
         'test_modulo_complex',
+        'test_modulo_dict',
         'test_modulo_float',
         'test_modulo_frozenset',
         'test_modulo_int',
+        'test_modulo_list',
+        'test_modulo_None',
+        'test_modulo_NotImplemented',
         'test_modulo_set',
         'test_modulo_str',
         'test_modulo_tuple',

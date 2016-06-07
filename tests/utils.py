@@ -242,11 +242,17 @@ PYTHON_FLOAT = re.compile('(\d+)e(-)?0?(\d+)')
 MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,8}')
 
 
-def cleanse_java(input):
+def cleanse_java(input, substitutions):
     try:
+        # Test the specific message
         out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception2>: \\g<message2>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
+        # Test just the exception type
+        # out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception2>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
     except:
+        # Test the specific message
         out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception1>: \\g<message1>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
+        # Test just the exception type
+        # out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception1>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
 
     stack = JAVA_STACK.findall(out)
     out = JAVA_STACK.sub('', out)
@@ -261,12 +267,21 @@ def cleanse_java(input):
     )
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
     out = JAVA_FLOAT.sub('\\1e\\2\\3', out).replace("'python.test.__init__'", '***EXECUTABLE***').replace("'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
+
+    if substitutions:
+        for to_value, from_values in substitutions.items():
+            for from_value in from_values:
+                out = out.replace(from_value, to_value)
+
     out = out.replace('\r\n', '\n')
     return out
 
 
-def cleanse_python(input):
+def cleanse_python(input, substitutions):
+    # Test the specific message
     out = PYTHON_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception>: \\g<message>'.format(linesep=os.linesep), input)
+    # Test just the exception type
+    # out = PYTHON_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception>{linesep}'.format(linesep=os.linesep), input)
     stack = PYTHON_STACK.findall(input)
     out = '%s%s%s' % (
         out,
@@ -281,11 +296,16 @@ def cleanse_python(input):
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
     out = PYTHON_FLOAT.sub('\\1e\\2\\3', out).replace("'test.py'", '***EXECUTABLE***')
 
-    # Python 3.4.4 changed the error message returned by int()
+    # Python 3.4.4 changed the message describing strings in exceptions
     out = out.replace(
-        'int() argument must be a string or a number, not',
-        'int() argument must be a string, a bytes-like object or a number, not'
+        'argument must be a string or',
+        'argument must be a string, a bytes-like object or'
     )
+
+    if substitutions:
+        for to_value, from_values in substitutions.items():
+            for from_value in from_values:
+                out = out.replace(from_value, to_value)
 
     out = out.replace('\r\n', '\n')
     return out
@@ -345,7 +365,12 @@ class TranspileTestCase(TestCase):
         java = adjust(java)
         self.assertEqual(debug.getvalue(), java[1:])
 
-    def assertCodeExecution(self, code, message=None, extra_code=None, run_in_global=True, run_in_function=True, args=None):
+    def assertCodeExecution(
+            self, code,
+            message=None,
+            extra_code=None,
+            run_in_global=True, run_in_function=True,
+            args=None, substitutions=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
         #==================================================
@@ -372,8 +397,8 @@ class TranspileTestCase(TestCase):
 
             # Cleanse the Python and Java output, producing a simple
             # normalized format for exceptions, floats etc.
-            java_out = cleanse_java(java_out)
-            py_out = cleanse_python(py_out)
+            java_out = cleanse_java(java_out, substitutions)
+            py_out = cleanse_python(py_out, substitutions)
 
             # Confirm that the output of the Java code is the same as the Python code.
             if message:
@@ -406,8 +431,8 @@ class TranspileTestCase(TestCase):
 
             # Cleanse the Python and Java output, producing a simple
             # normalized format for exceptions, floats etc.
-            java_out = cleanse_java(java_out)
-            py_out = cleanse_python(py_out)
+            java_out = cleanse_java(java_out, substitutions)
+            py_out = cleanse_python(py_out, substitutions)
 
             # Confirm that the output of the Java code is the same as the Python code.
             if message:
@@ -416,7 +441,11 @@ class TranspileTestCase(TestCase):
                 context = 'Function context'
             self.assertEqual(java_out, py_out, context)
 
-    def assertJavaExecution(self, code, out, extra_code=None, java=None, run_in_global=True, run_in_function=True, args=None):
+    def assertJavaExecution(
+                self, code, out,
+                extra_code=None, java=None,
+                run_in_global=True, run_in_function=True,
+                args=None, substitutions=None):
         "Run code under Java and check the output is as expected"
         self.maxDiff = None
         try:
@@ -464,7 +493,7 @@ class TranspileTestCase(TestCase):
 
                 # Cleanse the Java output, producing a simple
                 # normalized format for exceptions, floats etc.
-                java_out = cleanse_java(java_out)
+                java_out = cleanse_java(java_out, substitutions)
 
                 # Confirm that the output of the Java code is the same as the Python code.
                 self.assertEqual(java_out, py_out, 'Global context')
@@ -492,7 +521,7 @@ class TranspileTestCase(TestCase):
 
                 # Cleanse the Java output, producing a simple
                 # normalized format for exceptions, floats etc.
-                java_out = cleanse_java(java_out)
+                java_out = cleanse_java(java_out, substitutions)
 
                 # Confirm that the output of the Java code is the same as the Python code.
                 self.assertEqual(java_out, py_out, 'Function context')
@@ -502,10 +531,119 @@ class TranspileTestCase(TestCase):
             shutil.rmtree(java_dir)
 
 
+SAMPLE_DATA = {
+    'bool': [
+            'True',
+            'False',
+        ],
+    'bytearray': [
+            'bytearray()',
+            'bytearray(1)',
+            'bytearray([1, 2, 3])',
+        ],
+    'bytes': [
+            "b''",
+            "b'This is another string of bytes'",
+        ],
+    'class': [
+            'type(1)',
+            'type("a")',
+            'type(object())',
+            'type("MyClass", (object,), {})',
+        ],
+    'complex': [
+            '1j',
+            '1+2j',
+            '-5j',
+        ],
+    'dict': [
+            "{}",
+            "{'a': 1, 'c': 2.3456, 'd': 'another'}",
+        ],
+    'float': [
+            '2.3456',
+            '0.0',
+            '-3.14159',
+        ],
+    'frozenset': [
+            'frozenset([1, 2])',
+            'frozenset()',
+        ],
+    'int': [
+            '3',
+            '0',
+            '-5',
+        ],
+    'list': [
+            "[]",
+            "[3, 4, 5]",
+            '[1, 2, 3, 4, 5]',
+            "['a','b','c']",
+        ],
+    'set': [
+            "set()",
+            "{1, 2.3456, 'another'}",
+        ],
+    'str': [
+            '""',
+            '"This is another string"',
+            '"One arg: %s"',
+            '"Three args: %s | %s | %s"',
+        ],
+    'tuple': [
+            "(1, 2)",
+            "(3, 1.2, True, )",
+            "(1, 2.3456, 'another')",
+        ],
+    'None': [
+            'None',
+        ],
+    'NotImplemented': [
+            'NotImplemented',
+        ],
+}
+
+
+SAMPLE_SUBSTITUTIONS = {
+    # Normalize set ordering
+    "{1, 2.3456, 'another'}": [
+        "{1, 'another', 2.3456}",
+        "{2.3456, 1, 'another'}",
+        "{2.3456, 'another', 1}",
+        "{'another', 1, 2.3456}",
+        "{'another', 2.3456, 1}",
+    ],
+    "{'a', 'b', 'c'}": [
+        "{'a', 'c', 'b'}",
+        "{'b', 'a', 'c'}",
+        "{'b', 'c', 'a'}",
+        "{'c', 'a', 'b'}",
+        "{'c', 'b', 'a'}",
+    ],
+    # Normalize dictionary ordering
+    "{'a': 1, 'c': 2.3456, 'd': 'another'}": [
+        "{'a': 1, 'd': 'another', 'c': 2.3456, }",
+        "{'c': 2.3456, 'd': 'another', 'a': 1}",
+        "{'c': 2.3456, 'a': 1, 'd': 'another'}",
+        "{'d': 'another', 'a': 1, 'c': 2.3456}",
+        "{'d': 'another', 'c': 2.3456}, 'a': 1",
+    ],
+    # FIXME: Normalize float formatting for key results.
+    "-3.2e-4": [
+        "-0.00032"
+    ]
+}
+
+
 def _unary_test(test_name, operation):
     def func(self):
-        for value in self.values:
-            self.assertUnaryOperation(x=value, operation=operation, format=self.format)
+        for value in SAMPLE_DATA[self.data_type]:
+            self.assertUnaryOperation(
+                x=value,
+                operation=operation,
+                format=self.format,
+                substitutions=SAMPLE_SUBSTITUTIONS
+            )
     return func
 
 
@@ -533,29 +671,17 @@ class UnaryOperationTestCase:
     test_unary_invert = _unary_test('test_unary_invert', '~')
 
 
-SAMPLE_DATA = [
-    ('bool', ['True', 'False']),
-    # ('bytearray', [3]),
-    ('bytes', ["b''", "b'This is another string of bytes'"]),
-    # ('class', ['']),
-    # ('complex', ['']),
-    ('dict', ["{}", "{'a': 1, 'c': 2.3456, 'd': 'another'}"]),
-    ('float', ['2.3456', '0.0', '-3.14159']),
-    # ('frozenset', ),
-    ('int', ['3', '0', '-5']),
-    ('list', ["[]", "[3, 4, 5]"]),
-    ('set', ["set()", "{1, 2.3456, 'another'}"]),
-    ('str', ['""', '"This is another string"']),
-    ('tuple', ["(1, 2.3456, 'another')"]),
-    ('none', ['None']),
-]
-
-
 def _binary_test(test_name, operation, examples):
     def func(self):
-        for value in self.values:
+        for value in SAMPLE_DATA[self.data_type]:
             for example in examples:
-                self.assertBinaryOperation(x=value, y=example, operation=operation, format=self.format)
+                self.assertBinaryOperation(
+                    x=value,
+                    y=example,
+                    operation=operation,
+                    format=self.format,
+                    substitutions=SAMPLE_SUBSTITUTIONS
+                )
     return func
 
 
@@ -572,13 +698,17 @@ class BinaryOperationTestCase:
         return super().run(result=result)
 
     def assertBinaryOperation(self, **kwargs):
-        self.assertCodeExecution("""
+        substitutions = kwargs.pop('substitutions')
+        self.assertCodeExecution(
+            """
             x = %(x)s
             y = %(y)s
             print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs)
+            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs,
+            substitutions=substitutions
+        )
 
-    for datatype, examples in SAMPLE_DATA:
+    for datatype, examples in SAMPLE_DATA.items():
         vars()['test_add_%s' % datatype] = _binary_test('test_add_%s' % datatype, 'x + y', examples)
         vars()['test_subtract_%s' % datatype] = _binary_test('test_subtract_%s' % datatype, 'x - y', examples)
         vars()['test_multiply_%s' % datatype] = _binary_test('test_multiply_%s' % datatype, 'x * y', examples)
@@ -603,9 +733,15 @@ class BinaryOperationTestCase:
 
 def _inplace_test(test_name, operation, examples):
     def func(self):
-        for value in self.values:
+        for value in SAMPLE_DATA[self.data_type]:
             for example in examples:
-                self.assertInplaceOperation(x=value, y=example, operation=operation, format=self.format)
+                self.assertInplaceOperation(
+                    x=value,
+                    y=example,
+                    operation=operation,
+                    format=self.format,
+                    substitutions=SAMPLE_SUBSTITUTIONS,
+                )
     return func
 
 
@@ -622,14 +758,18 @@ class InplaceOperationTestCase:
         return super().run(result=result)
 
     def assertInplaceOperation(self, **kwargs):
-        self.assertCodeExecution("""
+        substitutions = kwargs.pop('substitutions')
+        self.assertCodeExecution(
+            """
             x = %(x)s
             y = %(y)s
             %(operation)s
             print(%(format)sx)
-            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs)
+            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs,
+            substitutions=substitutions
+        )
 
-    for datatype, examples in SAMPLE_DATA:
+    for datatype, examples in SAMPLE_DATA.items():
         vars()['test_add_%s' % datatype] = _inplace_test('test_add_%s' % datatype, 'x += y', examples)
         vars()['test_subtract_%s' % datatype] = _inplace_test('test_subtract_%s' % datatype, 'x -= y', examples)
         vars()['test_multiply_%s' % datatype] = _inplace_test('test_multiply_%s' % datatype, 'x *= y', examples)
@@ -648,7 +788,13 @@ def _builtin_test(test_name, operation, examples):
     def func(self):
         for function in self.functions:
             for example in examples:
-                self.assertBuiltinFunction(x=example, f=function, operation=operation, format=self.format)
+                self.assertBuiltinFunction(
+                    x=example,
+                    f=function,
+                    operation=operation,
+                    format=self.format,
+                    substitutions=SAMPLE_SUBSTITUTIONS
+                )
     return func
 
 
@@ -664,15 +810,18 @@ class BuiltinFunctionTestCase:
         return super().run(result=result)
 
     def assertBuiltinFunction(self, **kwargs):
-        self.assertCodeExecution("""
+        substitutions = kwargs.pop('substitutions')
+        self.assertCodeExecution(
+            """
             f = %(f)s
             x = %(x)s
             print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s" % kwargs)
+            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s" % kwargs,
+            substitutions=substitutions
+        )
 
-    for datatype, examples in SAMPLE_DATA:
-        if datatype != 'set' and datatype != 'frozenset' and datatype != 'dict':
-            vars()['test_%s' % datatype] = _builtin_test('test_%s' % datatype, 'f(x)', examples)
+    for datatype, examples in SAMPLE_DATA.items():
+        vars()['test_%s' % datatype] = _builtin_test('test_%s' % datatype, 'f(x)', examples)
 
 
 def _builtin_twoarg_test(test_name, operation, examples1, examples2):
@@ -680,7 +829,14 @@ def _builtin_twoarg_test(test_name, operation, examples1, examples2):
         for function in self.functions:
             for example1 in examples1:
                 for example2 in examples2:
-                    self.assertBuiltinTwoargFunction(x=example1, y=example2, f=function, operation=operation, format=self.format)
+                    self.assertBuiltinTwoargFunction(
+                        x=example1,
+                        y=example2,
+                        f=function,
+                        operation=operation,
+                        format=self.format,
+                        substitutions=SAMPLE_SUBSTITUTIONS
+                    )
     return func
 
 
@@ -696,15 +852,20 @@ class BuiltinTwoargFunctionTestCase:
         return super().run(result=result)
 
     def assertBuiltinTwoargFunction(self, **kwargs):
-        self.assertCodeExecution("""
+        substitutions = kwargs.pop('substitutions')
+        self.assertCodeExecution(
+            """
             f = %(f)s
             x = %(x)s
             y = %(y)s
             print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s and y=%(y)s" % kwargs)
+            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s and y=%(y)s" % kwargs,
+            substitutions=substitutions
+        )
 
-    EXCLUDED_DATATYPES = ['set', 'frozenset', 'dict']
-    for datatype1, examples1 in SAMPLE_DATA:
-        for datatype2, examples2 in SAMPLE_DATA:
-            if datatype1 not in EXCLUDED_DATATYPES and datatype2 not in EXCLUDED_DATATYPES:
-                vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test('test_%s_%s' % (datatype1, datatype2), 'f(x, y)', examples1, examples2)
+    for datatype1, examples1 in SAMPLE_DATA.items():
+        for datatype2, examples2 in SAMPLE_DATA.items():
+            vars()['test_%s_%s' % (datatype1, datatype2)] = _builtin_twoarg_test(
+                'test_%s_%s' % (datatype1, datatype2),
+                'f(x, y)', examples1, examples2
+            )

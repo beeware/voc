@@ -1,10 +1,7 @@
-from unittest import expectedFailure
-
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class AbsTests(TranspileTestCase):
-    @expectedFailure
     def test_abs_not_implemented(self):
         self.assertCodeExecution("""
             class NotAbsLike:
@@ -22,5 +19,4 @@ class BuiltinAbsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_class',
         'test_complex',
         'test_frozenset',
-        'test_set',
     ]

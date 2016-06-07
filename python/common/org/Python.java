@@ -165,7 +165,7 @@ public class Python {
                 } else if (name.startsWith("org.python.exceptions.")) {
                     name = name.substring(22);
                 } else if (name.startsWith("python.")) {
-                    name = name.substring(7);
+                    name = cls.getSimpleName();
                 }
             } catch (java.lang.IllegalAccessException e) {
                 return "**UNKNOWABLE**";
@@ -664,7 +664,7 @@ public class Python {
         try {
             return (org.python.types.Float) x.__float__();
         } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError("float() argument must be a string or a number, not '" + x.typeName() + "'");
+            throw new org.python.exceptions.TypeError("float() argument must be a string, a bytes-like object or a number, not '" + x.typeName() + "'");
         }
     }
 
@@ -1208,7 +1208,7 @@ public class Python {
             if (length == 1) {
                 return new org.python.types.Int((int) (org.Python.str(c).value).charAt(0));
             } else {
-                throw new org.python.exceptions.TypeError("ord() expected string of length 1, but string of length " + length + " found");
+                throw new org.python.exceptions.TypeError("ord() expected a character, but string of length " + length + " found");
             }
         } catch (ClassCastException e) {
             throw new org.python.exceptions.TypeError("ord() expected string of length 1, but " + c.typeName() + " found");
