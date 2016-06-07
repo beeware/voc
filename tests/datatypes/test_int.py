@@ -18,14 +18,11 @@ class IntTests(TranspileTestCase):
 
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = ['42', '0', '-37']
-
-    not_implemented = [
-    ]
+    data_type = 'int'
 
 
 class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['42', '0', '-37']
+    data_type = 'int'
 
     not_implemented = [
         'test_add_bytearray',
@@ -128,7 +125,7 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = ['42', '0', '-37']
+    data_type = 'int'
 
     not_implemented = [
         'test_add_bytearray',
@@ -175,18 +172,11 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_or_frozenset',
 
         'test_power_bytearray',
-        'test_power_bytes',
         'test_power_class',
         'test_power_complex',
-        'test_power_dict',
         'test_power_float',
         'test_power_frozenset',
         'test_power_int',
-        'test_power_list',
-        'test_power_none',
-        'test_power_set',
-        'test_power_str',
-        'test_power_tuple',
 
         'test_rshift_bytearray',
         'test_rshift_class',

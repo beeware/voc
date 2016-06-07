@@ -5,6 +5,7 @@ class InputTests(TranspileTestCase):
     pass
 
 
+# FIXME: This test can't run without a redirection for stdin.
 # class BuiltinInputFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 #     functions = ["input"]
 
@@ -19,7 +20,8 @@ class InputTests(TranspileTestCase):
 #         'test_frozenset',
 #         'test_int',
 #         'test_list',
-#         'test_none',
+#         'test_None',
+#         'test_NotImplemented',
 #         'test_set',
 #         'test_str',
 #         'test_tuple',

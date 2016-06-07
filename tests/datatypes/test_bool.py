@@ -18,7 +18,7 @@ class BoolTests(TranspileTestCase):
 
 
 class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    values = ['True', 'False']
+    data_type = 'bool'
 
     not_implemented = [
         'test_unary_positive',
@@ -28,7 +28,7 @@ class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):
 
 
 class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    values = ['True', 'False']
+    data_type = 'bool'
 
     not_implemented = [
         'test_add_bytearray',
@@ -67,6 +67,11 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_le_complex',
         'test_le_frozenset',
 
+        'test_lshift_bytearray',
+        'test_lshift_class',
+        'test_lshift_complex',
+        'test_lshift_frozenset',
+
         'test_lt_bytearray',
         'test_lt_class',
         'test_lt_complex',
@@ -99,6 +104,11 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_power_complex',
         'test_power_frozenset',
 
+        'test_rshift_bytearray',
+        'test_rshift_class',
+        'test_rshift_complex',
+        'test_rshift_frozenset',
+
         'test_subscr_bool',
         'test_subscr_bytearray',
         'test_subscr_bytes',
@@ -109,7 +119,8 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_frozenset',
         'test_subscr_int',
         'test_subscr_list',
-        'test_subscr_none',
+        'test_subscr_None',
+        'test_subscr_NotImplemented',
         'test_subscr_set',
         'test_subscr_str',
         'test_subscr_tuple',
@@ -129,7 +140,8 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_true_divide_frozenset',
         'test_true_divide_int',
         'test_true_divide_list',
-        'test_true_divide_none',
+        'test_true_divide_None',
+        'test_true_divide_NotImplemented',
         'test_true_divide_set',
         'test_true_divide_str',
         'test_true_divide_tuple',
@@ -143,7 +155,7 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    values = ['True', 'False']
+    data_type = 'bool'
 
     not_implemented = [
         'test_add_bool',
@@ -203,18 +215,11 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
         'test_power_bool',
         'test_power_bytearray',
-        'test_power_bytes',
         'test_power_class',
         'test_power_complex',
-        'test_power_dict',
         'test_power_float',
         'test_power_frozenset',
         'test_power_int',
-        'test_power_list',
-        'test_power_none',
-        'test_power_set',
-        'test_power_str',
-        'test_power_tuple',
 
         'test_rshift_bool',
         'test_rshift_bytearray',
@@ -241,7 +246,8 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_true_divide_frozenset',
         'test_true_divide_int',
         'test_true_divide_list',
-        'test_true_divide_none',
+        'test_true_divide_None',
+        'test_true_divide_NotImplemented',
         'test_true_divide_set',
         'test_true_divide_str',
         'test_true_divide_tuple',
