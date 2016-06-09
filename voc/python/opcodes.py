@@ -1031,7 +1031,7 @@ class InplaceOpcode(Opcode):
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
                 self.__method__,
-                '(Lorg/python/Object;)V'
+                '(Lorg/python/Object;)Lorg/python/Object;'
             )
         )
 

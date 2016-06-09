@@ -191,13 +191,7 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_frozenset',
         'test_floor_divide_int',
 
-        'test_lshift_bool',
-        'test_lshift_bytearray',
         'test_lshift_bytes',
-        'test_lshift_class',
-        'test_lshift_complex',
-        'test_lshift_int',
-        'test_lshift_frozenset',
 
         'test_modulo_bool',
         'test_modulo_bytearray',
@@ -242,13 +236,7 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_str',
         'test_power_tuple',
 
-        'test_rshift_bool',
-        'test_rshift_bytearray',
         'test_rshift_bytes',
-        'test_rshift_class',
-        'test_rshift_complex',
-        'test_rshift_int',
-        'test_rshift_frozenset',
 
         'test_subtract_bool',
         'test_subtract_bytearray',
