@@ -1248,7 +1248,7 @@ public class Python {
         StringBuilder buffer = new StringBuilder();
 
         for (int i = 0; i < value.length; i++) {
-            buffer.append(value[i]);
+            buffer.append(value[i].__str__());
 
             if (i != value.length - 1) {
                 if (sep == null) {

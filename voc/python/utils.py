@@ -200,29 +200,32 @@ class TryExcept:
                         ]),
                 )
                 if handler.var_name:
-                    context.add_opcodes(
-                        opcodes.ASTORE_name(context, handler.var_name)
-                    )
+                    context.store_name(handler.var_name, True)
                 else:
                     # No named exception, but there is still an exception
                     # on the stack. Pop it off.
                     context.add_opcodes(JavaOpcodes.POP())
 
                 handler.transpile(context)
+
+                if handler.var_name:
+                    context.delete_name(handler.var_name, True)
+
             elif len(handler.exceptions) == 1:  # catch single - except A as v:
                 context.add_opcodes(
                     opcodes.CATCH('org/python/exceptions/%s' % handler.exceptions[0]),
                 )
                 if handler.var_name:
-                    context.add_opcodes(
-                        opcodes.ASTORE_name(context, handler.var_name)
-                    )
+                    context.store_name(handler.var_name, True)
                 else:
                     # No named exception, but there is still an exception
                     # on the stack. Pop it off.
                     context.add_opcodes(JavaOpcodes.POP())
 
                 handler.transpile(context)
+
+                if handler.var_name:
+                    context.delete_name(handler.var_name, True)
             else:
                 # The bucket case - except:
                 # No named exception, but there is still an exception
