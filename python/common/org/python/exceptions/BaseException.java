@@ -62,10 +62,6 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         }
     }
 
-    public String toString() {
-        return (String) ((org.python.types.Str) __str__()).value;
-    }
-
     // protected void finalize() throws Throwable {
     //     try {
     //         // this.__del__();
@@ -111,14 +107,14 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
-        return new org.python.types.Str(super.toString());
+        return new org.python.types.Str(this.getClass().getSimpleName() + "(\"" + this.getMessage() + "\",)");
     }
 
     @org.python.Method(
         __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
-        return this.__repr__();
+        return new org.python.types.Str(this.getMessage());
     }
 
     @org.python.Method(

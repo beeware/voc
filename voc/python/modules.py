@@ -83,7 +83,7 @@ class StaticBlock(Block):
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
     @property

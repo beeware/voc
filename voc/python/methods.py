@@ -135,9 +135,9 @@ class Method(Block):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-    def delete_name(self, name):
+    def delete_name(self, name, use_locals):
         try:
-            free_name(name)
+            free_name(self, name)
         except KeyError:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
@@ -147,7 +147,7 @@ class Method(Block):
 
                 JavaOpcodes.LDC_W(name),
 
-                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)V'),
             )
 
     @property
@@ -746,7 +746,7 @@ class MainMethod(Method):
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
     def transpile_setup(self):

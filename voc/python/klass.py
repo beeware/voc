@@ -69,7 +69,7 @@ class ClassBlock(Block):
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
     def add_method(self, full_method_name, code, annotations):
