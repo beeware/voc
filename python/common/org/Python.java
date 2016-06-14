@@ -1492,7 +1492,7 @@ public class Python {
             value = new org.python.types.Int(0);
         }
 
-        org.python.Iterable iterator = iterable.__iter__();
+        org.python.Iterable iterator = org.Python.iter(iterable);
         while (true) {
             org.python.Object next;
             try {
