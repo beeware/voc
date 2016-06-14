@@ -1480,10 +1480,30 @@ public class Python {
             "\n" +
             "Return the sum of an iterable of numbers (NOT strings) plus the value\n" +
             "of parameter 'start' (which defaults to 0).  When the iterable is\n" +
-            "empty, return start.\n"
+            "empty, return start.\n",
+        args = {"iterable"},
+        default_args = {"start"}
     )
-    public static org.python.Object sum() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'sum' not implemented");
+    public static org.python.Object sum(org.python.Object iterable, org.python.Object start) {
+        org.python.Object value;
+        if (start != null) {
+            value = start;
+        } else {
+            value = new org.python.types.Int(0);
+        }
+
+        org.python.Iterable iterator = iterable.__iter__();
+        while (true) {
+            org.python.Object next;
+            try {
+                next = iterator.__next__();
+            } catch (org.python.exceptions.StopIteration si) {
+                break;
+            }
+            value = value.__add__(next);
+        }
+
+        return value;
     }
 
     @org.python.Method(
