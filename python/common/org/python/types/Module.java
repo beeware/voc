@@ -38,23 +38,25 @@ public class Module extends org.python.types.Object {
         // System.out.println("MODULE CLS = " + cls);
         // System.out.println("MODULE CLS ATTRS = " + cls.__dict__);
 
-        // org.python.Object value = this.__dict__.get(name);
-        org.python.Object value = cls.__dict__.get(name);
+        org.python.Object value = this.__dict__.get(name);
         if (value == null) {
-            // The class attributes didn't contain the object. We must
-            // differentiate between "doesn't exist" and "value is null";
-            // If the key *doesn't* exist in the attributes dictionary,
-            // try to look it up. If it doesn't exist as a field, then
-            // store a null to represent this fact, so we won't look again.
-            if (!cls.__dict__.containsKey(name)) {
-                try {
-                    value = new org.python.java.Field(klass.getField(name));
-                } catch (java.lang.NoSuchFieldException e) {
-                    value = null;
+            value = cls.__dict__.get(name);
+            if (value == null) {
+                // The class attributes didn't contain the object. We must
+                // differentiate between "doesn't exist" and "value is null";
+                // If the key *doesn't* exist in the attributes dictionary,
+                // try to look it up. If it doesn't exist as a field, then
+                // store a null to represent this fact, so we won't look again.
+                if (!cls.__dict__.containsKey(name)) {
+                    try {
+                        value = new org.python.java.Field(klass.getField(name));
+                    } catch (java.lang.NoSuchFieldException e) {
+                        value = null;
+                    }
+                    // If the field doesn't exist, store a value of null
+                    // so that we don't try to look up the field again.
+                    cls.__dict__.put(name, value);
                 }
-                // If the field doesn't exist, store a value of null
-                // so that we don't try to look up the field again.
-                cls.__dict__.put(name, value);
             }
         }
 
@@ -76,11 +78,12 @@ public class Module extends org.python.types.Object {
         org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
         // System.out.println("instance __dict__ = " + this.__dict__);
         // System.out.println("class __dict__ = " + cls.__dict__);
+
         org.python.Object attr = cls.__getattribute_null(name);
 
         // System.out.println("attr = " + attr);
         if (attr == null) {
-            cls.__dict__.put(name, value);
+            this.__dict__.put(name, value);
         } else {
             attr.__set__(this, value);
         }
