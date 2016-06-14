@@ -2,7 +2,6 @@ from ..utils import TranspileTestCase
 
 
 class TryExceptTests(TranspileTestCase):
-
     def test_try_except(self):
         # No exception
         self.assertCodeExecution("""
@@ -442,6 +441,15 @@ class TryExceptTests(TranspileTestCase):
             except:
                 print("Got an anonymous error")
             print('Done.')
+            """)
+
+    def test_try_catch_in_loop(self):
+        self.assertCodeExecution("""
+            for x in range(2):
+                try:
+                    print('success', next(iter([])))
+                except Exception:
+                    print('whoops')
             """)
 
 
