@@ -32,11 +32,14 @@ public class Module extends org.python.types.Object {
     }
 
     public org.python.Object __getattribute_null(java.lang.String name) {
-        // System.out.println("GETATTRIBUTE CLASS " + this + " " + name);
-        // System.out.println("CLASS ATTRS " + this.__dict__);
+        // System.out.println("GETATTRIBUTE MODULE " + this + " " + name);
+        // System.out.println("MODULE ATTRS " + this.__dict__);
         org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
-        org.python.Object value = cls.__dict__.get(name);
+        // System.out.println("MODULE CLS = " + cls);
+        // System.out.println("MODULE CLS ATTRS = " + cls.__dict__);
 
+        // org.python.Object value = this.__dict__.get(name);
+        org.python.Object value = cls.__dict__.get(name);
         if (value == null) {
             // The class attributes didn't contain the object. We must
             // differentiate between "doesn't exist" and "value is null";
@@ -75,13 +78,26 @@ public class Module extends org.python.types.Object {
         // System.out.println("class __dict__ = " + cls.__dict__);
         org.python.Object attr = cls.__getattribute_null(name);
 
+        // System.out.println("attr = " + attr);
         if (attr == null) {
-            this.__dict__.put(name, value);
+            cls.__dict__.put(name, value);
         } else {
             attr.__set__(this, value);
         }
 
-        cls.__dict__.put(name, value);
         return true;
+    }
+
+    public void __delattr__(java.lang.String name) {
+        if (!this.__delattr_null(name)) {
+            throw new org.python.exceptions.NameError(name);
+        }
+    }
+
+    public boolean __delattr_null(java.lang.String name) {
+        // System.out.println("DELETE ATTR from " + this.__dict__);
+        org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
+        org.python.Object result = cls.__dict__.remove(name);
+        return (result != null);
     }
 }

@@ -374,7 +374,8 @@ public class Object implements org.python.Object {
     }
 
     public boolean __delattr_null(java.lang.String name) {
-        org.python.Object result = __dict__.remove(name);
+        // System.out.println("DELETE ATTR from " + this.__dict__);
+        org.python.Object result = this.__dict__.remove(name);
         return (result != null);
     }
 
