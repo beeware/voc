@@ -27,6 +27,7 @@ _suite_configured = False
 # Set during setUpSuite()
 _output_dir = ''
 
+
 def setUpSuite():
     """Configure the entire test suite.
 
@@ -67,7 +68,6 @@ def setUpSuite():
     atexit.register(remove_output_dir)
 
 
-
 @contextlib.contextmanager
 def capture_output(redirect_stderr=True):
     oldout, olderr = sys.stdout, sys.stderr
@@ -99,10 +99,7 @@ def adjust(text, run_in_function=False):
     first_line = lines[0].lstrip()
     n_spaces = len(lines[0]) - len(first_line)
 
-    if run_in_function:
-        n_spaces = n_spaces - 4
-
-    final_lines = [line[n_spaces:] for line in lines]
+    final_lines = [('    ' if run_in_function else '') + line[n_spaces:] for line in lines]
 
     if run_in_function:
         final_lines = [
@@ -201,19 +198,16 @@ JAVA_STACK = re.compile('^\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?
 PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n)+(?P<exception>.*?): (?P<message>.*\r?\n)')
 PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n')
 
-MEMORY_REFERENCE = re.compile('0x[\dabcdef]{4,12}')
+MEMORY_REFERENCE = re.compile('0x[\dABCDEFabcdef]{4,16}')
+
 
 def cleanse_java(input, substitutions):
     try:
         # Test the specific message
         out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception2>: \\g<message2>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
-        # Test just the exception type
-        # out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception2>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
     except:
         # Test the specific message
         out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception1>: \\g<message1>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
-        # Test just the exception type
-        # out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception1>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
 
     stack = JAVA_STACK.findall(out)
     out = JAVA_STACK.sub('', out)
@@ -241,8 +235,7 @@ def cleanse_java(input, substitutions):
 def cleanse_python(input, substitutions):
     # Test the specific message
     out = PYTHON_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception>: \\g<message>'.format(linesep=os.linesep), input)
-    # Test just the exception type
-    # out = PYTHON_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception>{linesep}'.format(linesep=os.linesep), input)
+
     stack = PYTHON_STACK.findall(input)
     out = '%s%s%s' % (
         out,
@@ -619,11 +612,11 @@ SAMPLE_SUBSTITUTIONS = {
     ],
     # Normalize dictionary ordering
     "{'a': 1, 'c': 2.3456, 'd': 'another'}": [
-        "{'a': 1, 'd': 'another', 'c': 2.3456, }",
+        "{'a': 1, 'd': 'another', 'c': 2.3456}",
         "{'c': 2.3456, 'd': 'another', 'a': 1}",
         "{'c': 2.3456, 'a': 1, 'd': 'another'}",
         "{'d': 'another', 'a': 1, 'c': 2.3456}",
-        "{'d': 'another', 'c': 2.3456}, 'a': 1",
+        "{'d': 'another', 'c': 2.3456, 'a': 1}",
     ],
 }
 
@@ -666,15 +659,13 @@ class UnaryOperationTestCase:
 
 def _binary_test(test_name, operation, examples):
     def func(self):
-        for value in SAMPLE_DATA[self.data_type]:
-            for example in examples:
-                self.assertBinaryOperation(
-                    x=value,
-                    y=example,
-                    operation=operation,
-                    format=self.format,
-                    substitutions=SAMPLE_SUBSTITUTIONS
-                )
+        self.assertBinaryOperation(
+            x_values=SAMPLE_DATA[self.data_type],
+            y_values=examples,
+            operation=operation,
+            format=self.format,
+            substitutions=SAMPLE_SUBSTITUTIONS
+        )
     return func
 
 
@@ -690,14 +681,31 @@ class BinaryOperationTestCase:
                 getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
         return super().run(result=result)
 
-    def assertBinaryOperation(self, **kwargs):
-        substitutions = kwargs.pop('substitutions')
+    def assertBinaryOperation(self, x_values, y_values, operation, format, substitutions):
+        data = []
+        for x in x_values:
+            for y in y_values:
+                data.append((x, y))
+
         self.assertCodeExecution(
-            """
-            x = %(x)s
-            y = %(y)s
-            print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs,
+            '##################################################\n'.join(
+                adjust("""
+                    try:
+                        x = %(x)s
+                        y = %(y)s
+                        print(%(format)s%(operation)s)
+                    except Exception as e:
+                        print(type(e), ':', e)
+                    """ % {
+                        'x': x,
+                        'y': y,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
+                for x, y in data
+            ),
+            "Error running %s" % operation,
             substitutions=substitutions
         )
 
