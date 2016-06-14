@@ -623,13 +623,12 @@ SAMPLE_SUBSTITUTIONS = {
 
 def _unary_test(test_name, operation):
     def func(self):
-        for value in SAMPLE_DATA[self.data_type]:
-            self.assertUnaryOperation(
-                x=value,
-                operation=operation,
-                format=self.format,
-                substitutions=SAMPLE_SUBSTITUTIONS
-            )
+        self.assertUnaryOperation(
+            x_values=SAMPLE_DATA[self.data_type],
+            operation=operation,
+            format=self.format,
+            substitutions=SAMPLE_SUBSTITUTIONS
+        )
     return func
 
 
@@ -645,11 +644,26 @@ class UnaryOperationTestCase:
                 getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = expect_failure
         return super().run(result=result)
 
-    def assertUnaryOperation(self, **kwargs):
-        self.assertCodeExecution("""
-            x = %(x)s
-            print(%(format)s%(operation)sx)
-            """ % kwargs)
+    def assertUnaryOperation(self, x_values, operation, format, substitutions):
+        self.assertCodeExecution(
+            '##################################################\n'.join(
+                adjust("""
+                    try:
+                        x = %(x)s
+                        print(%(format)s%(operation)sx)
+                    except Exception as e:
+                        print(type(e), ':', e)
+                    """ % {
+                        'x': x,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
+                for x in x_values
+            ),
+            "Error running %s" % operation,
+            substitutions=substitutions
+        )
 
     test_unary_positive = _unary_test('test_unary_positive', '+')
     test_unary_negative = _unary_test('test_unary_negative', '-')
@@ -734,15 +748,13 @@ class BinaryOperationTestCase:
 
 def _inplace_test(test_name, operation, examples):
     def func(self):
-        for value in SAMPLE_DATA[self.data_type]:
-            for example in examples:
-                self.assertInplaceOperation(
-                    x=value,
-                    y=example,
-                    operation=operation,
-                    format=self.format,
-                    substitutions=SAMPLE_SUBSTITUTIONS,
-                )
+        self.assertInplaceOperation(
+            x_values=SAMPLE_DATA[self.data_type],
+            y_values=examples,
+            operation=operation,
+            format=self.format,
+            substitutions=SAMPLE_SUBSTITUTIONS,
+        )
     return func
 
 
@@ -758,15 +770,32 @@ class InplaceOperationTestCase:
                 getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
         return super().run(result=result)
 
-    def assertInplaceOperation(self, **kwargs):
-        substitutions = kwargs.pop('substitutions')
+    def assertInplaceOperation(self, x_values, y_values, operation, format, substitutions):
+        data = []
+        for x in x_values:
+            for y in y_values:
+                data.append((x, y))
+
         self.assertCodeExecution(
-            """
-            x = %(x)s
-            y = %(y)s
-            %(operation)s
-            print(%(format)sx)
-            """ % kwargs, "Error running %(operation)s with x=%(x)s and y=%(y)s" % kwargs,
+            '##################################################\n'.join(
+                adjust("""
+                    try:
+                        x = %(x)s
+                        y = %(y)s
+                        %(operation)s
+                        print(%(format)sx)
+                    except Exception as e:
+                        print(type(e), ':', e)
+                    """ % {
+                        'x': x,
+                        'y': y,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
+                for x, y in data
+            ),
+            "Error running %s" % operation,
             substitutions=substitutions
         )
 
@@ -787,15 +816,13 @@ class InplaceOperationTestCase:
 
 def _builtin_test(test_name, operation, examples):
     def func(self):
-        for function in self.functions:
-            for example in examples:
-                self.assertBuiltinFunction(
-                    x=example,
-                    f=function,
-                    operation=operation,
-                    format=self.format,
-                    substitutions=SAMPLE_SUBSTITUTIONS
-                )
+        self.assertBuiltinFunction(
+            x_values=examples,
+            f_values=self.functions,
+            operation=operation,
+            format=self.format,
+            substitutions=SAMPLE_SUBSTITUTIONS
+        )
     return func
 
 
@@ -810,14 +837,31 @@ class BuiltinFunctionTestCase:
                 getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
         return super().run(result=result)
 
-    def assertBuiltinFunction(self, **kwargs):
-        substitutions = kwargs.pop('substitutions')
+    def assertBuiltinFunction(self, f_values, x_values, operation, format, substitutions):
+        data = []
+        for f in f_values:
+            for x in x_values:
+                data.append((f, x))
+
         self.assertCodeExecution(
-            """
-            f = %(f)s
-            x = %(x)s
-            print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s" % kwargs,
+            '##################################################\n'.join(
+                adjust("""
+                    try:
+                        f = %(f)s
+                        x = %(x)s
+                        print(%(format)s%(operation)s)
+                    except Exception as e:
+                        print(type(e), ':', e)
+                    """ % {
+                        'f': f,
+                        'x': x,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
+                for f, x in data
+            ),
+            "Error running %s" % operation,
             substitutions=substitutions
         )
 
@@ -827,17 +871,14 @@ class BuiltinFunctionTestCase:
 
 def _builtin_twoarg_test(test_name, operation, examples1, examples2):
     def func(self):
-        for function in self.functions:
-            for example1 in examples1:
-                for example2 in examples2:
-                    self.assertBuiltinTwoargFunction(
-                        x=example1,
-                        y=example2,
-                        f=function,
-                        operation=operation,
-                        format=self.format,
-                        substitutions=SAMPLE_SUBSTITUTIONS
-                    )
+        self.assertBuiltinTwoargFunction(
+            f_values=self.functions,
+            x_values=examples1,
+            y_values=examples2,
+            operation=operation,
+            format=self.format,
+            substitutions=SAMPLE_SUBSTITUTIONS
+        )
     return func
 
 
@@ -852,15 +893,34 @@ class BuiltinTwoargFunctionTestCase:
                 getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
         return super().run(result=result)
 
-    def assertBuiltinTwoargFunction(self, **kwargs):
-        substitutions = kwargs.pop('substitutions')
+    def assertBuiltinTwoargFunction(self, f_values, x_values, y_values, operation, format, substitutions):
+        data = []
+        for f in f_values:
+            for x in x_values:
+                for y in y_values:
+                    data.append((f, x, y))
+
         self.assertCodeExecution(
-            """
-            f = %(f)s
-            x = %(x)s
-            y = %(y)s
-            print(%(format)s%(operation)s)
-            """ % kwargs, "Error running %(operation)s with f=%(f)s, x=%(x)s and y=%(y)s" % kwargs,
+            '##################################################\n'.join(
+                adjust("""
+                    try:
+                        f = %(f)s
+                        x = %(x)s
+                        y = %(y)s
+                        print(%(format)s%(operation)s)
+                    except Exception as e:
+                        print(type(e), ':', e)
+                    """ % {
+                        'f': f,
+                        'x': x,
+                        'y': y,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
+                for f, x, y in data
+            ),
+            "Error running %s" % operation,
             substitutions=substitutions
         )
 
