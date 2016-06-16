@@ -37,7 +37,14 @@ def setUpSuite():
     if _suite_configured:
         return
 
+    def remove_output_dir():
+        global _output_dir
+        if _output_dir != '':
+            shutil.rmtree(_output_dir)
+
+    atexit.register(remove_output_dir)
     _output_dir = tempfile.mkdtemp(dir=TESTS_DIR)
+
     os.environ['VOC_BUILD_DIR'] = os.path.join(_output_dir, 'build')
     os.environ['VOC_DIST_DIR'] = os.path.join(_output_dir, 'dist')
     proc = subprocess.Popen(
@@ -59,13 +66,6 @@ def setUpSuite():
         raise Exception("Error compiling java sources: " + out.decode('ascii'))
 
     _suite_configured = True
-
-    def remove_output_dir():
-        global _output_dir
-        shutil.rmtree(_output_dir)
-
-    atexit.register(remove_output_dir)
-
 
 
 @contextlib.contextmanager
