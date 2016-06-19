@@ -58,6 +58,21 @@ class JavaNormalizationTests(unittest.TestCase):
             """
         )
 
+    def test_exception_in_module_init(self):
+        self.assertNormalized(
+            """
+            Exception in thread "main" org.python.exceptions.NameError: name 'y' is not defined
+                at org.python.types.Module.__getattribute__(Module.java:32)
+                at python.example.__init__.module$import(example.py:2)
+                at python.example.__init__.main(example.py)
+            """,
+            """
+            ### EXCEPTION ###
+            NameError: name 'y' is not defined
+                example.py:2
+            """
+        )
+
     def test_exception_in_clinit_after_output(self):
         self.assertNormalized(
             """

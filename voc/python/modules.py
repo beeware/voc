@@ -12,26 +12,16 @@ from .methods import MainMethod, Method, CO_GENERATOR, GeneratorMethod, extract_
 from .opcodes import ASTORE_name, ALOAD_name, free_name
 
 
-class StaticBlock(Block):
+class ModuleBlock(Block):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.local_vars['self'] = len(self.local_vars)
 
-    def transpile_setup(self):
-        self.add_opcodes(
-            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.module.class_name),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
-
-            JavaOpcodes.NEW('org/python/types/Module'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.class_name),
-            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
-
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', '(Ljava/lang/Class;)V'),
-
-            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
-            JavaOpcodes.POP()
-        )
+    # def transpile_setup(self):
+    #     self.add_opcodes(
+    #         JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.module.class_name),
+    #         JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+    #     )
 
     def transpile_teardown(self):
         self.add_opcodes(
@@ -41,8 +31,8 @@ class StaticBlock(Block):
     def store_name(self, name, use_locals):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -56,10 +46,12 @@ class StaticBlock(Block):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
-            JavaOpcodes.LDC_W(self.module.class_name),
-            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-            JavaOpcodes.GETFIELD('org/python/types/Type', '__dict__', 'Ljava/util/Map;'),
+            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
 
             ALOAD_name(self, '#value'),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', '(Ljava/util/Map;)V'),
@@ -68,8 +60,8 @@ class StaticBlock(Block):
 
     def load_name(self, name, use_locals):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
             JavaOpcodes.LDC_W(name),
@@ -78,8 +70,8 @@ class StaticBlock(Block):
 
     def delete_name(self, name, use_locals):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
             JavaOpcodes.LDC_W(name),
@@ -149,6 +141,10 @@ class Module(Block):
         self.anonymous_inner_class_count = 0
 
     @property
+    def full_name(self):
+        return '.'.join(self.namespace.split('.')[1:] + [self.name])
+
+    @property
     def descriptor(self):
         return '/'.join(self.namespace.split('.') + [self.name])
 
@@ -201,7 +197,7 @@ class Module(Block):
                     body_commands.append(cmd)
 
         # Create the body of the module definition
-        self.body = StaticBlock(self, body_commands)
+        self.body = ModuleBlock(self, body_commands)
 
         if main is None:
             if self.verbosity:
@@ -236,7 +232,7 @@ class Module(Block):
 
         # Add a static method to the module, populated with the
         # body content of the module.
-        static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
+        static_init = JavaMethod('module$import', '()V', public=False)
         static_init.attributes.append(self.body.transpile())
         classfile.methods.append(static_init)
 
@@ -247,10 +243,11 @@ class Module(Block):
                 '()V',
                 attributes=[
                     JavaCode(
-                        max_stack=1,
+                        max_stack=2,
                         max_locals=1,
                         code=[
                             JavaOpcodes.ALOAD_0(),
+                            JavaOpcodes.DUP(),
                             JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', '()V'),
                             JavaOpcodes.RETURN(),
                         ],

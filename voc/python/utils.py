@@ -660,11 +660,28 @@ def find_try_except(offset_index, instructions, i):
 
     # Find the end of the entire try block
     end_jump_index = offset_index[instruction.argval] - 1
-    end_block_offset = instructions[end_jump_index].argval
+
+    # print("initial end jump index", end_jump_index)
+    # print("initial end block offset instr", instructions[end_jump_index])
+    if instructions[end_jump_index].opname == 'JUMP_FORWARD':
+        end_block_offset = instructions[end_jump_index].argval
+    elif instructions[end_jump_index].opname == 'JUMP_ABSOLUTE':
+        loop_jump_offset = instructions[end_jump_index].argval
+        # print("initial loop jump offset", loop_jump_offset)
+        loop_jump_index = offset_index[loop_jump_offset]
+        # print("initial loop jump index", loop_jump_index)
+        end_block_offset = instructions[loop_jump_index].argval
+    else:
+        raise Exception('Unknown jump for try-except')
+
+    # print("initial end block offset", end_block_offset)
     end_block_index = offset_index[end_block_offset]
+    # print("initial end block index", end_block_index)
 
     while instructions[end_block_index].opname != 'END_FINALLY':
         end_block_index -= 1
+        # print("check OPNAME at", end_block_index, instructions[end_block_index].opname)
+    end_block_offset = instructions[end_block_index].offset
 
     # print("START INDEX", try_start_index)
     # print("START OFFSET", instructions[try_start_index].offset)
@@ -724,7 +741,8 @@ def find_try_except(offset_index, instructions, i):
             except_start_index = i
             # print("EXCEPT START anon", except_start_index)
 
-        while not (instructions[i].opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE') and instructions[i].argval >= end_block_offset):
+        # print("INDEX = ", i, instructions[i], end_block_offset)
+        while not (instructions[i].opname in ('JUMP_FORWARD', 'JUMP_ABSOLUTE')):
             i = i + 1
 
         if var_name:

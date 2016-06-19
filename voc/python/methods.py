@@ -97,9 +97,9 @@ class Method(Block):
             self.add_opcodes(
                 ASTORE_name(self, '#value'),
 
-                JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
 
-                JavaOpcodes.LDC_W(self.globals_module.descriptor),
+                JavaOpcodes.LDC_W(self.globals_module.full_name),
                 JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -124,8 +124,8 @@ class Method(Block):
                 pass
 
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W(self.globals_module.descriptor),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.globals_module.full_name),
 
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -140,8 +140,8 @@ class Method(Block):
             free_name(self, name)
         except KeyError:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-                JavaOpcodes.LDC_W(self.globals_module.descriptor),
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+                JavaOpcodes.LDC_W(self.globals_module.full_name),
                 JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -704,8 +704,8 @@ class MainMethod(Method):
     def store_name(self, name, use_locals):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -719,7 +719,7 @@ class MainMethod(Method):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.LDC_W(self.module.class_name),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
             JavaOpcodes.GETFIELD('org/python/types/Type', '__dict__', 'Ljava/util/Map;'),
@@ -731,8 +731,8 @@ class MainMethod(Method):
 
     def load_name(self, name, use_locals):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
             JavaOpcodes.LDC_W(name),
@@ -741,8 +741,8 @@ class MainMethod(Method):
 
     def delete_name(self, name, use_locals):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W(self.module.descriptor),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
             JavaOpcodes.LDC_W(name),
@@ -751,26 +751,33 @@ class MainMethod(Method):
 
     def transpile_setup(self):
         self.add_opcodes(
-            # Register this module as being __main__
-            JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            JavaOpcodes.LDC_W('__main__'),
+            # Add a TRY-CATCH for SystemExit
+            TRY(),
 
-            JavaOpcodes.NEW('org/python/types/Module'),
+            # Initialize and register this module
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Ljava/util/Map;'),
             JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.class_name),
-            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', '(Ljava/lang/Class;)V'),
+            JavaOpcodes.LDC_W(self.module.full_name),
+
+            JavaOpcodes.NEW(self.module.class_descriptor),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL(self.module.class_descriptor, '<init>', '()V'),
+            ASTORE_name(self, '#module'),
 
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
             JavaOpcodes.POP(),
-        )
 
-        # If there are any commands in this main method,
-        # add a TRY-CATCH for SystemExit
-        if self.commands:
-            self.add_opcodes(
-                TRY()
-            )
+            # Register the same instances as __main__
+            JavaOpcodes.LDC_W('__main__'),
+            ALOAD_name(self, '#module'),
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+            JavaOpcodes.POP(),
+
+            # Run the module block.
+            ALOAD_name(self, '#module'),
+            JavaOpcodes.INVOKEVIRTUAL(self.module.class_descriptor, 'module$import', '()V'),
+        )
 
     def transpile_teardown(self):
         # Main method is a special case - it always returns Null,
@@ -785,20 +792,17 @@ class MainMethod(Method):
 
         self.add_opcodes(java_op)
 
-        # If there are any commands in this main method,
-        # finish the TRY-CATCH for SystemExit
-        if self.commands:
-            self.add_opcodes(
-                CATCH('org/python/exceptions/SystemExit'),
-                    JavaOpcodes.GETFIELD('org/python/exceptions/SystemExit', 'return_code', 'I'),
-                    JavaOpcodes.INVOKESTATIC('java/lang/System', 'exit', '(I)V'),
-                END_TRY(),
-                JavaOpcodes.RETURN()
-            )
+        # Close out the TRY-CATCH for SystemExit
+        self.add_opcodes(
+            CATCH('org/python/exceptions/SystemExit'),
+                JavaOpcodes.GETFIELD('org/python/exceptions/SystemExit', 'return_code', 'I'),
+                JavaOpcodes.INVOKESTATIC('java/lang/System', 'exit', '(I)V'),
+            END_TRY(),
+            JavaOpcodes.RETURN()
+        )
 
     def method_attributes(self):
-        return [
-        ]
+        return []
 
 
 class ClosureMethod(Method):
