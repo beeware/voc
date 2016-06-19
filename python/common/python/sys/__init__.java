@@ -2,11 +2,6 @@ package python.sys;
 
 
 public class __init__ extends org.python.types.Module {
-    static {
-        org.python.types.Type cls = org.python.types.Type.pythonType(python.sys.__init__.class);
-        org.Python.initializeModule(python.sys.__init__.class, cls.__dict__);
-    }
-
     @org.python.Method(
         __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
@@ -268,7 +263,8 @@ public class __init__ extends org.python.types.Module {
 
     public static org.python.types.List meta_path;
 
-    public static org.python.types.Dict modules;
+    // FIXME: This should be an org.python.types.Dict
+    public static java.util.Map<java.lang.String, org.python.types.Module> modules = new java.util.HashMap<java.lang.String, org.python.types.Module>();
 
     public static org.python.types.List path;
 

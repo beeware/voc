@@ -211,12 +211,13 @@ def cleanse_java(input, substitutions):
 
     stack = JAVA_STACK.findall(out)
     out = JAVA_STACK.sub('', out)
+
     out = '%s%s%s' % (
         out,
         os.linesep.join([
             "    %s:%s" % (s[3], s[5])
             for s in stack[::-1]
-            if s[0].startswith('python.') and not s[0].endswith('.<init>')
+            if s[0].startswith('python.') and not s[0].endswith('.<init>') and s[5]
         ]),
         os.linesep if stack else ''
     )
