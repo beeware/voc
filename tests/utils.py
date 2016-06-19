@@ -522,6 +522,20 @@ class TranspileTestCase(TestCase):
         return out
 
 
+class NotImplementedToExpectedFailure:
+    def run(self, result=None):
+        # Override the run method to inject the "expectingFailure" marker
+        # when the test case runs.
+        if self._testMethodName in getattr(self, 'not_implemented', []):
+            # Mark 'expecting failure' on class. It will only be applicable
+            # for this specific run.
+            method = getattr(self, self._testMethodName)
+            wrapper = lambda *args, **kwargs: method(*args, **kwargs)
+            wrapper.__unittest_expecting_failure__ = True
+            setattr(self, self._testMethodName, wrapper)
+        return super().run(result=result)
+
+
 SAMPLE_DATA = {
     'bool': [
             'True',
@@ -633,9 +647,10 @@ def _unary_test(test_name, operation):
     return func
 
 
-class UnaryOperationTestCase:
+class UnaryOperationTestCase(NotImplementedToExpectedFailure):
     format = ''
 
+<<<<<<< HEAD
     def run(self, result=None):
         # Override the run method to inject the "expectingFailure" marker
         # when the test case runs.
@@ -665,6 +680,13 @@ class UnaryOperationTestCase:
             "Error running %s" % operation,
             substitutions=substitutions
         )
+=======
+    def assertUnaryOperation(self, **kwargs):
+        self.assertCodeExecution("""
+            x = %(x)s
+            print(%(format)s%(operation)sx)
+            """ % kwargs)
+>>>>>>> upstream/master
 
     test_unary_positive = _unary_test('test_unary_positive', '+')
     test_unary_negative = _unary_test('test_unary_negative', '-')
@@ -684,24 +706,12 @@ def _binary_test(test_name, operation, examples):
     return func
 
 
-class BinaryOperationTestCase:
+class BinaryOperationTestCase(NotImplementedToExpectedFailure):
     format = ''
     y = 3
 
-    def run(self, result=None):
-        # Override the run method to inject the "expectingFailure" marker
-        # when the test case runs.
-        for test_name in dir(self):
-            if test_name.startswith('test_'):
-                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
-        return super().run(result=result)
-
-    def assertBinaryOperation(self, x_values, y_values, operation, format, substitutions):
-        data = []
-        for x in x_values:
-            for y in y_values:
-                data.append((x, y))
-
+    def assertBinaryOperation(self, **kwargs):
+        substitutions = kwargs.pop('substitutions')
         self.assertCodeExecution(
             '##################################################\n'.join(
                 adjust("""
@@ -759,24 +769,12 @@ def _inplace_test(test_name, operation, examples):
     return func
 
 
-class InplaceOperationTestCase:
+class InplaceOperationTestCase(NotImplementedToExpectedFailure):
     format = ''
     y = 3
 
-    def run(self, result=None):
-        # Override the run method to inject the "expectingFailure" marker
-        # when the test case runs.
-        for test_name in dir(self):
-            if test_name.startswith('test_'):
-                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
-        return super().run(result=result)
-
-    def assertInplaceOperation(self, x_values, y_values, operation, format, substitutions):
-        data = []
-        for x in x_values:
-            for y in y_values:
-                data.append((x, y))
-
+    def assertInplaceOperation(self, **kwargs):
+        substitutions = kwargs.pop('substitutions')
         self.assertCodeExecution(
             '##################################################\n'.join(
                 adjust("""
@@ -827,23 +825,11 @@ def _builtin_test(test_name, operation, examples):
     return func
 
 
-class BuiltinFunctionTestCase:
+class BuiltinFunctionTestCase(NotImplementedToExpectedFailure):
     format = ''
 
-    def run(self, result=None):
-        # Override the run method to inject the "expectingFailure" marker
-        # when the test case runs.
-        for test_name in dir(self):
-            if test_name.startswith('test_'):
-                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
-        return super().run(result=result)
-
-    def assertBuiltinFunction(self, f_values, x_values, operation, format, substitutions):
-        data = []
-        for f in f_values:
-            for x in x_values:
-                data.append((f, x))
-
+    def assertBuiltinFunction(self, **kwargs):
+        substitutions = kwargs.pop('substitutions')
         self.assertCodeExecution(
             '##################################################\n'.join(
                 adjust("""
@@ -883,24 +869,11 @@ def _builtin_twoarg_test(test_name, operation, examples1, examples2):
     return func
 
 
-class BuiltinTwoargFunctionTestCase:
+class BuiltinTwoargFunctionTestCase(NotImplementedToExpectedFailure):
     format = ''
 
-    def run(self, result=None):
-        # Override the run method to inject the "expectingFailure" marker
-        # when the test case runs.
-        for test_name in dir(self):
-            if test_name.startswith('test_'):
-                getattr(self, test_name).__dict__['__unittest_expecting_failure__'] = test_name in self.not_implemented
-        return super().run(result=result)
-
-    def assertBuiltinTwoargFunction(self, f_values, x_values, y_values, operation, format, substitutions):
-        data = []
-        for f in f_values:
-            for x in x_values:
-                for y in y_values:
-                    data.append((f, x, y))
-
+    def assertBuiltinTwoargFunction(self, **kwargs):
+        substitutions = kwargs.pop('substitutions')
         self.assertCodeExecution(
             '##################################################\n'.join(
                 adjust("""
