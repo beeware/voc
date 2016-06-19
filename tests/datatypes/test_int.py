@@ -1,5 +1,7 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
+from unittest import expectedFailure
+
 
 class IntTests(TranspileTestCase):
     def test_setattr(self):
@@ -14,6 +16,12 @@ class IntTests(TranspileTestCase):
             x = 37
             print(x.attr)
             print('Done.')
+            """)
+
+    @expectedFailure
+    def test_invalid_literal(self):
+        self.assertCodeExecution("""
+            int('q', 16)
             """)
 
 
