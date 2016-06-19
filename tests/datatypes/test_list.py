@@ -53,6 +53,31 @@ class ListTests(TranspileTestCase):
             print(x[-10])
             """)
 
+    def test_slice(self):
+        # Full slice
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x[:])
+            """)
+
+        # Left bound slice
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x[1:])
+            """)
+
+        # Right bound slice
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x[:4])
+            """)
+
+        # Slice bound in both directions
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x[1:4])
+            """)
+
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'list'

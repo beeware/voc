@@ -4,23 +4,6 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class SumTests(TranspileTestCase):
-    pass
-
-
-class BuiltinSumFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
-    functions = ["sum"]
-
-    not_implemented = [
-        'test_bytearray',
-        'test_bytes',
-        'test_class',
-        'test_complex',
-        'test_dict',
-        'test_frozenset',
-        'test_set',
-        'test_str',
-    ]
-
     def test_sum_list(self):
         self.assertCodeExecution("""
             print(sum([1, 2, 3, 4, 5, 6, 7]))
@@ -43,3 +26,18 @@ class BuiltinSumFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         self.assertCodeExecution("""
             print(sum([1, 1.414, 2, 3.14159]))
         """)
+
+
+class BuiltinSumFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
+    functions = ["sum"]
+
+    not_implemented = [
+        'test_bytearray',
+        'test_bytes',
+        'test_class',
+        'test_complex',
+        'test_dict',
+        'test_frozenset',
+        'test_set',
+        'test_str',
+    ]
