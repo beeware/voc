@@ -20,7 +20,6 @@ public class ImportLib {
                 || path[0].equals("android")) {
             native_import = true;
         } else {
-            import_name.append("python");
             native_import = false;
         }
 
@@ -35,15 +34,18 @@ public class ImportLib {
                 import_name.append(".");
             }
             import_name.append(name);
+            java.lang.String mod_name = import_name.toString();
 
-            python_module = python.sys.__init__.modules.get(import_name.toString());
-            if (python_module == null) {
+            try {
+                // System.out.println("IMPORT " + mod_name);
+                python_module = (org.python.types.Module) python.sys.__init__.modules.__getitem__(new org.python.types.Str(mod_name));
+            } catch (org.python.exceptions.KeyError ke) {
                 try {
-                    // System.out.println("IMPORT " + import_name.toString());
+                    // System.out.println("handle IMPORT " + mod_name);
                     if (native_import) {
-                        python_module = importNativeModule(import_name.toString());
+                        python_module = importNativeModule(mod_name);
                     } else {
-                        python_module = importPythonModule(import_name.toString());
+                        python_module = importPythonModule(mod_name);
                     }
                 } catch (java.lang.ClassNotFoundException e) {
                     throw new org.python.exceptions.ImportError("No module named '" + python_name + "'");
@@ -76,12 +78,13 @@ public class ImportLib {
             for (java.lang.String name: from_list) {
                 // System.out.println("IMPORT NAME " + name);
                 if (!name.equals("*")) {
+                    java.lang.String mod_name = import_name.toString() + name;
                     try {
                         if (native_import) {
-                            java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(import_name.toString() + name);
+                            java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(mod_name);
                             parent_module.__setattr__(name, org.python.java.Type.pythonType(java_class));
                         } else {
-                            python_module = importPythonModule(import_name.toString() + name);
+                            python_module = importPythonModule(mod_name);
                             parent_module.__setattr__(name, python_module);
                         }
                     } catch (java.lang.ClassNotFoundException e) {
@@ -90,9 +93,9 @@ public class ImportLib {
                         try {
                             parent_module.__getattribute__(name);
                         } catch (org.python.exceptions.NameError ne) {
-                            python_module = new org.python.java.Module(import_name.toString() + name);
+                            python_module = new org.python.java.Module(mod_name);
                             parent_module.__setattr__(name, python_module);
-                            python.sys.__init__.modules.put(name.toString() + name, python_module);
+                            python.sys.__init__.modules.__setitem__(new org.python.types.Str(mod_name), python_module);
                         }
                     }
                 }
@@ -109,7 +112,7 @@ public class ImportLib {
             python_module = null;
         } catch (java.lang.ClassNotFoundException e) {
             python_module = new org.python.java.Module(import_name);
-            python.sys.__init__.modules.put(import_name, python_module);
+            python.sys.__init__.modules.__setitem__(new org.python.types.Str(import_name), python_module);
         } finally {
         //     System.out.println("CONSTRUCTOR DONE");
         }
@@ -121,7 +124,7 @@ public class ImportLib {
         org.python.types.Module python_module;
         try {
             // Load and construct an instance of the module class.
-            java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(import_name + ".__init__");
+            java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass("python." + import_name + ".__init__");
             java.lang.reflect.Constructor constructor = java_class.getConstructor();
             python_module = (org.python.types.Module) constructor.newInstance();
 
@@ -130,7 +133,7 @@ public class ImportLib {
             if (import_name.startsWith("python.")) {
                 python_name = import_name.substring(7);
             }
-            python.sys.__init__.modules.put(python_name, python_module);
+            python.sys.__init__.modules.__setitem__(new org.python.types.Str(python_name), python_module);
 
             // Initialize module
             java.lang.reflect.Method init = java_class.getMethod("module$import");
