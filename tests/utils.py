@@ -576,8 +576,8 @@ SAMPLE_DATA = {
             '-3.14159',
         ],
     'frozenset': [
-            'frozenset([1, 2])',
-            'frozenset()',
+            "frozenset()",
+            "frozenset({1, 2.3456, 'another'})",
         ],
     'int': [
             '3',
