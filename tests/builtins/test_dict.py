@@ -16,5 +16,6 @@ class BuiltinDictFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_frozenset',
         'test_list',
         'test_set',
+        'test_slice',
         'test_str',
     ]

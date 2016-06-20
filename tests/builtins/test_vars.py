@@ -24,4 +24,6 @@ class BuiltinVarsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_set',
         'test_str',
         'test_tuple',
+        'test_range',
+        'test_slice',
     ]
