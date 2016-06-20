@@ -274,7 +274,10 @@ class TranspileTestCase(TestCase):
         global _output_dir
         setUpSuite()
         cls.temp_dir = os.path.join(_output_dir, 'temp')
-        classpath = os.path.join('dist', 'python-java-testdaemon.jar')
+        classpath = ':'.join([
+            os.path.join('dist', 'python-java-testdaemon.jar'),
+            os.path.join('dist', 'python-java.jar'),
+        ])
         cls.jvm = subprocess.Popen(
             ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
             stdin=subprocess.PIPE,
@@ -495,6 +498,7 @@ class TranspileTestCase(TestCase):
             # encode to turn str into bytes-like object
             self.jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
             self.jvm.stdin.flush()
+
             out = ""
             while True:
                 try:
@@ -503,7 +507,7 @@ class TranspileTestCase(TestCase):
                         break
                     else:
                         out += line
-                except IOError:
+                except IOError as e:
                     continue
         else:
             classpath = os.pathsep.join([

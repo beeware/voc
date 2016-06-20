@@ -263,8 +263,7 @@ public class __init__ extends org.python.types.Module {
 
     public static org.python.types.List meta_path;
 
-    // FIXME: This should be an org.python.types.Dict
-    public static java.util.Map<java.lang.String, org.python.types.Module> modules = new java.util.HashMap<java.lang.String, org.python.types.Module>();
+    public static org.python.types.Dict modules = new org.python.types.Dict();
 
     public static org.python.types.List path;
 

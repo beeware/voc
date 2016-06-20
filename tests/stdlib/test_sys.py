@@ -210,13 +210,13 @@ class SysModuleTests(TranspileTestCase):
             import sys
             print('ARGS =', sys.argv)
             print('Done.')
-            """, run_in_global=False)
+            """)
 
         self.assertCodeExecution("""
             import sys
             print('ARGS =', sys.argv)
             print('Done.')
-            """, run_in_global=False, args=['1', 'asdf', '3'])
+            """, args=['1', 'asdf', '3'])
 
     ############################################################
     # base_exec_prefix
