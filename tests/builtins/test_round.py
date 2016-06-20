@@ -17,5 +17,7 @@ class BuiltinRoundFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_float',
         'test_frozenset',
         'test_NotImplemented',
+        'test_range',
         'test_set',
+        'test_slice',
     ]

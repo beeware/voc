@@ -576,8 +576,8 @@ SAMPLE_DATA = {
             '-3.14159',
         ],
     'frozenset': [
-            'frozenset([1, 2])',
-            'frozenset()',
+            "frozenset()",
+            "frozenset({1, 2.3456, 'another'})",
         ],
     'int': [
             '3',
@@ -587,21 +587,39 @@ SAMPLE_DATA = {
     'list': [
             "[]",
             "[3, 4, 5]",
-            '[1, 2, 3, 4, 5]',
+            '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]',
             "['a','b','c']",
+        ],
+    'range': [
+            "range(0)",
+            "range(5)",
+            "range(2, 7)",
+            "range(2, 7, 2)",
+            "range(7, 2, -1)",
+            "range(7, 2, -2)",
         ],
     'set': [
             "set()",
             "{1, 2.3456, 'another'}",
         ],
+    'slice': [
+            "slice(0)",
+            "slice(5)",
+            "slice(2, 7)",
+            "slice(2, 7, 2)",
+            "slice(7, 2, -1)",
+            "slice(7, 2, -2)",
+        ],
     'str': [
             '""',
             '"This is another string"',
+            '"Mÿ hôvèrçràft îß fûłl öf éêlś"',
             '"One arg: %s"',
             '"Three args: %s | %s | %s"',
         ],
     'tuple': [
             "(1, 2)",
+            "(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)",
             "(3, 1.2, True, )",
             "(1, 2.3456, 'another')",
         ],
