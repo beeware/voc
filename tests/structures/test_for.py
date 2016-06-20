@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -56,18 +58,19 @@ class ForLoopTests(TranspileTestCase):
             print('Done.')
             """)
 
-    # def test_for_else(self):
-    #     self.assertCodeExecution(
-    #         code="""
-    #             total = 0
-    #             for i in []:
-    #                 total = total + i
-    #             else:
-    #                 total = -999
-    #             """,
-    #         expected="""
-    #          Code (159 bytes)
-    #         """)
+    @expectedFailure
+    def test_for_else(self):
+        self.assertCodeExecution(
+            code="""
+                total = 0
+                for i in []:
+                    total = total + i
+                else:
+                    total = -999
+                """,
+            expected="""
+             Code (159 bytes)
+            """)
 
     def test_break(self):
         self.assertCodeExecution(
