@@ -78,6 +78,17 @@ public class Set extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __getitem__(org.python.Object index) {
+        if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
+            throw new org.python.exceptions.TypeError("'set' object does not support indexing");
+        } else {
+            throw new org.python.exceptions.TypeError("'set' object is not subscriptable");
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
@@ -149,6 +160,34 @@ public class Set extends org.python.types.Object {
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // Builtin types can't have attributes set on them.
         return false;
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Bool __bool__() {
+        return new org.python.types.Bool(this.value.size() > 0);
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'set'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'set'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'set'");
     }
 
     @org.python.Method(

@@ -1777,13 +1777,25 @@ class LOAD_CONST(Opcode):
                     JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
                 )
 
-            # elif isinstance(const, bytes):
-            #     context.add_opcodes(
-            #         JavaOpcodes.NEW('org/python/types/Bytes'),
-            #         JavaOpcodes.DUP(),
-            #         JavaOpcodes.LDC_W(const),
-            #         JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
-            #     )
+            elif isinstance(const, bytes):
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Bytes'),
+                    JavaOpcodes.DUP(),
+                    ICONST_val(len(const)),
+                    JavaOpcodes.NEWARRAY(JavaOpcodes.NEWARRAY.T_BYTE),
+                )
+
+                for i, b in enumerate(const):
+                    context.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        ICONST_val(i),
+                        JavaOpcodes.BIPUSH(b),
+                        JavaOpcodes.BASTORE(),
+                    )
+
+                context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '([B)V'),
+                )
 
             elif isinstance(const, tuple):
                 context.add_opcodes(
@@ -3081,9 +3093,7 @@ def add_callable(opcode, context, arguments, full_method_name, closure=False):
             ),
 
             # globals
-            # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            # JavaOpcodes.LDC_W(method.module.descriptor),
-            # JavaOpcodes.GETSTATIC(method.module.descriptor, '__dict__', 'Ljava/util/Map;'),
+            # JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
             JavaOpcodes.ACONST_NULL(),  # globals
 
             # Default args

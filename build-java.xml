@@ -20,7 +20,7 @@
     </javac>
   </target>
 
-  <target name="compile-testdaemon" description="Compile the testdaemon source">
+  <target name="compile-testdaemon" depends="compile" description="Compile the testdaemon source">
     <mkdir dir="${build}/java-testdaemon"/>
     <javac
         debug="true"
@@ -28,6 +28,7 @@
         includeantruntime="false"
         destdir="${build}/java-testdaemon">
       <src path="${src}/testdaemon" />
+      <classpath path="${build}/java" />
     </javac>
   </target>
 
