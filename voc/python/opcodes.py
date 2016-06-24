@@ -1011,6 +1011,9 @@ class BinaryOpcode(Opcode):
 
 
 class InplaceOpcode(Opcode):
+    """
+    Handle opcodes that are followed by an '=' (inplace operations)
+    """
     @property
     def consume_count(self):
         return 2
@@ -1021,12 +1024,13 @@ class InplaceOpcode(Opcode):
 
     def convert(self, context, arguments):
         arguments[0].operation.transpile(context, arguments[0].arguments)
-        context.add_opcodes(JavaOpcodes.DUP())
+        # context.add_opcodes(JavaOpcodes.DUP())
 
         for argument in arguments[1:]:
             argument.operation.transpile(context, argument.arguments)
 
         context.next_resolve_list.append((self, 'start_op'))
+
         context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
@@ -1034,7 +1038,8 @@ class InplaceOpcode(Opcode):
                 '(Lorg/python/Object;)Lorg/python/Object;'
             )
         )
-
+        
+ 
 
 ##########################################################################
 # The actual Python opcodes

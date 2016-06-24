@@ -449,8 +449,24 @@ public class Bool extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+
+    public org.python.Object __iadd__(org.python.Object other) {
+        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int( this_val += (((org.python.types.Bool) other).value ? 1 : 0) );
+        } else if (other instanceof org.python.types.Int) {
+            return new org.python.types.Int( this_val += ((org.python.types.Int) other).value);
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float(this_val += ((org.python.types.Float) other).value);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'bool' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __ilshift__(org.python.Object other) {
-            int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
         if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(this_val <<= (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Int) {
@@ -467,7 +483,7 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __irshift__(org.python.Object other) {
-            int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
         if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(this_val >>= (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Int) {

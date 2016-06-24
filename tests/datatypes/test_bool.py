@@ -166,14 +166,12 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
     values = ['True', 'False']
 
     not_implemented = [
-        'test_add_bool',
         'test_add_bytearray',
         'test_add_bytes',
         'test_add_class',
         'test_add_complex',
         'test_add_float',
         'test_add_frozenset',
-        'test_add_int',
 
         'test_and_bytearray',
         'test_and_bytes',
