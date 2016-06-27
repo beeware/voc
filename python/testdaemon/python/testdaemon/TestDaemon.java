@@ -11,6 +11,7 @@ import java.security.Permission;
 import java.util.Arrays;
 import java.util.Scanner;
 
+
 public class TestDaemon {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -21,7 +22,7 @@ public class TestDaemon {
         URL runtime2;
         try {
             // load the voc jar here so that they can see the runtime classes
-            voc = new URL("file:" + System.getProperty("user.dir") + "/../dist/python-java.jar");
+            voc = new URL("file:" + System.getProperty("user.dir") + "/dist/python-java.jar");
             // need the trailing slash so that the ClassLoader knows it's a
             // directory instead of a jar file
             runtime1 = new URL("file:" + System.getProperty("user.dir") + "/temp/");
@@ -89,9 +90,9 @@ public class TestDaemon {
             } finally {
                 // always cleanup the module cache in ImportLib
                 try {
-                    Class<?> importlib = joinedClassLoader.loadClass("org.python.ImportLib");
+                    Class<?> importlib = joinedClassLoader.loadClass("python.sys.__init__");
                     Field importlib_modules = importlib.getDeclaredField("modules");
-                    importlib_modules.set(null, new java.util.HashMap());
+                    importlib_modules.set(null, new org.python.types.Dict());
                 } catch (ReflectiveOperationException e) {
                     // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
                 }

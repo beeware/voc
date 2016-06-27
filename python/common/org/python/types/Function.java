@@ -269,7 +269,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             // the instance argument is passed in as a regular method argument,
             // not as the implied Java register 0. Builtins and closure methods
             // require the instance to be passed as the explicit instance.
-            if (java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
+            if (java.lang.reflect.Modifier.isStatic(this.method.getModifiers())) {
                 return org.python.types.Type.toPython(this.method.invoke(null, adjusted_args));
             } else {
                 return org.python.types.Type.toPython(this.method.invoke(instance, adjusted_args));

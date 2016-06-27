@@ -56,7 +56,17 @@ To capture unexpected successes in test:
 
     $ python setup.py test | grep success
 
-Running the full test suite will take quite a while - it takes 40 minutes on the CI server. If you just want to run a single test, or a single group of tests, you can provide command-line arguments.
+Running the full test suite will take quite a while - it takes 40 minutes on the CI server. You can speed this up by running the tests in parallel via pytest:
+
+.. code-block:: bash
+
+    $ cd voc
+    $ pip install -r requirements/tests.txt
+    $ py.test -n auto
+
+You can specify the number of cores to utilize, or use ``auto`` as shown above to use all available cores.
+
+If you just want to run a single test, or a single group of tests, you can provide command-line arguments.
 
 To run a single test, provide the full dotted-path to the test:
 

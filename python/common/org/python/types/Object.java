@@ -337,6 +337,7 @@ public class Object implements org.python.Object {
 
         // If the attribute already exists, then it's OK to set it.
         org.python.Object attr = cls.__getattribute_null(name);
+
         // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {
             if (attr == null) {
@@ -349,7 +350,6 @@ public class Object implements org.python.Object {
         } else {
             attr.__set__(this, value);
         }
-        // org.Python.debug("POST SET ATTRS ", this.__dict__);
         return true;
     }
 
@@ -374,7 +374,8 @@ public class Object implements org.python.Object {
     }
 
     public boolean __delattr_null(java.lang.String name) {
-        org.python.Object result = __dict__.remove(name);
+        // System.out.println("DELETE ATTR from " + this.__dict__);
+        org.python.Object result = this.__dict__.remove(name);
         return (result != null);
     }
 
@@ -793,7 +794,8 @@ public class Object implements org.python.Object {
     )
     public org.python.Object __idivmod__(org.python.Object other) {
         try {
-            this.setValue(this.__pow__(other, null));
+            // this.setValue(this.__idivmod__(other, null));
+            this.setValue(this.__idivmod__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for //=: '" + this.typeName() + "' and '" + other.typeName() + "'");
@@ -806,12 +808,8 @@ public class Object implements org.python.Object {
         args = {"other"}
     )
     public org.python.Object __ipow__(org.python.Object other) {
-        try {
-            this.setValue(this.__pow__(other, null));
-            return this;
-        } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for **=: '" + this.typeName() + "' and '" + other.typeName() + "'");
-        }
+        this.setValue(this.__pow__(other, null));
+        return this;
     }
 
 
@@ -821,7 +819,7 @@ public class Object implements org.python.Object {
     )
     public org.python.Object __ilshift__(org.python.Object other) {
         try {
-            this.setValue(this.__ilshift__(other));
+            this.setValue(this.__lshift__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: '" + this.typeName() + "' and '" + other.typeName() + "'");
@@ -835,7 +833,7 @@ public class Object implements org.python.Object {
     )
     public org.python.Object __irshift__(org.python.Object other) {
         try {
-            this.setValue(this.__irshift__(other));
+            this.setValue(this.__rshift__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: '" + this.typeName() + "' and '" + other.typeName() + "'");
