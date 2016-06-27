@@ -160,7 +160,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_complex',
         'test_add_frozenset',
         'test_add_slice',
-        'test_add_float',
 
         'test_and_bytearray',
         'test_and_class',

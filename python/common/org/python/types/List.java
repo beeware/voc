@@ -63,6 +63,19 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __iadd__(org.python.Object other) {
+        if (other instanceof org.python.types.List) {
+            this.value.addAll(((org.python.types.List) other).value);
+            return this;
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("'%s' object is not iterable", Python.typeName(other.getClass())));
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __invert__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'list'");
     }

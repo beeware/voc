@@ -198,22 +198,11 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
 
     not_implemented = [
-        'test_add_bool',
         'test_add_bytearray',
-        'test_add_bytes',
         'test_add_class',
         'test_add_complex',
-        'test_add_dict',
-        'test_add_float',
         'test_add_frozenset',
         'test_add_slice',
-        'test_add_int',
-        'test_add_list',
-        'test_add_None',
-        'test_add_NotImplemented',
-        'test_add_range',
-        'test_add_set',
-        'test_add_str',
 
         'test_and_bytearray',
         'test_and_class',

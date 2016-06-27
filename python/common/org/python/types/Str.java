@@ -357,8 +357,9 @@ public class Str extends org.python.types.Object {
         __doc__ = "",
         args = {"other"}
     )
-    public void __ipow__(org.python.Object other) {
+    public org.python.Object __ipow__(org.python.Object other) {
         this.setValue(this.__pow__(other, null));
+        return this;
     }
 
     @org.python.Method(
@@ -407,18 +408,20 @@ public class Str extends org.python.types.Object {
         __doc__ = "",
         args = {"other"}
     )
-    public void __imul__(org.python.Object other) {
+    public org.python.Object __imul__(org.python.Object other) {
         this.setValue(this.__mul__(other));
+        return this;
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public void __imod__(org.python.Object other) {
+    public org.python.Object __imod__(org.python.Object other) {
         if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         }
         super.__imod__(other);
+        return this;
     }
 
 
@@ -426,9 +429,10 @@ public class Str extends org.python.types.Object {
         __doc__ = "",
         args = {"other"}
     )
-    public void __iadd__(org.python.Object other) {
+    public org.python.Object __iadd__(org.python.Object other) {
         try {
             this.setValue(this.__add__(other));
+            return this;
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to " + this.typeName() + " implicitly");
         }

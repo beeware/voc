@@ -179,13 +179,12 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
     not_implemented = [
-        'test_add_bool',
         'test_add_bytearray',
         'test_add_class',
         'test_add_complex',
         'test_add_float',
         'test_add_frozenset',
-        'test_add_int',
+
         'test_add_slice',
 
         'test_and_bytearray',
@@ -204,12 +203,10 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_int',
         'test_floor_divide_slice',
 
-        'test_lshift_bool',
         'test_lshift_bytearray',
         'test_lshift_class',
         'test_lshift_complex',
         'test_lshift_frozenset',
-        'test_lshift_int',
         'test_lshift_slice',
 
         'test_modulo_bool',
@@ -250,11 +247,9 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_int',
         'test_power_slice',
 
-        'test_rshift_bool',
         'test_rshift_bytearray',
         'test_rshift_class',
         'test_rshift_complex',
-        'test_rshift_int',
         'test_rshift_frozenset',
         'test_rshift_slice',
 

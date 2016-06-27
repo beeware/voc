@@ -369,6 +369,13 @@ public class Set extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __iadd__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'set' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object intersection(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("intersection() has not been implemented.");
     }

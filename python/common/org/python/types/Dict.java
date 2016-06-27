@@ -87,6 +87,13 @@ public class Dict extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __iadd__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'dict' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __neg__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary -: 'dict'");
     }
