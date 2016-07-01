@@ -78,48 +78,116 @@ public class Set extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __getitem__(org.python.Object index) {
+        if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
+            throw new org.python.exceptions.TypeError("'set' object does not support indexing");
+        } else {
+            throw new org.python.exceptions.TypeError("'set' object is not subscriptable");
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__lt__() has not been implemented");
+        if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value) && !this.value.equals(otherSet.value));
+        }
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: set() < %s()",
+                org.Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__le__() has not been implemented");
+        if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value));
+        }
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: set() <= %s()",
+                org.Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__eq__() has not been implemented");
+        boolean eq = false;
+        if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            eq = this.value.equals(otherSet.value);
+        }
+        return new org.python.types.Bool(eq);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__ne__() has not been implemented");
+        return new org.python.types.Bool(!((org.python.types.Bool) this.__eq__(other)).value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__gt__() has not been implemented");
+        if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(this.value.containsAll(otherSet.value) && !this.value.equals(otherSet.value));
+        }
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: set() > %s()",
+                org.Python.typeName(other.getClass())));
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("__ge__() has not been implemented");
+        if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(this.value.containsAll(otherSet.value));
+        }
+        throw new org.python.exceptions.TypeError(
+            String.format("unorderable types: set() >= %s()",
+                org.Python.typeName(other.getClass())));
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // Builtin types can't have attributes set on them.
         return false;
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Bool __bool__() {
+        return new org.python.types.Bool(this.value.size() > 0);
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'set'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'set'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'set'");
     }
 
     @org.python.Method(
@@ -155,6 +223,20 @@ public class Set extends org.python.types.Object {
     )
     public org.python.Object __not_contains__(org.python.Object other) {
         return new org.python.types.Bool(!this.value.contains(other));
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __mul__(org.python.Object other) {
+        if (other instanceof org.python.types.List) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        } else if (other instanceof org.python.types.Tuple) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        } else if (other instanceof org.python.types.Str) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        }
+        return super.__mul__(other);
     }
 
     // @org.python.Method(
@@ -282,6 +364,13 @@ public class Set extends org.python.types.Object {
     )
     public org.python.Object discard(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("discard() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __iadd__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'set' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(

@@ -1418,7 +1418,6 @@ class FLOAD_1(Opcode):
         return 0
 
 
-
 class FLOAD_2(Opcode):
     # Load a float value from local variable 2
     # Stack: → value
@@ -1434,7 +1433,6 @@ class FLOAD_2(Opcode):
     @property
     def consume_count(self):
         return 0
-
 
 
 class FLOAD_3(Opcode):
@@ -4035,13 +4033,47 @@ class NEW(Opcode):
 
 
 class NEWARRAY(Opcode):
+    # Create new array with count elements of primitive type identified by atype
+    # 1: atype
+    # count → arrayref
     code = 0xbc
 
-    def __init__(self):
+    # Valid primitive types that NEWARRAY can be created with.
+    # For non-primitive types, see ANEWARRAY
+    T_BOOLEAN = 4
+    T_CHAR = 5
+    T_FLOAT = 6
+    T_DOUBLE = 7
+    T_BYTE = 8
+    T_SHORT = 9
+    T_INT = 10
+    T_LONG = 11
+
+    def __init__(self, atype):
         super(NEWARRAY, self).__init__()
-# 1: atype
-# count → arrayref
-# Create new array with count elements of primitive type identified by atype
+        self.atype = atype
+
+    def __len__(self):
+        return 2
+
+    def __arg_repr__(self):
+        return ' %s' % self.atype
+
+    @classmethod
+    def read_extra(cls, reader, dump=None):
+        atype = reader.read_u1()
+        return cls(atype)
+
+    def write_extra(self, writer):
+        writer.write_u1(self.atype)
+
+    @property
+    def produce_count(self):
+        return 1
+
+    @property
+    def consume_count(self):
+        return 1
 
 
 class NOP(Opcode):

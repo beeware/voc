@@ -7,6 +7,9 @@ VOC
 .. image:: https://travis-ci.org/pybee/voc.svg?branch=master
     :target: https://travis-ci.org/pybee/voc
 
+.. image:: https://badges.gitter.im/pybee/developers.svg
+    :target: https://gitter.im/pybee/developers
+
 A transpiler that converts Python bytecode into Java bytecode.
 
 This is experimental code. If it breaks, you get to keep all the shiny pieces.
@@ -32,8 +35,8 @@ with `the first tutorial`_.
 
 If you'd like to contribute to VOC development, we have a `guide for first time contributors`_.
 
-.. _Getting Started guide: http://voc.readthedocs.org/en/latest/intro/getting-started.html
-.. _the first tutorial: http://voc.readthedocs.org/en/latest/tutorials/tutorial-0.html
+.. _Getting Started guide: https://voc.readthedocs.io/en/latest/intro/getting-started.html
+.. _the first tutorial: https://voc.readthedocs.io/en/latest/tutorials/tutorial-0.html
 
 .. _guide for first time contributors: https://github.com/pybee/voc/wiki/Your-first-VOC-contribution
 
@@ -82,7 +85,7 @@ If you experience problems with VOC, `log them on GitHub`_. If you
 want to contribute code, please `fork the code`_ and `submit a pull request`_.
 
 .. _BeeWare suite: http://pybee.org
-.. _Read The Docs: http://voc.readthedocs.org
+.. _Read The Docs: https://voc.readthedocs.io
 .. _@pybeeware on Twitter: https://twitter.com/pybeeware
 .. _BeeWare Users Mailing list: https://groups.google.com/forum/#!forum/beeware-users
 .. _wiki: https://github.com/pybee/voc/wiki/Your-first-VOC-contribution

@@ -23,11 +23,10 @@ public class Object extends org.python.types.Object {
 
     public Object(org.python.types.Type.Origin origin, java.lang.Object object) {
         super(origin, object.getClass());
-        // System.out.println("JAVA WRAPPER FOR " + this.getClass());
+        // System.out.println("JAVA WRAPPER FOR " + object.getClass());
         this.object = object;
         try {
             java.lang.reflect.Field voc_field = this.object.getClass().getField("__VOC__");
-            // System.out.println("SET __VOC__");
             voc_field.set(this.object, this);
         } catch (NoSuchFieldException e) {
             // System.out.println("NO __VOC__ FIELD");
@@ -40,7 +39,7 @@ public class Object extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<Native %s object at 0x%x>", this.object.getClass(), this.object.hashCode()));
+        return new org.python.types.Str(String.format("<Native %s object at 0x%x>", this.object.getClass().getName(), this.object.hashCode()));
     }
 
     @org.python.Method(
@@ -56,11 +55,11 @@ public class Object extends org.python.types.Object {
     // public org.python.Object __getattribute__(java.lang.String name) {
     //     // System.out.println("GETATTRIBUTE NATIVE OBJECT " + this + " " + name);
     //     // Look for a cached attribute.
-    //     org.python.Object value = this.attrs.get(name);
+    //     org.python.Object value = this.__dict__.get(name);
 
     //     if (value == null) {
     //         // Look for a cached class-level attribute.
-    //         org.python.types.Type klass = (org.python.types.Type) this.attrs.get("__class__");
+    //         org.python.types.Type klass = (org.python.types.Type) this.__dict__.get("__class__");
     //         value = klass.__getattribute__(name).__get__(this, klass);
     //     }
 
@@ -81,7 +80,7 @@ public class Object extends org.python.types.Object {
     //     } catch(org.python.exceptions.AttributeError e) {
     //     }
 
-    //     this.attrs.put(name, value);
+    //     this.__dict__.put(name, value);
     // }
 
 }

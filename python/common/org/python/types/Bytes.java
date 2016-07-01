@@ -245,6 +245,13 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __iadd__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+        throw new org.python.exceptions.NotImplementedError("bytes.__iadd__ has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object index(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.index has not been implemented.");
     }

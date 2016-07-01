@@ -89,7 +89,7 @@ class InterfaceTests(TranspileTestCase):
                 """
             },
             out="""
-            Set handler to <test.MyHandler object at 0xXXXXXXXX>
+            Set handler to <MyHandler object at 0xXXXXXXXX>
             Do event Stuff
             My handler for a Stuff event on Java View
             Event done.
