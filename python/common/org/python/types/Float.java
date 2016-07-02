@@ -161,6 +161,8 @@ public class Float extends org.python.types.Object {
             else {
                 return new org.python.types.Bool(this.value == 0.0);
             }
+        } else if (other instanceof NoneType) {
+            return new org.python.types.Bool(false);
         }
         throw new org.python.exceptions.TypeError("unorderable types: float() == " + other.typeName() + "()");
     }
@@ -169,7 +171,15 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__ne__() has not been implemented.");
+        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float ||
+            other instanceof org.python.types.Bool || other instanceof org.python.types.NoneType){
+            if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
+                return new org.python.types.Bool(false);
+            } else if(!((org.python.types.Bool) this.__eq__((org.python.Object) other)).value){
+                return new org.python.types.Bool(true);
+            }
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: float() == " + other.typeName() + "()");
     }
 
     @org.python.Method(
