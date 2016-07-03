@@ -588,7 +588,22 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.NotImplementedError("float.__round__() has not been implemented.");
+        /*if((org.python.types.Int)ndigits != new org.python.types.Int(0)) {
+            throw new org.python.exceptions.NotImplementedError("float.__round__() with ndigits has not been implemented");
+        }*/
+        long wholeNumber = (long) this.value;
+        double fractionalPart = this.value - wholeNumber;
+        if(fractionalPart < 0.5) {
+            return new org.python.types.Int(wholeNumber);
+        } else if(fractionalPart > 0.5) {
+            return new org.python.types.Int(wholeNumber + 1);
+        } else {
+            if(wholeNumber%2 == 0) {
+                return new org.python.types.Int(wholeNumber + 1);
+            } else {
+                return new org.python.types.Int(wholeNumber);
+            }
+        }
     }
 
 
