@@ -588,9 +588,9 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        /*if((org.python.types.Int)ndigits != new org.python.types.Int(0)) {
+        if(((org.python.types.Int)ndigits).value != 0) {
             throw new org.python.exceptions.NotImplementedError("float.__round__() with ndigits has not been implemented");
-        }*/
+        }
         long wholeNumber = (long) this.value;
         double fractionalPart = this.value - wholeNumber;
         if(fractionalPart < 0.5) {
