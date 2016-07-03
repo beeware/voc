@@ -2,12 +2,11 @@ package python.time;
 
 
 public class __init__ extends org.python.types.Module {
-    static {
-        org.python.types.Type cls = org.python.types.Type.pythonType(python.time.__init__.class);
-        org.Python.initializeModule(python.time.__init__.class, cls.attrs);
-
+    public __init__() {
+        super();
         vm_start_time = python.platform.__init__.impl.clock();
     }
+
 
     private static long vm_start_time;
 

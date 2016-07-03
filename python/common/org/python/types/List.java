@@ -63,6 +63,19 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __iadd__(org.python.Object other) {
+        if (other instanceof org.python.types.List) {
+            this.value.addAll(((org.python.types.List) other).value);
+            return this;
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("'%s' object is not iterable", Python.typeName(other.getClass())));
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __invert__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'list'");
     }
@@ -334,7 +347,7 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public void __setitem__(org.python.Object index) {
+    public void __delitem__(org.python.Object index) {
         try {
             int idx = (int) ((org.python.types.Int) index).value;
             if (idx < 0) {
@@ -490,5 +503,12 @@ public class List extends org.python.types.Object {
     public org.python.Object sort() {
         throw new org.python.exceptions.NotImplementedError("list.sort() has not been implemented.");
     }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
 
+         throw new org.python.exceptions.TypeError("type list doesn't define __round__ method");
+
+    }
 }

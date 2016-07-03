@@ -21,8 +21,8 @@ public class Method extends org.python.types.Object implements org.python.Callab
         if (this.im_self == null) {
             return new org.python.types.Str(
                 String.format("<unbound method %s.%s>",
-                    this.im_class.attrs.get("__name__"),
-                    this.im_func.attrs.get("__name__")
+                    this.im_class.__dict__.get("__name__"),
+                    this.im_func.__dict__.get("__name__")
                 )
             );
         } else if (org.python.types.Closure.class.isAssignableFrom(this.im_class.klass)) {
@@ -32,8 +32,8 @@ public class Method extends org.python.types.Object implements org.python.Callab
         } else {
             return new org.python.types.Str(
                 String.format("<bound method %s.%s of %s>",
-                    this.im_class.attrs.get("__name__"),
-                    this.im_func.attrs.get("__name__"),
+                    this.im_class.__dict__.get("__name__"),
+                    this.im_func.__dict__.get("__name__"),
                     this.im_self
                 )
             );

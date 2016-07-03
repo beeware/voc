@@ -62,10 +62,6 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         }
     }
 
-    public String toString() {
-        return (String) ((org.python.types.Str) __str__()).value;
-    }
-
     // protected void finalize() throws Throwable {
     //     try {
     //         // this.__del__();
@@ -111,14 +107,14 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
-        return new org.python.types.Str(super.toString());
+        return new org.python.types.Str(this.getClass().getSimpleName() + "(\"" + this.getMessage() + "\",)");
     }
 
     @org.python.Method(
         __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
-        return this.__repr__();
+        return new org.python.types.Str(this.getMessage());
     }
 
     @org.python.Method(
@@ -414,55 +410,55 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
     }
 
 
-    public void __iadd__(org.python.Object other) {
+    public org.python.Object __iadd__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__iadd__");
     }
 
-    public void __isub__(org.python.Object other) {
+    public org.python.Object __isub__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__isub__");
     }
 
-    public void __imul__(org.python.Object other) {
+    public org.python.Object __imul__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__imul__");
     }
 
-    public void __itruediv__(org.python.Object other) {
+    public org.python.Object __itruediv__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__itruediv__");
     }
 
-    public void __ifloordiv__(org.python.Object other) {
+    public org.python.Object __ifloordiv__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__ifloordiv__");
     }
 
-    public void __imod__(org.python.Object other) {
+    public org.python.Object __imod__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__imod__");
     }
 
-    public void __idivmod__(org.python.Object other) {
+    public org.python.Object __idivmod__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__idivmod__");
     }
 
-    public void __ipow__(org.python.Object other) {
+    public org.python.Object __ipow__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__ipow__");
     }
 
-    public void __ilshift__(org.python.Object other) {
+    public org.python.Object __ilshift__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__ilshift__");
     }
 
-    public void __irshift__(org.python.Object other) {
+    public org.python.Object __irshift__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__irshift__");
     }
 
-    public void __iand__(org.python.Object other) {
+    public org.python.Object __iand__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__iand__");
     }
 
-    public void __ixor__(org.python.Object other) {
+    public org.python.Object __ixor__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__ixor__");
     }
 
-    public void __ior__(org.python.Object other) {
+    public org.python.Object __ior__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__ior__");
     }
 

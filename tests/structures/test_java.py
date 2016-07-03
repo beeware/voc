@@ -288,7 +288,7 @@ class JavaTests(TranspileTestCase):
             out="""
                 Class is <class 'com.example.MyClass'>
                 Method is <native function com.example.MyClass.method>
-                Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+                Method from instance is <bound native method com.example.MyClass.method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the instance!
                 Done.
                 """)
@@ -321,7 +321,7 @@ class JavaTests(TranspileTestCase):
                 Class is <class 'com.example.MyClass'>
                 Static method is <native function com.example.MyClass.method>
                 Hello from the class!
-                Static method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+                Static method from instance is <bound native method com.example.MyClass.method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the class!
                 Done.
                 """)
@@ -384,13 +384,13 @@ class JavaTests(TranspileTestCase):
                 Method on superclass is <native function com.example.MyBase.method>
                 Base method is <native function com.example.MyBase.base_method>
                 Method is <native function com.example.MyClass.method>
-                Base method from superclass instance is <bound native method com.example.MyBase.base_method of <Native class com.example.MyBase object at 0xXXXXXXXX>>
+                Base method from superclass instance is <bound native method com.example.MyBase.base_method of <Native com.example.MyBase object at 0xXXXXXXXX>>
                 Hello from the base!
-                Method from superclass instance is <bound native method com.example.MyBase.method of <Native class com.example.MyBase object at 0xXXXXXXXX>>
+                Method from superclass instance is <bound native method com.example.MyBase.method of <Native com.example.MyBase object at 0xXXXXXXXX>>
                 Goodbye from the base!
-                Base method from instance is <bound native method com.example.MyBase.base_method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+                Base method from instance is <bound native method com.example.MyBase.base_method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the base!
-                Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+                Method from instance is <bound native method com.example.MyClass.method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the instance!
                 Done.
                 """)
@@ -461,13 +461,13 @@ class JavaTests(TranspileTestCase):
                 Hello from the base!
                 Static method is <native function com.example.MyClass.static_method>
                 Hello from the class!
-                Base static method from superclass instance is <bound native method com.example.MyBase.base_static_method of <Native class com.example.MyBase object at 0xXXXXXXXX>>
+                Base static method from superclass instance is <bound native method com.example.MyBase.base_static_method of <Native com.example.MyBase object at 0xXXXXXXXX>>
                 Hello from the base!
-                Static method from superclass instance is <bound native method com.example.MyBase.static_method of <Native class com.example.MyBase object at 0xXXXXXXXX>>
+                Static method from superclass instance is <bound native method com.example.MyBase.static_method of <Native com.example.MyBase object at 0xXXXXXXXX>>
                 Goodbye from the base!
-                Base static method from instance is <bound native method com.example.MyBase.base_static_method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+                Base static method from instance is <bound native method com.example.MyBase.base_static_method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the base!
-                Static method from instance is <bound native method com.example.MyClass.static_method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
+                Static method from instance is <bound native method com.example.MyClass.static_method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the class!
                 Done.
                 """)
@@ -620,3 +620,191 @@ class JavaTests(TranspileTestCase):
                 Hello from the inside!
                 Done.
                 """)
+
+    def test_primitive_conversion(self):
+        "Primitive types are converted correctly"
+        self.assertJavaExecution("""
+                from com.example import MyObject
+
+                obj = MyObject()
+
+                result = obj.method(3)
+                print('Result is', result)
+
+                result = obj.method(3.14159)
+                print('Result is', result)
+
+                result = obj.method(True)
+                print('Result is', result)
+
+                print("Done.")
+                """,
+            java={
+                'com/example/MyObject': """
+                package com.example;
+
+                public class MyObject {
+                    public int method(int x) {
+                        System.out.println("Hello from int method: " + x);
+                        return x * 2;
+                    }
+
+                    public float method(float x) {
+                        System.out.println("Hello from float method: " + x);
+                        return x * 2.5f;
+                    }
+
+                    public boolean method(boolean x) {
+                        System.out.println("Hello from boolean method: " + x);
+                        return !x;
+                    }
+                }
+                """
+            },
+            out="""
+                Hello from int method: 3
+                Result is 6
+                Hello from float method: 3.14159
+                Result is 7.853975296020508
+                Hello from boolean method: true
+                Result is False
+                Done.
+                """)
+
+    def test_primitive_zero_conversion(self):
+        "Primitive representations of 'false' values are converted correctly"
+        self.assertJavaExecution("""
+                from com.example import MyObject
+
+                obj = MyObject()
+
+                result = obj.method(0)
+                print('Result is', result)
+
+                result = obj.method(0.0)
+                print('Result is', result)
+
+                result = obj.method(False)
+                print('Result is', result)
+
+                print("Done.")
+                """,
+            java={
+                'com/example/MyObject': """
+                package com.example;
+
+                public class MyObject {
+                    public int method(int x) {
+                        System.out.println("Hello from int method: " + x);
+                        return x * 2;
+                    }
+
+                    public float method(float x) {
+                        System.out.println("Hello from float method: " + x);
+                        return x * 2.5f;
+                    }
+
+                    public boolean method(boolean x) {
+                        System.out.println("Hello from boolean method: " + x);
+                        return !x;
+                    }
+                }
+                """
+            },
+            out="""
+                Hello from int method: 0
+                Result is 0
+                Hello from float method: 0.0
+                Result is 0.0
+                Hello from boolean method: false
+                Result is True
+                Done.
+                """)
+
+    def test_attribute_on_reference(self):
+        self.assertJavaExecution("""
+                from com.example import BaseObject, Controller
+
+                class TestObject(extends=com.example.BaseObject):
+                    def __init__(self, v1, v2):
+                        # super().__init__(v1)
+                        self.extra1 = v2
+
+                    def process(self) -> None:
+                        print("Processed Base data is %s" % self.base)
+                        print("Processed Extra data 1 is %s" % self.extra1)
+                        print("Processed Extra data 2 is %s" % self.extra2)
+
+                obj = TestObject(37, 99)
+                obj.extra2 = 42
+
+                print("Base data is %s" % obj.base)
+                print("Extra data 1 is %s" % obj.extra1)
+                print("Extra data 2 is %s" % obj.extra2)
+
+                controller = Controller()
+
+                controller.setObject(obj)
+
+                controller.poke()
+
+                print("Done.")
+                """,
+            java={
+                'com/example/ObjIFace': """
+                package com.example;
+
+                public interface ObjIFace {
+                    public void process();
+                }
+
+                """,
+                'com/example/Controller': """
+                package com.example;
+
+                public class Controller {
+                    public ObjIFace obj;
+
+                    public Controller() {
+                    }
+
+                    public void setObject(ObjIFace o) {
+                        this.obj = o;
+                    }
+
+                    public void poke() {
+                        this.obj.process();
+                    }
+                }
+
+                """,
+                'com/example/BaseObject': """
+                package com.example;
+
+                public class BaseObject implements com.example.ObjIFace {
+                    public int base;
+
+                    public BaseObject() {
+                        base = 1;
+                    }
+
+                    public BaseObject(int v) {
+                        base = v;
+                    }
+
+                    public void process() {
+                        System.out.println("Do nothing...");
+                    }
+                }
+                """
+            },
+            out="""
+                Base data is 1
+                Extra data 1 is 99
+                Extra data 2 is 42
+                Processed Base data is 1
+                Processed Extra data 1 is 99
+                Processed Extra data 2 is 42
+                Done.
+                """,
+            run_in_function=False)

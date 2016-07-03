@@ -332,7 +332,7 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
-            java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+            java.util.List<org.python.Object> data = new java.util.ArrayList<org.python.Object>();
             data.add(this.__floordiv__(other));
             data.add(this.__mod__(other));
             return new org.python.types.Tuple(data);
@@ -548,6 +548,53 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __iadd__(org.python.Object other) {
+        if (other instanceof org.python.types.Int) {
+            return new org.python.types.Int(this.value += ((org.python.types.Int) other).value);
+        } else if (other instanceof org.python.types.Float) {
+            double this_val = this.value;
+            return new org.python.types.Float(this_val += ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(this.value += (((org.python.types.Bool) other).value ? 1 : 0));
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'int' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __ilshift__(org.python.Object other) {
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(this.value <<= (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int(this.value <<= other_val);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: 'int' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __irshift__(org.python.Object other) {
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(this.value >>= (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int(this.value >>= other_val);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: 'int' and '" + other.typeName() + "'");
+    }   
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __neg__() {
         return new org.python.types.Int(-this.value);
     }
@@ -591,7 +638,10 @@ public class Int extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.NotImplementedError("int.__round__() has not been implemented");
+        if (ndigits instanceof org.python.types.Int){
+               return new org.python.types.Int(this.value);
+        }
+        throw new org.python.exceptions.TypeError("'"+ndigits.typeName()+"' object cannot be interpreted as an integer");
     }
 
 }

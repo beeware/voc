@@ -16,6 +16,25 @@ public class NoneType extends org.python.types.Object {
     }
 
     @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __iadd__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'NoneType' and '" + other.typeName() + "'");
+    }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __ilshift__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: 'NoneType' and '" + other.typeName() + "'");
+    }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __irshift__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: 'NoneType' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
         __doc__=""
     )
     public org.python.Object __neg__() {
@@ -106,5 +125,12 @@ public class NoneType extends org.python.types.Object {
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         return false;
+    }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
+           
+      throw new org.python.exceptions.TypeError("type NoneType doesn't define __round__ method");    
     }
 }

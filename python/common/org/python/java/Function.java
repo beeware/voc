@@ -110,13 +110,13 @@ public class Function extends org.python.types.Object implements org.python.Call
         // org.Python.debug("               To", to_type);
 
         if (from_type == null) {
-            if (       from_type == java.lang.Double.TYPE
-                    || from_type == java.lang.Float.TYPE
-                    || from_type == java.lang.Long.TYPE
-                    || from_type == java.lang.Integer.TYPE
-                    || from_type == java.lang.Short.TYPE
-                    || from_type == java.lang.Byte.TYPE
-                    || from_type == java.lang.Character.TYPE) {
+            if (       to_type == java.lang.Double.TYPE
+                    || to_type == java.lang.Float.TYPE
+                    || to_type == java.lang.Long.TYPE
+                    || to_type == java.lang.Integer.TYPE
+                    || to_type == java.lang.Short.TYPE
+                    || to_type == java.lang.Byte.TYPE
+                    || to_type == java.lang.Character.TYPE) {
                 // org.Python.debug("null cannot be assigned to a primitive");
                 return MatchType.NO_MATCH;
             } else {
@@ -432,8 +432,8 @@ public class Function extends org.python.types.Object implements org.python.Call
             clazz = clazz.getSuperclass();
         }
         // org.Python.debug("methods: ", this.methods);
-        this.attrs.put("__name__", new org.python.types.Str(this.name));
-        this.attrs.put("__qualname__", new org.python.types.Str(this.name));
+        this.__dict__.put("__name__", new org.python.types.Str(this.name));
+        this.__dict__.put("__qualname__", new org.python.types.Str(this.name));
     }
 
     @org.python.Method(
@@ -519,7 +519,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             throw new org.python.exceptions.RuntimeError("Illegal access to Java function");
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
-                e.getTargetException().printStackTrace();
+                // e.getTargetException().printStackTrace();
                 // If the Java method raised an Python exception, re-raise that
                 // exception as-is. If it wasn"t a Python exception, wrap it
                 // as one and continue.
@@ -527,9 +527,14 @@ public class Function extends org.python.types.Object implements org.python.Call
             } catch (ClassCastException java_e) {
                 java.lang.String message = e.getCause().getMessage();
                 if (message == null) {
-                    message = e.getCause().getClass().getName();
+                    throw new org.python.exceptions.RuntimeError(
+                        e.getCause().getClass().getName()
+                    );
+                } else {
+                    throw new org.python.exceptions.RuntimeError(
+                        e.getCause().getClass().getName() + ": " + message
+                    );
                 }
-                throw new org.python.exceptions.RuntimeError(message);
             }
         } finally {
         //     org.Python.debug("INVOKE METHOD DONE");

@@ -77,15 +77,27 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Float __float__() {
+        double result;
         try {
-            return new org.python.types.Float(Double.parseDouble(this.value));
+            result = Double.parseDouble(this.value);
         } catch (NumberFormatException e) {
-            String value = this.value;
-            if (value.length() > 0) {
-                value = "'" + value + "'";
+            String trimmed = this.value.trim();
+            if (trimmed == "inf") {
+                result = Double.POSITIVE_INFINITY;
+            } else if (trimmed == "-inf") {
+                result = Double.NEGATIVE_INFINITY;
+            } else if (trimmed == "nan") {
+                result = Double.NaN;
+            } else {
+                String value = this.value;
+                if (value.length() > 0) {
+                    value = "'" + value + "'";
+                }
+                throw new org.python.exceptions.ValueError(
+                    "could not convert string to float: " + value);
             }
-            throw new org.python.exceptions.ValueError("could not convert string to float: " + value);
         }
+        return new org.python.types.Float(result);
     }
 
     @org.python.Method(
@@ -225,7 +237,21 @@ public class Str extends org.python.types.Object {
                     }
                 }
                 return new org.python.types.Str(sliced);
+            } else if (index instanceof org.python.types.Bool) {
+                boolean slice = ((org.python.types.Bool) index).value;
+                java.lang.String sliced;
 
+                if (this.value.length() == 0) {
+                    throw new org.python.exceptions.IndexError("string index out of range");
+                } else {
+                    if (slice) {
+                       sliced = this.value.substring(1, 2);
+                    }
+                    else {
+                       sliced = this.value.substring(0, 1);
+                    }
+                    return new org.python.types.Str(sliced);
+                }
             } else {
                 int idx = (int)((org.python.types.Int) index).value;
                 if (idx < 0) {
@@ -328,6 +354,15 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __ipow__(org.python.Object other) {
+        this.setValue(this.__pow__(other, null));
+        return this;
+    }
+
+    @org.python.Method(
         __doc__=""
     )
     public org.python.Object __pos__() {
@@ -370,13 +405,45 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+        this.setValue(this.__mul__(other));
+        return this;
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
-    public void __imod__(org.python.Object other) {
+    public org.python.Object __imod__(org.python.Object other) {
         if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         }
         super.__imod__(other);
+        return this;
+    }
+
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __iadd__(org.python.Object other) {
+        try {
+            this.setValue(this.__add__(other));
+            return this;
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to " + this.typeName() + " implicitly");
+        }
+    }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
+
+         throw new org.python.exceptions.TypeError("type str doesn't define __round__ method");
+
     }
 
 }

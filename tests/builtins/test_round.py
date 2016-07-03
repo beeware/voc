@@ -9,7 +9,6 @@ class BuiltinRoundFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["round"]
 
     not_implemented = [
-        'test_bool',
         'test_bytearray',
         'test_bytes',
         'test_class',
@@ -17,10 +16,8 @@ class BuiltinRoundFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_dict',
         'test_float',
         'test_frozenset',
-        'test_int',
-        'test_list',
-        'test_none',
+        'test_NotImplemented',
+        'test_range',
         'test_set',
-        'test_str',
-        'test_tuple',
+        'test_slice',
     ]

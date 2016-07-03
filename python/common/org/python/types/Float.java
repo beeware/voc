@@ -1,4 +1,5 @@
 package org.python.types;
+import java.util.Locale;
 
 public class Float extends org.python.types.Object {
     private static final long NEGATIVE_ZERO_RAW_BITS = Double.doubleToRawLongBits(-0.0);
@@ -48,7 +49,54 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(java.lang.Double.toString(this.value));
+        double value = this.value;
+        String result;
+        if (Double.isNaN(value)) {
+            result = "nan";
+        } else if (Double.isInfinite(value)) {
+            if (value > 0) {
+                result = "inf";
+            } else {
+                result = "-inf";
+            }
+        } else {
+            result = java.lang.Double.toString(this.value);
+            String format = "%.17g";
+            result = String.format(Locale.US, format, value);
+            int dot_pos = result.indexOf(".");
+            int e_pos = result.indexOf("e");
+            if (dot_pos != -1) {
+                // Remove trailing zeroes in the fractional part
+                int last_zero = -1;
+                int i;
+                for (i = dot_pos + 1; i < result.length(); i++) {
+                    char c = result.charAt(i);
+                    if (i == e_pos) {
+                        break;
+                    } else if (c == '0') {
+                        if (last_zero == -1) {
+                            last_zero = i;
+                        }
+                    } else {
+                        last_zero = -1;
+                    }
+                }
+                if (last_zero != -1) {
+                    if (last_zero == dot_pos + 1) {
+                        // Everything after the dot is zeros
+                        if (e_pos == -1) {
+                            // If there's no "e", leave ".0" at the end
+                            last_zero += 1;
+                        } else {
+                            // If there is an "e", nuke the dot as well
+                            last_zero -= 1;
+                        }
+                    }
+                    result = result.substring(0, last_zero) + result.substring(i);
+                }
+            }
+        }
+        return new org.python.types.Str(result);
     }
 
     @org.python.Method(
@@ -218,6 +266,22 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
+
+        if (other instanceof org.python.types.Str) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + "float" + "'");
+        } else if (other instanceof org.python.types.Int) {
+            return new org.python.types.Float(this.value * ((org.python.types.Int) other).value);
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float(((double) this.value) * ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Float(this.value * (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Dict) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
+        } else if (other instanceof org.python.types.NoneType) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
+        } else if (other instanceof org.python.types.Set) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
+        }
         throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
     }
 
@@ -335,7 +399,7 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
-            java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+            java.util.List<org.python.Object> data = new java.util.ArrayList<org.python.Object>();
             data.add(this.__floordiv__(other));
             data.add(this.__mod__(other));
             return new org.python.types.Tuple(data);
@@ -444,6 +508,36 @@ public class Float extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __iadd__(org.python.Object other) {
+        if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            return new org.python.types.Float(this.value += ((double) other_val));
+        } else if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Float(this.value += 1.0);
+            }
+            return new org.python.types.Float(this.value);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'float' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __ilshift__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: 'float' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __irshift__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: 'float' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __neg__() {
         return new org.python.types.Float(-this.value);
     }
@@ -485,5 +579,68 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.NotImplementedError("float.__round__() has not been implemented.");
+    }
+
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'float'");
+    }
+
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Str hex() {
+        String result;
+        if (Double.isNaN(this.value)) {
+            result = "nan";
+        } else if (Double.isInfinite(this.value)) {
+            if (this.value > 0) {
+                result = "inf";
+            } else {
+                result = "-inf";
+            }
+        } else {
+            long bits = Double.doubleToLongBits(this.value);
+            StringBuilder buffer = new StringBuilder();
+            boolean sign = (bits >> 63) != 0;
+            long exponent = (bits >> 52) & 0x7ffL;
+            long mantissa = bits & 0x000fffffffffffffL;
+            if (sign) {
+                buffer.append("-");
+            }
+            buffer.append("0x");
+            String hexMantissa = Long.toHexString(mantissa);
+            if (exponent == 0) {
+                buffer.append("0.");
+            } else {
+                buffer.append("1.");
+            }
+            if (exponent == 0 && mantissa == 0) {
+                // for some reason the matissa is not padded in this case
+                buffer.append(hexMantissa);
+                buffer.append("p+0");
+            } else {
+                buffer.append("0000000000000".substring(hexMantissa.length()));
+                buffer.append(hexMantissa);
+                if (exponent == 0) {
+                    exponent = -1022;
+                } else {
+                    exponent -= 1023;
+                }
+                if (exponent >= 0) {
+                    buffer.append("p+");
+                    buffer.append(Long.toString(exponent));
+                } else {
+                    buffer.append("p-");
+                    buffer.append(Long.toString(-exponent));
+                }
+            }
+            result = buffer.toString();
+        }
+        return new org.python.types.Str(result);
     }
 }

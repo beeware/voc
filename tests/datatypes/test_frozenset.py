@@ -1,66 +1,14 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
-
-class SliceTests(TranspileTestCase):
-    def test_slice_list(self):
-        self.assertCodeExecution("""
-            x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-            print("x[:] = ", x[:])
-            print("x[5:] = ", x[5:])
-            print("x[:5] = ", x[:5])
-            print("x[2:8] = ", x[2:8])
-
-            print("x[::2] = ", x[::2])
-            print("x[5::2] = ", x[5::2])
-            print("x[:5:2] = ", x[:5:2])
-            print("x[2:8:2] = ", x[2:8:2])
-            """)
-
-    def test_slice_range(self):
-        self.assertCodeExecution("""
-            x = range(0, 10)
-            print("x[:] = ", x[:])
-            print("x[5:] = ", x[5:])
-            print("x[:5] = ", x[:5])
-            print("x[2:8] = ", x[2:8])
-
-            print("x[::2] = ", x[::2])
-            print("x[5::2] = ", x[5::2])
-            print("x[:5:2] = ", x[:5:2])
-            print("x[2:8:2] = ", x[2:8:2])
-            """)
-
-    def test_slice_string(self):
-        self.assertCodeExecution("""
-            x = "0123456789a"
-            print("x[:] = ", x[:])
-            print("x[5:] = ", x[5:])
-            print("x[:5] = ", x[:5])
-            print("x[2:8] = ", x[2:8])
-
-            print("x[::2] = ", x[::2])
-            print("x[5::2] = ", x[5::2])
-            print("x[:5:2] = ", x[:5:2])
-            print("x[2:8:2] = ", x[2:8:2])
-            """)
-
-    def test_slice_tuple(self):
-        self.assertCodeExecution("""
-            x = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-            print("x[:] = ", x[:])
-            print("x[5:] = ", x[5:])
-            print("x[:5] = ", x[:5])
-            print("x[2:8] = ", x[2:8])
-
-            print("x[::2] = ", x[::2])
-            print("x[5::2] = ", x[5::2])
-            print("x[:5:2] = ", x[:5:2])
-            print("x[2:8:2] = ", x[2:8:2])
-            """)
+import unittest
 
 
-class UnarySliceOperationTests(UnaryOperationTestCase, TranspileTestCase):
-    data_type = 'slice'
+class FrozensetTests(TranspileTestCase):
+    pass
+
+
+class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
+    data_type = 'frozenset'
 
     not_implemented = [
         'test_unary_invert',
@@ -70,8 +18,8 @@ class UnarySliceOperationTests(UnaryOperationTestCase, TranspileTestCase):
     ]
 
 
-class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
-    data_type = 'slice'
+class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
+    data_type = 'frozenset'
 
     not_implemented = [
         'test_add_bool',
@@ -418,8 +366,8 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
     ]
 
 
-class InplaceSliceOperationTests(InplaceOperationTestCase, TranspileTestCase):
-    data_type = 'slice'
+class InplaceFrozensetOperationTests(InplaceOperationTestCase, TranspileTestCase):
+    data_type = 'frozenset'
 
     not_implemented = [
         'test_add_bool',

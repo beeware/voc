@@ -11,8 +11,8 @@ class BuiltinRangeFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     not_implemented = [
         'test_bool',
         'test_bytearray',
-        'test_bytes',
         'test_class',
         'test_complex',
         'test_frozenset',
+        'test_slice',
     ]

@@ -30,7 +30,7 @@ print('Done.')
 
 class JavaNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
-        self.assertEqual(cleanse_java(adjust(actual)), adjust(expected))
+        self.assertEqual(cleanse_java(adjust(actual), None), adjust(expected))
 
     def test_no_exception(self):
         self.assertNormalized(
@@ -55,6 +55,21 @@ class JavaNormalizationTests(unittest.TestCase):
             ### EXCEPTION ###
             IndexError: list index out of range
                 test.py:2
+            """
+        )
+
+    def test_exception_in_module_init(self):
+        self.assertNormalized(
+            """
+            Exception in thread "main" org.python.exceptions.NameError: name 'y' is not defined
+                at org.python.types.Module.__getattribute__(Module.java:32)
+                at python.example.__init__.module$import(example.py:2)
+                at python.example.__init__.main(example.py)
+            """,
+            """
+            ### EXCEPTION ###
+            NameError: name 'y' is not defined
+                example.py:2
             """
         )
 
@@ -210,9 +225,6 @@ class JavaNormalizationTests(unittest.TestCase):
             """
         )
 
-    def test_float(self):
-        self.assertNormalized('7.950899459780156E-6', '7.950899459780156e-6')
-
     def test_memory_reference(self):
         self.assertNormalized(
             """
@@ -234,7 +246,7 @@ class JavaNormalizationTests(unittest.TestCase):
 
 class PythonNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
-        self.assertEqual(cleanse_python(adjust(actual)), adjust(expected))
+        self.assertEqual(cleanse_python(adjust(actual), None), adjust(expected))
 
     def test_no_exception(self):
         self.assertNormalized(
@@ -277,9 +289,6 @@ class PythonNormalizationTests(unittest.TestCase):
                 test.py:3
             """
         )
-
-    def test_float(self):
-        self.assertNormalized('7.950899459780156e-06', '7.950899459780156e-6')
 
     def test_memory_reference(self):
         self.assertNormalized(

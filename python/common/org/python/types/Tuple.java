@@ -417,7 +417,28 @@ public class Tuple extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __iadd__(org.python.Object other) {
+        if (other instanceof org.python.types.Tuple) {
+            this.value.addAll(((org.python.types.Tuple) other).value);
+            return this;
+        } else {
+            throw new org.python.exceptions.TypeError(
+                String.format("can only concatenate tuple (not \"%s\") to tuple", org.Python.typeName(other.getClass())));
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         throw new org.python.exceptions.NotImplementedError("tuple.index() has not been implemented.");
+    }
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __round__(org.python.Object ndigits) {
+           
+         throw new org.python.exceptions.TypeError("type tuple doesn't define __round__ method");    
+        
     }
 }
