@@ -365,18 +365,8 @@ public class Float extends org.python.types.Object {
                 if (other_val == 0) {
                     throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
                 } else {
-                    double result = this.value % other_val;
-                    if (other_val > 0 && result < 0) {
-                        // second operand is positive, ensure that result is positive
-                        result += other_val;
-                    } else if (other_val < 0 && result > 0) {
-                        // second operand is negative, ensure that result is negative
-                        result += other_val; // subtract other_val, which is negative
-                    }
-                    if (other_val < 0 && result >= 0
-                            && Double.doubleToRawLongBits(result) != NEGATIVE_ZERO_RAW_BITS) {
-                        result *= -1;
-                    }
+                    // Reference: http://stackoverflow.com/a/4412200
+                    double result = (((((double) this.value) % other_val) + other_val) % other_val);
                     return new org.python.types.Float(result);
                 }
             } else if (other instanceof org.python.types.Float) {
@@ -384,20 +374,7 @@ public class Float extends org.python.types.Object {
                 if (other_val == 0.0) {
                     throw new org.python.exceptions.ZeroDivisionError("float modulo");
                 } else {
-                    double result = ((double) this.value) % other_val;
-                    if (other_val > 0.0 && result < 0.0) {
-                        // second operand is positive, ensure that result is positive
-                        result += other_val;
-                    } else if (other_val < 0.0 && result > 0.0) {
-                        // second operand is negative, ensure that result is negative
-                        result += other_val; // subtract other_val, which is negative
-                    }
-                    // edge case where adding -0.0 to 0.0 doesn't yield the expected -0.0
-                    // do this only if it is definitely not -0.0 already
-                    if (other_val < 0.0 && result >= 0.0
-                            && Double.doubleToRawLongBits(result) != NEGATIVE_ZERO_RAW_BITS) {
-                        result *= -1;
-                    }
+                    double result = (((((double) this.value) % other_val) + other_val) % other_val);
                     return new org.python.types.Float(result);
                 }
             }
