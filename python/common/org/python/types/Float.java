@@ -358,12 +358,12 @@ public class Float extends org.python.types.Object {
                 if (((org.python.types.Bool) other).value) {
                     return new org.python.types.Float(this.value - Math.floor(this.value));
                 } else {
-                    throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
                 }
             } else if (other instanceof org.python.types.Int) {
                 long other_val = ((org.python.types.Int) other).value;
                 if (other_val == 0) {
-                    throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
                 } else {
                     // Reference: http://stackoverflow.com/a/4412200
                     double result = (((((double) this.value) % other_val) + other_val) % other_val);
@@ -379,9 +379,9 @@ public class Float extends org.python.types.Object {
                 }
             }
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.typeName() + "'");
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
