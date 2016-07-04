@@ -568,21 +568,34 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        if(((org.python.types.Int)ndigits).value != 0) {
-            throw new org.python.exceptions.NotImplementedError("float.__round__() with ndigits has not been implemented");
-        }
-        long wholeNumber = (long) this.value;
-        double fractionalPart = this.value - wholeNumber;
-        if(fractionalPart < 0.5) {
-            return new org.python.types.Int(wholeNumber);
-        } else if(fractionalPart > 0.5) {
-            return new org.python.types.Int(wholeNumber + 1);
-        } else {
-            if(wholeNumber%2 == 0) {
-                return new org.python.types.Int(wholeNumber + 1);
+        if(ndigits instanceof org.python.types.Int) {
+            long wholeNumber;
+            double fractionalPart;
+            if(((org.python.types.Int)ndigits).value != 0) {
+                throw new org.python.exceptions.NotImplementedError("float.__round__() with ndigits has not been implemented");
             } else {
-                return new org.python.types.Int(wholeNumber);
+                wholeNumber = (long) this.value;
+                fractionalPart = this.value - wholeNumber;
             }
+            int sign;
+            if(wholeNumber>=0) {
+                sign = 1;
+            } else {
+                sign = -1;
+            }
+            if(Math.abs(fractionalPart) < 0.5) {
+                return new org.python.types.Int(sign*Math.abs(wholeNumber));
+            } else if(Math.abs(fractionalPart) > 0.5) {
+                return new org.python.types.Int(sign*(Math.abs(wholeNumber) + 1));
+            } else {
+                if(wholeNumber%2 == 0) {
+                    return new org.python.types.Int(sign*Math.abs(wholeNumber));
+                } else {
+                    return new org.python.types.Int(sign*(Math.abs(wholeNumber) + 1));
+                }
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for round(): 'float' and '" + ndigits.typeName() + "'");
         }
     }
 
