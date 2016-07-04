@@ -112,7 +112,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_range',
         'test_eq_set',
         'test_eq_slice',
-        'test_eq_str',
         'test_eq_tuple',
 
         'test_floor_divide_bytearray',
@@ -190,7 +189,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_range',
         'test_ne_set',
         'test_ne_slice',
-        'test_ne_str',
         'test_ne_tuple',
 
 

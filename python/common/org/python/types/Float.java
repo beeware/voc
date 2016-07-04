@@ -152,16 +152,18 @@ public class Float extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value == ((double)((org.python.types.Int) other).value));
-        } else if (other instanceof Float) {
+        } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Bool(this.value == ((org.python.types.Float) other).value);
-        } else if (other instanceof Bool) {
+        } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value == 1.0);
             }
             else {
                 return new org.python.types.Bool(this.value == 0.0);
             }
-        } else if (other instanceof NoneType) {
+        } else if (other instanceof org.python.types.NoneType) {
+            return new org.python.types.Bool(false);
+        } else if (other instanceof org.python.types.Str) {
             return new org.python.types.Bool(false);
         }
         throw new org.python.exceptions.TypeError("unorderable types: float() == " + other.typeName() + "()");
@@ -172,7 +174,8 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object __ne__(org.python.Object other) {
         if (other instanceof org.python.types.Int || other instanceof org.python.types.Float ||
-            other instanceof org.python.types.Bool || other instanceof org.python.types.NoneType){
+            other instanceof org.python.types.Bool || other instanceof org.python.types.NoneType ||
+            other instanceof org.python.types.Str){
             if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
                 return new org.python.types.Bool(false);
             } else if(!((org.python.types.Bool) this.__eq__((org.python.Object) other)).value){
