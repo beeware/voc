@@ -7,8 +7,8 @@ VOC
 .. image:: https://travis-ci.org/pybee/voc.svg?branch=master
     :target: https://travis-ci.org/pybee/voc
 
-.. image:: https://badges.gitter.im/pybee/developers.svg
-    :target: https://gitter.im/pybee/developers
+.. image:: https://badges.gitter.im/pybee/general.svg
+    :target: https://gitter.im/pybee/general
 
 A transpiler that converts Python bytecode into Java bytecode.
 
