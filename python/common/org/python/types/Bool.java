@@ -93,7 +93,6 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __eq__(org.python.Object other) {
-
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) == ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
@@ -504,14 +503,14 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__neg__() has not been implemented.");
+        return new org.python.types.Int(this.value ? -1 : 0);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__pos__() has not been implemented.");
+        return new org.python.types.Int(this.value ? 1 : 0);
     }
 
     @org.python.Method(
@@ -525,7 +524,7 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__invert__() has not been implemented.");
+        return new org.python.types.Int(this.value ? -2 : -1);
     }
 
     @org.python.Method(

@@ -21,9 +21,6 @@ class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
     not_implemented = [
-        'test_unary_positive',
-        'test_unary_negative',
-        'test_unary_invert',
     ]
 
 
