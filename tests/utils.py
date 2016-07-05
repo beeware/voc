@@ -664,6 +664,8 @@ SAMPLE_SUBSTITUTIONS = {
         "{'d': 'another', 'a': 1, 'c': 2.3456}",
         "{'d': 'another', 'c': 2.3456, 'a': 1}",
     ],
+    # Normalize precision error
+    "-3.14159": ["-3.1415900000000008",],
 }
 
 

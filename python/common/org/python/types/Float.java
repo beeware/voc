@@ -366,6 +366,14 @@ public class Float extends org.python.types.Object {
                     throw new org.python.exceptions.ZeroDivisionError("float modulo");
                 } else {
                     // Reference: http://stackoverflow.com/a/4412200
+                    // This translates to (a % b + b) %b
+                    // This expression works as the result of (a % b) is necessarily lower than b,
+                    // no matter if a is positive or negative. Adding b takes care of the negative
+                    // values of a, since (a % b) is a negative value between -b and 0, (a % b + b)
+                    // is necessarily lower than b and positive. The last modulo is there in case a
+                    // was positive to begin with, since if a is positive (a % b + b) would become
+                    // larger than b. Therefore, (a % b + b) % b turns it into smaller than b again
+                    // (and doesn't affect negative a values).
                     double result = (((((double) this.value) % other_val) + other_val) % other_val);
                     return new org.python.types.Float(result);
                 }

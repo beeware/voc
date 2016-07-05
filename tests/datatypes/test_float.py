@@ -153,7 +153,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_bytearray',
         'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_int',
         'test_modulo_frozenset',
         'test_modulo_slice',
 
@@ -268,13 +267,11 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_lshift_frozenset',
         'test_lshift_slice',
 
-        'test_modulo_bool',
         'test_modulo_bytearray',
         'test_modulo_class',
         'test_modulo_complex',
         'test_modulo_frozenset',
         'test_modulo_slice',
-        'test_modulo_int',
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
