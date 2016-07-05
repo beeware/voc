@@ -27,24 +27,24 @@ class RangeTests(TranspileTestCase):
             range(0, 5, 0)
         """)
 
+    def test_len_empty(self):
+        self.assertCodeExecution("""
+            print(len(range(5, 5)))
+        """)
+
+    def test_len_positive_step(self):
+        self.assertCodeExecution("""
+            print(len(range(5, 0, 1)))
+        """)
+
+    def test_len_negative_step(self):
+        self.assertCodeExecution("""
+            print(len(range(0, 5, -1)))
+        """)
+
 
 class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
-
-    def test_bool_empty(self):
-        self.assertCodeExecution("""
-            print(bool(range(5, 5)))
-        """)
-
-    def test_bool_positive_step(self):
-        self.assertCodeExecution("""
-            print(bool(range(5, 0, 1)))
-        """)
-
-    def test_bool_negative_step(self):
-        self.assertCodeExecution("""
-            print(bool(range(0, 5, -1)))
-        """)
 
 
 class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):

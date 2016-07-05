@@ -122,12 +122,28 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     }
 
     @org.python.Method(
+        __doc__ = "Implement __len__(self)."
+    )
+    public org.python.types.Int __len__() {
+        if (this.step > 0 && this.start < this.stop) {
+            return new org.python.types.Int(
+                1 + (this.stop - 1 - this.start) / this.step
+            );
+        } else if (this.step < 0 && this.start > this.stop) {
+            return new org.python.types.Int(
+                1 + (this.start - 1 - this.stop) / (-this.step)
+            );
+        } else {
+            return new org.python.types.Int(0);
+        }
+    }
+
+    @org.python.Method(
         __doc__ = "Implement __bool__(self)."
     )
     public org.python.types.Bool __bool__() {
         return new org.python.types.Bool(
-            (this.step > 0 && this.start < this.stop)
-            || (this.step < 0 && this.start > this.stop)
+            ((org.python.types.Int) this.__len__()).value > 0
         );
     }
 
