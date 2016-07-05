@@ -37,6 +37,9 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         } else {
             throw new org.python.exceptions.TypeError("'" + step.typeName() + "' object cannot be interpreted as an integer");
         }
+        if (this.step == 0) {
+            throw new org.python.exceptions.ValueError("range() arg 3 must not be zero");
+        }
         this.__dict__.put("step", step);
 
         index = this.start;

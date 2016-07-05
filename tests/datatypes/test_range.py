@@ -22,6 +22,11 @@ class RangeTests(TranspileTestCase):
             print("x[5] = ", x[5])
             """)
 
+    def test_zero_step(self):
+        self.assertCodeExecution("""
+            range(0, 5, 0)
+        """)
+
 
 class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
