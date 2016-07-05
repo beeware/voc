@@ -125,7 +125,10 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         __doc__ = "Implement __bool__(self)."
     )
     public org.python.types.Bool __bool__() {
-        return new org.python.types.Bool(this.start != this.stop);
+        return new org.python.types.Bool(
+            (this.step > 0 && this.start < this.stop)
+            || (this.step < 0 && this.start > this.stop)
+        );
     }
 
     @org.python.Method(
