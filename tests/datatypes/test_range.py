@@ -31,10 +31,6 @@ class RangeTests(TranspileTestCase):
 class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
 
-    not_implemented = [
-        'test_unary_not',
-    ]
-
 
 class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'range'

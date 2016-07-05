@@ -122,6 +122,13 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     }
 
     @org.python.Method(
+        __doc__ = "Implement __bool__(self)."
+    )
+    public org.python.types.Bool __bool__() {
+        return new org.python.types.Bool(this.start != this.stop);
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __invert__() {
