@@ -28,7 +28,6 @@ class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_unary_not',
-        'test_unary_positive',
     ]
 
 
