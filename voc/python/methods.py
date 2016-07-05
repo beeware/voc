@@ -338,7 +338,7 @@ class InitMethod(Method):
         self.add_opcodes(
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'toPython', '(Ljava/lang/Object;)Lorg/python/Object;'),
 
-            JavaOpcodes.LDC('__init__'),
+            JavaOpcodes.LDC_W('__init__'),
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute_null', '(Ljava/lang/String;)Lorg/python/Object;'),
 
             # If no __init__ exists, just return.

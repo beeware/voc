@@ -171,7 +171,7 @@ def compileJava(java_dir, java):
             sources.append(class_file)
 
     classpath = os.pathsep.join([
-        os.path.join('..', 'dist', 'python-java.jar'),
+        os.path.join('..', 'dist', 'python-java-support.jar'),
         os.curdir,
     ])
     proc = subprocess.Popen(
@@ -276,7 +276,7 @@ class TranspileTestCase(TestCase):
         cls.temp_dir = os.path.join(_output_dir, 'temp')
         classpath = ':'.join([
             os.path.join('dist', 'python-java-testdaemon.jar'),
-            os.path.join('dist', 'python-java.jar'),
+            os.path.join('dist', 'python-java-support.jar'),
         ])
         cls.jvm = subprocess.Popen(
             ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
@@ -511,7 +511,7 @@ class TranspileTestCase(TestCase):
                     continue
         else:
             classpath = os.pathsep.join([
-                os.path.join('..', 'dist', 'python-java.jar'),
+                os.path.join('..', 'dist', 'python-java-support.jar'),
                 os.path.join('..', 'java'),
                 os.curdir,
             ])
@@ -574,6 +574,12 @@ SAMPLE_DATA = {
             '2.3456',
             '0.0',
             '-3.14159',
+            '-4.81756',
+            '5.5',
+            '-3.5',
+            '4.5',
+            '-4.5',
+            '-3.5'
         ],
     'frozenset': [
             "frozenset()",
@@ -583,6 +589,8 @@ SAMPLE_DATA = {
             '3',
             '0',
             '-5',
+            '-3',
+            '5',
         ],
     'list': [
             "[]",
@@ -656,6 +664,8 @@ SAMPLE_SUBSTITUTIONS = {
         "{'d': 'another', 'a': 1, 'c': 2.3456}",
         "{'d': 'another', 'c': 2.3456, 'a': 1}",
     ],
+    # Normalize precision error
+    "-3.14159": ["-3.1415900000000008",],
 }
 
 

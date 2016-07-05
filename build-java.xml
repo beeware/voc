@@ -35,22 +35,22 @@
   <target name="dist" depends="compile" description="Generate Oracle jar file">
     <mkdir dir="${dist}"/>
 
-    <jar jarfile="${dist}/Python-Java-${python-version}-b${release}.jar" basedir="${build}/java"/>
+    <jar jarfile="${dist}/Python-Java-${python-version}-support.b${release}.jar" basedir="${build}/java"/>
 
     <copy
-        tofile="${dist}/python-java.jar"
-        file="${dist}/Python-Java-${python-version}-b${release}.jar"
+        tofile="${dist}/python-java-support.jar"
+        file="${dist}/Python-Java-${python-version}-support.b${release}.jar"
         overwrite="true" />
   </target>
 
   <target name="dist-testdaemon" depends="compile-testdaemon" description="Generate testdaemon jar file">
     <mkdir dir="${dist}"/>
 
-    <jar jarfile="${dist}/Python-Java-testdaemon-${python-version}-b${release}.jar" basedir="${build}/java-testdaemon"/>
+    <jar jarfile="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar" basedir="${build}/java-testdaemon"/>
 
     <copy
         tofile="${dist}/python-java-testdaemon.jar"
-        file="${dist}/Python-Java-testdaemon-${python-version}-b${release}.jar"
+        file="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar"
         overwrite="true" />
   </target>
 

@@ -119,8 +119,7 @@ public class Float extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value < 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value < 0.0);
             }
         }
@@ -135,11 +134,10 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Bool(this.value <= ((double)((org.python.types.Int) other).value));
         } else if (other instanceof Float) {
             return new org.python.types.Bool(this.value <= ((org.python.types.Float) other).value);
-        } else if(other instanceof Bool) {
+        } else if (other instanceof Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value <= 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value <= 0.0);
             }
         }
@@ -152,15 +150,18 @@ public class Float extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value == ((double)((org.python.types.Int) other).value));
-        } else if (other instanceof Float) {
+        } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Bool(this.value == ((org.python.types.Float) other).value);
-        } else if (other instanceof Bool) {
+        } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value == 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value == 0.0);
             }
+        } else if (other instanceof org.python.types.NoneType) {
+            return new org.python.types.Bool(false);
+        } else if (other instanceof org.python.types.Str) {
+            return new org.python.types.Bool(false);
         }
         throw new org.python.exceptions.TypeError("unorderable types: float() == " + other.typeName() + "()");
     }
@@ -169,7 +170,16 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("float.__ne__() has not been implemented.");
+        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float ||
+                other instanceof org.python.types.Bool || other instanceof org.python.types.NoneType ||
+                other instanceof org.python.types.Str) {
+            if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
+                return new org.python.types.Bool(false);
+            } else if (!((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
+                return new org.python.types.Bool(true);
+            }
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: float() == " + other.typeName() + "()");
     }
 
     @org.python.Method(
@@ -180,11 +190,10 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Bool(this.value > ((double)((org.python.types.Int) other).value));
         } else if (other instanceof Float) {
             return new org.python.types.Bool(this.value > ((org.python.types.Float) other).value);
-        } else if(other instanceof Bool) {
+        } else if (other instanceof Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value > 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value > 0.0);
             }
         }
@@ -198,11 +207,10 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Bool(this.value >= ((double)((org.python.types.Int) other).value));
         } else if (other instanceof Float) {
             return new org.python.types.Bool(this.value >= ((org.python.types.Float) other).value);
-        } else if(other instanceof Bool) {
+        } else if (other instanceof Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value >= 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value >= 0.0);
             }
         }
@@ -304,8 +312,7 @@ public class Float extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Float(this.value);
-            }
-            else {
+            } else {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
         }
@@ -345,25 +352,23 @@ public class Float extends org.python.types.Object {
                 if (((org.python.types.Bool) other).value) {
                     return new org.python.types.Float(this.value - Math.floor(this.value));
                 } else {
-                    throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
                 }
             } else if (other instanceof org.python.types.Int) {
                 long other_val = ((org.python.types.Int) other).value;
                 if (other_val == 0) {
-                    throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
+                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
                 } else {
-                    double result = this.value % other_val;
-                    if (other_val > 0 && result < 0) {
-                        // second operand is positive, ensure that result is positive
-                        result += other_val;
-                    } else if (other_val < 0 && result > 0) {
-                        // second operand is negative, ensure that result is negative
-                        result += other_val; // subtract other_val, which is negative
-                    }
-                    if (other_val < 0 && result >= 0
-                            && Double.doubleToRawLongBits(result) != NEGATIVE_ZERO_RAW_BITS) {
-                        result *= -1;
-                    }
+                    // Reference: http://stackoverflow.com/a/4412200
+                    // This translates to (a % b + b) %b
+                    // This expression works as the result of (a % b) is necessarily lower than b,
+                    // no matter if a is positive or negative. Adding b takes care of the negative
+                    // values of a, since (a % b) is a negative value between -b and 0, (a % b + b)
+                    // is necessarily lower than b and positive. The last modulo is there in case a
+                    // was positive to begin with, since if a is positive (a % b + b) would become
+                    // larger than b. Therefore, (a % b + b) % b turns it into smaller than b again
+                    // (and doesn't affect negative a values).
+                    double result = (((((double) this.value) % other_val) + other_val) % other_val);
                     return new org.python.types.Float(result);
                 }
             } else if (other instanceof org.python.types.Float) {
@@ -371,27 +376,14 @@ public class Float extends org.python.types.Object {
                 if (other_val == 0.0) {
                     throw new org.python.exceptions.ZeroDivisionError("float modulo");
                 } else {
-                    double result = ((double) this.value) % other_val;
-                    if (other_val > 0.0 && result < 0.0) {
-                        // second operand is positive, ensure that result is positive
-                        result += other_val;
-                    } else if (other_val < 0.0 && result > 0.0) {
-                        // second operand is negative, ensure that result is negative
-                        result += other_val; // subtract other_val, which is negative
-                    }
-                    // edge case where adding -0.0 to 0.0 doesn't yield the expected -0.0
-                    // do this only if it is definitely not -0.0 already
-                    if (other_val < 0.0 && result >= 0.0
-                            && Double.doubleToRawLongBits(result) != NEGATIVE_ZERO_RAW_BITS) {
-                        result *= -1;
-                    }
+                    double result = (((((double) this.value) % other_val) + other_val) % other_val);
                     return new org.python.types.Float(result);
                 }
             }
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.typeName() + "'");
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'int' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -578,7 +570,35 @@ public class Float extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.NotImplementedError("float.__round__() has not been implemented.");
+        if(ndigits instanceof org.python.types.Int) {
+            long wholeNumber;
+            double fractionalPart;
+            if (((org.python.types.Int)ndigits).value != 0) {
+                throw new org.python.exceptions.NotImplementedError("float.__round__() with ndigits has not been implemented");
+            } else {
+                wholeNumber = (long) this.value;
+                fractionalPart = this.value - wholeNumber;
+            }
+            int sign;
+            if (wholeNumber >= 0) {
+                sign = 1;
+            } else {
+                sign = -1;
+            }
+            if (Math.abs(fractionalPart) < 0.5) {
+                return new org.python.types.Int(sign * Math.abs(wholeNumber));
+            } else if (Math.abs(fractionalPart) > 0.5) {
+                return new org.python.types.Int(sign * (Math.abs(wholeNumber) + 1));
+            } else {
+                if (wholeNumber % 2 == 0) {
+                    return new org.python.types.Int(sign * Math.abs(wholeNumber));
+                } else {
+                    return new org.python.types.Int(sign * (Math.abs(wholeNumber) + 1));
+                }
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for round(): 'float' and '" + ndigits.typeName() + "'");
+        }
     }
 
 

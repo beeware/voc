@@ -15,7 +15,7 @@ Setting up your development environment
 The process of setting up a development environment is very similar to
 the :doc:`/intro/getting-started` process. The biggest difference is that
 instead of using the official PyBee repository, you'll be using your own
-Github fork .
+Github fork.
 
 As with the getting started guide, these instructions will assume that you
 have Python3, a Java 7 or Java 8 JDK, and Apache ANT installed, and have virtualenv available for use.
@@ -51,7 +51,7 @@ To run the entire test suite, type:
 
     $ cd voc
     $ python setup.py test
-    
+
 To capture unexpected successes in test:
 
     $ python setup.py test | grep success
