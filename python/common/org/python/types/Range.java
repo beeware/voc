@@ -124,4 +124,11 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     public org.python.Object __invert__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'range'");
     }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'range'");
+    }
 }
