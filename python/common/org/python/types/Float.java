@@ -119,8 +119,7 @@ public class Float extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value < 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value < 0.0);
             }
         }
@@ -135,11 +134,10 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Bool(this.value <= ((double)((org.python.types.Int) other).value));
         } else if (other instanceof Float) {
             return new org.python.types.Bool(this.value <= ((org.python.types.Float) other).value);
-        } else if(other instanceof Bool) {
+        } else if (other instanceof Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value <= 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value <= 0.0);
             }
         }
@@ -157,8 +155,7 @@ public class Float extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value == 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value == 0.0);
             }
         } else if (other instanceof org.python.types.NoneType) {
@@ -174,11 +171,11 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object __ne__(org.python.Object other) {
         if (other instanceof org.python.types.Int || other instanceof org.python.types.Float ||
-            other instanceof org.python.types.Bool || other instanceof org.python.types.NoneType ||
-            other instanceof org.python.types.Str){
+                other instanceof org.python.types.Bool || other instanceof org.python.types.NoneType ||
+                other instanceof org.python.types.Str) {
             if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
                 return new org.python.types.Bool(false);
-            } else if(!((org.python.types.Bool) this.__eq__((org.python.Object) other)).value){
+            } else if (!((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
                 return new org.python.types.Bool(true);
             }
         }
@@ -193,11 +190,10 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Bool(this.value > ((double)((org.python.types.Int) other).value));
         } else if (other instanceof Float) {
             return new org.python.types.Bool(this.value > ((org.python.types.Float) other).value);
-        } else if(other instanceof Bool) {
+        } else if (other instanceof Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value > 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value > 0.0);
             }
         }
@@ -211,11 +207,10 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Bool(this.value >= ((double)((org.python.types.Int) other).value));
         } else if (other instanceof Float) {
             return new org.python.types.Bool(this.value >= ((org.python.types.Float) other).value);
-        } else if(other instanceof Bool) {
+        } else if (other instanceof Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value >= 1.0);
-            }
-            else {
+            } else {
                 return new org.python.types.Bool(this.value >= 0.0);
             }
         }
@@ -317,8 +312,7 @@ public class Float extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Float(this.value);
-            }
-            else {
+            } else {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
         }
@@ -579,27 +573,27 @@ public class Float extends org.python.types.Object {
         if(ndigits instanceof org.python.types.Int) {
             long wholeNumber;
             double fractionalPart;
-            if(((org.python.types.Int)ndigits).value != 0) {
+            if (((org.python.types.Int)ndigits).value != 0) {
                 throw new org.python.exceptions.NotImplementedError("float.__round__() with ndigits has not been implemented");
             } else {
                 wholeNumber = (long) this.value;
                 fractionalPart = this.value - wholeNumber;
             }
             int sign;
-            if(wholeNumber>=0) {
+            if (wholeNumber >= 0) {
                 sign = 1;
             } else {
                 sign = -1;
             }
-            if(Math.abs(fractionalPart) < 0.5) {
-                return new org.python.types.Int(sign*Math.abs(wholeNumber));
-            } else if(Math.abs(fractionalPart) > 0.5) {
-                return new org.python.types.Int(sign*(Math.abs(wholeNumber) + 1));
+            if (Math.abs(fractionalPart) < 0.5) {
+                return new org.python.types.Int(sign * Math.abs(wholeNumber));
+            } else if (Math.abs(fractionalPart) > 0.5) {
+                return new org.python.types.Int(sign * (Math.abs(wholeNumber) + 1));
             } else {
-                if(wholeNumber%2 == 0) {
-                    return new org.python.types.Int(sign*Math.abs(wholeNumber));
+                if (wholeNumber % 2 == 0) {
+                    return new org.python.types.Int(sign * Math.abs(wholeNumber));
                 } else {
-                    return new org.python.types.Int(sign*(Math.abs(wholeNumber) + 1));
+                    return new org.python.types.Int(sign * (Math.abs(wholeNumber) + 1));
                 }
             }
         } else {
