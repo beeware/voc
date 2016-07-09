@@ -28,6 +28,7 @@ setup(
     entry_points={
         'console_scripts': [
             'voc = voc.__main__:main',
+            'vod = voc.java.__main__:main',
         ]
     },
     license='New BSD',
