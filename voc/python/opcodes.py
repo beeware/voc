@@ -1037,8 +1037,8 @@ class InplaceOpcode(Opcode):
                 '(Lorg/python/Object;)Lorg/python/Object;'
             )
         )
-        
- 
+
+
 
 ##########################################################################
 # The actual Python opcodes
