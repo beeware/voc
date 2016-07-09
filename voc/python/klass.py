@@ -114,13 +114,12 @@ class ClassBlock(Block):
             # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor),
             # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
-            # JavaOpcodes.LDC_W("FORCE LOAD OF " + self.module.class_name),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-
             # Force the loading and instantiation of the module
             # that contains the class.
-            JavaOpcodes.LDC_W(self.module.class_name),
-            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
+            JavaOpcodes.ACONST_NULL(),
+            JavaOpcodes.ICONST_0(),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;[Ljava/lang/String;I)Lorg/python/types/Module;'),
             JavaOpcodes.POP(),
 
             # Set __base__ on the type
