@@ -171,7 +171,7 @@ def compileJava(java_dir, java):
             sources.append(class_file)
 
     classpath = os.pathsep.join([
-        os.path.join('..', 'dist', 'python-java.jar'),
+        os.path.join('..', 'dist', 'python-java-support.jar'),
         os.curdir,
     ])
     proc = subprocess.Popen(
@@ -276,7 +276,7 @@ class TranspileTestCase(TestCase):
         cls.temp_dir = os.path.join(_output_dir, 'temp')
         classpath = ':'.join([
             os.path.join('dist', 'python-java-testdaemon.jar'),
-            os.path.join('dist', 'python-java.jar'),
+            os.path.join('dist', 'python-java-support.jar'),
         ])
         cls.jvm = subprocess.Popen(
             ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
@@ -511,7 +511,7 @@ class TranspileTestCase(TestCase):
                     continue
         else:
             classpath = os.pathsep.join([
-                os.path.join('..', 'dist', 'python-java.jar'),
+                os.path.join('..', 'dist', 'python-java-support.jar'),
                 os.path.join('..', 'java'),
                 os.curdir,
             ])
