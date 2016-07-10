@@ -49,7 +49,7 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     @org.python.Method(
         __doc__ = "Implement iter(self)."
     )
-    public org.python.types.Str __repr__() {
+    public org.python.Object __repr__() {
         if (this.step == 1) {
             return new org.python.types.Str(String.format("range(%d, %d)", this.start, this.stop));
         } else {
@@ -124,7 +124,7 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     @org.python.Method(
         __doc__ = "Implement __len__(self)."
     )
-    public org.python.types.Int __len__() {
+    public org.python.Object __len__() {
         if (this.step > 0 && this.start < this.stop) {
             return new org.python.types.Int(
                 1 + (this.stop - 1 - this.start) / this.step
@@ -141,7 +141,7 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     @org.python.Method(
         __doc__ = "Implement __bool__(self)."
     )
-    public org.python.types.Bool __bool__() {
+    public org.python.Object __bool__() {
         return new org.python.types.Bool(
             ((org.python.types.Int) this.__len__()).value > 0
         );
