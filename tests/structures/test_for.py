@@ -72,6 +72,18 @@ class ForLoopTests(TranspileTestCase):
              Code (159 bytes)
             """)
 
+    @expectedFailure
+    def test_for_else_break(self):
+        self.assertCodeExecution(
+            code="""
+                total = 0
+                for i in []:
+                    total = total + i
+                    break
+                else:
+                    total = -999
+            """)
+
     def test_break(self):
         self.assertCodeExecution(
             code="""

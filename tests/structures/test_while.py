@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -63,5 +65,34 @@ class WhileLoopTests(TranspileTestCase):
                     i = i + 1
                     if i == 10:
                         break
+                print("Done")
+            """)
+
+    @expectedFailure
+    def test_while_else(self):
+        self.assertCodeExecution(
+            code="""
+                i = 1
+                j = 4
+                while i < j:
+                    print(i)
+                    i = i + 1
+                else:
+                    print("Else")
+                print("Done")
+            """)
+
+    @expectedFailure
+    def test_while_else_break(self):
+        self.assertCodeExecution(
+            code="""
+                i = 1
+                j = 4
+                while i < j:
+                    print(i)
+                    i = i + 1
+                    break
+                else:
+                    print("Else")
                 print("Done")
             """)
