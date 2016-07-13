@@ -418,12 +418,15 @@ class ForLoop:
         self.commands = []
 
         self.modifier = ''
+        
+        self.else_block = None
 
     def __repr__(self):
-        return '<For %s: %s-%s>' % (
+        return '<For %s: %s-%s%s>' % (
             self.start,
             self.loop,
             self.end,
+            ' | %s' % self.else_block if self.else_block else '',
         )
 
     @property
@@ -585,10 +588,13 @@ class WhileLoop:
         self.starts_line = starts_line
         self.commands = []
 
+        self.else_block = None
+
     def __repr__(self):
-        return '<For %s-%s>' % (
+        return '<While %s-%s%s>' % (
             self.start,
             self.end,
+            ' | %s' % self.else_block if self.else_block else '',
         )
 
     @property
@@ -866,6 +872,12 @@ def find_blocks(instructions):
             while instructions[i].opname not in ('FOR_ITER', 'POP_JUMP_IF_FALSE'):
                 i = i + 1
 
+            loop_end_offset = instructions[i].argval
+            loop_end_index = offset_index[loop_end_offset]
+
+            print("LOOP END INDEX", loop_end_index)
+            print("LOOP END OFFSET", loop_end_offset)
+
             if instructions[i].opname == 'FOR_ITER':
                 loop_offset = instructions[i + 2].offset
                 loop_index = offset_index[loop_offset]
@@ -878,21 +890,43 @@ def find_blocks(instructions):
                     start=start_index,
                     loop=loop_index,
                     varname=instructions[loop_index - 1].argval,
-                    end=end_index,
+                    end=loop_end_index,
                     start_offset=instructions[start_index].offset,
                     for_offset=instructions[loop_index-2].offset,
                     loop_offset=loop_offset,
-                    end_offset=end_offset,
+                    end_offset=loop_end_offset,
                     starts_line=instruction.starts_line
                 )
             else:
                 block = WhileLoop(
                     start=start_index,
-                    end=end_index,
+                    end=loop_end_index,
                     start_offset=instructions[start_index].offset,
-                    end_offset=end_offset,
+                    end_offset=loop_end_offset,
                     starts_line=instruction.starts_line,
                 )
+
+            if end_offset > loop_end_offset:
+                else_offset = loop_end_offset + 1
+                else_index = offset_index[else_offset]
+
+                else_end_offset = end_offset
+                else_end_index = offset_index[else_end_offset]
+
+                print("ELSE INDEX", else_index)
+                print("ELSE OFFSET", else_offset)
+
+                print("ELSE END INDEX", else_end_index)
+                print("ELSE END OFFSET", else_end_offset)
+
+                else_block = ElseBlock(
+                    start=else_index,
+                    start_offset=else_offset,
+                    end=else_end_index,
+                    end_offset=else_end_offset,
+                    starts_line=instructions[else_index].starts_line
+                )
+                block.else_block = else_block
 
             blocks[end_index] = block
             i = i + 1
