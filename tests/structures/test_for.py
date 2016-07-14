@@ -67,9 +67,7 @@ class ForLoopTests(TranspileTestCase):
                     total = total + i
                 else:
                     total = -999
-                """,
-            expected="""
-             Code (159 bytes)
+                print(total)
             """)
 
     @expectedFailure
@@ -82,6 +80,7 @@ class ForLoopTests(TranspileTestCase):
                     break
                 else:
                     total = -999
+                print(total)
             """)
 
     def test_break(self):
