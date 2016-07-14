@@ -467,6 +467,18 @@ class TryExceptTests(TranspileTestCase):
                 print('outer except')
         """)
 
+    @expectedFailure
+    def test_try_if_else_in_try(self):
+        self.assertCodeExecution("""
+            try:
+                if 1 == 2:
+                    print('1 == 2!?')
+                else:
+                    print('1 != 2')
+            except:
+                print('except')
+        """)
+
 
 class TryExceptFinallyTests(TranspileTestCase):
     def test_try_finally(self):
