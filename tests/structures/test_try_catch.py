@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -451,6 +453,19 @@ class TryExceptTests(TranspileTestCase):
                 except Exception:
                     print('whoops')
             """)
+
+    @expectedFailure
+    def test_try_nested(self):
+        self.assertCodeExecution("""
+            try:
+                print('outer try')
+                try:
+                    print('inner try')
+                except:
+                    print('inner except')
+            except:
+                print('outer except')
+        """)
 
 
 class TryExceptFinallyTests(TranspileTestCase):
