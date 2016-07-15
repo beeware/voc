@@ -69,6 +69,19 @@ class WhileLoopTests(TranspileTestCase):
             """)
 
     @expectedFailure
+    def test_while_forever_with_if_not(self):
+        self.assertCodeExecution(
+            code="""
+                i = 0
+                while 1:
+                    print("Loop", i)
+                    i = i + 1
+                    if not i < 10:
+                        break
+                print("Done")
+            """)
+
+    @expectedFailure
     def test_while_else(self):
         self.assertCodeExecution(
             code="""
