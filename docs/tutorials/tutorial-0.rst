@@ -63,14 +63,14 @@ This classfile can run on any Java 6 (or higher) VM. To run the project, type:
 
 .. code-block:: bash
 
-    $ java -classpath ../voc/dist/python-java.jar:. python.example.__init__
+    $ java -classpath ../voc/dist/python-java-support.jar:. python.example.__init__
     Hello World!
 
 * On Windows
 
 .. code-block:: bash
 
-    > java -classpath ../voc/dist/python-java.jar;. python.example.__init__
+    > java -classpath ../voc/dist/python-java-support.jar;. python.example.__init__
     Hello World!
 
 
