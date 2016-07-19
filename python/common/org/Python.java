@@ -955,10 +955,12 @@ public class Python {
         __doc__ = "map(func, *iterables) --> map object" +
             "\n" +
             "Make an iterator that computes the function using arguments from\n" +
-            "each of the iterables.  Stops when the shortest iterable is exhausted.\n"
+            "each of the iterables.  Stops when the shortest iterable is exhausted.\n",
+        args={"func"},
+        varargs="iterable"
     )
-    public static org.python.Object map() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
+    public static org.python.Object map(org.python.Object func, org.python.Object [] iterables) {
+        return new org.python.types.MapObject(func, iterables);
     }
 
     @org.python.Method(
