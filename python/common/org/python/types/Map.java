@@ -1,22 +1,15 @@
 package org.python.types;
 
-public class MapObject extends org.python.types.Object implements org.python.Iterable {
+public class Map extends org.python.types.Object implements org.python.Iterable {
     private org.python.Object callable;
     private java.util.List<org.python.Iterable> iterators;
 
-    public MapObject(org.python.Object callable, org.python.Object [] iterables) {
+    public Map(org.python.Object callable, org.python.Object [] iterables) {
         this.callable = callable;
         this.iterators = new java.util.ArrayList();
         for (org.python.Object iterable: iterables) {
             this.iterators.add(org.Python.iter(iterable));
         }
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<map object at 0x%s>", this.hashCode()));
     }
 
     @org.python.Method(

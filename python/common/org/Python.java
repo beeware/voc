@@ -960,7 +960,7 @@ public class Python {
         varargs="iterable"
     )
     public static org.python.Object map(org.python.Object func, org.python.Object [] iterables) {
-        return new org.python.types.MapObject(func, iterables);
+        return new org.python.types.Map(func, iterables);
     }
 
     @org.python.Method(
