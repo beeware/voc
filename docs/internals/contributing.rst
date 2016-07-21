@@ -38,6 +38,7 @@ Then create a virtual environment and install VOC into it:
 
     $ virtualenv -p $(which python3) env
     $ . env/bin/activate
+    $ cd voc
     $ pip install -e .
 
 You're now ready to run the test suite!
@@ -49,7 +50,6 @@ To run the entire test suite, type:
 
 .. code-block:: bash
 
-    $ cd voc
     $ python setup.py test
 
 To capture unexpected successes in test:
@@ -60,7 +60,6 @@ Running the full test suite will take quite a while - it takes 40 minutes on the
 
 .. code-block:: bash
 
-    $ cd voc
     $ pip install -r requirements/tests.txt
     $ py.test -n auto
 
