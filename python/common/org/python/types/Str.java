@@ -269,7 +269,7 @@ public class Str extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("string indices must be integers, not " + index.typeName());
+            throw new org.python.exceptions.TypeError("string indices must be integers");
         }
     }
 
