@@ -119,3 +119,30 @@ class WhileLoopTests(TranspileTestCase):
                     print("Else")
                 print("Done")
             """)
+
+    @expectedFailure
+    def test_while_forever_inside_try(self):
+        """Test ``while True`` inside try/finally block.
+
+        Currently raises::
+
+            Traceback (most recent call last):
+              ...
+              File ".../env/src/voc/voc/python/opcodes.py", line 962, in convert
+                self.convert_opcode(context, arguments)
+              File ".../env/src/voc/voc/python/opcodes.py", line 1394, in convert_opcode
+                jump(JavaOpcodes.GOTO(0), context, current_loop, Opcode.NEXT)
+            UnboundLocalError: local variable 'current_loop' referenced before assignment
+        """
+        self.assertCodeExecution(
+            code="""
+                i = 0
+                try:
+                    while 1:
+                        print("Loop", i)
+                        i = i + 1
+                        if i == 10:
+                            break
+                finally:
+                    print("Done")
+            """)
