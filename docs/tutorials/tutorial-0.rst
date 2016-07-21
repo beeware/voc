@@ -11,6 +11,7 @@ This tutorial assumes you've read and followed the instructions in
 :doc:`/intro/getting-started`. If you've done this, you should have:
 
 * Java 6 (or higher) installed and available on your path,
+* A ``env`` directory for your virtualenv
 * A ``tutorial`` directory with a VOC checkout,
 * A activated Python 3.4 virtual environment,
 * VOC installed in that virtual environment,
@@ -29,6 +30,7 @@ Let's start by creating a ``tutorial0`` directory in the tutorial directory alon
 So that your directory structure looks like::
 
     tutorial
+    ├── env
     ├── tutorial0
     └── voc
 
