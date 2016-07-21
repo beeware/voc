@@ -55,16 +55,6 @@ class FloatTests(TranspileTestCase):
             print(x)
             """)
 
-    def test_eq_list(self):
-        self.assertCodeExecution("""
-            x = 3.14
-            y = True
-            print(x == y)
-            print('False')
-            """)
-
-
-
     @expectedFailure
     def test_negative_zero_constant(self):
         # Current behavior:
