@@ -186,8 +186,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_dict',
         'test_subscr_frozenset',
         'test_subscr_slice',
-        'test_subscr_str',
-        'test_subscr_tuple',
 
         'test_subtract_bytearray',
         'test_subtract_class',
