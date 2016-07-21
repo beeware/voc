@@ -274,7 +274,7 @@ class TranspileTestCase(TestCase):
         global _output_dir
         setUpSuite()
         cls.temp_dir = os.path.join(_output_dir, 'temp')
-        classpath = ':'.join([
+        classpath = os.pathsep.join([
             os.path.join('dist', 'python-java-testdaemon.jar'),
             os.path.join('dist', 'python-java-support.jar'),
         ])
