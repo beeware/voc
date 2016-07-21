@@ -55,6 +55,16 @@ class FloatTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_eq_list(self):
+        self.assertCodeExecution("""
+            x = 3.14
+            y = True
+            print(x == y)
+            print('False')
+            """)
+
+
+
     @expectedFailure
     def test_negative_zero_constant(self):
         # Current behavior:
@@ -107,7 +117,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_complex',
         'test_eq_dict',
         'test_eq_frozenset',
-        'test_eq_list',
         'test_eq_NotImplemented',
         'test_eq_range',
         'test_eq_set',

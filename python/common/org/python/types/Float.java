@@ -160,6 +160,8 @@ public class Float extends org.python.types.Object {
             }
         } else if (other instanceof org.python.types.NoneType) {
             return new org.python.types.Bool(false);
+        } else if (other instanceof org.python.types.List) {
+            return new org.python.types.Bool(false);
         } else if (other instanceof org.python.types.Str) {
             return new org.python.types.Bool(false);
         }
