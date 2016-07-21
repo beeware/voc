@@ -29,6 +29,7 @@ Let's start by creating a ``tutorial0`` directory in the tutorial directory alon
 So that your directory structure looks like::
 
     tutorial
+    ├── env
     ├── tutorial0
     └── voc
 
