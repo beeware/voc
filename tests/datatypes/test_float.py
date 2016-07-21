@@ -107,7 +107,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_complex',
         'test_eq_dict',
         'test_eq_frozenset',
-        'test_eq_list',
         'test_eq_NotImplemented',
         'test_eq_range',
         'test_eq_set',
