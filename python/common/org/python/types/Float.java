@@ -174,7 +174,7 @@ public class Float extends org.python.types.Object {
     public org.python.Object __ne__(org.python.Object other) {
         if (other instanceof org.python.types.Int || other instanceof org.python.types.Float ||
                 other instanceof org.python.types.Bool || other instanceof org.python.types.NoneType ||
-                other instanceof org.python.types.Str) {
+                other instanceof org.python.types.Str || other instanceof org.python.types.List) {
             if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
                 return new org.python.types.Bool(false);
             } else if (!((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
