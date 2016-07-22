@@ -67,7 +67,10 @@ public class List extends org.python.types.Object {
         if (other instanceof org.python.types.List) {
             this.value.addAll(((org.python.types.List) other).value);
             return this;
-        } else {
+        } else if (other instanceof org.python.types.Tuple) {
+	    this.value.addAll(((org.python.types.Tuple) other).value);
+	    return this;
+	} else {
             throw new org.python.exceptions.TypeError(
                 String.format("'%s' object is not iterable", Python.typeName(other.getClass())));
         }
