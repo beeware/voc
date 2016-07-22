@@ -183,7 +183,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_bytearray',
         'test_subscr_class',
         'test_subscr_complex',
-        'test_subscr_dict',
         'test_subscr_frozenset',
         'test_subscr_slice',
 
