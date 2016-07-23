@@ -1,15 +1,14 @@
 import os
 
 from ..java import (
-    Class as JavaClass,
-    Code as JavaCode,
-    Method as JavaMethod,
+    Class as JavaClass, Code as JavaCode, Method as JavaMethod, SourceFile,
     opcodes as JavaOpcodes,
-    SourceFile,
 )
 from .blocks import Block, IgnoreBlock
-from .methods import MainMethod, Method, CO_GENERATOR, GeneratorMethod, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, free_name
+from .methods import (
+    CO_GENERATOR, GeneratorMethod, MainMethod, Method, extract_parameters,
+)
+from .opcodes import ALOAD_name, ASTORE_name, free_name
 
 
 class ModuleBlock(Block):

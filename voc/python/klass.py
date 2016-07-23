@@ -1,20 +1,15 @@
 import os
 
 from ..java import (
-    Class as JavaClass,
-    Field as JavaField,
-    Method as JavaMethod,
-    Code as JavaCode,
-    opcodes as JavaOpcodes,
-    SourceFile,
-    RuntimeVisibleAnnotations,
-    Annotation,
-    ConstantElementValue,
+    Annotation, Class as JavaClass, Code as JavaCode, ConstantElementValue,
+    Field as JavaField, Method as JavaMethod, RuntimeVisibleAnnotations,
+    SourceFile, opcodes as JavaOpcodes,
 )
-
 from .blocks import Block, IgnoreBlock
-from .methods import InitMethod, InstanceMethod, CO_GENERATOR, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, free_name
+from .methods import (
+    CO_GENERATOR, InitMethod, InstanceMethod, extract_parameters,
+)
+from .opcodes import ALOAD_name, ASTORE_name, free_name
 
 
 class ClassBlock(Block):

@@ -1,5 +1,5 @@
-from collections import namedtuple
 import re
+from collections import namedtuple
 
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 
