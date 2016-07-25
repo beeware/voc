@@ -1,5 +1,6 @@
 from .signatures import method_descriptor
 
+
 ##########################################################################
 # Some utility methods to help compare and hash constants
 ##########################################################################

@@ -1,5 +1,4 @@
-from ..java import opcodes as JavaOpcodes, Classref
-
+from ..java import Classref, opcodes as JavaOpcodes
 
 ##########################################################################
 # Pseudo instructions used to flag the offset position of other
