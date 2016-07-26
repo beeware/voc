@@ -460,7 +460,17 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object count() {
+    public org.python.Object count(org.python.Object other) {
+        if (other instanceof org.python.types.Int) {
+            int count = 0;
+            int len = (int) this.__len__().value;
+            for(int i=0;i<len;i++) {
+                if(((org.python.types.Bool)other.__eq__(this.value.get(i))).value){
+                    count++;
+                }
+            }
+            return new org.python.types.Int(count);
+        }
         throw new org.python.exceptions.NotImplementedError("list.count() has not been implemented.");
     }
 
@@ -503,12 +513,11 @@ public class List extends org.python.types.Object {
     public org.python.Object sort() {
         throw new org.python.exceptions.NotImplementedError("list.sort() has not been implemented.");
     }
+
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-
-         throw new org.python.exceptions.TypeError("type list doesn't define __round__ method");
-
+        throw new org.python.exceptions.TypeError("type list doesn't define __round__ method");
     }
 }

@@ -78,6 +78,12 @@ class ListTests(TranspileTestCase):
             print(x[1:4])
             """)
 
+    def test_count(self):
+        self.assertCodeExecution("""
+            x = [1, 1, 1, 4, 5]
+            print(x.count(1))
+            """)
+
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'list'
