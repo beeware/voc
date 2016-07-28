@@ -462,17 +462,15 @@ public class List extends org.python.types.Object {
         args = {"other"}
     )
     public org.python.Object count(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            int count = 0;
-            int len = (int) this.__len__().value;
-            for(int i=0;i<len;i++) {
-                if(((org.python.types.Bool)other.__eq__(this.value.get(i))).value){
-                    count++;
-                }
+        int count = 0;
+        int len = (int) this.__len__().value;
+        for(int i=0;i<len;i++) {
+            System.out.println(this.value.get(i));
+            if(((org.python.types.Bool)other.__eq__(this.value.get(i))).value){
+                count++;
             }
-            return new org.python.types.Int(count);
         }
-        throw new org.python.exceptions.NotImplementedError("list.count() has not been implemented.");
+        return new org.python.types.Int(count);
     }
 
     @org.python.Method(
