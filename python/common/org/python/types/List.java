@@ -458,7 +458,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object count(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
