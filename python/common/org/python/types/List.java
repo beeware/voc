@@ -465,7 +465,6 @@ public class List extends org.python.types.Object {
         int count = 0;
         int len = (int) this.__len__().value;
         for(int i=0;i<len;i++) {
-            System.out.println(this.value.get(i));
             if(((org.python.types.Bool)other.__eq__(this.value.get(i))).value){
                 count++;
             }
