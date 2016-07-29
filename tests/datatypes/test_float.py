@@ -173,7 +173,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_dict',
         'test_ne_frozenset',
         'test_ne_NotImplemented',
-        'test_ne_list',
         'test_ne_range',
         'test_ne_set',
         'test_ne_slice',
