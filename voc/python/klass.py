@@ -9,7 +9,9 @@ from .blocks import Block, IgnoreBlock
 from .methods import (
     CO_GENERATOR, InitMethod, InstanceMethod, extract_parameters,
 )
-from .opcodes import ALOAD_name, ASTORE_name, free_name
+from .utils import (
+    ALOAD_name, ASTORE_name, free_name
+)
 
 
 class ClassBlock(Block):

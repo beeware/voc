@@ -1,11 +1,15 @@
+import ast
 import dis
 
 from ..java import (
     Code as JavaCode, ExceptionInfo as JavaExceptionInfo, LineNumberTable,
-    opcodes as JavaOpcodes,
+    opcodes as JavaOpcodes, Classref
 )
-from .opcodes import ALOAD_name, ICONST_val, Opcode, Ref, jump, resolve_jump
-from .utils import extract_command, find_blocks
+from .utils import (
+    TRY, CATCH, END_TRY,
+    jump, resolve_jump, Ref,
+    ICONST_val, ALOAD_name, ASTORE_name,
+)
 
 
 class IgnoreBlock(Exception):
@@ -55,39 +59,6 @@ class Block:
     def delete_name(self, name, use_locals):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
-    def extract(self, code):
-        """Break a code object into the parts it defines, populating the
-        provided block.
-
-        """
-        self.code = code
-        instructions = list(dis.Bytecode(code))
-
-        if self.verbosity > 1:
-            print ('=' * len(str(code)))
-            print (code)
-            print ('-' * len(str(code)))
-
-        # for i, inst in enumerate(instructions):
-        #     print (i, inst.offset, inst.opname, inst.argval)
-
-        blocks = find_blocks(instructions)
-
-        i = len(instructions)
-        commands = []
-        while i > 0:
-            i, command = extract_command(instructions, blocks, i)
-            commands.append(command)
-
-        commands.reverse()
-
-        if self.verbosity > 1:
-            for command in commands:
-                command.dump()
-
-        # Append the extracted commands to any pre-existing ones.
-        self.commands.extend(commands)
-
     @property
     def can_ignore_empty(self):
         return False
@@ -112,9 +83,275 @@ class Block:
                 # Resolve any references to the "next" opcode.
                 for (obj, attr) in self.next_resolve_list:
                     # print("        resolve %s reference on %s %s with %s %s" % (attr, obj, id(obj), opcode, id(opcode)))
-                    setattr(obj, attr, opcode)
+                    setattr(obj, attr.value, opcode)
 
                 self.next_resolve_list = []
+
+    def add_str(self, value):
+        self.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(value),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+        )
+
+    def add_int(self, value):
+        self.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Int'),
+            JavaOpcodes.DUP(),
+            ICONST_val(value),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+        )
+
+    def add_float(self, value):
+        self.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Float'),
+            JavaOpcodes.DUP(),
+            ICONST_val(value),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
+        )
+
+    def add_tuple(self, data):
+        self.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Tuple'),
+            JavaOpcodes.DUP(),
+
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+        )
+
+        for value in data:
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+
+            if value is None:
+                self.add_opcodes(
+                    JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+                )
+            else:
+                if isinstance(value, bool):
+                    self.add_opcodes(
+                        JavaOpcodes.NEW('org/python/types/Bool'),
+                        JavaOpcodes.DUP(),
+                        ICONST_val(value),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                    )
+
+                elif isinstance(value, int):
+                    self.add_opcodes(
+                        JavaOpcodes.NEW('org/python/types/Int'),
+                        JavaOpcodes.DUP(),
+                        ICONST_val(value),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+                    )
+
+                elif isinstance(value, float):
+                    self.add_opcodes(
+                        JavaOpcodes.NEW('org/python/types/Float'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.LDC2_W(value),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
+                    )
+
+                elif isinstance(value, str):
+                    self.add_opcodes(
+                        JavaOpcodes.NEW('org/python/types/Str'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.LDC_W(value),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                    )
+
+                # elif isinstance(value, bytes):
+                #     self.add_opcodes(
+                #         JavaOpcodes.NEW('org/python/types/Bytes'),
+                #         JavaOpcodes.DUP(),
+                #         JavaOpcodes.LDC_W(value),
+                #         JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
+                #     )
+
+                elif isinstance(value, tuple):
+                    self.add_tuple(value)
+
+                else:
+                    raise RuntimeError("Unknown constant type %s" % type(value))
+
+            self.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP()
+            )
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
+        )
+
+    def add_callable(self, function_def, method, closure=False):
+
+        # We need the code object for the AST function definition.
+        # Create and compile a module that only contains the function def;
+        # the sixth last instruction will be a LOAD_CONST of the code
+        # object for the function being defined.
+        #   ...
+        #   LOAD_CONST     (<code object>)
+        #   LOAD_CONST     'function_name'
+        #   MAKE_FUNCTION
+        #   STORE_NAME     function_name
+        #   LOAD_CONST     None
+        #   RETURN_VALUE
+        compiled = compile(
+            ast.Module(body=[function_def]),
+            filename=self.module.sourcefile,
+            mode='exec'
+        )
+        code = list(dis.get_instructions(compiled))[-6].argval
+
+        # Evaluate the full method name
+        full_method_name = function_def.name.replace('.<locals>.', '$')
+        if full_method_name.endswith('<listcomp>'):
+            full_method_name = full_method_name.replace('<listcomp>', 'listcomp_%x' % id(self))
+        elif full_method_name.endswith('<dictcomp>'):
+            full_method_name = full_method_name.replace('<dictcomp>', 'dictcomp_%x' % id(self))
+        elif full_method_name.endswith('<setcomp>'):
+            full_method_name = full_method_name.replace('<setcomp>', 'setcomp_%x' % id(self))
+        elif full_method_name.endswith('<genexpr>'):
+            full_method_name = full_method_name.replace('<genexpr>', 'genexpr_%x' % id(self))
+
+        self.add_opcodes(
+            TRY(),
+                # Wrap that Method into a Callable.
+                JavaOpcodes.NEW('org/python/types/Function'),
+                JavaOpcodes.DUP(),
+        )
+
+        self.add_str(full_method_name)
+
+        # Add the code object
+        self.add_opcodes(
+                JavaOpcodes.NEW('org/python/types/Code'),
+                JavaOpcodes.DUP(),
+        )
+
+        self.add_int(code.co_argcount)
+        self.add_tuple(code.co_cellvars)
+
+        self.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),  # co_code
+        )
+
+        # self.add_tuple(code.co_consts)
+        self.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),  # co_consts
+        )
+
+        self.add_str(code.co_filename)
+        self.add_int(code.co_firstlineno)
+        self.add_int(code.co_flags)
+        self.add_tuple(code.co_freevars)
+        self.add_int(code.co_kwonlyargcount)
+
+        self.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),  # co_lnotab
+        )
+
+        self.add_str(code.co_name)
+        self.add_tuple(code.co_names)
+        self.add_int(code.co_nlocals)
+        self.add_int(code.co_stacksize)
+        self.add_tuple(code.co_varnames)
+
+        self.add_opcodes(
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
+
+                # Get a Method representing the new function
+                JavaOpcodes.LDC_W(Classref(method.parent.class_descriptor)),
+                JavaOpcodes.LDC_W(method.name),
+
+                ICONST_val(len(method.parameters)),
+                JavaOpcodes.ANEWARRAY('java/lang/Class'),
+        )
+
+        for i, param in enumerate(method.parameters):
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i),
+                JavaOpcodes.LDC_W(Classref('org/python/Object')),
+                JavaOpcodes.AASTORE(),
+            )
+
+        self.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'java/lang/Class',
+                    'getMethod',
+                    '(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;'
+                ),
+
+                # globals
+                # JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.ACONST_NULL(),  # globals
+
+                # Default args
+                JavaOpcodes.NEW('java/util/ArrayList'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+        )
+
+        # # Default arguments list
+        # for argument in arguments[:opcode.default_args]:
+        #     self.add_opcodes(
+        #         JavaOpcodes.DUP(),
+        #     )
+
+        #     argument.operation.transpile(self, argument.arguments)
+
+        #     self.add_opcodes(
+        #         JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+        #         JavaOpcodes.POP(),
+        #     )
+
+        # Default keyword arguments list
+        self.add_opcodes(
+                JavaOpcodes.NEW('java/util/HashMap'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+        )
+
+        # for name, argument in zip(
+        #                 arguments[opcode.default_args:opcode.default_args + opcode.default_kwargs * 2:2],
+        #                 arguments[opcode.default_args + 1:opcode.default_args + opcode.default_kwargs * 2 + 1:2]):
+        #     self.add_opcodes(
+        #         JavaOpcodes.DUP(),
+        #         JavaOpcodes.LDC_W(name.operation.const),
+        #     )
+
+        #     argument.operation.transpile(self, argument.arguments)
+
+        #     self.add_opcodes(
+        #         JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+        #         JavaOpcodes.POP(),
+        #     )
+
+        # Closure
+        if closure:
+            closure_arg = arguments[-3]
+            closure_arg.operation.transpile(self, closure_arg.arguments)
+        else:
+            self.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),
+            )
+
+        self.add_opcodes(
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;Ljava/util/List;)V'),
+
+            CATCH('java/lang/NoSuchMethodError'),
+                ASTORE_name(self, '#EXCEPTION#'),
+                JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W('Unable to find MAKE_FUNCTION output %s.%s' % (method.parent.descriptor, full_method_name)),
+                JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.ATHROW(),
+            END_TRY()
+        )
 
     def stack_depth(self):
         "Evaluate the maximum stack depth required by a sequence of Java opcodes"

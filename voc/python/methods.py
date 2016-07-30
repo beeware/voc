@@ -3,15 +3,12 @@ from ..java import (
     RuntimeVisibleAnnotations, opcodes as JavaOpcodes,
 )
 from .blocks import Block
-from .opcodes import (
-    CATCH, END_TRY, TRY, ALOAD_name, ASTORE_name, DLOAD_name, FLOAD_name,
-    ICONST_val, ILOAD_name, Opcode, free_name,
+from .utils import (
+    TRY, CATCH, END_TRY,
+    ALOAD_name, ASTORE_name, free_name,
+#     DLOAD_name, FLOAD_name,
+#     ICONST_val, ILOAD_name,
 )
-
-POSITIONAL_OR_KEYWORD = 1
-VAR_POSITIONAL = 2
-KEYWORD_ONLY = 3
-VAR_KEYWORD = 4
 
 CO_VARARGS = 0x0004
 CO_VARKEYWORDS = 0x0008
@@ -42,8 +39,8 @@ def descriptor(annotation):
 
 
 class Method(Block):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
-        super().__init__(parent, commands=commands, verbosity=verbosity)
+    def __init__(self, parent, name, parameters, returns=None, static=False):
+        super().__init__(parent)
         self.name = name
         self.parameters = parameters
 
@@ -188,7 +185,6 @@ class Method(Block):
             implements=['org/python/Callable'],
             public=True,
             final=True,
-            verbosity=self.module.verbosity
         )
 
         if code.co_flags & CO_GENERATOR:
@@ -200,7 +196,6 @@ class Method(Block):
                 returns={
                     'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
                 },
-                verbosity=self.module.verbosity
             )
         else:
             method = ClosureMethod(
@@ -210,7 +205,6 @@ class Method(Block):
                 returns={
                     'annotation': annotations.get('return', 'org/python/Object').replace('.', '/')
                 },
-                verbosity=self.module.verbosity
             )
         method.extract(code)
         callable.methods.append(method)
@@ -258,28 +252,27 @@ class Method(Block):
 
 
 class InitMethod(Method):
-    def __init__(self, parent, verbosity=0):
+    def __init__(self, parent):
         super().__init__(
             parent, '<init>',
             parameters=[
                 {
                     'name': 'self',
-                    'kind': POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
                     'annotation': 'org/python/Object'
                 },
                 {
                     'name': 'args',
-                    'kind': POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
                     'annotation': '[Lorg/python/Object;'
                 },
                 {
                     'name': 'kwargs',
-                    'kind': POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
                     'annotation': 'java/util/Map'
                 }
             ],
             returns={'annotation': None},
-            verbosity=verbosity
         )
 
     def __repr__(self):
@@ -356,14 +349,12 @@ class InitMethod(Method):
 
 
 class InstanceMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
+    def __init__(self, parent, name, parameters, returns=None, static=False):
         super().__init__(
             parent, name,
             parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands,
-            verbosity=verbosity
         )
 
     def __repr__(self):
@@ -670,16 +661,13 @@ class InstanceMethod(Method):
 
 
 class MainMethod(Method):
-    def __init__(self, parent, commands=None, end_offset=None, verbosity=0):
+    def __init__(self, parent):
         super().__init__(
             parent, '__main__',
             parameters=[{'name': 'args', 'annotation': 'argv'}],
             returns={'annotation': None},
             static=True,
-            commands=commands,
-            verbosity=verbosity
         )
-        self.end_offset = end_offset
 
     def __repr__(self):
         return '<MainMethod %s>' % self.module.name
@@ -807,18 +795,6 @@ class MainMethod(Method):
         )
 
     def transpile_teardown(self):
-        # Main method is a special case - it always returns Null,
-        # but the code doesn't contain this return, so the jump
-        # target doesn't exist. Fake a jump target for the return
-        java_op = JavaOpcodes.RETURN()
-
-        if self.end_offset:
-            python_op = Opcode(self.end_offset, None, True)
-            python_op.start_op = java_op
-            self.jump_targets[self.end_offset] = python_op
-
-        self.add_opcodes(java_op)
-
         # Close out the TRY-CATCH for SystemExit
         self.add_opcodes(
             CATCH('org/python/exceptions/SystemExit'),
@@ -833,14 +809,12 @@ class MainMethod(Method):
 
 
 class ClosureMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
+    def __init__(self, parent, name, parameters, returns=None, static=False):
         super().__init__(
             parent, name,
             parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands,
-            verbosity=verbosity
         )
 
     def __repr__(self):
@@ -861,14 +835,12 @@ class ClosureMethod(Method):
 
 
 class GeneratorMethod(Method):
-    def __init__(self, parent, generator, name, parameters, returns=None, static=False, commands=None, verbosity=0):
+    def __init__(self, parent, generator, name, parameters, returns=None, static=False):
         super().__init__(
             parent, name=name,
             parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands,
-            verbosity=verbosity
         )
         self.generator = generator
 
@@ -987,51 +959,3 @@ class ClosureGeneratorMethod(GeneratorMethod):
     def globals_module(self):
         return self.module.parent
 
-
-def extract_parameters(code, annotations):
-    pos_count = code.co_argcount
-    arg_names = code.co_varnames
-    keyword_only_count = code.co_kwonlyargcount
-
-    parameters = []
-
-    # Non-keyword-only parameters.
-    for offset, name in enumerate(arg_names[0:pos_count]):
-        parameters.append({
-            'name': name,
-            'annotation': annotations.get(name, 'org/python/Object'),
-            'kind': POSITIONAL_OR_KEYWORD,
-        })
-
-    # *args
-    if code.co_flags & CO_VARARGS:
-        name = arg_names[pos_count + keyword_only_count]
-        annotation = annotations.get(name, 'org/python/Object')
-        parameters.append({
-            'name': name,
-            'annotation': annotation,
-            'kind': VAR_POSITIONAL
-        })
-
-    # Keyword-only parameters.
-    for name in arg_names[pos_count:pos_count + keyword_only_count]:
-        parameters.append({
-            'name': name,
-            'annotation': annotations.get(name, 'org/python/Object'),
-            'kind': KEYWORD_ONLY,
-        })
-
-    # **kwargs
-    if code.co_flags & CO_VARKEYWORDS:
-        index = pos_count + keyword_only_count
-        if code.co_flags & CO_VARARGS:
-            index += 1
-
-        name = arg_names[index]
-        parameters.append({
-            'name': name,
-            'annotation': annotations.get(name, 'org/python/Object'),
-            'kind': VAR_KEYWORD
-        })
-
-    return parameters

@@ -2,13 +2,13 @@ import os
 
 from ..java import (
     Class as JavaClass, Code as JavaCode, Method as JavaMethod, SourceFile,
-    opcodes as JavaOpcodes,
+    opcodes as JavaOpcodes
 )
-from .blocks import Block, IgnoreBlock
+from .blocks import Block
 from .methods import (
-    CO_GENERATOR, GeneratorMethod, MainMethod, Method, extract_parameters,
+    CO_GENERATOR, GeneratorMethod, Method,
 )
-from .opcodes import ALOAD_name, ASTORE_name, free_name
+from .utils import extract_parameters, ALOAD_name, ASTORE_name, free_name
 
 
 class ModuleBlock(Block):
@@ -105,34 +105,46 @@ class ModuleBlock(Block):
     def module(self):
         return self.parent
 
-    def add_method(self, method_name, code, annotations):
-        if code.co_flags & CO_GENERATOR:
-            # Generator method.
-            method = GeneratorMethod(
-                self.module,
-                generator=code.co_name,
-                name=method_name,
-                parameters=extract_parameters(code, annotations),
-                returns={
-                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
-                },
-                static=True,
-                verbosity=self.module.verbosity
-            )
-        else:
-            # Normal method.
-            method = Method(
-                self.module,
-                name=method_name,
-                parameters=extract_parameters(code, annotations),
-                returns={
-                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
-                },
-                static=True,
-                verbosity=self.module.verbosity
-            )
-        method.extract(code)
+    def add_method(self, function_def):
+
+        # if code.co_flags & CO_GENERATOR:
+        #     # Generator method.
+        #     method = GeneratorMethod(
+        #         self.module,
+        #         generator=code.co_name,
+        #         name=function_def.name,
+        #         parameters=extract_parameters(function_def),
+        #         returns={
+        #             'annotation': (
+        #                 function_def.returns
+        #                 if function_def.returns
+        #                 else 'org.python.Object'
+        #             ).replace('.', '/')
+        #         },
+        #         static=True
+        #     )
+        # else:
+
+        # Normal method.
+        method = Method(
+            self.module,
+            name=function_def.name,
+            parameters=extract_parameters(function_def),
+            returns={
+                'annotation': (
+                    function_def.returns
+                    if function_def.returns else
+                    'org.python.Object'
+                ).replace('.', '/')
+            },
+            static=True,
+        )
+
         self.module.methods.append(method)
+
+        self.add_callable(function_def, method)
+        self.store_name(function_def.name, use_locals=True)
+
         return method
 
 
@@ -174,65 +186,6 @@ class Module(Block):
     @property
     def class_descriptor(self):
         return '/'.join(self.namespace.split('.') + [self.name, '__init__'])
-
-    def materialize(self):
-        "Convert a collection of commands into a full Python code definition"
-        main_commands = []
-        body_commands = []
-        main_end = None
-
-        main = None
-
-        for cmd in self.commands:
-            if main_end is not None:
-                # Marker for the end of the main block:
-                if cmd.is_main_end(main_end):
-                    try:
-                        main = MainMethod(self, main_commands, end_offset=main_end, verbosity=self.verbosity)
-                    except IgnoreBlock:
-                        pass
-                    main_end = None
-                else:
-                    main_commands.append(cmd)
-            else:
-                # Look for a very specific pattern, flagging the "main" method:
-                #   if __name__ == '__main__':
-                #       ...
-                # which is represented as:
-                #         LOAD_NAME: __name__
-                #         LOAD_CONST: __main__
-                #     COMPARE_OP: ==
-                #  POP_JUMP_IF_FALSE: <end of block target>
-                #  ... <main code>
-                #  <end of block target>
-                if cmd.is_main_start():
-                    if main is not None:
-                        print("Found duplicate main block... replacing previous main")
-
-                    main_end = cmd.operation.target
-
-                # All other module-level cmds goes into the static block
-                else:
-                    body_commands.append(cmd)
-
-        # Create the body of the module definition
-        self.body = ModuleBlock(self, body_commands)
-
-        if main is None:
-            if self.verbosity:
-                print("Adding default main method...")
-            main = MainMethod(self, [], verbosity=self.verbosity)
-
-        self.methods.append(main)
-
-        # Having constructed all the parts of the module, materialize them.
-        self.body.materialize()
-
-        for method in self.methods:
-            method.materialize()
-
-        for klass in self.classes:
-            klass.materialize()
 
     def transpile(self):
         """Convert a materialized Python code definition into a list of Java
