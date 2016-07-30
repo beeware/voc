@@ -1,14 +1,11 @@
 import dis
 
 from ..java import (
-    Code as JavaCode,
+    Code as JavaCode, ExceptionInfo as JavaExceptionInfo, LineNumberTable,
     opcodes as JavaOpcodes,
-    ExceptionInfo as JavaExceptionInfo,
-    LineNumberTable
 )
-
+from .opcodes import ALOAD_name, ICONST_val, Opcode, Ref, jump, resolve_jump
 from .utils import extract_command, find_blocks
-from .opcodes import Ref, resolve_jump, jump, Opcode, ALOAD_name, ICONST_val
 
 
 class IgnoreBlock(Exception):

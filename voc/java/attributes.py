@@ -1,8 +1,9 @@
 from collections import OrderedDict
 
-from .constants import Utf8, Classref, NameAndType, Float, Integer
+from .constants import Classref, Float, Integer, NameAndType, Utf8
 from .opcodes import Opcode
 from .signatures import method_descriptor
+
 
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 

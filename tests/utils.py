@@ -115,7 +115,7 @@ def adjust(text, run_in_function=False):
 def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
     """Run a block of Python code with the Python interpreter."""
     # Output source code into test directory
-    with open(os.path.join(test_dir, 'test.py'), 'w') as py_source:
+    with open(os.path.join(test_dir, 'test.py'), 'w', encoding='utf-8') as py_source:
         py_source.write(adjust(main_code, run_in_function=run_in_function))
 
     if extra_code:
@@ -274,7 +274,7 @@ class TranspileTestCase(TestCase):
         global _output_dir
         setUpSuite()
         cls.temp_dir = os.path.join(_output_dir, 'temp')
-        classpath = ':'.join([
+        classpath = os.pathsep.join([
             os.path.join('dist', 'python-java-testdaemon.jar'),
             os.path.join('dist', 'python-java-support.jar'),
         ])

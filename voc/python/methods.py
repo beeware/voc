@@ -1,18 +1,11 @@
 from ..java import (
-    Code as JavaCode,
-    Method as JavaMethod,
-    opcodes as JavaOpcodes,
-    RuntimeVisibleAnnotations,
-    Annotation,
-    ConstantElementValue,
+    Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
+    RuntimeVisibleAnnotations, opcodes as JavaOpcodes,
 )
-
 from .blocks import Block
 from .opcodes import (
-    ALOAD_name, ASTORE_name, free_name,
-    ILOAD_name, FLOAD_name, DLOAD_name,
-    ICONST_val,
-    Opcode, TRY, CATCH, END_TRY,
+    CATCH, END_TRY, TRY, ALOAD_name, ASTORE_name, DLOAD_name, FLOAD_name,
+    ICONST_val, ILOAD_name, Opcode, free_name,
 )
 
 POSITIONAL_OR_KEYWORD = 1

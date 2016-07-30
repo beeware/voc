@@ -247,7 +247,6 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_set',
         'test_add_slice',
         'test_add_str',
-        'test_add_tuple',
 
         'test_and_bytearray',
         'test_and_class',

@@ -22,16 +22,29 @@ class RangeTests(TranspileTestCase):
             print("x[5] = ", x[5])
             """)
 
+    def test_zero_step(self):
+        self.assertCodeExecution("""
+            range(0, 5, 0)
+        """)
+
+    def test_len_empty(self):
+        self.assertCodeExecution("""
+            print(len(range(5, 5)))
+        """)
+
+    def test_len_positive_step(self):
+        self.assertCodeExecution("""
+            print(len(range(5, 0, 1)))
+        """)
+
+    def test_len_negative_step(self):
+        self.assertCodeExecution("""
+            print(len(range(0, 5, -1)))
+        """)
+
 
 class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
-
-    not_implemented = [
-        'test_unary_invert',
-        'test_unary_negative',
-        'test_unary_not',
-        'test_unary_positive',
-    ]
 
 
 class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):

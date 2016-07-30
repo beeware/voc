@@ -1,4 +1,8 @@
-from .constants import Classref, Fieldref, Methodref, InterfaceMethodref, String, Integer, Long, Float, Double, Constant
+from .constants import (
+    Classref, Constant, Double, Fieldref, Float, Integer, InterfaceMethodref,
+    Long, Methodref, String,
+)
+
 
 # From: https://en.wikipedia.org/wiki/Java_bytecode_instruction_listings
 # Reference" http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-6.html#jvms-6.2
