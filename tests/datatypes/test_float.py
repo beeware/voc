@@ -55,13 +55,7 @@ class FloatTests(TranspileTestCase):
             print(x)
             """)
 
-    @expectedFailure
     def test_negative_zero_constant(self):
-        # Current behavior:
-        # Positive and negative zero are considered equal, so when both
-        # are used in the same program, only one of them is added to the
-        # constants pool, and then it's used throughout the program.
-        # This should be changed.
         self.assertCodeExecution("""
             x = -0.0
             y = 0.0

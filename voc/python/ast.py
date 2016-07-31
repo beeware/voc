@@ -30,8 +30,11 @@ def is_mainline(node):
 
 def node_visitor(fn):
     def dec(self, node):
-        if node.lineno != self._current_line:
-            self._current_line = self.context.next_opcode_starts_line = node.lineno
+        try:
+            if node.lineno != self._current_line:
+                self._current_line = self.context.next_opcode_starts_line = node.lineno
+        except AttributeError:
+            pass
         self.context.next_resolve_list.append((node, OpcodePosition.START))
         fn(self, node)
         self.context.next_resolve_list.append((node, OpcodePosition.END))
@@ -131,23 +134,37 @@ class Visitor(ast.NodeVisitor):
         # expr* targets):
         raise NotImplementedError('No handler for Delete')
 
+    def _set_target(self, target):
+        if type(target) == ast.Attribute:
+            self.visit(target.value)
+            self.context.add_opcodes(
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.LDC_W(target.attr),
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            )
+        elif type(target) == ast.Name:
+            self.context.store_name(target.id, use_locals=False)
+        else:
+            raise NotImplementedError('Unknown assignment target type %s' % type(target))
+
     @node_visitor
     def visit_Assign(self, node):
         # Evaluate the value
         self.visit(node.value)
+
         if len(node.targets) > 1:
             for target in node.targets:
                 # Assign the value to the target
                 self.context.add_opcodes(
                     JavaOpcodes.DUP()
                 )
-                self.context.store_name(target.id, use_locals=False)
+                self._set_target(target)
             self.context.add_opcodes(
                 JavaOpcodes.POP()
             )
         else:
-            self.context.store_name(node.targets[0].id, use_locals=False)
-
+            self._set_target(node.targets[0])
 
     @node_visitor
     def visit_AugAssign(self, node):
@@ -335,8 +352,19 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_UnaryOp(self, node):
-        # unaryop op, expr operand):
-        raise NotImplementedError('No handler for UnaryOp')
+        self.visit(node.operand)
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE(
+                'org/python/Object',
+                {
+                    ast.USub: '__neg__',
+                    ast.UAdd: '__pos__',
+                    ast.Not: '__not__',
+                    ast.Invert: '__invert__',
+                }[type(node.op)],
+                '()Lorg/python/Object;'
+            )
+        )
 
     @node_visitor
     def visit_Lambda(self, node):
@@ -495,6 +523,11 @@ class Visitor(ast.NodeVisitor):
                 )
 
             else:
+                if type(node.ops[0]) in (ast.In, ast.NotIn):
+                    self.context.add_opcodes(
+                        JavaOpcodes.SWAP()
+                    )
+
                 self.context.add_opcodes(
                     JavaOpcodes.INVOKEINTERFACE(
                         'org/python/Object',
@@ -504,9 +537,11 @@ class Visitor(ast.NodeVisitor):
                             ast.GtE: '__ge__',
                             ast.Lt: '__lt__',
                             ast.LtE: '__le__',
+                            ast.In: '__contains__',
                             ast.Is: '__eq__',
                             ast.IsNot: '__ne__',
                             ast.NotEq: '__ne__',
+                            ast.NotIn: '__not_contains__',
                         }[type(node.ops[0])],
                         '(Lorg/python/Object;)Lorg/python/Object;'
                     )
@@ -625,13 +660,20 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Attribute(self, node):
-        # expr value, identifier attr, expr_context ctx):
-        raise NotImplementedError('No handler for Attribute')
+        self.visit(node.value)
+
+        self.context.add_opcodes(
+            JavaOpcodes.LDC_W(node.attr),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
 
     @node_visitor
     def visit_Subscript(self, node):
-        # expr value, slice slice, expr_context ctx):
-        raise NotImplementedError('No handler for Subscript')
+        self.visit(node.value)
+        self.visit(node.slice)
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+        )
 
     @node_visitor
     def visit_Starred(self, node):
@@ -701,7 +743,34 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Slice(self, node):
         # expr? lower, expr? upper, expr? step):
-        raise NotImplementedError('No handler for Slice')
+        self.context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Slice'),
+            JavaOpcodes.DUP(),
+        )
+        if node.lower:
+            self.visit(node.lower)
+        else:
+            self.context.add_opcodes(
+                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+            )
+
+        if node.upper:
+            self.visit(node.upper)
+        else:
+            self.context.add_opcodes(
+                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+            )
+
+        if node.step:
+            self.visit(node.step)
+        else:
+            self.context.add_opcodes(
+                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+            )
+
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Slice', '<init>', '(Lorg/python/Object;Lorg/python/Object;Lorg/python/Object;)V')
+        )
 
     @node_visitor
     def visit_ExtSlice(self, node):
@@ -710,8 +779,7 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Index(self, node):
-        # expr value):
-        raise NotImplementedError('No handler for Index')
+        self.visit(node.value)
 
     @node_visitor
     def visit_ExceptHandler(self, node):
