@@ -90,7 +90,7 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_add_bytearray',
         'test_add_class',
-        'test_add_float',
+
         'test_add_complex',
         'test_add_frozenset',
         'test_add_slice',
