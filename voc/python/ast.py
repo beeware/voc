@@ -178,23 +178,26 @@ class Visitor(ast.NodeVisitor):
         self.visit(node.test)
 
         self.context.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-            JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
-            jump(JavaOpcodes.IFEQ(0), self.context, node, OpcodePosition.ELSE),
+            IF([
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                ], JavaOpcodes.IFEQ),
         )
 
         for child in node.body:
             self.visit(child)
 
         self.context.add_opcodes(
-            jump(JavaOpcodes.GOTO(0), self.context, node, OpcodePosition.END),
+            ELSE(),
         )
-        self.context.next_resolve_list.append((node, OpcodePosition.ELSE))
 
         for child in node.orelse:
             self.visit(child)
 
+        self.context.add_opcodes(
+            END_IF()
+        )
 
     # @node_visitor
     # def visit_With(self, node):
@@ -369,20 +372,24 @@ class Visitor(ast.NodeVisitor):
         self.visit(node.test)
 
         self.context.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-            JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
-            jump(JavaOpcodes.IFEQ(0), self.context, node, OpcodePosition.ELSE),
+            IF([
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                ], JavaOpcodes.IFEQ),
         )
 
         self.visit(node.body)
 
         self.context.add_opcodes(
-            jump(JavaOpcodes.GOTO(0), self.context, node, OpcodePosition.END),
+            ELSE(),
         )
-        self.context.next_resolve_list.append((node, OpcodePosition.ELSE))
 
         self.visit(node.orelse)
+
+        self.context.add_opcodes(
+            END_IF(),
+        )
 
     # @node_visitor
     # def visit_Dict(self, node):

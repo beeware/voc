@@ -12,7 +12,6 @@ class ArgType(Enum):
 
 class OpcodePosition(Enum):
     START = 'start_op'
-    ELSE = 'else_op'
     END = 'end_op'
     NEXT = 'next_op'
     YIELD = 'yield_op'
@@ -1003,8 +1002,6 @@ def resolve_jump(opcode, context, target, position):
     # print("RESOLVE %s 0x%x to %s %s" % (opcode, id(opcode), target, position))
     if position == OpcodePosition.START:
         opcode.jump_op = target.start_op
-    elif position == OpcodePosition.ELSE:
-        opcode.jump_op = target.else_op
     elif position == OpcodePosition.END:
         opcode.jump_op = target.end_op
     elif position == OpcodePosition.NEXT:
