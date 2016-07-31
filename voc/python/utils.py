@@ -831,6 +831,7 @@ def free_name(context, name):
     # print("FREE", context, name, index)
     # print("locals: ", context.local_vars)
 
+
 ##########################################################################
 # Handle constant values.
 #
@@ -869,9 +870,26 @@ def ICONST_val(value):
         elif -2147483648 <= value <= 2147483647:
             return JavaOpcodes.LDC(value)
         else:
-            return JavaOpcodes.LDC_W(value)
+            raise RuntimeError("%s is out of integer range" % value)
     else:
         raise RuntimeError("%s is not an integer constant" % value)
+
+
+def LCONST_val(value):
+    """Write an long integer constant onto the stack.
+
+    There are a couple of opcodes that can be used to optimize the
+    loading of small longs; use them if possible.
+    """
+    if isinstance(value, int):
+        if value == 0:
+            return JavaOpcodes.LCONST_0()
+        elif value == 1:
+            return JavaOpcodes.LCONST_1()
+        else:
+            return JavaOpcodes.LDC2_W(value)
+    else:
+        raise RuntimeError("%s is not a long integer constant" % value)
 
 
 def FCONST_val(value):
@@ -904,10 +922,8 @@ def DCONST_val(value):
             return JavaOpcodes.DCONST_0()
         elif value == 1.0:
             return JavaOpcodes.DCONST_1()
-        elif value == 2.0:
-            return JavaOpcodes.DCONST_2()
         else:
-            return JavaOpcodes.LDC_W(value)
+            return JavaOpcodes.LDC2_W(value)
     else:
         raise RuntimeError("%s is not a double constant" % value)
 

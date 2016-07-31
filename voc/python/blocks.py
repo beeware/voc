@@ -8,7 +8,7 @@ from ..java import (
 from .utils import (
     TRY, CATCH, END_TRY,
     jump, resolve_jump, Ref,
-    ICONST_val, ALOAD_name, ASTORE_name,
+    ICONST_val, LCONST_val, DCONST_val, ALOAD_name, ASTORE_name,
 )
 
 
@@ -99,15 +99,15 @@ class Block:
         self.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Int'),
             JavaOpcodes.DUP(),
-            ICONST_val(value),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+            LCONST_val(value),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
         )
 
     def add_float(self, value):
         self.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Float'),
             JavaOpcodes.DUP(),
-            ICONST_val(value),
+            DCONST_val(value),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
         )
 
@@ -143,8 +143,8 @@ class Block:
                     self.add_opcodes(
                         JavaOpcodes.NEW('org/python/types/Int'),
                         JavaOpcodes.DUP(),
-                        ICONST_val(value),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(I)V'),
+                        LCONST_val(value),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
                     )
 
                 elif isinstance(value, float):

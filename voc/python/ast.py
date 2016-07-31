@@ -90,22 +90,20 @@ class Visitor(ast.NodeVisitor):
 
         self._context.pop()
 
-        # @node_visitor
-    # def visit_Interactive(self, node):
-    #     # stmt* body):
-    #     print("Interactive", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Interactive(self, node):
+        # stmt* body):
+        raise NotImplementedError('No handler for Interactive')
 
-    # @node_visitor
-    # def visit_Expr(self, node):
-    #     print("Expression", node)
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Expr(self, node):
+        # No special handling required for Expr nodes.
+        self.generic_visit(node)
 
-    # @node_visitor
-    # def visit_Suite(self, node):
-    #     # stmt* body):
-    #     print("Suite", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Suite(self, node):
+        # stmt* body):
+        raise NotImplementedError('No handler for Suite')
 
     # # Statements
     @node_visitor
@@ -118,23 +116,20 @@ class Visitor(ast.NodeVisitor):
             self.visit(child)
         self._context.pop()
 
-        # @node_visitor
-    # def visit_ClassDef(self, node):
-    #     # identifier name, expr* bases, keyword* keywords, expr? starargs, expr? kwargs, stmt* body, expr* decorator_list):
-    #     print("ClassDef", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_ClassDef(self, node):
+        # identifier name, expr* bases, keyword* keywords, expr? starargs, expr? kwargs, stmt* body, expr* decorator_list):
+        raise NotImplementedError('No handler for ClassDef')
 
-    # @node_visitor
-    # def visit_Return(self, node):
-    #     # expr? value):
-    #     print("Return", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Return(self, node):
+        # expr? value):
+        raise NotImplementedError('No handler for Return')
 
-    # @node_visitor
-    # def visit_Delete(self, node):
-    #     # expr* targets):
-    #     print("Delete", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Delete(self, node):
+        # expr* targets):
+        raise NotImplementedError('No handler for Delete')
 
     @node_visitor
     def visit_Assign(self, node):
@@ -154,23 +149,20 @@ class Visitor(ast.NodeVisitor):
             self.context.store_name(node.targets[0].id, use_locals=False)
 
 
-            # @node_visitor
-    # def visit_AugAssign(self, node):
-    #     # expr target, operator op, expr value):
-    #     print("AugAssign", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_AugAssign(self, node):
+        # expr target, operator op, expr value):
+        raise NotImplementedError('No handler for AugAssign')
 
-    # @node_visitor
-    # def visit_For(self, node):
-    #     # expr target, expr iter, stmt* body, stmt* orelse):
-    #     print("For", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_For(self, node):
+        # expr target, expr iter, stmt* body, stmt* orelse):
+        raise NotImplementedError('No handler for For')
 
-    # @node_visitor
-    # def visit_While(self, node):
-    #     # expr test, stmt* body, stmt* orelse):
-    #     print("While", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_While(self, node):
+        # expr test, stmt* body, stmt* orelse):
+        raise NotImplementedError('No handler for While')
 
     @node_visitor
     def visit_If(self, node):
@@ -199,29 +191,25 @@ class Visitor(ast.NodeVisitor):
             END_IF()
         )
 
-    # @node_visitor
-    # def visit_With(self, node):
-    #     # withitem* items, stmt* body):
-    #     print("With", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_With(self, node):
+        # withitem* items, stmt* body):
+        raise NotImplementedError('No handler for With')
 
-    # @node_visitor
-    # def visit_Raise(self, node):
-    #     # expr? exc, expr? cause):
-    #     print("Raise", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Raise(self, node):
+        # expr? exc, expr? cause):
+        raise NotImplementedError('No handler for Raise')
 
-    # @node_visitor
-    # def visit_Try(self, node):
-    #     # stmt* body, excepthandler* handlers, stmt* orelse, stmt* finalbody):
-    #     print("Try", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Try(self, node):
+        # stmt* body, excepthandler* handlers, stmt* orelse, stmt* finalbody):
+        raise NotImplementedError('No handler for Try')
 
-    # @node_visitor
-    # def visit_Assert(self, node):
-    #     # expr test, expr? msg):
-    #     print("Assert", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Assert(self, node):
+        # expr test, expr? msg):
+        raise NotImplementedError('No handler for Assert')
 
     @node_visitor
     def visit_Import(self, node):
@@ -284,42 +272,33 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.POP(),
             )
 
-    # @node_visitor
-    # def visit_Global(self, node):
-    #     # identifier* names):
-    #     print("Global", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Global(self, node):
+        # identifier* names):
+        raise NotImplementedError('No handler for Global')
 
-    # @node_visitor
-    # def visit_Nonlocal(self, node):
-    #     # identifier* names):
-    #     print("Nonlocal", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Nonlocal(self, node):
+        # identifier* names):
+        raise NotImplementedError('No handler for Nonlocal')
 
-    # @node_visitor
-    # def visit_Expr(self, node):
-    #     # expr value):
-    #     print("Expr", dir(node)))
-    #     self.generic_visit(node)
-
-
-    # @node_visitor
-    # def visit_Pass(self, node):
+    @node_visitor
+    def visit_Pass(self, node):
     # #
     #     print("Pass", dir(node))
-    #     self.generic_visit(node)
+        raise NotImplementedError('No handler for Pass')
 
-    # @node_visitor
-    # def visit_Break(self, node):
+    @node_visitor
+    def visit_Break(self, node):
     # #
     #     print("Break", dir(node))
-    #     self.generic_visit(node)
+        raise NotImplementedError('No handler for Break')
 
-    # @node_visitor
-    # def visit_Continue(self, node):
+    @node_visitor
+    def visit_Continue(self, node):
     # #
     #     print("Continue", dir(node))
-    #     self.generic_visit(node)
+        raise NotImplementedError('No handler for Continue')
 
     # # Expressions
     @node_visitor
@@ -349,23 +328,20 @@ class Visitor(ast.NodeVisitor):
         # The last value is the failsafe.
         self.visit(node.values[-1])
 
-    # @node_visitor
-    # def visit_BinOp(self, node):
-    #     # expr left, operator op, expr right):
-    #     print("BinOp", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_BinOp(self, node):
+        # expr left, operator op, expr right):
+        raise NotImplementedError('No handler for BinOp')
 
-    # @node_visitor
-    # def visit_UnaryOp(self, node):
-    #     # unaryop op, expr operand):
-    #     print("UnaryOp", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_UnaryOp(self, node):
+        # unaryop op, expr operand):
+        raise NotImplementedError('No handler for UnaryOp')
 
-    # @node_visitor
-    # def visit_Lambda(self, node):
-    #     # arguments args, expr body):
-    #     print("Lambda", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Lambda(self, node):
+        # arguments args, expr body):
+        raise NotImplementedError('No handler for Lambda')
 
     @node_visitor
     def visit_IfExp(self, node):
@@ -391,54 +367,90 @@ class Visitor(ast.NodeVisitor):
             END_IF(),
         )
 
-    # @node_visitor
-    # def visit_Dict(self, node):
-    #     # expr* keys, expr* values):
-    #     print("Dict", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Dict(self, node):
+        self.context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Dict'),
+            JavaOpcodes.DUP(),
 
-    # @node_visitor
-    # def visit_Set(self, node):
-    #     expr* elts):
-    #     print("Set", dir(node)))
-    #     self.generic_visit(node)
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V')
+        )
 
-    # @node_visitor
-    # def visit_ListComp(self, node):
-    #     expr elt, comprehension* generators):
-    #     print("ListComp", dir(node)))
-    #     self.generic_visit(node)
+        for kchild, vchild in zip(node.keys, node.values):
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
 
-    # @node_visitor
-    # def visit_SetComp(self, node):
-    #     expr elt, comprehension* generators):
-    #     print("SetComp", dir(node)))
-    #     self.generic_visit(node)
+            self.visit(kchild)
+            self.visit(vchild)
 
-    # @node_visitor
-    # def visit_DictComp(self, node):
-    #     expr key, expr value, comprehension* generators):
-    #     print("DictComp", dir(node)))
-    #     self.generic_visit(node)
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.POP(),
+            )
 
-    # @node_visitor
-    # def visit_GeneratorExp(self, node):
-    #     expr elt, comprehension* generators):
-    #     print("GeneratorExp", dir(node)))
-    #     self.generic_visit(node)
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '(Ljava/util/Map;)V')
+        )
 
+    @node_visitor
+    def visit_Set(self, node):
+        self.context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Set'),
+            JavaOpcodes.DUP(),
 
-    # @node_visitor
-    # def visit_Yield(self, node):
-    #     expr? value):
-    #     print("Yield", dir(node)))
-    #     self.generic_visit(node)
+            JavaOpcodes.NEW('java/util/HashSet'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashSet', '<init>', '()V')
+        )
 
-    # @node_visitor
-    # def visit_YieldFrom(self, node):
-    #     expr value):
-    #     print("YieldFrom", dir(node)))
-    #     self.generic_visit(node)
+        for child in node.elts:
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+
+            self.visit(child)
+
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/Set', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Set', '<init>', '(Ljava/util/Set;)V')
+        )
+
+    @node_visitor
+    def visit_ListComp(self, node):
+        # expr elt, comprehension* generators):
+        raise NotImplementedError('No handler for ListComp')
+
+    @node_visitor
+    def visit_SetComp(self, node):
+        # expr elt, comprehension* generators):
+        raise NotImplementedError('No handler for SetComp')
+
+    @node_visitor
+    def visit_DictComp(self, node):
+        # expr key, expr value, comprehension* generators):
+        raise NotImplementedError('No handler for DictComp')
+
+    @node_visitor
+    def visit_GeneratorExp(self, node):
+        # expr elt, comprehension* generators):
+        raise NotImplementedError('No handler for GeneratorExp')
+
+    @node_visitor
+    def visit_Yield(self, node):
+        # expr? value):
+        raise NotImplementedError('No handler for Yield')
+
+    @node_visitor
+    def visit_YieldFrom(self, node):
+        # expr value):
+        raise NotImplementedError('No handler for YieldFrom')
 
     @node_visitor
     def visit_Compare(self, node):
@@ -449,7 +461,7 @@ class Visitor(ast.NodeVisitor):
             self.visit(node.comparators[0])
             const_comparison |= type(node.comparators[0]) == ast.Num
         else:
-            raise Exception("Don't know how to resolve multiple comparators")
+            raise NotImplementedError("Don't know how to resolve multiple comparators")
 
         if len(node.ops) == 1:
             if type(node.ops[0]) == ast.Is and not const_comparison:
@@ -500,7 +512,7 @@ class Visitor(ast.NodeVisitor):
                     )
                 )
         else:
-            raise Exception("Don't know how to resolve multiple operators")
+            raise NotImplementedError("Don't know how to resolve multiple operators")
 
     @node_visitor
     def visit_Call(self, node):
@@ -573,18 +585,16 @@ class Visitor(ast.NodeVisitor):
         elif isinstance(node.n, float):
             self.context.add_float(node.n)
         else:
-            raise Exception('Unknown number type')
+            raise NotImplementedError('Unknown number type %s' % type(node.n))
 
     @node_visitor
     def visit_Str(self, node):
-        "Load a string constant"
         self.context.add_str(node.s)
 
-        # @node_visitor
-    # def visit_Bytes(self, node):
+    @node_visitor
+    def visit_Bytes(self, node):
     #     bytes s):
-    #     print("Bytes", dir(node)))
-    #     self.generic_visit(node)
+        raise NotImplementedError('No handler for Bytes')
 
     @node_visitor
     def visit_NameConstant(self, node):
@@ -592,72 +602,118 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
             )
+        elif node.value is True:
+            self.context.add_opcodes(
+                JavaOpcodes.NEW('org/python/types/Bool'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.ICONST_1(),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+            )
+        elif node.value is False:
+            self.context.add_opcodes(
+                JavaOpcodes.NEW('org/python/types/Bool'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.ICONST_0(),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+            )
         else:
-            raise Exception("Unknown named constant %s" % node.value)
+            raise NotImplementedError("Unknown named constant %s" % node.value)
 
-    # @node_visitor
-    # def visit_Ellipsis(self, node):
-    # #
-    #      print("Ellipsis", dir(node))
-    #      self.generic_visit(node)
+    @node_visitor
+    def visit_Ellipsis(self, node):
+        raise NotImplementedError('No handler for Ellipsis')
 
+    @node_visitor
+    def visit_Attribute(self, node):
+        # expr value, identifier attr, expr_context ctx):
+        raise NotImplementedError('No handler for Attribute')
 
-    # @node_visitor
-    # def visit_Attribute(self, node):
-    #     expr value, identifier attr, expr_context ctx):
-    #     print("Attribute", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Subscript(self, node):
+        # expr value, slice slice, expr_context ctx):
+        raise NotImplementedError('No handler for Subscript')
 
-    # @node_visitor
-    # def visit_Subscript(self, node):
-    #     expr value, slice slice, expr_context ctx):
-    #     print("Subscript", dir(node)))
-    #     self.generic_visit(node)
-
-    # @node_visitor
-    # def visit_Starred(self, node):
-    #     expr value, expr_context ctx):
-    #     print("Starred", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_Starred(self, node):
+        # expr value, expr_context ctx):
+        raise NotImplementedError('No handler for Starred')
 
     @node_visitor
     def visit_Name(self, node):
         self.context.load_name(node.id, use_locals=True)
 
-        # @node_visitor
-    # def visit_List(self, node):
-    #     expr* elts, expr_context ctx):
-    #     print("List", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_List(self, node):
+        self.context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/List'),
+            JavaOpcodes.DUP(),
 
-    # @node_visitor
-    # def visit_Tuple(self, node):
-    #     expr* elts, expr_context ctx):
-    #     print("Tuple", dir(node)))
-    #     self.generic_visit(node)
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            ICONST_val(len(node.elts)),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
+        )
 
+        for child in node.elts:
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
 
-    # @node_visitor
-    # def visit_Slice(self, node):
-    #     expr? lower, expr? upper, expr? step):
-    #     print("Slice", dir(node)))
-    #     self.generic_visit(node)
+            self.visit(child)
 
-    # @node_visitor
-    # def visit_ExtSlice(self, node):
-    #     slice* dims):
-    #     print("ExtSlice", dir(node)))
-    #     self.generic_visit(node)
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
 
-    # @node_visitor
-    # def visit_Index(self, node):
-    #     expr value):
-    #     print("Index", dir(node)))
-    #     self.generic_visit(node)
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', '(Ljava/util/List;)V')
+        )
 
+    @node_visitor
+    def visit_Tuple(self, node):
+        self.context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Tuple'),
+            JavaOpcodes.DUP(),
 
-    # @node_visitor
-    # def visit_ExceptHandler(self, node):
-    #     expr? type, identifier? name, stmt* body):
-    #     print("ExceptHandler", dir(node)))
-    #     self.generic_visit(node)
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            ICONST_val(len(node.elts)),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
+        )
+
+        for child in node.elts:
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+
+            self.visit(child)
+
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP(),
+            )
+
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V')
+        )
+
+    @node_visitor
+    def visit_Slice(self, node):
+        # expr? lower, expr? upper, expr? step):
+        raise NotImplementedError('No handler for Slice')
+
+    @node_visitor
+    def visit_ExtSlice(self, node):
+        # slice* dims):
+        raise NotImplementedError('No handler for ExtSlice')
+
+    @node_visitor
+    def visit_Index(self, node):
+        # expr value):
+        raise NotImplementedError('No handler for Index')
+
+    @node_visitor
+    def visit_ExceptHandler(self, node):
+        # expr? type, identifier? name, stmt* body):
+        raise NotImplementedError('No handler for ExceptHandler')
