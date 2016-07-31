@@ -172,9 +172,28 @@ class Visitor(ast.NodeVisitor):
     #     print("While", dir(node)))
     #     self.generic_visit(node)
 
-    # @node_visitor
-    # def visit_If(self, node):
+    @node_visitor
+    def visit_If(self, node):
         # expr test, stmt* body, stmt* orelse):
+        self.visit(node.test)
+
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+            JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+            jump(JavaOpcodes.IFEQ(0), self.context, node, OpcodePosition.ELSE),
+        )
+
+        for child in node.body:
+            self.visit(child)
+
+        self.context.add_opcodes(
+            jump(JavaOpcodes.GOTO(0), self.context, node, OpcodePosition.END),
+        )
+        self.context.next_resolve_list.append((node, OpcodePosition.ELSE))
+
+        for child in node.orelse:
+            self.visit(child)
 
 
     # @node_visitor
@@ -414,12 +433,67 @@ class Visitor(ast.NodeVisitor):
     #     print("YieldFrom", dir(node)))
     #     self.generic_visit(node)
 
+    @node_visitor
+    def visit_Compare(self, node):
+        self.visit(node.left)
+        const_comparison = type(node.left) == ast.Num
 
-    # @node_visitor
-    # def visit_Compare(self, node):
-    #     expr left, cmpop* ops, expr* comparators):
-    #     print("Compare", dir(node)))
-    #     self.generic_visit(node)
+        if len(node.comparators) == 1:
+            self.visit(node.comparators[0])
+            const_comparison |= type(node.comparators[0]) == ast.Num
+        else:
+            raise Exception("Don't know how to resolve multiple comparators")
+
+        if len(node.ops) == 1:
+            if type(node.ops[0]) == ast.Is and not const_comparison:
+                self.context.add_opcodes(
+                    IF([], JavaOpcodes.IF_ACMPNE),
+                        JavaOpcodes.NEW('org/python/types/Bool'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.ICONST_1(),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Bool'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.ICONST_0(),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                    END_IF(),
+                )
+
+            elif type(node.ops[0]) == ast.IsNot and not const_comparison:
+                self.context.add_opcodes(
+                    IF([], JavaOpcodes.IF_ACMPEQ),
+                        JavaOpcodes.NEW('org/python/types/Bool'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.ICONST_1(),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/types/Bool'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.ICONST_0(),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                    END_IF(),
+                )
+
+            else:
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE(
+                        'org/python/Object',
+                        {
+                            ast.Eq: '__eq__',
+                            ast.Gt: '__gt__',
+                            ast.GtE: '__ge__',
+                            ast.Lt: '__lt__',
+                            ast.LtE: '__le__',
+                            ast.Is: '__eq__',
+                            ast.IsNot: '__ne__',
+                            ast.NotEq: '__ne__',
+                        }[type(node.ops[0])],
+                        '(Lorg/python/Object;)Lorg/python/Object;'
+                    )
+                )
+        else:
+            raise Exception("Don't know how to resolve multiple operators")
 
     @node_visitor
     def visit_Call(self, node):
@@ -505,11 +579,14 @@ class Visitor(ast.NodeVisitor):
     #     print("Bytes", dir(node)))
     #     self.generic_visit(node)
 
-    # @node_visitor
-    # def visit_NameConstant(self, node):
-    #     singleton value):
-    #     print("NameConstant", dir(node)))
-    #     self.generic_visit(node)
+    @node_visitor
+    def visit_NameConstant(self, node):
+        if node.value is None:
+            self.context.add_opcodes(
+                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+            )
+        else:
+            raise Exception("Unknown named constant %s" % node.value)
 
     # @node_visitor
     # def visit_Ellipsis(self, node):
