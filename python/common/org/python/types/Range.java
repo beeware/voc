@@ -23,35 +23,45 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         } else {
             throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
         }
-        attrs.put("start", start);
+        this.__dict__.put("start", start);
 
         if (stop instanceof org.python.types.Int) {
             this.stop = ((org.python.types.Int) stop).value;
         } else {
             throw new org.python.exceptions.TypeError("'" + stop.typeName() + "' object cannot be interpreted as an integer");
         }
-        attrs.put("stop", stop);
+        this.__dict__.put("stop", stop);
 
         if (step instanceof org.python.types.Int) {
             this.step = ((org.python.types.Int) step).value;
         } else {
             throw new org.python.exceptions.TypeError("'" + step.typeName() + "' object cannot be interpreted as an integer");
         }
-        attrs.put("step", step);
+        if (this.step == 0) {
+            throw new org.python.exceptions.ValueError("range() arg 3 must not be zero");
+        }
+        this.__dict__.put("step", step);
 
         index = this.start;
-        // value = attrs;
+        // value = __dict__;
     }
 
     @org.python.Method(
         __doc__ = "Implement iter(self)."
     )
-    public org.python.types.Str __repr__() {
+    public org.python.Object __repr__() {
         if (this.step == 1) {
             return new org.python.types.Str(String.format("range(%d, %d)", this.start, this.stop));
         } else {
             return new org.python.types.Str(String.format("range(%d, %d, %d)", this.start, this.stop, this.step));
         }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __iadd__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'range' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -85,9 +95,9 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
             if (index instanceof org.python.types.Slice) {
                 org.python.types.Slice slice = (org.python.types.Slice) index;
                 return new org.python.types.Range(
-                    slice.start == null ? this.attrs.get("start") : slice.start,
-                    slice.stop == null ? this.attrs.get("stop") : slice.stop,
-                    slice.step == null ? this.attrs.get("step") : slice.step
+                    slice.start == null ? this.__dict__.get("start") : slice.start,
+                    slice.stop == null ? this.__dict__.get("stop") : slice.stop,
+                    slice.step == null ? this.__dict__.get("step") : slice.step
                 );
             } else {
                 long idx = ((org.python.types.Int)index).value;
@@ -111,4 +121,50 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
         }
     }
 
+    @org.python.Method(
+        __doc__ = "Implement __len__(self)."
+    )
+    public org.python.Object __len__() {
+        if (this.step > 0 && this.start < this.stop) {
+            return new org.python.types.Int(
+                1 + (this.stop - 1 - this.start) / this.step
+            );
+        } else if (this.step < 0 && this.start > this.stop) {
+            return new org.python.types.Int(
+                1 + (this.start - 1 - this.stop) / (-this.step)
+            );
+        } else {
+            return new org.python.types.Int(0);
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = "Implement __bool__(self)."
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(
+            ((org.python.types.Int) this.__len__()).value > 0
+        );
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'range'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'range'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'range'");
+    }
 }

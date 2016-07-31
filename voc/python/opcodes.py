@@ -1,5 +1,4 @@
-from ..java import opcodes as JavaOpcodes, Classref
-
+from ..java import Classref, opcodes as JavaOpcodes
 
 ##########################################################################
 # Pseudo instructions used to flag the offset position of other
@@ -1011,6 +1010,9 @@ class BinaryOpcode(Opcode):
 
 
 class InplaceOpcode(Opcode):
+    """
+    Handle opcodes that are followed by an '=' (inplace operations)
+    """
     @property
     def consume_count(self):
         return 2
@@ -1021,19 +1023,20 @@ class InplaceOpcode(Opcode):
 
     def convert(self, context, arguments):
         arguments[0].operation.transpile(context, arguments[0].arguments)
-        context.add_opcodes(JavaOpcodes.DUP())
 
         for argument in arguments[1:]:
             argument.operation.transpile(context, argument.arguments)
 
         context.next_resolve_list.append((self, 'start_op'))
+
         context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
                 self.__method__,
-                '(Lorg/python/Object;)V'
+                '(Lorg/python/Object;)Lorg/python/Object;'
             )
         )
+
 
 
 ##########################################################################
@@ -1427,8 +1430,11 @@ class RETURN_VALUE(Opcode):
         else:
             if return_type is None:
                 context.add_opcodes(
-                    JavaOpcodes.POP(),
                     JavaOpcodes.RETURN()
+                )
+            elif return_type == 'void':
+                context.add_opcodes(
+                    JavaOpcodes.ARETURN()
                 )
             else:
                 context.add_opcodes(
@@ -1774,13 +1780,25 @@ class LOAD_CONST(Opcode):
                     JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
                 )
 
-            # elif isinstance(const, bytes):
-            #     context.add_opcodes(
-            #         JavaOpcodes.NEW('org/python/types/Bytes'),
-            #         JavaOpcodes.DUP(),
-            #         JavaOpcodes.LDC_W(const),
-            #         JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
-            #     )
+            elif isinstance(const, bytes):
+                context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Bytes'),
+                    JavaOpcodes.DUP(),
+                    ICONST_val(len(const)),
+                    JavaOpcodes.NEWARRAY(JavaOpcodes.NEWARRAY.T_BYTE),
+                )
+
+                for i, b in enumerate(const):
+                    context.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        ICONST_val(i),
+                        JavaOpcodes.BIPUSH(b),
+                        JavaOpcodes.BASTORE(),
+                    )
+
+                context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '([B)V'),
+                )
 
             elif isinstance(const, tuple):
                 context.add_opcodes(
@@ -3079,9 +3097,7 @@ def add_callable(opcode, context, arguments, full_method_name, closure=False):
             ),
 
             # globals
-            # JavaOpcodes.GETSTATIC('org/python/ImportLib', 'modules', 'Ljava/util/Map;'),
-            # JavaOpcodes.LDC_W(method.module.descriptor),
-            # JavaOpcodes.GETSTATIC(method.module.descriptor, 'attrs', 'Ljava/util/Map;'),
+            # JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
             JavaOpcodes.ACONST_NULL(),  # globals
 
             # Default args

@@ -123,6 +123,7 @@ public class Bool extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) > (((org.python.types.Bool) other).value ? 1 : 0));
         }
+
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
@@ -203,8 +204,12 @@ public class Bool extends org.python.types.Object {
             }
             else{
                 return new org.python.types.Str("");
-                
+
             }
+        } else if (other instanceof org.python.types.List) {
+            return other.__mul__(this);
+        } else if (other instanceof org.python.types.Tuple) {
+            return other.__mul__(this);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'bool' and '" + other.typeName() + "'");
     }
@@ -265,7 +270,7 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
-            java.util.List<org.python.Object> data = new java.util.ArrayList<>();
+            java.util.List<org.python.Object> data = new java.util.ArrayList<org.python.Object>();
             data.add(this.__floordiv__(other));
             data.add(this.__mod__(other));
             return new org.python.types.Tuple(data);
@@ -289,14 +294,32 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__lshift__() has not been implemented.");
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) << (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) << other_val);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__rshift__() has not been implemented.");
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) >> (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) >> other_val);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -418,20 +441,70 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __ror__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__ror__() has not been implemented.");
+
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __iadd__(org.python.Object other) {
+        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int( this_val += (((org.python.types.Bool) other).value ? 1 : 0) );
+        } else if (other instanceof org.python.types.Int) {
+            return new org.python.types.Int( this_val += ((org.python.types.Int) other).value);
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float(this_val += ((org.python.types.Float) other).value);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'bool' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __ilshift__(org.python.Object other) {
+        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(this_val <<= (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int(this_val <<= other_val);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: 'bool' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __irshift__(org.python.Object other) {
+        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int(this_val >>= (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val < 0) {
+                throw new org.python.exceptions.ValueError("negative shift count");
+            }
+            return new org.python.types.Int(this_val >>= other_val);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__neg__() has not been implemented.");
+        return new org.python.types.Int(this.value ? -1 : 0);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__pos__() has not been implemented.");
+        return new org.python.types.Int(this.value ? 1 : 0);
     }
 
     @org.python.Method(
@@ -445,7 +518,7 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.NotImplementedError("bool.__invert__() has not been implemented.");
+        return new org.python.types.Int(this.value ? -2 : -1);
     }
 
     @org.python.Method(

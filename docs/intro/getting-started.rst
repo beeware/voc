@@ -5,6 +5,31 @@ In this guide we will walk you through setting up your VOC environment for
 development and testing. We will assume that you have a working Python 3, JDK,
 Apache ANT installation and use virtualenv.
 
+Checking Dependencies
+---------------------
+
+To check if you have Python installed, run ``python --version`` at the command line
+
+.. code-block:: bash
+
+	$ python --version
+	Python 3.4.4
+
+To check if you have the JDK installed, run ``javac -version``
+
+.. code-block:: bash
+
+	$ javac -version
+	javac 1.7.0_101
+
+To check if Apache ANT is installed, run ``ant -version``
+
+.. code-block:: bash
+
+	$ ant -version
+	Apache Ant(TM) version 1.9.7 compiled on April 24 2016
+
+
 Get a copy of VOC
 -----------------
 
@@ -34,10 +59,11 @@ Next, you need to build the Python support file:
 
     $ ant java
 
-This should create a ``dist/python-java.jar`` file. This JAR file is a support library
-that implements Python-like behavior and provides the Python standard library for
-the Java environment. This JAR file must be included on the classpath for any
-VOC-generated project.
+This should create a ``dist/python-java-support.jar`` file. This JAR
+file is a support library that implements Python-like behavior and
+provides the Python standard library for the Java environment. This
+JAR file must be included on the classpath for any VOC-generated
+project.
 
 Next Steps
 ----------

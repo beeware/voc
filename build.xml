@@ -3,11 +3,16 @@
     Build Python support libraries for voc
   </description>
 
-  <property name="python-version" value="3.4.2"/>
+  <property environment="env"/>
+  <property name="python-version" value="3.4"/>
   <property name="release" value="1"/>
 
-  <property name="build" location="build"/>
-  <property name="dist" location="dist"/>
+  <condition property="build" value="${env.VOC_BUILD_DIR}" else="build">
+    <isset property="env.VOC_BUILD_DIR" />
+  </condition>
+  <condition property="dist" value="${env.VOC_DIST_DIR}" else="dist">
+    <isset property="env.VOC_DIST_DIR" />
+  </condition>
 
   <target name="java">
     <ant antfile="build-java.xml" target="dist"/>

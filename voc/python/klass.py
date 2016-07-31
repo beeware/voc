@@ -1,20 +1,15 @@
 import os
 
 from ..java import (
-    Class as JavaClass,
-    Field as JavaField,
-    Method as JavaMethod,
-    Code as JavaCode,
-    opcodes as JavaOpcodes,
-    SourceFile,
-    RuntimeVisibleAnnotations,
-    Annotation,
-    ConstantElementValue,
+    Annotation, Class as JavaClass, Code as JavaCode, ConstantElementValue,
+    Field as JavaField, Method as JavaMethod, RuntimeVisibleAnnotations,
+    SourceFile, opcodes as JavaOpcodes,
 )
-
 from .blocks import Block, IgnoreBlock
-from .methods import InitMethod, InstanceMethod, CO_GENERATOR, extract_parameters
-from .opcodes import ASTORE_name, ALOAD_name, free_name
+from .methods import (
+    CO_GENERATOR, InitMethod, InstanceMethod, extract_parameters,
+)
+from .opcodes import ALOAD_name, ASTORE_name, free_name
 
 
 class ClassBlock(Block):
@@ -49,7 +44,7 @@ class ClassBlock(Block):
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
-            JavaOpcodes.GETFIELD('org/python/types/Type', 'attrs', 'Ljava/util/Map;'),
+            JavaOpcodes.GETFIELD('org/python/types/Type', '__dict__', 'Ljava/util/Map;'),
             ALOAD_name(self, '#value'),
 
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', '(Ljava/util/Map;)V'),
@@ -69,7 +64,7 @@ class ClassBlock(Block):
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
             JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
     def add_method(self, full_method_name, code, annotations):
@@ -85,12 +80,16 @@ class ClassBlock(Block):
         if code.co_flags & CO_GENERATOR:
             raise Exception("Can't handle Generator instance methods (yet)")
         else:
+            return_type = annotations.get('return', 'org/python/Object')
+            if return_type is None:
+                return_type = 'void'
+
             method = InstanceMethod(
                 self.klass,
                 name=method_name,
                 parameters=parameters,
                 returns={
-                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+                    'annotation': return_type
                 },
                 static=True,
                 verbosity=self.klass.verbosity
@@ -101,24 +100,21 @@ class ClassBlock(Block):
         return method
 
     def transpile_setup(self):
-        base_namespace = self.parent.namespace.replace('.', '/') + '/'
-
         if self.klass.extends:
             base_descriptor = self.klass.extends.replace('.', '/')
         else:
-            base_descriptor = self.klass.bases[0] if self.klass.bases[0].startswith('org/python/') else base_namespace + self.klass.bases[0]
+            base_descriptor = 'org/python/types/Object'
 
         self.add_opcodes(
             # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor),
             # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
 
-            # JavaOpcodes.LDC_W("FORCE LOAD OF " + self.module.class_name),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-
             # Force the loading and instantiation of the module
             # that contains the class.
-            JavaOpcodes.LDC_W(self.module.class_name),
-            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+            JavaOpcodes.LDC_W(self.module.full_name),
+            JavaOpcodes.ACONST_NULL(),
+            JavaOpcodes.ICONST_0(),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;[Ljava/lang/String;I)Lorg/python/types/Module;'),
             JavaOpcodes.POP(),
 
             # Set __base__ on the type
@@ -193,18 +189,21 @@ class Class(Block):
     def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0):
         super().__init__(module, verbosity=verbosity)
         self.name = name
-        self.bases = bases if bases else ['org/python/types/Object']
+        if namespace is None:
+            self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
+        else:
+            self.namespace = namespace
+
+        self.bases = bases if bases else []
         self.extends = extends
+
         self.implements = implements if implements else []
         self.public = public
         self.final = final
         self.methods = methods if methods else []
         self.fields = fields if fields else {}
         self.init = init
-        if namespace is None:
-            self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
-        else:
-            self.namespace = namespace
+
         self.anonymous_inner_class_count = 0
 
         # Track constructors when they are added
@@ -293,25 +292,32 @@ class Class(Block):
         for method in self.methods:
             classfile.methods.extend(method.transpile())
 
+        # Ensure the class has a class protected, no-args init() so that
+        # instances can be instantiated.
         if self.extends:
-            classfile.methods.append(
-                JavaMethod(
-                    '<init>',
-                    '()V',
-                    static=False,
-                    attributes=[
-                        JavaCode(
-                            max_stack=1,
-                            max_locals=1,
-                            code=[
-                                JavaOpcodes.ALOAD_0(),
-                                JavaOpcodes.INVOKESPECIAL(self.extends, '<init>', '()V'),
-                                JavaOpcodes.RETURN(),
-                            ]
-                        )
-                    ]
-                )
+            base_descriptor = self.extends.replace('.', '/')
+        else:
+            base_descriptor = 'org/python/types/Object'
+
+        classfile.methods.append(
+            JavaMethod(
+                '<init>',
+                '()V',
+                public=False,
+                static=False,
+                attributes=[
+                    JavaCode(
+                        max_stack=1,
+                        max_locals=1,
+                        code=[
+                            JavaOpcodes.ALOAD_0(),
+                            JavaOpcodes.INVOKESPECIAL(base_descriptor, '<init>', '()V'),
+                            JavaOpcodes.RETURN(),
+                        ]
+                    )
+                ]
             )
+        )
 
         return self.namespace, self.name, classfile
 

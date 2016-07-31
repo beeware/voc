@@ -64,7 +64,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
      * This means converting:
      *    * `null` into a None
      *    * Returning any object that already implements org.python.Object as itself.
-     *    * Wrapping any other object in a org.python.java.Object wrapper.
+     *    * Returning the existing VOC wrapper if one exists
+     *    * Wrapping any other object in a newly created org.python.java.Object wrapper.
      */
     public static org.python.Object toPython(java.lang.Object value) {
         if (value == null) {
@@ -99,7 +100,24 @@ public class Type extends org.python.types.Object implements org.python.Callable
             } else if (org.python.Object.class.isAssignableFrom(value.getClass())) {
                 return (org.python.Object) value;
             } else {
-                return new org.python.java.Object(value);
+                try {
+                    // Check to see if a __VOC__ field exists on the object.
+                    // If it does, that field will contain the wrapper object.
+                    // However, if this is the first time the object has been
+                    // referenced (e.g., during construction), we may need to
+                    // create the wrapper.
+                    java.lang.reflect.Field field = value.getClass().getField("__VOC__");
+                    org.python.Object wrapper = (org.python.Object) field.get(value);
+                    if (wrapper == null) {
+                        wrapper = new org.python.java.Object(value);
+                        field.set(value, wrapper);
+                    }
+                    return wrapper;
+                } catch (java.lang.NoSuchFieldException nsf) {
+                    return new org.python.java.Object(value);
+                } catch (java.lang.IllegalAccessException e) {
+                    throw new org.python.exceptions.RuntimeError("Illegal access to __VOC__ attribute");
+                }
             }
         }
     }
@@ -140,13 +158,13 @@ public class Type extends org.python.types.Object implements org.python.Callable
         if (origin != Origin.PLACEHOLDER) {
             this.klass = klass;
 
-            this.attrs.put("__name__", new org.python.types.Str(this.klass.getName()));
-            this.attrs.put("__qualname__", new org.python.types.Str(this.klass.getName()));
-            // this.attrs.put("__module__", );
+            this.__dict__.put("__name__", new org.python.types.Str(this.klass.getName()));
+            this.__dict__.put("__qualname__", new org.python.types.Str(this.klass.getName()));
+            // this.__dict__.put("__module__", );
         }
 
         if (origin == Origin.BUILTIN) {
-            org.Python.initializeModule(klass, this.attrs);
+            org.Python.initializeModule(klass, this.__dict__);
         } else if (origin == Origin.PYTHON || origin == Origin.EXTENSION) {
             try {
                 this.constructor = this.klass.getConstructor(org.python.Object[].class, java.util.Map.class);
@@ -173,8 +191,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
     public org.python.Object __getattribute_null(java.lang.String name) {
         // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name);
-        // System.out.println("CLASS ATTRS " + this.attrs);
-        org.python.Object value = this.attrs.get(name);
+        // System.out.println("CLASS ATTRS " + this.__dict__);
+        org.python.Object value = this.__dict__.get(name);
 
         if (value == null) {
             // The class attributes didn't contain a value for the attribute
@@ -186,38 +204,48 @@ public class Type extends org.python.types.Object implements org.python.Callable
             } catch (java.lang.NoSuchFieldException e) {
                 value = new org.python.exceptions.AttributeError(this.klass, name);
             }
-            this.attrs.put(name, value);
+            this.__dict__.put(name, value);
+            value = null;
         }
 
         // If the result of the lookup is an AttributeError, there's
-        // no local field; so defer to the base type.
-        if (value instanceof org.python.exceptions.AttributeError) {
-            if (this.__base__ == null) {
-                value = null;
-            } else {
-                value = this.__base__.__getattribute_null(name);
+        // no local field; so defer to the base type chain.
+        if (value == null) {
+            if (this.__bases__ != null) {
+                for (org.python.Object base_name: this.__bases__.value) {
+                    org.python.types.Type base = org.python.types.Type.pythonType(base_name.toString());
+                    value = base.__getattribute_null(name);
+                    if (value != null) {
+                        break;
+                    }
+                }
             }
         }
+
+        if (value instanceof org.python.exceptions.AttributeError) {
+            value = null;
+        }
+
         // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name + " = " + value);
         return value;
     }
 
     public void __setattr__(java.lang.String name, org.python.Object value) {
         if (!this.__setattr_null(name, value)) {
-            throw new org.python.exceptions.TypeError("can't set attributes of built-in/extension type '" + org.Python.typeName(this.klass) + "'");
+            throw new org.python.exceptions.TypeError("Can't set new attributes on built-in type '" + org.Python.typeName(this.klass) + "'");
         }
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // System.out.println("SETATTRIBUTE TYPE " + name + " = " + value);
-        // System.out.println("class attrs = " + this.attrs);
+        // System.out.println("class __dict__ = " + this.__dict__);
 
         // Can't set attributes of builtin types.
         if (this.origin == Origin.BUILTIN) {
             return false;
         }
 
-        this.attrs.put(name, value);
+        this.__dict__.put(name, value);
         return true;
     }
 

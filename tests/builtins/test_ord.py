@@ -9,10 +9,10 @@ class BuiltinOrdFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["ord"]
 
     not_implemented = [
-        'test_bytearray',
         'test_bytes',
+        'test_bytearray',
         'test_class',
         'test_complex',
         'test_frozenset',
-        'test_str',
+        'test_slice',
     ]

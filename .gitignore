@@ -12,3 +12,5 @@ tests/temp
 /docs/_build
 .project
 .pydevproject
+tests/tmp*
+.cache/

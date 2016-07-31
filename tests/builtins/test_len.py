@@ -14,5 +14,6 @@ class BuiltinLenFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_class',
         'test_complex',
         'test_frozenset',
+        'test_slice',
         'test_tuple',
     ]
