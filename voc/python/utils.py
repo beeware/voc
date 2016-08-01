@@ -16,8 +16,6 @@ class OpcodePosition(Enum):
     NEXT = 'next_op'
     YIELD = 'yield_op'
 
-    TRY_END = 'try_end_op'
-
 
 def dump(node, annotate_fields=True, include_attributes=True, indent='  '):
     """

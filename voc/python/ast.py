@@ -166,7 +166,31 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_AugAssign(self, node):
         # expr target, operator op, expr value):
-        raise NotImplementedError('No handler for AugAssign')
+        # Evaluate the value
+        self.context.load_name(node.target.id, use_locals=True)
+        self.visit(node.value)
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE(
+                'org/python/Object',
+                {
+                    ast.Add: '__iadd__',
+                    ast.Sub: '__isub__',
+                    ast.Mult: '__imul__',
+                    ast.Div: '__itruediv__',
+                    ast.FloorDiv: '__ifloordiv__',
+                    ast.Mod: '__imod__',
+                    ast.Pow: '__ipow__',
+                    ast.LShift: '__ilshift__',
+                    ast.RShift: '__irshift__',
+                    ast.BitOr: '__ior__',
+                    ast.BitXor: '__ixor__',
+                    ast.BitAnd: '__iand__',
+                    # ast.MatMult: '__imatmult__',
+                }[type(node.op)],
+                '(Lorg/python/Object;)Lorg/python/Object;'
+            )
+        )
+        self.visit(node.target)
 
     @node_visitor
     def visit_For(self, node):
@@ -182,8 +206,6 @@ class Visitor(ast.NodeVisitor):
         )
 
         loop = START_LOOP()
-        self.context.jump_targets[node] = loop
-
         self.context.store_name('#for-iter-%x' % id(node), True)
         self.context.add_opcodes(
             loop,
@@ -215,7 +237,28 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_While(self, node):
         # expr test, stmt* body, stmt* orelse):
-        raise NotImplementedError('No handler for While')
+
+        loop = START_LOOP()
+        self.context.add_opcodes(
+            loop
+        )
+        self.visit(node.test)
+        self.context.add_opcodes(
+            IF([
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                ], JavaOpcodes.IFNE),
+                jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
+            END_IF(),
+        )
+
+        for child in node.body:
+            self.visit(child)
+
+        self.context.add_opcodes(
+            END_LOOP()
+        )
 
     @node_visitor
     def visit_If(self, node):
@@ -233,12 +276,13 @@ class Visitor(ast.NodeVisitor):
         for child in node.body:
             self.visit(child)
 
-        self.context.add_opcodes(
-            ELSE(),
-        )
+        if node.orelse:
+            self.context.add_opcodes(
+                ELSE(),
+            )
 
-        for child in node.orelse:
-            self.visit(child)
+            for child in node.orelse:
+                self.visit(child)
 
         self.context.add_opcodes(
             END_IF()
@@ -396,15 +440,21 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Break(self, node):
-    # #
-    #     print("Break", dir(node))
-        raise NotImplementedError('No handler for Break')
+        for loop in self.context.loops[::-1]:
+            if loop.end_op is None:
+                break
+        self.context.add_opcodes(
+            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
+        )
 
     @node_visitor
     def visit_Continue(self, node):
-    # #
-    #     print("Continue", dir(node))
-        raise NotImplementedError('No handler for Continue')
+        for loop in self.context.loops[::-1]:
+            if loop.end_op is None:
+                break
+        self.context.add_opcodes(
+            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.START),
+        )
 
     # # Expressions
     @node_visitor
@@ -444,10 +494,10 @@ class Visitor(ast.NodeVisitor):
                 'org/python/Object',
                 {
                     ast.Add: '__add__',
-                    ast.Sub: '__neg__',
+                    ast.Sub: '__sub__',
                     ast.Mult: '__mul__',
-                    ast.Div: '__div__',
-                    ast.FloorDiv: '__floor_div__',
+                    ast.Div: '__truediv__',
+                    ast.FloorDiv: '__floordiv__',
                     ast.Mod: '__mod__',
                     ast.Pow: '__pow__',
                     ast.LShift: '__lshift__',
