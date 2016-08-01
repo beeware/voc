@@ -500,7 +500,7 @@ class Block:
                     # print("   h", handler.descriptors)
                     exceptions.append(JavaExceptionInfo(
                         handler.start_op.java_offset,
-                        handler.catch_end_op.java_offset,
+                        handler.end_op.java_offset,
                         try_catch.finally_handler.start_op.java_offset,
                         None
                     ))

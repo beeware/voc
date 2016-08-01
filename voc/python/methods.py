@@ -220,7 +220,10 @@ class Method(Block):
 
     def transpile_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
-            self.add_opcodes(JavaOpcodes.ARETURN())
+            self.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),
+                JavaOpcodes.ARETURN()
+            )
 
     def method_attributes(self):
         return [
@@ -762,36 +765,35 @@ class MainMethod(Method):
         self.add_opcodes(
             # Add a TRY-CATCH for SystemExit
             TRY(),
+                # Initialize and register this module
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.DUP(),
 
-            # Initialize and register this module
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-            JavaOpcodes.DUP(),
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(self.module.full_name),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.NEW(self.module.class_descriptor),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL(self.module.class_descriptor, '<init>', '()V'),
+                ASTORE_name(self, '#module'),
 
-            JavaOpcodes.NEW(self.module.class_descriptor),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL(self.module.class_descriptor, '<init>', '()V'),
-            ASTORE_name(self, '#module'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                # Register the same instances as __main__
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W('__main__'),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
-            # Register the same instances as __main__
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W('__main__'),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                ALOAD_name(self, '#module'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
 
-            ALOAD_name(self, '#module'),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
-
-            # Run the module block.
-            ALOAD_name(self, '#module'),
-            JavaOpcodes.INVOKEVIRTUAL(self.module.class_descriptor, 'module$import', '()V'),
+                # Run the module block.
+                ALOAD_name(self, '#module'),
+                JavaOpcodes.INVOKEVIRTUAL(self.module.class_descriptor, 'module$import', '()V'),
         )
 
     def transpile_teardown(self):

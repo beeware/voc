@@ -15,8 +15,8 @@ class OpcodePosition(Enum):
     END = 'end_op'
     NEXT = 'next_op'
     YIELD = 'yield_op'
+
     TRY_END = 'try_end_op'
-    CATCH_END = 'catch_end_op'
 
 
 def dump(node, annotate_fields=True, include_attributes=True, indent='  '):
@@ -361,6 +361,8 @@ class TRY:
             ...
         CATCH()
             ...
+        FINALLY()
+            ...
         END_TRY()
 
     END_TRY come *after* the last operation in the relevant block;
@@ -386,33 +388,30 @@ class TRY:
     that has no end_op recorded.
 
     """
-    def __init__(self, else_block=None, finally_block=None):
-        # The first command covered by the try block
-        self.start_op = None
-
-        # The last command covered by the try
-        self.try_end_op = None
-
-        # The jump at the end of the try block, after any
-        # else and finally processing
-        self.jump_op = None
-
-        # The last command in the try/catch/else sequence
-        self.end_op = None
-        self.handlers = []
-
-        # The commands for the "else" block
-        self.else_block = else_block
-
-        # The commands for the "finally" block
-        self.finally_block = finally_block
-
-        # A handler for the finally block
-        self.finally_handler = None
-
+    def __init__(self):
         # If this TRY can be identified as the start of a new
         # line of source code, track that line.
         self.starts_line = None
+
+        # The first command covered by the try block
+        self.start_op = None
+
+        # The last command in the try block. This may be a
+        # jump to the else or finally block, or past the
+        # other handlers.
+        self.try_end_op = None
+
+        # The jump to the else/finally block.
+        self.jump_op = None
+
+        # The last command in the try/catch/else/finally sequence
+        self.end_op = None
+
+        # The catch handlers
+        self.handlers = []
+
+        # A handler for the finally block
+        self.finally_handler = None
 
     def process(self, context):
         context.try_catches.append(self)
@@ -438,17 +437,16 @@ class CATCH:
         # line of source code, track that line.
         self.starts_line = None
 
-        # The last command covered by the catch
-        self.catch_end_op = None
+        # The first command covered by the catch block
+        self.start_op = None
 
-        # The jump at the end of the catch block, after any
-        # finally processing
-        self.jump_op = None
+        # The end of the catch block.
+        self.end_op = None
 
-    def __len__(self):
-        # The CATCH needs to be able to pass as an opcode under initial
-        # post processing
-        return 3
+    # def __len__(self):
+    #     # The CATCH needs to be able to pass as an opcode under initial
+    #     # post processing
+    #     return 3
 
     def process(self, context):
         # Find the most recent exception on the stack that hasn't been
@@ -460,43 +458,21 @@ class CATCH:
         # print("    current try_catch", try_catch)
         # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
 
-        # If this is the first catch, insert a GOTO operation.
+        # If this is the first catch, insert a GOTO operation to
+        # the ELSE block. If it's the second or later catch, GOTO
+        # the FINALLY block.
         # The jump distance will be updated when all the CATCH blocks
         # have been processed and the try_catch is converted.
-        # If it isn't the first catch, then this catch concludes the
-        # previous one. Add a goto to the end of the block, and
-        # record the end of the block for framing purposes.
         end_jump = JavaOpcodes.GOTO(0)
         if len(try_catch.handlers) == 0:
-            if try_catch.else_block or try_catch.finally_block:
-                context.next_resolve_list.append((try_catch, OpcodePosition.TRY_END))
-            else:
-                try_catch.try_end_op = end_jump
-
-            if try_catch.else_block:
-                for command in try_catch.else_block.commands:
-                    command.transpile(context)
-
-            if try_catch.finally_block:
-                for command in try_catch.finally_block.commands:
-                    command.transpile(context)
-
+            try_catch.try_end_op = end_jump
             try_catch.jump_op = end_jump
         else:
-            if try_catch.else_block or try_catch.finally_block:
-                context.next_resolve_list.append((try_catch.handlers[-1], OpcodePosition.CATCH_END))
-            else:
-                try_catch.handlers[-1].catch_end_op = end_jump
-
-            if try_catch.finally_block:
-                for command in try_catch.finally_block.commands:
-                    command.transpile(context)
-
+            try_catch.handlers[-1].end_op = end_jump
             try_catch.handlers[-1].jump_op = end_jump
-            try_catch.handlers[-1].end_op = context.opcodes[-1]
-
-        context.add_opcodes(end_jump)
-        jump(end_jump, context, try_catch, OpcodePosition.NEXT)
+        context.add_opcodes(
+            jump(end_jump, context, try_catch, OpcodePosition.NEXT)
+        )
 
         # Add this catch block as a handler
         try_catch.handlers.append(self)
@@ -514,13 +490,11 @@ class FINALLY:
         # line of source code, track that line.
         self.starts_line = None
 
+        # The first command covered by the finally block
+        self.start_op = None
+
         # The last command covered by the finally
         self.end_op = None
-
-    def __len__(self):
-        # The FINALLY needs to be able to pass as an opcode under initial
-        # post processing
-        return 3
 
     def process(self, context):
         # Find the most recent exception on the stack that hasn't been
@@ -532,7 +506,7 @@ class FINALLY:
         # print("    current try_catch", try_catch)
         # print("    try-catches", [(id(t), t.end_op) for t in context.try_catches])
 
-        # If this is the first catch, insert a GOTO operation.
+        # If there are no catches, insert a GOTO operation.
         # The jump distance will be updated when all the CATCH blocks
         # have been processed and the try_catch is converted.
         # If it isn't the first catch, then this catch concludes the
@@ -540,37 +514,13 @@ class FINALLY:
         # record the end of the block for framing purposes.
         end_jump = JavaOpcodes.GOTO(0)
         if len(try_catch.handlers) == 0:
-            if try_catch.else_block or try_catch.finally_block:
-                context.next_resolve_list.append((try_catch, OpcodePosition.TRY_END))
-            else:
-                try_catch.try_end_op = end_jump
-
-            if try_catch.else_block:
-                for command in try_catch.else_block.commands:
-                    command.transpile(context)
-
-            if try_catch.finally_block:
-                for command in try_catch.finally_block.commands:
-                    command.transpile(context)
-
-            try_catch.jump_op = end_jump
+            try_catch.try_end_op = context.opcodes[-1]
         else:
-            if try_catch.else_block or try_catch.finally_block:
-                context.next_resolve_list.append((try_catch.handlers[-1], OpcodePosition.CATCH_END))
-            else:
-                try_catch.handlers[-1].catch_end_op = end_jump
-
-            if try_catch.finally_block:
-                for command in try_catch.finally_block.commands:
-                    command.transpile(context)
-
-            try_catch.handlers[-1].jump_op = end_jump
             try_catch.handlers[-1].end_op = context.opcodes[-1]
 
-        context.add_opcodes(end_jump)
-        jump(end_jump, context, try_catch, OpcodePosition.NEXT)
+        context.add_opcodes(jump(end_jump, context, try_catch, OpcodePosition.NEXT))
 
-        # Add this catch block as a handler
+        # Add this block as the finally handler
         try_catch.finally_handler = self
 
         # The next opcode is the start of the finally block.

@@ -6,9 +6,11 @@ from .modules import Module, ModuleBlock
 from .methods import Method, MainMethod
 from .utils import (
     IF, ELSE, END_IF,
-    TRY, CATCH, END_TRY,
+    TRY, CATCH, FINALLY, END_TRY,
+    START_LOOP, END_LOOP,
     ICONST_val,
-    jump, OpcodePosition
+    jump, OpcodePosition,
+    ASTORE_name, ALOAD_name, free_name,
 )
 
 
@@ -100,8 +102,14 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Expr(self, node):
-        # No special handling required for Expr nodes.
         self.generic_visit(node)
+
+        # If the expression is a call, we need to ignore
+        # any return value from the function.
+        if type(node.value) in (ast.Call, ast.Attribute):
+            self.context.add_opcodes(
+                JavaOpcodes.POP()
+            )
 
     @node_visitor
     def visit_Suite(self, node):
@@ -127,26 +135,15 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Return(self, node):
         # expr? value):
-        raise NotImplementedError('No handler for Return')
+        self.visit(node.value)
+        self.context.add_opcodes(
+            JavaOpcodes.ARETURN()
+        )
 
     @node_visitor
     def visit_Delete(self, node):
         # expr* targets):
         raise NotImplementedError('No handler for Delete')
-
-    def _set_target(self, target):
-        if type(target) == ast.Attribute:
-            self.visit(target.value)
-            self.context.add_opcodes(
-                JavaOpcodes.SWAP(),
-                JavaOpcodes.LDC_W(target.attr),
-                JavaOpcodes.SWAP(),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
-            )
-        elif type(target) == ast.Name:
-            self.context.store_name(target.id, use_locals=False)
-        else:
-            raise NotImplementedError('Unknown assignment target type %s' % type(target))
 
     @node_visitor
     def visit_Assign(self, node):
@@ -159,12 +156,12 @@ class Visitor(ast.NodeVisitor):
                 self.context.add_opcodes(
                     JavaOpcodes.DUP()
                 )
-                self._set_target(target)
+                self.visit(target)
             self.context.add_opcodes(
                 JavaOpcodes.POP()
             )
         else:
-            self._set_target(node.targets[0])
+            self.visit(node.targets[0])
 
     @node_visitor
     def visit_AugAssign(self, node):
@@ -174,7 +171,46 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_For(self, node):
         # expr target, expr iter, stmt* body, stmt* orelse):
-        raise NotImplementedError('No handler for For')
+        # print ("TRANSPILE LOOP", self.start_offset, self.for_offset, self.loop_offset, self.end_offset)
+        # context.next_opcode_starts_line = self.starts_line
+
+        # self.pre_loop(context)
+
+        self.visit(node.iter)
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
+        )
+
+        loop = START_LOOP()
+        self.context.jump_targets[node] = loop
+
+        self.context.store_name('#for-iter-%x' % id(node), True)
+        self.context.add_opcodes(
+            loop,
+                TRY(),
+        )
+        self.context.load_name('#for-iter-%x' % id(node), True)
+        self.context.add_opcodes(
+                    JavaOpcodes.CHECKCAST('org/python/Iterable'),
+        )
+        self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;'),
+                CATCH('org/python/exceptions/StopIteration'),
+                    JavaOpcodes.POP(),
+                    jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
+                END_TRY(),
+        )
+        self.context.store_name(node.target.id, True)
+
+        for child in node.body:
+            self.visit(child)
+
+        self.context.add_opcodes(
+            END_LOOP()
+        )
+
+        # Clean up
+        # free_name(self.context, '#for-iter-%x' % id(node))
 
     @node_visitor
     def visit_While(self, node):
@@ -216,12 +252,67 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Raise(self, node):
         # expr? exc, expr? cause):
-        raise NotImplementedError('No handler for Raise')
+        exception = 'org/python/exceptions/%s' % node.exc.func.id
+        self.context.add_opcodes(
+            JavaOpcodes.NEW(exception),
+            JavaOpcodes.DUP(),
+        )
+
+        for arg in node.exc.args:
+            self.visit(arg)
+
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % 'Lorg/python/Object;' * len(node.exc.args)),
+            JavaOpcodes.ATHROW(),
+        )
 
     @node_visitor
     def visit_Try(self, node):
         # stmt* body, excepthandler* handlers, stmt* orelse, stmt* finalbody):
-        raise NotImplementedError('No handler for Try')
+        self.context.add_opcodes(
+            TRY()
+        )
+
+        for child in node.body:
+            self.visit(child)
+
+        for child in node.orelse:
+            self.visit(child)
+
+        # Finally content is duplicated at the end of the body
+        # if it is defined.
+        if node.finalbody:
+            for child in node.finalbody:
+                self.visit(child)
+
+        for handler in node.handlers:
+            self.visit(handler)
+
+            # Finally content is duplicated at the end of the handler
+            # if it is defined.
+            if node.finalbody:
+                for child in node.finalbody:
+                    self.visit(child)
+
+        if node.finalbody:
+            self.context.add_opcodes(
+                FINALLY()
+            )
+            ASTORE_name(self.context, '#exception-%x' % id(node))
+
+            for child in node.finalbody:
+                self.visit(child)
+
+            ALOAD_name(self.context, '#exception-%x' % id(node))
+            self.context.add_opcodes(
+                JavaOpcodes.ATHROW(),
+            )
+
+            free_name(self.context, '#exception-%x' % id(node))
+
+        self.context.add_opcodes(
+            END_TRY()
+        )
 
     @node_visitor
     def visit_Assert(self, node):
@@ -301,9 +392,7 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Pass(self, node):
-    # #
-    #     print("Pass", dir(node))
-        raise NotImplementedError('No handler for Pass')
+        pass
 
     @node_visitor
     def visit_Break(self, node):
@@ -348,7 +437,29 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_BinOp(self, node):
         # expr left, operator op, expr right):
-        raise NotImplementedError('No handler for BinOp')
+        self.visit(node.left)
+        self.visit(node.right)
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE(
+                'org/python/Object',
+                {
+                    ast.Add: '__add__',
+                    ast.Sub: '__neg__',
+                    ast.Mult: '__mul__',
+                    ast.Div: '__div__',
+                    ast.FloorDiv: '__floor_div__',
+                    ast.Mod: '__mod__',
+                    ast.Pow: '__pow__',
+                    ast.LShift: '__lshift__',
+                    ast.RShift: '__rshift__',
+                    ast.BitOr: '__or__',
+                    ast.BitXor: '__xor__',
+                    ast.BitAnd: '__and__',
+                    # ast.MatMult:
+                }[type(node.op)],
+                '(Lorg/python/Object;)Lorg/python/Object;'
+            )
+        )
 
     @node_visitor
     def visit_UnaryOp(self, node):
@@ -629,7 +740,25 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Bytes(self, node):
     #     bytes s):
-        raise NotImplementedError('No handler for Bytes')
+        self.context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Bytes'),
+            JavaOpcodes.DUP(),
+
+            JavaOpcodes.BIPUSH(len(node.s)),
+            JavaOpcodes.NEWARRAY(JavaOpcodes.NEWARRAY.T_BYTE),
+        )
+
+        for i, b in enumerate(node.s):
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i),
+                JavaOpcodes.BIPUSH(node.s[i]),
+                JavaOpcodes.BASTORE(),
+            )
+
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '([B)V')
+        )
 
     @node_visitor
     def visit_NameConstant(self, node):
@@ -662,10 +791,20 @@ class Visitor(ast.NodeVisitor):
     def visit_Attribute(self, node):
         self.visit(node.value)
 
-        self.context.add_opcodes(
-            JavaOpcodes.LDC_W(node.attr),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
-        )
+        if type(node.ctx) == ast.Load:
+            self.context.add_opcodes(
+                JavaOpcodes.LDC_W(node.attr),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            )
+        elif type(node.ctx) == ast.Store:
+            self.context.add_opcodes(
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.LDC_W(target.attr),
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            )
+        else:
+            raise NotImplmentedError("Unknown context %s" % node.ctx)
 
     @node_visitor
     def visit_Subscript(self, node):
@@ -682,7 +821,12 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Name(self, node):
-        self.context.load_name(node.id, use_locals=True)
+        if type(node.ctx) == ast.Load:
+            self.context.load_name(node.id, use_locals=True)
+        elif type(node.ctx) == ast.Store:
+            self.context.store_name(node.id, use_locals=False)
+        else:
+            raise NotImplementedError("Unknown context %s" % node.ctx)
 
     @node_visitor
     def visit_List(self, node):
@@ -784,4 +928,26 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_ExceptHandler(self, node):
         # expr? type, identifier? name, stmt* body):
-        raise NotImplementedError('No handler for ExceptHandler')
+        if isinstance(node.type, ast.Tuple):
+            exception = [
+                'org/python/exceptions/%s' % exc.id
+                for exc in node.type.elts
+            ]
+        elif node.type:
+            exception = 'org/python/exceptions/%s' % node.type.id
+        else:
+            exception = None
+
+        self.context.add_opcodes(
+            CATCH(exception),
+        )
+
+        if node.name:
+            self.context.store_name(node.name, True)
+        else:
+            # No named exception, but there is still an exception
+            # on the stack. Pop it off.
+            self.context.add_opcodes(JavaOpcodes.POP())
+
+        for child in node.body:
+            self.visit(child)
