@@ -138,3 +138,46 @@ class FunctionTests(TranspileTestCase):
             myfunc(z=99, y=42, x=37)
             print('Done.')
             """, run_in_function=False)
+
+    @expectedFailure
+    def test_call_function_kw(self):
+        self.assertCodeExecution("""
+            def myfunc(**kwargs):
+                print(kwargs['first'] * 3)
+                print(kwargs['second'] * 3)
+
+                return kwargs['first'] + kwargs['second']
+
+            values = {'first': 1, 'second': 2}
+            print("values sum =", myfunc(**values))
+            print('Done.')
+            """, run_in_function=False)
+
+    @expectedFailure
+    def test_call_function_var_kw(self):
+        self.assertCodeExecution("""
+            def myfunc(*args, **kwargs):
+                print(kwargs['first'] * 3)
+                print(kwargs['second'] * 3)
+                print(args)
+
+                return kwargs['first'] + kwargs['second']
+
+            values_tuple = (1, 2, 3, 4)
+            values_dict = {'first': 1, 'second': 2}
+            print("values sum =", myfunc(*values_tuple, **values_dict))
+            print('Done.')
+            """, run_in_function=False)
+
+    @expectedFailure
+    def test_call_function_var(self):
+        self.assertCodeExecution("""
+                def myfunc(*args):
+                    print(args)
+
+                    return len(args)
+
+                values_tuple = (1, 2, 3, 4)
+                print("values count =", myfunc(*values_tuple))
+                print('Done.')
+                """, run_in_function=False)
