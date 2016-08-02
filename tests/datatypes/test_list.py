@@ -78,6 +78,49 @@ class ListTests(TranspileTestCase):
             print(x[1:4])
             """)
 
+    def test_count(self):
+        # Normal Count
+        self.assertCodeExecution("""
+            x = [1, 1, 1, 4, 5]
+            print(x.count(1))
+            """)
+
+        # Bool Count
+        self.assertCodeExecution("""
+            x = [1, 1, False, 1, 4, True, 5, True]
+            print(x.count(1))
+            """)
+
+        # Element doesn't exist count
+        self.assertCodeExecution("""
+            x = [1, False, 1, 1, True, 4, 5, True]
+            print(x.count(2))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 1, 1, 4, 5, True]
+            print(x.count(1))
+            """)
+
+    def test_contains(self):
+        # Normal Contains
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x.contains(1))
+            """)
+
+        # Element doesn't exist
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x.contains(0))
+            """)
+
+        # Checking for boolean
+        self.assertCodeExecution("""
+            x = [True, False]
+            print(x.count(1))
+            """)
+
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'list'
