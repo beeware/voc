@@ -342,15 +342,15 @@ public class Int extends org.python.types.Object {
     }
 
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
-        long this_val = ((org.python.types.Int) this).value;
-        long other_val = ((org.python.types.Int) other).value;
-        long modulo_val = ((org.python.types.Int) modulo).value;
         if (modulo != null) {
             /* if exponent is not int and modulo specified raise TypeError*/
             if(other instanceof org.python.types.Float) {
                 throw new org.python.exceptions.TypeError("pow() 3rd argument not allowed unless all arguments are integers");
             }
             if(other instanceof org.python.types.Int || other instanceof org.python.types.Bool) {
+                long this_val = ((org.python.types.Int) this).value;
+                long other_val = ((org.python.types.Int) other).value;
+                long modulo_val = ((org.python.types.Int) modulo).value;
                 /* if exponent is negative raise TypeError*/
                 if(other_val < 0) {
                     throw new org.python.exceptions.TypeError("pow() 2nd argument cannot be negative when 3rd argument specified");
@@ -385,6 +385,7 @@ public class Int extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for pow(): 'int', '" + other.typeName() + "', 'int");
         }
         if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
             if (other_val < 0) {
                 if (this.value == 0) {
                     throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
@@ -402,6 +403,7 @@ public class Int extends org.python.types.Object {
                 return new org.python.types.Int(result);
             }
         } else if (other instanceof org.python.types.Float) {
+            long other_val = ((org.python.types.Int) other).value;
             if (this.value == 0 && other_val < 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
             }
