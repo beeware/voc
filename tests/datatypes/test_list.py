@@ -102,6 +102,24 @@ class ListTests(TranspileTestCase):
             print(x.count(1))
             """)
 
+    def test_contains(self):
+        # Normal Contains
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x.contains(1))
+            """)
+
+        # Element doesn't exist
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x.contains(0))
+            """)
+
+        # Checking for boolean
+        self.assertCodeExecution("""
+            x = [True, False]
+            print(x.count(1))
+            """)
 
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):

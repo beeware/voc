@@ -389,7 +389,15 @@ public class List extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __contains__(org.python.Object item) {
-        throw new org.python.exceptions.NotImplementedError("list.__contains__() has not been implemented.");
+        boolean found = false;
+        int len = (int) this.__len__().value;
+        for(int i=0;i<len;i++) {
+            if(((org.python.types.Bool)item.__eq__(this.value.get(i))).value){
+                found = true;
+                break;
+            }
+        }
+        return new org.python.types.Bool(found);
     }
 
     @org.python.Method(
