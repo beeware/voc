@@ -777,6 +777,9 @@ class BinaryOperationTestCase(NotImplementedToExpectedFailure):
         vars()['test_eq_%s' % datatype] = _binary_test('test_eq_%s' % datatype, 'x == y', examples)
         vars()['test_ne_%s' % datatype] = _binary_test('test_ne_%s' % datatype, 'x != y', examples)
 
+        vars()['test_direct_add_%s' % datatype] = _binary_test('test_add_%s' % datatype, 'x.__add__(y)', examples)
+        vars()['test_direct_multiply_%s' % datatype] = _binary_test('test_multiply_%s' % datatype, 'x.__mul__(y)', examples)
+        vars()['test_direct_subtract_%s' % datatype] = _binary_test('test_subtract_%s' % datatype, 'x.__sub__(y)', examples)
 
 def _inplace_test(test_name, operation, examples):
     def func(self):
