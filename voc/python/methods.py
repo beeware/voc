@@ -6,8 +6,10 @@ from .blocks import Block
 from .utils import (
     TRY, CATCH, END_TRY,
     ALOAD_name, ASTORE_name, free_name,
-#     DLOAD_name, FLOAD_name,
-#     ICONST_val, ILOAD_name,
+    # DLOAD_name, FLOAD_name,
+    # ICONST_val, ILOAD_name,
+    ArgType,
+    extract_parameters
 )
 
 CO_VARARGS = 0x0004
@@ -173,46 +175,51 @@ class Method(Block):
     def module(self):
         return self.parent
 
-    def add_method(self, method_name, code, annotations):
+    def add_method(self, function_def):
         # If a method is added to a method, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
+        print (function_def, dir(function_def))
         callable = ClosureClass(
             parent=self.parent,
-            name='%s$%s' % (self.parent.name, method_name),
-            closure_var_names=code.co_names,
+            name='%s$%s' % (self.parent.name, function_def.name),
+            closure_var_names=[],  # code.co_names,
             bases=['org/python/types/Closure'],
             implements=['org/python/Callable'],
             public=True,
             final=True,
         )
 
-        if code.co_flags & CO_GENERATOR:
-            method = ClosureGeneratorMethod(
-                callable,
-                generator=code.co_name,
-                name='invoke',
-                parameters=extract_parameters(code, annotations),
-                returns={
-                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
-                },
-            )
-        else:
-            method = ClosureMethod(
-                callable,
-                name='invoke',
-                parameters=extract_parameters(code, annotations),
-                returns={
-                    'annotation': annotations.get('return', 'org/python/Object').replace('.', '/')
-                },
-            )
-        method.extract(code)
+        # if code.co_flags & CO_GENERATOR:
+        #     method = ClosureGeneratorMethod(
+        #         callable,
+        #         generator=code.co_name,
+        #         name='invoke',
+        #         parameters=extract_parameters(code, annotations),
+        #         returns={
+        #             'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+        #         },
+        #     )
+        # else:
+        method = ClosureMethod(
+            callable,
+            name='invoke',
+            parameters=extract_parameters(function_def),
+            returns={
+                'annotation': (
+                    function_def.returns.annotation
+                    if function_def.returns
+                    else 'org/python/Object'
+                ),
+            },
+        )
+
         callable.methods.append(method)
 
-        callable.fields = dict(
-            (name, 'Lorg/python/Object;')
-            for name in code.co_names
-        )
+        # callable.fields = dict(
+        #     (name, 'Lorg/python/Object;')
+        #     for name in code.co_names
+        # )
 
         self.parent.classes.append(callable)
 

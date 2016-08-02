@@ -769,16 +769,25 @@ def DLOAD_name(context, name):
         return JavaOpcodes.DLOAD(index)
 
 
-def free_name(context, name):
+def free_name(context, name, must_exist=True):
     """Remove a name from the local variable pool
+
+    By default the variable must exist. However, if you pass
+    in must_exist, the non-existence of the variable will not
+    be treated as an error. This is to allow for variables that
+    are created as part of looping constructs, and may not be
+    created in the case of an empty loop.
     """
-    index = context.local_vars[name]
-    context.deleted_vars.add(index)
-    del context.local_vars[name]
+    try:
+        index = context.local_vars[name]
+        context.deleted_vars.add(index)
+        del context.local_vars[name]
 
-    # print("FREE", context, name, index)
-    # print("locals: ", context.local_vars)
-
+        # print("FREE", context, name, index)
+        # print("locals: ", context.local_vars)
+    except KeyError:
+        if must_exist:
+            raise
 
 ##########################################################################
 # Handle constant values.

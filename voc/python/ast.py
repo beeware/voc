@@ -194,24 +194,19 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_For(self, node):
-        # expr target, expr iter, stmt* body, stmt* orelse):
-        # print ("TRANSPILE LOOP", self.start_offset, self.for_offset, self.loop_offset, self.end_offset)
-        # context.next_opcode_starts_line = self.starts_line
-
-        # self.pre_loop(context)
-
         self.visit(node.iter)
         self.context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
         )
 
         loop = START_LOOP()
-        self.context.store_name('#for-iter-%x' % id(node), True)
+
         self.context.add_opcodes(
+            ASTORE_name(self.context, '#for-iter-%x' % id(node)),
             loop,
                 TRY(),
+                ALOAD_name(self.context, '#for-iter-%x' % id(node))
         )
-        self.context.load_name('#for-iter-%x' % id(node), True)
         self.context.add_opcodes(
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
         )
@@ -232,7 +227,7 @@ class Visitor(ast.NodeVisitor):
         )
 
         # Clean up
-        # free_name(self.context, '#for-iter-%x' % id(node))
+        free_name(self.context, '#for-iter-%x' % id(node))
 
     @node_visitor
     def visit_While(self, node):
@@ -613,8 +608,62 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_ListComp(self, node):
-        # expr elt, comprehension* generators):
-        raise NotImplementedError('No handler for ListComp')
+        self.context.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/List'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', '()V'),
+            ASTORE_name(self.context, '#listcomp-value-%x' % id(node)),
+        )
+
+        if len(node.generators) != 1:
+            raise NotImplementedError("Don't know how to handle multiple generators")
+
+        for i, generator in enumerate(node.generators):
+            if type(generator) == ast.comprehension:
+                self.visit(generator.iter)
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
+                )
+            else:
+                raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
+
+        loop = START_LOOP()
+
+        self.context.add_opcodes(
+            ASTORE_name(self.context, '#listcomp-iter-%x' % id(node)),
+            loop,
+                TRY(),
+                ALOAD_name(self.context, '#listcomp-iter-%x' % id(node))
+        )
+        self.context.add_opcodes(
+                    JavaOpcodes.CHECKCAST('org/python/Iterable'),
+        )
+        self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;'),
+                CATCH('org/python/exceptions/StopIteration'),
+                    JavaOpcodes.POP(),
+                    jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
+                END_TRY(),
+        )
+        self.visit(generator.target)
+
+        self.visit(node.elt)
+
+        # And add it to the result list
+        # self.context.add_opcodes(
+        #     JavaOpcodes.SWAP(),
+        #     JavaOpcodes.LDC_W('append'),
+        #     JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', '()V'),
+        # )
+
+        self.context.add_opcodes(
+            # JavaOpcodes.POP(),
+            END_LOOP()
+        )
+
+        # Clean up
+        free_name(self.context, '#listcomp-iter-%x' % id(node))
+
 
     @node_visitor
     def visit_SetComp(self, node):
