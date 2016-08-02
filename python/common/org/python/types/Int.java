@@ -403,7 +403,7 @@ public class Int extends org.python.types.Object {
                 return new org.python.types.Int(result);
             }
         } else if (other instanceof org.python.types.Float) {
-            long other_val = ((org.python.types.Int) other).value;
+            double other_val = ((org.python.types.Float) other).value;
             if (this.value == 0 && other_val < 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
             }
