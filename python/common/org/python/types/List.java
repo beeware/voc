@@ -389,7 +389,15 @@ public class List extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __contains__(org.python.Object item) {
-        throw new org.python.exceptions.NotImplementedError("list.__contains__() has not been implemented.");
+        boolean found = false;
+        int len = (int) this.__len__().value;
+        for(int i=0;i<len;i++) {
+            if(((org.python.types.Bool)item.__eq__(this.value.get(i))).value){
+                found = true;
+                break;
+            }
+        }
+        return new org.python.types.Bool(found);
     }
 
     @org.python.Method(
@@ -461,10 +469,18 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
-    public org.python.Object count() {
-        throw new org.python.exceptions.NotImplementedError("list.count() has not been implemented.");
+    public org.python.Object count(org.python.Object other) {
+        int count = 0;
+        int len = (int) this.__len__().value;
+        for(int i=0;i<len;i++) {
+            if(((org.python.types.Bool)other.__eq__(this.value.get(i))).value){
+                count++;
+            }
+        }
+        return new org.python.types.Int(count);
     }
 
     @org.python.Method(
@@ -506,12 +522,11 @@ public class List extends org.python.types.Object {
     public org.python.Object sort() {
         throw new org.python.exceptions.NotImplementedError("list.sort() has not been implemented.");
     }
+
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-
-         throw new org.python.exceptions.TypeError("type list doesn't define __round__ method");
-
+        throw new org.python.exceptions.TypeError("type list doesn't define __round__ method");
     }
 }

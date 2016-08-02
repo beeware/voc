@@ -4,7 +4,6 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase, BuiltinTwoargFu
 
 
 class PowTests(TranspileTestCase):
-    @expectedFailure
     def test_int_z(self):
         self.assertCodeExecution("""
             x = 3

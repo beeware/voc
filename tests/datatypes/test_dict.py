@@ -179,7 +179,6 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_slice',
 
         'test_multiply_bytearray',
-        'test_multiply_bytes',
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',

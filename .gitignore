@@ -13,3 +13,4 @@ tests/temp
 .project
 .pydevproject
 tests/tmp*
+.cache/

@@ -21,7 +21,6 @@ class SumTests(TranspileTestCase):
             print(sum(i))
         """)
 
-    @expectedFailure  # + not defined on float/float yet.
     def test_sum_mix_floats_and_ints(self):
         self.assertCodeExecution("""
             print(sum([1, 1.414, 2, 3.14159]))

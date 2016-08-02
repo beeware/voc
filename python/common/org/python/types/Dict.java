@@ -178,6 +178,8 @@ public class Dict extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
         } else if (other instanceof org.python.types.Str) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        } else if (other instanceof org.python.types.Bytes) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
         }
         return super.__mul__(other);
     }

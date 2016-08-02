@@ -158,30 +158,18 @@ public class Float extends org.python.types.Object {
             } else {
                 return new org.python.types.Bool(this.value == 0.0);
             }
-        } else if (other instanceof org.python.types.NoneType) {
-            return new org.python.types.Bool(false);
-        } else if (other instanceof org.python.types.List) {
-            return new org.python.types.Bool(false);
-        } else if (other instanceof org.python.types.Str) {
-            return new org.python.types.Bool(false);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: float() == " + other.typeName() + "()");
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float ||
-                other instanceof org.python.types.Bool || other instanceof org.python.types.NoneType ||
-                other instanceof org.python.types.Str) {
-            if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
-                return new org.python.types.Bool(false);
-            } else if (!((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
-                return new org.python.types.Bool(true);
-            }
+        if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
+            return new org.python.types.Bool(false);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: float() == " + other.typeName() + "()");
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -249,6 +237,9 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Float(this.value + 1.0);
             }
             return new org.python.types.Float(this.value);
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            return new org.python.types.Float(this.value + other_val);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'float' and '" + other.typeName() + "'");
     }
@@ -511,6 +502,9 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Float(this.value += 1.0);
             }
             return new org.python.types.Float(this.value);
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            return new org.python.types.Float(this.value + other_val);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'float' and '" + other.typeName() + "'");
     }
