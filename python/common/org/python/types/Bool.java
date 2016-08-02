@@ -224,7 +224,12 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__truediv__() has not been implemented.");
+        try {
+            return new org.python.types.Int(this.value ? 1 : 0).__truediv__(other);
+        } catch (org.python.exceptions.TypeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'bool' and '" + other.typeName() + "'");
+        }
+        // throw new org.python.exceptions.NotImplementedError("bool.__truediv__() has not been implemented.");
     }
 
     @org.python.Method(
