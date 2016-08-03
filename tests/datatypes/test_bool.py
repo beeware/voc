@@ -236,7 +236,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_true_divide_float',
         'test_true_divide_frozenset',
         'test_true_divide_int',
-        'test_true_divide_slice',
 
         'test_xor_bytearray',
         'test_xor_class',
