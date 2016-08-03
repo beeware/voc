@@ -96,7 +96,7 @@ public class NoneType extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
+        if (other instanceof org.python.types.Bytes || other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NoneType'");
         } else {
             throw new org.python.exceptions.TypeError(
@@ -130,7 +130,6 @@ public class NoneType extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-           
-      throw new org.python.exceptions.TypeError("type NoneType doesn't define __round__ method");    
+        throw new org.python.exceptions.TypeError("type NoneType doesn't define __round__ method");
     }
 }

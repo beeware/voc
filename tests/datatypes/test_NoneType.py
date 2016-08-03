@@ -176,15 +176,11 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
         'test_modulo_frozenset',
         'test_modulo_slice',
 
-        'test_multiply_bytes',
         'test_multiply_bytearray',
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',
-        'test_multiply_list',
         'test_multiply_slice',
-        'test_multiply_str',
-        'test_multiply_tuple',
 
         'test_or_bytearray',
         'test_or_class',

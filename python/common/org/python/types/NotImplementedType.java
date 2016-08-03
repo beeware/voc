@@ -96,7 +96,7 @@ public class NotImplementedType extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
+        if (other instanceof org.python.types.Bytes || other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NotImplementedType'");
         } else {
             throw new org.python.exceptions.TypeError(
