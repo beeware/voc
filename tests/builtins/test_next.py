@@ -39,5 +39,4 @@ class BuiltinNextFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_complex',
         'test_frozenset',
         'test_range',
-        'test_slice',
     ]
