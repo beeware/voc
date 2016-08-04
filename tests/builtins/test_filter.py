@@ -63,7 +63,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_bool_list',
         'test_bool_range',
         'test_bool_set',
-        'test_bool_slice',
         'test_bool_str',
         'test_bool_tuple',
 
@@ -94,7 +93,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_bytes_list',
         'test_bytes_range',
         'test_bytes_set',
-        'test_bytes_slice',
         'test_bytes_str',
         'test_bytes_tuple',
 
@@ -143,7 +141,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_dict_list',
         'test_dict_range',
         'test_dict_set',
-        'test_dict_slice',
         'test_dict_str',
         'test_dict_tuple',
 
@@ -156,7 +153,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_float_list',
         'test_float_range',
         'test_float_set',
-        'test_float_slice',
         'test_float_str',
         'test_float_tuple',
 
@@ -187,7 +183,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_int_list',
         'test_int_range',
         'test_int_set',
-        'test_int_slice',
         'test_int_str',
         'test_int_tuple',
 
@@ -200,7 +195,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_list_list',
         'test_list_range',
         'test_list_set',
-        'test_list_slice',
         'test_list_str',
         'test_list_tuple',
 
@@ -213,7 +207,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_None_list',
         'test_None_range',
         'test_None_set',
-        'test_None_slice',
         'test_None_str',
         'test_None_tuple',
 
@@ -226,7 +219,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_NotImplemented_list',
         'test_NotImplemented_range',
         'test_NotImplemented_set',
-        'test_NotImplemented_slice',
         'test_NotImplemented_str',
         'test_NotImplemented_tuple',
 
@@ -239,7 +231,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_range_list',
         'test_range_range',
         'test_range_set',
-        'test_range_slice',
         'test_range_str',
         'test_range_tuple',
 
@@ -252,25 +243,18 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_set_list',
         'test_set_range',
         'test_set_set',
-        'test_set_slice',
         'test_set_str',
         'test_set_tuple',
 
-        'test_slice_bool',
         'test_slice_bytearray',
         'test_slice_bytes',
         'test_slice_class',
         'test_slice_complex',
         'test_slice_dict',
-        'test_slice_float',
         'test_slice_frozenset',
-        'test_slice_int',
         'test_slice_list',
-        'test_slice_None',
-        'test_slice_NotImplemented',
         'test_slice_range',
         'test_slice_set',
-        'test_slice_slice',
         'test_slice_str',
         'test_slice_tuple',
 
@@ -283,7 +267,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_str_list',
         'test_str_range',
         'test_str_set',
-        'test_str_slice',
         'test_str_str',
         'test_str_tuple',
 
@@ -296,7 +279,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_tuple_list',
         'test_tuple_range',
         'test_tuple_set',
-        'test_tuple_slice',
         'test_tuple_str',
         'test_tuple_tuple',
     ]

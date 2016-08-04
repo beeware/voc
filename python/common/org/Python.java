@@ -1422,10 +1422,19 @@ public class Python {
         __doc__ = "slice(stop)" +
             "slice(start, stop[, step])\n" +
             "\n" +
-            "Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).\n"
+            "Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).\n",
+        args={"start_or_stop"},
+        default_args={"stop", "step"}
     )
-    public static org.python.Object slice() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
+    public static org.python.Object slice(org.python.Object start_or_stop, org.python.Object stop, org.python.Object step) {
+        if (stop == null && step == null) {
+            return new org.python.types.Slice(start_or_stop);
+        } else if (step == null) {
+            return new org.python.types.Slice(start_or_stop, stop);
+        } else {
+            return new org.python.types.Slice(start_or_stop, stop, step);
+        }
+
     }
 
     @org.python.Method(

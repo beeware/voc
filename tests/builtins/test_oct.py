@@ -13,5 +13,4 @@ class BuiltinOctFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_class',
         'test_complex',
         'test_frozenset',
-        'test_slice',
     ]
