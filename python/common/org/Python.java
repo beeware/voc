@@ -336,10 +336,65 @@ public class Python {
             " - a text string encoded using the specified encoding\n" +
             " - a bytes or a buffer object\n" +
             " - any object implementing the buffer API.\n" +
-            " - an integer\n"
+            " - an integer\n",
+        default_args = {"source", "encoding", "errors"}
     )
-    public static org.python.types.ByteArray bytearray() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
+    public static org.python.types.ByteArray bytearray(org.python.Object source, org.python.Object encoding, org.python.Object errors) {
+        if (source == null) {
+            // bytearray()
+            return new org.python.types.ByteArray();
+        } else {
+            if (encoding == null) {
+                if (source instanceof org.python.types.Int) {
+                    // bytearray(int)
+                    return new org.python.types.ByteArray((int)((org.python.types.Int) source.__int__()).value);
+                }
+                org.python.Iterable iterator = null;
+                try {
+                    iterator = org.Python.iter(source);
+                } catch (org.python.exceptions.TypeError e) {
+                    // Not an iterator
+                }
+                if (iterator != null) {
+                    // bytearray(iterable_of_ints)
+                    java.util.List<Byte> generated = new java.util.ArrayList<Byte>();
+                    try {
+                        while (true) {
+                            org.python.Object next = iterator.__next__();
+                            if (next instanceof org.python.types.Int) {
+                                long value = ((org.python.types.Int) next.__int__()).value;
+                                if ((value < 0) || (value > 255)) {
+                                    throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
+                                } else {
+                                    generated.add(new Byte((byte)value));
+                                }
+                            } else if (next instanceof org.python.types.Str) {
+                                // TODO: Can take ASCII single-character strings
+                                throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with strings not implemented");
+                            }
+                        }
+                    } catch (org.python.exceptions.StopIteration si) {
+                    }
+                    byte[] primative_bytes = new byte[generated.size()];
+                    for(int i = 0; i < primative_bytes.length; i++) {
+                        primative_bytes[i] = generated.get(i);
+                    }
+                    return new org.python.types.ByteArray(primative_bytes);
+                } else {
+                    // bytearray(bytes_or_buffer)
+                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with bytes_or_buffer not implemented");
+                }
+            } else {
+                // bytearray(string, encoding[, errors])
+                if (errors == null) {
+                    // bytearray(string, encoding)
+                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
+                } else {
+                    // bytearray(string, encoding, errors)
+                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
+                }
+            }
+        }
     }
 
     @org.python.Method(
