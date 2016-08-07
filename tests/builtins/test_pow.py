@@ -4,7 +4,6 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase, BuiltinTwoargFu
 
 
 class PowTests(TranspileTestCase):
-    @expectedFailure
     def test_int_z(self):
         self.assertCodeExecution("""
             x = 3
@@ -94,17 +93,14 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_bool_class',
         'test_bool_complex',
         'test_bool_frozenset',
-        'test_bool_slice',
 
         'test_bytearray_class',
         'test_bytearray_complex',
         'test_bytearray_frozenset',
-        'test_bytearray_slice',
 
         'test_bytes_class',
         'test_bytes_complex',
         'test_bytes_frozenset',
-        'test_bytes_slice',
 
         'test_class_bool',
         'test_class_bytearray',
@@ -145,13 +141,11 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_dict_class',
         'test_dict_complex',
         'test_dict_frozenset',
-        'test_dict_slice',
 
         'test_float_class',
         'test_float_complex',
         'test_float_float',
         'test_float_frozenset',
-        'test_float_slice',
 
         'test_frozenset_bool',
         'test_frozenset_bytearray',
@@ -175,58 +169,36 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_int_complex',
         'test_int_float',
         'test_int_frozenset',
-        'test_int_slice',
 
         'test_list_class',
         'test_list_complex',
         'test_list_frozenset',
-        'test_list_slice',
 
         'test_None_class',
         'test_None_complex',
         'test_None_frozenset',
-        'test_None_slice',
 
         'test_NotImplemented_class',
         'test_NotImplemented_complex',
         'test_NotImplemented_frozenset',
-        'test_NotImplemented_slice',
 
         'test_range_class',
         'test_range_complex',
         'test_range_frozenset',
-        'test_range_slice',
 
         'test_set_class',
         'test_set_complex',
         'test_set_frozenset',
-        'test_set_slice',
 
-        'test_slice_bool',
-        'test_slice_bytearray',
-        'test_slice_bytes',
         'test_slice_class',
         'test_slice_complex',
-        'test_slice_dict',
-        'test_slice_float',
         'test_slice_frozenset',
-        'test_slice_int',
-        'test_slice_list',
-        'test_slice_None',
-        'test_slice_NotImplemented',
-        'test_slice_range',
-        'test_slice_set',
-        'test_slice_slice',
-        'test_slice_str',
-        'test_slice_tuple',
 
         'test_str_class',
         'test_str_complex',
         'test_str_frozenset',
-        'test_str_slice',
 
         'test_tuple_class',
         'test_tuple_complex',
         'test_tuple_frozenset',
-        'test_tuple_slice',
     ]
