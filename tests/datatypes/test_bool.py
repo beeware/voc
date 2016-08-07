@@ -28,62 +28,52 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
     not_implemented = [
-        'test_add_bytearray',
         'test_add_class',
         'test_add_complex',
         'test_add_frozenset',
         'test_add_slice',
 
-        'test_and_bytearray',
         'test_and_class',
         'test_and_complex',
         'test_and_frozenset',
         'test_and_int',
         'test_and_slice',
 
-        'test_eq_bytearray',
         'test_eq_class',
         'test_eq_complex',
         'test_eq_frozenset',
         'test_eq_slice',
 
-        'test_floor_divide_bytearray',
         'test_floor_divide_class',
         'test_floor_divide_complex',
         'test_floor_divide_frozenset',
         'test_floor_divide_slice',
 
-        'test_ge_bytearray',
         'test_ge_class',
         'test_ge_complex',
         'test_ge_frozenset',
         'test_ge_slice',
 
-        'test_gt_bytearray',
         'test_gt_class',
         'test_gt_complex',
         'test_gt_frozenset',
         'test_gt_slice',
 
-        'test_le_bytearray',
         'test_le_class',
         'test_le_complex',
         'test_le_frozenset',
         'test_le_slice',
 
-        'test_lshift_bytearray',
         'test_lshift_class',
         'test_lshift_complex',
         'test_lshift_frozenset',
         'test_lshift_slice',
 
-        'test_lt_bytearray',
         'test_lt_class',
         'test_lt_complex',
         'test_lt_frozenset',
         'test_lt_slice',
 
-        'test_modulo_bytearray',
         'test_modulo_class',
         'test_modulo_complex',
         'test_modulo_frozenset',
@@ -96,26 +86,22 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_frozenset',
         'test_multiply_slice',
 
-        'test_ne_bytearray',
         'test_ne_class',
         'test_ne_complex',
         'test_ne_frozenset',
         'test_ne_slice',
 
-        'test_or_bytearray',
         'test_or_class',
         'test_or_complex',
         'test_or_frozenset',
         'test_or_int',
         'test_or_slice',
 
-        'test_power_bytearray',
         'test_power_class',
         'test_power_complex',
         'test_power_frozenset',
         'test_power_slice',
 
-        'test_rshift_bytearray',
         'test_rshift_class',
         'test_rshift_complex',
         'test_rshift_frozenset',
@@ -139,7 +125,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_str',
         'test_subscr_tuple',
 
-        'test_subtract_bytearray',
         'test_subtract_class',
         'test_subtract_complex',
         'test_subtract_frozenset',
@@ -163,7 +148,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_true_divide_str',
         'test_true_divide_tuple',
 
-        'test_xor_bytearray',
         'test_xor_class',
         'test_xor_complex',
         'test_xor_frozenset',
@@ -176,15 +160,12 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
     not_implemented = [
-        'test_add_bytearray',
         'test_add_class',
         'test_add_complex',
         'test_add_float',
         'test_add_frozenset',
-
         'test_add_slice',
 
-        'test_and_bytearray',
         'test_and_class',
         'test_and_complex',
         'test_and_frozenset',
@@ -192,7 +173,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_and_slice',
 
         'test_floor_divide_bool',
-        'test_floor_divide_bytearray',
         'test_floor_divide_class',
         'test_floor_divide_complex',
         'test_floor_divide_float',
@@ -200,14 +180,12 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_int',
         'test_floor_divide_slice',
 
-        'test_lshift_bytearray',
         'test_lshift_class',
         'test_lshift_complex',
         'test_lshift_frozenset',
         'test_lshift_slice',
 
         'test_modulo_bool',
-        'test_modulo_bytearray',
         'test_modulo_class',
         'test_modulo_complex',
         'test_modulo_float',
@@ -228,7 +206,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
 
-        'test_or_bytearray',
         'test_or_class',
         'test_or_complex',
         'test_or_frozenset',
@@ -236,7 +213,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_or_slice',
 
         'test_power_bool',
-        'test_power_bytearray',
         'test_power_class',
         'test_power_complex',
         'test_power_float',
@@ -244,14 +220,12 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_int',
         'test_power_slice',
 
-        'test_rshift_bytearray',
         'test_rshift_class',
         'test_rshift_complex',
         'test_rshift_frozenset',
         'test_rshift_slice',
 
         'test_subtract_bool',
-        'test_subtract_bytearray',
         'test_subtract_class',
         'test_subtract_complex',
         'test_subtract_float',
@@ -277,7 +251,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_true_divide_str',
         'test_true_divide_tuple',
 
-        'test_xor_bytearray',
         'test_xor_class',
         'test_xor_complex',
         'test_xor_frozenset',
