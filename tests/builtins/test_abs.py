@@ -15,7 +15,6 @@ class BuiltinAbsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["abs"]
 
     not_implemented = [
-        'test_bytearray',
         'test_class',
         'test_complex',
         'test_frozenset',

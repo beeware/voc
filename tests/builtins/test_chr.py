@@ -9,7 +9,6 @@ class BuiltinChrFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["chr"]
 
     not_implemented = [
-        'test_bytearray',
         'test_class',
         'test_complex',
         'test_frozenset',

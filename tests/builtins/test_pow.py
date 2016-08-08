@@ -90,30 +90,14 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
 
     not_implemented = [
 
-        'test_bool_bytearray',
         'test_bool_class',
         'test_bool_complex',
         'test_bool_frozenset',
 
-        'test_bytearray_bool',
-        'test_bytearray_bytearray',
-        'test_bytearray_bytes',
         'test_bytearray_class',
         'test_bytearray_complex',
-        'test_bytearray_dict',
-        'test_bytearray_float',
         'test_bytearray_frozenset',
-        'test_bytearray_range',
-        'test_bytearray_slice',
-        'test_bytearray_int',
-        'test_bytearray_list',
-        'test_bytearray_None',
-        'test_bytearray_NotImplemented',
-        'test_bytearray_set',
-        'test_bytearray_str',
-        'test_bytearray_tuple',
 
-        'test_bytes_bytearray',
         'test_bytes_class',
         'test_bytes_complex',
         'test_bytes_frozenset',
@@ -154,12 +138,10 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_complex_str',
         'test_complex_tuple',
 
-        'test_dict_bytearray',
         'test_dict_class',
         'test_dict_complex',
         'test_dict_frozenset',
 
-        'test_float_bytearray',
         'test_float_class',
         'test_float_complex',
         'test_float_float',
@@ -183,48 +165,39 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_frozenset_str',
         'test_frozenset_tuple',
 
-        'test_int_bytearray',
         'test_int_class',
         'test_int_complex',
         'test_int_float',
         'test_int_frozenset',
 
-        'test_list_bytearray',
         'test_list_class',
         'test_list_complex',
         'test_list_frozenset',
 
-        'test_None_bytearray',
         'test_None_class',
         'test_None_complex',
         'test_None_frozenset',
 
-        'test_NotImplemented_bytearray',
         'test_NotImplemented_class',
         'test_NotImplemented_complex',
         'test_NotImplemented_frozenset',
 
-        'test_range_bytearray',
         'test_range_class',
         'test_range_complex',
         'test_range_frozenset',
 
-        'test_set_bytearray',
         'test_set_class',
         'test_set_complex',
         'test_set_frozenset',
 
-        'test_slice_bytearray',
         'test_slice_class',
         'test_slice_complex',
         'test_slice_frozenset',
 
-        'test_str_bytearray',
         'test_str_class',
         'test_str_complex',
         'test_str_frozenset',
 
-        'test_tuple_bytearray',
         'test_tuple_class',
         'test_tuple_complex',
         'test_tuple_frozenset',
