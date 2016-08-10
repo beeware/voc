@@ -1,6 +1,6 @@
 from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
-    RuntimeVisibleAnnotations, opcodes as JavaOpcodes,
+    RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref
 )
 from .blocks import Block
 from .utils import (
@@ -9,7 +9,6 @@ from .utils import (
     # DLOAD_name, FLOAD_name,
     # ICONST_val, ILOAD_name,
     ArgType,
-    extract_parameters
 )
 
 CO_VARARGS = 0x0004
@@ -41,17 +40,12 @@ def descriptor(annotation):
 
 
 class Method(Block):
-    def __init__(self, parent, name, parameters, returns=None, static=False):
+    def __init__(self, parent, name, code, parameters, returns, static=False):
         super().__init__(parent)
         self.name = name
+        self.code = code
         self.parameters = parameters
-
-        if returns is None:
-            self.returns = {
-                'annotation': 'org/python/Object'
-            }
-        else:
-            self.returns = returns
+        self.returns = returns
 
         # Reserve space for the register that will hold self (if required)
         self.add_self()
@@ -175,20 +169,22 @@ class Method(Block):
     def module(self):
         return self.parent
 
-    def add_method(self, function_def):
+    def add_method(self, name, code, parameter_signatures, return_signature):
         # If a method is added to a method, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
-        print (function_def, dir(function_def))
         callable = ClosureClass(
             parent=self.parent,
-            name='%s$%s' % (self.parent.name, function_def.name),
+            name='%s$%s$%s' % (self.module.name, self.name, name),
             closure_var_names=[],  # code.co_names,
             bases=['org/python/types/Closure'],
             implements=['org/python/Callable'],
             public=True,
             final=True,
         )
+        self.parent.classes.append(callable)
+
+        callable.visitor_setup()
 
         # if code.co_flags & CO_GENERATOR:
         #     method = ClosureGeneratorMethod(
@@ -204,31 +200,51 @@ class Method(Block):
         method = ClosureMethod(
             callable,
             name='invoke',
-            parameters=extract_parameters(function_def),
-            returns={
-                'annotation': (
-                    function_def.returns.annotation
-                    if function_def.returns
-                    else 'org/python/Object'
-                ),
-            },
+            code=code,
+            parameters=parameter_signatures,
+            returns=return_signature,
         )
 
         callable.methods.append(method)
 
-        # callable.fields = dict(
-        #     (name, 'Lorg/python/Object;')
-        #     for name in code.co_names
-        # )
+        for field in code.co_names:
+            callable.fields[field] = 'Lorg/python/Object;'
 
-        self.parent.classes.append(callable)
+        callable.visitor_teardown()
+
+        self.add_opcodes(
+            JavaOpcodes.NEW(callable.descriptor),
+            JavaOpcodes.DUP(),
+
+            # These are the args and kwargs for the closure class
+            JavaOpcodes.ACONST_NULL(),
+            JavaOpcodes.ACONST_NULL(),
+
+            JavaOpcodes.INVOKESPECIAL(method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+
+            JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.LDC_W(method.name),
+        )
+
+        self.add_callable(method)
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            JavaOpcodes.LDC_W('invoke'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
+        # Store the callable object as an accessible symbol.
+        self.store_name(name, use_locals=True)
 
         return method
 
-    def transpile_teardown(self):
+    def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
             self.add_opcodes(
-                JavaOpcodes.ACONST_NULL(),
+                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                 JavaOpcodes.ARETURN()
             )
 
@@ -250,7 +266,7 @@ class Method(Block):
                 self.method_name,
                 self.signature,
                 static=self.static,
-                attributes=[self.transpile_commands()] + self.method_attributes()
+                attributes=[self.transpile_code()] + self.method_attributes()
             )
         ]
 
@@ -264,7 +280,9 @@ class Method(Block):
 class InitMethod(Method):
     def __init__(self, parent):
         super().__init__(
-            parent, '<init>',
+            parent,
+            name='<init>',
+            code=None,
             parameters=[
                 {
                     'name': 'self',
@@ -308,7 +326,7 @@ class InitMethod(Method):
     def signature(self):
         return '([Lorg/python/Object;Ljava/util/Map;)V'
 
-    def transpile_setup(self):
+    def visitor_setup(self):
         if self.klass.extends:
             super_class = self.klass.extends
         else:
@@ -352,7 +370,7 @@ class InitMethod(Method):
             JavaOpcodes.POP()  # 1
         )
 
-    def transpile_teardown(self):
+    def visitor_teardown(self):
         self.add_opcodes(
             JavaOpcodes.RETURN()
         )
@@ -673,7 +691,9 @@ class InstanceMethod(Method):
 class MainMethod(Method):
     def __init__(self, parent):
         super().__init__(
-            parent, '__main__',
+            parent,
+            name='__main__',
+            code=None,
             parameters=[{'name': 'args', 'annotation': 'argv'}],
             returns={'annotation': None},
             static=True,
@@ -701,9 +721,6 @@ class MainMethod(Method):
     @property
     def globals_module(self):
         return self.module
-
-    # def add_self(self):
-    #     pass
 
     def store_name(self, name, use_locals):
         self.add_opcodes(
@@ -768,7 +785,7 @@ class MainMethod(Method):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
-    def transpile_setup(self):
+    def visitor_setup(self):
         self.add_opcodes(
             # Add a TRY-CATCH for SystemExit
             TRY(),
@@ -803,7 +820,7 @@ class MainMethod(Method):
                 JavaOpcodes.INVOKEVIRTUAL(self.module.class_descriptor, 'module$import', '()V'),
         )
 
-    def transpile_teardown(self):
+    def visitor_teardown(self):
         # Close out the TRY-CATCH for SystemExit
         self.add_opcodes(
             CATCH('org/python/exceptions/SystemExit'),
@@ -818,9 +835,11 @@ class MainMethod(Method):
 
 
 class ClosureMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False):
+    def __init__(self, parent, name, code, parameters, returns=None, static=False):
         super().__init__(
-            parent, name,
+            parent,
+            name=name,
+            code=code,
             parameters=parameters,
             returns=returns,
             static=static,
@@ -841,6 +860,7 @@ class ClosureMethod(Method):
 
     def add_self(self):
         self.local_vars['self'] = len(self.local_vars)
+        self.has_self = True
 
 
 class GeneratorMethod(Method):
@@ -855,8 +875,9 @@ class GeneratorMethod(Method):
 
     def add_self(self):
         self.local_vars['<generator>'] = len(self.local_vars)
+        self.has_self = True
 
-    def transpile_setup(self):
+    def visitor_setup(self):
         # Restore the variables needed for the entry of the generator.
         self.add_opcodes(
             ALOAD_name(self, '<generator>'),
@@ -874,7 +895,7 @@ class GeneratorMethod(Method):
             JavaOpcodes.POP(),
         )
 
-    def transpile_teardown(self):
+    def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
             self.add_opcodes(
                 JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
@@ -889,7 +910,7 @@ class GeneratorMethod(Method):
                 self.method_name + "$generator",
                 '(Lorg/python/types/Generator;)Lorg/python/Object;',
                 static=True,
-                attributes=[self.transpile_commands()] + self.method_attributes()
+                attributes=[self.transpile_code()] + self.method_attributes()
             )
         ]
 

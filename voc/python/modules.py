@@ -8,144 +8,7 @@ from .blocks import Block
 from .methods import (
     CO_GENERATOR, GeneratorMethod, Method,
 )
-from .utils import extract_parameters, ALOAD_name, ASTORE_name, free_name
-
-
-class ModuleBlock(Block):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.local_vars['self'] = len(self.local_vars)
-
-    # def transpile_setup(self):
-    #     self.add_opcodes(
-    #         JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.module.class_name),
-    #         JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-    #     )
-
-    def transpile_teardown(self):
-        self.add_opcodes(
-            JavaOpcodes.RETURN(),
-        )
-
-    def store_name(self, name, use_locals):
-        self.add_opcodes(
-            ASTORE_name(self, '#value'),
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
-            JavaOpcodes.LDC_W(name),
-            ALOAD_name(self, '#value'),
-
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
-        )
-        free_name(self, '#value')
-
-    def store_dynamic(self):
-        self.add_opcodes(
-            ASTORE_name(self, '#value'),
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
-            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
-
-            ALOAD_name(self, '#value'),
-            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', '(Ljava/util/Map;)V'),
-        )
-        free_name(self, '#value')
-
-    def load_name(self, name, use_locals):
-        self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
-        )
-
-    def delete_name(self, name, use_locals):
-        self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)V'),
-        )
-
-    @property
-    def descriptor(self):
-        return self.parent.descriptor
-
-    @property
-    def module(self):
-        return self.parent
-
-    def add_method(self, function_def):
-
-        # if code.co_flags & CO_GENERATOR:
-        #     # Generator method.
-        #     method = GeneratorMethod(
-        #         self.module,
-        #         generator=code.co_name,
-        #         name=function_def.name,
-        #         parameters=extract_parameters(function_def),
-        #         returns={
-        #             'annotation': (
-        #                 function_def.returns
-        #                 if function_def.returns
-        #                 else 'org.python.Object'
-        #             ).replace('.', '/')
-        #         },
-        #         static=True
-        #     )
-        # else:
-
-        # Normal method.
-        method = Method(
-            self.module,
-            name=function_def.name,
-            parameters=extract_parameters(function_def),
-            returns={
-                'annotation': (
-                    function_def.returns
-                    if function_def.returns else
-                    'org.python.Object'
-                ).replace('.', '/')
-            },
-            static=True,
-        )
-
-        self.module.methods.append(method)
-
-        self.add_callable(function_def, method)
-        self.store_name(function_def.name, use_locals=True)
-
-        return method
+from .utils import ALOAD_name, ASTORE_name, free_name
 
 
 class Module(Block):
@@ -171,6 +34,15 @@ class Module(Block):
         self.classes = []
         self.anonymous_inner_class_count = 0
 
+        # Preallocate space for self when
+        # the module static block is invoked
+        self.parameters = [None]
+        self.local_vars['self'] = 0
+
+    @property
+    def module(self):
+        return self
+
     @property
     def full_name(self):
         return '.'.join(self.namespace.split('.')[1:] + [self.name])
@@ -186,6 +58,143 @@ class Module(Block):
     @property
     def class_descriptor(self):
         return '/'.join(self.namespace.split('.') + [self.name, '__init__'])
+
+    # def visitor_setup(self):
+    #     self.add_opcodes(
+    #         JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.class_name),
+    #         JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+    #     )
+
+    def store_name(self, name, use_locals):
+        self.add_opcodes(
+            ASTORE_name(self, '#value'),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+            JavaOpcodes.LDC_W(name),
+            ALOAD_name(self, '#value'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+        )
+        free_name(self, '#value')
+
+    def store_dynamic(self):
+        self.add_opcodes(
+            ASTORE_name(self, '#value'),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
+
+            ALOAD_name(self, '#value'),
+            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', '(Ljava/util/Map;)V'),
+        )
+        free_name(self, '#value')
+
+    def load_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
+    def delete_name(self, name, use_locals):
+        self.add_opcodes(
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            JavaOpcodes.LDC_W(name),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)V'),
+        )
+
+    def add_method(self, name, code, parameter_signatures, return_signature):
+        # if code.co_flags & CO_GENERATOR:
+        #     # Generator method.
+        #     method = GeneratorMethod(
+        #         self,
+        #         generator=code.co_name,
+        #         name=function_def.name,
+        #         parameters=extract_parameters(function_def),
+        #         returns={
+        #             'annotation': (
+        #                 function_def.returns
+        #                 if function_def.returns
+        #                 else 'org.python.Object'
+        #             ).replace('.', '/')
+        #         },
+        #         static=True
+        #     )
+        # else:
+
+        # Normal method.
+        method = Method(
+            self,
+            name=name,
+            code=code,
+            parameters=parameter_signatures,
+            returns=return_signature,
+            static=True,
+        )
+
+        # Add the method to the list that need to be
+        # transpiled into Java methods
+        self.methods.append(method)
+
+        # Add a definition of the callable object
+        self.add_callable(method)
+
+        # Store the callable object as an accessible symbol.
+        self.store_name(method.name, use_locals=True)
+
+        return method
+
+    def add_class(self, class_name, bases, extends, implements):
+        from .klass import Class
+
+        klass = Class(
+            self.context,
+            class_name,
+            bases=bases,
+            extends=extends,
+            implements=implements,
+        )
+
+        self.classes.append(klass)
+
+        return klass
+
+    def visitor_teardown(self):
+        self.add_opcodes(
+            JavaOpcodes.RETURN(),
+        )
 
     def transpile(self):
         """Convert a materialized Python code definition into a list of Java
@@ -205,7 +214,7 @@ class Module(Block):
         # Add a static method to the module, populated with the
         # body content of the module.
         static_init = JavaMethod('module$import', '()V', public=False)
-        static_init.attributes.append(self.body.transpile())
+        static_init.attributes.append(super().transpile())
         classfile.methods.append(static_init)
 
         # Add a dummy init method.

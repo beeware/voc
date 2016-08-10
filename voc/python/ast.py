@@ -1,14 +1,17 @@
 import ast
+import dis
 import sys
 
 from ..java import opcodes as JavaOpcodes
-from .modules import Module, ModuleBlock
+from .blocks import Block
+from .modules import Module
 from .methods import Method, MainMethod
 from .utils import (
     IF, ELSE, END_IF,
     TRY, CATCH, FINALLY, END_TRY,
     START_LOOP, END_LOOP,
     ICONST_val,
+    ArgType,
     jump, OpcodePosition,
     ASTORE_name, ALOAD_name, free_name,
 )
@@ -44,6 +47,28 @@ def node_visitor(fn):
     return dec
 
 
+class NameVisitor(ast.NodeVisitor):
+    def visit(self, root_node):
+        self.names = []
+        super().visit(root_node)
+        return self
+
+    @property
+    def cls_name(self):
+        return '.'.join(self.names)
+
+    @property
+    def ref_name(self):
+        return '/'.join(self.names)
+
+    def visit_Name(self, node):
+        self.names.append(node.id)
+
+    def visit_Attribute(self, node):
+        self.visit(node.value)
+        self.names.append(node.attr)
+
+
 class Visitor(ast.NodeVisitor):
     def __init__(self, namespace, filename, verbosity=1):
         super().__init__()
@@ -59,18 +84,26 @@ class Visitor(ast.NodeVisitor):
     def context(self):
         return self._context[-1]
 
+    def push_context(self, block):
+        self._context.append(block)
+        block.visitor_setup()
+
+    def pop_context(self):
+        self.context.visitor_teardown()
+        self._context.pop()
+
     def visit(self, root_node):
         super().visit(root_node)
         return self._root_module
 
     def visit_Module(self, node):
         module = Module(self.namespace, self.filename)
-        self._context.append(module)
+        self.push_context(module)
+
         if self._root_module is None:
             self._root_module = module
 
         main = None
-        module.body = ModuleBlock(module)
 
         for child in node.body:
             if is_mainline(child):
@@ -78,22 +111,26 @@ class Visitor(ast.NodeVisitor):
                     print("Found duplicate main block... replacing previous main", file=sys.stderr)
 
                 main = MainMethod(module)
-                self._context.append(main)
-                self.visit(child)
-                self._context.pop()
+                self.push_context(main)
+                for c in child.body:
+                    self.visit(c)
+                self.pop_context()
             else:
-                self._context.append(module.body)
                 self.visit(child)
-                self._context.pop()
 
         if main is None:
             if self.verbosity:
                 print("Adding default main method...")
             main = MainMethod(module)
+            self.push_context(main)
+            # No content, so pop right away.
+            # We need to push to make sure setup/teardown
+            # logic is invoked.
+            self.pop_context()
 
         module.methods.append(main)
 
-        self._context.pop()
+        self.pop_context()
 
     @node_visitor
     def visit_Interactive(self, node):
@@ -119,18 +156,136 @@ class Visitor(ast.NodeVisitor):
     # # Statements
     @node_visitor
     def visit_FunctionDef(self, node):
-        # identifier name, arguments args, stmt* body, expr* decorator_list, expr? returns):
-        method = self.context.add_method(node)
+        # We need the code object for the AST function definition.
+        # Create and compile a module that only contains the function def;
+        # the sixth last instruction will be a LOAD_CONST of the code
+        # object for the function being defined.
+        #   ...
+        #   LOAD_CONST     (<code object>)
+        #   LOAD_CONST     'function_name'
+        #   MAKE_FUNCTION
+        #   STORE_NAME     function_name
+        #   LOAD_CONST     None
+        #   RETURN_VALUE
+        compiled = compile(
+            ast.Module(body=[node]),
+            filename=self.context.module.sourcefile,
+            mode='exec'
+        )
+        code = list(dis.get_instructions(compiled))[-6].argval
 
-        self._context.append(method)
+        parameter_signatures = []
+        for i, arg in enumerate(node.args.args):
+            index = len(node.args.defaults) - len(node.args.args) + i
+            if index >= 0:
+                default = Block()
+                self.push_context(default)
+                self.visit(node.args.defaults[index])
+                self.pop_context()
+            else:
+                default = None
+
+            parameter_signatures.append({
+                'name': arg.arg,
+                'annotation': arg.annotation if arg.annotation else 'org/python/Object',
+                'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                'default': default
+            })
+
+        if node.args.vararg:
+            parameter_signatures.append({
+                'name': node.args.vararg,
+                'annotation': arg.annotation if arg.annotation else 'org/python/Object',
+                'kind': ArgType.VAR_POSITIONAL,
+            })
+
+        for i, arg in enumerate(node.args.kwonlyargs):
+            index = len(node.args.kw_defaults) - len(node.args.kwonlyargs) + i
+            if index >= 0:
+                default = Block()
+                self.push_context(default)
+                self.visit(node.args.kw_defaults[index])
+                self.pop_context()
+            else:
+                default = None
+
+            parameter_signatures.append({
+                'name': arg.arg,
+                'annotation': arg.annotation if arg.annotation else 'org/python/Object',
+                'kind': ArgType.KEYWORD_ONLY,
+                'default': default
+            })
+
+        if node.args.kwarg:
+            parameter_signatures.append({
+                'name': node.args.kwarg,
+                'annotation': arg.annotation if arg.annotation else 'org/python/Object',
+                'kind': ArgType.VAR_KEYWORD,
+            })
+
+        return_signature = {
+            'annotation': (
+                node.returns
+                if node.returns
+                else 'org.python.Object'
+            ).replace('.', '/'),
+        }
+
+        method = self.context.add_method(
+            node.name,
+            code,
+            parameter_signatures,
+            return_signature
+        )
+
+        self.push_context(method)
         for child in node.body:
             self.visit(child)
-        self._context.pop()
+        self.pop_context()
 
     @node_visitor
     def visit_ClassDef(self, node):
         # identifier name, expr* bases, keyword* keywords, expr? starargs, expr? kwargs, stmt* body, expr* decorator_list):
-        raise NotImplementedError('No handler for ClassDef')
+
+        # Construct a class.
+        class_name = node.name
+
+        name_visitor = NameVisitor()
+
+        bases = [
+            name_visitor.visit(base).ref_name
+            for base in node.bases
+        ]
+
+        extends = None
+        implements = []
+
+        for keyword in node.keywords:
+            key = keyword.arg
+            value = keyword.value
+
+            if key == "metaclass":
+                raise Exception("Can't handle metaclasses")
+            elif key == "extends":
+                extends = name_visitor.visit(value).ref_name
+            elif key == "implements":
+                if isinstance(value, ast.List):
+                    implements = [
+                        name_visitor.visit(v).ref_name
+                        for v in value.elts
+                    ]
+                else:
+                    implements = [value.replace('.', '/')]
+                    implements = [name_visitor.visit(value).ref_name]
+            else:
+                raise Exception("Unknown meta keyword " + str(key))
+
+        klass = self.context.add_class(node, class_name, bases, extends, implements)
+
+        self.push_context(klass)
+        for child in node.body:
+            self.visit(child)
+        self.pop_context()
 
     @node_visitor
     def visit_Return(self, node):
@@ -784,6 +939,7 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.AASTORE(),
                 )
 
+        # FIXME
         # if node.starargs is not None:
         #     for arg in node.starargs:
         #         self.context.add_opcodes(
@@ -803,17 +959,18 @@ class Visitor(ast.NodeVisitor):
         )
 
         if node.keywords is not None:
-            for arg, val in node.keywords:
+            for keyword in node.keywords:
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W(arg),
+                    JavaOpcodes.LDC_W(keyword.arg),
                 )
-                self.visit(val)
+                self.visit(keyword.value)
                 self.context.add_opcodes(
                     JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                     JavaOpcodes.POP()
                 )
 
+        # FIXME
         # if node.kwargs is not None:
         #     for arg in node.kwargs:
         #         self.generic_visit(arg)
@@ -923,7 +1080,7 @@ class Visitor(ast.NodeVisitor):
         if type(node.ctx) == ast.Load:
             self.context.load_name(node.id, use_locals=True)
         elif type(node.ctx) == ast.Store:
-            self.context.store_name(node.id, use_locals=False)
+            self.context.store_name(node.id, use_locals=True)
         else:
             raise NotImplementedError("Unknown context %s" % node.ctx)
 

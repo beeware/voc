@@ -7,25 +7,141 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import (
-    CO_GENERATOR, InitMethod, InstanceMethod, extract_parameters,
+    CO_GENERATOR, InitMethod, InstanceMethod
 )
 from .utils import (
     ALOAD_name, ASTORE_name, free_name
 )
 
 
-class ClassBlock(Block):
-    @property
-    def descriptor(self):
-        return self.parent.descriptor
+class Class(Block):
+    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0):
+        super().__init__(module, verbosity=verbosity)
+        self.name = name
+        if namespace is None:
+            self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
+        else:
+            self.namespace = namespace
+
+        self.bases = bases if bases else []
+        self.extends = extends
+
+        self.implements = implements if implements else []
+        self.public = public
+        self.final = final
+        self.methods = methods if methods else []
+        self.fields = fields if fields else {}
+        self.init = init
+
+        self.anonymous_inner_class_count = 0
+
+        # Track constructors when they are added
+        self.init_method = None
+
+        # Mark this class as being a VOC generated class.
+        self.fields["__VOC__"] = "Lorg/python/Object;"
+
+        # Make sure there is a default constructor
+        default_init = InitMethod(self)
+        default_init.visitor_setup()
+        default_init.visitor_teardown()
+        self.methods.append(default_init)
 
     @property
-    def klass(self):
-        return self.parent
+    def descriptor(self):
+        return '/'.join([self.namespace.replace('.', '/'), self.name])
+
+    @property
+    def class_name(self):
+        return '.'.join(self.namespace.split('.') + [self.name])
+
+    @property
+    def class_descriptor(self):
+        return '/'.join(self.namespace.split('.') + [self.name])
 
     @property
     def module(self):
-        return self.klass.module
+        return self.parent
+
+    def visitor_setup(self):
+        if self.extends:
+            base_descriptor = self.extends.replace('.', '/')
+        else:
+            base_descriptor = 'org/python/types/Object'
+
+        self.add_opcodes(
+            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+            # Force the loading and instantiation of the module
+            # that contains the class.
+            JavaOpcodes.LDC_W(self.module.full_name),
+            JavaOpcodes.ACONST_NULL(),
+            JavaOpcodes.ICONST_0(),
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;[Ljava/lang/String;I)Lorg/python/types/Module;'),
+            JavaOpcodes.POP(),
+
+            # Set __base__ on the type
+            JavaOpcodes.LDC_W(self.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.LDC_W(base_descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            # JavaOpcodes.DUP(),
+            # JavaOpcodes.LDC_W("__base__ for %s should be %s; is" % (self.klass, base_descriptor)),
+            # JavaOpcodes.SWAP(),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
+
+            JavaOpcodes.PUTFIELD('org/python/types/Type', '__base__', 'Lorg/python/types/Type;'),
+
+            # Set __bases__ on the type
+            JavaOpcodes.LDC_W(self.descriptor),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.NEW('org/python/types/Tuple'),
+            JavaOpcodes.DUP(),
+
+            JavaOpcodes.NEW('java/util/ArrayList'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+        )
+
+        if self.extends:
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(self.extends.replace('.', '/')),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP()
+            )
+
+        for base in self.bases:
+            base_namespace = self.parent.namespace.replace('.', '/') + '/'
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(base if base.startswith('org/python/') else base_namespace + base),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
+                JavaOpcodes.POP()
+            )
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
+
+            JavaOpcodes.PUTFIELD('org/python/types/Type', '__bases__', 'Lorg/python/types/Tuple;'),
+
+            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+        )
 
     def store_name(self, name, use_locals):
         self.add_opcodes(
@@ -54,6 +170,7 @@ class ClassBlock(Block):
         free_name(self, '#value')
 
     def load_name(self, name, use_locals):
+        print("KLASS", self, "LOAD", name)
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.klass.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
@@ -69,7 +186,7 @@ class ClassBlock(Block):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
-    def add_method(self, full_method_name, code, annotations):
+    def add_method(self, name, code, parameters, annotations):
         parts = full_method_name.split('$')[-1].split('.')
         method_name = parts[-1]
         class_name = parts[-2]
@@ -97,160 +214,17 @@ class ClassBlock(Block):
                 verbosity=self.klass.verbosity
             )
         method.extract(code)
-        self.klass.add_method(method)
 
-        return method
-
-    def transpile_setup(self):
-        if self.klass.extends:
-            base_descriptor = self.klass.extends.replace('.', '/')
-        else:
-            base_descriptor = 'org/python/types/Object'
-
-        self.add_opcodes(
-            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-
-            # Force the loading and instantiation of the module
-            # that contains the class.
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.ACONST_NULL(),
-            JavaOpcodes.ICONST_0(),
-            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;[Ljava/lang/String;I)Lorg/python/types/Module;'),
-            JavaOpcodes.POP(),
-
-            # Set __base__ on the type
-            JavaOpcodes.LDC_W(self.klass.descriptor),
-            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
-
-            JavaOpcodes.LDC_W(base_descriptor),
-            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
-
-            # JavaOpcodes.DUP(),
-            # JavaOpcodes.LDC_W("__base__ for %s should be %s; is" % (self.klass, base_descriptor)),
-            # JavaOpcodes.SWAP(),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
-
-            JavaOpcodes.PUTFIELD('org/python/types/Type', '__base__', 'Lorg/python/types/Type;'),
-
-            # Set __bases__ on the type
-            JavaOpcodes.LDC_W(self.klass.descriptor),
-            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
-
-            JavaOpcodes.NEW('org/python/types/Tuple'),
-            JavaOpcodes.DUP(),
-
-            JavaOpcodes.NEW('java/util/ArrayList'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
-        )
-
-        if self.klass.extends:
-            self.add_opcodes(
-                JavaOpcodes.DUP(),
-
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.klass.extends.replace('.', '/')),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
-                JavaOpcodes.POP()
-            )
-
-        for base in self.klass.bases:
-            base_namespace = self.parent.namespace.replace('.', '/') + '/'
-            self.add_opcodes(
-                JavaOpcodes.DUP(),
-
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(base if base.startswith('org/python/') else base_namespace + base),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-                JavaOpcodes.INVOKEVIRTUAL('java/util/ArrayList', 'add', '(Ljava/lang/Object;)Z'),
-                JavaOpcodes.POP()
-            )
-
-        self.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
-
-            JavaOpcodes.PUTFIELD('org/python/types/Type', '__bases__', 'Lorg/python/types/Tuple;'),
-
-            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
-        )
-
-    def transpile_teardown(self):
-        self.add_opcodes(
-            JavaOpcodes.RETURN()
-        )
-
-
-class Class(Block):
-    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0):
-        super().__init__(module, verbosity=verbosity)
-        self.name = name
-        if namespace is None:
-            self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
-        else:
-            self.namespace = namespace
-
-        self.bases = bases if bases else []
-        self.extends = extends
-
-        self.implements = implements if implements else []
-        self.public = public
-        self.final = final
-        self.methods = methods if methods else []
-        self.fields = fields if fields else {}
-        self.init = init
-
-        self.anonymous_inner_class_count = 0
-
-        # Track constructors when they are added
-        self.init_method = None
-
-        # Make sure there is a default constructor
-        self.add_method(InitMethod(self))
-
-    @property
-    def descriptor(self):
-        return '/'.join([self.namespace.replace('.', '/'), self.name])
-
-    @property
-    def class_name(self):
-        return '.'.join(self.namespace.split('.') + [self.name])
-
-    @property
-    def class_descriptor(self):
-        return '/'.join(self.namespace.split('.') + [self.name])
-
-    @property
-    def module(self):
-        return self.parent
-
-    def add_method(self, method):
         self.methods.append(method)
         if method.name == '__init__':
             self.init_method = method
 
-    def materialize(self):
-        # Create the body of the class
-        self.body = ClassBlock(self, self.commands)
+        return method
 
-        # Materialize the body of the class
-        self.body.materialize()
-
-        # Materialize any methods in the class
-        for method in self.methods:
-            method.materialize()
-
-        # Add a field to indicate this was a VOC generated class.
-        # The value of this field is the VOC wrapper instance in the
-        # case of an extension type; it will be self in most other
-        # cases.
-        self.fields["__VOC__"] = "Lorg/python/Object;"
+    def visitor_teardown(self):
+        self.add_opcodes(
+            JavaOpcodes.RETURN()
+        )
 
     def transpile(self):
         classfile = JavaClass(
@@ -279,7 +253,7 @@ class Class(Block):
         try:
             # If we have block content, add a static block to the class
             static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
-            static_init.attributes.append(self.body.transpile())
+            static_init.attributes.append(super().transpile())
             classfile.methods.append(static_init)
         except IgnoreBlock:
             pass
@@ -368,3 +342,7 @@ class ClosureClass(Class):
             init=init,
             verbosity=verbosity
         )
+
+    @property
+    def klass(self):
+        return self.parent

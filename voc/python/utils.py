@@ -577,10 +577,10 @@ def ALOAD_name(context, name):
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    index = context.local_vars[name]
-
-    # print("LOAD AVAR NAME", context, name, index)
+    # print("LOAD AVAR NAME", context, name)
     # print("locals: ", context.local_vars)
+
+    index = context.local_vars[name]
 
     if index == 0:
         return JavaOpcodes.ALOAD_0()
@@ -634,10 +634,10 @@ def ILOAD_name(context, name):
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    index = context.local_vars[name]
-
-    # print("LOAD IVAR NAME", context, name, index)
+    # print("LOAD IVAR NAME", context, name)
     # print("locals: ", context.local_vars)
+
+    index = context.local_vars[name]
 
     if index == 0:
         return JavaOpcodes.ILOAD_0()
@@ -883,36 +883,6 @@ def DCONST_val(value):
             return JavaOpcodes.LDC2_W(value)
     else:
         raise RuntimeError("%s is not a double constant" % value)
-
-
-def extract_parameters(function_def):
-    parameters = []
-    for arg in function_def.args.args:
-        parameters.append({
-            'name': arg.arg,
-            'annotation': arg.annotation if arg.annotation else 'org/python/Object',
-            'kind': ArgType.POSITIONAL_OR_KEYWORD,
-        })
-    if function_def.args.vararg:
-        parameters.append({
-            'name': function_def.args.vararg,
-            'annotation': arg.annotation if arg.annotation else 'org/python/Object',
-            'kind': ArgType.VAR_POSITIONAL,
-        })
-    for arg in function_def.args.kwonlyargs:
-        parameters.append({
-            'name': arg.arg,
-            'annotation': arg.annotation if arg.annotation else 'org/python/Object',
-            'kind': ArgType.KEYWORD_ONLY,
-        })
-    if function_def.args.kwarg:
-        parameters.append({
-            'name': function_def.args.kwarg,
-            'annotation': arg.annotation if arg.annotation else 'org/python/Object',
-            'kind': ArgType.VAR_KEYWORD,
-        })
-
-    return parameters
 
 
 ##########################################################################
