@@ -67,6 +67,13 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'bytes'");
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __contains__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
