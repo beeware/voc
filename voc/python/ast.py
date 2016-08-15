@@ -59,25 +59,33 @@ def node_visitor(fn):
 
 
 class NameVisitor(ast.NodeVisitor):
-    def visit(self, root_node):
-        self.names = []
-        super().visit(root_node)
+    def evaluate(self, root_node):
+        self.names = [[]]
+        self.visit(root_node)
         return self
 
     @property
     def cls_name(self):
-        return '.'.join(self.names)
+        return '$'.join('.'.join(group) for group in self.names)
 
     @property
     def ref_name(self):
-        return '/'.join(self.names)
+        return '$'.join('/'.join(group) for group in self.names)
 
     def visit_Name(self, node):
-        self.names.append(node.id)
+        self.names[-1].append(node.id)
 
     def visit_Attribute(self, node):
         self.visit(node.value)
-        self.names.append(node.attr)
+        self.names[-1].append(node.attr)
+
+    def visit_Subscript(self, node):
+        self.visit(node.value)
+        self.names.append([])
+        self.visit(node.slice)
+
+    def visit_Index(self, node):
+        self.visit(node.value)
 
 
 class Visitor(ast.NodeVisitor):
@@ -192,7 +200,7 @@ class Visitor(ast.NodeVisitor):
 
             parameter_signatures.append({
                 'name': arg.arg,
-                'annotation': name_visitor.visit(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.evaluate(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
                 'kind': ArgType.POSITIONAL_OR_KEYWORD,
                 'default': default
             })
@@ -200,7 +208,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.vararg:
             parameter_signatures.append({
                 'name': node.args.vararg,
-                'annotation': name_visitor.visit(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.evalutate(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
                 'kind': ArgType.VAR_POSITIONAL,
             })
 
@@ -216,7 +224,7 @@ class Visitor(ast.NodeVisitor):
 
             parameter_signatures.append({
                 'name': arg.arg,
-                'annotation': name_visitor.visit(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.evaluate(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
                 'kind': ArgType.KEYWORD_ONLY,
                 'default': default
             })
@@ -224,13 +232,13 @@ class Visitor(ast.NodeVisitor):
         if node.args.kwarg:
             parameter_signatures.append({
                 'name': node.args.kwarg,
-                'annotation': name_visitor.visit(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.evaluate(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
                 'kind': ArgType.VAR_KEYWORD,
             })
 
         return_signature = {
             'annotation': (
-                name_visitor.visit(node.returns).cls_name
+                name_visitor.evaluate(node.returns).cls_name
                 if node.returns
                 else 'org.python.Object'
             ).replace('.', '/'),
@@ -258,7 +266,7 @@ class Visitor(ast.NodeVisitor):
         name_visitor = NameVisitor()
 
         bases = [
-            name_visitor.visit(base).ref_name
+            name_visitor.evaluate(base).ref_name
             for base in node.bases
         ]
 
@@ -272,7 +280,7 @@ class Visitor(ast.NodeVisitor):
             if key == "metaclass":
                 raise Exception("Can't handle metaclasses")
             elif key == "extends":
-                extends = name_visitor.visit(value).ref_name
+                extends = name_visitor.evaluate(value).ref_name
             elif key == "implements":
                 if isinstance(value, ast.List):
                     implements = [
@@ -280,8 +288,9 @@ class Visitor(ast.NodeVisitor):
                         for v in value.elts
                     ]
                 else:
-                    implements = [value.replace('.', '/')]
-                    implements = [name_visitor.visit(value).ref_name]
+                    print(value)
+                    print(name_visitor.evaluate(value).ref_name)
+                    implements = [name_visitor.evaluate(value).ref_name]
             else:
                 raise Exception("Unknown meta keyword " + str(key))
 

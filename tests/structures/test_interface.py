@@ -56,7 +56,7 @@ class InterfaceTests(TranspileTestCase):
 
             view.setHandler(handler)
 
-            view.doEvent("Stuff");
+            view.doEvent("Stuff")
 
             print("Done.")
             """,

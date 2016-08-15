@@ -7,7 +7,7 @@ from .utils import (
     TRY, CATCH, END_TRY,
     ALOAD_name, ASTORE_name, free_name,
     # DLOAD_name, FLOAD_name,
-    # ICONST_val, ILOAD_name,
+    ICONST_val, ILOAD_name,
     ArgType,
 )
 
