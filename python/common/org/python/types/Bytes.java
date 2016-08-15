@@ -30,40 +30,33 @@ public class Bytes extends org.python.types.Object {
     // public org.python.Object __init__() {
     //     throw new org.python.exceptions.NotImplementedError("str.__init__() has not been implemented.");
     // }
-
-    public org.python.types.Str __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("bytes.__repr__ doesn't take keyword arguments");
-        } else if (args != null && args.size() != 0) {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
-        }
-
-        try {
-            return new org.python.types.Str("b'" + new java.lang.String(this.value, "UTF-8") + "'");
-        } catch (java.io.UnsupportedEncodingException e) {
-            throw new org.python.exceptions.UnicodeDecodeError();
-        }
-    }
-
-    public org.python.types.Str __str__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("bytes.__str__ doesn't take keyword arguments");
-        } else if (args != null && args.size() != 0) {
-            throw new org.python.exceptions.TypeError("Expected 0 arguments, got " + args.size());
-        }
-
-        try {
-            return new org.python.types.Str(new java.lang.String(this.value, "UTF-8"));
-        } catch (java.io.UnsupportedEncodingException e) {
-            throw new org.python.exceptions.UnicodeDecodeError();
-        }
+            
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Str __repr__() {
+        return new org.python.types.Str("b'" + new java.lang.String(this.value) + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __add__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__add__ has not been implemented.");
+    public org.python.types.Str __str__() {
+        return new org.python.types.Str("b'" + new java.lang.String(this.value) + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __add__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("can't concat bytes to " + other.typeName());
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __and__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: 'bytes' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -118,15 +111,88 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __ge__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__ge__ has not been implemented.");
+    public org.python.Object __ge__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unorderable types: bytes() >= " + other.typeName() + "()");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __getitem__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__getitem__ has not been implemented.");
+    public org.python.Object __getitem__(org.python.Object index) {
+        if (index instanceof org.python.types.Slice) {
+            org.python.types.Slice slice = (org.python.types.Slice) index;
+            byte[] sliced;
+
+            if (slice.start == null && slice.stop == null && slice.step == null) {
+                sliced = this.value;
+            } else {
+                long start;
+                if (slice.start != null) {
+                    start = slice.start.value;
+                } else {
+                    start = 0;
+                }
+
+                long stop;
+                if (slice.stop != null) {
+                    stop = slice.stop.value;
+                } else {
+                    stop = this.value.length;
+                }
+
+                long step;
+                if (slice.step != null) {
+                    step = slice.step.value;
+                } else {
+                    step = 1;
+                }
+
+                if (start >= this.value.length | stop >= this.value.length) {
+                    return new Bytes(new byte[0]);
+                }
+
+                int len = (int)(stop - start);
+                sliced = new byte[len];
+                //
+                // TODO: handle step size, including negative
+                //
+                System.arraycopy(this.value, (int)start, sliced, 0, len);
+            }
+            return new Bytes(sliced);
+
+        } else if (index instanceof org.python.types.Bool || index instanceof org.python.types.Int) {
+            int idx;
+            if (index instanceof org.python.types.Bool) {
+                boolean index_bool = ((org.python.types.Bool)index).value;
+                if (index_bool) {
+                    idx = 1;
+                } else {
+                    idx = 0;
+                }
+            }
+            else {
+                 idx = (int) ((org.python.types.Int) index).value;
+            }
+
+            if (idx < 0) {
+                if (-idx > this.value.length) {
+                    throw new org.python.exceptions.IndexError("index out of range");
+                } else {
+                    idx = this.value.length + idx;
+                    // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
+                    return new org.python.types.Int(this.value[idx]);
+                }
+            } else {
+                if (idx >= this.value.length) {
+                    throw new org.python.exceptions.IndexError("index out of range");
+                } else {
+                    // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
+                    return new org.python.types.Int(this.value[idx]);
+                }
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("byte indices must be integers or slices, not " + index.typeName());
+        }
     }
 
     @org.python.Method(
@@ -139,8 +205,13 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __gt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__gt__ has not been implemented.");
+    public org.python.Object __gt__(org.python.Object other) {
+        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes) {
+            throw new org.python.exceptions.NotImplementedError("bytes.__gt__ has not been implemented.");
+        }
+        else {
+            throw new org.python.exceptions.TypeError("unorderable types: bytes() > " + other.typeName() + "()");
+        }
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
@@ -158,8 +229,13 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __le__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__le__ has not been implemented.");
+    public org.python.Object __le__(org.python.Object other) {
+        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes) {
+            throw new org.python.exceptions.NotImplementedError("bytes.__le__ has not been implemented.");
+        }
+        else {
+            throw new org.python.exceptions.TypeError("unorderable types: bytes() <= " + other.typeName() + "()");
+        }
     }
 
     @org.python.Method(
@@ -172,15 +248,39 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __lt__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__lt__ has not been implemented.");
+    public org.python.Object __lt__(org.python.Object other) {
+        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes) {
+            throw new org.python.exceptions.NotImplementedError("bytes.__lt__ has not been implemented.");
+        }
+        else {
+            throw new org.python.exceptions.TypeError("unorderable types: bytes() < " + other.typeName() + "()");
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __mul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__mul__ has not been implemented.");
+    public org.python.Object __mul__(org.python.Object other) {
+        if (other instanceof org.python.types.Bool) {
+                boolean other_bool = ((org.python.types.Bool)other).value;
+                if (other_bool) {
+                        return this;
+                } else {
+                        return new Bytes(new byte[0]);
+                }
+        }
+        if (other instanceof org.python.types.Int) {
+            int other_value = Math.max(0, (int) ((org.python.types.Int) other).value);
+            int len = this.value.length;
+            byte[] bytes = new byte[other_value * len];
+            for (int i=0 ; i < other_value ; i++) {
+                System.arraycopy(this.value, 0, bytes, i * len, len);
+            }
+            return new Bytes(bytes);
+        }
+        else {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
