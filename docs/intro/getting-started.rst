@@ -50,23 +50,15 @@ Then create a virtual environment and install VOC into it:
     $ cd voc
     $ pip install -e .
 
-For Windows the use of PowerShell under Administrator permission is suggested.
+For Windows the use of cmd under Administrator permission is suggested instead of PowerShell.
 
 .. code-block:: bash
 
-    PS C:\your_dir> virtualenv -p "C:\Python35\python.exe" env
-    PS C:\your_dir> . .\env\Scripts\activate.ps1
-    PS C:\your_dir> cd voc
-    PS C:\your_dir> pip install -e .
+    > virtualenv -p "C:\Python35\python.exe" env
+    > env\Scripts\activate.bat
+    > cd voc
+    > pip install -e .
 
-If the second step produces a `PSExecutionException : UnauthorizedAccess`, the permissions can be set by:
-
-.. code-block:: bash
-
-    PS C:\your_dir> Set-ExecuionPolicy
-    ExecutionPolicy: remoteSigned
-
-repeat step 2 onwards.
 
 
 Building the support JAR file
