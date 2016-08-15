@@ -1,5 +1,7 @@
 package org.python.types;
 
+import java.util.Arrays;
+
 public class Bytes extends org.python.types.Object {
     public byte [] value;
 
@@ -18,7 +20,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     public Bytes(byte [] value) {
-        this.value = value;
+        this.value = Arrays.copyOf(value, value.length);
     }
 
     // public org.python.Object __new__() {

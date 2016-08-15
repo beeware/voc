@@ -52,11 +52,11 @@ To run the entire test suite, type:
 
     $ python setup.py test
 
-To capture unexpected successes in test:
+To capture unexpected successes and new failures in test:
 
 .. code-block:: bash
 
-    $ python setup.py test | grep success
+    $ python setup.py test 2>&1 | grep -E 'success|FAIL'
 
 Running the full test suite will take quite a while - it takes 40 minutes on the CI server. You can speed this up by running the tests in parallel via pytest:
 
