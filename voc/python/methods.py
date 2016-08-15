@@ -169,6 +169,33 @@ class Method(Block):
     def module(self):
         return self.parent
 
+    def add_class(self, class_name, bases, extends, implements):
+        from .klass import Class
+
+        klass = Class(
+            self.module,
+            name=class_name,
+            bases=bases,
+            extends=extends,
+            implements=implements,
+        )
+
+        self.module.classes.append(klass)
+
+        self.add_opcodes(
+            # JavaOpcodes.LDC_W("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+        )
+
+        self.store_name(klass.name, use_locals=True)
+
+        return klass
+
     def add_method(self, name, code, parameter_signatures, return_signature):
         # If a method is added to a method, it is added as an anonymous
         # inner class.
@@ -186,24 +213,25 @@ class Method(Block):
 
         callable.visitor_setup()
 
-        # if code.co_flags & CO_GENERATOR:
-        #     method = ClosureGeneratorMethod(
-        #         callable,
-        #         generator=code.co_name,
-        #         name='invoke',
-        #         parameters=extract_parameters(code, annotations),
-        #         returns={
-        #             'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
-        #         },
-        #     )
-        # else:
-        method = ClosureMethod(
-            callable,
-            name='invoke',
-            code=code,
-            parameters=parameter_signatures,
-            returns=return_signature,
-        )
+        if code.co_flags & CO_GENERATOR:
+            raise Exception("WORKING ON IT")
+            method = ClosureGeneratorMethod(
+                callable,
+                generator=code.co_name,
+                name='invoke',
+                parameters=extract_parameters(code, annotations),
+                returns={
+                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
+                },
+            )
+        else:
+            method = ClosureMethod(
+                callable,
+                name='invoke',
+                code=code,
+                parameters=parameter_signatures,
+                returns=return_signature,
+            )
 
         callable.methods.append(method)
 
@@ -377,9 +405,11 @@ class InitMethod(Method):
 
 
 class InstanceMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False):
+    def __init__(self, parent, name, code, parameters, returns=None, static=False):
         super().__init__(
-            parent, name,
+            parent,
+            name=name,
+            code=code,
             parameters=parameters,
             returns=returns,
             static=static,

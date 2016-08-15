@@ -121,7 +121,7 @@ class Class(Block):
             )
 
         for base in self.bases:
-            base_namespace = self.parent.namespace.replace('.', '/') + '/'
+            base_namespace = self.namespace.replace('.', '/') + '/'
             self.add_opcodes(
                 JavaOpcodes.DUP(),
 
@@ -138,15 +138,28 @@ class Class(Block):
             JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
 
             JavaOpcodes.PUTFIELD('org/python/types/Type', '__bases__', 'Lorg/python/types/Tuple;'),
-
-            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
         )
+
+        self.load_name('__name__', use_locals=True)
+        self.store_name('__module__', use_locals=True)
+
+        self.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V')
+        )
+        self.store_name('__qualname__', use_locals=True)
+
+        # self.add_opcodes(
+        #     JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
+        #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+        # )
 
     def store_name(self, name, use_locals):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
-            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
             JavaOpcodes.LDC_W(name),
@@ -159,7 +172,7 @@ class Class(Block):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
-            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
             JavaOpcodes.GETFIELD('org/python/types/Type', '__dict__', 'Ljava/util/Map;'),
@@ -170,9 +183,8 @@ class Class(Block):
         free_name(self, '#value')
 
     def load_name(self, name, use_locals):
-        print("KLASS", self, "LOAD", name)
         self.add_opcodes(
-            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
             JavaOpcodes.LDC_W(name),
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
@@ -180,42 +192,48 @@ class Class(Block):
 
     def delete_name(self, name, use_locals):
         self.add_opcodes(
-            JavaOpcodes.LDC_W(self.klass.descriptor),
+            JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
             JavaOpcodes.LDC_W(name),
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
-    def add_method(self, name, code, parameters, annotations):
-        parts = full_method_name.split('$')[-1].split('.')
-        method_name = parts[-1]
-        class_name = parts[-2]
+    def add_method(self, name, code, parameter_signatures, return_signature):
+        # parts = name.split('$')[-1].split('.')
+        # method_name = parts[-1]
+        # class_name = parts[-2]
 
-        if class_name != self.klass.name:
-            raise Exception("Method %s being added to %s!" % (class_name, self.klass.name))
+        # if class_name != self.klass.name:
+        #     raise Exception("Method %s being added to %s!" % (class_name, self.klass.name))
 
-        parameters = extract_parameters(code, annotations)
-
-        if code.co_flags & CO_GENERATOR:
+        # print (code)
+        if False:  # FIXME code.co_flags & CO_GENERATOR:
             raise Exception("Can't handle Generator instance methods (yet)")
         else:
-            return_type = annotations.get('return', 'org/python/Object')
-            if return_type is None:
-                return_type = 'void'
+            # return_type = annotations.get('return', 'org/python/Object')
+            # if return_type is None:
+            #     return_type = 'void'
 
             method = InstanceMethod(
-                self.klass,
-                name=method_name,
-                parameters=parameters,
-                returns={
-                    'annotation': return_type
-                },
+                self,
+                name=name,
+                code=code,
+                parameters=parameter_signatures,
+                returns=return_signature,
                 static=True,
-                verbosity=self.klass.verbosity
             )
-        method.extract(code)
 
+
+        # Add the method to the list that need to be
+        # transpiled into Java methods
         self.methods.append(method)
+
+        # Add a definition of the callable object
+        self.add_callable(method)
+
+        # Store the callable object as an accessible symbol.
+        self.store_name(method.name, use_locals=True)
+
         if method.name == '__init__':
             self.init_method = method
 

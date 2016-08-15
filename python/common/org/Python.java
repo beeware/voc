@@ -1425,7 +1425,7 @@ public class Python {
             "Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).\n"
     )
     public static org.python.Object slice() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
+        throw new org.python.exceptions.NotImplementedError("Builtin function 'slice' not implemented");
     }
 
     @org.python.Method(

@@ -180,14 +180,26 @@ class Module(Block):
         from .klass import Class
 
         klass = Class(
-            self.context,
-            class_name,
+            self,
+            name=class_name,
             bases=bases,
             extends=extends,
             implements=implements,
         )
 
         self.classes.append(klass)
+
+        self.add_opcodes(
+            # JavaOpcodes.LDC_W("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+        )
+
+        self.store_name(klass.name, use_locals=True)
 
         return klass
 
@@ -214,7 +226,7 @@ class Module(Block):
         # Add a static method to the module, populated with the
         # body content of the module.
         static_init = JavaMethod('module$import', '()V', public=False)
-        static_init.attributes.append(super().transpile())
+        static_init.attributes.append(self.transpile_code())
         classfile.methods.append(static_init)
 
         # Add a dummy init method.

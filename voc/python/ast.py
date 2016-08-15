@@ -2,7 +2,7 @@ import ast
 import dis
 import sys
 
-from ..java import opcodes as JavaOpcodes
+from ..java import opcodes as JavaOpcodes, Classref
 from .blocks import Block
 from .modules import Module
 from .methods import Method, MainMethod
@@ -17,7 +17,7 @@ from .utils import (
 )
 
 
-def is_mainline(node):
+def is_mainline_def(node):
     return (
         # Node is an if statement...
         isinstance(node, ast.If)
@@ -30,6 +30,17 @@ def is_mainline(node):
         # ... and the RHS is the string '__main__'
         and len(node.test.comparators) == 1 and isinstance(node.test.comparators[0], ast.Str)
             and node.test.comparators[0].s == '__main__'
+    )
+
+
+def is_super_call(node):
+    return (
+        # Node is a Call statement...
+        isinstance(node, ast.Call)
+        # ... where the function being invoked ...
+        and isinstance(node.func, ast.Name)
+        # ... is super.
+        and node.func.id == 'super'
     )
 
 
@@ -106,7 +117,7 @@ class Visitor(ast.NodeVisitor):
         main = None
 
         for child in node.body:
-            if is_mainline(child):
+            if is_mainline_def(child):
                 if main is not None:
                     print("Found duplicate main block... replacing previous main", file=sys.stderr)
 
@@ -158,21 +169,15 @@ class Visitor(ast.NodeVisitor):
     def visit_FunctionDef(self, node):
         # We need the code object for the AST function definition.
         # Create and compile a module that only contains the function def;
-        # the sixth last instruction will be a LOAD_CONST of the code
-        # object for the function being defined.
-        #   ...
-        #   LOAD_CONST     (<code object>)
-        #   LOAD_CONST     'function_name'
-        #   MAKE_FUNCTION
-        #   STORE_NAME     function_name
-        #   LOAD_CONST     None
-        #   RETURN_VALUE
+        # the co_consts for the module will contain exactly 1 code object.
         compiled = compile(
             ast.Module(body=[node]),
             filename=self.context.module.sourcefile,
             mode='exec'
         )
-        code = list(dis.get_instructions(compiled))[-6].argval
+        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
+
+        name_visitor = NameVisitor()
 
         parameter_signatures = []
         for i, arg in enumerate(node.args.args):
@@ -187,7 +192,7 @@ class Visitor(ast.NodeVisitor):
 
             parameter_signatures.append({
                 'name': arg.arg,
-                'annotation': arg.annotation if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.visit(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
                 'kind': ArgType.POSITIONAL_OR_KEYWORD,
                 'default': default
             })
@@ -195,7 +200,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.vararg:
             parameter_signatures.append({
                 'name': node.args.vararg,
-                'annotation': arg.annotation if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.visit(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
                 'kind': ArgType.VAR_POSITIONAL,
             })
 
@@ -211,7 +216,7 @@ class Visitor(ast.NodeVisitor):
 
             parameter_signatures.append({
                 'name': arg.arg,
-                'annotation': arg.annotation if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.visit(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
                 'kind': ArgType.KEYWORD_ONLY,
                 'default': default
             })
@@ -219,23 +224,23 @@ class Visitor(ast.NodeVisitor):
         if node.args.kwarg:
             parameter_signatures.append({
                 'name': node.args.kwarg,
-                'annotation': arg.annotation if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.visit(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
                 'kind': ArgType.VAR_KEYWORD,
             })
 
         return_signature = {
             'annotation': (
-                node.returns
+                name_visitor.visit(node.returns).cls_name
                 if node.returns
                 else 'org.python.Object'
             ).replace('.', '/'),
         }
 
         method = self.context.add_method(
-            node.name,
-            code,
-            parameter_signatures,
-            return_signature
+            name=node.name,
+            code=code,
+            parameter_signatures=parameter_signatures,
+            return_signature=return_signature
         )
 
         self.push_context(method)
@@ -280,7 +285,7 @@ class Visitor(ast.NodeVisitor):
             else:
                 raise Exception("Unknown meta keyword " + str(key))
 
-        klass = self.context.add_class(node, class_name, bases, extends, implements)
+        klass = self.context.add_class(class_name, bases, extends, implements)
 
         self.push_context(klass)
         for child in node.body:
@@ -637,29 +642,37 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_BinOp(self, node):
         # expr left, operator op, expr right):
-        self.visit(node.left)
-        self.visit(node.right)
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                {
-                    ast.Add: '__add__',
-                    ast.Sub: '__sub__',
-                    ast.Mult: '__mul__',
-                    ast.Div: '__truediv__',
-                    ast.FloorDiv: '__floordiv__',
-                    ast.Mod: '__mod__',
-                    ast.Pow: '__pow__',
-                    ast.LShift: '__lshift__',
-                    ast.RShift: '__rshift__',
-                    ast.BitOr: '__or__',
-                    ast.BitXor: '__xor__',
-                    ast.BitAnd: '__and__',
-                    # ast.MatMult:
-                }[type(node.op)],
-                '(Lorg/python/Object;)Lorg/python/Object;'
+        if isinstance(node.op, ast.Pow):
+            self.visit(node.left)
+            self.visit(node.right)
+            self.context.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__pow__', '(Lorg/python/Object;Lorg/python/Object;)Lorg/python/Object;'),
             )
-        )
+        else:
+            self.visit(node.left)
+            self.visit(node.right)
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE(
+                    'org/python/Object',
+                    {
+                        ast.Add: '__add__',
+                        ast.Sub: '__sub__',
+                        ast.Mult: '__mul__',
+                        ast.Div: '__truediv__',
+                        ast.FloorDiv: '__floordiv__',
+                        ast.Mod: '__mod__',
+                        ast.Pow: '__pow__',
+                        ast.LShift: '__lshift__',
+                        ast.RShift: '__rshift__',
+                        ast.BitOr: '__or__',
+                        ast.BitXor: '__xor__',
+                        ast.BitAnd: '__and__',
+                        # ast.MatMult:
+                    }[type(node.op)],
+                    '(Lorg/python/Object;)Lorg/python/Object;'
+                )
+            )
 
     @node_visitor
     def visit_UnaryOp(self, node):
@@ -916,19 +929,72 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Call(self, node):
-        # Evaluate the callable, and check that it *is* a callable
-        self.visit(node.func)
-        self.context.add_opcodes(
-            JavaOpcodes.CHECKCAST('org/python/Callable'),
-        )
+        if is_super_call(node):
+            # context.add_opcodes(
+            #     JavaOpcodes.LDC_W("ATTRIBUTE ON SUPER"),
+            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+            # )
 
-        # Create and populate the array of arguments to pass to invoke()
-        self.context.add_opcodes(
-            ICONST_val(len(node.args)),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
-        )
+            if len(node.args) == 0:
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
 
-        if node.args is not None:
+                    # The super class to bind to.
+                    JavaOpcodes.LDC_W(Classref(self.context.parent.descriptor)),
+                    JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+
+                    # Bind to self. Since we know we are in a class building context,
+                    # we can be certain that register 0 contains self.
+                    JavaOpcodes.ALOAD_0(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                )
+
+            elif len(node.args) == 1:  # Unbound super
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
+                )
+
+                # The super class to bind to.
+                self.visit(node.args[0])
+
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;)V'),
+                )
+
+            elif len(node.args) == 2:  # Bound super
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Super'),
+                    JavaOpcodes.DUP(),
+                )
+
+                # The super class to bind to.
+                self.visit(node.args[0])
+
+                # The instance to bind to.
+                self.visit(node.args[1])
+
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Super', '<init>', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                )
+
+            else:
+                raise Exception("Invalid number of arguments to super()")
+
+        else:
+            # Evaluate the callable, and check that it *is* a callable
+            self.visit(node.func)
+            self.context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/Callable'),
+            )
+
+            # Create and populate the array of arguments to pass to invoke()
+            self.context.add_opcodes(
+                ICONST_val(len(node.args)),
+                JavaOpcodes.ANEWARRAY('org/python/Object'),
+            )
+
             for i, arg in enumerate(node.args):
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
@@ -939,26 +1005,25 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.AASTORE(),
                 )
 
-        # FIXME
-        # if node.starargs is not None:
-        #     for arg in node.starargs:
-        #         self.context.add_opcodes(
-        #             JavaOpcodes.DUP(),
-        #             ICONST_val(i),
-        #         )
-        #         self.generic_visit(arg)
-        #         self.context.add_opcodes(
-        #             JavaOpcodes.AASTORE(),
-        #         )
+            # FIXME
+            # if node.starargs is not None:
+            #     for arg in node.starargs:
+            #         self.context.add_opcodes(
+            #             JavaOpcodes.DUP(),
+            #             ICONST_val(i),
+            #         )
+            #         self.generic_visit(arg)
+            #         self.context.add_opcodes(
+            #             JavaOpcodes.AASTORE(),
+            #         )
 
-        # Create and populate the map of kwargs to pass to invoke().
-        self.context.add_opcodes(
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V')
-        )
+            # Create and populate the map of kwargs to pass to invoke().
+            self.context.add_opcodes(
+                JavaOpcodes.NEW('java/util/HashMap'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V')
+            )
 
-        if node.keywords is not None:
             for keyword in node.keywords:
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
@@ -970,15 +1035,15 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.POP()
                 )
 
-        # FIXME
-        # if node.kwargs is not None:
-        #     for arg in node.kwargs:
-        #         self.generic_visit(arg)
+            # FIXME
+            # if node.kwargs is not None:
+            #     for arg in node.kwargs:
+            #         self.generic_visit(arg)
 
-        # Set up the stack and invoke the callable
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
-        )
+            # Set up the stack and invoke the callable
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+            )
 
     @node_visitor
     def visit_Num(self, node):
@@ -1055,7 +1120,7 @@ class Visitor(ast.NodeVisitor):
         elif type(node.ctx) == ast.Store:
             self.context.add_opcodes(
                 JavaOpcodes.SWAP(),
-                JavaOpcodes.LDC_W(target.attr),
+                JavaOpcodes.LDC_W(node.attr),
                 JavaOpcodes.SWAP(),
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
             )
@@ -1114,31 +1179,42 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Tuple(self, node):
-        self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Tuple'),
-            JavaOpcodes.DUP(),
-
-            JavaOpcodes.NEW('java/util/ArrayList'),
-            JavaOpcodes.DUP(),
-            ICONST_val(len(node.elts)),
-            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
-        )
-
-        for child in node.elts:
+        if isinstance(node.ctx, ast.Load):
             self.context.add_opcodes(
+                JavaOpcodes.NEW('org/python/types/Tuple'),
                 JavaOpcodes.DUP(),
+
+                JavaOpcodes.NEW('java/util/ArrayList'),
+                JavaOpcodes.DUP(),
+                ICONST_val(len(node.elts)),
+                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
             )
 
-            self.visit(child)
+            for child in node.elts:
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                )
+
+                self.visit(child)
+
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+                    JavaOpcodes.POP(),
+                )
 
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
-                JavaOpcodes.POP(),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V')
             )
-
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V')
-        )
+        elif isinstance(node.ctx, ast.Store):
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
+            )
+            for child in node.elts:
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;')
+                )
+                self.visit(child)
 
     @node_visitor
     def visit_Slice(self, node):
