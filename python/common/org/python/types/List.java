@@ -331,13 +331,13 @@ public class List extends org.python.types.Object {
             int idx = (int) ((org.python.types.Int) index).value;
             if (idx < 0) {
                 if (-idx > this.value.size()) {
-                    throw new org.python.exceptions.IndexError("list index out of range");
+                    throw new org.python.exceptions.IndexError("list assignment index out of range");
                 } else {
                     this.value.set(this.value.size() + idx, value);
                 }
             } else {
                 if (idx >= this.value.size()) {
-                    throw new org.python.exceptions.IndexError("list index out of range");
+                    throw new org.python.exceptions.IndexError("list assignment index out of range");
                 } else {
                     this.value.set(idx, value);
                 }
@@ -512,8 +512,18 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("list.pop() has not been implemented.");
     }
 
-    public void remove(org.python.Object item) {
-        throw new org.python.exceptions.NotImplementedError("list.remove() has not been implemented.");
+    @org.python.Method(
+        __doc__ = "",
+        args = {"item"}
+    )
+    public org.python.Object remove(org.python.Object item) {
+        for(int i = 0; i < this.value.size(); i++) {
+            if(((org.python.types.Bool)item.__eq__(this.value.get(i))).value){
+                this.value.remove(i);
+                return org.python.types.NoneType.NONE;
+            }
+        }
+        throw new org.python.exceptions.ValueError("list.remove(x): x not in list");
     }
 
     @org.python.Method(
