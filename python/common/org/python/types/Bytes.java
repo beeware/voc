@@ -35,20 +35,44 @@ public class Bytes extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str("b'" + new java.lang.String(this.value) + "'");
+        return this.__str__();
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.types.Str __str__() {
-        return new org.python.types.Str("b'" + new java.lang.String(this.value) + "'");
+        StringBuilder sb = new StringBuilder();
+        sb.append("b'");
+        for (int c : this.value) {
+            if (c >= 32 && c < 128) {
+                sb.append((char)c);
+            } else {
+                sb.append(String.format("\\x%02d",c));
+            }
+        }
+        sb.append("'");
+        return new org.python.types.Str(sb.toString());
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __add__(org.python.Object other) {
+        if (other instanceof org.python.types.Bytes) {
+            byte[] other_bytes = (byte[])((org.python.types.Bytes) other).value;
+            byte[] new_bytes = new byte[this.value.length + other_bytes.length];
+            System.arraycopy(this.value, 0, new_bytes, 0, this.value.length);
+            System.arraycopy(other_bytes, 0, new_bytes, this.value.length, other_bytes.length);
+            return new Bytes(new_bytes);
+        } else if (other instanceof org.python.types.ByteArray) {
+            byte[] other_bytes = (byte[])((org.python.types.ByteArray) other).value;
+            if (other_bytes == null) return this;
+            byte[] new_bytes = new byte[this.value.length + other_bytes.length];
+            System.arraycopy(this.value, 0, new_bytes, 0, this.value.length);
+            System.arraycopy(other_bytes, 0, new_bytes, this.value.length, other_bytes.length);
+            return new Bytes(new_bytes);
+        }
         throw new org.python.exceptions.TypeError("can't concat bytes to " + other.typeName());
     }
 
