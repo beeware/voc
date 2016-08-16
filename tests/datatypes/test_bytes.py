@@ -40,12 +40,15 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_dict',
         'test_and_frozenset',
 
-        'test_eq_bytearray',
-        'test_eq_bytes',
         'test_eq_class',
         'test_eq_complex',
         'test_eq_dict',
         'test_eq_frozenset',
+
+        'test_ne_class',
+        'test_ne_complex',
+        'test_ne_dict',
+        'test_ne_frozenset',
 
         'test_floor_divide_class',
         'test_floor_divide_complex',
@@ -87,19 +90,26 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_modulo_class',
         'test_modulo_complex',
+        'test_modulo_dict',
         'test_modulo_frozenset',
+        'test_modulo_None',
+        'test_modulo_NotImplemented',
+        'test_modulo_bool',
+        'test_modulo_bytearray',
+        'test_modulo_bytes',
+        'test_modulo_float',
+        'test_modulo_int',
+        'test_modulo_list',
+        'test_modulo_range',
+        'test_modulo_set',
+        'test_modulo_slice',
+        'test_modulo_str',
+        'test_modulo_tuple',
 
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_dict',
         'test_multiply_frozenset',
-
-        'test_ne_bytearray',
-        'test_ne_bytes',
-        'test_ne_class',
-        'test_ne_complex',
-        'test_ne_dict',
-        'test_ne_frozenset',
 
         'test_or_class',
         'test_or_complex',
@@ -135,21 +145,6 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_xor_complex',
         'test_xor_dict',
         'test_xor_frozenset',
-
-        'test_modulo_None',
-        'test_modulo_NotImplemented',
-        'test_modulo_bool',
-        'test_modulo_bytearray',
-        'test_modulo_bytes',
-        'test_modulo_dict',
-        'test_modulo_float',
-        'test_modulo_int',
-        'test_modulo_list',
-        'test_modulo_range',
-        'test_modulo_set',
-        'test_modulo_slice',
-        'test_modulo_str',
-        'test_modulo_tuple',
     ]
 
 

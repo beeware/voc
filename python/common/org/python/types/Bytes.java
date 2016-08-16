@@ -58,6 +58,22 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __eq__(org.python.Object other) {
+        if (other instanceof org.python.types.Bytes) {
+            byte[] other_value = ((org.python.types.Bytes) other).value;
+            return new org.python.types.Bool(Arrays.equals(this.value, other_value));
+        } else if (other instanceof org.python.types.ByteArray) {
+            byte[] other_value = ((org.python.types.ByteArray) other).value;
+            if (other_value == null) other_value = new byte[0];
+            return new org.python.types.Bool(Arrays.equals(this.value, other_value));
+        } else {
+            return new org.python.types.Bool(false);
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
             byte[] other_bytes = (byte[])((org.python.types.Bytes) other).value;
@@ -123,13 +139,6 @@ public class Bytes extends org.python.types.Object {
     )
     public org.python.types.Str __format__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.__format__ has not been implemented.");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __eq__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__eq__ has not been implemented.");
     }
 
     @org.python.Method(
@@ -326,8 +335,8 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __ne__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__ne__ has not been implemented.");
+    public org.python.Object __ne__(org.python.Object other) {
+        return new org.python.types.Bool(((org.python.types.Bool)this.__eq__(other)).value ? 0 : 1);
     }
 
     @org.python.Method(
