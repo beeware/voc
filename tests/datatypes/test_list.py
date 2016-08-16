@@ -251,7 +251,6 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_dict',
         'test_multiply_float',
         'test_multiply_frozenset',
-        'test_multiply_list',
         'test_multiply_None',
         'test_multiply_NotImplemented',
         'test_multiply_range',
