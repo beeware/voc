@@ -126,37 +126,53 @@ public class Bytes extends org.python.types.Object {
             if (slice.start == null && slice.stop == null && slice.step == null) {
                 sliced = this.value;
             } else {
-                long start;
+                int start;
                 if (slice.start != null) {
-                    start = slice.start.value;
+                    start = (int)slice.start.value;
                 } else {
                     start = 0;
                 }
 
-                long stop;
+                int stop;
                 if (slice.stop != null) {
-                    stop = slice.stop.value;
+                    stop = (int)slice.stop.value;
                 } else {
                     stop = this.value.length;
                 }
 
-                long step;
+                int step;
                 if (slice.step != null) {
-                    step = slice.step.value;
+                    step = (int)slice.step.value;
                 } else {
                     step = 1;
                 }
 
-                if (start >= this.value.length | stop >= this.value.length) {
-                    return new Bytes(new byte[0]);
-                }
+                // System.err.format("start:%d, stop:%d, step:%d\n", start, stop, step);
+                if (step > 0) {
+                    if (start >= this.value.length || stop >= this.value.length || start > stop) {
+                        return new Bytes(new byte[0]);
+                    }
 
-                int len = (int)(stop - start);
-                sliced = new byte[len];
-                //
-                // TODO: handle step size, including negative
-                //
-                System.arraycopy(this.value, (int)start, sliced, 0, len);
+                    int len = (int)Math.ceil((float)(stop - start) / step);
+                    sliced = new byte[len];
+                
+                    for (int i=0, j=start ; j < stop ; i++, j += step) {
+                        // System.err.format("this.value[%d] -> sliced[%d]\n", j, i);
+                        sliced[i] = this.value[j];
+                    }
+                } else { // step < 0
+                    if (Math.abs(start) >= this.value.length || Math.abs(stop) >= this.value.length || stop > start) {
+                        return new Bytes(new byte[0]);
+                    }
+
+                    int len = (int)Math.ceil((float)(stop - start) / step);
+                    sliced = new byte[len];
+                
+                    for (int i=0, j=start ; j > stop ; i++, j += step) {
+                        // System.err.format("this.value[%d] -> sliced[%d]\n", j, i);
+                        sliced[i] = this.value[j];
+                    }
+                }
             }
             return new Bytes(sliced);
 
