@@ -61,19 +61,31 @@ def node_visitor(fn):
 class NameVisitor(ast.NodeVisitor):
     def evaluate(self, root_node):
         self.names = [[]]
-        self.visit(root_node)
+        if root_node:
+            self.visit(root_node)
         return self
 
     @property
     def cls_name(self):
-        return '$'.join('.'.join(group) for group in self.names)
+        return '$'.join('.'.join(n for n in group if n) for group in self.names)
 
     @property
     def ref_name(self):
-        return '$'.join('/'.join(group) for group in self.names)
+        return '$'.join('/'.join(n for n in group if n) for group in self.names)
+
+    @property
+    def annotation(self):
+        type_name = self.ref_name
+        return type_name if type_name else 'org/python/Object'
 
     def visit_Name(self, node):
         self.names[-1].append(node.id)
+
+    def visit_NameConstant(self, node):
+        if node.value is None:
+            self.names[-1].append("void")
+        else:
+            raise NotImplementedError("Unknown named constant %s" % node.value)
 
     def visit_Attribute(self, node):
         self.visit(node.value)
@@ -200,7 +212,7 @@ class Visitor(ast.NodeVisitor):
 
             parameter_signatures.append({
                 'name': arg.arg,
-                'annotation': name_visitor.evaluate(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.evaluate(arg.annotation).annotation,
                 'kind': ArgType.POSITIONAL_OR_KEYWORD,
                 'default': default
             })
@@ -208,7 +220,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.vararg:
             parameter_signatures.append({
                 'name': node.args.vararg,
-                'annotation': name_visitor.evalutate(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.evalutate(arg.annotation).annotation,
                 'kind': ArgType.VAR_POSITIONAL,
             })
 
@@ -224,7 +236,7 @@ class Visitor(ast.NodeVisitor):
 
             parameter_signatures.append({
                 'name': arg.arg,
-                'annotation': name_visitor.evaluate(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.evaluate(arg.annotation).annotation,
                 'kind': ArgType.KEYWORD_ONLY,
                 'default': default
             })
@@ -232,16 +244,12 @@ class Visitor(ast.NodeVisitor):
         if node.args.kwarg:
             parameter_signatures.append({
                 'name': node.args.kwarg,
-                'annotation': name_visitor.evaluate(arg.annotation).cls_name if arg.annotation else 'org/python/Object',
+                'annotation': name_visitor.evaluate(arg.annotation).annotation,
                 'kind': ArgType.VAR_KEYWORD,
             })
 
         return_signature = {
-            'annotation': (
-                name_visitor.evaluate(node.returns).cls_name
-                if node.returns
-                else 'org.python.Object'
-            ).replace('.', '/'),
+            'annotation': name_visitor.evaluate(node.returns).annotation
         }
 
         method = self.context.add_method(
@@ -288,8 +296,6 @@ class Visitor(ast.NodeVisitor):
                         for v in value.elts
                     ]
                 else:
-                    print(value)
-                    print(name_visitor.evaluate(value).ref_name)
                     implements = [name_visitor.evaluate(value).ref_name]
             else:
                 raise Exception("Unknown meta keyword " + str(key))

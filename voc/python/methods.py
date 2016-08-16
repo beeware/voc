@@ -461,7 +461,7 @@ class InstanceMethod(Method):
 
         # Then extract each argument, converting to Python types as required.
         for i, param in enumerate(self.parameters[1:]):
-            annotation = param.get('annotation', 'org/python/Object')
+            annotation = param['annotation']
 
             if annotation is None:
                 raise Exception("Parameters can't be void")
