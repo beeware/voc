@@ -582,7 +582,9 @@ def ALOAD_name(context, name):
 
     index = context.local_vars[name]
 
-    if index == 0:
+    if index is None:
+        raise NameError(name)
+    elif index == 0:
         return JavaOpcodes.ALOAD_0()
     elif index == 1:
         return JavaOpcodes.ALOAD_1()
@@ -604,11 +606,14 @@ def ASTORE_name(context, name):
     try:
         index = context.local_vars[name]
     except KeyError:
+        index = None
+
+    if index is None:
         try:
             index = context.deleted_vars.pop()
             # print ("REUSE index", index)
         except KeyError:
-            index = len(context.local_vars)
+            index = len(context.active_local_vars)
             # print ("GET NEW index", index)
         context.local_vars[name] = index
 
@@ -639,7 +644,9 @@ def ILOAD_name(context, name):
 
     index = context.local_vars[name]
 
-    if index == 0:
+    if index is None:
+        raise NameError(name)
+    elif index == 0:
         return JavaOpcodes.ILOAD_0()
     elif index == 1:
         return JavaOpcodes.ILOAD_1()
@@ -661,11 +668,14 @@ def ISTORE_name(context, name):
     try:
         index = context.local_vars[name]
     except KeyError:
+        index = None
+
+    if index is None:
         try:
             index = context.deleted_vars.pop()
             # print ("REUSE index", index)
         except KeyError:
-            index = len(context.local_vars)
+            index = len(context.active_local_vars)
             # print ("GET NEW index", index)
         context.local_vars[name] = index
 
@@ -709,7 +719,9 @@ def LLOAD_name(context, name):
     # print("LOAD LVAR NAME", context, name, index)
     # print("locals: ", context.local_vars)
 
-    if index == 0:
+    if index is None:
+        raise NameError(name)
+    elif index == 0:
         return JavaOpcodes.LLOAD_0()
     elif index == 1:
         return JavaOpcodes.LLOAD_1()
@@ -733,7 +745,9 @@ def FLOAD_name(context, name):
     # print("LOAD FVAR NAME", context, name, index)
     # print("locals: ", context.local_vars)
 
-    if index == 0:
+    if index is None:
+        raise NameError(name)
+    elif index == 0:
         return JavaOpcodes.FLOAD_0()
     elif index == 1:
         return JavaOpcodes.FLOAD_1()
@@ -757,7 +771,9 @@ def DLOAD_name(context, name):
     # print("LOAD LVAR NAME", context, name, index)
     # print("locals: ", context.local_vars)
 
-    if index == 0:
+    if index is None:
+        raise NameError(name)
+    elif index == 0:
         return JavaOpcodes.DLOAD_0()
     elif index == 1:
         return JavaOpcodes.DLOAD_1()
@@ -778,16 +794,17 @@ def free_name(context, name, must_exist=True):
     are created as part of looping constructs, and may not be
     created in the case of an empty loop.
     """
-    try:
-        index = context.local_vars[name]
-        context.deleted_vars.add(index)
-        del context.local_vars[name]
+    index = context.local_vars[name]
 
-        # print("FREE", context, name, index)
-        # print("locals: ", context.local_vars)
-    except KeyError:
-        if must_exist:
-            raise
+    if index is None and must_exist:
+        raise NameError(name)
+
+    context.deleted_vars.add(index)
+    context.local_vars[name] = None
+
+    # print("FREE", context, name, index)
+    # print("locals: ", context.local_vars)
+
 
 ##########################################################################
 # Handle constant values.

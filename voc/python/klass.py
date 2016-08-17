@@ -140,8 +140,8 @@ class Class(Block):
             JavaOpcodes.PUTFIELD('org/python/types/Type', '__bases__', 'Lorg/python/types/Tuple;'),
         )
 
-        self.load_name('__name__', use_locals=True)
-        self.store_name('__module__', use_locals=True)
+        self.load_name('__name__')
+        self.store_name('__module__')
 
         self.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Str'),
@@ -149,14 +149,14 @@ class Class(Block):
             JavaOpcodes.LDC_W(self.name),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V')
         )
-        self.store_name('__qualname__', use_locals=True)
+        self.store_name('__qualname__')
 
         # self.add_opcodes(
         #     JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
         #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
         # )
 
-    def store_name(self, name, use_locals):
+    def store_name(self, name):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
             JavaOpcodes.LDC_W(self.descriptor),
@@ -182,7 +182,7 @@ class Class(Block):
         )
         free_name(self, '#value')
 
-    def load_name(self, name, use_locals):
+    def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
@@ -190,7 +190,7 @@ class Class(Block):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-    def delete_name(self, name, use_locals):
+    def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
@@ -232,7 +232,7 @@ class Class(Block):
         self.add_callable(method)
 
         # Store the callable object as an accessible symbol.
-        self.store_name(method.name, use_locals=True)
+        self.store_name(method.name)
 
         if method.name == '__init__':
             self.init_method = method

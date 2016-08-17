@@ -100,6 +100,18 @@ class NameVisitor(ast.NodeVisitor):
         self.visit(node.value)
 
 
+class LocalsVisitor(ast.NodeVisitor):
+    def __init__(self, context):
+        self.context = context
+
+    def visit_Name(self, node):
+        if type(node.ctx) == ast.Store:
+            self.context.local_vars[node.id] = None
+
+    def visit_Attribute(self, node):
+        pass
+
+
 class Visitor(ast.NodeVisitor):
     def __init__(self, namespace, filename, verbosity=1):
         super().__init__()
@@ -260,6 +272,9 @@ class Visitor(ast.NodeVisitor):
         )
 
         self.push_context(method)
+
+        LocalsVisitor(method).visit(node)
+
         for child in node.body:
             self.visit(child)
         self.pop_context()
@@ -897,7 +912,6 @@ class Visitor(ast.NodeVisitor):
         # Clean up
         free_name(self.context, '#setcomp-iter-%x' % id(node))
 
-
     @node_visitor
     def visit_DictComp(self, node):
         # expr key, expr value, comprehension* generators):
@@ -1270,9 +1284,18 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Name(self, node):
         if type(node.ctx) == ast.Load:
-            self.context.load_name(node.id, use_locals=True)
+            try:
+                self.context.load_name(node.id)
+            except NameError:
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/UnboundLocalError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W(node.id),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/UnboundLocalError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW()
+                )
         elif type(node.ctx) == ast.Store:
-            self.context.store_name(node.id, use_locals=True)
+            self.context.store_name(node.id)
         else:
             raise NotImplementedError("Unknown context %s" % node.ctx)
 

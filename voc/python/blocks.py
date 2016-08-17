@@ -43,19 +43,27 @@ class Block:
         self.next_opcode_starts_line = None
 
     @property
+    def active_local_vars(self):
+        return {
+            name: index
+            for name, index in self.local_vars.items()
+            if index is not None
+        }
+
+    @property
     def module(self):
         return self.parent
 
-    def store_name(self, name, use_locals):
+    def store_name(self, name):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
     def store_dynamic(self):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
-    def load_name(self, name, use_locals):
+    def load_name(self, name):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
-    def delete_name(self, name, use_locals):
+    def delete_name(self, name):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
     @property
@@ -380,7 +388,7 @@ class Block:
         # initializing all variables, we can trick the verifier.
         # TODO: Ideally, we'd only initialize the variables that are ambiguous.
         init_vars = []
-        for i in range(len(self.parameters) + (1 if self.has_self else 0), len(self.local_vars) + len(self.deleted_vars)):
+        for i in range(len(self.parameters) + (1 if self.has_self else 0), len(self.active_local_vars) + len(self.deleted_vars)):
             if i == 0:
                 opcode = JavaOpcodes.ASTORE_0()
             elif i == 1:
@@ -489,7 +497,7 @@ class Block:
 
         return JavaCode(
             max_stack=self.stack_depth() + len(exceptions),
-            max_locals=len(self.local_vars) + len(self.deleted_vars),
+            max_locals=len(self.active_local_vars) + len(self.deleted_vars),
             code=self.opcodes,
             exceptions=exceptions,
             attributes=[

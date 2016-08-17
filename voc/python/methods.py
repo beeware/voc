@@ -74,8 +74,8 @@ class Method(Block):
     def add_self(self):
         pass
 
-    def store_name(self, name, use_locals):
-        if use_locals:
+    def store_name(self, name):
+        if name in self.local_vars:
             self.add_opcodes(
                 ASTORE_name(self, name)
             )
@@ -103,33 +103,29 @@ class Method(Block):
     def store_dynamic(self):
         raise NotImplementedError('Methods cannot dynamically store variables.')
 
-    def load_name(self, name, use_locals):
-        if use_locals:
-            try:
-                self.add_opcodes(
-                    ALOAD_name(self, name)
-                )
-                return
-            except KeyError:
-                pass
+    def load_name(self, name):
+        if name in self.local_vars:
+            self.add_opcodes(
+                ALOAD_name(self, name)
+            )
+        else:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
-        self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(self.globals_module.full_name),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.globals_module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                JavaOpcodes.LDC_W(name),
 
-            JavaOpcodes.LDC_W(name),
+                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            )
 
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
-        )
-
-    def delete_name(self, name, use_locals):
+    def delete_name(self, name):
         try:
             free_name(self, name)
         except KeyError:
@@ -192,7 +188,7 @@ class Method(Block):
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
         )
 
-        self.store_name(klass.name, use_locals=True)
+        self.store_name(klass.name)
 
         return klass
 
@@ -265,7 +261,7 @@ class Method(Block):
         )
 
         # Store the callable object as an accessible symbol.
-        self.store_name(name, use_locals=True)
+        self.store_name(name)
 
         return method
 
@@ -752,7 +748,7 @@ class MainMethod(Method):
     def globals_module(self):
         return self.module
 
-    def store_name(self, name, use_locals):
+    def store_name(self, name):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
@@ -785,7 +781,7 @@ class MainMethod(Method):
         )
         free_name(self, '#value')
 
-    def load_name(self, name, use_locals):
+    def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
@@ -800,7 +796,7 @@ class MainMethod(Method):
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-    def delete_name(self, name, use_locals):
+    def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
@@ -1018,4 +1014,3 @@ class ClosureGeneratorMethod(GeneratorMethod):
     @property
     def globals_module(self):
         return self.module.parent
-

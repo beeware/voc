@@ -65,7 +65,7 @@ class Module(Block):
     #         JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
     #     )
 
-    def store_name(self, name, use_locals):
+    def store_name(self, name):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
@@ -105,7 +105,7 @@ class Module(Block):
         )
         free_name(self, '#value')
 
-    def load_name(self, name, use_locals):
+    def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
@@ -120,7 +120,7 @@ class Module(Block):
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-    def delete_name(self, name, use_locals):
+    def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
@@ -172,7 +172,7 @@ class Module(Block):
         self.add_callable(method)
 
         # Store the callable object as an accessible symbol.
-        self.store_name(method.name, use_locals=True)
+        self.store_name(method.name)
 
         return method
 
@@ -199,7 +199,7 @@ class Module(Block):
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
         )
 
-        self.store_name(klass.name, use_locals=True)
+        self.store_name(klass.name)
 
         return klass
 
