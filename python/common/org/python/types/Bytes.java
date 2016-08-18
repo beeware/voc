@@ -145,7 +145,110 @@ public class Bytes extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
+        if (other instanceof org.python.types.Bytes) {
+            byte[] other_bytes = (byte[])((org.python.types.Bytes) other).value;
+            for (int i=0; i < Math.min(this.value.length, other_bytes.length); i++) {
+                if (this.value[i] > other_bytes[i]) return new org.python.types.Bool(1);
+                if (this.value[i] < other_bytes[i]) return new org.python.types.Bool(0);
+            }
+            if (this.value.length < other_bytes.length) return new org.python.types.Bool(0);
+            return new org.python.types.Bool(1);
+        } else if (other instanceof org.python.types.ByteArray) {
+            byte[] other_bytes = (byte[])((org.python.types.ByteArray) other).value;
+            if (other_bytes == null) return new org.python.types.Bool(1);
+            for (int i=0; i < Math.min(this.value.length, other_bytes.length); i++) {
+                if (this.value[i] > other_bytes[i]) return new org.python.types.Bool(1);
+                if (this.value[i] < other_bytes[i]) return new org.python.types.Bool(0);
+            }
+            if (this.value.length < other_bytes.length) return new org.python.types.Bool(0);
+            return new org.python.types.Bool(1);
+        }
         throw new org.python.exceptions.TypeError("unorderable types: bytes() >= " + other.typeName() + "()");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __gt__(org.python.Object other) {
+        if (other instanceof org.python.types.Bytes) {
+            byte[] other_bytes = (byte[])((org.python.types.Bytes) other).value;
+            for (int i=0; i < Math.min(this.value.length, other_bytes.length); i++) {
+                if (this.value[i] > other_bytes[i]) return new org.python.types.Bool(1);
+                if (this.value[i] < other_bytes[i]) return new org.python.types.Bool(0);
+            }
+            if (this.value.length <= other_bytes.length) return new org.python.types.Bool(0);
+            return new org.python.types.Bool(1);
+        } else if (other instanceof org.python.types.ByteArray) {
+            byte[] other_bytes = (byte[])((org.python.types.ByteArray) other).value;
+            if (other_bytes == null) other_bytes = new byte[0];
+            for (int i=0; i < Math.min(this.value.length, other_bytes.length); i++) {
+                if (this.value[i] > other_bytes[i]) return new org.python.types.Bool(1);
+                if (this.value[i] < other_bytes[i]) return new org.python.types.Bool(0);
+            }
+            if (this.value.length <= other_bytes.length) return new org.python.types.Bool(0);
+            return new org.python.types.Bool(1);
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: bytes() > " + other.typeName() + "()");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __le__(org.python.Object other) {
+        if (other instanceof org.python.types.Bytes) {
+            byte[] other_bytes = (byte[])((org.python.types.Bytes) other).value;
+            for (int i=0; i < Math.min(this.value.length, other_bytes.length); i++) {
+                if (this.value[i] < other_bytes[i]) return new org.python.types.Bool(1);
+                if (this.value[i] > other_bytes[i]) return new org.python.types.Bool(0);
+            }
+            if (this.value.length <= other_bytes.length) return new org.python.types.Bool(1);
+            return new org.python.types.Bool(0);
+        } else if (other instanceof org.python.types.ByteArray) {
+            byte[] other_bytes = (byte[])((org.python.types.ByteArray) other).value;
+            if (other_bytes == null) other_bytes = new byte[0];
+            for (int i=0; i < Math.min(this.value.length, other_bytes.length); i++) {
+                if (this.value[i] < other_bytes[i]) return new org.python.types.Bool(1);
+                if (this.value[i] > other_bytes[i]) return new org.python.types.Bool(0);
+            }
+            if (this.value.length <= other_bytes.length) return new org.python.types.Bool(1);
+            return new org.python.types.Bool(0);
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: bytes() <= " + other.typeName() + "()");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __lt__(org.python.Object other) {
+        if (other instanceof org.python.types.Bytes) {
+            byte[] other_bytes = (byte[])((org.python.types.Bytes) other).value;
+            for (int i=0; i < Math.min(this.value.length, other_bytes.length); i++) {
+                if (this.value[i] < other_bytes[i]) return new org.python.types.Bool(1);
+                if (this.value[i] > other_bytes[i]) return new org.python.types.Bool(0);
+            }
+            if (this.value.length < other_bytes.length) return new org.python.types.Bool(1);
+            return new org.python.types.Bool(0);
+        } else if (other instanceof org.python.types.ByteArray) {
+            byte[] other_bytes = (byte[])((org.python.types.ByteArray) other).value;
+            if (other_bytes == null) return new org.python.types.Bool(0);
+            for (int i=0; i < Math.min(this.value.length, other_bytes.length); i++) {
+                if (this.value[i] < other_bytes[i]) return new org.python.types.Bool(1);
+                if (this.value[i] > other_bytes[i]) return new org.python.types.Bool(0);
+            }
+            if (this.value.length < other_bytes.length) return new org.python.types.Bool(1);
+            return new org.python.types.Bool(0);
+        }
+        throw new org.python.exceptions.TypeError("unorderable types: bytes() < " + other.typeName() + "()");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __mod__(org.python.Object other) {
+        if (other instanceof org.python.types.List || other instanceof org.python.types.Range) {
+            return this;
+        }
+        throw new org.python.exceptions.TypeError("not all arguments converted during bytes formatting");
     }
 
     @org.python.Method(
@@ -251,18 +354,6 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.__getnewargs__ has not been implemented.");
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __gt__(org.python.Object other) {
-        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes) {
-            throw new org.python.exceptions.NotImplementedError("bytes.__gt__ has not been implemented.");
-        }
-        else {
-            throw new org.python.exceptions.TypeError("unorderable types: bytes() > " + other.typeName() + "()");
-        }
-    }
-
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
         // Builtin types can't have attributes set on them.
         return false;
@@ -278,32 +369,8 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __le__(org.python.Object other) {
-        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes) {
-            throw new org.python.exceptions.NotImplementedError("bytes.__le__ has not been implemented.");
-        }
-        else {
-            throw new org.python.exceptions.TypeError("unorderable types: bytes() <= " + other.typeName() + "()");
-        }
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
     public org.python.types.Int __len__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         return new org.python.types.Int(this.value.length);
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __lt__(org.python.Object other) {
-        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes) {
-            throw new org.python.exceptions.NotImplementedError("bytes.__lt__ has not been implemented.");
-        }
-        else {
-            throw new org.python.exceptions.TypeError("unorderable types: bytes() < " + other.typeName() + "()");
-        }
     }
 
     @org.python.Method(
