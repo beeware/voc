@@ -327,7 +327,8 @@ public class Set extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object add(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("add() has not been implemented.");
+        this.value.add(other);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
