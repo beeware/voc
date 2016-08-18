@@ -327,7 +327,6 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_NotImplemented',
         'test_multiply_range',
         'test_multiply_set',
-        'test_multiply_slice',
         'test_multiply_str',
         'test_multiply_tuple',
 

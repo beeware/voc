@@ -440,6 +440,13 @@ public class List extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __sub__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'list' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__rmul__() has not been implemented.");
     }
