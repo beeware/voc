@@ -403,7 +403,7 @@ class Visitor(ast.NodeVisitor):
                     jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
                 END_TRY(),
         )
-        self.context.store_name(node.target.id, True)
+        self.context.store_name(node.target.id)
 
         for child in node.body:
             self.visit(child)
@@ -1425,7 +1425,7 @@ class Visitor(ast.NodeVisitor):
         )
 
         if node.name:
-            self.context.store_name(node.name, True)
+            self.context.store_name(node.name)
         else:
             # No named exception, but there is still an exception
             # on the stack. Pop it off.
