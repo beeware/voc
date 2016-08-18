@@ -152,6 +152,7 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_rshift_complex',
         'test_rshift_frozenset',
 
+        'test_subscr_bool',
         'test_subscr_class',
         'test_subscr_complex',
         'test_subscr_frozenset',
