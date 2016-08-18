@@ -127,7 +127,7 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, arg
                     os.makedirs(os.path.join(test_dir, *path[:-1]))
                 except FileExistsError:
                     pass
-            with open(os.path.join(test_dir, *path), 'w') as py_source:
+            with open(os.path.join(test_dir, *path), 'w', encoding="utf-8") as py_source:
                 py_source.write(adjust(code))
 
     if args is None:
@@ -165,7 +165,7 @@ def compileJava(java_dir, java):
             except FileExistsError:
                 pass
 
-            with open(full_path, 'w') as java_source:
+            with open(full_path, 'w', encoding="utf-8") as java_source:
                 java_source.write(adjust(code))
 
             sources.append(class_file)

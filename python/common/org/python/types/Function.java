@@ -222,7 +222,19 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
 
         if ((flags & CO_VARARGS) != 0) {
-            adjusted[pos_count] = java.util.Arrays.copyOfRange(args, pos_count, args.length);
+            // Construct Python tuple object
+            org.python.types.Tuple tuple = new org.python.types.Tuple(
+                java.util.Arrays.asList(java.util.Arrays.copyOfRange(args, pos_count, args.length)));
+
+            adjusted[pos_count] = tuple;
+        }
+        // Add remaining kwargs to kwargs argument if we have one.
+        if ((flags & CO_VARKEYWORDS) != 0) {
+            org.python.types.Dict kwargDict = new org.python.types.Dict();
+            for (java.util.Map.Entry<String, org.python.Object> entry : kwargs.entrySet()) {
+              kwargDict.__setitem__(new org.python.types.Str(entry.getKey()), entry.getValue());
+            }
+            adjusted[adjusted.length - 1] = kwargDict;
         }
 
         return adjusted;

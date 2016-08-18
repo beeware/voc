@@ -53,6 +53,77 @@ class ListTests(TranspileTestCase):
             print(x[-10])
             """)
 
+    def test_setitem(self):
+        self.assertCodeExecution("""
+            x = [1]
+            x[0] = 5
+            print(x[0])
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x[1] = "hello"
+            x[2] = "there"
+            print(x)
+            """)
+
+        # Out of bounds
+        self.assertCodeExecution("""
+            x = []
+            x[0] = 5
+            """)
+
+        # Out of bounds (negative)
+        self.assertCodeExecution("""
+            x = [1]
+            x[-2] = 5
+            """)
+
+    def test_append(self):
+        # New list
+        self.assertCodeExecution("""
+            x = []
+            x.append("hello")
+            x.append(5)
+            print(x[0], x[1])
+            """)
+
+        # Existing list
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4]
+            x.append(5)
+            x.append("hello")
+            print(x[4], x[5])
+            """)
+
+    def test_remove(self):
+        # Remove integer
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.remove(1)
+            print(x)
+            """)
+
+        # Remove only first duplicate
+        self.assertCodeExecution("""
+            x = [1, 2, 2, 3, 2]
+            x.remove(2)
+            print(x)
+            """)
+
+        # Remove boolean
+        self.assertCodeExecution("""
+            x = [True, False, True, False]
+            x.remove(1)
+            print(x)
+            """)
+
+        # Not in list
+        self.assertCodeExecution("""
+            x = [1, 2]
+            x.remove(3)
+            """)
+
     def test_slice(self):
         # Full slice
         self.assertCodeExecution("""
@@ -244,21 +315,9 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_complex',
         'test_modulo_frozenset',
 
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
         'test_multiply_class',
         'test_multiply_complex',
-        'test_multiply_dict',
-        'test_multiply_float',
         'test_multiply_frozenset',
-        'test_multiply_list',
-        'test_multiply_None',
-        'test_multiply_NotImplemented',
-        'test_multiply_range',
-        'test_multiply_set',
-        'test_multiply_slice',
-        'test_multiply_str',
-        'test_multiply_tuple',
 
         'test_or_class',
         'test_or_complex',

@@ -1014,7 +1014,7 @@ public class Python {
         args={"func"},
         varargs="iterable"
     )
-    public static org.python.Object map(org.python.Object func, org.python.Object [] iterables) {
+    public static org.python.Object map(org.python.Object func, org.python.types.Tuple iterables) {
         return new org.python.types.Map(func, iterables);
     }
 
@@ -1297,17 +1297,19 @@ public class Python {
         varargs="value",
         kwonlyargs={"file", "sep", "end", "flush"}
     )
-    public static void print(org.python.Object [] value, org.python.Object file, org.python.Object sep, org.python.Object end, org.python.Object flush) {
+    public static void print(org.python.types.Tuple value, org.python.Object file, org.python.Object sep, org.python.Object end, org.python.Object flush) {
         if (file == null) {
             // file = System.out;
         }
 
+        java.util.List<org.python.Object> valueArgs = value.value;
+
         StringBuilder buffer = new StringBuilder();
 
-        for (int i = 0; i < value.length; i++) {
-            buffer.append(value[i].__str__());
+        for (int i = 0; i < valueArgs.size(); i++) {
+            buffer.append(valueArgs.get(i).__str__());
 
-            if (i != value.length - 1) {
+            if (i != valueArgs.size() - 1) {
                 if (sep == null) {
                     buffer.append(" ");
                 } else {

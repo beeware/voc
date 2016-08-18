@@ -47,6 +47,28 @@ class SetTests(TranspileTestCase):
             print('c' in x)
             """)
 
+    def test_pop(self):
+        # Test empty set popping.
+        self.assertCodeExecution("""
+            x = set()
+            x.pop()
+        """)
+
+        # Test populated set popping.
+        self.assertCodeExecution("""
+            x = {'a'}
+            print(len(x) == 1)
+            x.pop()
+            print(len(x) == set())
+        """)
+
+        # Test popping returns from set.
+        self.assertCodeExecution("""
+            x = {'a', 'b', 'c', 'd', 'e'}
+            y = x.pop()
+            print(y in x)
+        """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
