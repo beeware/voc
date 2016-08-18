@@ -136,7 +136,7 @@ but accept as many as you can get. For instance, the ``min`` function.
         args = {"first", "others"},
         varargs = "others"
     )
-    public function org.python.Object min(org.python.Object first, org.python.Object [] others) {
+    public function org.python.Object min(org.python.Object first, org.python.types.Tuple others) {
         org.python.Object val = first;
         for (other: others) {
             if (other.__lt__(val)) {
@@ -149,5 +149,25 @@ but accept as many as you can get. For instance, the ``min`` function.
 A function accepting keyword arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Of course, sometimes you want to use keyword arguments. Unfortunately, that is
-currently not used. Be the first to contribute an example!
+.. code-block:: python
+
+    def loop_kwargs(**kwargs):
+        """Loop over the kwargs to this function."""
+        for k in kwargs:
+          pass
+
+.. code-block:: java
+
+    @org.python.Method(
+        __doc__ = "Loop over the kwargs to this function.",
+        args = {},
+        kwargs = "kwargs"
+    )
+    public function org.python.Object loop_kwargs(org.python.types.Dict kwargs) {
+        Map<org.python.Object, org.python.Object> kwargValues = kwargs.value;
+        for(org.python.Object key : kwargValues.keySet()) {
+          // The keys will always be python Str objects
+          org.python.types.Str keyStr = (org.python.types.Str) key;
+        }
+        return org.python.types.NoneType.NONE;
+    }
