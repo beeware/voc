@@ -438,7 +438,32 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+        if (other instanceof org.python.types.Int) {
+            long count = ((org.python.types.Int) other).value;
+            org.python.types.List result = new org.python.types.List();
+            for (long i = 0; i < count; i++) {
+                result.value.addAll(this.value);
+            }
+            return result;
+        } else if (other instanceof org.python.types.Bool) {
+            boolean bool = ((org.python.types.Bool) other).value;
+            if (bool) {
+                return this;
+            }
+            else {
+                return new org.python.types.List();
+            }
+        }
+        else {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+        }
+    }
+
+    @org.python.Method(
+            __doc__ = ""
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__rmul__() has not been implemented.");
