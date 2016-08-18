@@ -232,7 +232,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.vararg:
             parameter_signatures.append({
                 'name': node.args.vararg,
-                'annotation': name_visitor.evalutate(arg.annotation).annotation,
+                # 'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
                 'kind': ArgType.VAR_POSITIONAL,
             })
 
@@ -256,7 +256,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.kwarg:
             parameter_signatures.append({
                 'name': node.args.kwarg,
-                'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                # 'annotation': name_visitor.evaluate(arg.annotation).annotation,
                 'kind': ArgType.VAR_KEYWORD,
             })
 
@@ -806,7 +806,7 @@ class Visitor(ast.NodeVisitor):
             JavaOpcodes.NEW('org/python/types/List'),
             JavaOpcodes.DUP(),
             JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', '()V'),
-            ASTORE_name(self.context, '#listcomp-value-%x' % id(node)),
+            ASTORE_name(self.context, '#listcomp-result-%x' % id(node)),
         )
 
         if len(node.generators) != 1:
@@ -844,17 +844,18 @@ class Visitor(ast.NodeVisitor):
 
         # # And add it to the result list
         self.context.add_opcodes(
-            ALOAD_name(self.context, '#listcomp-value-%x' % id(node)),
+            ALOAD_name(self.context, '#listcomp-result-%x' % id(node)),
             JavaOpcodes.SWAP(),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/List', 'append', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/List', 'append', '(Lorg/python/Object;)Lorg/python/Object;'),
 
             JavaOpcodes.POP(),
             END_LOOP(),
-            ALOAD_name(self.context, '#listcomp-value-%x' % id(node)),
+            ALOAD_name(self.context, '#listcomp-result-%x' % id(node)),
         )
 
         # Clean up
         free_name(self.context, '#listcomp-iter-%x' % id(node))
+        free_name(self.context, '#listcomp-result-%x' % id(node))
 
     @node_visitor
     def visit_SetComp(self, node):
@@ -862,7 +863,7 @@ class Visitor(ast.NodeVisitor):
             JavaOpcodes.NEW('org/python/types/Set'),
             JavaOpcodes.DUP(),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Set', '<init>', '()V'),
-            ASTORE_name(self.context, '#setcomp-value-%x' % id(node)),
+            ASTORE_name(self.context, '#setcomp-result-%x' % id(node)),
         )
 
         if len(node.generators) != 1:
@@ -900,17 +901,18 @@ class Visitor(ast.NodeVisitor):
 
         # # And add it to the result list
         self.context.add_opcodes(
-            ALOAD_name(self.context, '#setcomp-value-%x' % id(node)),
+            ALOAD_name(self.context, '#setcomp-result-%x' % id(node)),
             JavaOpcodes.SWAP(),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/List', 'append', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Set', 'add', '(Lorg/python/Object;)Lorg/python/Object;'),
 
             JavaOpcodes.POP(),
             END_LOOP(),
-            ALOAD_name(self.context, '#setcomp-value-%x' % id(node)),
+            ALOAD_name(self.context, '#setcomp-result-%x' % id(node)),
         )
 
         # Clean up
         free_name(self.context, '#setcomp-iter-%x' % id(node))
+        free_name(self.context, '#setcomp-result-%x' % id(node))
 
     @node_visitor
     def visit_DictComp(self, node):
@@ -919,7 +921,7 @@ class Visitor(ast.NodeVisitor):
             JavaOpcodes.NEW('org/python/types/Dict'),
             JavaOpcodes.DUP(),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '()V'),
-            ASTORE_name(self.context, '#dictcomp-value-%x' % id(node)),
+            ASTORE_name(self.context, '#dictcomp-result-%x' % id(node)),
         )
 
         if len(node.generators) != 1:
@@ -954,21 +956,31 @@ class Visitor(ast.NodeVisitor):
                 self.visit(generator.target)
 
         self.visit(node.key)
+        self.context.add_opcodes(
+            ASTORE_name(self.context, '#dictcomp-key-%x' % id(node)),
+        )
+
         self.visit(node.value)
+        self.context.add_opcodes(
+            ASTORE_name(self.context, '#dictcomp-value-%x' % id(node)),
+        )
 
         # And add it to the result list
         self.context.add_opcodes(
+            ALOAD_name(self.context, '#dictcomp-result-%x' % id(node)),
+            ALOAD_name(self.context, '#dictcomp-key-%x' % id(node)),
             ALOAD_name(self.context, '#dictcomp-value-%x' % id(node)),
-            JavaOpcodes.SWAP(),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/List', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Dict', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
 
-            JavaOpcodes.POP(),
             END_LOOP(),
-            ALOAD_name(self.context, '#dictcomp-value-%x' % id(node)),
+            ALOAD_name(self.context, '#dictcomp-result-%x' % id(node)),
         )
 
         # Clean up
         free_name(self.context, '#dictcomp-iter-%x' % id(node))
+        free_name(self.context, '#dictcomp-key-%x' % id(node))
+        free_name(self.context, '#dictcomp-value-%x' % id(node))
+        free_name(self.context, '#dictcomp-result-%x' % id(node))
 
     @node_visitor
     def visit_GeneratorExp(self, node):
