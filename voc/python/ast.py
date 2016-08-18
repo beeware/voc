@@ -357,7 +357,7 @@ class Visitor(ast.NodeVisitor):
     def visit_AugAssign(self, node):
         # expr target, operator op, expr value):
         # Evaluate the value
-        self.context.load_name(node.target.id, use_locals=True)
+        self.context.load_name(node.target.id)
         self.visit(node.value)
         self.context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE(
@@ -554,9 +554,9 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;[Ljava/lang/String;I)Lorg/python/types/Module;')
             )
             if alias.asname:
-                self.context.store_name(alias.asname, use_locals=True)
+                self.context.store_name(alias.asname)
             else:
-                self.context.store_name(alias.name, use_locals=True)
+                self.context.store_name(alias.name)
 
     @node_visitor
     def visit_ImportFrom(self, node):
@@ -597,9 +597,9 @@ class Visitor(ast.NodeVisitor):
                 )
 
                 if alias.asname:
-                    self.context.store_name(alias.asname, use_locals=True)
+                    self.context.store_name(alias.asname)
                 else:
-                    self.context.store_name(alias.name, use_locals=True)
+                    self.context.store_name(alias.name)
 
             self.context.add_opcodes(
                 JavaOpcodes.POP(),
