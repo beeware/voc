@@ -607,8 +607,8 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Global(self, node):
-        # identifier* names):
-        raise NotImplementedError('No handler for Global')
+        for name in node.names:
+            self.context.local_vars.pop(name)
 
     @node_visitor
     def visit_Nonlocal(self, node):
@@ -1282,11 +1282,25 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Subscript(self, node):
-        self.visit(node.value)
-        self.visit(node.slice)
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
-        )
+        if type(node.ctx) == ast.Load:
+            self.visit(node.value)
+            self.visit(node.slice)
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            )
+        elif type(node.ctx) == ast.Store:
+            self.context.add_opcodes(
+                ASTORE_name(self.context, '#value'),
+            )
+            self.visit(node.value)
+            self.visit(node.slice)
+            self.context.add_opcodes(
+                ALOAD_name(self.context, '#value'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+            )
+            free_name(self.context, '#value')
+        else:
+            raise NotImplmentedError("Unknown context %s" % node.ctx)
 
     @node_visitor
     def visit_Starred(self, node):
