@@ -35,9 +35,11 @@ class Command:
         except:
             return '<Command %s (%s args)>' % (self.operation.opname, len(self.arguments))
 
+
     @property
     def consume_count(self):
         return sum(c.consume_count for c in self.arguments) + self.operation.consume_count
+
 
     @property
     def product_count(self):

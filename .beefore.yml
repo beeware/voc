@@ -1,0 +1,4 @@
+checks:
+    dco:
+    pycodestyle:
+    eslint:

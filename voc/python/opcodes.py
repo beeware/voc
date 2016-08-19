@@ -12,15 +12,19 @@ RESOLVE = object()
 
 
 class START_LOOP:
-    """A pseudo instruction that can be used to mark the
+    """
+
+    A pseudo instruction that can be used to mark the
     start of a loop (either a FOR or a WHILE)
     """
     def __init__(self):
         # The opcode that is the first in the formal LOOP block
         self.start_op = None
 
+
         # The last operation in the LOOP block
         self.end_op = None
+
 
         # If this IF can be identified as the start of a new
         # line of source code, track that line.

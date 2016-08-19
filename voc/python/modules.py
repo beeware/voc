@@ -13,7 +13,8 @@ from .opcodes import ALOAD_name, ASTORE_name, free_name
 
 class ModuleBlock(Block):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs
+            )
         self.local_vars['self'] = len(self.local_vars)
 
     # def transpile_setup(self):

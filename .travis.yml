@@ -1,9 +1,17 @@
 language: python
-python:
-  - "3.4.2"
-  - "3.4.4"
+matrix:
+  include:
+    - python: "3.4.2"
+      env: TARGET=test
+    - python: "3.4.4"
+      env: TARGET=test
+    - python: 3.4
+      env:
+        - TARGET="beefore -u $BEEFORE_GITHUB_USERNAME -r $TRAVIS_REPO_SLUG -c $TRAVIS_COMMIT -p $TRAVIS_PULL_REQUEST -d $TRAVIS_BUILD_DIR"
+        - BEEFORE_TARGET_URL=$TRAVIS_BUILD_URL
 install:
   - "pip install ."
-  - "ant java"
+  - "pip install git+https://github.com/pybee/beefore.git#egg=beefore"
 script:
-  - "python setup.py test"
+  - export
+  - "python setup.py $TARGET"
