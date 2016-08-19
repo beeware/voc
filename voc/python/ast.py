@@ -805,6 +805,43 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_ListComp(self, node):
+        # Get the code object for the list comprehension.
+        compiled = compile(
+            ast.Module(
+                body=[
+                    ast.Expr(
+                        value=node,
+                        lineno=node.lineno,
+                        col_offset=node.col_offset
+                    )
+                ]
+            ),
+            filename=self.context.module.sourcefile,
+            mode='exec'
+        )
+        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
+
+        listcomp = self.context.add_method(
+            name='listcomp_%x' % id(node),
+            code=code,
+            parameter_signatures=[
+                {
+                    'name': '.%s' % i,
+                    # 'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'default': None
+                }
+                for i, arg in enumerate(node.generators)
+            ],
+            return_signature={
+                'annotation': 'org/python/types/List'
+            }
+        )
+
+        self.push_context(listcomp)
+
+        LocalsVisitor(listcomp).visit(node)
+
         self.context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/List'),
             JavaOpcodes.DUP(),
@@ -817,8 +854,8 @@ class Visitor(ast.NodeVisitor):
 
         for i, generator in enumerate(node.generators):
             if isinstance(generator, ast.comprehension):
-                self.visit(generator.iter)
                 self.context.add_opcodes(
+                    ALOAD_name(self.context, '.%s' % i),
                     JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
                 )
             else:
@@ -845,23 +882,111 @@ class Visitor(ast.NodeVisitor):
 
         self.visit(node.elt)
 
-        # # And add it to the result list
+        # And add it to the result list
         self.context.add_opcodes(
-            ALOAD_name(self.context, '#listcomp-result-%x' % id(node)),
-            JavaOpcodes.SWAP(),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/List', 'append', '(Lorg/python/Object;)Lorg/python/Object;'),
+                ALOAD_name(self.context, '#listcomp-result-%x' % id(node)),
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.INVOKEVIRTUAL('org/python/types/List', 'append', '(Lorg/python/Object;)Lorg/python/Object;'),
+                JavaOpcodes.POP(),
 
-            JavaOpcodes.POP(),
             END_LOOP(),
             ALOAD_name(self.context, '#listcomp-result-%x' % id(node)),
+            JavaOpcodes.ARETURN(),
         )
 
         # Clean up
         free_name(self.context, '#listcomp-iter-%x' % id(node))
         free_name(self.context, '#listcomp-result-%x' % id(node))
 
+        self.pop_context()
+
+        # Now invoke the list comprehension
+        self.context.load_name('listcomp_%x' % id(node))
+        self.context.add_opcodes(
+            ICONST_val(len(node.generators)),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+
+        for i, generator in enumerate(node.generators):
+            if isinstance(generator, ast.comprehension):
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                )
+
+                self.visit(generator.iter)
+
+                self.context.add_opcodes(
+                    JavaOpcodes.AASTORE(),
+                )
+
+        self.context.add_opcodes(
+            # No keyword arguments
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+
+            # Now invoke.
+            JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+        )
+
+        # FIXME: This would be a much more efficient way to invoke
+        # the comprehension method, but when it's a closure, it's
+        # not that simple.
+        # for i, generator in enumerate(node.generators):
+        #     if isinstance(generator, ast.comprehension):
+        #         self.visit(generator.iter)
+        #
+        # self.context.add_opcodes(
+        #     JavaOpcodes.INVOKESTATIC(
+        #         self.context.class_descriptor,
+        #         'listcomp_%x' % id(node),
+        #         '(%s)Lorg/python/Object;' % ''.join(
+        #             'Lorg/python/Object;'
+        #             for gen in node.generators
+        #         )
+        #     )
+        # )
+
     @node_visitor
     def visit_SetComp(self, node):
+        # Get the code object for the list comprehension.
+        compiled = compile(
+            ast.Module(
+                body=[
+                    ast.Expr(
+                        value=node,
+                        lineno=node.lineno,
+                        col_offset=node.col_offset
+                    )
+                ]
+            ),
+            filename=self.context.module.sourcefile,
+            mode='exec'
+        )
+        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
+
+        setcomp = self.context.add_method(
+            name='setcomp_%x' % id(node),
+            code=code,
+            parameter_signatures=[
+                {
+                    'name': '.%s' % i,
+                    # 'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'default': None
+                }
+                for i, arg in enumerate(node.generators)
+            ],
+            return_signature={
+                'annotation': 'org/python/types/Set'
+            }
+        )
+
+        self.push_context(setcomp)
+
+        LocalsVisitor(setcomp).visit(node)
+
         self.context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Set'),
             JavaOpcodes.DUP(),
@@ -874,8 +999,8 @@ class Visitor(ast.NodeVisitor):
 
         for i, generator in enumerate(node.generators):
             if isinstance(generator, ast.comprehension):
-                self.visit(generator.iter)
                 self.context.add_opcodes(
+                    ALOAD_name(self.context, '.%s' % i),
                     JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
                 )
             else:
@@ -902,24 +1027,93 @@ class Visitor(ast.NodeVisitor):
 
         self.visit(node.elt)
 
-        # # And add it to the result list
+        # And add it to the result set
         self.context.add_opcodes(
-            ALOAD_name(self.context, '#setcomp-result-%x' % id(node)),
-            JavaOpcodes.SWAP(),
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Set', 'add', '(Lorg/python/Object;)Lorg/python/Object;'),
+                ALOAD_name(self.context, '#setcomp-result-%x' % id(node)),
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Set', 'add', '(Lorg/python/Object;)Lorg/python/Object;'),
+                JavaOpcodes.POP(),
 
-            JavaOpcodes.POP(),
             END_LOOP(),
             ALOAD_name(self.context, '#setcomp-result-%x' % id(node)),
+            JavaOpcodes.ARETURN(),
         )
 
         # Clean up
         free_name(self.context, '#setcomp-iter-%x' % id(node))
         free_name(self.context, '#setcomp-result-%x' % id(node))
 
+        self.pop_context()
+
+        # Now invoke the set comprehension
+        self.context.load_name('setcomp_%x' % id(node))
+        self.context.add_opcodes(
+            ICONST_val(len(node.generators)),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+
+        for i, generator in enumerate(node.generators):
+            if isinstance(generator, ast.comprehension):
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                )
+
+                self.visit(generator.iter)
+
+                self.context.add_opcodes(
+                    JavaOpcodes.AASTORE(),
+                )
+
+        self.context.add_opcodes(
+            # No keyword arguments
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+
+            # Now invoke.
+            JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+        )
+
     @node_visitor
     def visit_DictComp(self, node):
-        # expr key, expr value, comprehension* generators):
+        # Get the code object for the dict comprehension.
+        compiled = compile(
+            ast.Module(
+                body=[
+                    ast.Expr(
+                        value=node,
+                        lineno=node.lineno,
+                        col_offset=node.col_offset
+                    )
+                ]
+            ),
+            filename=self.context.module.sourcefile,
+            mode='exec'
+        )
+        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
+
+        dictcomp = self.context.add_method(
+            name='dictcomp_%x' % id(node),
+            code=code,
+            parameter_signatures=[
+                {
+                    'name': '.%s' % i,
+                    # 'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'default': None
+                }
+                for i, arg in enumerate(node.generators)
+            ],
+            return_signature={
+                'annotation': 'org/python/types/Dict'
+            }
+        )
+
+        self.push_context(dictcomp)
+
+        LocalsVisitor(dictcomp).visit(node)
+
         self.context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Dict'),
             JavaOpcodes.DUP(),
@@ -932,8 +1126,8 @@ class Visitor(ast.NodeVisitor):
 
         for i, generator in enumerate(node.generators):
             if isinstance(generator, ast.comprehension):
-                self.visit(generator.iter)
                 self.context.add_opcodes(
+                    ALOAD_name(self.context, '.%s' % i),
                     JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
                 )
             else:
@@ -977,6 +1171,7 @@ class Visitor(ast.NodeVisitor):
 
             END_LOOP(),
             ALOAD_name(self.context, '#dictcomp-result-%x' % id(node)),
+            JavaOpcodes.ARETURN(),
         )
 
         # Clean up
@@ -985,6 +1180,38 @@ class Visitor(ast.NodeVisitor):
         free_name(self.context, '#dictcomp-value-%x' % id(node))
         free_name(self.context, '#dictcomp-result-%x' % id(node))
 
+        self.pop_context()
+
+        # Now invoke the dict comprehension
+        self.context.load_name('dictcomp_%x' % id(node))
+        self.context.add_opcodes(
+            ICONST_val(len(node.generators)),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+
+        for i, generator in enumerate(node.generators):
+            if isinstance(generator, ast.comprehension):
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                )
+
+                self.visit(generator.iter)
+
+                self.context.add_opcodes(
+                    JavaOpcodes.AASTORE(),
+                )
+
+        self.context.add_opcodes(
+            # No keyword arguments
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+
+            # Now invoke.
+            JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+        )
+
     @node_visitor
     def visit_GeneratorExp(self, node):
         # expr elt, comprehension* generators):
@@ -992,7 +1219,7 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Yield(self, node):
-        n_vars = len(self.context.local_vars) + len(self.context.deleted_vars)
+        n_vars = len(self.context.active_local_vars) + len(self.context.deleted_vars)
 
         self.visit(node.value)
         self.context.add_opcodes(
@@ -1038,6 +1265,9 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.AALOAD(),
                 JavaOpcodes.ASTORE(i),
             )
+        self.context.add_opcodes(
+            JavaOpcodes.POP(),
+        )
 
     @node_visitor
     def visit_YieldFrom(self, node):
@@ -1169,24 +1399,25 @@ class Visitor(ast.NodeVisitor):
                 raise Exception("Invalid number of arguments to super()")
 
         else:
+            # Evaluate the callable, and check that it *is* a callable
+            self.visit(node.func)
+            self.context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/Callable'),
+            )
 
             # Create and populate the array of arguments to pass to invoke()
             self.context.add_opcodes(
                 ICONST_val(len(node.args)),
                 JavaOpcodes.ANEWARRAY('org/python/Object'),
-                ASTORE_name(self.context, '#call-args-%x' % id(node)),
             )
 
             for i, arg in enumerate(node.args):
-                self.visit(arg)
 
-                # We need to store then retrieve because the
                 self.context.add_opcodes(
-                    ALOAD_name(self.context, '#call-args-%x' % id(node)),
-                    JavaOpcodes.SWAP(),
+                    JavaOpcodes.DUP(),
                     ICONST_val(i),
-                    JavaOpcodes.SWAP(),
                 )
+                self.visit(arg)
                 self.context.add_opcodes(
                     JavaOpcodes.AASTORE(),
                 )
@@ -1208,17 +1439,15 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.NEW('java/util/HashMap'),
                 JavaOpcodes.DUP(),
                 JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
-                ASTORE_name(self.context, '#call-kwargs-%x' % id(node)),
             )
 
             for keyword in node.keywords:
-                self.visit(keyword.value)
                 self.context.add_opcodes(
-                    ALOAD_name(self.context, '#call-kwargs-%x' % id(node)),
-                    JavaOpcodes.SWAP(),
+                    JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(keyword.arg),
                     JavaOpcodes.SWAP(),
                 )
+                self.visit(keyword.value)
                 self.context.add_opcodes(
                     JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                     JavaOpcodes.POP()
@@ -1229,20 +1458,10 @@ class Visitor(ast.NodeVisitor):
             #     for arg in node.kwargs:
             #         self.visit(arg)
 
-            # Evaluate the callable, and check that it *is* a callable
-            self.visit(node.func)
-            self.context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/Callable'),
-                ALOAD_name(self.context, '#call-args-%x' % id(node)),
-                ALOAD_name(self.context, '#call-kwargs-%x' % id(node)),
-            )
-
             # Set up the stack and invoke the callable
             self.context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
             )
-            free_name(self.context, '#call-args-%x' % id(node)),
-            free_name(self.context, '#call-kwargs-%x' % id(node)),
 
     @node_visitor
     def visit_Num(self, node):
@@ -1259,7 +1478,6 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Bytes(self, node):
-    #     bytes s):
         self.context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Bytes'),
             JavaOpcodes.DUP(),

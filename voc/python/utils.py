@@ -578,7 +578,7 @@ def ALOAD_name(context, name):
     register operations for the first 4 local variables.
     """
     # print("LOAD AVAR NAME", context, name)
-    # print("locals: ", context.local_vars)
+    # print("locals: ", context.local_vars, context.deleted_vars)
 
     index = context.local_vars[name]
 
@@ -618,7 +618,7 @@ def ASTORE_name(context, name):
         context.local_vars[name] = index
 
     # print("STORE AVAR NAME", context, index, name)
-    # print("locals: ", context.local_vars)
+    # print("locals: ", context.local_vars, context.deleted_vars)
 
     if index == 0:
         return JavaOpcodes.ASTORE_0()
@@ -803,7 +803,7 @@ def free_name(context, name, must_exist=True):
     context.local_vars[name] = None
 
     # print("FREE", context, name, index)
-    # print("locals: ", context.local_vars)
+    # print("locals: ", context.local_vars, context.deleted_vars)
 
 
 ##########################################################################

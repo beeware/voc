@@ -250,6 +250,7 @@ class Method(Block):
             JavaOpcodes.LDC_W(method.name),
         )
 
+        # Store the callable object as an accessible symbol.
         self.add_callable(method)
 
         self.add_opcodes(
@@ -258,7 +259,6 @@ class Method(Block):
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-        # Store the callable object as an accessible symbol.
         self.store_name(name)
 
         return method
