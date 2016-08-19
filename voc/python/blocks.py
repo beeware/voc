@@ -193,17 +193,6 @@ class Block:
         )
 
     def add_callable(self, method, closure=False):
-        # Evaluate the full method name
-        final_name = method.name.replace('.<locals>.', '$')
-        if final_name.endswith('<listcomp>'):
-            final_name = final_name.replace('<listcomp>', 'listcomp_%x' % id(self))
-        elif final_name.endswith('<dictcomp>'):
-            final_name = final_name.replace('<dictcomp>', 'dictcomp_%x' % id(self))
-        elif final_name.endswith('<setcomp>'):
-            final_name = final_name.replace('<setcomp>', 'setcomp_%x' % id(self))
-        elif final_name.endswith('<genexpr>'):
-            final_name = final_name.replace('<genexpr>', 'genexpr_%x' % id(self))
-
         self.add_opcodes(
             TRY(),
                 # Wrap that Method into a Callable.
@@ -211,7 +200,7 @@ class Block:
                 JavaOpcodes.DUP(),
         )
 
-        self.add_str(final_name)
+        self.add_str(method.name)
 
         # Add the code object
         self.add_opcodes(
@@ -288,11 +277,7 @@ class Block:
             if arg['kind'] == ArgType.POSITIONAL_OR_KEYWORD and arg['default']:
                 self.add_opcodes(
                     JavaOpcodes.DUP(),
-                )
-
-                self.add_opcodes(*arg['default'].opcodes)
-
-                self.add_opcodes(
+                    ALOAD_name(self, arg['default']),
                     JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
                     JavaOpcodes.POP(),
                 )
@@ -309,11 +294,7 @@ class Block:
                 self.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(arg['name']),
-                )
-
-                self.add_opcodes(*arg['default'].opcodes)
-
-                self.add_opcodes(
+                    ALOAD_name(self, arg['default']),
                     JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
                     JavaOpcodes.POP(),
                 )

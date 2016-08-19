@@ -3,7 +3,6 @@ import dis
 import sys
 
 from ..java import opcodes as JavaOpcodes, Classref
-from .blocks import Block
 from .modules import Module
 from .methods import Method, MainMethod
 from .utils import (
@@ -211,14 +210,17 @@ class Visitor(ast.NodeVisitor):
 
         name_visitor = NameVisitor()
 
+        default_vars = []
         parameter_signatures = []
         for i, arg in enumerate(node.args.args):
             index = len(node.args.defaults) - len(node.args.args) + i
             if index >= 0:
-                default = Block()
-                self.push_context(default)
+                default = '#%s-default-%s-%x' % (node.name, i, id(node))
                 self.visit(node.args.defaults[index])
-                self.pop_context()
+                self.context.add_opcodes(
+                    ASTORE_name(self.context, default)
+                )
+                default_vars.append(default)
             else:
                 default = None
 
@@ -239,10 +241,12 @@ class Visitor(ast.NodeVisitor):
         for i, arg in enumerate(node.args.kwonlyargs):
             index = len(node.args.kw_defaults) - len(node.args.kwonlyargs) + i
             if index >= 0:
-                default = Block()
-                self.push_context(default)
+                default = '#%s-kw_default-%s-%x' % (node.name, i, id(node))
                 self.visit(node.args.kw_defaults[index])
-                self.pop_context()
+                self.context.add_opcodes(
+                    ASTORE_name(self.context, default)
+                )
+                default_vars.append(default)
             else:
                 default = None
 
@@ -270,6 +274,10 @@ class Visitor(ast.NodeVisitor):
             parameter_signatures=parameter_signatures,
             return_signature=return_signature
         )
+
+        # Free all the variables used for default storage.
+        for default in default_vars:
+            free_name(self.context, default)
 
         self.push_context(method)
 
@@ -1825,7 +1833,6 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Slice(self, node):
-        # expr? lower, expr? upper, expr? step):
         self.context.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Slice'),
             JavaOpcodes.DUP(),
