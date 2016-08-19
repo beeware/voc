@@ -231,7 +231,7 @@ class Visitor(ast.NodeVisitor):
 
         if node.args.vararg:
             parameter_signatures.append({
-                'name': node.args.vararg,
+                'name': node.args.vararg.arg,
                 # 'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
                 'kind': ArgType.VAR_POSITIONAL,
             })
@@ -255,7 +255,7 @@ class Visitor(ast.NodeVisitor):
 
         if node.args.kwarg:
             parameter_signatures.append({
-                'name': node.args.kwarg,
+                'name': node.args.kwarg.arg,
                 # 'annotation': name_visitor.evaluate(arg.annotation).annotation,
                 'kind': ArgType.VAR_KEYWORD,
             })
@@ -1151,7 +1151,7 @@ class Visitor(ast.NodeVisitor):
             #             JavaOpcodes.DUP(),
             #             ICONST_val(i),
             #         )
-            #         self.generic_visit(arg)
+            #         self.visit(arg)
             #         self.context.add_opcodes(
             #             JavaOpcodes.AASTORE(),
             #         )
@@ -1177,11 +1177,10 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.POP()
                 )
 
-
             # FIXME
             # if node.kwargs is not None:
             #     for arg in node.kwargs:
-            #         self.generic_visit(arg)
+            #         self.visit(arg)
 
             # Evaluate the callable, and check that it *is* a callable
             self.visit(node.func)
