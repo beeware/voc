@@ -56,3 +56,30 @@ class AssignmentTests(TranspileTestCase):
                 print("No")
             print('Done.')
             """)
+
+    def test_list_assignment(self):
+        self.assertCodeExecution("""
+            [x, y, z] = range(3)
+            print(x)
+            print(y)
+            print(z)
+            print('Done.')
+            """)
+
+    def test_tuple_assignment(self):
+        self.assertCodeExecution("""
+            (x, y, z) = range(3)
+            print(x)
+            print(y)
+            print(z)
+            print('Done.')
+            """)
+
+    def test_implied_tuple_assignment(self):
+        self.assertCodeExecution("""
+            x, y, z = range(3)
+            print(x)
+            print(y)
+            print(z)
+            print('Done.')
+            """)

@@ -1745,31 +1745,43 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_List(self, node):
-        self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/List'),
-            JavaOpcodes.DUP(),
-
-            JavaOpcodes.NEW('java/util/ArrayList'),
-            JavaOpcodes.DUP(),
-            ICONST_val(len(node.elts)),
-            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
-        )
-
-        for child in node.elts:
+        if isinstance(node.ctx, ast.Load):
             self.context.add_opcodes(
+                JavaOpcodes.NEW('org/python/types/List'),
                 JavaOpcodes.DUP(),
+
+                JavaOpcodes.NEW('java/util/ArrayList'),
+                JavaOpcodes.DUP(),
+                ICONST_val(len(node.elts)),
+                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '(I)V')
             )
 
-            self.visit(child)
+            for child in node.elts:
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                )
+
+                self.visit(child)
+
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
+                    JavaOpcodes.POP(),
+                )
 
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
-                JavaOpcodes.POP(),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', '(Ljava/util/List;)V')
             )
 
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', '(Ljava/util/List;)V')
-        )
+        elif isinstance(node.ctx, ast.Store):
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
+            )
+            for child in node.elts:
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;')
+                )
+                self.visit(child)
 
     @node_visitor
     def visit_Tuple(self, node):
@@ -1799,6 +1811,7 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V')
             )
+
         elif isinstance(node.ctx, ast.Store):
             self.context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
