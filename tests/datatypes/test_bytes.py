@@ -1,3 +1,4 @@
+import sys
 from unittest import expectedFailure
 
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase

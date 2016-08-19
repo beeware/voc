@@ -5,6 +5,9 @@ import java.util.Arrays;
 public class Bytes extends org.python.types.Object {
     public byte [] value;
 
+    // ugly hack to allow for Python 3.4 / 3.5 differences
+    public static final float PYTHON_VERSION = 3.4f;
+
     /**
      * A utility method to update the internal value of this object.
      *
@@ -245,10 +248,14 @@ public class Bytes extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        if (other instanceof org.python.types.List || other instanceof org.python.types.Range) {
-            return this;
+        if (this.PYTHON_VERSION < 3.5) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'bytes' and '" + other.typeName() + "'");
+        } else {
+            if (other instanceof org.python.types.List || other instanceof org.python.types.Range) {
+                return this;
+            }
+            throw new org.python.exceptions.TypeError("not all arguments converted during bytes formatting");
         }
-        throw new org.python.exceptions.TypeError("not all arguments converted during bytes formatting");
     }
 
     @org.python.Method(
@@ -342,6 +349,8 @@ public class Bytes extends org.python.types.Object {
                     return new org.python.types.Int(this.value[idx]);
                 }
             }
+        } else if (this.PYTHON_VERSION < 3.5) {
+            throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
         } else {
             throw new org.python.exceptions.TypeError("byte indices must be integers or slices, not " + index.typeName());
         }
