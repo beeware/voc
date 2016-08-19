@@ -1600,7 +1600,6 @@ class Visitor(ast.NodeVisitor):
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(keyword.arg),
-                    JavaOpcodes.SWAP(),
                 )
                 self.visit(keyword.value)
                 self.context.add_opcodes(
