@@ -5,7 +5,7 @@ from ..java import (
 from .utils import (
     ArgType, OpcodePosition,
     TRY, CATCH, END_TRY,
-    jump, resolve_jump, Ref,
+    jump, resolve_jump,
     ICONST_val, LCONST_val, DCONST_val, ALOAD_name, ASTORE_name, free_name
 )
 
@@ -33,7 +33,6 @@ class Block:
         self.blocks = []
         self.jumps = []
         self.loops = []
-        self.jump_targets = {}
         self.unknown_jump_targets = {}
         self.returns = {
             'annotation': None
@@ -89,7 +88,7 @@ class Block:
 
                 # Resolve any references to the "next" opcode.
                 for (obj, attr) in self.next_resolve_list:
-                    print("        resolve %s reference on %s %s with %s %s" % (attr, obj, id(obj), opcode, id(opcode)))
+                    # print("        resolve %s reference on %s %s with %s %s" % (attr, obj, id(obj), opcode, id(opcode)))
                     setattr(obj, attr.value, opcode)
 
                 self.next_resolve_list = []

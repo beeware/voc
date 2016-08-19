@@ -908,36 +908,6 @@ def DCONST_val(value):
 # These helpers help define and resolve those references.
 ##########################################################################
 
-class Ref:
-    """A reference to an opcode by target offset"""
-    def __init__(self, context, target):
-        self.context = context
-        self.target = target
-        print ("ref", self.context, self.context.jump_targets, self.target)
-
-    def __repr__(self):
-        try:
-            return repr(self.context.jump_targets[self.target])
-        except KeyError:
-            return '<Ref: offset %s>' % self.target
-
-    @property
-    def start_op(self):
-        return self.context.jump_targets[self.target].start_op
-
-    @property
-    def end_op(self):
-        return self.context.jump_targets[self.target].end_op
-
-    @property
-    def next_op(self):
-        return self.context.jump_targets[self.target].next_op
-
-    @property
-    def yield_op(self):
-        return self.context.jump_targets[self.target].yield_op
-
-
 def jump(opcode, context, target, position):
     """Define a jump operation.
 
@@ -952,7 +922,7 @@ def jump(opcode, context, target, position):
 def resolve_jump(opcode, context, target, position):
     """Resolve a jump target in an opcode.
 
-    target is the Python opcode (or a Ref instance).
+    target is the Python AST node.
     When Python code is converted to Java, it will turn into
     0-N opcodes. We need to specify which one will be used
     as the Java offset:
