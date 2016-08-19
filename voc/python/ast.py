@@ -556,7 +556,10 @@ class Visitor(ast.NodeVisitor):
             if alias.asname:
                 self.context.store_name(alias.asname)
             else:
-                self.context.store_name(alias.name)
+                # The alias will be the fully dotted path. The import
+                # will return the top level module. Store the top level
+                # module as the top level path.
+                self.context.store_name(alias.name.split('.')[0])
 
     @node_visitor
     def visit_ImportFrom(self, node):
