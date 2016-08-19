@@ -64,10 +64,6 @@ class Method(Block):
         return False
 
     @property
-    def is_closuremethod(self):
-        return False
-
-    @property
     def globals_module(self):
         return self.module
 
@@ -875,10 +871,6 @@ class ClosureMethod(Method):
         )
 
     @property
-    def is_closuremethod(self):
-        return True
-
-    @property
     def globals_module(self):
         return self.module.parent
 
@@ -1006,10 +998,6 @@ class ClosureGeneratorMethod(GeneratorMethod):
         return '<ClosureGeneratorMethod %s (%s parameters, %s closure vars)>' % (
             self.name, len(self.parameters), len(self.parent.closure_var_names)
         )
-
-    @property
-    def is_closuremethod(self):
-        return True
 
     @property
     def globals_module(self):

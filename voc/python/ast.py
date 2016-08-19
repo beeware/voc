@@ -1214,8 +1214,163 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_GeneratorExp(self, node):
-        # expr elt, comprehension* generators):
-        raise NotImplementedError('No handler for GeneratorExp')
+        # Get the code object for the generator expression.
+        compiled = compile(
+            ast.Module(
+                body=[
+                    ast.Expr(
+                        value=node,
+                        lineno=node.lineno,
+                        col_offset=node.col_offset
+                    )
+                ]
+            ),
+            filename=self.context.module.sourcefile,
+            mode='exec'
+        )
+        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
+
+        genexp = self.context.add_method(
+            name='genexp_%x' % id(node),
+            code=code,
+            parameter_signatures=[
+                {
+                    'name': '.%s' % i,
+                    # 'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'default': None
+                }
+                for i, arg in enumerate(node.generators)
+            ],
+            return_signature={
+                'annotation': 'org/python/types/List'
+            }
+        )
+
+        self.push_context(genexp)
+
+        LocalsVisitor(genexp).visit(node)
+
+        n_vars = len(self.context.active_local_vars) + len(self.context.deleted_vars) + 1
+
+        if len(node.generators) != 1:
+            raise NotImplementedError("Don't know how to handle multiple generators")
+
+        for i, generator in enumerate(node.generators):
+            if isinstance(generator, ast.comprehension):
+                self.context.add_opcodes(
+                    ALOAD_name(self.context, '.%s' % i),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', '()Lorg/python/Iterable;')
+                )
+            else:
+                raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
+
+        loop = START_LOOP()
+
+        self.context.add_opcodes(
+            ASTORE_name(self.context, '#genexp-iter-%x' % id(node)),
+            loop,
+                TRY(),
+                    ALOAD_name(self.context, '#genexp-iter-%x' % id(node)),
+
+                    JavaOpcodes.CHECKCAST('org/python/Iterable'),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;'),
+                CATCH('org/python/exceptions/StopIteration'),
+                    JavaOpcodes.POP(),
+                    jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
+                END_TRY(),
+        )
+
+        for i, generator in enumerate(node.generators):
+            if isinstance(generator, ast.comprehension):
+                self.visit(generator.target)
+
+        self.visit(node.elt)
+
+        self.context.add_opcodes(
+            # Convert to a new value for return purposes
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', '()Lorg/python/Object;'),
+
+            # Save the current stack and yield index
+            ALOAD_name(self.context, '<generator>'),
+            ICONST_val(n_vars - 1),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+        for i in range(1, n_vars):
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i - 1),
+                JavaOpcodes.ALOAD(i),
+                JavaOpcodes.AASTORE(),
+            )
+
+        yield_point = len(self.context.yield_points) + 1
+        self.context.add_opcodes(
+            ICONST_val(yield_point),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Generator', 'yield', '([Lorg/python/Object;I)V'),
+
+            # "yield" by returning from the generator method.
+            JavaOpcodes.ARETURN()
+        )
+
+        # On restore, the next instruction is the target
+        # for the restore jump.
+        self.context.yield_points.append(node)
+        self.context.next_resolve_list.append((node, OpcodePosition.YIELD))
+
+        #  First thing to do is restore the state of the stack.
+        self.context.add_opcodes(
+            ALOAD_name(self.context, '<generator>'),
+            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', '[Lorg/python/Object;'),
+        )
+        for i in range(1, n_vars):
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i - 1),
+                JavaOpcodes.AALOAD(),
+                JavaOpcodes.ASTORE(i),
+            )
+
+        self.context.add_opcodes(
+            JavaOpcodes.POP(),
+
+            END_LOOP(),
+        )
+
+        # Clean up
+        free_name(self.context, '#genexp-iter-%x' % id(node))
+
+        self.pop_context()
+
+        # Now invoke the list comprehension
+        self.context.load_name('genexp_%x' % id(node))
+        self.context.add_opcodes(
+            ICONST_val(len(node.generators)),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+
+        for i, generator in enumerate(node.generators):
+            if isinstance(generator, ast.comprehension):
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                )
+
+                self.visit(generator.iter)
+
+                self.context.add_opcodes(
+                    JavaOpcodes.AASTORE(),
+                )
+
+        self.context.add_opcodes(
+            # No keyword arguments
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+
+            # Now invoke.
+            JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+        )
 
     @node_visitor
     def visit_Yield(self, node):
