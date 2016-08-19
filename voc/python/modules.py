@@ -136,33 +136,27 @@ class Module(Block):
         )
 
     def add_method(self, name, code, parameter_signatures, return_signature):
-        # if code.co_flags & CO_GENERATOR:
-        #     # Generator method.
-        #     method = GeneratorMethod(
-        #         self,
-        #         generator=code.co_name,
-        #         name=function_def.name,
-        #         parameters=extract_parameters(function_def),
-        #         returns={
-        #             'annotation': (
-        #                 function_def.returns
-        #                 if function_def.returns
-        #                 else 'org.python.Object'
-        #             ).replace('.', '/')
-        #         },
-        #         static=True
-        #     )
-        # else:
-
-        # Normal method.
-        method = Method(
-            self,
-            name=name,
-            code=code,
-            parameters=parameter_signatures,
-            returns=return_signature,
-            static=True,
-        )
+        if code.co_flags & CO_GENERATOR:
+            # Generator method.
+            method = GeneratorMethod(
+                self,
+                name=name,
+                code=code,
+                generator=code.co_name,
+                parameters=parameter_signatures,
+                returns=return_signature,
+                static=True
+            )
+        else:
+            # Normal method.
+            method = Method(
+                self,
+                name=name,
+                code=code,
+                parameters=parameter_signatures,
+                returns=return_signature,
+                static=True,
+            )
 
         # Add the method to the list that need to be
         # transpiled into Java methods

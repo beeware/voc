@@ -3,7 +3,7 @@ from ..java import (
     opcodes as JavaOpcodes, Classref
 )
 from .utils import (
-    ArgType,
+    ArgType, OpcodePosition,
     TRY, CATCH, END_TRY,
     jump, resolve_jump, Ref,
     ICONST_val, LCONST_val, DCONST_val, ALOAD_name, ASTORE_name, free_name
@@ -89,7 +89,7 @@ class Block:
 
                 # Resolve any references to the "next" opcode.
                 for (obj, attr) in self.next_resolve_list:
-                    # print("        resolve %s reference on %s %s with %s %s" % (attr, obj, id(obj), opcode, id(opcode)))
+                    print("        resolve %s reference on %s %s with %s %s" % (attr, obj, id(obj), opcode, id(opcode)))
                     setattr(obj, attr.value, opcode)
 
                 self.next_resolve_list = []
@@ -170,13 +170,13 @@ class Block:
                         JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
                     )
 
-                # elif isinstance(value, bytes):
-                #     self.add_opcodes(
-                #         JavaOpcodes.NEW('org/python/types/Bytes'),
-                #         JavaOpcodes.DUP(),
-                #         JavaOpcodes.LDC_W(value),
-                #         JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
-                #     )
+                elif isinstance(value, bytes):
+                    self.add_opcodes(
+                        JavaOpcodes.NEW('org/python/types/Bytes'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.LDC_W(value),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
+                    )
 
                 elif isinstance(value, tuple):
                     self.add_tuple(value)
@@ -376,7 +376,7 @@ class Block:
                 ALOAD_name(self, '<generator>'),
                 JavaOpcodes.GETFIELD('org/python/types/Generator', 'yield_point', 'I'),
                 ICONST_val(i + 1),
-                jump(JavaOpcodes.IF_ICMPEQ(0), self, Ref(self, yield_point), Opcode.YIELD)
+                jump(JavaOpcodes.IF_ICMPEQ(0), self, yield_point, OpcodePosition.YIELD)
             ])
 
         self.opcodes = yield_jumps + self.opcodes

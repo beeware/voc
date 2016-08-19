@@ -992,8 +992,52 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Yield(self, node):
-        # expr? value):
-        raise NotImplementedError('No handler for Yield')
+        n_vars = len(self.context.local_vars) + len(self.context.deleted_vars)
+
+        self.visit(node.value)
+        self.context.add_opcodes(
+            # Convert to a new value for return purposes
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', '()Lorg/python/Object;'),
+
+            # Save the current stack and yield index
+            ALOAD_name(self.context, '<generator>'),
+            ICONST_val(n_vars - 1),
+            JavaOpcodes.ANEWARRAY('org/python/Object'),
+        )
+        for i in range(1, n_vars):
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i - 1),
+                JavaOpcodes.ALOAD(i),
+                JavaOpcodes.AASTORE(),
+            )
+
+        yield_point = len(self.context.yield_points) + 1
+        self.context.add_opcodes(
+            ICONST_val(yield_point),
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Generator', 'yield', '([Lorg/python/Object;I)V'),
+
+            # "yield" by returning from the generator method.
+            JavaOpcodes.ARETURN()
+        )
+
+        # On restore, the next instruction is the target
+        # for the restore jump.
+        self.context.yield_points.append(node)
+        self.context.next_resolve_list.append((node, OpcodePosition.YIELD))
+
+        #  First thing to do is restore the state of the stack.
+        self.context.add_opcodes(
+            ALOAD_name(self.context, '<generator>'),
+            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', '[Lorg/python/Object;'),
+        )
+        for i in range(1, n_vars):
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                ICONST_val(i - 1),
+                JavaOpcodes.AALOAD(),
+                JavaOpcodes.ASTORE(i),
+            )
 
     @node_visitor
     def visit_YieldFrom(self, node):

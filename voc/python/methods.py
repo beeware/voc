@@ -210,15 +210,13 @@ class Method(Block):
         callable.visitor_setup()
 
         if code.co_flags & CO_GENERATOR:
-            raise Exception("WORKING ON IT")
             method = ClosureGeneratorMethod(
                 callable,
-                generator=code.co_name,
                 name='invoke',
-                parameters=extract_parameters(code, annotations),
-                returns={
-                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
-                },
+                code=code,
+                generator=code.co_name,
+                parameters=parameter_signatures,
+                returns=return_signature,
             )
         else:
             method = ClosureMethod(
@@ -890,9 +888,11 @@ class ClosureMethod(Method):
 
 
 class GeneratorMethod(Method):
-    def __init__(self, parent, generator, name, parameters, returns=None, static=False):
+    def __init__(self, parent, name, code, generator, parameters, returns=None, static=False):
         super().__init__(
-            parent, name=name,
+            parent,
+            name=name,
+            code=code,
             parameters=parameters,
             returns=returns,
             static=static,

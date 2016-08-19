@@ -913,6 +913,7 @@ class Ref:
     def __init__(self, context, target):
         self.context = context
         self.target = target
+        print ("ref", self.context, self.context.jump_targets, self.target)
 
     def __repr__(self):
         try:
