@@ -619,7 +619,7 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Global(self, node):
         for name in node.names:
-            self.context.local_vars.pop(name)
+            self.context.local_vars.pop(name, None)
 
     @node_visitor
     def visit_Nonlocal(self, node):
