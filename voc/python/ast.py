@@ -105,7 +105,8 @@ class LocalsVisitor(ast.NodeVisitor):
 
     def visit_Name(self, node):
         if type(node.ctx) == ast.Store:
-            self.context.local_vars[node.id] = None
+            if node.id not in self.context.local_vars:
+                self.context.local_vars[node.id] = None
 
     def visit_Attribute(self, node):
         pass

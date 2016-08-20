@@ -57,6 +57,16 @@ class AssignmentTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_assign_to_argument(self):
+        self.assertCodeExecution("""
+            def foo(arg):
+                val = arg + 10
+                arg = val - 2
+                return arg
+            print(foo(20))
+            print('Done.')
+            """)
+
     def test_list_assignment(self):
         self.assertCodeExecution("""
             [x, y, z] = range(3)
