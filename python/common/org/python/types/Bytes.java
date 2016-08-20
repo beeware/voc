@@ -33,7 +33,7 @@ public class Bytes extends org.python.types.Object {
     // public org.python.Object __init__() {
     //     throw new org.python.exceptions.NotImplementedError("str.__init__() has not been implemented.");
     // }
-            
+
     @org.python.Method(
         __doc__ = ""
     )
@@ -305,7 +305,7 @@ public class Bytes extends org.python.types.Object {
 
                     int len = (int)Math.ceil((float)(stop - start) / step);
                     sliced = new byte[len];
-                
+
                     for (int i=0, j=start ; j < stop ; i++, j += step) {
                         // System.err.format("this.value[%d] -> sliced[%d]\n", j, i);
                         sliced[i] = this.value[j];
@@ -317,7 +317,7 @@ public class Bytes extends org.python.types.Object {
 
                     int len = (int)Math.ceil((float)(stop - start) / step);
                     sliced = new byte[len];
-                
+
                     for (int i=0, j=start ; j > stop ; i++, j += step) {
                         // System.err.format("this.value[%d] -> sliced[%d]\n", j, i);
                         sliced[i] = this.value[j];

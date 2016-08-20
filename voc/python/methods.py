@@ -1,17 +1,15 @@
 from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
-    RuntimeVisibleAnnotations, opcodes as JavaOpcodes,
+    RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref
 )
 from .blocks import Block
-from .opcodes import (
-    CATCH, END_TRY, TRY, ALOAD_name, ASTORE_name, DLOAD_name, FLOAD_name,
-    ICONST_val, ILOAD_name, Opcode, free_name,
+from .utils import (
+    TRY, CATCH, END_TRY,
+    ALOAD_name, ASTORE_name, free_name,
+    # DLOAD_name, FLOAD_name,
+    ICONST_val, ILOAD_name,
+    ArgType,
 )
-
-POSITIONAL_OR_KEYWORD = 1
-VAR_POSITIONAL = 2
-KEYWORD_ONLY = 3
-VAR_KEYWORD = 4
 
 CO_VARARGS = 0x0004
 CO_VARKEYWORDS = 0x0008
@@ -42,17 +40,12 @@ def descriptor(annotation):
 
 
 class Method(Block):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
-        super().__init__(parent, commands=commands, verbosity=verbosity)
+    def __init__(self, parent, name, code, parameters, returns, static=False):
+        super().__init__(parent)
         self.name = name
+        self.code = code
         self.parameters = parameters
-
-        if returns is None:
-            self.returns = {
-                'annotation': 'org/python/Object'
-            }
-        else:
-            self.returns = returns
+        self.returns = returns
 
         # Reserve space for the register that will hold self (if required)
         self.add_self()
@@ -71,18 +64,14 @@ class Method(Block):
         return False
 
     @property
-    def is_closuremethod(self):
-        return False
-
-    @property
     def globals_module(self):
         return self.module
 
     def add_self(self):
         pass
 
-    def store_name(self, name, use_locals):
-        if use_locals:
+    def store_name(self, name):
+        if name in self.local_vars:
             self.add_opcodes(
                 ASTORE_name(self, name)
             )
@@ -110,33 +99,29 @@ class Method(Block):
     def store_dynamic(self):
         raise NotImplementedError('Methods cannot dynamically store variables.')
 
-    def load_name(self, name, use_locals):
-        if use_locals:
-            try:
-                self.add_opcodes(
-                    ALOAD_name(self, name)
-                )
-                return
-            except KeyError:
-                pass
+    def load_name(self, name):
+        if name in self.local_vars:
+            self.add_opcodes(
+                ALOAD_name(self, name)
+            )
+        else:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
-        self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(self.globals_module.full_name),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.globals_module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                JavaOpcodes.LDC_W(name),
 
-            JavaOpcodes.LDC_W(name),
+                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            )
 
-            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
-        )
-
-    def delete_name(self, name, use_locals):
+    def delete_name(self, name):
         try:
             free_name(self, name)
         except KeyError:
@@ -176,57 +161,110 @@ class Method(Block):
     def module(self):
         return self.parent
 
-    def add_method(self, method_name, code, annotations):
+    def add_class(self, class_name, bases, extends, implements):
+        from .klass import Class
+
+        klass = Class(
+            self.module,
+            name=class_name,
+            bases=bases,
+            extends=extends,
+            implements=implements,
+        )
+
+        self.module.classes.append(klass)
+
+        self.add_opcodes(
+            # JavaOpcodes.LDC_W("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
+            JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
+
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+        )
+
+        self.store_name(klass.name)
+
+        return klass
+
+    def add_method(self, name, code, parameter_signatures, return_signature):
         # If a method is added to a method, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
         callable = ClosureClass(
             parent=self.parent,
-            name='%s$%s' % (self.parent.name, method_name),
-            closure_var_names=code.co_names,
+            name='%s$%s$%s' % (self.module.name, self.name, name),
+            closure_var_names=[],  # code.co_names,
             bases=['org/python/types/Closure'],
             implements=['org/python/Callable'],
             public=True,
             final=True,
-            verbosity=self.module.verbosity
         )
+        self.parent.classes.append(callable)
+
+        callable.visitor_setup()
 
         if code.co_flags & CO_GENERATOR:
             method = ClosureGeneratorMethod(
                 callable,
-                generator=code.co_name,
                 name='invoke',
-                parameters=extract_parameters(code, annotations),
-                returns={
-                    'annotation': annotations.get('return', 'org.python.Object').replace('.', '/')
-                },
-                verbosity=self.module.verbosity
+                code=code,
+                generator=code.co_name,
+                parameters=parameter_signatures,
+                returns=return_signature,
             )
         else:
             method = ClosureMethod(
                 callable,
                 name='invoke',
-                parameters=extract_parameters(code, annotations),
-                returns={
-                    'annotation': annotations.get('return', 'org/python/Object').replace('.', '/')
-                },
-                verbosity=self.module.verbosity
+                code=code,
+                parameters=parameter_signatures,
+                returns=return_signature,
             )
-        method.extract(code)
+
         callable.methods.append(method)
 
-        callable.fields = dict(
-            (name, 'Lorg/python/Object;')
-            for name in code.co_names
+        for field in code.co_names:
+            callable.fields[field] = 'Lorg/python/Object;'
+
+        callable.visitor_teardown()
+
+        self.add_opcodes(
+            JavaOpcodes.NEW(callable.descriptor),
+            JavaOpcodes.DUP(),
+
+            # These are the args and kwargs for the closure class
+            JavaOpcodes.ACONST_NULL(),
+            JavaOpcodes.ACONST_NULL(),
+
+            JavaOpcodes.INVOKESPECIAL(method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+
+            JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
+
+            JavaOpcodes.LDC_W(method.name),
         )
 
-        self.parent.classes.append(callable)
+        # Store the callable object as an accessible symbol.
+        self.add_callable(method)
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+            JavaOpcodes.LDC_W('invoke'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+        )
+
+        self.store_name(name)
 
         return method
 
-    def transpile_teardown(self):
+    def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
-            self.add_opcodes(JavaOpcodes.ARETURN())
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                JavaOpcodes.ARETURN()
+            )
 
     def method_attributes(self):
         return [
@@ -246,7 +284,7 @@ class Method(Block):
                 self.method_name,
                 self.signature,
                 static=self.static,
-                attributes=[self.transpile_commands()] + self.method_attributes()
+                attributes=[self.transpile_code()] + self.method_attributes()
             )
         ]
 
@@ -258,28 +296,29 @@ class Method(Block):
 
 
 class InitMethod(Method):
-    def __init__(self, parent, verbosity=0):
+    def __init__(self, parent):
         super().__init__(
-            parent, '<init>',
+            parent,
+            name='<init>',
+            code=None,
             parameters=[
                 {
                     'name': 'self',
-                    'kind': POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
                     'annotation': 'org/python/Object'
                 },
                 {
                     'name': 'args',
-                    'kind': POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
                     'annotation': '[Lorg/python/Object;'
                 },
                 {
                     'name': 'kwargs',
-                    'kind': POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
                     'annotation': 'java/util/Map'
                 }
             ],
             returns={'annotation': None},
-            verbosity=verbosity
         )
 
     def __repr__(self):
@@ -305,7 +344,7 @@ class InitMethod(Method):
     def signature(self):
         return '([Lorg/python/Object;Ljava/util/Map;)V'
 
-    def transpile_setup(self):
+    def visitor_setup(self):
         if self.klass.extends:
             super_class = self.klass.extends
         else:
@@ -349,21 +388,21 @@ class InitMethod(Method):
             JavaOpcodes.POP()  # 1
         )
 
-    def transpile_teardown(self):
+    def visitor_teardown(self):
         self.add_opcodes(
             JavaOpcodes.RETURN()
         )
 
 
 class InstanceMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
+    def __init__(self, parent, name, code, parameters, returns=None, static=False):
         super().__init__(
-            parent, name,
+            parent,
+            name=name,
+            code=code,
             parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands,
-            verbosity=verbosity
         )
 
     def __repr__(self):
@@ -412,7 +451,7 @@ class InstanceMethod(Method):
 
         # Then extract each argument, converting to Python types as required.
         for i, param in enumerate(self.parameters[1:]):
-            annotation = param.get('annotation', 'org/python/Object')
+            annotation = param['annotation']
 
             if annotation is None:
                 raise Exception("Parameters can't be void")
@@ -670,16 +709,15 @@ class InstanceMethod(Method):
 
 
 class MainMethod(Method):
-    def __init__(self, parent, commands=None, end_offset=None, verbosity=0):
+    def __init__(self, parent):
         super().__init__(
-            parent, '__main__',
+            parent,
+            name='__main__',
+            code=None,
             parameters=[{'name': 'args', 'annotation': 'argv'}],
             returns={'annotation': None},
             static=True,
-            commands=commands,
-            verbosity=verbosity
         )
-        self.end_offset = end_offset
 
     def __repr__(self):
         return '<MainMethod %s>' % self.module.name
@@ -704,10 +742,7 @@ class MainMethod(Method):
     def globals_module(self):
         return self.module
 
-    # def add_self(self):
-    #     pass
-
-    def store_name(self, name, use_locals):
+    def store_name(self, name):
         self.add_opcodes(
             ASTORE_name(self, '#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
@@ -740,7 +775,7 @@ class MainMethod(Method):
         )
         free_name(self, '#value')
 
-    def load_name(self, name, use_locals):
+    def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
@@ -755,7 +790,7 @@ class MainMethod(Method):
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-    def delete_name(self, name, use_locals):
+    def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
@@ -770,55 +805,42 @@ class MainMethod(Method):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
-    def transpile_setup(self):
+    def visitor_setup(self):
         self.add_opcodes(
             # Add a TRY-CATCH for SystemExit
             TRY(),
+                # Initialize and register this module
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.DUP(),
 
-            # Initialize and register this module
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-            JavaOpcodes.DUP(),
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(self.module.full_name),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.NEW(self.module.class_descriptor),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.INVOKESPECIAL(self.module.class_descriptor, '<init>', '()V'),
+                ASTORE_name(self, '#module'),
 
-            JavaOpcodes.NEW(self.module.class_descriptor),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL(self.module.class_descriptor, '<init>', '()V'),
-            ASTORE_name(self, '#module'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                # Register the same instances as __main__
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W('__main__'),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
-            # Register the same instances as __main__
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W('__main__'),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                ALOAD_name(self, '#module'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
 
-            ALOAD_name(self, '#module'),
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
-
-            # Run the module block.
-            ALOAD_name(self, '#module'),
-            JavaOpcodes.INVOKEVIRTUAL(self.module.class_descriptor, 'module$import', '()V'),
+                # Run the module block.
+                ALOAD_name(self, '#module'),
+                JavaOpcodes.INVOKEVIRTUAL(self.module.class_descriptor, 'module$import', '()V'),
         )
 
-    def transpile_teardown(self):
-        # Main method is a special case - it always returns Null,
-        # but the code doesn't contain this return, so the jump
-        # target doesn't exist. Fake a jump target for the return
-        java_op = JavaOpcodes.RETURN()
-
-        if self.end_offset:
-            python_op = Opcode(self.end_offset, None, True)
-            python_op.start_op = java_op
-            self.jump_targets[self.end_offset] = python_op
-
-        self.add_opcodes(java_op)
-
+    def visitor_teardown(self):
         # Close out the TRY-CATCH for SystemExit
         self.add_opcodes(
             CATCH('org/python/exceptions/SystemExit'),
@@ -833,14 +855,14 @@ class MainMethod(Method):
 
 
 class ClosureMethod(Method):
-    def __init__(self, parent, name, parameters, returns=None, static=False, commands=None, verbosity=0):
+    def __init__(self, parent, name, code, parameters, returns=None, static=False):
         super().__init__(
-            parent, name,
+            parent,
+            name=name,
+            code=code,
             parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands,
-            verbosity=verbosity
         )
 
     def __repr__(self):
@@ -849,33 +871,31 @@ class ClosureMethod(Method):
         )
 
     @property
-    def is_closuremethod(self):
-        return True
-
-    @property
     def globals_module(self):
         return self.module.parent
 
     def add_self(self):
         self.local_vars['self'] = len(self.local_vars)
+        self.has_self = True
 
 
 class GeneratorMethod(Method):
-    def __init__(self, parent, generator, name, parameters, returns=None, static=False, commands=None, verbosity=0):
+    def __init__(self, parent, name, code, generator, parameters, returns=None, static=False):
         super().__init__(
-            parent, name=name,
+            parent,
+            name=name,
+            code=code,
             parameters=parameters,
             returns=returns,
             static=static,
-            commands=commands,
-            verbosity=verbosity
         )
         self.generator = generator
 
     def add_self(self):
         self.local_vars['<generator>'] = len(self.local_vars)
+        self.has_self = True
 
-    def transpile_setup(self):
+    def visitor_setup(self):
         # Restore the variables needed for the entry of the generator.
         self.add_opcodes(
             ALOAD_name(self, '<generator>'),
@@ -893,7 +913,7 @@ class GeneratorMethod(Method):
             JavaOpcodes.POP(),
         )
 
-    def transpile_teardown(self):
+    def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
             self.add_opcodes(
                 JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
@@ -908,7 +928,7 @@ class GeneratorMethod(Method):
                 self.method_name + "$generator",
                 '(Lorg/python/types/Generator;)Lorg/python/Object;',
                 static=True,
-                attributes=[self.transpile_commands()] + self.method_attributes()
+                attributes=[self.transpile_code()] + self.method_attributes()
             )
         ]
 
@@ -980,58 +1000,5 @@ class ClosureGeneratorMethod(GeneratorMethod):
         )
 
     @property
-    def is_closuremethod(self):
-        return True
-
-    @property
     def globals_module(self):
         return self.module.parent
-
-
-def extract_parameters(code, annotations):
-    pos_count = code.co_argcount
-    arg_names = code.co_varnames
-    keyword_only_count = code.co_kwonlyargcount
-
-    parameters = []
-
-    # Non-keyword-only parameters.
-    for offset, name in enumerate(arg_names[0:pos_count]):
-        parameters.append({
-            'name': name,
-            'annotation': annotations.get(name, 'org/python/Object'),
-            'kind': POSITIONAL_OR_KEYWORD,
-        })
-
-    # *args
-    if code.co_flags & CO_VARARGS:
-        name = arg_names[pos_count + keyword_only_count]
-        annotation = annotations.get(name, 'org/python/Object')
-        parameters.append({
-            'name': name,
-            'annotation': annotation,
-            'kind': VAR_POSITIONAL
-        })
-
-    # Keyword-only parameters.
-    for name in arg_names[pos_count:pos_count + keyword_only_count]:
-        parameters.append({
-            'name': name,
-            'annotation': annotations.get(name, 'org/python/Object'),
-            'kind': KEYWORD_ONLY,
-        })
-
-    # **kwargs
-    if code.co_flags & CO_VARKEYWORDS:
-        index = pos_count + keyword_only_count
-        if code.co_flags & CO_VARARGS:
-            index += 1
-
-        name = arg_names[index]
-        parameters.append({
-            'name': name,
-            'annotation': annotations.get(name, 'org/python/Object'),
-            'kind': VAR_KEYWORD
-        })
-
-    return parameters

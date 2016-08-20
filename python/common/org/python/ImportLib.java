@@ -54,6 +54,7 @@ public class ImportLib {
                 // If we are multiple steps into an import chain, tell the
                 // parent module of this new module.
                 if (parent_module != null) {
+                    // System.out.println("SET PARENT ATTRIBUTE " + parent_module + "." + name.toString() + " = " + python_module);
                     parent_module.__setattr__(name.toString(), python_module);
                 }
             }

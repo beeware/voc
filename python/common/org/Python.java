@@ -1491,7 +1491,6 @@ public class Python {
         } else {
             return new org.python.types.Slice(start_or_stop, stop, step);
         }
-
     }
 
     @org.python.Method(
