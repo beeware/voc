@@ -272,17 +272,21 @@ class ELIF:
         # jump operation at the end of the IF block. If there are
         # ELIFs, add the GOTO as the jump operation on the most
         # recent ELIF.
-        jump_op = JavaOpcodes.GOTO(0)
-        context.add_opcodes(jump_op)
+        # However, if the most recent operation is a RETURN,
+        # this jump isn't needed; just resolve the start position.
+        if not isinstance(context.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
+            jump_op = JavaOpcodes.GOTO(0)
+            context.add_opcodes(jump_op)
+
+            if len(if_block.elifs) == 0:
+                if_block.jump_op = jump_op
+            else:
+                # print("    already got an endif")
+                if_block.handlers[-1].jump_op = jump_op
 
         if len(if_block.elifs) == 0:
-            if_block.jump_op = jump_op
-
             jump(if_block.if_op, context, self, OpcodePosition.START)
         else:
-            # print("    already got an endif")
-            if_block.handlers[-1].jump_op = jump_op
-
             jump(if_block.handlers[-1].if_op, context, self, OpcodePosition.START)
 
         # Record the start of the elif block
