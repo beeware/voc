@@ -327,7 +327,8 @@ public class Set extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object add(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("add() has not been implemented.");
+        this.value.add(other);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -409,10 +410,19 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = "",
+            args = {}
     )
-    public org.python.Object pop(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("pop() has not been implemented.");
+    public org.python.Object pop() {
+        if (this.value.size() == 0) {
+            throw new org.python.exceptions.KeyError(new org.python.types.Str("pop from an empty set"));
+        }
+
+        java.util.Iterator<org.python.Object> iterator = this.value.iterator();
+        org.python.Object popped = iterator.next();
+        iterator.remove();
+
+        return popped;
     }
 
     @org.python.Method(

@@ -139,6 +139,28 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
+    def test_call_function_with_var_args(self):
+        self.assertCodeExecution("""
+                def myfunc(*args):
+                    print(args)
+                    return args[0]
+
+                print("first arg =", myfunc(1, 2, 3, 4, 5))
+                print('Done.')
+                """, run_in_function=False)
+
+    def test_call_function_with_kw(self):
+        self.assertCodeExecution("""
+            def myfunc(**kwargs):
+                print(kwargs['first'] * 3)
+                print(kwargs['second'] * 3)
+
+                return kwargs['first'] + kwargs['second']
+
+            print("values sum =", myfunc(first=1, second=2))
+            print('Done.')
+            """, run_in_function=False)
+
     @expectedFailure
     def test_call_function_kw(self):
         self.assertCodeExecution("""

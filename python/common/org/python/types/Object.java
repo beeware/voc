@@ -704,20 +704,18 @@ public class Object implements org.python.Object {
         throw new org.python.exceptions.AttributeError(this, "__ror__");
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
     )
     public org.python.Object __iadd__(org.python.Object other) {
         try {
-            this.setValue(this.__iadd__(other));
+            this.setValue(this.__add__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -732,7 +730,6 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
@@ -745,7 +742,6 @@ public class Object implements org.python.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -773,7 +769,6 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
@@ -787,21 +782,18 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
     )
     public org.python.Object __idivmod__(org.python.Object other) {
         try {
-            // this.setValue(this.__idivmod__(other, null));
-            this.setValue(this.__idivmod__(other));
+            this.setValue(this.__divmod__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for //=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -826,7 +818,6 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
@@ -840,7 +831,6 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
@@ -853,7 +843,6 @@ public class Object implements org.python.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for &=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -880,7 +869,6 @@ public class Object implements org.python.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for |=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = ""

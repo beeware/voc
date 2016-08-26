@@ -284,7 +284,32 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Int __contains__(org.python.Object item) {
-        throw new org.python.exceptions.NotImplementedError("__contains__() has not been implemented.");
+        if (item instanceof org.python.types.Str){
+
+            int substr_exists = 0;
+            org.python.types.Str item_str = (org.python.types.Str)item;
+
+            if (this.value.length() == 0 && item_str.value.length() == 0){
+                substr_exists = 1;
+            }
+            else {
+                for(int i = 0; i < this.value.length() - item_str.value.length(); i++){
+                    boolean mismatch = false;
+                    for(int j = 0; j < item_str.value.length(); j++){
+                        if (this.value.charAt(i + j) != item_str.value.charAt(j)){
+                            mismatch = true;
+                            break;
+                        }
+                    }
+                    if (!mismatch){
+                        substr_exists = 1;
+                    }
+                }
+            }
+            return new org.python.types.Int(substr_exists);
+        }
+        throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
+        // throw new org.python.exceptions.NotImplementedError("__contains__() has not been implemented.");
     }
 
     @org.python.Method(

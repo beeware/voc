@@ -4,11 +4,11 @@ public class Map extends org.python.types.Object implements org.python.Iterable 
     private org.python.Object callable;
     private org.python.Iterable[] iterators;
 
-    public Map(org.python.Object callable, org.python.Object [] iterables) {
+    public Map(org.python.Object callable, org.python.types.Tuple iterables) {
         this.callable = callable;
-        this.iterators = new org.python.Iterable[iterables.length];
-        for (int i = 0; i < iterables.length; i++) {
-            this.iterators[i] = org.Python.iter(iterables[i]);
+        this.iterators = new org.python.Iterable[iterables.value.size()];
+        for (int i = 0; i < iterables.value.size(); i++) {
+            this.iterators[i] = org.Python.iter(iterables.value.get(i));
         }
     }
 

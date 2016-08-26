@@ -1,3 +1,4 @@
+import ast
 import importlib
 import marshal
 import os
@@ -5,28 +6,33 @@ import py_compile
 import sys
 
 from .python.modules import Module
+from .python.ast import Visitor
+from .python.utils import dump
 
 
 def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):
     transpiler = Transpiler(namespace=namespace, verbosity=verbosity)
 
-    for source_file in input:
-        if os.path.isfile(source_file):
+    for file_or_dir in input:
+        if os.path.isfile(file_or_dir):
             if verbosity:
-                print("Compiling %s ..." % source_file)
-            py_compile.compile(source_file, doraise=True)
-            transpiler.transpile(source_file, prefix)
-        elif os.path.isdir(source_file):
-            for root, dirs, files in os.walk(source_file, followlinks=True):
+                print("Compiling %s ..." % file_or_dir)
+
+            with open(file_or_dir) as source:
+                ast_module = ast.parse(source.read(), mode='exec')
+                transpiler.transpile(file_or_dir, ast_module, prefix)
+        elif os.path.isdir(file_or_dir):
+            for root, dirs, files in os.walk(file_or_dir, followlinks=True):
                 for filename in files:
                     if os.path.splitext(filename)[1] == '.py':
-                        source = os.path.join(root, filename)
+                        source_file = os.path.join(root, filename)
                         if verbosity:
-                            print("Compiling %s ..." % source)
-                        py_compile.compile(source, doraise=True)
-                        transpiler.transpile(source, prefix)
+                            print("Compiling %s ..." % source_file)
+                        with open(source_file) as source:
+                            ast_module = ast.parse(source.read(), mode='exec')
+                            transpiler.transpile(source_file, ast_module, prefix)
         else:
-            print("Unknown source file type: ", source_file, file=sys.stderr)
+            print("Unknown source file: %s" % file_or_dir, file=sys.stderr)
 
     transpiler.write(outdir)
 
@@ -59,39 +65,33 @@ class Transpiler:
             with open(classfilename, 'wb') as out:
                 javaclassfile.write(out)
 
-    def transpile(self, filename, prefix):
+    def transpile(self, filename, ast_module, prefix):
         "Transpile a Python source file into class files"
-        with open(importlib.util.cache_from_source(filename), 'rb') as compiled:
-            # Read off the magic from the start of the PYC file.
-            compiled.read(12)
+        # Determine what portion of the filename is part of the
+        # common source directory, and which is namespace.
+        common = os.path.commonprefix([
+            os.path.abspath(prefix),
+            os.path.abspath(filename)
+        ])
 
-            # Decompile the code object.
-            code = marshal.load(compiled)
-
-            # Determine what portion of the filename is part of the
-            # common source directory, and which is namespace.
-            common = os.path.commonprefix([
-                os.path.abspath(prefix),
-                os.path.abspath(filename)
-            ])
-
-            self.transpile_code(os.path.abspath(filename)[len(common):], code)
+        self.transpile_code(os.path.abspath(filename)[len(common):], ast_module)
 
     def transpile_string(self, filename, code_string):
         "Transpile a string containing Python code into class files"
-        code = compile(code_string, filename, "exec")
+        ast_module = ast.parse(code_string, mode='exec')
+        self.transpile_code(filename, ast_module)
 
-        self.transpile_code(filename, code)
-
-    def transpile_code(self, filename, code):
+    def transpile_code(self, filename, ast_module):
         "Transpile a code object into class files"
-        module = Module(self.namespace, filename, verbosity=self.verbosity)
+        # Convert the AST into Java opcodes
+        if self.verbosity > 1:
+            print ('=' * 75)
+            print(filename.strip('/'))
+            print ('=' * 75)
+            print(dump(ast_module))
+            print ('-' * 75)
 
-        # Extract commands from the code block
-        module.extract(code)
-
-        # Materialize the code structures
-        module.materialize()
+        module = Visitor(self.namespace, filename, verbosity=self.verbosity).visit(ast_module)
 
         # Transpile the module code, adding any classfiles generated
         # to the list to be exported.

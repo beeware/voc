@@ -50,6 +50,17 @@ Then create a virtual environment and install VOC into it:
     $ cd voc
     $ pip install -e .
 
+For Windows the use of cmd under Administrator permission is suggested instead of PowerShell.
+
+.. code-block:: bash
+
+    > virtualenv -p "C:\Python35\python.exe" env
+    > env\Scripts\activate.bat
+    > cd voc
+    > pip install -e .
+
+
+
 Building the support JAR file
 -----------------------------
 

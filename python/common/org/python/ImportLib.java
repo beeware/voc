@@ -45,7 +45,16 @@ public class ImportLib {
                     if (native_import) {
                         python_module = importNativeModule(mod_name);
                     } else {
-                        python_module = importPythonModule(mod_name);
+                        try {
+                            // try to import unknown native module as python..
+                            python_module = importPythonModule(mod_name);
+                        } catch (java.lang.ClassNotFoundException e) {
+                            // .. but try again to import as native module
+                            // if is not found, otherwise some modules like
+                            // generated resource modules can not be imported
+                            python_module = importNativeModule(mod_name);
+                        }
+
                     }
                 } catch (java.lang.ClassNotFoundException e) {
                     throw new org.python.exceptions.ImportError("No module named '" + python_name + "'");
@@ -54,6 +63,7 @@ public class ImportLib {
                 // If we are multiple steps into an import chain, tell the
                 // parent module of this new module.
                 if (parent_module != null) {
+                    // System.out.println("SET PARENT ATTRIBUTE " + parent_module + "." + name.toString() + " = " + python_module);
                     parent_module.__setattr__(name.toString(), python_module);
                 }
             }

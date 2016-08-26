@@ -454,7 +454,6 @@ class TryExceptTests(TranspileTestCase):
                     print('whoops')
             """)
 
-    @expectedFailure
     def test_try_nested(self):
         self.assertCodeExecution("""
             try:
@@ -467,7 +466,6 @@ class TryExceptTests(TranspileTestCase):
                 print('outer except')
         """)
 
-    @expectedFailure
     def test_try_if_else_in_try(self):
         self.assertCodeExecution("""
             try:

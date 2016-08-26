@@ -3498,7 +3498,9 @@ class LCONST_0(Opcode):
 
     @property
     def produce_count(self):
-        return 1
+        # Although it only produces one value, the wide value
+        # takes up 2 slots on the stack.
+        return 2
 
     @property
     def consume_count(self):
@@ -3515,7 +3517,9 @@ class LCONST_1(Opcode):
 
     @property
     def produce_count(self):
-        return 1
+        # Although it only produces one value, the wide value
+        # takes up 2 slots on the stack.
+        return 2
 
     @property
     def consume_count(self):

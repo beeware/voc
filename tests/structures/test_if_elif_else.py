@@ -235,6 +235,21 @@ class IfElifElseTests(TranspileTestCase):
             print('Done')
             """)
 
+    def test_end_of_function_block_with_return(self):
+        # Ensure that if the last instruction in an if/else block
+        # is a return, a GOTO isn't added to the end of the block.
+        self.assertCodeExecution("""
+            def foo(x):
+                print("Testing", x)
+                if x == 0:
+                    return 42
+                else:
+                    return 37
+            y = foo(100)
+            print("Result", y)
+            print('Done')
+            """)
+
     def test_end_of_block_in_main(self):
         # Ensure that the jump target at the end of a block
         # is correctly identified in a main loop
