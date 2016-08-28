@@ -5,6 +5,9 @@ import java.util.Arrays;
 public class ByteArray extends org.python.types.Object {
     public byte [] value;
 
+    // ugly hack to allow for Python 3.4 / 3.5 differences
+    public static final float PYTHON_VERSION = 3.4f;
+
     /**
      * A utility method to update the internal value of this object.
      *
@@ -20,6 +23,7 @@ public class ByteArray extends org.python.types.Object {
     }
 
     public ByteArray() {
+		this.value = new byte [0];
     }
 
     public ByteArray(int length) {
@@ -38,6 +42,31 @@ public class ByteArray extends org.python.types.Object {
     //     throw new org.python.exceptions.NotImplementedError("str.__init__() has not been implemented.");
     // }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Str __repr__() {
+        return this.__str__();
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.types.Str __str__() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("b'");
+        for (int c : this.value) {
+            if (c >= 32 && c < 128) {
+                sb.append((char)c);
+            } else {
+                sb.append(String.format("\\x%02d",c));
+            }
+        }
+        sb.append("'");
+        return new org.python.types.Str(sb.toString());
+    }
+
+/*
     public org.python.types.Str __repr__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("bytearray.__repr__ doesn't take keyword arguments");
@@ -65,6 +94,40 @@ public class ByteArray extends org.python.types.Object {
             throw new org.python.exceptions.UnicodeDecodeError();
         }
     }
+*/
+
+	// Unary methods
+
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: '" + this.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: '" + this.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: '" + this.typeName() + "'");
+    }
+
+    @org.python.Method(
+        __doc__=""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(this.value.length > 0);
+    }
+
+
+
 
     @org.python.Method(
         __doc__ = ""
