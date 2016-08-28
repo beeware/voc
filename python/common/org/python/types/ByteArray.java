@@ -304,7 +304,7 @@ public class ByteArray extends org.python.types.Object {
                 }
             }
         } else if (this.PYTHON_VERSION < 3.5) {
-            throw new org.python.exceptions.TypeError("bytearray indices must be integers, not " + index.typeName());
+            throw new org.python.exceptions.TypeError("bytearray indices must be integers");
         } else {
             throw new org.python.exceptions.TypeError("bytearray indices must be integers or slices, not " + index.typeName());
         }
@@ -434,7 +434,11 @@ public class ByteArray extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __imod__(org.python.Object other) {
-        return this.__mod__(other);
+        if (this.PYTHON_VERSION < 3.5) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %=: 'bytearray' and '" + other.typeName() + "'");
+        } else {
+            return this.__mod__(other);
+        }
     }
 
     @org.python.Method(
