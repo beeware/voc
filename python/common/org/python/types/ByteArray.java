@@ -35,6 +35,10 @@ public class ByteArray extends org.python.types.Object {
         this.value = Arrays.copyOf(value, value.length);
     }
 
+    // public ByteArray(org.python.types.Bool bool) {
+    //     this.value = new byte [(bool.value == true) ? 1 : 0];
+    // }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("str.__new__() has not been implemented.");
     // }
