@@ -496,7 +496,7 @@ class Visitor(ast.NodeVisitor):
             self.visit(arg)
 
         self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % 'Lorg/python/Object;' * len(node.exc.args)),
+            JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % ('Lorg/python/Object;' * len(node.exc.args))),
             JavaOpcodes.ATHROW(),
         )
 
