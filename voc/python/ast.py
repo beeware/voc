@@ -486,17 +486,24 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Raise(self, node):
         # expr? exc, expr? cause):
-        exception = 'org/python/exceptions/%s' % node.exc.func.id
+        if getattr(node.exc, 'func', None) is not None:
+            name = node.exc.func.id
+            args = node.exc.args
+        else:
+            name = node.exc.id
+            args = []
+
+        exception = 'org/python/exceptions/%s' % name
         self.context.add_opcodes(
             JavaOpcodes.NEW(exception),
             JavaOpcodes.DUP(),
         )
 
-        for arg in node.exc.args:
+        for arg in args:
             self.visit(arg)
 
         self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % ('Lorg/python/Object;' * len(node.exc.args))),
+            JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % ('Lorg/python/Object;' * len(args))),
             JavaOpcodes.ATHROW(),
         )
 

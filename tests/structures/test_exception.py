@@ -11,13 +11,11 @@ class ExceptionTests(TranspileTestCase):
             raise KeyError("This is the name")
             """)
 
-    @expectedFailure
     def test_raise_without_any_params(self):
         self.assertCodeExecution("""
             raise ValueError()
         """)
 
-    @expectedFailure
     def test_raise_by_classname(self):
         self.assertCodeExecution("""
             raise ValueError
