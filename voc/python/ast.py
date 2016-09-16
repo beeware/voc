@@ -1632,6 +1632,8 @@ class Visitor(ast.NodeVisitor):
             self.context.add_int(node.n)
         elif isinstance(node.n, float):
             self.context.add_float(node.n)
+        elif isinstance(node.n, complex):
+            self.context.add_complex(node.n)
         else:
             raise NotImplementedError('Unknown number type %s' % type(node.n))
 

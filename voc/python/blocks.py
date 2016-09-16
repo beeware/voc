@@ -117,6 +117,16 @@ class Block:
             JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
         )
 
+    def add_complex(self, value):
+        print("\n\n\nvalue")
+        print(value)
+        self.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Complex'),
+            JavaOpcodes.DUP(),
+            DCONST_val(value.imag),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Complex', '<init>', '(D)V'),
+        )
+
     def add_tuple(self, data):
         self.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Tuple'),
