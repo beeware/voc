@@ -2,19 +2,15 @@ package org.python.types;
 
 public class Complex extends org.python.types.Object {
 
+    private org.python.types.Float real;
+    private org.python.types.Float imag;
+
     /**
      * A utility method to update the internal value of this object.
      *
      * Used by __i*__ operations to do an in-place operation.
      * obj must be of type org.python.types.Complex
      */
-    /*
-        TODO(soummyaah): Ask Russell if setValue should exist since complex is immutable
-    */
-    /*void setValue(org.python.Object obj) {
-        this.real = ((org.python.types.Complex) obj).real;
-        this.imag = ((org.python.types.Complex) obj).imag;
-    }*/
 
     public java.lang.Object toJava() {
         // return this.value;
