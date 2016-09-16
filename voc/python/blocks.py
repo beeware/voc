@@ -72,7 +72,6 @@ class Block:
     def add_opcodes(self, *opcodes):
         # Add the opcodes to the code list and process them.
         for opcode in opcodes:
-            # print("ADD OPCODE", id(opcode), opcode)
             if opcode.process(self):
                 # self.opcodes.extend([
                 #     JavaOpcodes.LDC_W(str(opcode)),
