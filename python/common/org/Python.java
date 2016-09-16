@@ -501,10 +501,22 @@ public class Python {
         __doc__ = "complex(real[, imag]) -> complex number" +
             "\n" +
             "Create a complex number from a real part and an optional imaginary part.\n" +
-            "This is equivalent to (real + imag*1j) where imag defaults to 0.\n"
+            "This is equivalent to (real + imag*1j) where imag defaults to 0.\n",
+        default_args = {"real", "imag"}
     )
-    public static org.python.types.Complex complex() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'complex' not implemented");
+    public static org.python.types.Complex complex(org.python.Object real, org.python.Object imag) {
+        org.python.types.Float real_val;
+        org.python.types.Float imag_val;
+        if(real instanceof org.python.types.Str && imag != null) {
+            throw new org.python.exceptions.TypeError("complex() can't take second arg if first is a string");
+        }
+        try {
+            real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
+            imag_val = Python.float_cast(imag == null ? new org.python.types.Float(0) : imag);
+        } catch (org.python.exceptions.AttributeError e){
+                throw new org.python.exceptions.TypeError("complex() argument must be a string or a number, not " + real.typeName());
+        }
+        return new org.python.types.Complex(real_val, imag_val);
     }
 
     @org.python.Method(
