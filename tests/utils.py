@@ -189,14 +189,16 @@ def compileJava(java_dir, java):
 JAVA_EXCEPTION = re.compile(
     '(((Exception in thread "[\w-]+" )?org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\r?\n]+))|' +
     '([^\r\n]*?\r?\n((    |\t)at[^\r\n]*?\r?\n)*' +
-    'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+): (?P<message2>[^\r?\n]+)))\r?\n' +
+    'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+)(?:\:\s)?(?P<message2>[^\r?]+))\r?)\n' +
     '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)(.*\r?\n)*' +
     '(Exception in thread "\w+" )?'
 )
 JAVA_STACK = re.compile('^\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)\r?\n', re.MULTILINE)
 
-# PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\n(  File ".*", line \d+, in .*\n)(    .*\n  File "(?P<file>.*)", line (?P<line>\d+), in .*\n)+(?P<exception>.*): (?P<message>.*\n)')
-PYTHON_EXCEPTION = re.compile('Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n)+(?P<exception>.*?): (?P<message>.*\r?\n)')
+PYTHON_EXCEPTION = re.compile(
+    'Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), ' +
+    'in .*\r?\n    .*\r?\n)+(?P<exception>[^:]*)(?::\s)?(?P<message>.*\n)$')
+
 PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n')
 
 MEMORY_REFERENCE = re.compile('0x[\dABCDEFabcdef]{4,16}')
@@ -209,7 +211,6 @@ def cleanse_java(input, substitutions):
     except:
         # Test the specific message
         out = JAVA_EXCEPTION.sub('### EXCEPTION ###{linesep}\\g<exception1>: \\g<message1>{linesep}\\g<trace>'.format(linesep=os.linesep), input)
-
     stack = JAVA_STACK.findall(out)
     out = JAVA_STACK.sub('', out)
 
