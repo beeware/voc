@@ -72,7 +72,6 @@ class Block:
     def add_opcodes(self, *opcodes):
         # Add the opcodes to the code list and process them.
         for opcode in opcodes:
-            # print("ADD OPCODE", id(opcode), opcode)
             if opcode.process(self):
                 # self.opcodes.extend([
                 #     JavaOpcodes.LDC_W(str(opcode)),
@@ -115,6 +114,14 @@ class Block:
             JavaOpcodes.DUP(),
             DCONST_val(value),
             JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
+        )
+
+    def add_complex(self, value):
+        self.add_opcodes(
+            JavaOpcodes.NEW('org/python/types/Complex'),
+            JavaOpcodes.DUP(),
+            DCONST_val(value.imag),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Complex', '<init>', '(D)V'),
         )
 
     def add_tuple(self, data):
