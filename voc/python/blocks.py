@@ -117,8 +117,6 @@ class Block:
         )
 
     def add_complex(self, value):
-        print("\n\n\nvalue")
-        print(value)
         self.add_opcodes(
             JavaOpcodes.NEW('org/python/types/Complex'),
             JavaOpcodes.DUP(),
