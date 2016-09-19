@@ -501,10 +501,43 @@ public class Python {
         __doc__ = "complex(real[, imag]) -> complex number" +
             "\n" +
             "Create a complex number from a real part and an optional imaginary part.\n" +
-            "This is equivalent to (real + imag*1j) where imag defaults to 0.\n"
+            "This is equivalent to (real + imag*1j) where imag defaults to 0.\n",
+        default_args = {"real", "imag"}
     )
-    public static org.python.types.Complex complex() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'complex' not implemented");
+    public static org.python.types.Complex complex(org.python.Object real, org.python.Object imag) {
+        org.python.types.Float real_val = new org.python.types.Float(0);
+        org.python.types.Float imag_val = new org.python.types.Float(0);
+        if (real instanceof org.python.types.Str && imag != null) {
+            throw new org.python.exceptions.TypeError("complex() can't take second arg if first is a string");
+        }
+        if (imag instanceof org.python.types.Str) {
+            throw new org.python.exceptions.TypeError("complex() second arg can't be a string");
+        }
+        if (real instanceof org.python.types.Complex) {
+            org.python.types.Complex real_cmplx_obj = (org.python.types.Complex) real;
+            real_val = (org.python.types.Float) real_val.__add__(real_cmplx_obj.real);
+            imag_val = (org.python.types.Float) imag_val.__add__(real_cmplx_obj.imag);
+        }
+         else {
+            try {
+            real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
+            } catch (org.python.exceptions.AttributeError e){
+                    throw new org.python.exceptions.TypeError("complex() argument must be a string or a number, not " + real.typeName());
+            }
+        }
+        if (imag instanceof org.python.types.Complex) {
+            org.python.types.Complex imag_cmplx_obj = (org.python.types.Complex) imag;
+            real_val = (org.python.types.Float) real_val.__sub__(imag_cmplx_obj.imag);
+            imag_val = (org.python.types.Float) imag_val.__add__(imag_cmplx_obj.real);
+        }
+         else {
+            try {
+            imag_val = Python.float_cast(imag == null ? new org.python.types.Float(0) : imag);
+            } catch (org.python.exceptions.AttributeError e){
+                    throw new org.python.exceptions.TypeError("complex() argument must be a string or a number, not " + real.typeName());
+            }
+        }
+        return new org.python.types.Complex(real_val, imag_val);
     }
 
     @org.python.Method(
