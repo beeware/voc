@@ -2,8 +2,8 @@ package org.python.types;
 
 public class Complex extends org.python.types.Object {
 
-    private org.python.types.Float real;
-    private org.python.types.Float imag;
+    public org.python.types.Float real;
+    public org.python.types.Float imag;
 
     /**
      * A utility method to update the internal value of this object.
