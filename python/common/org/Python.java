@@ -507,13 +507,13 @@ public class Python {
     public static org.python.types.Complex complex(org.python.Object real, org.python.Object imag) {
         org.python.types.Float real_val = new org.python.types.Float(0);
         org.python.types.Float imag_val = new org.python.types.Float(0);
-        if(real instanceof org.python.types.Str && imag != null) {
+        if (real instanceof org.python.types.Str && imag != null) {
             throw new org.python.exceptions.TypeError("complex() can't take second arg if first is a string");
         }
-        if(imag instanceof org.python.types.Str) {
+        if (imag instanceof org.python.types.Str) {
             throw new org.python.exceptions.TypeError("complex() second arg can't be a string");
         }
-        if(real instanceof org.python.types.Complex) {
+        if (real instanceof org.python.types.Complex) {
             org.python.types.Complex real_cmplx_obj = (org.python.types.Complex) real;
             real_val = (org.python.types.Float) real_val.__add__(real_cmplx_obj.real);
             imag_val = (org.python.types.Float) imag_val.__add__(real_cmplx_obj.imag);
@@ -525,7 +525,7 @@ public class Python {
                     throw new org.python.exceptions.TypeError("complex() argument must be a string or a number, not " + real.typeName());
             }
         }
-        if(imag instanceof org.python.types.Complex) {
+        if (imag instanceof org.python.types.Complex) {
             org.python.types.Complex imag_cmplx_obj = (org.python.types.Complex) imag;
             real_val = (org.python.types.Float) real_val.__sub__(imag_cmplx_obj.imag);
             imag_val = (org.python.types.Float) imag_val.__add__(imag_cmplx_obj.real);
