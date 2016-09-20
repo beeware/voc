@@ -1,4 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+
+import sys
+if sys.version_info[:3] < (3, 4):
+    raise SystemExit("You need Python 3.4+")
+
+
 import io
 import re
 from setuptools import setup, find_packages
@@ -38,6 +45,7 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
         'Topic :: Software Development',
         'Topic :: Utilities',
     ],
