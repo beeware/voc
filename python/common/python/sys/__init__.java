@@ -2,6 +2,16 @@ package python.sys;
 
 
 public class __init__ extends org.python.types.Module {
+    static {
+        stdout = python.platform.__init__.impl.stdout();
+        stderr = python.platform.__init__.impl.stderr();
+        stdin = python.platform.__init__.impl.stdin();
+
+        __stdout__ = python.platform.__init__.impl.stdout();
+        __stderr__ = python.platform.__init__.impl.stderr();
+        __stdin__ = python.platform.__init__.impl.stdin();
+    }
+
     @org.python.Method(
         __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
@@ -49,11 +59,14 @@ public class __init__ extends org.python.types.Module {
 
     // __spec__ <class '_frozen_importlib.ModuleSpec'>
 
-    // __stderr__ <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object __stderr__;
 
-    // __stdin__ <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object __stdin__;
 
-    // __stdout__ <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object __stdout__;
 
     @org.python.Method(
         __doc__ = ""

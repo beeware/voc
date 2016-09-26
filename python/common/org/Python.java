@@ -1388,12 +1388,7 @@ public class Python {
         kwonlyargs={"file", "sep", "end", "flush"}
     )
     public static void print(org.python.types.Tuple value, org.python.Object file, org.python.Object sep, org.python.Object end, org.python.Object flush) {
-        if (file == null) {
-            // file = System.out;
-        }
-
         java.util.List<org.python.Object> valueArgs = value.value;
-
         StringBuilder buffer = new StringBuilder();
 
         for (int i = 0; i < valueArgs.size(); i++) {
@@ -1412,8 +1407,27 @@ public class Python {
         } else {
             buffer.append(end);
         }
-        System.out.print(buffer.toString());
-        // file.write(buffer.toString());
+
+        if (file == null) {
+           file = python.sys.__init__.stdout;
+        }
+
+        org.python.Object content = new org.python.types.Str(buffer.toString());
+        org.python.Object write_method = file.__getattribute__("write");
+        try {
+            ((org.python.Callable) write_method).invoke(new org.python.Object [] { content }, null);
+        } catch (java.lang.ClassCastException e) {
+            throw new org.python.exceptions.TypeError("'" + write_method.typeName() + "' object is not callable");
+        }
+
+        if (flush != null && ((org.python.types.Bool) flush.__bool__()).value) {
+            org.python.Object flush_method = file.__getattribute__("flush");
+            try {
+                ((org.python.Callable) flush_method).invoke(null, null);
+            } catch (java.lang.ClassCastException e) {
+                throw new org.python.exceptions.TypeError("'" + flush_method.typeName() + "' object is not callable");
+            }
+        }
     }
 
     @org.python.Method(
