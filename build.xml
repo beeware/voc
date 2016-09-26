@@ -5,7 +5,7 @@
 
   <property environment="env"/>
   <property name="python-version" value="3.4"/>
-  <property name="release" value="1"/>
+  <property name="release" value="2"/>
 
   <condition property="build" value="${env.VOC_BUILD_DIR}" else="build">
     <isset property="env.VOC_BUILD_DIR" />
