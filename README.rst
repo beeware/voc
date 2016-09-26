@@ -1,4 +1,5 @@
-.. image:: http://pybee.org/project/projects/bridges/voc/voc-72.png
+.. image:: http://pybee.org/project/projects/bridges/voc/voc.png
+    :height: 72px
     :target: https://pybee.org/voc
 
 VOC
