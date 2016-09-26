@@ -424,7 +424,7 @@ public class ByteArray extends org.python.types.Object {
             if (other instanceof org.python.types.List || other instanceof org.python.types.Range || other instanceof org.python.types.Dict) {
                 int i;
                 for (i=0; i < this.value.length; i++) {
-                    if (this.value[0] == 0) break;    
+                    if (this.value[0] == 0) break;
                 }
                 byte[] bytes = new byte[i];
                 System.arraycopy(this.value, 0, bytes, 0, i);

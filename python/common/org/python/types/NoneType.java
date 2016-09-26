@@ -130,7 +130,7 @@ public class NoneType extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-           
-      throw new org.python.exceptions.TypeError("type NoneType doesn't define __round__ method");    
+
+      throw new org.python.exceptions.TypeError("type NoneType doesn't define __round__ method");
     }
 }

@@ -1,7 +1,6 @@
 package org.python.types;
 
 public class Complex extends org.python.types.Object {
-
     public org.python.types.Float real;
     public org.python.types.Float imag;
 

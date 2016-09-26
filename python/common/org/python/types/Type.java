@@ -26,7 +26,9 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // Any type implementing org.python.Object is a Python type;
             // otherwise, wrap it as a native Java type.
             if (org.python.Object.class.isAssignableFrom(java_class)) {
-                if (java_class.getName().startsWith("org.python.types.")) {
+                // if (org.python.Builtin.class.isAssignableFrom(java_class)) {
+                if (java_class.getName().startsWith("org.python.types")
+                        || java_class.getName().startsWith("org.python.stdlib")) {
                     python_type = new org.python.types.Type(Origin.BUILTIN, java_class);
                 } else {
                     python_type = new org.python.types.Type(Origin.PYTHON, java_class);

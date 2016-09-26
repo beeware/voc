@@ -1,7 +1,6 @@
 package org.python.types;
 
 public class Closure extends org.python.types.Object {
-
     public java.util.List<org.python.Object> default_args;
     public java.util.Map<java.lang.String, org.python.Object> default_kwargs;
 
