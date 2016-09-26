@@ -1583,7 +1583,6 @@ class Visitor(ast.NodeVisitor):
             )
 
             for i, arg in enumerate(node.args):
-
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
                     ICONST_val(i),
@@ -1593,17 +1592,13 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.AASTORE(),
                 )
 
-            # FIXME
-            # if node.starargs is not None:
-            #     for arg in node.starargs:
-            #         self.context.add_opcodes(
-            #             JavaOpcodes.DUP(),
-            #             ICONST_val(i),
-            #         )
-            #         self.visit(arg)
-            #         self.context.add_opcodes(
-            #             JavaOpcodes.AASTORE(),
-            #         )
+            if node.starargs is not None:
+                # Evaluate the starargs
+                self.visit(node.starargs)
+
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKESTATIC('org/Python', 'addToArgs', '([Lorg/python/Object;Lorg/python/Object;)[Lorg/python/Object;'),
+                )
 
             # Create and populate the map of kwargs to pass to invoke().
             self.context.add_opcodes(
@@ -1623,10 +1618,15 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.POP()
                 )
 
-            # FIXME
-            # if node.kwargs is not None:
-            #     for arg in node.kwargs:
-            #         self.visit(arg)
+            if node.kwargs is not None:
+                # Evaluate the kwargs
+                self.visit(node.kwargs)
+
+                # Add all the kwargs to the kwargs dict.
+                self.context.add_opcodes(
+                    JavaOpcodes.LDC_W(node.func.id),
+                    JavaOpcodes.INVOKESTATIC('org/Python', 'addToKwargs', '(Ljava/util/Map;Lorg/python/Object;Ljava/lang/String;)Ljava/util/Map;'),
+                )
 
             # Set up the stack and invoke the callable
             self.context.add_opcodes(

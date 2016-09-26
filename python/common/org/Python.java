@@ -185,6 +185,63 @@ public class Python {
         return name;
     }
 
+    /**
+     * Add the contents of a list to the varargs to be used in a function call.
+     */
+    public static org.python.Object [] addToArgs(org.python.Object [] args, org.python.Object varargs) {
+        java.util.List<org.python.Object> temp_list = new java.util.ArrayList<org.python.Object>();
+        try {
+            org.python.Iterable iter = varargs.__iter__();
+            while (true) {
+                org.python.Object item = iter.__next__();
+                temp_list.add(item);
+            }
+        } catch (org.python.exceptions.StopIteration e) {}
+
+        java.lang.Object [] va_list = temp_list.toArray();
+        org.python.Object [] arg_list = new org.python.Object [args.length + va_list.length];
+
+        System.arraycopy(args, 0, arg_list, 0, args.length);
+        System.arraycopy(va_list, 0, arg_list, args.length, va_list.length);
+
+        return arg_list;
+    }
+
+    /**
+     * Add the contents of a dictionary to the keyword arguments to be used
+     * in a function call.
+     *
+     * Returns the updated kwargs Map.
+     *
+     * If any of the keys in the varkwargs dictionary aren't strings,
+     * a TypeError is raised.
+     */
+    public static java.util.Map<java.lang.String, org.python.Object> addToKwargs(java.util.Map<java.lang.String, org.python.Object> kwargs, org.python.Object kwvarargs, java.lang.String func_name) {
+        // FIXME: Once we have dictionary iterators, we should use an iteration-based
+        // rollout, rather than casting to Dict.
+        // try {
+        //     org.python.Iterable iter = varkwargs.__iter__();
+        //     while (true) {
+        //         org.python.Object key = iter.__next__()
+        //         java.lang.String key_string = ((org.python.types.Str) key).value;
+        //         org.python.Object key
+        //         kwargs.put(key_string, value);
+        //     }
+        // } catch (ClassCastException e) {
+        //     throw new org.python.exceptions.TypeError(func_name + "() keywords must be strings");
+        // } catch (org.python.exceptions.StopIteration e) {}
+
+        for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : ((org.python.types.Dict) kwvarargs).value.entrySet()) {
+            try {
+                kwargs.put(((org.python.types.Str) entry.getKey()).value, entry.getValue());
+            } catch (ClassCastException e) {
+                throw new org.python.exceptions.TypeError(func_name + "() keywords must be strings");
+            }
+        }
+        return kwargs;
+    }
+
+
     @org.python.Method(
         __doc__ = "__import__(name, globals=None, locals=None, fromlist=(), level=0) -> module" +
             "\n" +

@@ -161,7 +161,6 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
-    @expectedFailure
     def test_call_function_kw(self):
         self.assertCodeExecution("""
             def myfunc(**kwargs):
@@ -175,7 +174,6 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
-    @expectedFailure
     def test_call_function_var_kw(self):
         self.assertCodeExecution("""
             def myfunc(*args, **kwargs):
@@ -191,7 +189,6 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
-    @expectedFailure
     def test_call_function_var(self):
         self.assertCodeExecution("""
                 def myfunc(*args):
