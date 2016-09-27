@@ -103,8 +103,7 @@ public interface Object {
     /**
      * Section 3.3.5 - Emulating callable objects
      */
-    // public org.python.Object __call__(
-    // );
+    // public org.python.Object __call__();
 
     /**
      * Section 3.3.6 - Emulating container types
