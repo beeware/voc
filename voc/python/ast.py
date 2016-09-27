@@ -334,10 +334,11 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Return(self, node):
         # expr? value):
-        self.visit(node.value)
-        self.context.add_opcodes(
-            JavaOpcodes.ARETURN()
-        )
+        if node.value:
+            self.visit(node.value)
+            self.context.add_opcodes(
+                JavaOpcodes.ARETURN()
+            )
 
     @node_visitor
     def visit_Delete(self, node):
