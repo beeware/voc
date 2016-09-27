@@ -471,4 +471,305 @@ public class Str extends org.python.types.Object {
 
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object capitalize() {
+        throw new org.python.exceptions.NotImplementedError("capitalize() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object casefold() {
+        throw new org.python.exceptions.NotImplementedError("casefold() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object center() {
+        throw new org.python.exceptions.NotImplementedError("center() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object count() {
+        throw new org.python.exceptions.NotImplementedError("count() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object encode() {
+        throw new org.python.exceptions.NotImplementedError("encode() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object endswith() {
+        throw new org.python.exceptions.NotImplementedError("endswith() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object expandtabs() {
+        throw new org.python.exceptions.NotImplementedError("expandtabs() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object find() {
+        throw new org.python.exceptions.NotImplementedError("find() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object format() {
+        throw new org.python.exceptions.NotImplementedError("format() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object format_map() {
+        throw new org.python.exceptions.NotImplementedError("format_map() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object index() {
+        throw new org.python.exceptions.NotImplementedError("index() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isalnum() {
+        throw new org.python.exceptions.NotImplementedError("isalnum() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isalpha() {
+        throw new org.python.exceptions.NotImplementedError("isalpha() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isdecimal() {
+        throw new org.python.exceptions.NotImplementedError("isdecimal() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isdigit() {
+        throw new org.python.exceptions.NotImplementedError("isdigit() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isidentifier() {
+        throw new org.python.exceptions.NotImplementedError("isidentifier() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object islower() {
+        throw new org.python.exceptions.NotImplementedError("islower() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isnumeric() {
+        throw new org.python.exceptions.NotImplementedError("isnumeric() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isprintable() {
+        throw new org.python.exceptions.NotImplementedError("isprintable() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isspace() {
+        throw new org.python.exceptions.NotImplementedError("isspace() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object istitle() {
+        throw new org.python.exceptions.NotImplementedError("istitle() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object isupper() {
+        throw new org.python.exceptions.NotImplementedError("isupper() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object join() {
+        throw new org.python.exceptions.NotImplementedError("join() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object ljust() {
+        throw new org.python.exceptions.NotImplementedError("ljust() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object lower() {
+        throw new org.python.exceptions.NotImplementedError("lower() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object lstrip() {
+        throw new org.python.exceptions.NotImplementedError("lstrip() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object maketrans() {
+        throw new org.python.exceptions.NotImplementedError("maketrans() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object partition() {
+        throw new org.python.exceptions.NotImplementedError("partition() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object replace() {
+        throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object rfind() {
+        throw new org.python.exceptions.NotImplementedError("rfind() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object rindex() {
+        throw new org.python.exceptions.NotImplementedError("rindex() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object rjust() {
+        throw new org.python.exceptions.NotImplementedError("rjust() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object rpartition() {
+        throw new org.python.exceptions.NotImplementedError("rpartition() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object rsplit() {
+        throw new org.python.exceptions.NotImplementedError("rsplit() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object rstrip() {
+        throw new org.python.exceptions.NotImplementedError("rstrip() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object split() {
+        throw new org.python.exceptions.NotImplementedError("split() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object splitlines() {
+        throw new org.python.exceptions.NotImplementedError("splitlines() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object startswith() {
+        throw new org.python.exceptions.NotImplementedError("startswith() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object strip() {
+        throw new org.python.exceptions.NotImplementedError("strip() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object swapcase() {
+        throw new org.python.exceptions.NotImplementedError("swapcase() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object title() {
+        throw new org.python.exceptions.NotImplementedError("title() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object translate() {
+        throw new org.python.exceptions.NotImplementedError("translate() has not been implemented.");
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object upper() {
+        return new org.python.types.Str(this.value.toUpperCase());
+    }
+
 }

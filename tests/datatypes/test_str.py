@@ -66,6 +66,16 @@ class StrTests(TranspileTestCase):
             print(x[1:4])
             """)
 
+    def test_case_changes(self):
+        self.assertCodeExecution("""
+            s = "hello, world"
+            # print(s.capitalize())
+            # print(s.lower())
+            # print(s.swap())
+            # print(s.title())
+            print(s.upper())
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
