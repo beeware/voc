@@ -1,11 +1,13 @@
 import ast
 import dis
 import sys
+import traceback
 
 from ..java import opcodes as JavaOpcodes, Classref
 from .modules import Module
 from .methods import Method, MainMethod
 from .utils import (
+    dump,
     IF, ELSE, END_IF,
     TRY, CATCH, FINALLY, END_TRY,
     START_LOOP, END_LOOP,
@@ -135,8 +137,15 @@ class Visitor(ast.NodeVisitor):
         self.context.visitor_teardown()
         self._context.pop()
 
-    def visit(self, root_node):
-        super().visit(root_node)
+    def visit(self, node):
+        try:
+            super().visit(node)
+        except Exception as e:
+            traceback.print_exc()
+            print()
+            print("Problem occurred in %s" % self.filename)
+            print('Node: %s' % dump(node))
+            sys.exit(1)
         return self._root_module
 
     def visit_Module(self, node):
@@ -485,7 +494,6 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Raise(self, node):
-        # expr? exc, expr? cause):
         if getattr(node.exc, 'func', None) is not None:
             name = node.exc.func.id
             args = node.exc.args
