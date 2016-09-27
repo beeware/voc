@@ -29,3 +29,16 @@ class ExceptionTests(TranspileTestCase):
                 print("Got a Key Error")
             print('Done.')
             """)
+
+    @expectedFailure
+    def test_raise_custom_exception(self):
+        self.assertCodeExecution("""
+            class MyException(Exception):
+                pass
+
+            try:
+                raise MyException("This is the exception")
+            except MyException:
+                print("Got a custom exception")
+            print('Done.')
+            """)
