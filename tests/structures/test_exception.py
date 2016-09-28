@@ -25,8 +25,20 @@ class ExceptionTests(TranspileTestCase):
         self.assertCodeExecution("""
             try:
                 raise KeyError("This is the name")
+                print("No error")
             except KeyError:
                 print("Got a Key Error")
+            print('Done.')
+            """)
+
+    def test_reraise(self):
+        self.assertCodeExecution("""
+            try:
+                raise KeyError("This is the name")
+                print("No error")
+            except KeyError:
+                print("Got error")
+                raise
             print('Done.')
             """)
 

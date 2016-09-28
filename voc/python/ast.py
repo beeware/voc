@@ -125,6 +125,8 @@ class Visitor(ast.NodeVisitor):
         self._context = []
         self._root_module = None
 
+        self.current_exc_name = []
+
     @property
     def context(self):
         return self._context[-1]
@@ -494,24 +496,33 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Raise(self, node):
-        if getattr(node.exc, 'func', None) is not None:
-            name = node.exc.func.id
-            args = node.exc.args
+        if node.exc is None:
+            # Re-raise most recent exception.
+            self.context.add_opcodes(
+                ALOAD_name(self.context, self.current_exc_name[-1]),
+            )
         else:
-            name = node.exc.id
-            args = []
+            if getattr(node.exc, 'func', None) is not None:
+                name = node.exc.func.id
+                args = node.exc.args
+            else:
+                name = node.exc.id
+                args = []
 
-        exception = 'org/python/exceptions/%s' % name
+            exception = 'org/python/exceptions/%s' % name
+            self.context.add_opcodes(
+                JavaOpcodes.NEW(exception),
+                JavaOpcodes.DUP(),
+            )
+
+            for arg in args:
+                self.visit(arg)
+
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % ('Lorg/python/Object;' * len(args))),
+            )
+
         self.context.add_opcodes(
-            JavaOpcodes.NEW(exception),
-            JavaOpcodes.DUP(),
-        )
-
-        for arg in args:
-            self.visit(arg)
-
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % ('Lorg/python/Object;' * len(args))),
             JavaOpcodes.ATHROW(),
         )
 
@@ -1907,11 +1918,20 @@ class Visitor(ast.NodeVisitor):
         )
 
         if node.name:
-            self.context.store_name(node.name)
+            exc_name = node.name
         else:
             # No named exception, but there is still an exception
-            # on the stack. Pop it off.
-            self.context.add_opcodes(JavaOpcodes.POP())
+            # on the stack. Store it so it can be used in rethrows
+            # if necessary.
+            exc_name = '#exception-%x' % id(node)
+
+        self.context.add_opcodes(
+            ASTORE_name(self.context, exc_name),
+        )
+        self.current_exc_name.append(exc_name)
 
         for child in node.body:
             self.visit(child)
+
+        free_name(self.context, exc_name)
+        self.current_exc_name.pop()
