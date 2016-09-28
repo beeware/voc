@@ -230,16 +230,16 @@ public class Function extends org.python.types.Object implements org.python.Call
                 }
             } else {
                 // Use a default argument. They might be specified as a kwarg.
-                // System.out.println("   c" + i);
+                // System.out.println("   c" + (i + first_arg));
                 org.python.Object value = null;
                 if (kwargs != null) {
-                    java.lang.String varname = ((org.python.types.Str) varnames.get(i)).value;
+                    java.lang.String varname = ((org.python.types.Str) varnames.get(i + first_arg)).value;
                     value = kwargs.remove(varname);
                 }
                 if (value == null) {
-                    value = this.default_args.get(i - required_args);
+                    value = this.default_args.get(i + first_arg - required_args);
                 }
-                adjusted[i] = value;
+                adjusted[i + first_arg] = value;
                 // System.out.println("   cARG " + i + ": " + value);
             }
         }
@@ -249,7 +249,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             // System.out.println("Handle varargs");
             // Construct Python tuple object
             org.python.types.Tuple tuple = new org.python.types.Tuple(
-                java.util.Arrays.asList(java.util.Arrays.copyOfRange(args, argcount, args.length)));
+                java.util.Arrays.asList(java.util.Arrays.copyOfRange(args, argcount - first_arg, args.length)));
 
             adjusted[argcount] = tuple;
             // System.out.println("   dARG " + argcount + ": " + tuple);

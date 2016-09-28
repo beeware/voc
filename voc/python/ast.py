@@ -246,7 +246,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.vararg:
             parameter_signatures.append({
                 'name': node.args.vararg.arg,
-                # 'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
+                'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
                 'kind': ArgType.VAR_POSITIONAL,
             })
 
@@ -272,7 +272,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.kwarg:
             parameter_signatures.append({
                 'name': node.args.kwarg.arg,
-                # 'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                'annotation': name_visitor.evaluate(node.args.kwarg.annotation).annotation,
                 'kind': ArgType.VAR_KEYWORD,
             })
 
@@ -1668,8 +1668,13 @@ class Visitor(ast.NodeVisitor):
                 self.visit(node.kwargs)
 
                 # Add all the kwargs to the kwargs dict.
+                try:
+                    func_name = node.func.id
+                except AttributeError:
+                    func_name = node.func.attr
+
                 self.context.add_opcodes(
-                    JavaOpcodes.LDC_W(node.func.id),
+                    JavaOpcodes.LDC_W(func_name),
                     JavaOpcodes.INVOKESTATIC('org/Python', 'addToKwargs', '(Ljava/util/Map;Lorg/python/Object;Ljava/lang/String;)Ljava/util/Map;'),
                 )
 

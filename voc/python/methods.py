@@ -307,12 +307,12 @@ class InitMethod(Function):
                 },
                 {
                     'name': 'args',
-                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.VAR_POSITIONAL,
                     'annotation': '[Lorg/python/Object;'
                 },
                 {
                     'name': 'kwargs',
-                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.VAR_KEYWORD,
                     'annotation': 'java/util/Map'
                 }
             ],
