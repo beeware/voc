@@ -576,8 +576,34 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Assert(self, node):
-        # expr test, expr? msg):
-        raise NotImplementedError('No handler for Assert')
+
+        self.visit(node.test)
+        self.context.add_opcodes(
+            IF([
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                ], JavaOpcodes.IFNE),
+
+                JavaOpcodes.NEW('org/python/exceptions/AssertionError'),
+                JavaOpcodes.DUP(),
+        )
+
+        if node.msg:
+            self.visit(node.msg)
+            self.context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/AssertionError', '<init>', '(Lorg/python/Object;)V'),
+            )
+        else:
+            self.context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/AssertionError', '<init>', '()V'),
+            )
+
+        self.context.add_opcodes(
+                JavaOpcodes.ATHROW(),
+            END_IF(),
+        )
+
 
     @node_visitor
     def visit_Import(self, node):
