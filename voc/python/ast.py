@@ -423,7 +423,8 @@ class Visitor(ast.NodeVisitor):
                     jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
                 END_TRY(),
         )
-        self.context.store_name(node.target.id)
+
+        self.visit(node.target)
 
         for child in node.body:
             self.visit(child)
@@ -576,7 +577,6 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Assert(self, node):
-
         self.visit(node.test)
         self.context.add_opcodes(
             IF([
@@ -1885,6 +1885,9 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;')
                 )
                 self.visit(child)
+            self.context.add_opcodes(
+                JavaOpcodes.POP(),
+            )
 
     @node_visitor
     def visit_Slice(self, node):

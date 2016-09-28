@@ -115,3 +115,31 @@ class ForLoopTests(TranspileTestCase):
                         print(i, j)
                 print("Done")
             """)
+
+    def test_multiple_values(self):
+        self.assertCodeExecution("""
+            values = [
+                (1, 2, 3),
+                (4, 5, 6),
+                (7, 8, 9),
+            ]
+            for x, y, z, in values:
+                print(x, y, z)
+            print('Done.')
+            """)
+
+    @expectedFailure
+    def test_multiple_values_iterator(self):
+        self.assertCodeExecution("""
+            values = {
+                'a': 1,
+                'b': 2,
+                'c': 3,
+            }
+            for k, v in values.items():
+                print(k, v)
+            print('And once again...')
+            for item in values.items():
+                print(item[0], item[1])
+            print('Done.')
+            """)
