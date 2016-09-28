@@ -7,7 +7,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import (
-    CO_GENERATOR, InitMethod, InstanceMethod
+    CO_GENERATOR, InitMethod, Function, Method
 )
 from .utils import (
     ALOAD_name, ASTORE_name, free_name
@@ -15,11 +15,11 @@ from .utils import (
 
 
 class Class(Block):
-    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0):
-        super().__init__(module, verbosity=verbosity)
+    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0, include_default_constructor=False):
+        super().__init__(parent=module, verbosity=verbosity)
         self.name = name
         if namespace is None:
-            self.namespace = '%s.%s' % (self.parent.namespace, self.parent.name)
+            self.namespace = '%s.%s' % (module.namespace, module.name)
         else:
             self.namespace = namespace
 
@@ -33,7 +33,7 @@ class Class(Block):
         self.fields = fields if fields else {}
         self.init = init
 
-        self.anonymous_inner_class_count = 0
+        self.include_default_constructor = include_default_constructor
 
         # Track constructors when they are added
         self.init_method = None
@@ -56,12 +56,8 @@ class Class(Block):
         return '.'.join(self.namespace.split('.') + [self.name])
 
     @property
-    def class_descriptor(self):
-        return '/'.join(self.namespace.split('.') + [self.name])
-
-    @property
     def module(self):
-        return self.parent
+        return self._parent
 
     def visitor_setup(self):
         if self.extends:
@@ -198,7 +194,7 @@ class Class(Block):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
-    def add_method(self, name, code, parameter_signatures, return_signature):
+    def add_function(self, name, code, parameter_signatures, return_signature):
         # parts = name.split('$')[-1].split('.')
         # method_name = parts[-1]
         # class_name = parts[-2]
@@ -214,7 +210,7 @@ class Class(Block):
             # if return_type is None:
             #     return_type = 'void'
 
-            method = InstanceMethod(
+            method = Method(
                 self,
                 name=name,
                 code=code,
@@ -293,64 +289,37 @@ class Class(Block):
         else:
             base_descriptor = 'org/python/types/Object'
 
-        classfile.methods.append(
-            JavaMethod(
-                '<init>',
-                '()V',
-                public=False,
-                static=False,
-                attributes=[
-                    JavaCode(
-                        max_stack=1,
-                        max_locals=1,
-                        code=[
-                            JavaOpcodes.ALOAD_0(),
-                            JavaOpcodes.INVOKESPECIAL(base_descriptor, '<init>', '()V'),
-                            JavaOpcodes.RETURN(),
-                        ]
-                    )
-                ]
+        if self.include_default_constructor:
+            classfile.methods.append(
+                JavaMethod(
+                    '<init>',
+                    '()V',
+                    public=False,
+                    static=False,
+                    attributes=[
+                        JavaCode(
+                            max_stack=1,
+                            max_locals=1,
+                            code=[
+                                JavaOpcodes.ALOAD_0(),
+                                JavaOpcodes.INVOKESPECIAL(base_descriptor, '<init>', '()V'),
+                                JavaOpcodes.RETURN(),
+                            ]
+                        )
+                    ]
+                )
             )
-        )
 
         return self.namespace, self.name, classfile
 
 
-class InnerClass(Class):
-    def __init__(self, parent, name, bases=None, extends=None, implements=None, public=True, final=False, methods=None, init=None, verbosity=0):
-        if isinstance(parent, Class):
-            module = parent.module
-        else:
-            module = parent
-        super().__init__(
-            module=module,
-            name=name,
-            namespace=parent.namespace,
-            bases=bases,
-            extends=extends,
-            implements=implements,
-            public=public,
-            final=final,
-            methods=methods,
-            init=init,
-            verbosity=verbosity
-        )
-
-
 class ClosureClass(Class):
-    def __init__(self, parent, closure_var_names, name=None, extends=None, bases=None, implements=None, public=True, final=False, methods=None, init=None, verbosity=0):
+    def __init__(self, module, closure_var_names, name=None, extends=None, bases=None, implements=None, public=True, final=False, methods=None, init=None, verbosity=0):
         self.closure_var_names = closure_var_names
-        if isinstance(parent, Class):
-            module = parent.module
-        else:
-            module = parent
-        if name is None:
-            parent.anonymous_inner_class_count += 1
-            name = "%s$%d" % (parent.name, parent.anonymous_inner_class_count)
         super().__init__(
             module=module,
             name=name,
-            namespace=parent.namespace,
+            namespace=module.namespace,
             bases=bases,
             extends=extends,
             implements=implements,
@@ -358,9 +327,6 @@ class ClosureClass(Class):
             final=final,
             methods=methods,
             init=init,
-            verbosity=verbosity
+            verbosity=verbosity,
+            include_default_constructor=False,
         )
-
-    @property
-    def klass(self):
-        return self.parent

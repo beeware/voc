@@ -5,7 +5,7 @@ import traceback
 
 from ..java import opcodes as JavaOpcodes, Classref
 from .modules import Module
-from .methods import Method, MainMethod
+from .methods import MainFunction
 from .utils import (
     dump,
     IF, ELSE, END_IF,
@@ -162,7 +162,7 @@ class Visitor(ast.NodeVisitor):
                 if main is not None:
                     print("Found duplicate main block... replacing previous main", file=sys.stderr)
 
-                main = MainMethod(module)
+                main = MainFunction(module)
                 self.push_context(main)
                 for c in child.body:
                     self.visit(c)
@@ -173,14 +173,14 @@ class Visitor(ast.NodeVisitor):
         if main is None:
             if self.verbosity:
                 print("Adding default main method...")
-            main = MainMethod(module)
+            main = MainFunction(module)
             self.push_context(main)
             # No content, so pop right away.
             # We need to push to make sure setup/teardown
             # logic is invoked.
             self.pop_context()
 
-        module.methods.append(main)
+        module.functions.append(main)
 
         self.pop_context()
 
@@ -278,7 +278,7 @@ class Visitor(ast.NodeVisitor):
             'annotation': name_visitor.evaluate(node.returns).annotation
         }
 
-        method = self.context.add_method(
+        function = self.context.add_function(
             name=node.name,
             code=code,
             parameter_signatures=parameter_signatures,
@@ -289,9 +289,9 @@ class Visitor(ast.NodeVisitor):
         for default in default_vars:
             free_name(self.context, default)
 
-        self.push_context(method)
+        self.push_context(function)
 
-        LocalsVisitor(method).visit(node)
+        LocalsVisitor(function).visit(node)
 
         for child in node.body:
             self.visit(child)
@@ -845,7 +845,7 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
-        listcomp = self.context.add_method(
+        listcomp = self.context.add_function(
             name='listcomp_%x' % id(node),
             code=code,
             parameter_signatures=[
@@ -990,7 +990,7 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
-        setcomp = self.context.add_method(
+        setcomp = self.context.add_function(
             name='setcomp_%x' % id(node),
             code=code,
             parameter_signatures=[
@@ -1117,7 +1117,7 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
-        dictcomp = self.context.add_method(
+        dictcomp = self.context.add_function(
             name='dictcomp_%x' % id(node),
             code=code,
             parameter_signatures=[
@@ -1254,7 +1254,7 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
-        genexp = self.context.add_method(
+        genexp = self.context.add_function(
             name='genexp_%x' % id(node),
             code=code,
             parameter_signatures=[
@@ -1536,7 +1536,7 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.DUP(),
 
                     # The super class to bind to.
-                    JavaOpcodes.LDC_W(Classref(self.context.parent.descriptor)),
+                    JavaOpcodes.LDC_W(Classref(self.context.klass.descriptor)),
                     JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
 
                     # Bind to self. Since we know we are in a class building context,

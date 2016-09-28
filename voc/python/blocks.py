@@ -17,7 +17,7 @@ class IgnoreBlock(Exception):
 
 class Block:
     def __init__(self, parent=None, verbosity=0):
-        self.parent = parent
+        self._parent = parent
         self.verbosity = verbosity
 
         self.has_self = False
@@ -48,10 +48,6 @@ class Block:
             for name, index in self.local_vars.items()
             if index is not None
         }
-
-    @property
-    def module(self):
-        return self.parent
 
     def store_name(self, name):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
@@ -199,15 +195,15 @@ class Block:
             JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
         )
 
-    def add_callable(self, method, closure=False):
+    def add_callable(self, function, closure=False):
         self.add_opcodes(
             TRY(),
-                # Wrap that Method into a Callable.
+                # Wrap that function into a Callable.
                 JavaOpcodes.NEW('org/python/types/Function'),
                 JavaOpcodes.DUP(),
         )
 
-        self.add_str(method.name)
+        self.add_str(function.name)
 
         # Add the code object
         self.add_opcodes(
@@ -215,46 +211,46 @@ class Block:
                 JavaOpcodes.DUP(),
         )
 
-        self.add_int(method.code.co_argcount)
-        self.add_tuple(method.code.co_cellvars)
+        self.add_int(function.code.co_argcount)
+        self.add_tuple(function.code.co_cellvars)
 
         self.add_opcodes(
                 JavaOpcodes.ACONST_NULL(),  # co_code
         )
 
-        # self.add_tuple(method.code.co_consts)
+        # self.add_tuple(function.code.co_consts)
         self.add_opcodes(
                 JavaOpcodes.ACONST_NULL(),  # co_consts
         )
 
-        self.add_str(method.code.co_filename)
-        self.add_int(method.code.co_firstlineno)
-        self.add_int(method.code.co_flags)
-        self.add_tuple(method.code.co_freevars)
-        self.add_int(method.code.co_kwonlyargcount)
+        self.add_str(function.code.co_filename)
+        self.add_int(function.code.co_firstlineno)
+        self.add_int(function.code.co_flags)
+        self.add_tuple(function.code.co_freevars)
+        self.add_int(function.code.co_kwonlyargcount)
 
         self.add_opcodes(
                 JavaOpcodes.ACONST_NULL(),  # co_lnotab
         )
 
-        self.add_str(method.code.co_name)
-        self.add_tuple(method.code.co_names)
-        self.add_int(method.code.co_nlocals)
-        self.add_int(method.code.co_stacksize)
-        self.add_tuple(method.code.co_varnames)
+        self.add_str(function.code.co_name)
+        self.add_tuple(function.code.co_names)
+        self.add_int(function.code.co_nlocals)
+        self.add_int(function.code.co_stacksize)
+        self.add_tuple(function.code.co_varnames)
 
         self.add_opcodes(
                 JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
 
-                # Get a Method representing the new function
-                JavaOpcodes.LDC_W(Classref(method.parent.class_descriptor)),
-                JavaOpcodes.LDC_W(method.name),
+                # Get a Java Method representing the new function
+                JavaOpcodes.LDC_W(Classref(function.class_descriptor)),
+                JavaOpcodes.LDC_W(function.name),
 
-                ICONST_val(len(method.parameters)),
+                ICONST_val(len(function.parameters)),
                 JavaOpcodes.ANEWARRAY('java/lang/Class'),
         )
 
-        for i, param in enumerate(method.parameters):
+        for i, param in enumerate(function.parameters):
             self.add_opcodes(
                 JavaOpcodes.DUP(),
                 ICONST_val(i),
@@ -280,7 +276,7 @@ class Block:
         )
 
         # Default arguments list
-        for arg in method.parameters:
+        for arg in function.parameters:
             if arg['kind'] == ArgType.POSITIONAL_OR_KEYWORD and arg['default']:
                 self.add_opcodes(
                     JavaOpcodes.DUP(),
@@ -296,7 +292,7 @@ class Block:
                 JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
         )
 
-        for arg in method.parameters:
+        for arg in function.parameters:
             if arg['kind'] == ArgType.POSITIONAL_OR_KEYWORD and arg['default']:
                 self.add_opcodes(
                     JavaOpcodes.DUP(),
@@ -323,7 +319,7 @@ class Block:
                 ASTORE_name(self, '#EXCEPTION#'),
                 JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W('Unable to find MAKE_FUNCTION output %s.%s' % (method.parent.descriptor, method.name)),
+                JavaOpcodes.LDC_W('Unable to find MAKE_FUNCTION output %s.%s' % (function.class_descriptor, function.name)),
                 JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
                 JavaOpcodes.ATHROW(),
             END_TRY()
