@@ -518,11 +518,13 @@ public class Python {
             real_val = (org.python.types.Float) real_val.__add__(real_cmplx_obj.real);
             imag_val = (org.python.types.Float) imag_val.__add__(real_cmplx_obj.imag);
         }
-         else {
+        else {
             try {
-            real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
-            } catch (org.python.exceptions.AttributeError e){
-                    throw new org.python.exceptions.TypeError("complex() argument must be a string or a number, not " + real.typeName());
+                real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
+            } catch (org.python.exceptions.TypeError e){
+                throw new org.python.exceptions.TypeError("complex() argument must be a string, a bytes-like object or a number, not '" + real.typeName() + "'");
+            } catch (org.python.exceptions.ValueError e){
+                throw new org.python.exceptions.ValueError("complex() arg is a malformed string");
             }
         }
         if (imag instanceof org.python.types.Complex) {
@@ -530,11 +532,11 @@ public class Python {
             real_val = (org.python.types.Float) real_val.__sub__(imag_cmplx_obj.imag);
             imag_val = (org.python.types.Float) imag_val.__add__(imag_cmplx_obj.real);
         }
-         else {
+        else {
             try {
-            imag_val = Python.float_cast(imag == null ? new org.python.types.Float(0) : imag);
-            } catch (org.python.exceptions.AttributeError e){
-                    throw new org.python.exceptions.TypeError("complex() argument must be a string or a number, not " + real.typeName());
+                imag_val = (org.python.types.Float)imag_val.__add__(Python.float_cast(imag == null ? new org.python.types.Float(0) : imag));
+            } catch (org.python.exceptions.TypeError e){
+                throw new org.python.exceptions.TypeError("complex() argument must be a string, a bytes-like object or a number, not '" + imag.typeName() + "'");
             }
         }
         return new org.python.types.Complex(real_val, imag_val);
