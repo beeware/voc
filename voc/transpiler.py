@@ -86,10 +86,8 @@ class Transpiler:
         # Convert the AST into Java opcodes
         if self.verbosity > 1:
             print ('=' * 75)
-            print(filename.strip('/'))
-            print ('=' * 75)
             print(dump(ast_module))
-            print ('-' * 75)
+            print ('=' * 75)
 
         module = Visitor(self.namespace, filename, verbosity=self.verbosity).visit(ast_module)
 
