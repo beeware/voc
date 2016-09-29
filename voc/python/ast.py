@@ -114,36 +114,6 @@ class LocalsVisitor(ast.NodeVisitor):
         pass
 
 
-# class DefinedClassVisitor(ast.NodeVisitor):
-#     def __init__(self, symbols, namespace):
-#         self.symbols = symbols
-#         self.names =
-#         self.namespace = namespace
-
-#         parts = namespace.split('.')
-
-#         self.locals = self.symbols[parts[0]]
-#         for part in parts[1:]
-#             self.locals = self.locals.setdefault(part, {})
-
-#     def visit_Import(self, node):
-#         print(dump(node))
-#         pass
-
-#     def visit_ImportFrom(self, node):
-#         print(dump(node))
-#         pass
-
-#     def visit_ClassDef(self, node):
-#         print(dump(node))
-#         self.locals
-#         pass
-
-#     def visit_Assign(self, node):
-#         print(dump(node))
-#         pass
-
-
 class Visitor(ast.NodeVisitor):
     def __init__(self, namespace, filename, verbosity=1):
         super().__init__()
@@ -162,6 +132,10 @@ class Visitor(ast.NodeVisitor):
     @property
     def context(self):
         return self._context[-1]
+
+    @property
+    def root_module(self):
+        return self._root_module
 
     def push_context(self, block):
         self._context.append(block)
@@ -662,8 +636,13 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_ImportFrom(self, node):
+        if node.module:
+            from_module = node.module
+        else:
+            from_module = self.root_module.full_name
+
         self.context.add_opcodes(
-            JavaOpcodes.LDC_W(node.module),
+            JavaOpcodes.LDC_W(from_module),
 
             ICONST_val(len(node.names)),
             JavaOpcodes.ANEWARRAY('java/lang/String'),
