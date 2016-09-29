@@ -64,15 +64,34 @@ class ExceptionTests(TranspileTestCase):
             print('Done.')
             """)
 
-    @expectedFailure
     def test_raise_custom_exception(self):
         self.assertCodeExecution("""
             class MyException(Exception):
                 pass
 
             try:
-                raise MyException("This is the exception")
+                raise MyException()
             except MyException:
                 print("Got a custom exception")
             print('Done.')
             """)
+
+    @expectedFailure
+    def test_raise_custom_exception_import_from(self):
+        self.assertCodeExecution("""
+            from example import *
+
+            try:
+                raise MyException("This is the exception")
+            except MyException:
+                print("Got a custom exception")
+            print('Done.')
+            """,
+            extra_code={
+                'example':
+                    """
+                    class MyException(Exception):
+                        pass
+
+                    """
+            })

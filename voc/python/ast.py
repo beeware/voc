@@ -114,6 +114,36 @@ class LocalsVisitor(ast.NodeVisitor):
         pass
 
 
+# class DefinedClassVisitor(ast.NodeVisitor):
+#     def __init__(self, symbols, namespace):
+#         self.symbols = symbols
+#         self.names =
+#         self.namespace = namespace
+
+#         parts = namespace.split('.')
+
+#         self.locals = self.symbols[parts[0]]
+#         for part in parts[1:]
+#             self.locals = self.locals.setdefault(part, {})
+
+#     def visit_Import(self, node):
+#         print(dump(node))
+#         pass
+
+#     def visit_ImportFrom(self, node):
+#         print(dump(node))
+#         pass
+
+#     def visit_ClassDef(self, node):
+#         print(dump(node))
+#         self.locals
+#         pass
+
+#     def visit_Assign(self, node):
+#         print(dump(node))
+#         pass
+
+
 class Visitor(ast.NodeVisitor):
     def __init__(self, namespace, filename, verbosity=1):
         super().__init__()
@@ -127,6 +157,8 @@ class Visitor(ast.NodeVisitor):
 
         self.current_exc_name = []
 
+        self.symbol_namespace = {}
+
     @property
     def context(self):
         return self._context[-1]
@@ -138,6 +170,9 @@ class Visitor(ast.NodeVisitor):
     def pop_context(self):
         self.context.visitor_teardown()
         self._context.pop()
+
+    def full_classref(self, name, default_prefix=None):
+        return self.symbol_namespace.get(name, '.'.join([default_prefix, name])).replace('.', '/')
 
     def visit(self, node):
         try:
@@ -342,6 +377,8 @@ class Visitor(ast.NodeVisitor):
             self.visit(child)
         self.pop_context()
 
+        self.symbol_namespace[class_name] = klass.class_name
+
     @node_visitor
     def visit_Return(self, node):
         # expr? value):
@@ -511,7 +548,7 @@ class Visitor(ast.NodeVisitor):
                 name = node.exc.id
                 args = []
 
-            exception = 'org/python/exceptions/%s' % name
+            exception = self.full_classref(name, default_prefix='org.python.exceptions')
             self.context.add_opcodes(
                 JavaOpcodes.NEW(exception),
                 JavaOpcodes.DUP(),
@@ -1940,11 +1977,11 @@ class Visitor(ast.NodeVisitor):
         # expr? type, identifier? name, stmt* body):
         if isinstance(node.type, ast.Tuple):
             exception = [
-                'org/python/exceptions/%s' % exc.id
+                self.full_classref(exc.id, default_prefix='org.python.exceptions')
                 for exc in node.type.elts
             ]
         elif node.type:
-            exception = 'org/python/exceptions/%s' % node.type.id
+            exception = self.full_classref(node.type.id, default_prefix='org.python.exceptions')
         else:
             exception = None
 
