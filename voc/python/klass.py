@@ -15,7 +15,7 @@ from .utils import (
 
 
 class Class(Block):
-    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0, include_default_constructor=False):
+    def __init__(self, module, name, namespace=None, bases=None, extends=None, implements=None, public=True, final=False, methods=None, fields=None, init=None, verbosity=0, include_default_constructor=True):
         super().__init__(parent=module, verbosity=verbosity)
         self.name = name
         if namespace is None:
@@ -24,7 +24,7 @@ class Class(Block):
             self.namespace = namespace
 
         self.bases = bases if bases else []
-        self.extends = extends
+        self._extends = extends
 
         self.implements = implements if implements else []
         self.public = public
@@ -60,11 +60,6 @@ class Class(Block):
         return self._parent
 
     def visitor_setup(self):
-        if self.extends:
-            base_descriptor = self.extends.replace('.', '/')
-        else:
-            base_descriptor = 'org/python/types/Object'
-
         self.add_opcodes(
             # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor),
             # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
@@ -81,11 +76,11 @@ class Class(Block):
             JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
-            JavaOpcodes.LDC_W(base_descriptor),
+            JavaOpcodes.LDC_W(self.extends_descriptor),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/String;)Lorg/python/types/Type;'),
 
             # JavaOpcodes.DUP(),
-            # JavaOpcodes.LDC_W("__base__ for %s should be %s; is" % (self.klass, base_descriptor)),
+            # JavaOpcodes.LDC_W("__base__ for %s should be %s; is" % (self.klass, self.extends_descriptor)),
             # JavaOpcodes.SWAP(),
             # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;Ljava/lang/Object;)V'),
 
@@ -240,10 +235,24 @@ class Class(Block):
             JavaOpcodes.RETURN()
         )
 
+    @property
+    def extends(self):
+        if self._extends:
+            return self._extends
+        else:
+            if 'Exception' in self.bases:
+                return 'org.python.exceptions.Exception'
+            else:
+                return 'org.python.types.Object'
+
+    @property
+    def extends_descriptor(self):
+        return self.extends.replace('.', '/')
+
     def transpile(self):
         classfile = JavaClass(
             self.descriptor,
-            extends=self.extends if self.extends else 'org/python/types/Object',
+            extends=self.extends_descriptor,
             implements=self.implements,
             public=self.public,
             final=self.final
@@ -284,11 +293,6 @@ class Class(Block):
 
         # Ensure the class has a class protected, no-args init() so that
         # instances can be instantiated.
-        if self.extends:
-            base_descriptor = self.extends.replace('.', '/')
-        else:
-            base_descriptor = 'org/python/types/Object'
-
         if self.include_default_constructor:
             classfile.methods.append(
                 JavaMethod(
@@ -302,7 +306,7 @@ class Class(Block):
                             max_locals=1,
                             code=[
                                 JavaOpcodes.ALOAD_0(),
-                                JavaOpcodes.INVOKESPECIAL(base_descriptor, '<init>', '()V'),
+                                JavaOpcodes.INVOKESPECIAL(self.extends_descriptor, '<init>', '()V'),
                                 JavaOpcodes.RETURN(),
                             ]
                         )

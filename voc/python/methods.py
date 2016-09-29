@@ -347,27 +347,15 @@ class InitMethod(Function):
         return '([Lorg/python/Object;Ljava/util/Map;)V'
 
     def visitor_setup(self):
-        if self.klass.extends:
-            super_class = self.klass.extends
-        else:
-            super_class = 'org/python/types/Object'
-
         # Get the __init__ method for the class...
-        if self.klass.extends:
-            self.add_opcodes(
-                # Create the instance
-                JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.DUP(),
-                # TODO - this only allows using the default constructor
-                # for extended Java classes.
-                JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '()V'),
-            )
-        else:
-            self.add_opcodes(
-                JavaOpcodes.ALOAD_0(),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL(super_class, '<init>', '()V'),
-            )
+        self.add_opcodes(
+            # Create the instance
+            JavaOpcodes.ALOAD_0(),
+            JavaOpcodes.DUP(),
+            # TODO - this only allows using the default constructor
+            # for extended Java classes.
+            JavaOpcodes.INVOKESPECIAL(self.klass.extends_descriptor, '<init>', '()V'),
+        )
 
         self.add_opcodes(
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'toPython', '(Ljava/lang/Object;)Lorg/python/Object;'),
