@@ -1950,19 +1950,21 @@ class Visitor(ast.NodeVisitor):
 
         self.context.add_opcodes(
             CATCH(exception),
-                JavaOpcodes.DUP(),
         )
 
-        if node.name:
+        # Top of stack is the exception to be raised
+        if exception and node.name:
+            # The exception has been named. Store it as that name.
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
             self.context.store_name(node.name)
-            # No named exception, but there is still an exception
-            # on the stack.
 
-        # Store the exception it so it can be
-        # easily used in rethrows if necessary.
+        # Regardless of whether the exception is named,
+        # locally store it so that it can be re-raised easily.
         exc_name = '#exception-%x' % id(node)
         self.context.add_opcodes(
-                ASTORE_name(self.context, exc_name),
+            ASTORE_name(self.context, exc_name),
         )
 
         self.current_exc_name.append(exc_name)
@@ -1971,5 +1973,4 @@ class Visitor(ast.NodeVisitor):
             self.visit(child)
 
         free_name(self.context, exc_name)
-
         self.current_exc_name.pop()

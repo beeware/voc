@@ -42,6 +42,17 @@ class ExceptionTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_reraise_anonymous(self):
+        self.assertCodeExecution("""
+            try:
+                raise KeyError("This is the name")
+                print("No error")
+            except:
+                print("Got error")
+                raise
+            print('Done.')
+            """)
+
     def test_reraise_named(self):
         self.assertCodeExecution("""
             try:
