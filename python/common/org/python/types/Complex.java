@@ -49,8 +49,33 @@ public class Complex extends org.python.types.Object {
     )
     public org.python.types.Str __repr__() {
         // TODO(soummyaah): Show integer rounded values as ints
-        return new org.python.types.Str(String.format("(%s%sj)", this.real.__repr__(), this.imag.value < 0 ? this.imag.__repr__() : "+" + this.imag.__repr__()));
-        // throw new org.python.exceptions.NotImplementedError("complex.__repr__() has not been implemented.");
+        java.lang.StringBuilder buffer = new java.lang.StringBuilder();
+        boolean real_present = true;
+        if(this.real.value != 0) {
+            buffer.append("(");
+            if (((org.python.types.Bool)((this.real).__int__().__eq__(this.real))).value) {
+                buffer.append((this.real).__int__().__repr__().value);
+            } else {
+                buffer.append((this.real).__repr__().value);
+            }
+        } else {
+            real_present = false;
+        }
+        if(this.imag.value < 0) {
+            buffer.append("-");
+        } else if(this.real.value != 0) {
+            buffer.append("+");
+        }
+        if (((org.python.types.Bool)((this.imag).__int__().__eq__(this.imag))).value) {
+            buffer.append((this.imag).__int__().__repr__().value);
+        } else {
+            buffer.append((this.imag).__repr__().value);
+        }
+        buffer.append("j");
+        if(real_present) {
+            buffer.append(")");
+        }
+        return new org.python.types.Str(buffer.toString());
     }
 
     @org.python.Method(
