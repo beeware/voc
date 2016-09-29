@@ -14,6 +14,16 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_noargs_function(self):
+        self.assertCodeExecution("""
+            def myfunc():
+                print('Hello')
+                return 5
+
+            print("value =", myfunc())
+            print('Done.')
+            """)
+
     def test_void_function(self):
         self.assertCodeExecution("""
             def myfunc(value):
@@ -141,13 +151,13 @@ class FunctionTests(TranspileTestCase):
 
     def test_call_function_with_var_args(self):
         self.assertCodeExecution("""
-                def myfunc(*args):
-                    print(args)
-                    return args[0]
+            def myfunc(*args):
+                print(args)
+                return args[0]
 
-                print("first arg =", myfunc(1, 2, 3, 4, 5))
-                print('Done.')
-                """, run_in_function=False)
+            print("first arg =", myfunc(1, 2, 3, 4, 5))
+            print('Done.')
+            """, run_in_function=False)
 
     def test_call_function_with_kw(self):
         self.assertCodeExecution("""
@@ -191,12 +201,12 @@ class FunctionTests(TranspileTestCase):
 
     def test_call_function_var(self):
         self.assertCodeExecution("""
-                def myfunc(*args):
-                    print(args)
+            def myfunc(*args):
+                print(args)
 
-                    return len(args)
+                return len(args)
 
-                values_tuple = (1, 2, 3, 4)
-                print("values count =", myfunc(*values_tuple))
-                print('Done.')
-                """, run_in_function=False)
+            values_tuple = (1, 2, 3, 4)
+            print("values count =", myfunc(*values_tuple))
+            print('Done.')
+            """, run_in_function=False)

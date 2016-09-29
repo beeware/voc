@@ -6,7 +6,7 @@ from ..java import (
 )
 from .blocks import Block
 from .methods import (
-    CO_GENERATOR, GeneratorMethod, Method,
+    CO_GENERATOR, GeneratorFunction, Function,
 )
 from .utils import ALOAD_name, ASTORE_name, free_name
 
@@ -30,7 +30,7 @@ class Module(Block):
         self.namespace = '.'.join(parts[:-1])
         self.name = parts[-1]
 
-        self.methods = []
+        self.functions = []
         self.classes = []
         self.anonymous_inner_class_count = 0
 
@@ -135,10 +135,10 @@ class Module(Block):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
-    def add_method(self, name, code, parameter_signatures, return_signature):
+    def add_function(self, name, code, parameter_signatures, return_signature):
         if code.co_flags & CO_GENERATOR:
             # Generator method.
-            method = GeneratorMethod(
+            function = GeneratorFunction(
                 self,
                 name=name,
                 code=code,
@@ -148,8 +148,8 @@ class Module(Block):
                 static=True
             )
         else:
-            # Normal method.
-            method = Method(
+            # Normal function.
+            function = Function(
                 self,
                 name=name,
                 code=code,
@@ -158,17 +158,17 @@ class Module(Block):
                 static=True,
             )
 
-        # Add the method to the list that need to be
-        # transpiled into Java methods
-        self.methods.append(method)
+        # Add the function to the list that need to be
+        # transpiled into Java functions
+        self.functions.append(function)
 
         # Add a definition of the callable object
-        self.add_callable(method)
+        self.add_callable(function)
 
         # Store the callable object as an accessible symbol.
-        self.store_name(method.name)
+        self.store_name(function.name)
 
-        return method
+        return function
 
     def add_class(self, class_name, bases, extends, implements):
         from .klass import Class
@@ -244,8 +244,8 @@ class Module(Block):
         )
 
         # Add any static methods defined in the module
-        for method in self.methods:
-            classfile.methods.extend(method.transpile())
+        for function in self.functions:
+            classfile.methods.extend(function.transpile())
 
         # The list of classfiles that will be returned will contain
         # at least one entry - the class for the module itself.

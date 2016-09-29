@@ -39,9 +39,9 @@ def descriptor(annotation):
         return 'L%s;' % annotation.replace('.', '/')
 
 
-class Method(Block):
-    def __init__(self, parent, name, code, parameters, returns, static=False):
-        super().__init__(parent)
+class Function(Block):
+    def __init__(self, module, name, code, parameters, returns, static=False):
+        super().__init__(parent=module)
         self.name = name
         self.code = code
         self.parameters = parameters
@@ -57,15 +57,11 @@ class Method(Block):
         self.static = static
 
     def __repr__(self):
-        return '<Method %s (%s parameters)>' % (self.name, len(self.parameters))
+        return '<Function %s (%s parameters)>' % (self.name, len(self.parameters))
 
     @property
     def is_constructor(self):
         return False
-
-    @property
-    def globals_module(self):
-        return self.module
 
     def add_self(self):
         pass
@@ -83,7 +79,7 @@ class Method(Block):
 
                 JavaOpcodes.NEW('org/python/types/Str'),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.globals_module.full_name),
+                JavaOpcodes.LDC_W(self.module.full_name),
                 JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
@@ -97,7 +93,7 @@ class Method(Block):
             free_name(self, '#value')
 
     def store_dynamic(self):
-        raise NotImplementedError('Methods cannot dynamically store variables.')
+        raise NotImplementedError('Functions cannot dynamically store variables.')
 
     def load_name(self, name):
         if name in self.local_vars:
@@ -110,7 +106,7 @@ class Method(Block):
 
                 JavaOpcodes.NEW('org/python/types/Str'),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.globals_module.full_name),
+                JavaOpcodes.LDC_W(self.module.full_name),
                 JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
@@ -130,7 +126,7 @@ class Method(Block):
 
                 JavaOpcodes.NEW('org/python/types/Str'),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.globals_module.full_name),
+                JavaOpcodes.LDC_W(self.module.full_name),
                 JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
 
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
@@ -159,7 +155,11 @@ class Method(Block):
 
     @property
     def module(self):
-        return self.parent
+        return self._parent
+
+    @property
+    def class_descriptor(self):
+        return self.module.class_descriptor
 
     def add_class(self, class_name, bases, extends, implements):
         from .klass import Class
@@ -188,12 +188,12 @@ class Method(Block):
 
         return klass
 
-    def add_method(self, name, code, parameter_signatures, return_signature):
-        # If a method is added to a method, it is added as an anonymous
+    def add_function(self, name, code, parameter_signatures, return_signature):
+        # If a function is added to a function, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
-        callable = ClosureClass(
-            parent=self.parent,
+        klass = ClosureClass(
+            module=self.module,
             name='%s$%s$%s' % (self.module.name, self.name, name),
             closure_var_names=[],  # code.co_names,
             bases=['org/python/types/Closure'],
@@ -201,52 +201,50 @@ class Method(Block):
             public=True,
             final=True,
         )
-        self.parent.classes.append(callable)
+        self.module.classes.append(klass)
 
-        callable.visitor_setup()
+        klass.visitor_setup()
 
         if code.co_flags & CO_GENERATOR:
-            method = ClosureGeneratorMethod(
-                callable,
-                name='invoke',
+            method = GeneratorClosure(
+                klass,
                 code=code,
                 generator=code.co_name,
                 parameters=parameter_signatures,
                 returns=return_signature,
             )
         else:
-            method = ClosureMethod(
-                callable,
-                name='invoke',
+            method = Closure(
+                klass,
                 code=code,
                 parameters=parameter_signatures,
                 returns=return_signature,
             )
 
-        callable.methods.append(method)
+        klass.methods.append(method)
 
         for field in code.co_names:
-            callable.fields[field] = 'Lorg/python/Object;'
+            klass.fields[field] = 'Lorg/python/Object;'
 
-        callable.visitor_teardown()
+        klass.visitor_teardown()
 
         self.add_opcodes(
-            JavaOpcodes.NEW(callable.descriptor),
+            JavaOpcodes.NEW(klass.descriptor),
             JavaOpcodes.DUP(),
 
             # These are the args and kwargs for the closure class
             JavaOpcodes.ACONST_NULL(),
             JavaOpcodes.ACONST_NULL(),
 
-            JavaOpcodes.INVOKESPECIAL(method.parent.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+            JavaOpcodes.INVOKESPECIAL(klass.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
 
-            JavaOpcodes.LDC_W(Classref(method.parent.descriptor)),
+            JavaOpcodes.LDC_W(Classref(klass.descriptor)),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
 
-            JavaOpcodes.LDC_W(method.name),
+            JavaOpcodes.LDC_W('invoke'),
         )
 
-        # Store the callable object as an accessible symbol.
+        # Store the closure instance as an accessible symbol.
         self.add_callable(method)
 
         self.add_opcodes(
@@ -295,10 +293,10 @@ class Method(Block):
         return self.transpile_method() + self.transpile_wrapper()
 
 
-class InitMethod(Method):
-    def __init__(self, parent):
+class InitMethod(Function):
+    def __init__(self, klass):
         super().__init__(
-            parent,
+            klass,
             name='<init>',
             code=None,
             parameters=[
@@ -309,12 +307,12 @@ class InitMethod(Method):
                 },
                 {
                     'name': 'args',
-                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.VAR_POSITIONAL,
                     'annotation': '[Lorg/python/Object;'
                 },
                 {
                     'name': 'kwargs',
-                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'kind': ArgType.VAR_KEYWORD,
                     'annotation': 'java/util/Map'
                 }
             ],
@@ -330,11 +328,15 @@ class InitMethod(Method):
 
     @property
     def klass(self):
-        return self.parent
+        return self._parent
 
     @property
     def module(self):
         return self.klass.module
+
+    @property
+    def class_descriptor(self):
+        return self.klass.descriptor
 
     @property
     def can_ignore_empty(self):
@@ -394,10 +396,10 @@ class InitMethod(Method):
         )
 
 
-class InstanceMethod(Method):
-    def __init__(self, parent, name, code, parameters, returns=None, static=False):
+class Method(Function):
+    def __init__(self, klass, name, code, parameters, returns=None, static=False):
         super().__init__(
-            parent,
+            klass,
             name=name,
             code=code,
             parameters=parameters,
@@ -410,11 +412,15 @@ class InstanceMethod(Method):
 
     @property
     def klass(self):
-        return self.parent
+        return self._parent
 
     @property
     def module(self):
         return self.klass.module
+
+    @property
+    def class_descriptor(self):
+        return self.klass.descriptor
 
     @property
     def bound_signature(self):
@@ -708,10 +714,10 @@ class InstanceMethod(Method):
         return wrapper_methods
 
 
-class MainMethod(Method):
-    def __init__(self, parent):
+class MainFunction(Function):
+    def __init__(self, module):
         super().__init__(
-            parent,
+            module,
             name='__main__',
             code=None,
             parameters=[{'name': 'args', 'annotation': 'argv'}],
@@ -720,7 +726,7 @@ class MainMethod(Method):
         )
 
     def __repr__(self):
-        return '<MainMethod %s>' % self.module.name
+        return '<MainFunction %s>' % self.module.name
 
     @property
     def method_name(self):
@@ -728,7 +734,7 @@ class MainMethod(Method):
 
     @property
     def module(self):
-        return self.parent
+        return self._parent
 
     @property
     def signature(self):
@@ -737,10 +743,6 @@ class MainMethod(Method):
     @property
     def can_ignore_empty(self):
         return True
-
-    @property
-    def globals_module(self):
-        return self.module
 
     def store_name(self, name):
         self.add_opcodes(
@@ -854,11 +856,11 @@ class MainMethod(Method):
         return []
 
 
-class ClosureMethod(Method):
-    def __init__(self, parent, name, code, parameters, returns=None, static=False):
+class Closure(Function):
+    def __init__(self, klass, code, parameters, returns=None, static=False):
         super().__init__(
-            parent,
-            name=name,
+            klass,
+            name='invoke',
             code=code,
             parameters=parameters,
             returns=returns,
@@ -866,23 +868,31 @@ class ClosureMethod(Method):
         )
 
     def __repr__(self):
-        return '<ClosureMethod %s (%s parameters, %s closure vars)>' % (
-            self.name, len(self.parameters), len(self.parent.closure_var_names)
+        return '<Closure %s (%s parameters, %s closure vars)>' % (
+            self.name, len(self.parameters), len(self.klass.closure_var_names)
         )
 
     @property
-    def globals_module(self):
-        return self.module.parent
+    def klass(self):
+        return self._parent
+
+    @property
+    def module(self):
+        return self.klass.module
+
+    @property
+    def class_descriptor(self):
+        return self.klass.descriptor
 
     def add_self(self):
         self.local_vars['self'] = len(self.local_vars)
         self.has_self = True
 
 
-class GeneratorMethod(Method):
-    def __init__(self, parent, name, code, generator, parameters, returns=None, static=False):
+class GeneratorFunction(Function):
+    def __init__(self, module, name, code, generator, parameters, returns=None, static=False):
         super().__init__(
-            parent,
+            module,
             name=name,
             code=code,
             parameters=parameters,
@@ -890,6 +900,10 @@ class GeneratorMethod(Method):
             static=static,
         )
         self.generator = generator
+
+    @property
+    def klass(self):
+        return self.module
 
     def add_self(self):
         self.local_vars['<generator>'] = len(self.local_vars)
@@ -942,7 +956,7 @@ class GeneratorMethod(Method):
             JavaOpcodes.LDC_W(self.generator),
 
             # p2: The actual generator method
-            JavaOpcodes.LDC_W(self.module.class_name),
+            JavaOpcodes.LDC_W(self.klass.class_name),
             JavaOpcodes.INVOKESTATIC('java/lang/Class', 'forName', '(Ljava/lang/String;)Ljava/lang/Class;'),
 
             JavaOpcodes.LDC_W(self.method_name + "$generator"),
@@ -993,12 +1007,31 @@ class GeneratorMethod(Method):
         ]
 
 
-class ClosureGeneratorMethod(GeneratorMethod):
+class GeneratorClosure(GeneratorFunction):
+    def __init__(self, module, code, generator, parameters, returns=None, static=False):
+        super().__init__(
+            module,
+            name='invoke',
+            code=code,
+            generator=generator,
+            parameters=parameters,
+            returns=returns,
+            static=static,
+        )
+
     def __repr__(self):
-        return '<ClosureGeneratorMethod %s (%s parameters, %s closure vars)>' % (
-            self.name, len(self.parameters), len(self.parent.closure_var_names)
+        return '<GeneratorClosure %s (%s parameters, %s closure vars)>' % (
+            self.name, len(self.parameters), len(self.klass.closure_var_names)
         )
 
     @property
-    def globals_module(self):
-        return self.module.parent
+    def klass(self):
+        return self._parent
+
+    @property
+    def module(self):
+        return self.klass.module
+
+    @property
+    def class_descriptor(self):
+        return self.klass.descriptor

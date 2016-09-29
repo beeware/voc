@@ -1,11 +1,13 @@
 import ast
 import dis
 import sys
+import traceback
 
 from ..java import opcodes as JavaOpcodes, Classref
 from .modules import Module
-from .methods import Method, MainMethod
+from .methods import MainFunction
 from .utils import (
+    dump,
     IF, ELSE, END_IF,
     TRY, CATCH, FINALLY, END_TRY,
     START_LOOP, END_LOOP,
@@ -123,6 +125,8 @@ class Visitor(ast.NodeVisitor):
         self._context = []
         self._root_module = None
 
+        self.current_exc_name = []
+
     @property
     def context(self):
         return self._context[-1]
@@ -135,8 +139,15 @@ class Visitor(ast.NodeVisitor):
         self.context.visitor_teardown()
         self._context.pop()
 
-    def visit(self, root_node):
-        super().visit(root_node)
+    def visit(self, node):
+        try:
+            super().visit(node)
+        except Exception as e:
+            traceback.print_exc()
+            print()
+            print("Problem occurred in %s" % self.filename)
+            print('Node: %s' % dump(node))
+            sys.exit(1)
         return self._root_module
 
     def visit_Module(self, node):
@@ -153,7 +164,7 @@ class Visitor(ast.NodeVisitor):
                 if main is not None:
                     print("Found duplicate main block... replacing previous main", file=sys.stderr)
 
-                main = MainMethod(module)
+                main = MainFunction(module)
                 self.push_context(main)
                 for c in child.body:
                     self.visit(c)
@@ -164,14 +175,14 @@ class Visitor(ast.NodeVisitor):
         if main is None:
             if self.verbosity:
                 print("Adding default main method...")
-            main = MainMethod(module)
+            main = MainFunction(module)
             self.push_context(main)
             # No content, so pop right away.
             # We need to push to make sure setup/teardown
             # logic is invoked.
             self.pop_context()
 
-        module.methods.append(main)
+        module.functions.append(main)
 
         self.pop_context()
 
@@ -235,7 +246,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.vararg:
             parameter_signatures.append({
                 'name': node.args.vararg.arg,
-                # 'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
+                'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
                 'kind': ArgType.VAR_POSITIONAL,
             })
 
@@ -261,7 +272,7 @@ class Visitor(ast.NodeVisitor):
         if node.args.kwarg:
             parameter_signatures.append({
                 'name': node.args.kwarg.arg,
-                # 'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                'annotation': name_visitor.evaluate(node.args.kwarg.annotation).annotation,
                 'kind': ArgType.VAR_KEYWORD,
             })
 
@@ -269,7 +280,7 @@ class Visitor(ast.NodeVisitor):
             'annotation': name_visitor.evaluate(node.returns).annotation
         }
 
-        method = self.context.add_method(
+        function = self.context.add_function(
             name=node.name,
             code=code,
             parameter_signatures=parameter_signatures,
@@ -280,9 +291,9 @@ class Visitor(ast.NodeVisitor):
         for default in default_vars:
             free_name(self.context, default)
 
-        self.push_context(method)
+        self.push_context(function)
 
-        LocalsVisitor(method).visit(node)
+        LocalsVisitor(function).visit(node)
 
         for child in node.body:
             self.visit(child)
@@ -413,7 +424,8 @@ class Visitor(ast.NodeVisitor):
                     jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
                 END_TRY(),
         )
-        self.context.store_name(node.target.id)
+
+        self.visit(node.target)
 
         for child in node.body:
             self.visit(child)
@@ -486,25 +498,33 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Raise(self, node):
-        # expr? exc, expr? cause):
-        if getattr(node.exc, 'func', None) is not None:
-            name = node.exc.func.id
-            args = node.exc.args
+        if node.exc is None:
+            # Re-raise most recent exception.
+            self.context.add_opcodes(
+                ALOAD_name(self.context, self.current_exc_name[-1]),
+            )
         else:
-            name = node.exc.id
-            args = []
+            if getattr(node.exc, 'func', None) is not None:
+                name = node.exc.func.id
+                args = node.exc.args
+            else:
+                name = node.exc.id
+                args = []
 
-        exception = 'org/python/exceptions/%s' % name
+            exception = 'org/python/exceptions/%s' % name
+            self.context.add_opcodes(
+                JavaOpcodes.NEW(exception),
+                JavaOpcodes.DUP(),
+            )
+
+            for arg in args:
+                self.visit(arg)
+
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % ('Lorg/python/Object;' * len(args))),
+            )
+
         self.context.add_opcodes(
-            JavaOpcodes.NEW(exception),
-            JavaOpcodes.DUP(),
-        )
-
-        for arg in args:
-            self.visit(arg)
-
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL(exception, '<init>', '(%s)V' % ('Lorg/python/Object;' * len(args))),
             JavaOpcodes.ATHROW(),
         )
 
@@ -558,8 +578,33 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Assert(self, node):
-        # expr test, expr? msg):
-        raise NotImplementedError('No handler for Assert')
+        self.visit(node.test)
+        self.context.add_opcodes(
+            IF([
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', '()Lorg/python/Object;'),
+                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                ], JavaOpcodes.IFNE),
+
+                JavaOpcodes.NEW('org/python/exceptions/AssertionError'),
+                JavaOpcodes.DUP(),
+        )
+
+        if node.msg:
+            self.visit(node.msg)
+            self.context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/AssertionError', '<init>', '(Lorg/python/Object;)V'),
+            )
+        else:
+            self.context.add_opcodes(
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/AssertionError', '<init>', '()V'),
+            )
+
+        self.context.add_opcodes(
+                JavaOpcodes.ATHROW(),
+            END_IF(),
+        )
+
 
     @node_visitor
     def visit_Import(self, node):
@@ -838,7 +883,7 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
-        listcomp = self.context.add_method(
+        listcomp = self.context.add_function(
             name='listcomp_%x' % id(node),
             code=code,
             parameter_signatures=[
@@ -983,7 +1028,7 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
-        setcomp = self.context.add_method(
+        setcomp = self.context.add_function(
             name='setcomp_%x' % id(node),
             code=code,
             parameter_signatures=[
@@ -1110,7 +1155,7 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
-        dictcomp = self.context.add_method(
+        dictcomp = self.context.add_function(
             name='dictcomp_%x' % id(node),
             code=code,
             parameter_signatures=[
@@ -1247,7 +1292,7 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
-        genexp = self.context.add_method(
+        genexp = self.context.add_function(
             name='genexp_%x' % id(node),
             code=code,
             parameter_signatures=[
@@ -1529,7 +1574,7 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.DUP(),
 
                     # The super class to bind to.
-                    JavaOpcodes.LDC_W(Classref(self.context.parent.descriptor)),
+                    JavaOpcodes.LDC_W(Classref(self.context.klass.descriptor)),
                     JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
 
                     # Bind to self. Since we know we are in a class building context,
@@ -1624,8 +1669,13 @@ class Visitor(ast.NodeVisitor):
                 self.visit(node.kwargs)
 
                 # Add all the kwargs to the kwargs dict.
+                try:
+                    func_name = node.func.id
+                except AttributeError:
+                    func_name = node.func.attr
+
                 self.context.add_opcodes(
-                    JavaOpcodes.LDC_W(node.func.id),
+                    JavaOpcodes.LDC_W(func_name),
                     JavaOpcodes.INVOKESTATIC('org/Python', 'addToKwargs', '(Ljava/util/Map;Lorg/python/Object;Ljava/lang/String;)Ljava/util/Map;'),
                 )
 
@@ -1841,6 +1891,9 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.INVOKEINTERFACE('org/python/Iterable', '__next__', '()Lorg/python/Object;')
                 )
                 self.visit(child)
+            self.context.add_opcodes(
+                JavaOpcodes.POP(),
+            )
 
     @node_visitor
     def visit_Slice(self, node):
@@ -1899,12 +1952,25 @@ class Visitor(ast.NodeVisitor):
             CATCH(exception),
         )
 
-        if node.name:
+        # Top of stack is the exception to be raised
+        if exception and node.name:
+            # The exception has been named. Store it as that name.
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
             self.context.store_name(node.name)
-        else:
-            # No named exception, but there is still an exception
-            # on the stack. Pop it off.
-            self.context.add_opcodes(JavaOpcodes.POP())
+
+        # Regardless of whether the exception is named,
+        # locally store it so that it can be re-raised easily.
+        exc_name = '#exception-%x' % id(node)
+        self.context.add_opcodes(
+            ASTORE_name(self.context, exc_name),
+        )
+
+        self.current_exc_name.append(exc_name)
 
         for child in node.body:
             self.visit(child)
+
+        free_name(self.context, exc_name)
+        self.current_exc_name.pop()
