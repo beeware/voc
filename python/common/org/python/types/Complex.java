@@ -394,20 +394,6 @@ public class Complex extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.NotImplementedError("complex.__round__ has not been implemented.");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __index__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__index__ has not been implemented.");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
     public org.python.Object conjugate() {
         throw new org.python.exceptions.NotImplementedError("complex.conjugate has not been implemented.");
     }
