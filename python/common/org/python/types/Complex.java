@@ -129,7 +129,7 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__ge__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unorderable types: complex() >= " + other.typeName() + "()");
     }
 
     @org.python.Method(
