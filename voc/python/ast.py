@@ -364,8 +364,18 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Delete(self, node):
-        # expr* targets):
-        raise NotImplementedError('No handler for Delete')
+        for target in node.targets:
+            self.visit(target)
+            if isinstance(target, ast.Attribute):
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__delattr__', '(Ljava/lang/String;)V'),
+                )
+            elif isinstance(target, ast.Subscript):
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__delitem__', '(Lorg/python/Object;)V'),
+                )
+            else:
+                raise NotImplementedError('No handler for Delete of type %s' % target)
 
     @node_visitor
     def visit_Assign(self, node):
@@ -1780,8 +1790,12 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.SWAP(),
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
             )
+        elif type(node.ctx) == ast.Del:
+            self.context.add_opcodes(
+                JavaOpcodes.LDC_W(node.attr),
+            )
         else:
-            raise NotImplmentedError("Unknown context %s" % node.ctx)
+            raise NotImplementedError("Unknown context %s" % node.ctx)
 
     @node_visitor
     def visit_Subscript(self, node):
@@ -1802,8 +1816,11 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
             )
             free_name(self.context, '#value')
+        elif type(node.ctx) == ast.Del:
+            self.visit(node.value)
+            self.visit(node.slice)
         else:
-            raise NotImplmentedError("Unknown context %s" % node.ctx)
+            raise NotImplementedError("Unknown context %s" % node.ctx)
 
     @node_visitor
     def visit_Starred(self, node):
