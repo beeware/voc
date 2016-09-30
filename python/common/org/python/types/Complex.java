@@ -61,9 +61,7 @@ public class Complex extends org.python.types.Object {
         } else {
             real_present = false;
         }
-        if(this.imag.value < 0) {
-            buffer.append("-");
-        } else if(this.real.value != 0) {
+        if(this.real.value != 0 && this.imag.value >= 0) {
             buffer.append("+");
         }
         if (((org.python.types.Bool)((this.imag).__int__().__eq__(this.imag))).value) {
@@ -157,7 +155,15 @@ public class Complex extends org.python.types.Object {
     )
 
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__add__ has not been implemented.");
+        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float) {
+            return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other), this.imag);
+        } else if (other instanceof Bool) {
+            return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other), this.imag);
+        } else if (other instanceof Complex) {
+            org.python.types.Complex other_object = (org.python.types.Complex)other;
+            return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other_object.real), (org.python.types.Float)this.imag.__add__(other_object.imag));
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(

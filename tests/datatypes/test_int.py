@@ -34,7 +34,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_add_class',
-        'test_add_complex',
         'test_add_frozenset',
 
         'test_and_class',

@@ -187,8 +187,11 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Float(((double) this.value) + ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(this.value + (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Complex) {
+            return (org.python.types.Complex)other.__add__(this);
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + other.typeName() + "'");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
