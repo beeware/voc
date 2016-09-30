@@ -351,14 +351,14 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__neg__ has not been implemented.");
+        return new org.python.types.Complex((org.python.types.Float)this.real.__neg__(), (org.python.types.Float)this.imag.__neg__());
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__pos__ has not been implemented.");
+        return new org.python.types.Complex(this.real, this.imag);
     }
 
     @org.python.Method(
@@ -372,14 +372,14 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__invert__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'complex'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.types.Int __int__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__int__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't convert complex to int");
     }
 
     @org.python.Method(

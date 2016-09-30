@@ -6,9 +6,8 @@ class UnaryComplexOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'complex'
 
     not_implemented = [
-        'test_unary_positive',
         'test_unary_negative',
-        'test_unary_invert',
+        'test_unary_positive',
         'test_unary_not'
     ]
 
