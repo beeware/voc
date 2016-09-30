@@ -48,7 +48,6 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        // TODO(soummyaah): Show integer rounded values as ints
         java.lang.StringBuilder buffer = new java.lang.StringBuilder();
         boolean real_present = true;
         if(this.real.value != 0) {
@@ -87,7 +86,7 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__lt__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unorderable types: complex() < " + other.typeName() + "()");
     }
 
     @org.python.Method(
@@ -228,7 +227,7 @@ public class Complex extends org.python.types.Object {
     public org.python.Object __lshift__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("complex.__lshift__ has not been implemented.");
     }
-
+=
     @org.python.Method(
         __doc__ = ""
     )
