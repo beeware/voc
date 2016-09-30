@@ -112,7 +112,10 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__ne__ has not been implemented.");
+        if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
+            return new org.python.types.Bool(false);
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
