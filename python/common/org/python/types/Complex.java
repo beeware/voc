@@ -107,7 +107,6 @@ public class Complex extends org.python.types.Object {
                 return new org.python.types.Bool(true);
             }
         } return new org.python.types.Bool(false);
-        // throw new org.python.exceptions.NotImplementedError("complex.__eq__ has not been implemented.");
     }
 
     @org.python.Method(
