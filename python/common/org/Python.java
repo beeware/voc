@@ -1458,7 +1458,8 @@ public class Python {
             "        del self._x\n"
     )
     public static org.python.Object property() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'property' not implemented");
+        // throw new org.python.exceptions.NotImplementedError("Builtin function 'property' not implemented");
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
