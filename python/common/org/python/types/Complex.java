@@ -230,7 +230,7 @@ public class Complex extends org.python.types.Object {
     public org.python.Object __lshift__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("complex.__lshift__ has not been implemented.");
     }
-=
+
     @org.python.Method(
         __doc__ = ""
     )
