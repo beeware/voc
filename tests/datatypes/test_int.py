@@ -100,7 +100,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_frozenset',
 
         'test_subtract_class',
-        'test_subtract_complex',
         'test_subtract_frozenset',
 
         'test_true_divide_class',

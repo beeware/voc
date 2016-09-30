@@ -170,7 +170,15 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __sub__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__sub__ has not been implemented.");
+        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float) {
+            return new org.python.types.Complex((org.python.types.Float)this.real.__sub__(other), this.imag);
+        } else if (other instanceof Bool) {
+            return new org.python.types.Complex((org.python.types.Float)this.real.__sub__(other), this.imag);
+        } else if (other instanceof Complex) {
+            org.python.types.Complex other_object = (org.python.types.Complex)other;
+            return new org.python.types.Complex((org.python.types.Float)this.real.__sub__(other_object.real), (org.python.types.Float)this.imag.__sub__(other_object.imag));
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
