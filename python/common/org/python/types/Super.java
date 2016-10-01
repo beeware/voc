@@ -350,6 +350,8 @@ public class Super implements org.python.Object {
         return false;
     }
 
+    public void __delete__(org.python.Object instance) {}
+
     @org.python.Method(
         __doc__ = ""
     )

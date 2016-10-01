@@ -353,7 +353,12 @@ public class Object implements org.python.Object {
         return true;
     }
 
-    public void __set__(org.python.Object instance, org.python.Object value) {}
+    @org.python.Method(
+        __doc__ = "",
+        args = {"instance", "value"}
+    )
+    public void __set__(org.python.Object instance, org.python.Object value) {
+    }
 
     @org.python.Method(
         __doc__ = "",
@@ -374,9 +379,28 @@ public class Object implements org.python.Object {
     }
 
     public boolean __delattr_null(java.lang.String name) {
-        // System.out.println("DELETE ATTR from " + this.__dict__);
-        org.python.Object result = this.__dict__.remove(name);
-        return (result != null);
+        // org.Python.debug(String.format("DELATTR %s", name));
+        // org.Python.debug("SELF ", this.__repr__());
+        // org.Python.debug("ATTRS ", this.__dict__);
+        org.python.types.Type cls = (org.python.types.Type) this.__dict__.get("__class__");
+
+        // If the attribute already exists, then it's OK to set it.
+        org.python.Object attr = cls.__getattribute_null(name);
+
+        if (attr == null) {
+            org.python.Object result = this.__dict__.remove(name);
+            return result != null;
+        } else {
+            attr.__delete__(this);
+            return true;
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"instance", "value"}
+    )
+    public void __delete__(org.python.Object instance) {
     }
 
     @org.python.Method(
@@ -402,14 +426,12 @@ public class Object implements org.python.Object {
     //     throw new org.python.exceptions.AttributeError(this, "__subclasscheck__");
     // }
 
-
     /**
      * Section 3.3.5 - Emulating callable objects
      */
     // public org.python.Object __call__(org.python.Object... args) {
     //     throw new org.python.exceptions.AttributeError(this, "__call__");
     // }
-
 
     /**
      * Section 3.3.6 - Emulating container types

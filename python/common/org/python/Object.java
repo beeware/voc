@@ -84,12 +84,15 @@ public interface Object {
     // Lastly, these methods are the public inteface to attribute
     // manipulation. This means they take Python objects as attributes,
     // and raise exceptions on failure.
-    public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
-    public void __set__(org.python.Object instance, org.python.Object value);
     public org.python.Object __getattr__(org.python.Object name);
     public org.python.Object __getattribute__(org.python.Object name);
     public void __setattr__(org.python.Object name, org.python.Object value);
     public void __delattr__(org.python.Object name);
+
+    // These are the prototypes for the descriptor protocol.
+    public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
+    public void __set__(org.python.Object instance, org.python.Object value);
+    public void __delete__(org.python.Object instance);
 
     // Attribute name retrieval.
     public org.python.Object __dir__();
