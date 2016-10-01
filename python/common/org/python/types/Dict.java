@@ -304,7 +304,10 @@ public class Dict extends org.python.types.Object {
         try {
             return this.__getitem__(other);
         } catch (org.python.exceptions.KeyError e){ // allow unhashable type error to be percolated up.
-            return default_value != null ? default_value: org.python.types.NoneType.NONE;
+            if (default_value == null) {
+                return org.python.types.NoneType.NONE;
+            }
+            return default_value;
         }
     }
 
