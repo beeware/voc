@@ -354,10 +354,19 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        default_args = {"other", "default_value"}
     )
-    public org.python.Object setdefault(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.setdefault() has not been implemented.");
+    public org.python.Object setdefault(org.python.Object other, org.python.Object default_value) {
+        try {
+            return this.__getitem__(other);
+        } catch (org.python.exceptions.KeyError e){ // allow unhashable type error to be percolated up.
+            if (default_value == null) {
+                default_value = org.python.types.NoneType.NONE;
+            }
+            __setitem__(other, default_value);
+            return default_value;
+        }
     }
 
     @org.python.Method(

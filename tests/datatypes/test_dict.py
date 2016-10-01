@@ -127,6 +127,20 @@ class DictTests(TranspileTestCase):
             print(x.popitem()) # Check for exception
             """)
 
+    def test_method_setdefault(self):
+        self.assertCodeExecution("""
+            x = {42: 'Babel'}
+            print(x.setdefault(42)) # should return Babel
+
+            print(x.setdefault(1)) # should return None
+            print(x[1] == None) # should be True
+
+            print(x.setdefault('David', 'Gilmour')) # should return 'Gilmour'
+
+            # Check unhashable exceptions
+            x.setdefault([], 42)
+            """)
+
 
 class UnaryDictOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'dict'
