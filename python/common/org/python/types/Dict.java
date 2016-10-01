@@ -339,8 +339,18 @@ public class Dict extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object popitem(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.popitem() has not been implemented.");
+    public org.python.Object popitem() {
+        if (this.value.size() == 0) {
+            throw new org.python.exceptions.KeyError(new org.python.types.Str("popitem(): dictionary is empty"));
+        }
+        java.util.Map.Entry<org.python.Object, org.python.Object> entry = this.value.entrySet().iterator().next();
+        org.python.Object key = entry.getKey();
+        org.python.Object value = this.value.remove(key);
+
+        java.util.List<org.python.Object> item_pair = new java.util.ArrayList<>();
+        item_pair.add(key);
+        item_pair.add(value);
+        return new org.python.types.Tuple(item_pair);
     }
 
     @org.python.Method(
