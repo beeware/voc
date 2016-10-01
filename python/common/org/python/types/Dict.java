@@ -264,14 +264,26 @@ public class Dict extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __contains__(org.python.Object item) {
-        return new org.python.types.Bool(this.value.get(item) != null);
+         // allow unhashable type error to be percolated up.
+        try{
+            __getitem__(item);
+            return new org.python.types.Bool(true);
+        } catch(org.python.exceptions.KeyError e) {
+            return new org.python.types.Bool(false);
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __not_contains__(org.python.Object item) {
-        return new org.python.types.Bool(this.value.get(item) == null);
+         // allow unhashable type error to be percolated up.
+        try{
+            __getitem__(item);
+            return new org.python.types.Bool(false);
+        } catch(org.python.exceptions.KeyError e) {
+            return new org.python.types.Bool(true);
+        }
     }
 
     @org.python.Method(

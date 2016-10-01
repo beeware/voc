@@ -95,6 +95,10 @@ class DictTests(TranspileTestCase):
             print('a' in x)
             print(x['a'])
             print('c' in x)
+
+            # Test __contains__ throws unhashable exception
+            print([] in x)
+            print([] not in x)
         """)
 
     def test_builtin_non_2_tuples(self):
