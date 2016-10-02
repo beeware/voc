@@ -1455,10 +1455,12 @@ public class Python {
             "        self._x = value\n" +
             "    @x.deleter\n" +
             "    def x(self):\n" +
-            "        del self._x\n"
+            "        del self._x\n",
+        args = {"fget"},
+        default_args = {"fset", "fdel", "doc"}
     )
-    public static org.python.Object property() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'property' not implemented");
+    public static org.python.Object property(org.python.Object fget, org.python.Object fset, org.python.Object fdel, org.python.Object doc) {
+        return new org.python.types.Property(fget, fset, fdel, doc);
     }
 
     @org.python.Method(

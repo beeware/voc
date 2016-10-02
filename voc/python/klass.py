@@ -7,7 +7,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import (
-    CO_GENERATOR, InitMethod, Function, Method
+    CO_GENERATOR, InitMethod, ClosureInitMethod, Function, Method
 )
 from .utils import (
     ALOAD_name, ASTORE_name, free_name
@@ -41,11 +41,7 @@ class Class(Block):
         # Mark this class as being a VOC generated class.
         self.fields["__VOC__"] = "Lorg/python/Object;"
 
-        # Make sure there is a default constructor
-        default_init = InitMethod(self)
-        default_init.visitor_setup()
-        default_init.visitor_teardown()
-        self.methods.append(default_init)
+        self.methods.append(self.constructor())
 
     @property
     def descriptor(self):
@@ -129,9 +125,18 @@ class Class(Block):
             JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', '(Ljava/util/List;)V'),
 
             JavaOpcodes.PUTFIELD('org/python/types/Type', '__bases__', 'Lorg/python/types/Tuple;'),
+
+            # Load the globals module
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.module.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
         )
 
-        self.load_name('__name__')
         self.store_name('__module__')
 
         self.add_opcodes(
@@ -189,22 +194,14 @@ class Class(Block):
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__delattr__', '(Ljava/lang/String;)V'),
         )
 
+    def constructor(self):
+        # Make sure there is a Java constructor
+        return InitMethod(self)
+
     def add_function(self, name, code, parameter_signatures, return_signature):
-        # parts = name.split('$')[-1].split('.')
-        # method_name = parts[-1]
-        # class_name = parts[-2]
-
-        # if class_name != self.klass.name:
-        #     raise Exception("Method %s being added to %s!" % (class_name, self.klass.name))
-
-        # print (code)
         if False:  # FIXME code.co_flags & CO_GENERATOR:
             raise Exception("Can't handle Generator instance methods (yet)")
         else:
-            # return_type = annotations.get('return', 'org/python/Object')
-            # if return_type is None:
-            #     return_type = 'void'
-
             method = Method(
                 self,
                 name=name,
@@ -214,16 +211,12 @@ class Class(Block):
                 static=True,
             )
 
-
         # Add the method to the list that need to be
         # transpiled into Java methods
         self.methods.append(method)
 
         # Add a definition of the callable object
         self.add_callable(method)
-
-        # Store the callable object as an accessible symbol.
-        self.store_name(method.name)
 
         if method.name == '__init__':
             self.init_method = method
@@ -318,19 +311,17 @@ class Class(Block):
 
 
 class ClosureClass(Class):
-    def __init__(self, module, closure_var_names, name=None, extends=None, bases=None, implements=None, public=True, final=False, methods=None, init=None, verbosity=0):
-        self.closure_var_names = closure_var_names
+    def __init__(self, module, name, closure_var_names, verbosity=0):
         super().__init__(
             module=module,
             name=name,
-            namespace=module.namespace,
-            bases=bases,
-            extends=extends,
-            implements=implements,
-            public=public,
-            final=final,
-            methods=methods,
-            init=init,
+            extends='org/python/types/Closure',
+            implements=['org/python/Callable'],
             verbosity=verbosity,
             include_default_constructor=False,
         )
+        self.closure_var_names = closure_var_names
+
+    def constructor(self):
+        # Make sure there is a default constructor
+        return ClosureInitMethod(self)

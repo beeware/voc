@@ -231,6 +231,7 @@ class Visitor(ast.NodeVisitor):
 
         name_visitor = NameVisitor()
 
+        # Build the definition of the function
         default_vars = []
         parameter_signatures = []
         for i, arg in enumerate(node.args.args):
@@ -289,12 +290,33 @@ class Visitor(ast.NodeVisitor):
             'annotation': name_visitor.evaluate(node.returns).annotation
         }
 
+        # Now actually define the function.
+        for decorator in node.decorator_list:
+            self.visit(decorator)
+            self.context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/Callable'),
+                JavaOpcodes.ICONST_1(),
+                JavaOpcodes.ANEWARRAY('org/python/Object'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.ICONST_0(),
+            )
+
         function = self.context.add_function(
             name=node.name,
             code=code,
             parameter_signatures=parameter_signatures,
             return_signature=return_signature
         )
+
+        for decorator in node.decorator_list[::-1]:
+            self.context.add_opcodes(
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.ACONST_NULL(),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+            )
+
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(node.name)
 
         # Free all the variables used for default storage.
         for default in default_vars:
@@ -364,8 +386,18 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Delete(self, node):
-        # expr* targets):
-        raise NotImplementedError('No handler for Delete')
+        for target in node.targets:
+            self.visit(target)
+            if isinstance(target, ast.Attribute):
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__delattr__', '(Ljava/lang/String;)V'),
+                )
+            elif isinstance(target, ast.Subscript):
+                self.context.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__delitem__', '(Lorg/python/Object;)V'),
+                )
+            else:
+                raise NotImplementedError('No handler for Delete of type %s' % target)
 
     @node_visitor
     def visit_Assign(self, node):
@@ -899,8 +931,9 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
+        listcomp_name = 'listcomp_%x' % id(node)
         listcomp = self.context.add_function(
-            name='listcomp_%x' % id(node),
+            name=listcomp_name,
             code=code,
             parameter_signatures=[
                 {
@@ -915,6 +948,9 @@ class Visitor(ast.NodeVisitor):
                 'annotation': 'org/python/types/List'
             }
         )
+
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(listcomp_name)
 
         self.push_context(listcomp)
 
@@ -1044,8 +1080,9 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
+        setcomp_name = 'setcomp_%x' % id(node)
         setcomp = self.context.add_function(
-            name='setcomp_%x' % id(node),
+            name=setcomp_name,
             code=code,
             parameter_signatures=[
                 {
@@ -1060,6 +1097,8 @@ class Visitor(ast.NodeVisitor):
                 'annotation': 'org/python/types/Set'
             }
         )
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(setcomp_name)
 
         self.push_context(setcomp)
 
@@ -1171,8 +1210,9 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
+        dictcomp_name = 'dictcomp_%x' % id(node)
         dictcomp = self.context.add_function(
-            name='dictcomp_%x' % id(node),
+            name=dictcomp_name,
             code=code,
             parameter_signatures=[
                 {
@@ -1187,6 +1227,8 @@ class Visitor(ast.NodeVisitor):
                 'annotation': 'org/python/types/Dict'
             }
         )
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(dictcomp_name)
 
         self.push_context(dictcomp)
 
@@ -1308,8 +1350,9 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
+        genexp_name = 'genexp_%x' % id(node)
         genexp = self.context.add_function(
-            name='genexp_%x' % id(node),
+            name=genexp_name,
             code=code,
             parameter_signatures=[
                 {
@@ -1324,6 +1367,9 @@ class Visitor(ast.NodeVisitor):
                 'annotation': 'org/python/types/List'
             }
         )
+
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(genexp_name)
 
         self.push_context(genexp)
 
@@ -1780,8 +1826,12 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.SWAP(),
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
             )
+        elif type(node.ctx) == ast.Del:
+            self.context.add_opcodes(
+                JavaOpcodes.LDC_W(node.attr),
+            )
         else:
-            raise NotImplmentedError("Unknown context %s" % node.ctx)
+            raise NotImplementedError("Unknown context %s" % node.ctx)
 
     @node_visitor
     def visit_Subscript(self, node):
@@ -1802,8 +1852,11 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
             )
             free_name(self.context, '#value')
+        elif type(node.ctx) == ast.Del:
+            self.visit(node.value)
+            self.visit(node.slice)
         else:
-            raise NotImplmentedError("Unknown context %s" % node.ctx)
+            raise NotImplementedError("Unknown context %s" % node.ctx)
 
     @node_visitor
     def visit_Starred(self, node):

@@ -165,9 +165,6 @@ class Module(Block):
         # Add a definition of the callable object
         self.add_callable(function)
 
-        # Store the callable object as an accessible symbol.
-        self.store_name(function.name)
-
         return function
 
     def add_class(self, class_name, bases, extends, implements):

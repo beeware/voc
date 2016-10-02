@@ -287,6 +287,8 @@ public class BaseException extends java.lang.RuntimeException implements org.pyt
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__delattr__' has not been implemented");
     }
 
+    public void __delete__(org.python.Object instance) {}
+
     @org.python.Method(
         __doc__ = "Implement dir(self, name)."
     )

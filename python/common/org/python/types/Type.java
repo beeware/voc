@@ -160,9 +160,9 @@ public class Type extends org.python.types.Object implements org.python.Callable
         if (origin != Origin.PLACEHOLDER) {
             this.klass = klass;
 
-            this.__dict__.put("__name__", new org.python.types.Str(this.klass.getName()));
-            this.__dict__.put("__qualname__", new org.python.types.Str(this.klass.getName()));
-            // this.__dict__.put("__module__", );
+            java.lang.String klass_name = this.klass.getName();
+            this.__dict__.put("__name__", new org.python.types.Str(klass_name));
+            this.__dict__.put("__qualname__", new org.python.types.Str(klass_name));
         }
 
         if (origin == Origin.BUILTIN) {
@@ -226,6 +226,23 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
         if (value instanceof org.python.exceptions.AttributeError) {
             value = null;
+        }
+
+        // If we still don't have a value, look for a global
+        // variable defined at the module level.
+        if (value == null) {
+            // System.out.println("CLASS ATTRS " + this.klass);
+            org.python.Object module = this.__dict__.get("__module__");
+            if (module != null) {
+                // System.out.println("Look for attribute in " + module);
+                value = module.__getattribute_null(name);
+            }
+        }
+
+        // If we don't have a module attribute, look for a builtin.
+        if (value == null) {
+            // System.out.println("Look for attribute in builtins " + name);
+            value = org.Python.builtins.get(name);
         }
 
         // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name + " = " + value);
