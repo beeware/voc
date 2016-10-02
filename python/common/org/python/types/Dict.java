@@ -264,14 +264,26 @@ public class Dict extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __contains__(org.python.Object item) {
-        return new org.python.types.Bool(this.value.get(item) != null);
+         // allow unhashable type error to be percolated up.
+        try{
+            __getitem__(item);
+            return new org.python.types.Bool(true);
+        } catch(org.python.exceptions.KeyError e) {
+            return new org.python.types.Bool(false);
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __not_contains__(org.python.Object item) {
-        return new org.python.types.Bool(this.value.get(item) == null);
+         // allow unhashable type error to be percolated up.
+        try{
+            __getitem__(item);
+            return new org.python.types.Bool(false);
+        } catch(org.python.exceptions.KeyError e) {
+            return new org.python.types.Bool(true);
+        }
     }
 
     @org.python.Method(
@@ -327,15 +339,34 @@ public class Dict extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.Object popitem(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.popitem() has not been implemented.");
+    public org.python.Object popitem() {
+        if (this.value.size() == 0) {
+            throw new org.python.exceptions.KeyError(new org.python.types.Str("popitem(): dictionary is empty"));
+        }
+        java.util.Map.Entry<org.python.Object, org.python.Object> entry = this.value.entrySet().iterator().next();
+        org.python.Object key = entry.getKey();
+        org.python.Object value = this.value.remove(key);
+
+        java.util.List<org.python.Object> item_pair = new java.util.ArrayList<>();
+        item_pair.add(key);
+        item_pair.add(value);
+        return new org.python.types.Tuple(item_pair);
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        default_args = {"other", "default_value"}
     )
-    public org.python.Object setdefault(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.setdefault() has not been implemented.");
+    public org.python.Object setdefault(org.python.Object other, org.python.Object default_value) {
+        try {
+            return this.__getitem__(other);
+        } catch (org.python.exceptions.KeyError e){ // allow unhashable type error to be percolated up.
+            if (default_value == null) {
+                default_value = org.python.types.NoneType.NONE;
+            }
+            __setitem__(other, default_value);
+            return default_value;
+        }
     }
 
     @org.python.Method(
