@@ -57,7 +57,6 @@ class MethodTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
-    @expectedFailure
     def test_closure(self):
         self.assertCodeExecution("""
             class TestObj:
