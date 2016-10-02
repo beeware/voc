@@ -324,7 +324,7 @@ class Block:
                 JavaOpcodes.ATHROW(),
             END_TRY()
         )
-        free_name(self, '#EXCEPTION#'),
+        free_name(self, '#EXCEPTION#')
 
     def stack_depth(self):
         "Evaluate the maximum stack depth required by a sequence of Java opcodes"

@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from ..utils import TranspileTestCase
 
 
@@ -55,7 +53,6 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
-    @expectedFailure
     def test_closure(self):
         self.assertCodeExecution("""
             def myfunc(value):

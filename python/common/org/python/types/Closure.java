@@ -1,8 +1,7 @@
 package org.python.types;
 
 public class Closure extends org.python.types.Object {
-    public java.util.List<org.python.Object> default_args;
-    public java.util.Map<java.lang.String, org.python.Object> default_kwargs;
+    public java.util.Map<java.lang.String, org.python.Object> closure_vars;
 
     /**
      * A utility method to update the internal value of this object.
@@ -13,8 +12,9 @@ public class Closure extends org.python.types.Object {
     void setValue(org.python.Object obj) {
     }
 
-    public Closure(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        super(args, kwargs);
+    public Closure(java.util.Map<java.lang.String, org.python.Object> vars) {
+        super();
+        this.closure_vars = vars;
     }
 
     @org.python.Method(
@@ -23,5 +23,4 @@ public class Closure extends org.python.types.Object {
     public org.python.Object __repr__() {
         return new org.python.types.Str(String.format("<function %s at 0x%x>", this.typeName(), this.hashCode()));
     }
-
 }

@@ -192,21 +192,18 @@ class Function(Block):
         # If a function is added to a function, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
+        print("CLOSURE VAR NAMES", code.co_names)
         klass = ClosureClass(
             module=self.module,
             name='%s$%s$%s' % (self.module.name, self.name, name),
-            closure_var_names=[],  # code.co_names,
-            bases=['org/python/types/Closure'],
-            implements=['org/python/Callable'],
-            public=True,
-            final=True,
+            closure_var_names=code.co_names,
         )
         self.module.classes.append(klass)
 
         klass.visitor_setup()
 
         if code.co_flags & CO_GENERATOR:
-            method = GeneratorClosure(
+            closure = GeneratorClosure(
                 klass,
                 code=code,
                 generator=code.co_name,
@@ -214,14 +211,14 @@ class Function(Block):
                 returns=return_signature,
             )
         else:
-            method = Closure(
+            closure = Closure(
                 klass,
                 code=code,
                 parameters=parameter_signatures,
                 returns=return_signature,
             )
 
-        klass.methods.append(method)
+        klass.methods.append(closure)
 
         for field in code.co_names:
             klass.fields[field] = 'Lorg/python/Object;'
@@ -232,11 +229,27 @@ class Function(Block):
             JavaOpcodes.NEW(klass.descriptor),
             JavaOpcodes.DUP(),
 
-            # These are the args and kwargs for the closure class
-            JavaOpcodes.ACONST_NULL(),
-            JavaOpcodes.ACONST_NULL(),
+            # Define the closure vars
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V')
+        )
 
-            JavaOpcodes.INVOKESPECIAL(klass.descriptor, '<init>', '([Lorg/python/Object;Ljava/util/Map;)V'),
+        for var_name in code.co_names:
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(var_name),
+            )
+
+            self.load_name(var_name)
+
+            self.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                JavaOpcodes.POP(),
+            )
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKESPECIAL(klass.descriptor, '<init>', '(Ljava/util/Map;)V'),
 
             JavaOpcodes.LDC_W(Classref(klass.descriptor)),
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'pythonType', '(Ljava/lang/Class;)Lorg/python/types/Type;'),
@@ -245,7 +258,7 @@ class Function(Block):
         )
 
         # Store the closure instance as an accessible symbol.
-        self.add_callable(method)
+        self.add_callable(closure)
 
         self.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
@@ -253,9 +266,7 @@ class Function(Block):
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
 
-        self.store_name(name)
-
-        return method
+        return closure
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
@@ -294,12 +305,12 @@ class Function(Block):
 
 
 class InitMethod(Function):
-    def __init__(self, klass):
+    def __init__(self, klass, parameters=None):
         super().__init__(
             klass,
             name='<init>',
             code=None,
-            parameters=[
+            parameters=parameters if parameters else [
                 {
                     'name': 'self',
                     'kind': ArgType.POSITIONAL_OR_KEYWORD,
@@ -318,6 +329,7 @@ class InitMethod(Function):
             ],
             returns={'annotation': None},
         )
+        self.build()
 
     def __repr__(self):
         return '<Constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
@@ -346,8 +358,8 @@ class InitMethod(Function):
     def signature(self):
         return '([Lorg/python/Object;Ljava/util/Map;)V'
 
-    def visitor_setup(self):
-        # Get the __init__ method for the class...
+    def build(self):
+        # Construct the contents of the constructor method...
         self.add_opcodes(
             # Create the instance
             JavaOpcodes.ALOAD_0(),
@@ -355,9 +367,7 @@ class InitMethod(Function):
             # TODO - this only allows using the default constructor
             # for extended Java classes.
             JavaOpcodes.INVOKESPECIAL(self.klass.extends_descriptor, '<init>', '()V'),
-        )
 
-        self.add_opcodes(
             JavaOpcodes.INVOKESTATIC('org/python/types/Type', 'toPython', '(Ljava/lang/Object;)Lorg/python/Object;'),
 
             JavaOpcodes.LDC_W('__init__'),
@@ -375,11 +385,8 @@ class InitMethod(Function):
             JavaOpcodes.ALOAD_2(),  # 1
             JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),  # 5
 
-            JavaOpcodes.POP()  # 1
-        )
+            JavaOpcodes.POP(),  # 1
 
-    def visitor_teardown(self):
-        self.add_opcodes(
             JavaOpcodes.RETURN()
         )
 
@@ -856,7 +863,7 @@ class Closure(Function):
         )
 
     def __repr__(self):
-        return '<Closure %s (%s parameters, %s closure vars)>' % (
+        return '<Closure %s (%s parameters, %s closure variables)>' % (
             self.name, len(self.parameters), len(self.klass.closure_var_names)
         )
 
@@ -876,6 +883,74 @@ class Closure(Function):
         self.local_vars['self'] = len(self.local_vars)
         self.has_self = True
 
+    def load_name(self, name):
+        if name in self.local_vars:
+            self.add_opcodes(
+                ALOAD_name(self, name)
+            )
+        elif name in self.klass.closure_var_names:
+            self.add_opcodes(
+                ALOAD_name(self, 'self'),
+                JavaOpcodes.GETFIELD('org/python/types/Closure', 'closure_vars', 'Ljava/util/Map;'),
+                JavaOpcodes.LDC_W(name),
+                JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
+            )
+        else:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+                JavaOpcodes.NEW('org/python/types/Str'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(self.module.full_name),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                JavaOpcodes.LDC_W(name),
+
+                JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
+            )
+
+
+class ClosureInitMethod(InitMethod):
+    def __init__(self, klass):
+        super().__init__(
+            klass,
+            parameters=[
+                {
+                    'name': 'self',
+                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                    'annotation': 'org/python/Object'
+                },
+                {
+                    'name': 'kwargs',
+                    'kind': ArgType.VAR_KEYWORD,
+                    'annotation': 'java/util/Map'
+                }
+            ],
+        )
+
+    def __repr__(self):
+        return '<Closure constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
+
+    @property
+    def signature(self):
+        return '(Ljava/util/Map;)V'
+
+    def build(self):
+        # Get the __init__ method for the class...
+        self.add_opcodes(
+            # Create the instance
+            JavaOpcodes.ALOAD_0(),
+            JavaOpcodes.DUP(),
+            # TODO - this only allows using the default constructor
+            # for extended Java classes.
+            JavaOpcodes.ALOAD_1(),
+            JavaOpcodes.INVOKESPECIAL(self.klass.extends_descriptor, '<init>', '(Ljava/util/Map;)V'),
+
+            JavaOpcodes.RETURN()
+        )
 
 class GeneratorFunction(Function):
     def __init__(self, module, name, code, generator, parameters, returns=None, static=False):
@@ -1008,8 +1083,8 @@ class GeneratorClosure(GeneratorFunction):
         )
 
     def __repr__(self):
-        return '<GeneratorClosure %s (%s parameters, %s closure vars)>' % (
-            self.name, len(self.parameters), len(self.klass.closure_var_names)
+        return '<GeneratorClosure %s (%s parameters)>' % (
+            self.name, len(self.parameters)
         )
 
     @property

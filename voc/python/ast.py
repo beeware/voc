@@ -231,6 +231,7 @@ class Visitor(ast.NodeVisitor):
 
         name_visitor = NameVisitor()
 
+        # Build the definition of the function
         default_vars = []
         parameter_signatures = []
         for i, arg in enumerate(node.args.args):
@@ -289,12 +290,33 @@ class Visitor(ast.NodeVisitor):
             'annotation': name_visitor.evaluate(node.returns).annotation
         }
 
+        # Now actually define the function.
+        for decorator in node.decorator_list:
+            self.visit(decorator)
+            self.context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/Callable'),
+                JavaOpcodes.ICONST_1(),
+                JavaOpcodes.ANEWARRAY('org/python/Object'),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.ICONST_0(),
+            )
+
         function = self.context.add_function(
             name=node.name,
             code=code,
             parameter_signatures=parameter_signatures,
             return_signature=return_signature
         )
+
+        for decorator in node.decorator_list[::-1]:
+            self.context.add_opcodes(
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.ACONST_NULL(),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+            )
+
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(node.name)
 
         # Free all the variables used for default storage.
         for default in default_vars:
@@ -926,6 +948,9 @@ class Visitor(ast.NodeVisitor):
             }
         )
 
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(listcomp.name)
+
         self.push_context(listcomp)
 
         LocalsVisitor(listcomp).visit(node)
@@ -1070,6 +1095,8 @@ class Visitor(ast.NodeVisitor):
                 'annotation': 'org/python/types/Set'
             }
         )
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(setcomp.name)
 
         self.push_context(setcomp)
 
@@ -1197,6 +1224,8 @@ class Visitor(ast.NodeVisitor):
                 'annotation': 'org/python/types/Dict'
             }
         )
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(dictcomp.name)
 
         self.push_context(dictcomp)
 
@@ -1334,6 +1363,9 @@ class Visitor(ast.NodeVisitor):
                 'annotation': 'org/python/types/List'
             }
         )
+
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(genexp.name)
 
         self.push_context(genexp)
 
