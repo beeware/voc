@@ -95,6 +95,10 @@ class DictTests(TranspileTestCase):
             print('a' in x)
             print(x['a'])
             print('c' in x)
+
+            # Test __contains__ throws unhashable exception
+            print([] in x)
+            print([] not in x)
         """)
 
     def test_builtin_non_2_tuples(self):
@@ -107,6 +111,49 @@ class DictTests(TranspileTestCase):
         # One of the elements isn't a sequence
         self.assertCodeExecution("""
             x = dict([('a', 1), False, ('b', 2)])
+            """)
+
+    def test_method_popitem(self):
+        self.assertCodeExecution("""
+            ITEMS = [(1, 2), (3, ("4", 5))]
+            x = dict(ITEMS)
+
+            popped_1 = x.popitem()
+            print(popped_1 in ITEMS)
+
+            popped_2 = x.popitem()
+            print(popped_2 in ITEMS and popped_2 != popped_1)
+
+            print(x.popitem()) # Check for exception
+            """)
+
+    def test_method_setdefault(self):
+        self.assertCodeExecution("""
+            x = {42: 'Babel'}
+            print(x.setdefault(42)) # should return Babel
+
+            print(x.setdefault(1)) # should return None
+            print(x[1] == None) # should be True
+
+            print(x.setdefault('David', 'Gilmour')) # should return 'Gilmour'
+
+            # Check unhashable exceptions
+            x.setdefault([], 42)
+            """)
+
+    def test_method_get(self):
+        self.assertCodeExecution("""
+            x = {1: 2}
+            print(x.get(1))
+            print(x.get(2))
+            print(x.get(3,4))
+            """)
+
+        # check for unhashable type errors
+        self.assertCodeExecution("""
+            x = {1: 2}
+            print(x.get([]))
+            print(x.get([], 1))
             """)
 
 
