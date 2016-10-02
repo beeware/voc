@@ -931,8 +931,9 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
+        listcomp_name = 'listcomp_%x' % id(node)
         listcomp = self.context.add_function(
-            name='listcomp_%x' % id(node),
+            name=listcomp_name,
             code=code,
             parameter_signatures=[
                 {
@@ -949,7 +950,7 @@ class Visitor(ast.NodeVisitor):
         )
 
         # Store the callable object as an accessible symbol.
-        self.context.store_name(listcomp.name)
+        self.context.store_name(listcomp_name)
 
         self.push_context(listcomp)
 
@@ -1079,8 +1080,9 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
+        setcomp_name = 'setcomp_%x' % id(node)
         setcomp = self.context.add_function(
-            name='setcomp_%x' % id(node),
+            name=setcomp_name,
             code=code,
             parameter_signatures=[
                 {
@@ -1096,7 +1098,7 @@ class Visitor(ast.NodeVisitor):
             }
         )
         # Store the callable object as an accessible symbol.
-        self.context.store_name(setcomp.name)
+        self.context.store_name(setcomp_name)
 
         self.push_context(setcomp)
 
@@ -1208,8 +1210,9 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
+        dictcomp_name = 'dictcomp_%x' % id(node)
         dictcomp = self.context.add_function(
-            name='dictcomp_%x' % id(node),
+            name=dictcomp_name,
             code=code,
             parameter_signatures=[
                 {
@@ -1225,7 +1228,7 @@ class Visitor(ast.NodeVisitor):
             }
         )
         # Store the callable object as an accessible symbol.
-        self.context.store_name(dictcomp.name)
+        self.context.store_name(dictcomp_name)
 
         self.push_context(dictcomp)
 
@@ -1347,8 +1350,9 @@ class Visitor(ast.NodeVisitor):
         )
         code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
 
+        genexp_name = 'genexp_%x' % id(node)
         genexp = self.context.add_function(
-            name='genexp_%x' % id(node),
+            name=genexp_name,
             code=code,
             parameter_signatures=[
                 {
@@ -1365,7 +1369,7 @@ class Visitor(ast.NodeVisitor):
         )
 
         # Store the callable object as an accessible symbol.
-        self.context.store_name(genexp.name)
+        self.context.store_name(genexp_name)
 
         self.push_context(genexp)
 
