@@ -128,6 +128,7 @@ class Visitor(ast.NodeVisitor):
         self.current_exc_name = []
 
         self.symbol_namespace = {}
+        self.code_objects = {}
 
     @property
     def context(self):
@@ -148,6 +149,19 @@ class Visitor(ast.NodeVisitor):
     def full_classref(self, name, default_prefix=None):
         return self.symbol_namespace.get(name, '.'.join([default_prefix, name])).replace('.', '/')
 
+    def extract_code_objects(self, compiled):
+        for obj in compiled.co_consts:
+            if isinstance(obj, type(compiled)):
+                if (obj.co_firstlineno, obj.co_name) in self.code_objects:
+                    print(
+                        'WARNING: multiple %s code objects found on line %s' % (
+                            obj.co_name, obj.co_firstlineno
+                        ),
+                        file=sys.stderr
+                    )
+                self.code_objects[(obj.co_firstlineno, obj.co_name)] = obj
+                self.extract_code_objects(obj)
+
     def visit(self, node):
         try:
             super().visit(node)
@@ -160,6 +174,10 @@ class Visitor(ast.NodeVisitor):
         return self._root_module
 
     def visit_Module(self, node):
+        # Compile the module, and extract all the code objects
+        compiled = compile(node, filename=self.filename, mode='exec')
+        self.extract_code_objects(compiled)
+
         module = Module(self.namespace, self.filename)
         self.push_context(module)
 
@@ -216,22 +234,11 @@ class Visitor(ast.NodeVisitor):
         # stmt* body):
         raise NotImplementedError('No handler for Suite')
 
-    # # Statements
+    # Statements
     @node_visitor
     def visit_FunctionDef(self, node):
-        # We need the code object for the AST function definition.
-        # Create and compile a module that only contains the function def;
-        # the co_consts for the module will contain exactly 1 code object.
-        compiled = compile(
-            ast.Module(body=[node]),
-            filename=self.context.module.sourcefile,
-            mode='exec'
-        )
-        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
-
-        name_visitor = NameVisitor()
-
         # Build the definition of the function
+        name_visitor = NameVisitor()
         default_vars = []
         parameter_signatures = []
         for i, arg in enumerate(node.args.args):
@@ -303,7 +310,7 @@ class Visitor(ast.NodeVisitor):
 
         function = self.context.add_function(
             name=node.name,
-            code=code,
+            code=self.code_objects[(node.lineno, node.name)],
             parameter_signatures=parameter_signatures,
             return_signature=return_signature
         )
@@ -332,8 +339,6 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_ClassDef(self, node):
-        # identifier name, expr* bases, keyword* keywords, expr? starargs, expr? kwargs, stmt* body, expr* decorator_list):
-
         # Construct a class.
         class_name = node.name
 
@@ -915,26 +920,10 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_ListComp(self, node):
-        # Get the code object for the list comprehension.
-        compiled = compile(
-            ast.Module(
-                body=[
-                    ast.Expr(
-                        value=node,
-                        lineno=node.lineno,
-                        col_offset=node.col_offset
-                    )
-                ]
-            ),
-            filename=self.context.module.sourcefile,
-            mode='exec'
-        )
-        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
-
         listcomp_name = 'listcomp_%x' % id(node)
         listcomp = self.context.add_function(
             name=listcomp_name,
-            code=code,
+            code=self.code_objects[(node.lineno, '<listcomp>')],
             parameter_signatures=[
                 {
                     'name': '.%s' % i,
@@ -1065,25 +1054,10 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_SetComp(self, node):
         # Get the code object for the list comprehension.
-        compiled = compile(
-            ast.Module(
-                body=[
-                    ast.Expr(
-                        value=node,
-                        lineno=node.lineno,
-                        col_offset=node.col_offset
-                    )
-                ]
-            ),
-            filename=self.context.module.sourcefile,
-            mode='exec'
-        )
-        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
-
         setcomp_name = 'setcomp_%x' % id(node)
         setcomp = self.context.add_function(
             name=setcomp_name,
-            code=code,
+            code=self.code_objects[(node.lineno, '<setcomp>')],
             parameter_signatures=[
                 {
                     'name': '.%s' % i,
@@ -1194,26 +1168,10 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_DictComp(self, node):
-        # Get the code object for the dict comprehension.
-        compiled = compile(
-            ast.Module(
-                body=[
-                    ast.Expr(
-                        value=node,
-                        lineno=node.lineno,
-                        col_offset=node.col_offset
-                    )
-                ]
-            ),
-            filename=self.context.module.sourcefile,
-            mode='exec'
-        )
-        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
-
         dictcomp_name = 'dictcomp_%x' % id(node)
         dictcomp = self.context.add_function(
             name=dictcomp_name,
-            code=code,
+            code=self.code_objects[(node.lineno, '<dictcomp>')],
             parameter_signatures=[
                 {
                     'name': '.%s' % i,
@@ -1334,26 +1292,10 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_GeneratorExp(self, node):
-        # Get the code object for the generator expression.
-        compiled = compile(
-            ast.Module(
-                body=[
-                    ast.Expr(
-                        value=node,
-                        lineno=node.lineno,
-                        col_offset=node.col_offset
-                    )
-                ]
-            ),
-            filename=self.context.module.sourcefile,
-            mode='exec'
-        )
-        code = [c for c in compiled.co_consts if isinstance(c, type(compiled))][0]
-
         genexp_name = 'genexp_%x' % id(node)
         genexp = self.context.add_function(
             name=genexp_name,
-            code=code,
+            code=self.code_objects[(node.lineno, '<genexpr>')],
             parameter_signatures=[
                 {
                     'name': '.%s' % i,

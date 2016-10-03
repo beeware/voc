@@ -192,11 +192,10 @@ class Function(Block):
         # If a function is added to a function, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
-        print("CLOSURE VAR NAMES", code.co_names)
         klass = ClosureClass(
             module=self.module,
             name='%s$%s$%s' % (self.module.name, self.name, name),
-            closure_var_names=code.co_names,
+            closure_var_names=code.co_freevars,
         )
         self.module.classes.append(klass)
 
@@ -235,7 +234,7 @@ class Function(Block):
             JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V')
         )
 
-        for var_name in code.co_names:
+        for var_name in code.co_freevars:
             self.add_opcodes(
                 JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(var_name),
