@@ -796,7 +796,7 @@ def _inplace_test(test_name, operation, examples):
             y_values=examples,
             operation=operation,
             format=self.format,
-            substitutions=getattr(self, 'substitutions', 'SAMPLE_SUBSTITUTIONS')
+            substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
     return func
 
