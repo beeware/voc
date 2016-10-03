@@ -636,10 +636,12 @@ public class Python {
         __doc__ = "delattr(object, name)" +
             "\n" +
             "Delete a named attribute on an object; delattr(x, 'y') is equivalent to\n" +
-            "``del x.y''.\n"
+            "``del x.y''.\n",
+            args = {"object", "name"}
     )
-    public static org.python.Object delattr() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'delattr' not implemented");
+    public static org.python.Object delattr(org.python.Object object, org.python.Object name) {
+        object.__delattr__(name);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -834,10 +836,23 @@ public class Python {
             "\n" +
             "Get a named attribute from an object; getattr(x, 'y') is equivalent to x.y.\n" +
             "When a default argument is given, it is returned when the attribute doesn't\n" +
-            "exist; without it, an exception is raised in that case.\n"
+            "exist; without it, an exception is raised in that case.\n",
+        args = {"object", "name"},
+        default_args = {"default_"}
     )
-    public static org.python.Object getattr() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'getattr' not implemented");
+    public static org.python.Object getattr(org.python.Object object, org.python.Object name, org.python.Object default_) {
+        org.python.Object result;
+        try {
+            result = object.__getattribute__(name);
+        } catch (org.python.exceptions.AttributeError ae) {
+            if (default_ == null) {
+                throw ae;
+            }
+            result = default_;
+        } catch (org.python.exceptions.TypeError te) {
+            throw new org.python.exceptions.TypeError(te.getMessage().replace("__getattribute__", "getattr"));
+        }
+        return result;
     }
 
     @org.python.Method(
@@ -1568,16 +1583,20 @@ public class Python {
         }
     }
 
-
-
     @org.python.Method(
         __doc__ = "setattr(object, name, value)" +
             "\n" +
             "Set a named attribute on an object; setattr(x, 'y', v) is equivalent to\n" +
-            "``x.y = v''.\n"
+            "``x.y = v''.\n",
+        args = {"object", "name", "value"}
     )
-    public static org.python.Object setattr() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'setattr' not implemented");
+    public static org.python.Object setattr(org.python.Object object, org.python.Object name, org.python.Object value) {
+        try {
+            object.__setattr__(name, value);
+            return org.python.types.NoneType.NONE;
+        } catch (org.python.exceptions.TypeError te) {
+            throw new org.python.exceptions.TypeError(te.getMessage().replace("__setattr__", "setattr"));
+        }
     }
 
     @org.python.Method(
