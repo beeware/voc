@@ -173,7 +173,10 @@ class Module(Block):
         klass = Class(
             self,
             name=class_name,
-            bases=bases,
+            bases=[
+                'org/python/Object' if b == 'object' else b
+                for b in bases
+            ],
             extends=extends,
             implements=implements,
         )
