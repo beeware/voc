@@ -75,12 +75,12 @@ class DescriptorTests(TranspileTestCase):
                     self._attr = value * 2
                     print("Attribute set")
 
-                def deleter(self, value):
-                    print("Setting attribute")
-                    self._attr = value * 2
-                    print("Attribute set")
+                def deleter(self):
+                    print("Deleting attribute")
+                    self._attr = 42
+                    print("Attribute deleted")
 
-                attr = property(getter)
+                attr = property(getter, setter, deleter)
 
             obj = MyObject()
             print("obj.attr =", obj.attr)
@@ -88,5 +88,80 @@ class DescriptorTests(TranspileTestCase):
             print("obj.attr =", obj.attr)
             del obj.attr
             print("obj.attr =", obj.attr)
+            print("Done.")
+            """)
+
+    def test_with_decorators(self):
+        self.assertCodeExecution("""
+            class MyObject:
+                def __init__(self):
+                    self._attr = None
+
+                @property
+                def attr(self):
+                    print("Got attribute")
+                    return self._attr
+
+                @attr.setter
+                def attr(self, value):
+                    print("Setting attribute")
+                    self._attr = value * 2
+                    print("Attribute set")
+
+                @attr.deleter
+                def attr(self):
+                    print("Deleting attribute")
+                    self._attr = 42
+                    print("Attribute deleted")
+
+            obj = MyObject()
+            print("obj.attr =", obj.attr)
+            obj.attr = 2345
+            print("obj.attr =", obj.attr)
+            del obj.attr
+            print("obj.attr =", obj.attr)
+            print("Done.")
+            """)
+
+    def test_with_decorators_misnamed_methods(self):
+        self.assertCodeExecution("""
+            class MyObject:
+                def __init__(self):
+                    self._attr = None
+
+                @property
+                def attr(self):
+                    print("Got attribute")
+                    return self._attr
+
+                @attr.setter
+                def attr1(self, value):
+                    print("Setting attribute")
+                    self._attr = value * 2
+                    print("Attribute set")
+
+                @attr.deleter
+                def attr2(self):
+                    print("Deleting attribute")
+                    self._attr = 42
+                    print("Attribute deleted")
+
+            obj = MyObject()
+            print("obj.attr =", obj.attr)
+            print("obj.attr1 =", obj.attr1)
+            print("obj.attr2 =", obj.attr2)
+            obj.attr1 = 2345
+            print("obj.attr =", obj.attr)
+            print("obj.attr1 =", obj.attr1)
+            print("obj.attr2 =", obj.attr2)
+            try:
+                obj.attr2 = 3456
+                print("Shouldn't be able to set value of attr2")
+            except AttributeError:
+                print("Can't set value of attr2")
+            del obj.attr2
+            print("obj.attr =", obj.attr)
+            print("obj.attr1 =", obj.attr1)
+            print("obj.attr2 =", obj.attr2)
             print("Done.")
             """)
