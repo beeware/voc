@@ -207,3 +207,17 @@ class FunctionTests(TranspileTestCase):
             print("values count =", myfunc(*values_tuple))
             print('Done.')
             """, run_in_function=False)
+
+    def test_redefine(self):
+        self.assertCodeExecution("""
+            def myfunc(value):
+                print(value * 3)
+                return value + 5
+
+            def myfunc(value):
+                print(value * 4)
+                return value + 6
+
+            print("value =", myfunc(5))
+            print('Done.')
+            """)

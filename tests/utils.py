@@ -680,7 +680,7 @@ def _unary_test(test_name, operation):
             x_values=SAMPLE_DATA[self.data_type],
             operation=operation,
             format=self.format,
-            substitutions=SAMPLE_SUBSTITUTIONS
+            substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
     return func
 
@@ -725,7 +725,7 @@ def _binary_test(test_name, operation, examples):
             y_values=examples,
             operation=operation,
             format=self.format,
-            substitutions=SAMPLE_SUBSTITUTIONS
+            substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
     return func
 
@@ -796,7 +796,7 @@ def _inplace_test(test_name, operation, examples):
             y_values=examples,
             operation=operation,
             format=self.format,
-            substitutions=SAMPLE_SUBSTITUTIONS,
+            substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
     return func
 
@@ -861,7 +861,7 @@ def _builtin_test(test_name, operation, examples):
             f_values=self.functions,
             operation=operation,
             format=self.format,
-            substitutions=SAMPLE_SUBSTITUTIONS
+            substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
     return func
 
@@ -913,7 +913,7 @@ def _builtin_twoarg_test(test_name, operation, examples1, examples2):
             y_values=examples2,
             operation=operation,
             format=self.format,
-            substitutions=SAMPLE_SUBSTITUTIONS
+            substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
     return func
 

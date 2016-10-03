@@ -23,7 +23,6 @@ class DecoratorTests(TranspileTestCase):
             print("Done.")
             """)
 
-    @expectedFailure
     def test_decorator_with_argument(self):
         self.assertCodeExecution("""
             def thing(multiplier):

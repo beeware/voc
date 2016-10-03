@@ -24,6 +24,7 @@ class Block:
         self.parameters = []
         self.local_vars = {}
         self.deleted_vars = set()
+        self.symbols = {}
 
         self.generator = None
         self.yield_points = []
@@ -244,7 +245,7 @@ class Block:
 
                 # Get a Java Method representing the new function
                 JavaOpcodes.LDC_W(Classref(function.class_descriptor)),
-                JavaOpcodes.LDC_W(function.name),
+                JavaOpcodes.LDC_W(function.java_name),
 
                 ICONST_val(len(function.parameters)),
                 JavaOpcodes.ANEWARRAY('java/lang/Class'),

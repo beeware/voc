@@ -43,6 +43,18 @@ class Function(Block):
     def __init__(self, module, name, code, parameters, returns, static=False):
         super().__init__(parent=module)
         self.name = name
+
+        # Python can redefine function symbols. Keep a track of any
+        # function that is defined; if the symbol has already been
+        # defined in this context, then append $n to the symbol in
+        # the Java classfile.
+        duplicates = self._parent.symbols.setdefault(self.name, [])
+        duplicates.append(self.method_name)
+        if len(duplicates) > 1:
+            self._java_suffix = '$%d' % (len(duplicates) - 1)
+        else:
+            self._java_suffix = ''
+
         self.code = code
         self.parameters = parameters
         self.returns = returns
@@ -154,6 +166,10 @@ class Function(Block):
         return self.name
 
     @property
+    def java_name(self):
+        return self.name + self._java_suffix
+
+    @property
     def module(self):
         return self._parent
 
@@ -192,11 +208,10 @@ class Function(Block):
         # If a function is added to a function, it is added as an anonymous
         # inner class.
         from .klass import ClosureClass
-        print("CLOSURE VAR NAMES", code.co_names)
         klass = ClosureClass(
             module=self.module,
             name='%s$%s$%s' % (self.module.name, self.name, name),
-            closure_var_names=code.co_names,
+            closure_var_names=code.co_freevars,
         )
         self.module.classes.append(klass)
 
@@ -235,7 +250,7 @@ class Function(Block):
             JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V')
         )
 
-        for var_name in code.co_names:
+        for var_name in code.co_freevars:
             self.add_opcodes(
                 JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(var_name),
@@ -290,7 +305,7 @@ class Function(Block):
     def transpile_method(self):
         return [
             JavaMethod(
-                self.method_name,
+                self.java_name,
                 self.signature,
                 static=self.static,
                 attributes=[self.transpile_code()] + self.method_attributes()
@@ -640,7 +655,7 @@ class Method(Function):
 
         wrapper_methods = [
             JavaMethod(
-                self.name,
+                self.java_name,
                 self.bound_signature,
                 attributes=[
                     JavaCode(
@@ -694,7 +709,7 @@ class Method(Function):
 
             wrapper_methods.append(
                 JavaMethod(
-                    self.name + "$super",
+                    self.java_name + "$super",
                     self.bound_signature,
                     attributes=[
                         JavaCode(
@@ -724,7 +739,7 @@ class MainFunction(Function):
         return '<MainFunction %s>' % self.module.name
 
     @property
-    def method_name(self):
+    def java_name(self):
         return 'main'
 
     @property
