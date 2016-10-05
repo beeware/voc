@@ -368,7 +368,7 @@ public class Object implements org.python.Object {
         try {
             this.__delattr__(((org.python.types.Str) name).value);
         } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
+            throw new org.python.exceptions.TypeError("attribute name must be string, not '" + name.typeName() + "'");
         }
     }
 
@@ -389,7 +389,7 @@ public class Object implements org.python.Object {
 
         if (attr == null) {
             org.python.Object result = this.__dict__.remove(name);
-            return result != null;
+            return result != null && !(result instanceof org.python.exceptions.AttributeError);
         } else {
             attr.__delete__(this);
             return true;

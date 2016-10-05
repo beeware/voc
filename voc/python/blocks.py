@@ -303,18 +303,13 @@ class Block:
                     JavaOpcodes.POP(),
                 )
 
-        # Closure
-        if closure:
-            pass
-            # closure_arg = arguments[-3]
-            # closure_arg.operation.transpile(self, closure_arg.arguments)
-        else:
-            self.add_opcodes(
-                JavaOpcodes.ACONST_NULL(),
-            )
+        # Closure. This is created and assigned when the function is accessed.
+        self.add_opcodes(
+            JavaOpcodes.ACONST_NULL(),
+        )
 
         self.add_opcodes(
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;Ljava/util/List;)V'),
+                JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;Lorg/python/types/Closure;)V'),
 
             CATCH('java/lang/NoSuchMethodError'),
                 ASTORE_name(self, '#EXCEPTION#'),
@@ -465,7 +460,6 @@ class Block:
         # print ("There are %s jumps" % len(self.jumps))
         for jmp in self.jumps:
             # print ("JUMP", hex(id(jmp)), jmp, jmp.java_offset, jmp.jump_op, hex(id(jmp.jump_op)))
-
             try:
                 jmp.offset = jmp.jump_op.java_offset - jmp.java_offset
             except AttributeError:
