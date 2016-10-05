@@ -389,7 +389,7 @@ public class Object implements org.python.Object {
 
         if (attr == null) {
             org.python.Object result = this.__dict__.remove(name);
-            return result != null;
+            return result != null && !(result instanceof org.python.exceptions.AttributeError);
         } else {
             attr.__delete__(this);
             return true;
