@@ -19,7 +19,7 @@ public class Function extends org.python.types.Object implements org.python.Call
     java.util.Map<java.lang.String, org.python.Object> globals;
     java.util.List<org.python.Object> default_args;
     java.util.Map<java.lang.String, org.python.Object> default_kwargs;
-    java.util.List<org.python.Object> closure;
+    org.python.types.Closure closure;
 
     private void populateAttrs() {
         org.python.types.Str name = new org.python.types.Str(method.getName());
@@ -104,13 +104,13 @@ public class Function extends org.python.types.Object implements org.python.Call
 
         this.code = new org.python.types.Code(
             new org.python.types.Int(argcount),  // co_argcount
-            null,  // new org.python.types.Tuple(),  // co_cellvars
+            new org.python.types.Tuple(),  // co_cellvars
             null,  // new org.python.types.Bytes(),  // co_code
             null,  // new org.python.types.Tuple(),  // co_consts
             null,  // new org.python.types.Str(),  // co_filename
             null,  // new org.python.types.Int(),  // co_firstlineno
             new org.python.types.Int(flags),  // co_flags
-            null,  // new org.python.types.Tuple(),  // co_freevars
+            new org.python.types.Tuple(),  // co_freevars
             new org.python.types.Int(kwonlyargs.length),  // co_kwonlyargcount
             null,  // new org.python.types.Bytes(),  // co_lnotab
             this.name,  // co_name
@@ -132,7 +132,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             java.util.Map<java.lang.String, org.python.Object> globals,
             java.util.List<org.python.Object> default_args,
             java.util.Map<java.lang.String, org.python.Object> default_kwargs,
-            java.util.List<org.python.Object> closure) {
+            org.python.types.Closure closure) {
         super();
 
         // System.out.println("Create function 2 " + name);
@@ -152,12 +152,23 @@ public class Function extends org.python.types.Object implements org.python.Call
     }
 
     @org.python.Method(
+        __doc__ = "Return repr(self)."
+    )
+    public org.python.Object __repr__() {
+        return new org.python.types.Str(String.format("<%s %s at 0x%x>", this.typeName(), this.name, this.hashCode()));
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         // System.out.println("__GET__ on function " + this + " " + this.getClass() + " " + instance + " " + instance.getClass());
-        if (instance != klass && !(instance instanceof org.python.types.Module)) {
-            return new Method(instance, (org.python.types.Type) klass, this);
+        if (instance != klass) {
+            if (instance instanceof org.python.types.Closure) {
+                return new org.python.types.Function(this.name, this.code, this.method, this.globals, this.default_args, this.default_kwargs, (org.python.types.Closure) instance);
+            } else if (!(instance instanceof org.python.types.Module)) {
+                return new org.python.types.Method(instance, (org.python.types.Type) klass, this);
+            }
         }
         return this;
     }
@@ -207,7 +218,7 @@ public class Function extends org.python.types.Object implements org.python.Call
 
         // If this is an instance, the first argument will be self; we don't
         // need to pass this to the Java function.
-        if (instance != null && java.lang.reflect.Modifier.isStatic(method.getModifiers())) {
+        if (instance != null && (java.lang.reflect.Modifier.isStatic(method.getModifiers()) || this.closure != null)) {
             // System.out.println("CALL USING INSTANCE");
             first_arg = 1;
             adjusted[0] = instance;
@@ -325,6 +336,8 @@ public class Function extends org.python.types.Object implements org.python.Call
             // require the instance to be passed as the explicit instance.
             if (java.lang.reflect.Modifier.isStatic(this.method.getModifiers())) {
                 return org.python.types.Type.toPython(this.method.invoke(null, adjusted_args));
+            } else if (this.closure != null) {
+                return org.python.types.Type.toPython(this.method.invoke(this.closure, adjusted_args));
             } else {
                 return org.python.types.Type.toPython(this.method.invoke(instance, adjusted_args));
             }

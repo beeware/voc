@@ -216,7 +216,6 @@ class Function(Block):
         self.module.classes.append(klass)
 
         klass.visitor_setup()
-
         if code.co_flags & CO_GENERATOR:
             closure = GeneratorClosure(
                 klass,
@@ -895,7 +894,11 @@ class Closure(Function):
         return self.klass.descriptor
 
     def add_self(self):
-        self.local_vars['self'] = len(self.local_vars)
+        # In a closure method, the first argument is the closure,
+        # not self. self *might* be the first argument -- but in
+        # that case, it's just the first argument in an unbound
+        # method.
+        self.local_vars['<closure>'] = len(self.local_vars)
         self.has_self = True
 
     def load_name(self, name):
@@ -905,7 +908,8 @@ class Closure(Function):
             )
         elif name in self.klass.closure_var_names:
             self.add_opcodes(
-                ALOAD_name(self, 'self'),
+                ALOAD_name(self, '<closure>'),
+                JavaOpcodes.CHECKCAST('org/python/types/Closure'),
                 JavaOpcodes.GETFIELD('org/python/types/Closure', 'closure_vars', 'Ljava/util/Map;'),
                 JavaOpcodes.LDC_W(name),
                 JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'get', '(Ljava/lang/Object;)Ljava/lang/Object;'),
@@ -966,6 +970,7 @@ class ClosureInitMethod(InitMethod):
 
             JavaOpcodes.RETURN()
         )
+
 
 class GeneratorFunction(Function):
     def __init__(self, module, name, code, generator, parameters, returns=None, static=False):

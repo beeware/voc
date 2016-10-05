@@ -18,7 +18,7 @@ public class Property extends org.python.types.Object {
     )
     public org.python.Object __repr__() {
         // if (this.expression.getName().startswith("genexpr_"))
-        return new org.python.types.Str(String.format("<%s at 0x%x>", this.typeName(), this.hashCode()));
+        return new org.python.types.Str(String.format("<%s object at 0x%x>", this.typeName(), this.hashCode()));
     }
 
     @org.python.Method(
