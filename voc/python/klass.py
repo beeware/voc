@@ -178,6 +178,36 @@ class Class(Block):
         )
         free_name(self, '#value')
 
+    def store_global(self):
+        self.add_opcodes(
+            ASTORE_name(self, '#varname'),
+            ASTORE_name(self, '#value'),
+
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.module.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+            ALOAD_name(self, '#varname'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST('java/lang/String'),
+
+            ALOAD_name(self, '#value'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+        )
+        free_name(self, '#value')
+
+    def store_local(self):
+        self.add_opcodes(
+            ASTORE_name(self),
+        )
+
     def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.LDC_W(self.descriptor),
@@ -185,6 +215,27 @@ class Class(Block):
             JavaOpcodes.LDC_W(name),
             JavaOpcodes.INVOKEVIRTUAL('org/python/types/Type', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
         )
+
+    def load_globals(self):
+        self.add_opcodes(
+            JavaOpcodes.DUP(),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
+
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Dict', 'addMap', '(Ljava/util/Map;)V'),
+        )
+
+    def load_locals(self):
+        self.load_globals()
 
     def delete_name(self, name):
         self.add_opcodes(

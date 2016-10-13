@@ -107,6 +107,36 @@ class Function(Block):
     def store_dynamic(self):
         raise NotImplementedError('Functions cannot dynamically store variables.')
 
+    def store_global(self):
+        self.add_opcodes(
+            ASTORE_name(self, '#varname'),
+            ASTORE_name(self, '#value'),
+
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.module.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+            ALOAD_name(self, '#varname'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', '()Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST('java/lang/String'),
+
+            ALOAD_name(self, '#value'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setattr__', '(Ljava/lang/String;Lorg/python/Object;)V'),
+        )
+        free_name(self, '#value')
+
+    def store_local(self):
+        self.add_opcodes(
+            ASTORE_name(self),
+        )
+
     def load_name(self, name):
         if name in self.local_vars:
             self.add_opcodes(
@@ -128,6 +158,40 @@ class Function(Block):
 
                 JavaOpcodes.INVOKEVIRTUAL('org/python/types/Module', '__getattribute__', '(Ljava/lang/String;)Lorg/python/Object;'),
             )
+
+    def load_locals(self):
+        for var_name, index in self.local_vars.items():
+            if index != None and not var_name.startwith('#'):
+                self.add_opcodes(
+                    JavaOpcodes.DUP(),
+
+                    JavaOpcodes.NEW('org/python/types/Str'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W(var_name),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+                    ALOAD_name(var_name),
+
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                )
+
+    def load_globals(self):
+        self.add_opcodes(
+            JavaOpcodes.DUP(),
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            JavaOpcodes.NEW('org/python/types/Str'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W(self.module.full_name),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
+
+            JavaOpcodes.INVOKEVIRTUAL('org/python/types/Dict', 'addMap', '(Ljava/util/Map;)V'),
+        )
 
     def delete_name(self, name):
         try:

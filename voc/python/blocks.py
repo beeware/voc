@@ -56,7 +56,19 @@ class Block:
     def store_dynamic(self):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
+    def store_global(self):
+        raise NotImplementedError('Abstract class `block` cannot be used directly.')
+
+    def store_local(self):
+        raise NotImplementedError('Abstract class `block` cannot be used directly.')
+
     def load_name(self, name):
+        raise NotImplementedError('Abstract class `block` cannot be used directly.')
+
+    def load_globals(self):
+        raise NotImplementedError('Abstract class `block` cannot be used directly.')
+
+    def load_locals(self):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
     def delete_name(self, name):

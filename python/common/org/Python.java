@@ -857,14 +857,14 @@ public class Python {
         return result;
     }
 
-    @org.python.Method(
-        __doc__ = "globals() -> dictionary" +
-            "\n" +
-            "Return the dictionary containing the current scope's global variables.\n"
-    )
-    public static org.python.types.Dict globals() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'globals' not implemented");
-    }
+    // @org.python.Method(
+    //     __doc__ = "globals() -> dictionary" +
+    //         "\n" +
+    //         "Return the dictionary containing the current scope's global variables.\n"
+    // )
+    // public static org.python.types.Dict globals() {
+    //     Implemented directly at the AST level
+    // }
 
     @org.python.Method(
         __doc__ = "hasattr(object, name) -> bool" +
@@ -1114,14 +1114,14 @@ public class Python {
         }
     }
 
-    @org.python.Method(
-        __doc__ = "locals() -> dictionary" +
-            "\n" +
-            "Update and return a dictionary containing the current scope's local variables.\n"
-    )
-    public static org.python.types.Dict locals() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'locals' not implemented");
-    }
+    // @org.python.Method(
+    //     __doc__ = "locals() -> dictionary" +
+    //         "\n" +
+    //         "Update and return a dictionary containing the current scope's local variables.\n"
+    // )
+    // public static org.python.types.Dict locals() {
+    //     Implemented directly at the AST level
+    // }
 
     @org.python.Method(
         __doc__ = "map(func, *iterables) --> map object" +

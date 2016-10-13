@@ -34,14 +34,14 @@ def is_mainline_def(node):
     )
 
 
-def is_super_call(node):
+def is_call(node, name):
     return (
         # Node is a Call statement...
         isinstance(node, ast.Call)
         # ... where the function being invoked ...
         and isinstance(node.func, ast.Name)
-        # ... is super.
-        and node.func.id == 'super'
+        # ... is the provided name
+        and node.func.id == name
     )
 
 
@@ -1568,7 +1568,59 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Call(self, node):
-        if is_super_call(node):
+        if is_call(node, 'locals'):
+            if node.kwargs:
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W("locals() takes no keyword arguments"),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW()
+                )
+            elif node.args:
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W("locals() takes no arguments (" + len(node.args) + " given)"),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW()
+                )
+            else:
+                # Create a map for storage
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Dict'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '()V'),
+                )
+                self.context.load_locals()
+
+        elif is_call(node, 'globals'):
+            if node.kwargs:
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W("locals() takes no keyword arguments"),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW()
+                )
+            elif node.args:
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W("locals() takes no arguments (" + len(node.args) + " given)"),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW()
+                )
+            else:
+                # Create a map for storage
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Dict'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '()V'),
+                )
+                self.context.load_globals()
+
+        elif is_call(node, 'super'):
             # context.add_opcodes(
             #     JavaOpcodes.LDC_W("ATTRIBUTE ON SUPER"),
             #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
@@ -1811,16 +1863,23 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
             )
         elif type(node.ctx) == ast.Store:
-            self.context.add_opcodes(
-                ASTORE_name(self.context, '#value'),
-            )
-            self.visit(node.value)
-            self.visit(node.slice)
-            self.context.add_opcodes(
-                ALOAD_name(self.context, '#value'),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
-            )
-            free_name(self.context, '#value')
+            if is_call(node.value, 'locals'):
+                self.visit(node.slice)
+                self.context.store_local()
+            elif is_call(node.value, 'globals'):
+                self.visit(node.slice)
+                self.context.store_global()
+            else:
+                self.context.add_opcodes(
+                    ASTORE_name(self.context, '#value'),
+                )
+                self.visit(node.value)
+                self.visit(node.slice)
+                self.context.add_opcodes(
+                    ALOAD_name(self.context, '#value'),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+                )
+                free_name(self.context, '#value')
         elif type(node.ctx) == ast.Del:
             self.visit(node.value)
             self.visit(node.slice)

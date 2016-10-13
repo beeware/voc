@@ -36,6 +36,18 @@ public class Dict extends org.python.types.Object {
         this.value = dict;
     }
 
+    /**
+     * This is an internal VOC method, and should not be exposed
+     * to the Python namespace. It is used to convert a __dict__ attribute
+     * (which is a map from Java strings to Objects) into an actual Python
+     * dict.
+     */
+    public void addMap(java.util.Map<java.lang.String, org.python.Object> dict) {
+        for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : dict.entrySet()) {
+            this.value.put(new org.python.types.Str(entry.getKey()), entry.getValue());
+        }
+    }
+
     // @org.python.Method(
     //     __doc__ = ""
     // )

@@ -2,7 +2,39 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class GlobalsTests(TranspileTestCase):
-    pass
+    def test_simple(self):
+        self.assertCodeExecution("""
+            print("There are %s globals" % len(globals()))
+            x = 1
+            y = 'z'
+            print("There are %s globals" % len(globals()))
+
+            def method():
+                print("In method: there are %s globals" % len(globals()))
+
+                print("globals()['x'] =", globals()['x'])
+                print("globals()['y'] =", globals()['y'])
+                try:
+                    print("globals()['z'] =", globals()['z'])
+                except KeyError:
+                    print("Variable z not defined")
+
+                globals()[y] = 2
+
+                print("In method: there are %s globals" % len(globals()))
+
+            method()
+
+            print("There are %s globals" % len(globals()))
+            print("globals()['x'] =", globals()['x'])
+            print("globals()['y'] =", globals()['y'])
+            print("globals()['z'] =", globals()['z'])
+            print('x', x)
+            print('y', y)
+            print('z', z)
+
+            print('Done')
+        """)
 
 
 class BuiltinGlobalsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
