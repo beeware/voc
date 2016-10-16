@@ -34,21 +34,22 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
 
         this.__dict__.put("__code__", this.code);
-
-        // org.python.Object doc;
-        // try {
-        //     org.python.types.Tuple consts = ((org.python.types.Tuple) this.code.__getattribute__("co_consts"));
-        //     if (consts != null) {
-        //         doc = consts.__getitem__(0);
-        //     } else {
-        //         doc = null;
-        //     }
-        // } catch (java.lang.ClassCastException e) {
-        //     doc = null;
-        // } catch (java.lang.IndexOutOfBoundsException e) {
-        //     doc = null;
-        // }
-        // this.__dict__.put("__doc__", doc);
+        org.python.Object doc;
+        try {
+            org.python.types.Tuple consts = (org.python.types.Tuple) this.code.co_consts;
+            if (consts != null) {
+                doc = consts.__getitem__(new org.python.types.Int(0));
+            } else {
+                doc = org.python.types.NoneType.NONE;
+            }
+        } catch (java.lang.NullPointerException e) {
+            doc = org.python.types.NoneType.NONE;
+        } catch (java.lang.ClassCastException e) {
+            doc = org.python.types.NoneType.NONE;
+        } catch (java.lang.IndexOutOfBoundsException e) {
+            doc = org.python.types.NoneType.NONE;
+        }
+        this.__dict__.put("__doc__", doc);
 
         // this.__dict__.put("__call__")
     }
