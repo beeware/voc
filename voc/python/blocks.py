@@ -1,3 +1,5 @@
+import types
+
 from ..java import (
     Code as JavaCode, ExceptionInfo as JavaExceptionInfo, LineNumberTable,
     opcodes as JavaOpcodes, Classref
@@ -56,12 +58,6 @@ class Block:
     def store_dynamic(self):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
-    def store_global(self):
-        raise NotImplementedError('Abstract class `block` cannot be used directly.')
-
-    def store_local(self):
-        raise NotImplementedError('Abstract class `block` cannot be used directly.')
-
     def load_name(self, name):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
@@ -69,6 +65,9 @@ class Block:
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
     def load_locals(self):
+        raise NotImplementedError('Abstract class `block` cannot be used directly.')
+
+    def load_vars(self):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
     def delete_name(self, name):
@@ -196,6 +195,11 @@ class Block:
                 elif isinstance(value, tuple):
                     self.add_tuple(value)
 
+                elif isinstance(value, types.CodeType):
+                    self.add_opcodes(
+                        JavaOpcodes.ACONST_NULL()
+                    )
+
                 else:
                     raise RuntimeError("Unknown constant type %s" % type(value))
 
@@ -231,10 +235,10 @@ class Block:
                 JavaOpcodes.ACONST_NULL(),  # co_code
         )
 
-        # self.add_tuple(function.code.co_consts)
-        self.add_opcodes(
-                JavaOpcodes.ACONST_NULL(),  # co_consts
-        )
+        self.add_tuple(function.code.co_consts)
+        # self.add_opcodes(
+        #         JavaOpcodes.ACONST_NULL(),  # co_consts
+        # )
 
         self.add_str(function.code.co_filename)
         self.add_int(function.code.co_firstlineno)

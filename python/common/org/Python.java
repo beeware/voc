@@ -75,6 +75,10 @@ public class Python {
         builtins.put("ZeroDivisionError", org.python.types.Type.pythonType(org.python.exceptions.ZeroDivisionError.class));
 
         builtins.put("NotImplemented", org.python.types.NotImplementedType.NOT_IMPLEMENTED);
+
+        builtins.put("locals", new org.python.internals.Scope("locals"));
+        builtins.put("globals", new org.python.internals.Scope("globals"));
+        builtins.put("vars", new org.python.internals.Scope("vars"));
     }
 
     public static void debug(java.lang.String msg) {
@@ -1815,15 +1819,15 @@ public class Python {
         }
     }
 
-    @org.python.Method(
-        __doc__ = "vars([object]) -> dictionary" +
-            "\n" +
-            "Without arguments, equivalent to locals().\n" +
-            "With an argument, equivalent to object.__dict__.\n"
-    )
-    public static org.python.types.Dict vars() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'vars' not implemented");
-    }
+    // @org.python.Method(
+    //     __doc__ = "vars([object]) -> dictionary" +
+    //         "\n" +
+    //         "Without arguments, equivalent to locals().\n" +
+    //         "With an argument, equivalent to object.__dict__.\n"
+    // )
+    // public static org.python.types.Dict vars() {
+    //     Implemented directly at the AST level
+    // }
 
     @org.python.Method(
         __doc__ = "zip(iter1 [,iter2 [...]]) --> zip object" +

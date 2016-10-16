@@ -8,7 +8,7 @@ from .modules import Module
 from .methods import MainFunction
 from .utils import (
     dump,
-    IF, ELSE, END_IF,
+    IF, ELSE, ELIF, END_IF,
     TRY, CATCH, FINALLY, END_TRY,
     START_LOOP, END_LOOP,
     ICONST_val,
@@ -224,7 +224,7 @@ class Visitor(ast.NodeVisitor):
 
         # If the expression is a call, we need to ignore
         # any return value from the function.
-        if isinstance(node.value, (ast.Call, ast.Attribute)):
+        if isinstance(node.value, (ast.Call, ast.Attribute, ast.Str)):
             self.context.add_opcodes(
                 JavaOpcodes.POP()
             )
@@ -661,9 +661,13 @@ class Visitor(ast.NodeVisitor):
         for alias in node.names:
             self.context.add_opcodes(
                 JavaOpcodes.LDC_W(alias.name),
-                JavaOpcodes.ACONST_NULL(),
+            )
+            self.context.load_globals()
+            self.context.load_locals()
+            self.context.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),  # from_list
                 JavaOpcodes.ICONST_0(),
-                JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;[Ljava/lang/String;I)Lorg/python/types/Module;')
+                JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;Ljava/util/Map;Ljava/util/Map;[Ljava/lang/String;I)Lorg/python/types/Module;')
             )
             if alias.asname:
                 self.context.store_name(alias.asname)
@@ -676,13 +680,18 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_ImportFrom(self, node):
         if node.module:
-            from_module = node.module
+            self.context.add_opcodes(
+                JavaOpcodes.LDC_W(node.module),
+            )
         else:
-            from_module = self.root_module.full_name
+            self.context.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),
+            )
+
+        self.context.load_globals()
+        self.context.load_locals()
 
         self.context.add_opcodes(
-            JavaOpcodes.LDC_W(from_module),
-
             ICONST_val(len(node.names)),
             JavaOpcodes.ANEWARRAY('java/lang/String'),
         )
@@ -697,7 +706,7 @@ class Visitor(ast.NodeVisitor):
 
         self.context.add_opcodes(
             ICONST_val(node.level),
-            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;[Ljava/lang/String;I)Lorg/python/types/Module;')
+            JavaOpcodes.INVOKESTATIC('org/python/ImportLib', '__import__', '(Ljava/lang/String;Ljava/util/Map;Ljava/util/Map;[Ljava/lang/String;I)Lorg/python/types/Module;')
         )
 
         if len(node.names) == 1 and node.names[0].name == '*':
@@ -1568,59 +1577,7 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Call(self, node):
-        if is_call(node, 'locals'):
-            if node.kwargs:
-                self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W("locals() takes no keyword arguments"),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
-                    JavaOpcodes.ATHROW()
-                )
-            elif node.args:
-                self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W("locals() takes no arguments (" + len(node.args) + " given)"),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
-                    JavaOpcodes.ATHROW()
-                )
-            else:
-                # Create a map for storage
-                self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Dict'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '()V'),
-                )
-                self.context.load_locals()
-
-        elif is_call(node, 'globals'):
-            if node.kwargs:
-                self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W("locals() takes no keyword arguments"),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
-                    JavaOpcodes.ATHROW()
-                )
-            elif node.args:
-                self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W("locals() takes no arguments (" + len(node.args) + " given)"),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
-                    JavaOpcodes.ATHROW()
-                )
-            else:
-                # Create a map for storage
-                self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Dict'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', '()V'),
-                )
-                self.context.load_globals()
-
-        elif is_call(node, 'super'):
+        if is_call(node, 'super'):
             # context.add_opcodes(
             #     JavaOpcodes.LDC_W("ATTRIBUTE ON SUPER"),
             #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V'),
@@ -1676,8 +1633,53 @@ class Visitor(ast.NodeVisitor):
         else:
             # Evaluate the callable, and check that it *is* a callable
             self.visit(node.func)
+            # globals(), locals() and vars() are special types of callables.
             self.context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/Callable'),
+                IF([
+                            JavaOpcodes.DUP(),
+                            JavaOpcodes.INSTANCEOF('org/python/internals/Scope'),
+                        ], JavaOpcodes.IFEQ),
+                    JavaOpcodes.CHECKCAST('org/python/internals/Scope'),
+                    IF([
+                                JavaOpcodes.DUP(),
+                                JavaOpcodes.GETFIELD('org/python/internals/Scope', 'name', 'Ljava/lang/String;'),
+                                JavaOpcodes.LDC_W('globals'),
+                                JavaOpcodes.INVOKEVIRTUAL('java/lang/Object', 'equals', '(Ljava/lang/Object;)Z')
+                            ], JavaOpcodes.IFEQ),
+            )
+            self.context.load_globals()
+            self.context.add_opcodes(
+                        JavaOpcodes.INVOKEVIRTUAL('org/python/internals/Scope', 'bind', '(Ljava/util/Map;)Lorg/python/internals/Scope;'),
+                    ELIF([
+                                JavaOpcodes.DUP(),
+                                JavaOpcodes.GETFIELD('org/python/internals/Scope', 'name', 'Ljava/lang/String;'),
+                                JavaOpcodes.LDC_W('locals'),
+                                JavaOpcodes.INVOKEVIRTUAL('java/lang/Object', 'equals', '(Ljava/lang/Object;)Z')
+                            ], JavaOpcodes.IFEQ),
+            )
+            self.context.load_locals()
+            self.context.add_opcodes(
+                        JavaOpcodes.INVOKEVIRTUAL('org/python/internals/Scope', 'bind', '(Ljava/util/Map;)Lorg/python/internals/Scope;'),
+                    ELIF([
+                                JavaOpcodes.DUP(),
+                                JavaOpcodes.GETFIELD('org/python/internals/Scope', 'name', 'Ljava/lang/String;'),
+                                JavaOpcodes.LDC_W('vars'),
+                                JavaOpcodes.INVOKEVIRTUAL('java/lang/Object', 'equals', '(Ljava/lang/Object;)Z')
+                            ], JavaOpcodes.IFEQ),
+            )
+            self.context.load_vars()
+            self.context.add_opcodes(
+                        JavaOpcodes.INVOKEVIRTUAL('org/python/internals/Scope', 'bind', '(Ljava/util/Map;)Lorg/python/internals/Scope;'),
+                    ELSE(),
+                        JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.LDC_W("Unknown scope type"),
+                        JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
+                        JavaOpcodes.ATHROW(),
+                    END_IF(),
+                ELSE(),
+                    # It's a normal callable.
+                    JavaOpcodes.CHECKCAST('org/python/Callable'),
             )
 
             # Create and populate the array of arguments to pass to invoke()
@@ -1689,7 +1691,6 @@ class Visitor(ast.NodeVisitor):
             )
 
             for i, arg in enumerate(node.args):
-
                 # This block implements *args in Python 3.5+
                 if isinstance(arg, ast.Starred):
                     self.visit(arg)
@@ -1715,9 +1716,9 @@ class Visitor(ast.NodeVisitor):
 
             # Create and populate the map of kwargs to pass to invoke().
             self.context.add_opcodes(
-                JavaOpcodes.NEW('java/util/HashMap'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+                    JavaOpcodes.NEW('java/util/HashMap'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
             )
 
             for keyword in node.keywords:
@@ -1740,7 +1741,8 @@ class Visitor(ast.NodeVisitor):
 
             # Set up the stack and invoke the callable
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
+                END_IF(),
             )
 
     @node_visitor
@@ -1863,23 +1865,16 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
             )
         elif type(node.ctx) == ast.Store:
-            if is_call(node.value, 'locals'):
-                self.visit(node.slice)
-                self.context.store_local()
-            elif is_call(node.value, 'globals'):
-                self.visit(node.slice)
-                self.context.store_global()
-            else:
-                self.context.add_opcodes(
-                    ASTORE_name(self.context, '#value'),
-                )
-                self.visit(node.value)
-                self.visit(node.slice)
-                self.context.add_opcodes(
-                    ALOAD_name(self.context, '#value'),
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
-                )
-                free_name(self.context, '#value')
+            self.context.add_opcodes(
+                ASTORE_name(self.context, '#value'),
+            )
+            self.visit(node.value)
+            self.visit(node.slice)
+            self.context.add_opcodes(
+                ALOAD_name(self.context, '#value'),
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__setitem__', '(Lorg/python/Object;Lorg/python/Object;)V'),
+            )
+            free_name(self.context, '#value')
         elif type(node.ctx) == ast.Del:
             self.visit(node.value)
             self.visit(node.slice)
