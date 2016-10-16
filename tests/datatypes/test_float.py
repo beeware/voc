@@ -83,16 +83,13 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_add_class',
-
         'test_add_complex',
         'test_add_frozenset',
 
         'test_and_class',
-        'test_and_complex',
         'test_and_frozenset',
 
         'test_eq_class',
-        'test_eq_complex',
         'test_eq_frozenset',
 
         'test_floor_divide_class',
@@ -100,23 +97,18 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_floor_divide_frozenset',
 
         'test_ge_class',
-        'test_ge_complex',
         'test_ge_frozenset',
 
         'test_gt_class',
-        'test_gt_complex',
         'test_gt_frozenset',
 
         'test_le_class',
-        'test_le_complex',
         'test_le_frozenset',
 
         'test_lshift_class',
-        'test_lshift_complex',
         'test_lshift_frozenset',
 
         'test_lt_class',
-        'test_lt_complex',
         'test_lt_frozenset',
 
         'test_modulo_class',
@@ -135,11 +127,9 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_tuple',
 
         'test_ne_class',
-        'test_ne_complex',
         'test_ne_frozenset',
 
         'test_or_class',
-        'test_or_complex',
         'test_or_frozenset',
 
         'test_power_class',
@@ -148,7 +138,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_power_frozenset',
 
         'test_rshift_class',
-        'test_rshift_complex',
         'test_rshift_frozenset',
 
         'test_subscr_bool',
@@ -178,7 +167,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_true_divide_frozenset',
 
         'test_xor_class',
-        'test_xor_complex',
         'test_xor_frozenset',
     ]
 
@@ -187,12 +175,11 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
     not_implemented = [
-       'test_add_class',
+        'test_add_class',
         'test_add_complex',
         'test_add_frozenset',
 
         'test_and_class',
-        'test_and_complex',
         'test_and_frozenset',
 
         'test_floor_divide_class',
@@ -200,7 +187,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_frozenset',
 
         'test_lshift_class',
-        'test_lshift_complex',
         'test_lshift_frozenset',
 
         'test_modulo_class',
@@ -220,7 +206,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_tuple',
 
         'test_or_class',
-        'test_or_complex',
         'test_or_frozenset',
 
         'test_power_class',
@@ -229,7 +214,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_frozenset',
 
         'test_rshift_class',
-        'test_rshift_complex',
         'test_rshift_frozenset',
 
         'test_subtract_class',
@@ -241,6 +225,5 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_true_divide_frozenset',
 
         'test_xor_class',
-        'test_xor_complex',
         'test_xor_frozenset',
     ]

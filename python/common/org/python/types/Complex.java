@@ -47,9 +47,31 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        // TODO(soummyaah): Show integer rounded values as ints
-        return new org.python.types.Str(String.format("(%s%sj)", this.real.__repr__(), this.imag.value < 0 ? this.imag.__repr__() : "+" + this.imag.__repr__()));
-        // throw new org.python.exceptions.NotImplementedError("complex.__repr__() has not been implemented.");
+        java.lang.StringBuilder buffer = new java.lang.StringBuilder();
+        boolean real_present = true;
+        if(this.real.value != 0) {
+            buffer.append("(");
+            if (((org.python.types.Bool)((this.real).__int__().__eq__(this.real))).value) {
+                buffer.append((this.real).__int__().__repr__().value);
+            } else {
+                buffer.append((this.real).__repr__().value);
+            }
+        } else {
+            real_present = false;
+        }
+        if(this.real.value != 0 && this.imag.value >= 0) {
+            buffer.append("+");
+        }
+        if (((org.python.types.Bool)((this.imag).__int__().__eq__(this.imag))).value) {
+            buffer.append((this.imag).__int__().__repr__().value);
+        } else {
+            buffer.append((this.imag).__repr__().value);
+        }
+        buffer.append("j");
+        if(real_present) {
+            buffer.append(")");
+        }
+        return new org.python.types.Str(buffer.toString());
     }
 
     @org.python.Method(
@@ -63,14 +85,14 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__lt__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unorderable types: complex() < " + other.typeName() + "()");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__le__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unorderable types: complex() <= " + other.typeName() + "()");
     }
 
     @org.python.Method(
@@ -83,28 +105,30 @@ public class Complex extends org.python.types.Object {
                 return new org.python.types.Bool(true);
             }
         } return new org.python.types.Bool(false);
-        // throw new org.python.exceptions.NotImplementedError("complex.__eq__ has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__ne__ has not been implemented.");
+        if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
+            return new org.python.types.Bool(false);
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__gt__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unorderable types: complex() > " + other.typeName() + "()");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__ge__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unorderable types: complex() >= " + other.typeName() + "()");
     }
 
     @org.python.Method(
@@ -131,14 +155,30 @@ public class Complex extends org.python.types.Object {
     )
 
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__add__ has not been implemented.");
+        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float) {
+            return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other), this.imag);
+        } else if (other instanceof Bool) {
+            return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other), this.imag);
+        } else if (other instanceof Complex) {
+            org.python.types.Complex other_object = (org.python.types.Complex)other;
+            return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other_object.real), (org.python.types.Float)this.imag.__add__(other_object.imag));
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __sub__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__sub__ has not been implemented.");
+        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float) {
+            return new org.python.types.Complex((org.python.types.Float)this.real.__sub__(other), this.imag);
+        } else if (other instanceof Bool) {
+            return new org.python.types.Complex((org.python.types.Float)this.real.__sub__(other), this.imag);
+        } else if (other instanceof Complex) {
+            org.python.types.Complex other_object = (org.python.types.Complex)other;
+            return new org.python.types.Complex((org.python.types.Float)this.real.__sub__(other_object.real), (org.python.types.Float)this.imag.__sub__(other_object.imag));
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -312,14 +352,14 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__neg__ has not been implemented.");
+        return new org.python.types.Complex((org.python.types.Float)this.real.__neg__(), (org.python.types.Float)this.imag.__neg__());
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__pos__ has not been implemented.");
+        return new org.python.types.Complex(this.real, this.imag);
     }
 
     @org.python.Method(
@@ -333,14 +373,14 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__invert__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'complex'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.types.Int __int__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__int__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't convert complex to int");
     }
 
     @org.python.Method(
@@ -348,20 +388,6 @@ public class Complex extends org.python.types.Object {
     )
     public org.python.types.Float __float__() {
         throw new org.python.exceptions.NotImplementedError("complex.__float__ has not been implemented.");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.NotImplementedError("complex.__round__ has not been implemented.");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __index__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__index__ has not been implemented.");
     }
 
     @org.python.Method(
