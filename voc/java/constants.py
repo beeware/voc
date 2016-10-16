@@ -676,7 +676,7 @@ class Long(Constant):
         return Long, (value,)
 
     def write_info(self, writer):
-        writer.write_u8(self.value)
+        writer.write_s8(self.value)
 
 
 class Double(Constant):
