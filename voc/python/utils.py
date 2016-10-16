@@ -282,12 +282,12 @@ class ELIF:
                 if_block.jump_op = jump_op
             else:
                 # print("    already got an endif")
-                if_block.handlers[-1].jump_op = jump_op
+                if_block.elifs[-1].jump_op = jump_op
 
         if len(if_block.elifs) == 0:
             jump(if_block.if_op, context, self, OpcodePosition.START)
         else:
-            jump(if_block.handlers[-1].if_op, context, self, OpcodePosition.START)
+            jump(if_block.elifs[-1].if_op, context, self, OpcodePosition.START)
 
         # Record the start of the elif block
         context.next_resolve_list.append((self, OpcodePosition.START))
