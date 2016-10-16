@@ -28,6 +28,23 @@ public class JavaPlatform implements python.Platform {
         System.out.println("DEBUG " + msg + ": " + obj);
     }
 
+    public org.python.Object getPlatform() {
+        java.lang.String os_name = System.getProperty("os.name");
+        java.lang.String py_name;
+        if (os_name.startsWith("Windows")) {
+            py_name = "win32";
+        } else if (os_name.equals("Mac OS X")) {
+            py_name = "darwin";
+        } else if (os_name.equals("Linux")) {
+            py_name = "linux";
+        } else {
+            System.out.println(os_name);
+            py_name = "unknown";
+        }
+
+        return new org.python.types.Str(py_name);
+    }
+
     public org.python.Object stderr() {
         return _stderr;
     }

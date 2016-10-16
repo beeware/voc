@@ -10,6 +10,8 @@ public class __init__ extends org.python.types.Module {
         __stdout__ = python.platform.__init__.impl.stdout();
         __stderr__ = python.platform.__init__.impl.stderr();
         __stdin__ = python.platform.__init__.impl.stdin();
+
+        platform = python.platform.__init__.impl.getPlatform();
     }
 
     @org.python.Method(
@@ -149,6 +151,7 @@ public class __init__ extends org.python.types.Module {
         default_args = {"status"}
     )
     public static org.python.Object exit(org.python.Object status) {
+        System.out.println("EXIT" +  status);
         if (status == null) {
             throw new org.python.exceptions.SystemExit();
         } else {
@@ -274,7 +277,7 @@ public class __init__ extends org.python.types.Module {
 
     public static org.python.types.Dict path_importer_cache;
 
-    public static org.python.types.Str platform;
+    public static org.python.Object platform;
 
     public static org.python.types.Str prefix;
 
