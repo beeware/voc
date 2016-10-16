@@ -68,12 +68,12 @@ class StrTests(TranspileTestCase):
 
     def test_case_changes(self):
         self.assertCodeExecution("""
-            s = "hello, world"
-            # print(s.capitalize())
-            # print(s.lower())
-            # print(s.swap())
-            # print(s.title())
-            print(s.upper())
+            for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
+                print(s.capitalize())
+                print(s.lower())
+                # print(s.swap())
+                # print(s.title())
+                print(s.upper())
             """)
 
 
