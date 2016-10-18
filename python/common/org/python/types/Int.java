@@ -228,6 +228,15 @@ public class Int extends org.python.types.Object {
             return other.__mul__(this);
         } else if (other instanceof org.python.types.Tuple) {
             return other.__mul__(this);
+        } else if (other instanceof org.python.types.Bytes){
+            byte[] other_value = ((org.python.types.Bytes) other).value;
+            int value = Math.max(0, (int) this.value);
+            int len = other_value.length;
+            byte[] bytes = new byte[value * len];
+            for(int i=0; i < value; i++){
+                System.arraycopy(other_value, 0, bytes, i * len, len);
+            }
+            return new org.python.types.Bytes(bytes);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'int' and '" + other.typeName() + "'");
     }
