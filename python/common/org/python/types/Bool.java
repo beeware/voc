@@ -216,6 +216,8 @@ public class Bool extends org.python.types.Object {
             return other.__mul__(this);
         } else if (other instanceof org.python.types.Tuple) {
             return other.__mul__(this);
+        } else if (other instanceof org.python.types.Bytes) {
+            return other.__mul__(this);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'bool' and '" + other.typeName() + "'");
     }
