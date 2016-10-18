@@ -2,6 +2,7 @@ from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationT
 
 
 class BoolTests(TranspileTestCase):
+
     def test_setattr(self):
         self.assertCodeExecution("""
             x = True
@@ -34,7 +35,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_and_class',
         'test_and_frozenset',
-        'test_and_int',
 
         'test_eq_class',
         'test_eq_frozenset',
