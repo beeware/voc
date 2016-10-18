@@ -61,15 +61,12 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
     not_implemented = [
         'test_bool_class',
-        'test_bool_complex',
         'test_bool_frozenset',
 
         'test_bytearray_class',
-        'test_bytearray_complex',
         'test_bytearray_frozenset',
 
         'test_bytes_class',
-        'test_bytes_complex',
         'test_bytes_frozenset',
 
         'test_class_bool',
@@ -90,30 +87,13 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_class_str',
         'test_class_tuple',
 
-        'test_complex_bool',
-        'test_complex_bytearray',
-        'test_complex_bytes',
         'test_complex_class',
-        'test_complex_complex',
-        'test_complex_dict',
-        'test_complex_float',
         'test_complex_frozenset',
-        'test_complex_int',
-        'test_complex_list',
-        'test_complex_None',
-        'test_complex_NotImplemented',
-        'test_complex_range',
-        'test_complex_set',
-        'test_complex_slice',
-        'test_complex_str',
-        'test_complex_tuple',
 
         'test_dict_class',
-        'test_dict_complex',
         'test_dict_frozenset',
 
         'test_float_class',
-        'test_float_complex',
         'test_float_frozenset',
 
         'test_frozenset_bool',
@@ -135,38 +115,29 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_frozenset_tuple',
 
         'test_int_class',
-        'test_int_complex',
         'test_int_frozenset',
 
         'test_list_class',
-        'test_list_complex',
         'test_list_frozenset',
 
         'test_None_class',
-        'test_None_complex',
         'test_None_frozenset',
 
         'test_NotImplemented_class',
-        'test_NotImplemented_complex',
         'test_NotImplemented_frozenset',
 
         'test_range_class',
-        'test_range_complex',
         'test_range_frozenset',
 
         'test_set_class',
-        'test_set_complex',
         'test_set_frozenset',
 
         'test_slice_class',
-        'test_slice_complex',
         'test_slice_frozenset',
 
         'test_str_class',
-        'test_str_complex',
         'test_str_frozenset',
 
         'test_tuple_class',
-        'test_tuple_complex',
         'test_tuple_frozenset',
     ]
