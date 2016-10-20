@@ -475,7 +475,11 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object capitalize() {
-        throw new org.python.exceptions.NotImplementedError("capitalize() has not been implemented.");
+        if (this.value.length() > 0) {
+            String newval = this.value.substring(0, 1).toUpperCase() + this.value.substring(1).toLowerCase();
+            return new Str(newval);
+        }
+        return this;
     }
 
     @org.python.Method(
@@ -643,7 +647,7 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object lower() {
-        throw new org.python.exceptions.NotImplementedError("lower() has not been implemented.");
+        return new Str(this.value.toLowerCase());
     }
 
     @org.python.Method(
