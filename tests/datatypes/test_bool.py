@@ -62,7 +62,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_complex',
         'test_modulo_frozenset',
 
-        'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
         'test_multiply_complex',
