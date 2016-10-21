@@ -188,12 +188,21 @@ class Block:
                     self.add_opcodes(
                         JavaOpcodes.NEW('org/python/types/Bytes'),
                         JavaOpcodes.DUP(),
-                        JavaOpcodes.LDC_W(value),
+                        JavaOpcodes.LDC_W(value.decode('ISO-8859-1')),
                         JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
                     )
 
                 elif isinstance(value, tuple):
                     self.add_tuple(value)
+
+                elif isinstance(value, complex):
+                    self.add_opcodes(
+                        JavaOpcodes.NEW('org/python/types/Complex'),
+                        JavaOpcodes.DUP(),
+                        DCONST_val(value.real),
+                        DCONST_val(value.imag),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Complex', '<init>', '(DD)V'),
+                    )
 
                 elif isinstance(value, types.CodeType):
                     self.add_opcodes(

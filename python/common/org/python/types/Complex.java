@@ -24,10 +24,14 @@ public class Complex extends org.python.types.Object {
         return this.hashCode();
     }
 
-    public Complex(org.python.types.Float real_val, org.python.types.Float imagi_val) {
-        super();
+    public Complex(org.python.types.Float real_val, org.python.types.Float imag_val) {
         this.real = real_val;
-        this.imag = imagi_val;
+        this.imag = imag_val;
+    }
+
+    public Complex(double real, double imag) {
+        this.real = new org.python.types.Float(real);
+        this.imag = new org.python.types.Float(imag);
     }
 
     public Complex(double imag) {
