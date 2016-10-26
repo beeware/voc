@@ -1,7 +1,7 @@
 package org.python;
 
 
-public interface Object {
+public interface Object extends Comparable {
     /**
      * Return a Java object that is the underlying data representation
      * of this object (e.g., the java.util.Map behind a Python dict()).

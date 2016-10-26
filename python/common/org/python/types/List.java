@@ -1,6 +1,7 @@
 package org.python.types;
 
 import org.Python;
+import java.util.Collections;
 
 public class List extends org.python.types.Object {
     public java.util.List<org.python.Object> value;
@@ -552,10 +553,18 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*"
     )
     public org.python.Object sort() {
-        throw new org.python.exceptions.NotImplementedError("list.sort() has not been implemented.");
+        return this.sort(org.python.types.NoneType.NONE, org.python.types.NoneType.NONE);
+    }
+
+    @org.python.Method(
+        __doc__ = "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*"
+    )
+    public org.python.Object sort(org.python.Object key, org.python.Object reverse) {
+        Collections.sort(this.value);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
