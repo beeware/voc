@@ -410,7 +410,7 @@ public class Object implements org.python.Object {
         org.python.types.List names = new org.python.types.List(new java.util.ArrayList(this.__dict__.keySet()));
 
         names.extend(this.__dict__.get("__class__").__dir__());
-        names.sort();
+        names.sort(null, null);
 
         return names;
     }

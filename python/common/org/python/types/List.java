@@ -2,6 +2,7 @@ package org.python.types;
 
 import org.Python;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class List extends org.python.types.Object {
     public java.util.List<org.python.Object> value;
@@ -553,17 +554,31 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*"
-    )
-    public org.python.Object sort() {
-        return this.sort(org.python.types.NoneType.NONE, org.python.types.NoneType.NONE);
-    }
-
-    @org.python.Method(
-        __doc__ = "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*"
+        __doc__ = "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*",
+        args = {},
+        default_args = {"key", "reverse"}
     )
     public org.python.Object sort(org.python.Object key, org.python.Object reverse) {
-        Collections.sort(this.value);
+        if (key == null && reverse == null) {
+            Collections.sort(this.value);
+        } else {
+            // needs to be final in order to use inside the comparator
+            final boolean shouldReverse = reverse == null ? false :
+                ((org.python.types.Bool) reverse.__bool__()).value;
+
+            Collections.sort(this.value, new Comparator<org.python.Object>() {
+                @Override
+                public int compare(org.python.Object o1, org.python.Object o2) {
+                    org.python.Object val1 = o1;
+                    org.python.Object val2 = o2;
+                    if (key != null) {
+                        val1 = ((org.python.types.Function) key).invoke(o1, null, null);
+                        val2 = ((org.python.types.Function) key).invoke(o2, null, null);
+                    }
+                    return shouldReverse ? val2.compareTo(val1) : val1.compareTo(val2);
+                }
+            });
+        }
         return org.python.types.NoneType.NONE;
     }
 
