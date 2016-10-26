@@ -5,6 +5,9 @@ In this guide we will walk you through setting up your VOC environment for
 development and testing. We will assume that you have a working Python 3, JDK,
 Apache ANT installation and use virtualenv.
 
+The default version apt-get provides on Ubuntu 16.04 is 3.5+ but VOC won't build on Python3.5+. Hence, a separate 
+Python 3.4+ installation would be required. 
+
 Checking Dependencies
 ---------------------
 
