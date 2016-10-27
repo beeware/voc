@@ -192,6 +192,45 @@ class ListTests(TranspileTestCase):
             print(x.count(1))
             """)
 
+    def test_sort(self):
+        self.assertCodeExecution("""
+            fixtures = [
+                [9, 4, 7],
+                ['beta', 'theta', 'alpha'],
+            ]
+            for x in fixtures:
+                x.sort()
+                print(x)
+            """)
+
+        self.assertCodeExecution("""
+            fixtures = [
+                [9, 4, 7],
+                ['beta', 'theta', 'alpha'],
+            ]
+            for x in fixtures:
+                x.sort(reverse=True)
+                print(x)
+            """)
+
+        self.assertCodeExecution("""
+            def second(s):
+                return s[1]
+
+            x = ['abc', 'bza', 'cda', 'daa']
+            x.sort(key=second)
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            def second(s):
+                return s[1]
+
+            x = ['abc', 'bza', 'cda', 'daa']
+            x.sort(key=second, reverse=True)
+            print(x)
+            """)
+
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'list'
