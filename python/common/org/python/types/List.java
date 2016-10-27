@@ -558,7 +558,7 @@ public class List extends org.python.types.Object {
         args = {},
         default_args = {"key", "reverse"}
     )
-    public org.python.Object sort(org.python.Object key, org.python.Object reverse) {
+    public org.python.Object sort(final org.python.Object key, org.python.Object reverse) {
         if (key == null && reverse == null) {
             Collections.sort(this.value);
         } else {
