@@ -231,6 +231,44 @@ class ListTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_pop(self):
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            print(x.pop())
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            print(x.pop(0))
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            print(x.pop(-2))
+            print(x)
+            """)
+
+    def test_pop_exceptions(self):
+        self.assertCodeExecution("""
+            x = []
+            print(x.pop())
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            print(x.pop(3))
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            print(x.pop(-4))
+            print(x)
+            """)
+
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'list'
