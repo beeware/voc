@@ -533,10 +533,23 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "L.pop([index]) -> item -- remove and return item at index (default last).",
+        default_args = {"item"}
     )
     public org.python.Object pop(org.python.Object item) {
-        throw new org.python.exceptions.NotImplementedError("list.pop() has not been implemented.");
+        int index = this.value.size() - 1;
+        if (item != null) {
+            index = ((Long) ((org.python.types.Int) item).toJava()).intValue();
+            if (index < 0) {
+                index = this.value.size() + index;
+            }
+        }
+        if (this.value.isEmpty()) {
+            throw new org.python.exceptions.IndexError("pop from empty list");
+        } else if (index < 0 || index >= this.value.size()) {
+            throw new org.python.exceptions.IndexError("pop index out of range");
+        }
+        return this.value.remove(index);
     }
 
     @org.python.Method(
