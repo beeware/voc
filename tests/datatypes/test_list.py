@@ -269,6 +269,38 @@ class ListTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_copy(self):
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = x.copy()
+            print(y)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = x.copy()
+            print(x == y)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = x.copy()
+            print(x is not y)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = x.copy()
+            y.append(4)
+            print(x == y)
+            """)
+
+        self.assertCodeExecution("""
+            x = [[1], 2, 3]
+            y = x.copy()
+            print(x[0] is y[0])
+            """)
+
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'list'

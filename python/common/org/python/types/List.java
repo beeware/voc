@@ -489,10 +489,10 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "L.copy() -> list -- a shallow copy of L"
     )
     public org.python.Object copy() {
-        throw new org.python.exceptions.NotImplementedError("list.copy() has not been implemented.");
+        return new org.python.types.List(new java.util.ArrayList<org.python.Object>(this.value));
     }
 
     @org.python.Method(
