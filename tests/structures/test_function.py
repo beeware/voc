@@ -12,6 +12,17 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_function_name_attribute(self):
+        self.assertCodeExecution("""
+            def myfunc():
+                def otherfunc():
+                    pass
+                print(otherfunc.__name__)
+
+            print(myfunc.__name__)
+            myfunc()
+            """)
+
     def test_noargs_function(self):
         self.assertCodeExecution("""
             def myfunc():
