@@ -232,3 +232,43 @@ class FunctionTests(TranspileTestCase):
             print("value =", myfunc(5))
             print('Done.')
             """)
+
+    def test_noarg_unexpected_extra_arg(self):
+        self.assertCodeExecution("""
+        def myfunc():
+            pass
+
+        myfunc(5)
+            """)
+
+    def test_noarg_unexpected_extra_several_args(self):
+        self.assertCodeExecution("""
+            def myfunc():
+                return 16
+
+            print(myfunc(1, 2, 3))
+            """)
+
+    def test_unexpected_extra_several_args(self):
+        self.assertCodeExecution("""
+            def myfunc(a):
+                return 16
+
+            print(myfunc(1, 2, 3))
+            """)
+
+    def test_multiple_args_unexpected_extra_several_args(self):
+        self.assertCodeExecution("""
+            def myfunc(a, b):
+                return 16
+
+            print(myfunc(1, 2, 3))
+            """)
+
+    # def test_missing_args(self):
+    #     self.assertCodeExecution("""
+    #         def myfunc(a):
+    #             return 16
+    #
+    #         print(myfunc())
+    #         """)

@@ -173,6 +173,13 @@ public class Function extends org.python.types.Object implements org.python.Call
         return this;
     }
 
+    private void throwUnexpectedPositionalArgumentsError(int numExpected, int numGot) {
+        String posArgs = numExpected + " positional argument" + (numExpected == 1 ? "" : "s");
+        String givenArgs = numGot + (numGot == 1 ? " was given" : " were given");
+        String mesg = this.name.value + "() takes " + posArgs  + " but " + givenArgs;
+        throw new org.python.exceptions.TypeError(mesg);
+    }
+
     java.lang.Object [] adjustArguments(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         // if (kwargs.size() > 0) {
         //     // TODO: This doesn't have to be so - we *could* introspect argument names.
@@ -208,6 +215,10 @@ public class Function extends org.python.types.Object implements org.python.Call
         int required_args = argcount - this.default_args.size();
         // System.out.println("nargs = " + n_args);
         // System.out.println("first default = " + required_args);
+
+        if (0 == has_varargs && args.length > n_args) {
+            throwUnexpectedPositionalArgumentsError(n_args, args.length);
+        }
 
         // If there are genuinely *no* arguments - not even self - return null;
         if (n_args == 0) {
