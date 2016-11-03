@@ -102,7 +102,7 @@ to either add ``1`` to the number, or the supplied argument.
 
     @org.python.Method(
         __doc__ = "Add two numbers.",
-        args = {"num", "delta"},
+        args = {"num"},
         default_args = {"delta"}
     )
     public function org.python.Object inc(org.python.Object num, org.python.Object delta) {
@@ -132,8 +132,8 @@ but accept as many as you can get. For instance, the ``min`` function.
 .. code-block:: java
 
     @org.python.Method(
-        __doc__ = "Get the minimum of the suppliend arguments.""",
-        args = {"first", "others"},
+        __doc__ = "Get the minimum of the supplied arguments.""",
+        args = {"first"},
         varargs = "others"
     )
     public function org.python.Object min(org.python.Object first, org.python.types.Tuple others) {
