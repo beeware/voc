@@ -269,6 +269,110 @@ class ListTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_copy(self):
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = x.copy()
+            print(y)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = x.copy()
+            print(x == y)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = x.copy()
+            print(x is not y)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = x.copy()
+            y.append(4)
+            print(x == y)
+            """)
+
+        self.assertCodeExecution("""
+            x = [[1], 2, 3]
+            y = x.copy()
+            print(x[0] is y[0])
+            """)
+
+    def test_index(self):
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            print(x.index(1))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 1]
+            print(x.index(1, 1))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4]
+            print(x.index(4, 0, len(x)))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4]
+            print(x.index(2, 1, 2))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4]
+            print(x.index(2, 0, 10))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 1]
+            print(x.index(1, 0, -2))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 1]
+            print(x.index(1, -3, -2))
+            """)
+
+        # cases for 'ValueError: not in list'
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            print(x.index(4))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 1]
+            print(x.index(2, 0, 1))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4]
+            print(x.index(4, 0, 3))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 1]
+            print(x.index(3, 0, 10))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4]
+            print(x.index(2, 10, 20))
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4]
+            print(x.index(2, 10, 0))
+            """)
+
+        self.assertCodeExecution("""
+            x = []
+            print(x.index(1, 0, 10))
+            """)
+
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'list'

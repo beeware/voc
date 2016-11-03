@@ -1,6 +1,7 @@
 package org.python.types;
 
 import org.Python;
+
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -489,10 +490,10 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "L.copy() -> list -- a shallow copy of L"
     )
     public org.python.Object copy() {
-        throw new org.python.exceptions.NotImplementedError("list.copy() has not been implemented.");
+        return new org.python.types.List(new java.util.ArrayList<org.python.Object>(this.value));
     }
 
     @org.python.Method(
@@ -517,19 +518,40 @@ public class List extends org.python.types.Object {
         return org.python.types.NoneType.NONE;
     }
 
+    private int toPositiveIndex(int index) {
+        if (index < 0) {
+            return this.value.size() + index;
+        }
+        return index;
+    }
+
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "L.index(value, [start, [stop]]) -> integer -- return first index of value.\nRaises ValueError if the value is not present.",
+        args = {"item"},
+        default_args = {"start", "end"}
     )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         if (start != null && !(start instanceof org.python.types.Int)) {
             throw new org.python.exceptions.TypeError("list indices must be integers, not " + start.typeName());
         }
-
         if (end != null && !(end instanceof org.python.types.Int)) {
             throw new org.python.exceptions.TypeError("list indices must be integers, not " + end.typeName());
         }
 
-        throw new org.python.exceptions.NotImplementedError("list.index() has not been implemented.");
+        int iStart = 0, iEnd = this.value.size();
+        if (end != null) {
+            iEnd = toPositiveIndex(((Long) end.toJava()).intValue());
+        }
+        if (start != null) {
+            iStart = toPositiveIndex(((Long) start.toJava()).intValue());
+        }
+
+        for (int i = iStart; i < Math.min(iEnd, this.value.size()); i++) {
+            if (((org.python.types.Bool) this.value.get(i).__eq__(item)).value) {
+                return new org.python.types.Int(i);
+            }
+        }
+        throw new org.python.exceptions.ValueError(String.format("%d is not in list",  ((org.python.types.Int)item).value));
     }
 
     @org.python.Method(
