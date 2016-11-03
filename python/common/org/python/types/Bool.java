@@ -79,14 +79,13 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) <= ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) <= (((org.python.types.Bool) other).value ? 1 : 0));
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) <= (((org.python.types.Float) other).value));
+        try {
+            org.python.types.Bool less_than = (org.python.types.Bool)__lt__(other);
+            org.python.types.Bool equals = (org.python.types.Bool)__eq__(other);
+            return new org.python.types.Bool(less_than.value || equals.value);
+        } catch (org.python.exceptions.TypeError e){
+            throw new org.python.exceptions.TypeError("unorderable types: bool() <= " + other.typeName() + "()");
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bool() <= " + other.typeName() + "()");
     }
 
     @org.python.Method(
@@ -107,43 +106,31 @@ public class Bool extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __ne__(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) != ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) != (((org.python.types.Bool) other).value ? 1 : 0));
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) != (((org.python.types.Float) other).value));
-        }
-        return new org.python.types.Bool(true);
+        return new org.python.types.Bool(! ((org.python.types.Bool)__eq__(other)).value );
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) > ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) > (((org.python.types.Bool) other).value ? 1 : 0));
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) > (((org.python.types.Float) other).value));
+        try {
+            org.python.types.Bool less_than = (org.python.types.Bool)__lt__(other);
+            org.python.types.Bool equals = (org.python.types.Bool)__eq__(other);
+            return new org.python.types.Bool(!less_than.value && !equals.value);
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("unorderable types: bool() > " + other.typeName() + "()");
         }
-
-        throw new org.python.exceptions.TypeError("unorderable types: bool() > " + other.typeName() + "()");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) >= ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) >= (((org.python.types.Bool) other).value ? 1 : 0));
-        } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) >= (((org.python.types.Float) other).value));
+        try {
+            return new org.python.types.Bool(! ((org.python.types.Bool)__lt__(other)).value);
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("unorderable types: bool() >= " + other.typeName() + "()");
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bool() >= " + other.typeName() + "()");
     }
 
     @org.python.Method(
