@@ -64,6 +64,22 @@ class RangeTests(TranspileTestCase):
             print(len(range(0, 5, -1)))
         """)
 
+    def test_multiple_iterators(self):
+        self.assertCodeExecution("""
+            r = range(0, 10)
+            print(list(r))
+            print(list(r))
+        """)
+
+    def test_iterator_iterator(self):
+        self.assertCodeExecution("""
+            r = range(0, 10)
+            i = iter(r)
+            print(next(i))
+            print(next(iter(i)))
+            print(r)
+        """)
+
 
 class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
