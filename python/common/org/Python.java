@@ -870,10 +870,21 @@ public class Python {
         __doc__ = "hasattr(object, name) -> bool" +
             "\n" +
             "Return whether the object has an attribute with the given name.\n" +
-            "(This is done by calling getattr(object, name) and catching AttributeError.)\n"
+            "(This is done by calling getattr(object, name) and catching AttributeError.)\n",
+        args = {"object", "name"}
     )
-    public static org.python.types.Bool hasattr() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'hasattr' not implemented");
+    public static org.python.types.Bool hasattr(org.python.Object object, org.python.Object name) {
+		if (!(name instanceof org.python.types.Str)) {
+			throw new org.python.exceptions.TypeError("hasattr(): attribute name must be string");
+		}
+        try {
+            object.__getattribute__(name);
+			return new org.python.types.Bool(true);
+        } catch (org.python.exceptions.AttributeError ae) {
+			return new org.python.types.Bool(false);
+        } catch (org.python.exceptions.TypeError te) {
+            throw new org.python.exceptions.TypeError(te.getMessage().replace("__hasattribute__", "hasattr"));
+        }
     }
 
     @org.python.Method(
