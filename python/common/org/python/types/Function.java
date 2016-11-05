@@ -216,7 +216,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         // System.out.println("nargs = " + n_args);
         // System.out.println("first default = " + required_args);
 
-        if (0 == has_varargs && args.length > n_args) {
+        if (0 == has_varargs && args != null && args.length > n_args) {
             throwUnexpectedPositionalArgumentsError(n_args, args.length);
         }
 
