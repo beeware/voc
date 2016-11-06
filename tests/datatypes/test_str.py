@@ -161,6 +161,16 @@ class StrTests(TranspileTestCase):
             print(s.count('ll', 0, 100))
             """)
 
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('hell', 1, -1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('hell', -4))
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

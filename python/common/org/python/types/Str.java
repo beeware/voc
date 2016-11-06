@@ -207,14 +207,14 @@ public class Str extends org.python.types.Object {
                 else {
                     long start;
                     if (slice.start != null) {
-                        start = Math.min(slice.start.value, this.value.length());
+                        start = toPositiveIndex(Math.min(slice.start.value, this.value.length()));
                     } else {
                         start = 0;
                     }
 
                     long stop;
                     if (slice.stop != null) {
-                        stop = Math.min(slice.stop.value, this.value.length());
+                        stop = toPositiveIndex(Math.min(slice.stop.value, this.value.length()));
                     } else {
                         stop = this.value.length();
                     }
@@ -510,6 +510,7 @@ public class Str extends org.python.types.Object {
             end = new Int(this.value.length());
         }
         String original = this.__getitem__(new Slice(start, end)).toString();
+
         return new Int((original.length() - original.replace(sub_str, "").length()) / sub_str.length());
     }
 
@@ -555,7 +556,7 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("format_map() has not been implemented.");
     }
 
-    private int toPositiveIndex(int index) {
+    private long toPositiveIndex(long index) {
         if (index < 0) {
             return this.value.length() + index;
         }
@@ -568,17 +569,15 @@ public class Str extends org.python.types.Object {
         default_args = {"start", "end"}
     )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
-        int iStart = 0, iEnd = this.value.length();
-        if (start != null) {
-            iStart = toPositiveIndex(((Long) ((Int) start).value).intValue());
+        if (start == null) {
+            start = new Int(0);
         }
-        if (end != null) {
-            iEnd = toPositiveIndex(((Long) ((Int) end).value).intValue());
-            iEnd = Math.min(iEnd, this.value.length());
+        if (end == null) {
+            end = new Int(this.value.length());
         }
-        int foundAt = this.value.substring(iStart, iEnd).indexOf(((Str) item).value);
+        int foundAt = this.__getitem__(new Slice(start, end)).toString().indexOf(item.toString());
         if (foundAt >= 0) {
-            return new Int(foundAt + iStart);
+            return new Int(foundAt + toPositiveIndex(((Int) start).value));
         }
         throw new org.python.exceptions.ValueError("substring not found");
     }
