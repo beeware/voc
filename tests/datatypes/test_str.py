@@ -113,6 +113,37 @@ class StrTests(TranspileTestCase):
             print(s.index('hell', -4))
             """)
 
+    def test_count(self):
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('e'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('a'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll', 3))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll', 3, 4))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll', 0, 4))
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

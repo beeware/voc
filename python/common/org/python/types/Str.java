@@ -497,10 +497,20 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"},
+        default_args = {"sub", "end"}
     )
-    public org.python.Object count() {
-        throw new org.python.exceptions.NotImplementedError("count() has not been implemented.");
+    public org.python.Object count(org.python.Object sub, org.python.Object start, org.python.Object end) {
+        String sub_str = ((Str) sub).toString();
+        if (start == null) {
+            start = new Int(0);
+        }
+        if (end == null) {
+            end = new Int(this.value.length());
+        }
+        String original = this.__getitem__(new Slice(start, end)).toString();
+        return new Int((original.length() - original.replace(sub_str, "").length()) / sub_str.length());
     }
 
     @org.python.Method(
