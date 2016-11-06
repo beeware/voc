@@ -171,6 +171,42 @@ class StrTests(TranspileTestCase):
             print(s.count('hell', -4))
             """)
 
+    def test_find(self):
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('world'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', 1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', 1, 3))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', 1, 100))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', 1, -1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', -4))
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

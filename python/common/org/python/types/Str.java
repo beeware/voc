@@ -536,10 +536,22 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.find(sub[, start[, end]]) -> int",
+        args = {"item"},
+        default_args = {"start", "end"}
     )
-    public org.python.Object find() {
-        throw new org.python.exceptions.NotImplementedError("find() has not been implemented.");
+    public org.python.Object find(org.python.Object item, org.python.Object start, org.python.Object end) {
+        if (start == null) {
+            start = new Int(0);
+        }
+        if (end == null) {
+            end = new Int(this.value.length());
+        }
+        int foundAt = this.__getitem__(new Slice(start, end)).toString().indexOf(item.toString());
+        if (foundAt >= 0) {
+            return new Int(foundAt + toPositiveIndex(((Int) start).value));
+        }
+        return new Int(foundAt);
     }
 
     @org.python.Method(
@@ -569,17 +581,12 @@ public class Str extends org.python.types.Object {
         default_args = {"start", "end"}
     )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
-        if (start == null) {
-            start = new Int(0);
+        org.python.Object foundAt = this.find(item, start, end);
+        if (((Int)foundAt).value < 0) {
+            throw new org.python.exceptions.ValueError("substring not found");
+        } else {
+            return foundAt;
         }
-        if (end == null) {
-            end = new Int(this.value.length());
-        }
-        int foundAt = this.__getitem__(new Slice(start, end)).toString().indexOf(item.toString());
-        if (foundAt >= 0) {
-            return new Int(foundAt + toPositiveIndex(((Int) start).value));
-        }
-        throw new org.python.exceptions.ValueError("substring not found");
     }
 
     @org.python.Method(
