@@ -207,14 +207,14 @@ public class Str extends org.python.types.Object {
                 else {
                     long start;
                     if (slice.start != null) {
-                        start = slice.start.value;
+                        start = Math.min(slice.start.value, this.value.length());
                     } else {
                         start = 0;
                     }
 
                     long stop;
                     if (slice.stop != null) {
-                        stop = slice.stop.value;
+                        stop = Math.min(slice.stop.value, this.value.length());
                     } else {
                         stop = this.value.length();
                     }
