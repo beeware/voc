@@ -545,11 +545,32 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("format_map() has not been implemented.");
     }
 
+    private int toPositiveIndex(int index) {
+        if (index < 0) {
+            return this.value.length() + index;
+        }
+        return index;
+    }
+
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.index(sub[, start[, end]]) -> int\n\nLike S.find() but raise ValueError when the substring is not found.",
+        args = {"item"},
+        default_args = {"start", "end"}
     )
-    public org.python.Object index() {
-        throw new org.python.exceptions.NotImplementedError("index() has not been implemented.");
+    public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
+        int iStart = 0, iEnd = this.value.length();
+        if (start != null) {
+            iStart = toPositiveIndex(((Long) ((Int) start).value).intValue());
+        }
+        if (end != null) {
+            iEnd = toPositiveIndex(((Long) ((Int) end).value).intValue());
+            iEnd = Math.min(iEnd, this.value.length());
+        }
+        int foundAt = this.value.substring(iStart, iEnd).indexOf(((Str) item).value);
+        if (foundAt >= 0) {
+            return new Int(foundAt + iStart);
+        }
+        throw new org.python.exceptions.ValueError("substring not found");
     }
 
     @org.python.Method(

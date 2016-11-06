@@ -1,3 +1,4 @@
+
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
@@ -74,6 +75,42 @@ class StrTests(TranspileTestCase):
                 # print(s.swap())
                 # print(s.title())
                 print(s.upper())
+            """)
+
+    def test_index(self):
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('world'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', 1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', 1, 3))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', 1, 100))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', 1, -1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', -4))
             """)
 
 
