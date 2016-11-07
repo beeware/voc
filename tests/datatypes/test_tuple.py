@@ -115,7 +115,6 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_lt_class',
         'test_lt_frozenset',
-        'test_lt_tuple',
 
         'test_modulo_class',
         'test_modulo_complex',
