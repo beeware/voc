@@ -149,6 +149,18 @@ class ListTests(TranspileTestCase):
             print(x[1:4])
             """)
 
+        # Slice bound in both directions with end out of bounds
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x[1:6])
+            """)
+
+        # Slice bound in both directions with start out of bounds
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            print(x[6:7])
+            """)
+
     def test_count(self):
         # Normal Count
         self.assertCodeExecution("""

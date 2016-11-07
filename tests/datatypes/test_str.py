@@ -1,3 +1,4 @@
+
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
@@ -19,51 +20,63 @@ class StrTests(TranspileTestCase):
     def test_getitem(self):
         # Simple positive index
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
+            x = "12345"
             print(x[2])
             """)
 
         # Simple negative index
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
+            x = "12345"
             print(x[-2])
             """)
 
         # Positive index out of range
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
+            x = "12345"
             print(x[10])
             """)
 
         # Negative index out of range
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
+            x = "12345"
             print(x[-10])
             """)
 
     def test_slice(self):
         # Full slice
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
+            x = "12345"
             print(x[:])
             """)
 
         # Left bound slice
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
+            x = "12345"
             print(x[1:])
             """)
 
         # Right bound slice
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
+            x = "12345"
             print(x[:4])
             """)
 
         # Slice bound in both directions
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
+            x = "12345"
             print(x[1:4])
+            """)
+
+        # Slice bound in both directions with end out of bounds
+        self.assertCodeExecution("""
+            x = "12345"
+            print(x[1:6])
+            """)
+
+        # Slice bound in both directions with start out of bounds
+        self.assertCodeExecution("""
+            x = "12345"
+            print(x[6:7])
             """)
 
     def test_case_changes(self):
@@ -74,6 +87,124 @@ class StrTests(TranspileTestCase):
                 # print(s.swap())
                 # print(s.title())
                 print(s.upper())
+            """)
+
+    def test_index(self):
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('world'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', 1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', 1, 3))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', 1, 100))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', 1, -1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.index('hell', -4))
+            """)
+
+    def test_count(self):
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('e'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('a'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll', 3))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll', 3, 4))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll', 0, 4))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('ll', 0, 100))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('hell', 1, -1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.count('hell', -4))
+            """)
+
+    def test_find(self):
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('world'))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', 1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', 1, 3))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', 1, 100))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', 1, -1))
+            """)
+
+        self.assertCodeExecution("""
+            s = 'hello hell'
+            print(s.find('hell', -4))
             """)
 
 
