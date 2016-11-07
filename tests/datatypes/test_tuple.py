@@ -64,6 +64,18 @@ class TupleTests(TranspileTestCase):
             print(x[-10])
             """)
 
+    def test_lt(self):
+        self.assertCodeExecution("""
+            pairs = [
+                (1, 2, 3), (3, 2, 1),
+                (1, 2, 1), (1, 2, 4),
+                (1, 2, 3, 4), (1, 2, 3, 0)
+            ]
+            for p1 in pairs:
+                for p2 in pairs:
+                    print(p1, "<", p2, ":", p1 < p2)
+            """, run_in_function=False)
+
 
 class UnaryTupleOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
@@ -103,7 +115,6 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_lt_class',
         'test_lt_frozenset',
-        'test_lt_tuple',
 
         'test_modulo_class',
         'test_modulo_complex',

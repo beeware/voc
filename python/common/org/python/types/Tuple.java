@@ -103,20 +103,23 @@ public class Tuple extends org.python.types.Object {
             int otherSize = otherTuple.value.size();
             int count = Math.min(size, otherSize);
 
-            boolean cmp = false;
             for (int i = 0; i < count; i++) {
                 org.python.types.Bool b =
                     (org.python.types.Bool) this.value.get(i).__lt__(otherTuple.value.get(i));
-
-                cmp = cmp & b.value;
+                org.python.types.Bool b2 =
+                    (org.python.types.Bool) otherTuple.value.get(i).__lt__(this.value.get(i));
+                if (b.value) {
+                    return new org.python.types.Bool(true);
+                } else if (b2.value) {
+                    return new org.python.types.Bool(false);
+                }
             }
 
-            if (cmp) {
-                return new org.python.types.Bool(cmp);
+            if (size == otherSize) {
+                return new org.python.types.Bool(false);
+            } else {
+                return new org.python.types.Bool(size < otherSize);
             }
-
-            // At this point the lists are different sizes or every comparison is true.
-            return new org.python.types.Bool(size < otherSize);
 
         } else {
             throw new org.python.exceptions.TypeError(
