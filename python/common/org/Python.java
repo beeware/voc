@@ -1630,11 +1630,67 @@ public class Python {
         }
     }
 
+    public static class __SortedObjectComparator implements java.util.Comparator<org.python.Object> {
+        private boolean reverse;
+        private org.python.Object key;
+
+        public __SortedObjectComparator(boolean reverse, org.python.Object key) {
+            this.reverse = reverse;
+            this.key = key;
+        }
+
+        public __SortedObjectComparator(boolean reverse) {
+            this.reverse = reverse;
+        }
+
+        public int compare(org.python.Object o1, org.python.Object o2) {
+            if (key != null) {
+                try {
+                    // Replace the two objects by their keys for comparison
+                    o1 = ((org.python.Callable) key).invoke(new org.python.Object [] { o1 }, null);
+                    o2 = ((org.python.Callable) key).invoke(new org.python.Object [] { o2 }, null);
+                } catch (java.lang.ClassCastException e) {
+                    throw new org.python.exceptions.TypeError("'" + key.typeName() + "' object is not callable");
+                }
+            }
+            if (((org.python.types.Bool) o1.__lt__(o2).__bool__()).value) {
+                return reverse ? 1 : -1;
+            }
+            if (((org.python.types.Bool) o2.__lt__(o1).__bool__()).value) {
+                return reverse ? -1 : 1;
+            }
+            return 0;
+        }
+    }
+
     @org.python.Method(
-        __doc__ = "sorted(iterable, key=None, reverse=False) --> new sorted list"
+        __doc__ = "sorted(iterable, key=None, reverse=False) --> new sorted list",
+        args={"iterable"},
+        default_args={"key", "reverse"}
     )
-    public static org.python.types.List sorted() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'sorted' not implemented");
+    public static org.python.types.List sorted(org.python.Object iterable, org.python.Object key, org.python.types.Bool reverse) {
+        if (iterable == null) {
+            return new org.python.types.List();
+        } else {
+            if (reverse == null) {
+                reverse = new org.python.types.Bool(false);
+            }
+            org.python.Iterable iterator = org.Python.iter(iterable);
+            java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
+            try {
+                while (true) {
+                    org.python.Object next = iterator.__next__();
+                    generated.add(next);
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            if (key == null || key instanceof org.python.types.NoneType) {
+                java.util.Collections.sort(generated, new __SortedObjectComparator(reverse.value));
+            } else {
+                java.util.Collections.sort(generated, new __SortedObjectComparator(reverse.value, key));
+            }
+            return new org.python.types.List(generated);
+        }
     }
 
     @org.python.Method(
