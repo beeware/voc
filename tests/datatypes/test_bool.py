@@ -71,7 +71,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_or_class',
         'test_or_frozenset',
-        'test_or_int',
 
         'test_power_class',
         'test_power_complex',

@@ -373,6 +373,9 @@ public class Bool extends org.python.types.Object {
         if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1 : 0) | (((org.python.types.Bool) other).value ? 1 : 0));
         }
+        if (other instanceof org.python.types.Int){
+            return new org.python.types.Int( (((org.python.types.Bool) this).value ? 1 : 0) | ((org.python.types.Int) other).value);
+        }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: 'bool' and '" + other.typeName() + "'");
     }
 
