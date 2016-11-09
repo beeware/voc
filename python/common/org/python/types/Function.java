@@ -1,4 +1,5 @@
 package org.python.types;
+import java.util.ArrayList;
 
 
 public class Function extends org.python.types.Object implements org.python.Callable {
@@ -173,6 +174,37 @@ public class Function extends org.python.types.Object implements org.python.Call
         return this;
     }
 
+    private void checkMissingArgs(int required_args, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> varnames) {
+        int n_missing_pos_args = required_args - args.length;
+        java.util.List<String> missingArgs = new ArrayList<String>();
+        if (n_missing_pos_args > 0) {
+            // build list of actual missing args, checking if haven't been passed as kwargs
+            for (int i = 0; i < n_missing_pos_args; i++) {
+                java.lang.String argname = ((String) varnames.get(i + args.length).toJava());
+                if (!kwargs.containsKey(argname)) {
+                    missingArgs.add(argname);
+                }
+            }
+
+            if (missingArgs.size() > 0) {
+                // we show missing args using Oxford comma, as CPython does
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < missingArgs.size(); i++) {
+                    sb.append("'" + missingArgs.get(i) + "'");
+                    if (i <= missingArgs.size() - 2) {
+                        sb.append(", ");
+                    }
+                    if (i == missingArgs.size() - 2) {
+                        sb.append("and ");
+                    }
+                }
+
+                throw new org.python.exceptions.TypeError(this.name + "() missing " + missingArgs.size() + " required positional "
+                        + (missingArgs.size() == 1 ? "argument" : "arguments") + ": " + sb.toString());
+            }
+        }
+    }
+
     private void throwUnexpectedPositionalArgumentsError(int numExpected, int numGot) {
         String posArgs = numExpected + " positional argument" + (numExpected == 1 ? "" : "s");
         String givenArgs = numGot + (numGot == 1 ? " was given" : " were given");
@@ -219,6 +251,8 @@ public class Function extends org.python.types.Object implements org.python.Call
         if (0 == has_varargs && args != null && args.length > n_args) {
             throwUnexpectedPositionalArgumentsError(n_args, args.length);
         }
+
+        checkMissingArgs(required_args, args, kwargs, varnames);
 
         // If there are genuinely *no* arguments - not even self - return null;
         if (n_args == 0) {

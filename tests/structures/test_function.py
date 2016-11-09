@@ -265,10 +265,26 @@ class FunctionTests(TranspileTestCase):
             print(myfunc(1, 2, 3))
             """)
 
-    # def test_missing_args(self):
-    #     self.assertCodeExecution("""
-    #         def myfunc(a):
-    #             return 16
-    #
-    #         print(myfunc())
-    #         """)
+    def test_missing_sole_arg(self):
+        self.assertCodeExecution("""
+            def myfunc(a):
+                return 16
+
+            print(myfunc())
+            """)
+
+    def test_missing_args_more_args(self):
+        self.assertCodeExecution("""
+            def otherfunc(a, b, c, d, e, f=3):
+                return 'ok'
+
+            print(otherfunc(1))
+            """)
+
+    def test_missing_args_with_varargs(self):
+        self.assertCodeExecution("""
+            def myfunc(a, b, *c, d=3):
+                return 'ok'
+
+            print(myfunc(1))
+            """)
