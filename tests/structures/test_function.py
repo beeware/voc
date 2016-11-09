@@ -288,3 +288,13 @@ class FunctionTests(TranspileTestCase):
 
             print(myfunc(1))
             """)
+
+    def test_a_method_missing_args(self):
+        self.assertCodeExecution("""
+            class MyClass:
+                def a_method(self, a, b, c):
+                    return 16
+
+            i = MyClass()
+            print(i.a_method())
+            """)

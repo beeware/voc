@@ -174,12 +174,12 @@ public class Function extends org.python.types.Object implements org.python.Call
         return this;
     }
 
-    private void checkMissingArgs(int required_args, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> varnames) {
+    private void checkMissingArgs(int required_args, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> varnames, int first_arg) {
         int n_missing_pos_args = required_args - args.length;
         java.util.List<String> missingArgs = new ArrayList<String>();
         if (n_missing_pos_args > 0) {
             // build list of actual missing args, checking if haven't been passed as kwargs
-            for (int i = 0; i < n_missing_pos_args; i++) {
+            for (int i = first_arg; i < n_missing_pos_args; i++) {
                 java.lang.String argname = ((String) varnames.get(i + args.length).toJava());
                 if (!kwargs.containsKey(argname)) {
                     missingArgs.add(argname);
@@ -252,8 +252,6 @@ public class Function extends org.python.types.Object implements org.python.Call
             throwUnexpectedPositionalArgumentsError(n_args, args.length);
         }
 
-        checkMissingArgs(required_args, args, kwargs, varnames);
-
         // If there are genuinely *no* arguments - not even self - return null;
         if (n_args == 0) {
             return null;
@@ -269,6 +267,8 @@ public class Function extends org.python.types.Object implements org.python.Call
             adjusted[0] = instance;
             // System.out.println("   aARG 0: " + instance);
         }
+
+        checkMissingArgs(required_args, args, kwargs, varnames, first_arg);
 
         // System.out.println("First arg = " + first_arg);
         // Populate the positional args.
