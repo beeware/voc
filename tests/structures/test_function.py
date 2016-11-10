@@ -12,6 +12,17 @@ class FunctionTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_function_name_attribute(self):
+        self.assertCodeExecution("""
+            def myfunc():
+                def otherfunc():
+                    pass
+                print(otherfunc.__name__)
+
+            print(myfunc.__name__)
+            myfunc()
+            """)
+
     def test_noargs_function(self):
         self.assertCodeExecution("""
             def myfunc():
@@ -220,4 +231,70 @@ class FunctionTests(TranspileTestCase):
 
             print("value =", myfunc(5))
             print('Done.')
+            """)
+
+    def test_noarg_unexpected_extra_arg(self):
+        self.assertCodeExecution("""
+        def myfunc():
+            pass
+
+        myfunc(5)
+            """)
+
+    def test_noarg_unexpected_extra_several_args(self):
+        self.assertCodeExecution("""
+            def myfunc():
+                return 16
+
+            print(myfunc(1, 2, 3))
+            """)
+
+    def test_unexpected_extra_several_args(self):
+        self.assertCodeExecution("""
+            def myfunc(a):
+                return 16
+
+            print(myfunc(1, 2, 3))
+            """)
+
+    def test_multiple_args_unexpected_extra_several_args(self):
+        self.assertCodeExecution("""
+            def myfunc(a, b):
+                return 16
+
+            print(myfunc(1, 2, 3))
+            """)
+
+    def test_missing_sole_arg(self):
+        self.assertCodeExecution("""
+            def myfunc(a):
+                return 16
+
+            print(myfunc())
+            """)
+
+    def test_missing_args_more_args(self):
+        self.assertCodeExecution("""
+            def otherfunc(a, b, c, d, e, f=3):
+                return 'ok'
+
+            print(otherfunc(1))
+            """)
+
+    def test_missing_args_with_varargs(self):
+        self.assertCodeExecution("""
+            def myfunc(a, b, *c, d=3):
+                return 'ok'
+
+            print(myfunc(1))
+            """)
+
+    def test_a_method_missing_args(self):
+        self.assertCodeExecution("""
+            class MyClass:
+                def a_method(self, a, b, c):
+                    return 16
+
+            i = MyClass()
+            print(i.a_method())
             """)

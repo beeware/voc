@@ -204,7 +204,7 @@ class Block:
                 JavaOpcodes.DUP(),
         )
 
-        self.add_str(function.name)
+        self.add_str(function.code.co_name)
 
         # Add the code object
         self.add_opcodes(
