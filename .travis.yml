@@ -6,4 +6,4 @@ install:
   - "pip install ."
   - "ant java"
 script:
-  - "python setup.py test"
+  - "python setup.py test -q"
