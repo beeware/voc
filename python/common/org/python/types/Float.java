@@ -282,7 +282,10 @@ public class Float extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
         } else if (other instanceof org.python.types.Set) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
+        } else if (other instanceof org.python.types.List) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
         }
+
         throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
     }
 

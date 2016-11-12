@@ -120,7 +120,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_frozenset',
-        'test_multiply_list',
         'test_multiply_NotImplemented',
         'test_multiply_range',
         'test_multiply_slice',
