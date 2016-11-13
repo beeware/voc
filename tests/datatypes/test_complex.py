@@ -20,24 +20,24 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_add_complex',
         'test_add_frozenset',
 
-        'test_and_None',
-        'test_and_NotImplemented',
-        'test_and_slice',
-        'test_and_range',
-        'test_and_bool',
-        'test_and_bytearray',
-        'test_and_bytes',
+
+
+
+
+
+
+
         'test_and_class',
-        'test_and_complex',
-        'test_and_dict',
-        'test_and_float',
+
+
+
         'test_and_frozenset',
-        'test_and_int',
-        'test_and_list',
-        'test_and_none',
-        'test_and_set',
-        'test_and_str',
-        'test_and_tuple',
+
+
+
+
+
+
 
         'test_eq_class',
         'test_eq_frozenset',
@@ -235,24 +235,24 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_frozenset',
         'test_add_int',
 
-        'test_and_None',
-        'test_and_NotImplemented',
-        'test_and_slice',
-        'test_and_range',
-        'test_and_bool',
-        'test_and_bytearray',
-        'test_and_bytes',
+
+
+
+
+
+
+
         'test_and_class',
-        'test_and_complex',
-        'test_and_dict',
-        'test_and_float',
+
+
+
         'test_and_frozenset',
-        'test_and_int',
-        'test_and_list',
+
+
         'test_and_none',
-        'test_and_set',
-        'test_and_str',
-        'test_and_tuple',
+
+
+
 
         'test_eq_None',
         'test_eq_NotImplemented',
