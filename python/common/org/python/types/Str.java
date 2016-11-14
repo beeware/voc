@@ -522,10 +522,11 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.endswith(suffix[, start[, end]]) -> bool",
+        args = {"item"}
     )
-    public org.python.Object endswith() {
-        throw new org.python.exceptions.NotImplementedError("endswith() has not been implemented.");
+    public org.python.Object endswith(org.python.Object suffix) {
+        return new org.python.types.Bool(this.value.endsWith(suffix.toString()));
     }
 
     @org.python.Method(
