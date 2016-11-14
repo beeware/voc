@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -56,18 +58,30 @@ class ForLoopTests(TranspileTestCase):
             print('Done.')
             """)
 
-    # def test_for_else(self):
-    #     self.assertCodeExecution(
-    #         code="""
-    #             total = 0
-    #             for i in []:
-    #                 total = total + i
-    #             else:
-    #                 total = -999
-    #             """,
-    #         expected="""
-    #          Code (159 bytes)
-    #         """)
+    @expectedFailure
+    def test_for_else(self):
+        self.assertCodeExecution(
+            code="""
+                total = 0
+                for i in []:
+                    total = total + i
+                else:
+                    total = -999
+                print(total)
+            """)
+
+    @expectedFailure
+    def test_for_else_break(self):
+        self.assertCodeExecution(
+            code="""
+                total = 0
+                for i in []:
+                    total = total + i
+                    break
+                else:
+                    total = -999
+                print(total)
+            """)
 
     def test_break(self):
         self.assertCodeExecution(
@@ -100,4 +114,32 @@ class ForLoopTests(TranspileTestCase):
                     for k in range(0, i):
                         print(i, j)
                 print("Done")
+            """)
+
+    def test_multiple_values(self):
+        self.assertCodeExecution("""
+            values = [
+                (1, 2, 3),
+                (4, 5, 6),
+                (7, 8, 9),
+            ]
+            for x, y, z, in values:
+                print(x, y, z)
+            print('Done.')
+            """)
+
+    @expectedFailure
+    def test_multiple_values_iterator(self):
+        self.assertCodeExecution("""
+            values = {
+                'a': 1,
+                'b': 2,
+                'c': 3,
+            }
+            for k, v in values.items():
+                print(k, v)
+            print('And once again...')
+            for item in values.items():
+                print(item[0], item[1])
+            print('Done.')
             """)

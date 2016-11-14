@@ -7,13 +7,14 @@ top of UTF-16, as well as encoding NUL (codepoint 0) as a two byte sequence.
 """
 
 from __future__ import unicode_literals
+
+import codecs
+import re
 from encodings import normalize_encoding
 from encodings.utf_8 import (
     IncrementalDecoder as UTF8IncrementalDecoder,
     IncrementalEncoder as UTF8IncrementalEncoder,
 )
-import re
-import codecs
 
 # Match 6-byte CESU-9 sequences
 CESU8_RE = re.compile(b'\xed[\xa0-\xaf][\x80-\xbf]\xed[\xb0-\xbf][\x80-\xbf]')

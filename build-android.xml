@@ -47,7 +47,7 @@
          application and should be checked into Version Control Systems. -->
     <loadproperties srcFile="project.properties" />
 
-    <property name="out.jar.name" value="python-android" />
+    <property name="out.jar.name" value="python-android-support" />
     <property name="source.absolute.dir" location="${source.dir}/common" />
     <property name="platform.absolute.dir" location="${source.dir}/android" />
 
@@ -148,11 +148,15 @@
              prefix, so the libs directory will be unrolled. -->
 
         <mkdir dir="${out.absolute.dir}/android/libs"/>
-        <mkdir dir="${out.absolute.dir}/android/src"/>
         <move file="${out.absolute.dir}/${out.jar.name}.jar"
              todir="${out.absolute.dir}/android/libs" />
-        <tar destfile="${out.absolute.dir}/Python-Android-${python-version}-b${release}.tar.gz"
-             basedir="${out.absolute.dir}/android" />
+
+        <echo file="${out.absolute.dir}/android/support.version" append="false">Python version: ${python-version}
+Build: ${release}
+</echo>
+        <tar destfile="${out.absolute.dir}/Python-${python-version}-Android-support.b${release}.tar.gz"
+             basedir="${out.absolute.dir}/android"
+             compression="gzip" />
     </target>
 
     <!--

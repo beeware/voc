@@ -19,8 +19,11 @@ class BuiltinVarsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_frozenset',
         'test_int',
         'test_list',
-        'test_none',
+        'test_None',
+        'test_NotImplemented',
         'test_set',
         'test_str',
         'test_tuple',
+        'test_range',
+        'test_slice',
     ]

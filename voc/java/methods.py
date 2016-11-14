@@ -1,5 +1,6 @@
-from .constants import Utf8
 from .attributes import Attribute
+from .constants import Utf8
+
 
 # From: http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html
 

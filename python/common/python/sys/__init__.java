@@ -3,8 +3,13 @@ package python.sys;
 
 public class __init__ extends org.python.types.Module {
     static {
-        org.python.types.Type cls = org.python.types.Type.pythonType(python.sys.__init__.class);
-        org.Python.initializeModule(python.sys.__init__.class, cls.__dict__);
+        stdout = python.platform.__init__.impl.stdout();
+        stderr = python.platform.__init__.impl.stderr();
+        stdin = python.platform.__init__.impl.stdin();
+
+        __stdout__ = python.platform.__init__.impl.stdout();
+        __stderr__ = python.platform.__init__.impl.stderr();
+        __stdin__ = python.platform.__init__.impl.stdin();
     }
 
     @org.python.Method(
@@ -54,11 +59,14 @@ public class __init__ extends org.python.types.Module {
 
     // __spec__ <class '_frozen_importlib.ModuleSpec'>
 
-    // __stderr__ <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object __stderr__;
 
-    // __stdin__ <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object __stdin__;
 
-    // __stdout__ <class '_io.TextIOWrapper'>
+    @org.python.Attribute()
+    public static org.python.Object __stdout__;
 
     @org.python.Method(
         __doc__ = ""
@@ -268,7 +276,7 @@ public class __init__ extends org.python.types.Module {
 
     public static org.python.types.List meta_path;
 
-    public static org.python.types.Dict modules;
+    public static org.python.types.Dict modules = new org.python.types.Dict();
 
     public static org.python.types.List path;
 

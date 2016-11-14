@@ -1,5 +1,6 @@
 from .signatures import method_descriptor
 
+
 ##########################################################################
 # Some utility methods to help compare and hash constants
 ##########################################################################
@@ -263,7 +264,7 @@ class Classref(Constant):
         return '<Class %s>' % self.name
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'name')
+        return isinstance(other, Classref) and other.tag == self.tag and other.name == self.name
 
     def __hash__(self):
         return multihash(self, 'tag', 'name')
@@ -321,7 +322,7 @@ class Fieldref(Constant):
         return '<Fieldref %s.%s (%s)>' % (self.class_name, self.name, self.descriptor)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'klass', 'name_and_type')
+        return isinstance(other, Fieldref) and other.tag == self.tag and other.klass == self.klass and other.name_and_type == self.name_and_type
 
     def __hash__(self):
         return multihash(self, 'tag', 'klass', 'name_and_type')
@@ -393,7 +394,7 @@ class Methodref(Constant):
         return '<Methodref %s.%s %s>' % (self.class_name, self.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'klass', 'name_and_type')
+        return isinstance(other, Methodref) and other.tag == self.tag and other.klass == self.klass and other.name_and_type == self.name_and_type
 
     def __hash__(self):
         return multihash(self, 'tag', 'klass', 'name_and_type')
@@ -454,7 +455,7 @@ class InterfaceMethodref(Constant):
         return '<InterfaceMethodref %s.%s %s>' % (self.class_name, self.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'klass', 'name_and_type')
+        return isinstance(other, InterfaceMethodref) and other.tag == self.tag and other.klass == self.klass and other.name_and_type == self.name_and_type
 
     def __hash__(self):
         return multihash(self, 'tag', 'klass', 'name_and_type')
@@ -504,7 +505,7 @@ class String(Constant):
         return "<String '%s'>" % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, String) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -551,7 +552,7 @@ class Integer(Constant):
         return '<Integer %s>' % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, Integer) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -608,7 +609,7 @@ class Float(Constant):
         return '<Float %s>' % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, Float) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -664,7 +665,7 @@ class Long(Constant):
         return '<Long %s>' % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, Long) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -727,7 +728,7 @@ class Double(Constant):
         return '<Double %s>' % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, Double) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -778,7 +779,7 @@ class NameAndType(Constant):
         return '<NameAndType: name:%s descriptor:%s>' % (self.name, self.descriptor)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'name', 'descriptor')
+        return isinstance(other, NameAndType) and other.tag == self.tag and other.name == self.name and other.descriptor == self.descriptor
 
     def __hash__(self):
         return multihash(self, 'tag', 'name', 'descriptor')
@@ -958,7 +959,7 @@ class Utf8(Constant):
         writer.write_bytes(self.bytes)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', '_bytes')
+        return isinstance(other, Utf8) and other.tag == self.tag and other._bytes == self._bytes
 
     def __hash__(self):
         return multihash(self, 'tag', '_bytes')

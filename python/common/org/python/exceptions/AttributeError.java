@@ -2,6 +2,10 @@ package org.python.exceptions;
 
 
 public class AttributeError extends org.python.exceptions.Exception {
+    public AttributeError(java.lang.String msg) {
+        super(msg);
+    }
+
     public AttributeError(org.python.Object obj, java.lang.String attr) {
         super("'" + obj.typeName() + "' object has no attribute '" + attr + "'");
     }

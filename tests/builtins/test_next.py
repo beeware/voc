@@ -22,7 +22,6 @@ class NextTests(TranspileTestCase):
             print(next(i, 0))
         """)
 
-    @expectedFailure
     def test_next_exhausted_without_default(self):
         self.assertCodeExecution("""
             i = iter([])
@@ -34,11 +33,7 @@ class BuiltinNextFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["next"]
 
     not_implemented = [
-        'test_bytearray',
-        'test_bytes',
         'test_class',
-        'test_complex',
-        'test_dict',
         'test_frozenset',
-        'test_set',
+        'test_range',
     ]

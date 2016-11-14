@@ -165,7 +165,7 @@ public class Python {
                 } else if (name.startsWith("org.python.exceptions.")) {
                     name = name.substring(22);
                 } else if (name.startsWith("python.")) {
-                    name = name.substring(7);
+                    name = cls.getSimpleName();
                 }
             } catch (java.lang.IllegalAccessException e) {
                 return "**UNKNOWABLE**";
@@ -183,6 +183,62 @@ public class Python {
         }
 
         return name;
+    }
+
+    /**
+     * Add the contents of a list to the varargs to be used in a function call.
+     */
+    public static org.python.Object [] addToArgs(org.python.Object [] args, org.python.Object varargs) {
+        java.util.List<org.python.Object> temp_list = new java.util.ArrayList<org.python.Object>();
+        try {
+            org.python.Iterable iter = varargs.__iter__();
+            while (true) {
+                org.python.Object item = iter.__next__();
+                temp_list.add(item);
+            }
+        } catch (org.python.exceptions.StopIteration e) {}
+
+        java.lang.Object [] va_list = temp_list.toArray();
+        org.python.Object [] arg_list = new org.python.Object [args.length + va_list.length];
+
+        System.arraycopy(args, 0, arg_list, 0, args.length);
+        System.arraycopy(va_list, 0, arg_list, args.length, va_list.length);
+
+        return arg_list;
+    }
+
+    /**
+     * Add the contents of a dictionary to the keyword arguments to be used
+     * in a function call.
+     *
+     * Returns the updated kwargs Map.
+     *
+     * If any of the keys in the varkwargs dictionary aren't strings,
+     * a TypeError is raised.
+     */
+    public static java.util.Map<java.lang.String, org.python.Object> addToKwargs(java.util.Map<java.lang.String, org.python.Object> kwargs, org.python.Object kwvarargs, java.lang.String func_name) {
+        // FIXME: Once we have dictionary iterators, we should use an iteration-based
+        // rollout, rather than casting to Dict.
+        // try {
+        //     org.python.Iterable iter = varkwargs.__iter__();
+        //     while (true) {
+        //         org.python.Object key = iter.__next__()
+        //         java.lang.String key_string = ((org.python.types.Str) key).value;
+        //         org.python.Object key
+        //         kwargs.put(key_string, value);
+        //     }
+        // } catch (ClassCastException e) {
+        //     throw new org.python.exceptions.TypeError(func_name + "() keywords must be strings");
+        // } catch (org.python.exceptions.StopIteration e) {}
+
+        for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : ((org.python.types.Dict) kwvarargs).value.entrySet()) {
+            try {
+                kwargs.put(((org.python.types.Str) entry.getKey()).value, entry.getValue());
+            } catch (ClassCastException e) {
+                throw new org.python.exceptions.TypeError(func_name + "() keywords must be strings");
+            }
+        }
+        return kwargs;
     }
 
     @org.python.Method(
@@ -228,21 +284,17 @@ public class Python {
         args = {"iterable"}
     )
     public static org.python.types.Bool all(org.python.Object iterable) {
+        org.python.Iterable iter = org.Python.iter(iterable);
         try {
-            org.python.Iterable iter = iterable.__iter__();
-            try {
-                while (true) {
-                    org.python.Object next = iter.__next__();
-                    if (!((org.python.types.Bool) next.__bool__()).value) {
-                        return new org.python.types.Bool(false);
-                    }
+            while (true) {
+                org.python.Object next = iter.__next__();
+                if (!((org.python.types.Bool) next.__bool__()).value) {
+                    return new org.python.types.Bool(false);
                 }
-            } catch (org.python.exceptions.StopIteration si) {
             }
-            return new org.python.types.Bool(true);
-        } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        } catch (org.python.exceptions.StopIteration si) {
         }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -253,21 +305,17 @@ public class Python {
         args = {"iterable"}
     )
     public static org.python.types.Bool any(org.python.Object iterable) {
+        org.python.Iterable iter = org.Python.iter(iterable);
         try {
-            org.python.Iterable iter = iterable.__iter__();
-            try {
-                while (true) {
-                    org.python.Object next = iter.__next__();
-                    if (((org.python.types.Bool) next.__bool__()).value) {
-                        return new org.python.types.Bool(true);
-                    }
+            while (true) {
+                org.python.Object next = iter.__next__();
+                if (((org.python.types.Bool) next.__bool__()).value) {
+                    return new org.python.types.Bool(true);
                 }
-            } catch (org.python.exceptions.StopIteration si) {
             }
-            return new org.python.types.Bool(false);
-        } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        } catch (org.python.exceptions.StopIteration si) {
         }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -344,10 +392,65 @@ public class Python {
             " - a text string encoded using the specified encoding\n" +
             " - a bytes or a buffer object\n" +
             " - any object implementing the buffer API.\n" +
-            " - an integer\n"
+            " - an integer\n",
+        default_args = {"source", "encoding", "errors"}
     )
-    public static org.python.types.ByteArray bytearray() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
+    public static org.python.types.ByteArray bytearray(org.python.Object source, org.python.Object encoding, org.python.Object errors) {
+        if (source == null) {
+            // bytearray()
+            return new org.python.types.ByteArray();
+        } else {
+            if (encoding == null) {
+                if (source instanceof org.python.types.Int) {
+                    // bytearray(int)
+                    return new org.python.types.ByteArray((int)((org.python.types.Int) source.__int__()).value);
+                }
+                org.python.Iterable iterator = null;
+                try {
+                    iterator = org.Python.iter(source);
+                } catch (org.python.exceptions.TypeError e) {
+                    // Not an iterator
+                }
+                if (iterator != null) {
+                    // bytearray(iterable_of_ints)
+                    java.util.List<Byte> generated = new java.util.ArrayList<Byte>();
+                    try {
+                        while (true) {
+                            org.python.Object next = iterator.__next__();
+                            if (next instanceof org.python.types.Int) {
+                                long value = ((org.python.types.Int) next.__int__()).value;
+                                if ((value < 0) || (value > 255)) {
+                                    throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
+                                } else {
+                                    generated.add(new Byte((byte)value));
+                                }
+                            } else if (next instanceof org.python.types.Str) {
+                                // TODO: Can take ASCII single-character strings
+                                throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with strings not implemented");
+                            }
+                        }
+                    } catch (org.python.exceptions.StopIteration si) {
+                    }
+                    byte[] primative_bytes = new byte[generated.size()];
+                    for(int i = 0; i < primative_bytes.length; i++) {
+                        primative_bytes[i] = generated.get(i);
+                    }
+                    return new org.python.types.ByteArray(primative_bytes);
+                } else {
+                    // bytearray(bytes_or_buffer)
+                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with bytes_or_buffer not implemented");
+                }
+            } else {
+                // bytearray(string, encoding[, errors])
+                if (errors == null) {
+                    // bytearray(string, encoding)
+                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
+                } else {
+                    // bytearray(string, encoding, errors)
+                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
+                }
+            }
+        }
     }
 
     @org.python.Method(
@@ -454,10 +557,45 @@ public class Python {
         __doc__ = "complex(real[, imag]) -> complex number" +
             "\n" +
             "Create a complex number from a real part and an optional imaginary part.\n" +
-            "This is equivalent to (real + imag*1j) where imag defaults to 0.\n"
+            "This is equivalent to (real + imag*1j) where imag defaults to 0.\n",
+        default_args = {"real", "imag"}
     )
-    public static org.python.types.Complex complex() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'complex' not implemented");
+    public static org.python.types.Complex complex(org.python.Object real, org.python.Object imag) {
+        org.python.types.Float real_val = new org.python.types.Float(0);
+        org.python.types.Float imag_val = new org.python.types.Float(0);
+        if (real instanceof org.python.types.Str && imag != null) {
+            throw new org.python.exceptions.TypeError("complex() can't take second arg if first is a string");
+        }
+        if (imag instanceof org.python.types.Str) {
+            throw new org.python.exceptions.TypeError("complex() second arg can't be a string");
+        }
+        if (real instanceof org.python.types.Complex) {
+            org.python.types.Complex real_cmplx_obj = (org.python.types.Complex) real;
+            real_val = (org.python.types.Float) real_val.__add__(real_cmplx_obj.real);
+            imag_val = (org.python.types.Float) imag_val.__add__(real_cmplx_obj.imag);
+        }
+        else {
+            try {
+                real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
+            } catch (org.python.exceptions.TypeError e){
+                throw new org.python.exceptions.TypeError("complex() argument must be a string, a bytes-like object or a number, not '" + real.typeName() + "'");
+            } catch (org.python.exceptions.ValueError e){
+                throw new org.python.exceptions.ValueError("complex() arg is a malformed string");
+            }
+        }
+        if (imag instanceof org.python.types.Complex) {
+            org.python.types.Complex imag_cmplx_obj = (org.python.types.Complex) imag;
+            real_val = (org.python.types.Float) real_val.__sub__(imag_cmplx_obj.imag);
+            imag_val = (org.python.types.Float) imag_val.__add__(imag_cmplx_obj.real);
+        }
+        else {
+            try {
+                imag_val = (org.python.types.Float)imag_val.__add__(Python.float_cast(imag == null ? new org.python.types.Float(0) : imag));
+            } catch (org.python.exceptions.TypeError e){
+                throw new org.python.exceptions.TypeError("complex() argument must be a string, a bytes-like object or a number, not '" + imag.typeName() + "'");
+            }
+        }
+        return new org.python.types.Complex(real_val, imag_val);
     }
 
     @org.python.Method(
@@ -500,10 +638,12 @@ public class Python {
         __doc__ = "delattr(object, name)" +
             "\n" +
             "Delete a named attribute on an object; delattr(x, 'y') is equivalent to\n" +
-            "``del x.y''.\n"
+            "``del x.y''.\n",
+            args = {"object", "name"}
     )
-    public static org.python.Object delattr() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'delattr' not implemented");
+    public static org.python.Object delattr(org.python.Object object, org.python.Object name) {
+        object.__delattr__(name);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -529,40 +669,36 @@ public class Python {
                     )
                 );
             } else {
+                org.python.Iterable iterator = org.Python.iter(iterable);
+                java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
                 try {
-                    org.python.Iterable iterator = iterable.__iter__();
-                    java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
-                    try {
-                        while (true) {
-                            org.python.Object next = iterator.__next__();
-                            java.util.List<org.python.Object> data;
-                            if (next instanceof org.python.types.Tuple) {
-                                data = ((org.python.types.Tuple) next).value;
-                            } else if (next instanceof org.python.types.List) {
-                                data = ((org.python.types.List) next).value;
-                            } else {
-                                throw new org.python.exceptions.TypeError(
-                                    "cannot convert dictionary update sequence element #" + generated.size() +
-                                        " to a sequence"
-                                );
-                            }
-
-                            if (data.size() != 2) {
-                                throw new org.python.exceptions.ValueError(
-                                    "dictionary update sequence element #" + generated.size() +
-                                        " has length " + data.size() +
-                                        "; 2 is required"
-                                );
-                            }
-
-                            generated.put(data.get(0), data.get(1));
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        java.util.List<org.python.Object> data;
+                        if (next instanceof org.python.types.Tuple) {
+                            data = ((org.python.types.Tuple) next).value;
+                        } else if (next instanceof org.python.types.List) {
+                            data = ((org.python.types.List) next).value;
+                        } else {
+                            throw new org.python.exceptions.TypeError(
+                                "cannot convert dictionary update sequence element #" + generated.size() +
+                                    " to a sequence"
+                            );
                         }
-                    } catch (org.python.exceptions.StopIteration si) {
+
+                        if (data.size() != 2) {
+                            throw new org.python.exceptions.ValueError(
+                                "dictionary update sequence element #" + generated.size() +
+                                    " has length " + data.size() +
+                                    "; 2 is required"
+                            );
+                        }
+
+                        generated.put(data.get(0), data.get(1));
                     }
-                    return new org.python.types.Dict(generated);
-                } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+                } catch (org.python.exceptions.StopIteration si) {
                 }
+                return new org.python.types.Dict(generated);
             }
         }
     }
@@ -644,12 +780,15 @@ public class Python {
     }
 
     @org.python.Method(
+        name = "filter",
         __doc__ = "filter(function or None, iterable) --> filter object" +
             "\n" +
             "Return an iterator yielding those items of iterable for which function(item)\n" +
-            "is true. If function is None, return the items that are true.\n"
+            "is true. If function is None, return the items that are true.\n",
+        args = {"function", "iterable"}
     )
-    public static org.python.Object filter() {
+    public static org.python.Object filter(org.python.Object function, org.python.Object iterable) {
+        org.python.Iterable iterator = org.Python.iter(iterable);
         throw new org.python.exceptions.NotImplementedError("Builtin function 'filter' not implemented");
     }
 
@@ -664,7 +803,7 @@ public class Python {
         try {
             return (org.python.types.Float) x.__float__();
         } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError("float() argument must be a string or a number, not '" + x.typeName() + "'");
+            throw new org.python.exceptions.TypeError("float() argument must be a string, a bytes-like object or a number, not '" + x.typeName() + "'");
         }
     }
 
@@ -699,10 +838,23 @@ public class Python {
             "\n" +
             "Get a named attribute from an object; getattr(x, 'y') is equivalent to x.y.\n" +
             "When a default argument is given, it is returned when the attribute doesn't\n" +
-            "exist; without it, an exception is raised in that case.\n"
+            "exist; without it, an exception is raised in that case.\n",
+        args = {"object", "name"},
+        default_args = {"default_"}
     )
-    public static org.python.Object getattr() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'getattr' not implemented");
+    public static org.python.Object getattr(org.python.Object object, org.python.Object name, org.python.Object default_) {
+        org.python.Object result;
+        try {
+            result = object.__getattribute__(name);
+        } catch (org.python.exceptions.AttributeError ae) {
+            if (default_ == null) {
+                throw ae;
+            }
+            result = default_;
+        } catch (org.python.exceptions.TypeError te) {
+            throw new org.python.exceptions.TypeError(te.getMessage().replace("__getattribute__", "getattr"));
+        }
+        return result;
     }
 
     @org.python.Method(
@@ -718,10 +870,21 @@ public class Python {
         __doc__ = "hasattr(object, name) -> bool" +
             "\n" +
             "Return whether the object has an attribute with the given name.\n" +
-            "(This is done by calling getattr(object, name) and catching AttributeError.)\n"
+            "(This is done by calling getattr(object, name) and catching AttributeError.)\n",
+        args = {"object", "name"}
     )
-    public static org.python.types.Bool hasattr() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'hasattr' not implemented");
+    public static org.python.types.Bool hasattr(org.python.Object object, org.python.Object name) {
+		if (!(name instanceof org.python.types.Str)) {
+			throw new org.python.exceptions.TypeError("hasattr(): attribute name must be string");
+		}
+        try {
+            object.__getattribute__(name);
+			return new org.python.types.Bool(true);
+        } catch (org.python.exceptions.AttributeError ae) {
+			return new org.python.types.Bool(false);
+        } catch (org.python.exceptions.TypeError te) {
+            throw new org.python.exceptions.TypeError(te.getMessage().replace("__hasattribute__", "hasattr"));
+        }
     }
 
     @org.python.Method(
@@ -873,10 +1036,18 @@ public class Python {
     )
     public static org.python.Iterable iter(org.python.Object iterable, org.python.Object sentinel) {
         if (sentinel == null) {
-            return iterable.__iter__();
+            try {
+                return iterable.__iter__();
+            } catch (org.python.exceptions.AttributeError e) {
+                // No __iter__ == not iterable
+                throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+            }
         } else {
             throw new org.python.exceptions.NotImplementedError("Builtin function 'iter' with callable/sentinel not implemented");
         }
+    }
+    public static org.python.Iterable iter(org.python.Object iterable) {
+        return org.Python.iter(iterable, null);
     }
 
     @org.python.Method(
@@ -929,20 +1100,16 @@ public class Python {
                     )
                 );
             } else {
+                org.python.Iterable iterator = org.Python.iter(iterable);
+                java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
                 try {
-                    org.python.Iterable iterator = iterable.__iter__();
-                    java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
-                    try {
-                        while (true) {
-                            org.python.Object next = iterator.__next__();
-                            generated.add(next);
-                        }
-                    } catch (org.python.exceptions.StopIteration si) {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        generated.add(next);
                     }
-                    return new org.python.types.List(generated);
-                } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+                } catch (org.python.exceptions.StopIteration si) {
                 }
+                return new org.python.types.List(generated);
             }
         }
     }
@@ -960,10 +1127,12 @@ public class Python {
         __doc__ = "map(func, *iterables) --> map object" +
             "\n" +
             "Make an iterator that computes the function using arguments from\n" +
-            "each of the iterables.  Stops when the shortest iterable is exhausted.\n"
+            "each of the iterables.  Stops when the shortest iterable is exhausted.\n",
+        args={"func"},
+        varargs="iterable"
     )
-    public static org.python.Object map() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
+    public static org.python.Object map(org.python.Object func, org.python.types.Tuple iterables) {
+        return new org.python.types.Map(func, iterables);
     }
 
     @org.python.Method(
@@ -1208,7 +1377,7 @@ public class Python {
             if (length == 1) {
                 return new org.python.types.Int((int) (org.Python.str(c).value).charAt(0));
             } else {
-                throw new org.python.exceptions.TypeError("ord() expected string of length 1, but string of length " + length + " found");
+                throw new org.python.exceptions.TypeError("ord() expected a character, but string of length " + length + " found");
             }
         } catch (ClassCastException e) {
             throw new org.python.exceptions.TypeError("ord() expected string of length 1, but " + c.typeName() + " found");
@@ -1245,17 +1414,14 @@ public class Python {
         varargs="value",
         kwonlyargs={"file", "sep", "end", "flush"}
     )
-    public static void print(org.python.Object [] value, org.python.Object file, org.python.Object sep, org.python.Object end, org.python.Object flush) {
-        if (file == null) {
-            // file = System.out;
-        }
-
+    public static void print(org.python.types.Tuple value, org.python.Object file, org.python.Object sep, org.python.Object end, org.python.Object flush) {
+        java.util.List<org.python.Object> valueArgs = value.value;
         StringBuilder buffer = new StringBuilder();
 
-        for (int i = 0; i < value.length; i++) {
-            buffer.append(value[i]);
+        for (int i = 0; i < valueArgs.size(); i++) {
+            buffer.append(valueArgs.get(i).__str__());
 
-            if (i != value.length - 1) {
+            if (i != valueArgs.size() - 1) {
                 if (sep == null) {
                     buffer.append(" ");
                 } else {
@@ -1268,8 +1434,27 @@ public class Python {
         } else {
             buffer.append(end);
         }
-        System.out.print(buffer.toString());
-        // file.write(buffer.toString());
+
+        if (file == null) {
+           file = python.sys.__init__.stdout;
+        }
+
+        org.python.Object content = new org.python.types.Str(buffer.toString());
+        org.python.Object write_method = file.__getattribute__("write");
+        try {
+            ((org.python.Callable) write_method).invoke(new org.python.Object [] { content }, null);
+        } catch (java.lang.ClassCastException e) {
+            throw new org.python.exceptions.TypeError("'" + write_method.typeName() + "' object is not callable");
+        }
+
+        if (flush != null && ((org.python.types.Bool) flush.__bool__()).value) {
+            org.python.Object flush_method = file.__getattribute__("flush");
+            try {
+                ((org.python.Callable) flush_method).invoke(null, null);
+            } catch (java.lang.ClassCastException e) {
+                throw new org.python.exceptions.TypeError("'" + flush_method.typeName() + "' object is not callable");
+            }
+        }
     }
 
     @org.python.Method(
@@ -1297,10 +1482,12 @@ public class Python {
             "        self._x = value\n" +
             "    @x.deleter\n" +
             "    def x(self):\n" +
-            "        del self._x\n"
+            "        del self._x\n",
+        args = {"fget"},
+        default_args = {"fset", "fdel", "doc"}
     )
-    public static org.python.Object property() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'property' not implemented");
+    public static org.python.Object property(org.python.Object fget, org.python.Object fset, org.python.Object fdel, org.python.Object doc) {
+        return new org.python.types.Property(fget, fset, fdel, doc);
     }
 
     @org.python.Method(
@@ -1395,51 +1582,115 @@ public class Python {
                     )
                 );
             } else {
+                org.python.Iterable iterator = org.Python.iter(iterable);
+                java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
                 try {
-                    org.python.Iterable iterator = iterable.__iter__();
-                    java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
-                    try {
-                        while (true) {
-                            org.python.Object next = iterator.__next__();
-                            generated.add(next);
-                        }
-                    } catch (org.python.exceptions.StopIteration si) {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        generated.add(next);
                     }
-                    return new org.python.types.Set(generated);
-                } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+                } catch (org.python.exceptions.StopIteration si) {
                 }
+                return new org.python.types.Set(generated);
             }
         }
     }
-
-
 
     @org.python.Method(
         __doc__ = "setattr(object, name, value)" +
             "\n" +
             "Set a named attribute on an object; setattr(x, 'y', v) is equivalent to\n" +
-            "``x.y = v''.\n"
+            "``x.y = v''.\n",
+        args = {"object", "name", "value"}
     )
-    public static org.python.Object setattr() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'setattr' not implemented");
+    public static org.python.Object setattr(org.python.Object object, org.python.Object name, org.python.Object value) {
+        try {
+            object.__setattr__(name, value);
+            return org.python.types.NoneType.NONE;
+        } catch (org.python.exceptions.TypeError te) {
+            throw new org.python.exceptions.TypeError(te.getMessage().replace("__setattr__", "setattr"));
+        }
     }
 
     @org.python.Method(
         __doc__ = "slice(stop)" +
             "slice(start, stop[, step])\n" +
             "\n" +
-            "Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).\n"
+            "Create a slice object.  This is used for extended slicing (e.g. a[0:10:2]).\n",
+        args={"start_or_stop"},
+        default_args={"stop", "step"}
     )
-    public static org.python.Object slice() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'input' not implemented");
+    public static org.python.Object slice(org.python.Object start_or_stop, org.python.Object stop, org.python.Object step) {
+        if (stop == null && step == null) {
+            return new org.python.types.Slice(start_or_stop);
+        } else if (step == null) {
+            return new org.python.types.Slice(start_or_stop, stop);
+        } else {
+            return new org.python.types.Slice(start_or_stop, stop, step);
+        }
+    }
+
+    public static class __SortedObjectComparator implements java.util.Comparator<org.python.Object> {
+        private boolean reverse;
+        private org.python.Object key;
+
+        public __SortedObjectComparator(boolean reverse, org.python.Object key) {
+            this.reverse = reverse;
+            this.key = key;
+        }
+
+        public __SortedObjectComparator(boolean reverse) {
+            this.reverse = reverse;
+        }
+
+        public int compare(org.python.Object o1, org.python.Object o2) {
+            if (key != null) {
+                try {
+                    // Replace the two objects by their keys for comparison
+                    o1 = ((org.python.Callable) key).invoke(new org.python.Object [] { o1 }, null);
+                    o2 = ((org.python.Callable) key).invoke(new org.python.Object [] { o2 }, null);
+                } catch (java.lang.ClassCastException e) {
+                    throw new org.python.exceptions.TypeError("'" + key.typeName() + "' object is not callable");
+                }
+            }
+            if (((org.python.types.Bool) o1.__lt__(o2).__bool__()).value) {
+                return reverse ? 1 : -1;
+            }
+            if (((org.python.types.Bool) o2.__lt__(o1).__bool__()).value) {
+                return reverse ? -1 : 1;
+            }
+            return 0;
+        }
     }
 
     @org.python.Method(
-        __doc__ = "sorted(iterable, key=None, reverse=False) --> new sorted list"
+        __doc__ = "sorted(iterable, key=None, reverse=False) --> new sorted list",
+        args={"iterable"},
+        default_args={"key", "reverse"}
     )
-    public static org.python.types.List sorted() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'sorted' not implemented");
+    public static org.python.types.List sorted(org.python.Object iterable, org.python.Object key, org.python.types.Bool reverse) {
+        if (iterable == null) {
+            return new org.python.types.List();
+        } else {
+            if (reverse == null) {
+                reverse = new org.python.types.Bool(false);
+            }
+            org.python.Iterable iterator = org.Python.iter(iterable);
+            java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
+            try {
+                while (true) {
+                    org.python.Object next = iterator.__next__();
+                    generated.add(next);
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            if (key == null || key instanceof org.python.types.NoneType) {
+                java.util.Collections.sort(generated, new __SortedObjectComparator(reverse.value));
+            } else {
+                java.util.Collections.sort(generated, new __SortedObjectComparator(reverse.value, key));
+            }
+            return new org.python.types.List(generated);
+        }
     }
 
     @org.python.Method(
@@ -1489,10 +1740,30 @@ public class Python {
             "\n" +
             "Return the sum of an iterable of numbers (NOT strings) plus the value\n" +
             "of parameter 'start' (which defaults to 0).  When the iterable is\n" +
-            "empty, return start.\n"
+            "empty, return start.\n",
+        args = {"iterable"},
+        default_args = {"start"}
     )
-    public static org.python.Object sum() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'sum' not implemented");
+    public static org.python.Object sum(org.python.Object iterable, org.python.Object start) {
+        org.python.Object value;
+        if (start != null) {
+            value = start;
+        } else {
+            value = new org.python.types.Int(0);
+        }
+
+        org.python.Iterable iterator = org.Python.iter(iterable);
+        while (true) {
+            org.python.Object next;
+            try {
+                next = iterator.__next__();
+            } catch (org.python.exceptions.StopIteration si) {
+                break;
+            }
+            value = value.__add__(next);
+        }
+
+        return value;
     }
 
     @org.python.Method(

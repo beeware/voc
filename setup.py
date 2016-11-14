@@ -1,4 +1,9 @@
-#/usr/bin/env python
+#!/usr/bin/env python3
+import sys
+
+if sys.version_info[:2] != (3, 4):
+    raise SystemExit("VOC requires Python 3.4+")
+
 import io
 import re
 from setuptools import setup, find_packages
@@ -28,6 +33,7 @@ setup(
     entry_points={
         'console_scripts': [
             'voc = voc.__main__:main',
+            'vod = voc.java.__main__:main',
         ]
     },
     license='New BSD',
@@ -37,6 +43,8 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3 :: Only',
         'Topic :: Software Development',
         'Topic :: Utilities',
     ],

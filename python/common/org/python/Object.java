@@ -1,7 +1,7 @@
 package org.python;
 
 
-public interface Object {
+public interface Object extends Comparable {
     /**
      * Return a Java object that is the underlying data representation
      * of this object (e.g., the java.util.Map behind a Python dict()).
@@ -84,12 +84,15 @@ public interface Object {
     // Lastly, these methods are the public inteface to attribute
     // manipulation. This means they take Python objects as attributes,
     // and raise exceptions on failure.
-    public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
-    public void __set__(org.python.Object instance, org.python.Object value);
     public org.python.Object __getattr__(org.python.Object name);
     public org.python.Object __getattribute__(org.python.Object name);
     public void __setattr__(org.python.Object name, org.python.Object value);
     public void __delattr__(org.python.Object name);
+
+    // These are the prototypes for the descriptor protocol.
+    public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
+    public void __set__(org.python.Object instance, org.python.Object value);
+    public void __delete__(org.python.Object instance);
 
     // Attribute name retrieval.
     public org.python.Object __dir__();
@@ -103,8 +106,7 @@ public interface Object {
     /**
      * Section 3.3.5 - Emulating callable objects
      */
-    // public org.python.Object __call__(
-    // );
+    // public org.python.Object __call__();
 
     /**
      * Section 3.3.6 - Emulating container types
@@ -136,19 +138,19 @@ public interface Object {
     public org.python.Object __xor__(org.python.Object other);
     public org.python.Object __or__(org.python.Object other);
 
-    public void __iadd__(org.python.Object other);
-    public void __isub__(org.python.Object other);
-    public void __imul__(org.python.Object other);
-    public void __itruediv__(org.python.Object other);
-    public void __ifloordiv__(org.python.Object other);
-    public void __imod__(org.python.Object other);
-    public void __idivmod__(org.python.Object other);
-    public void __ipow__(org.python.Object other);
-    public void __ilshift__(org.python.Object other);
-    public void __irshift__(org.python.Object other);
-    public void __iand__(org.python.Object other);
-    public void __ixor__(org.python.Object other);
-    public void __ior__(org.python.Object other);
+    public org.python.Object __iadd__(org.python.Object other);
+    public org.python.Object __isub__(org.python.Object other);
+    public org.python.Object __imul__(org.python.Object other);
+    public org.python.Object __itruediv__(org.python.Object other);
+    public org.python.Object __ifloordiv__(org.python.Object other);
+    public org.python.Object __imod__(org.python.Object other);
+    public org.python.Object __idivmod__(org.python.Object other);
+    public org.python.Object __ipow__(org.python.Object other);
+    public org.python.Object __ilshift__(org.python.Object other);
+    public org.python.Object __irshift__(org.python.Object other);
+    public org.python.Object __iand__(org.python.Object other);
+    public org.python.Object __ixor__(org.python.Object other);
+    public org.python.Object __ior__(org.python.Object other);
 
     public org.python.Object __neg__();
     public org.python.Object __pos__();

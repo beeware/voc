@@ -8,3 +8,4 @@ Project Internals
    contributing
    releases
    roadmap
+   signatures

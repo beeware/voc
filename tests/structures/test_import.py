@@ -88,10 +88,11 @@ class ImportTests(TranspileTestCase):
         "You can import a Python module implemented in Python"
         self.assertCodeExecution(
             """
+            print(1)
             import example
-
+            print(2)
             example.some_method()
-
+            print(3)
             print("Done.")
             """,
             extra_code={
@@ -441,3 +442,31 @@ class ImportTests(TranspileTestCase):
 
                     """
             }, run_in_function=False)
+
+    def test_import_from_dot(self):
+        self.assertCodeExecution(
+            """
+            from example import submodule2
+
+            moduleb.method()
+
+            print("Done.")
+            """,
+            extra_code={
+                'example.__init__':
+                    """
+                    """,
+                'example.submodule1':
+                    """
+                    def method():
+                        print("Calling method in submodule1")
+                    """,
+                'example.submodule2':
+                    """
+                    from . import submodule1
+
+                    def method():
+                        print("Calling method in submodule2")
+                        submodule1.method()
+                    """,
+            })
