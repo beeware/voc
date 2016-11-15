@@ -1,4 +1,6 @@
 language: python
+env:
+  - USE_PYOUT_CACHE=1
 python:
   - "3.4.2"
   - "3.4.4"

@@ -28,6 +28,10 @@ _suite_configured = False
 _output_dir = ''
 
 
+PYOUT_CACHE = {}
+USE_PYOUT_CACHE = os.getenv('USE_PYOUT_CACHE')
+
+
 def setUpSuite():
     """Configure the entire test suite.
 
@@ -112,11 +116,58 @@ def adjust(text, run_in_function=False):
     return '\n'.join(final_lines)
 
 
+def _build_pyout_cache_key(*args):
+    import hashlib
+    hash_obj = hashlib.md5()
+    hash_obj.update(repr(args).encode('utf-8'))
+    return hash_obj.hexdigest()
+
+
+def _pyout_cache_file():
+    major, minor, micro, *_ = sys.version_info
+    filename = 'pyout_cache-{}.{}.{}.pickle'.format(major, minor, micro)
+    return os.path.join(TESTS_DIR, 'cache', filename)
+
+
+def _load_pyout_cache():
+    """Update global cache with cache file contents"""
+    if not os.getenv('USE_PYOUT_CACHE'):
+        return
+
+    import pickle
+    filepath = _pyout_cache_file()
+    try:
+        with open(filepath, 'rb') as f:
+            cached = pickle.load(f)
+    except:
+        # ignore non existing cache files
+        pass
+    else:
+        PYOUT_CACHE.update(cached)
+        print('Loaded cached pyout from', filepath)
+
+
+def _update_pyout_cache():
+    """Write current state of global cache to cache file"""
+    if not os.getenv('USE_PYOUT_CACHE'):
+        return
+
+    import pickle
+    filepath = _pyout_cache_file()
+    with open(filepath, 'wb') as f:
+        pickle.dump(PYOUT_CACHE, f)
+
+
 def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
     """Run a block of Python code with the Python interpreter."""
     # Output source code into test directory
     with open(os.path.join(test_dir, 'test.py'), 'w', encoding='utf-8') as py_source:
         py_source.write(adjust(main_code, run_in_function=run_in_function))
+
+    if USE_PYOUT_CACHE:
+        pyout_cache_key = _build_pyout_cache_key(main_code, extra_code, run_in_function, args)
+        if pyout_cache_key in PYOUT_CACHE:
+            return PYOUT_CACHE[pyout_cache_key]
 
     if extra_code:
         for name, code in extra_code.items():
@@ -142,8 +193,12 @@ def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, arg
     )
     out = proc.communicate()
 
-    return out[0].decode('utf8')
+    bytes_output = out[0].decode('utf8')
 
+    if USE_PYOUT_CACHE:
+        PYOUT_CACHE[pyout_cache_key] = bytes_output
+
+    return bytes_output
 
 def compileJava(java_dir, java):
     if not java:
@@ -286,12 +341,14 @@ class TranspileTestCase(TestCase):
             stderr=subprocess.STDOUT,
             cwd=_output_dir,
         )
+        _load_pyout_cache()
 
     @classmethod
     def tearDownClass(cls):
         if cls.jvm is not None:
             # use communicate here to wait for process to exit
             cls.jvm.communicate("exit".encode("utf-8"))
+        _update_pyout_cache()
 
     def assertBlock(self, python, java):
         self.maxDiff = None
