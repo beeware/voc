@@ -28,4 +28,4 @@ install:
   - "pip install ."
   - "ant java"
 script:
-  - "python setup.py test -s $TEST_SUITE"
+  - "python setup.py test -q -s $TEST_SUITE"
