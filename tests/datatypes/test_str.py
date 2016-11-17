@@ -207,6 +207,12 @@ class StrTests(TranspileTestCase):
             print(s.find('hell', -4))
             """)
 
+    def test_title(self):
+        self.assertCodeExecution("""
+            s = ' foo  bar    baz '
+            print(s.title())
+        """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

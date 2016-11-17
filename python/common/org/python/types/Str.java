@@ -793,10 +793,24 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.title() -> str\n\nReturn a titlecased version of S, i.e. words start with title case\ncharacters, all remaining cased characters have lower case."
     )
     public org.python.Object title() {
-        throw new org.python.exceptions.NotImplementedError("title() has not been implemented.");
+	String title = "";
+	Character first = Character.toUpperCase(this.value.charAt(0));
+	title += Character.toString(first);
+	int c = 1;
+	char prev;
+	while(c < this.value.length()){
+ 	    prev = title.charAt(c - 1);
+	    if(prev == ' '){
+	        title += Character.toString(Character.toUpperCase(this.value.charAt(c)));
+	    } else {
+		title += Character.toString(this.value.charAt(c));
+	    }
+	    c ++;
+	}
+	return new Str(title);
     }
 
     @org.python.Method(
