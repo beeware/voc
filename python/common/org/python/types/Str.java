@@ -529,10 +529,40 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.expandtabs([tabsize]) -> string",
+        default_args= {"tabsize"}
     )
-    public org.python.Object expandtabs() {
-        throw new org.python.exceptions.NotImplementedError("expandtabs() has not been implemented.");
+    public org.python.Object expandtabs(org.python.Object tabsize) {
+        int tabsize_int = 8;
+        if (tabsize != null) {
+            tabsize_int = (int)((org.python.types.Int) tabsize).value;
+        }
+        if ( this.value == null ) return null;
+        StringBuilder buf = new StringBuilder();
+        int col = 0;
+        for (int i = 0; i<this.value.length(); i++) {
+            char c = this.value.charAt(i);
+            switch ( c ) {
+                case '\n' :
+                    col = 0;
+                    buf.append(c);
+                    break;
+                case '\t' :
+                    buf.append(this.spaces(tabsize_int - col % tabsize_int));
+                    col += tabsize_int - col % tabsize_int;
+                    break;
+                default :
+                    col++;
+                    buf.append(c);
+                    break;
+            }
+        }
+        return new Str(buf.toString());
+    }
+   private static String spaces(int n) {
+        StringBuilder buf = new StringBuilder();
+        for (int sp=1; sp<=n; sp++) buf.append(" ");
+        return buf.toString();
     }
 
     @org.python.Method(
@@ -793,10 +823,24 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.title() -> str\n\nReturn a titlecased version of S, i.e. words start with title case\ncharacters, all remaining cased characters have lower case."
     )
     public org.python.Object title() {
-        throw new org.python.exceptions.NotImplementedError("title() has not been implemented.");
+	String title = "";
+	Character first = Character.toUpperCase(this.value.charAt(0));
+	title += Character.toString(first);
+	int c = 1;
+	char prev;
+	while(c < this.value.length()){
+ 	    prev = title.charAt(c - 1);
+	    if(prev == ' '){
+	        title += Character.toString(Character.toUpperCase(this.value.charAt(c)));
+	    } else {
+		title += Character.toString(this.value.charAt(c));
+	    }
+	    c ++;
+	}
+	return new Str(title);
     }
 
     @org.python.Method(
