@@ -122,8 +122,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_frozenset',
         'test_multiply_NotImplemented',
         'test_multiply_range',
-        'test_multiply_slice',
-        'test_multiply_tuple',
 
         'test_ne_class',
         'test_ne_frozenset',
@@ -200,7 +198,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_list',
         'test_multiply_NotImplemented',
         'test_multiply_range',
-        'test_multiply_slice',
         'test_multiply_str',
         'test_multiply_tuple',
 
