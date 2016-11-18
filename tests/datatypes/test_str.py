@@ -10,6 +10,30 @@ class StrTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_endswith(self):
+        self.assertCodeExecution("""
+            s = "abracadabra"
+            suffix = "abra"
+            print(s.endswith(end))            
+            """)
+
+        self.assertCodeExecution("""
+            s = "abracadabra"
+            suffix = "ABRA"
+            print(s.endswith(end))            
+            """)
+
+        self.assertCodeExecution("""
+            s = "ABRACADABRA"
+            suffix = "abra"
+            print(s.endswith(end))            
+            """)
+
+
+        #self.assertCodeExecution("""
+        #  print('abracadabra'.endswith('abra'))
+        #    """)
+
     def test_getattr(self):
         self.assertCodeExecution("""
             x = "Hello, world"
