@@ -223,7 +223,11 @@ class StrTests(TranspileTestCase):
             print('a\\naa\\t'.expandtabs(4))
             """)
 
-
+    def test_title(self):
+        self.assertCodeExecution("""
+            s = ' foo  bar    baz '
+            print(s.title())
+        """)
 
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
