@@ -27,7 +27,7 @@ public class AndroidPlatform implements python.Platform {
     }
 
     public org.python.Object getPlatform() {
-        return new org.python.types.str("android");
+        return new org.python.types.Str("android");
     }
 
     public org.python.Object stderr() {
