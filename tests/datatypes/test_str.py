@@ -231,6 +231,28 @@ class StrTests(TranspileTestCase):
             print(s.find('hell', -4))
             """)
 
+    def test_expand(self):
+        self.assertCodeExecution("""
+            print('\\t'.expandtabs())
+            print('a\\t'.expandtabs())
+            print('aa\\t'.expandtabs())
+            print('aaa\\t'.expandtabs())
+            print('aaaaaaaa\\t'.expandtabs())
+            print('a\\naa\\t'.expandtabs())
+            print('\\t'.expandtabs(3))
+            print('a\\t'.expandtabs(3))
+            print('aa\\t'.expandtabs(7))
+            print('aaa\\t'.expandtabs(4))
+            print('aaaaaaaa\\t'.expandtabs(4))
+            print('a\\naa\\t'.expandtabs(4))
+            """)
+
+    def test_title(self):
+        self.assertCodeExecution("""
+            s = ' foo  bar    baz '
+            print(s.title())
+        """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
