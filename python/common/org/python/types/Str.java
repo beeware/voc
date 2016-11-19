@@ -820,7 +820,20 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object swapcase() {
-        throw new org.python.exceptions.NotImplementedError("swapcase() has not been implemented.");
+	if (this.value.isEmpty()){
+	    return new Str(this.value);
+	}
+	String title = "";
+	int c = 0;
+	while(c < this.value.length()){
+	    if (Character.isUpperCase(this.value.charAt(c))) {
+		title += Character.toString(Character.toLowerCase(this.value.charAt(c)));
+	    } else {
+		title += Character.toString(Character.toUpperCase(this.value.charAt(c)));
+	    }
+	    c ++;
+	}
+	return new Str(title);
     }
 
     @org.python.Method(
