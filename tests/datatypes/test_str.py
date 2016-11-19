@@ -14,19 +14,19 @@ class StrTests(TranspileTestCase):
         self.assertCodeExecution("""
             s = "abracadabra"
             suffix = "abra"
-            print(s.endswith(end))            
+            print(s.endswith(end))
             """)
 
         self.assertCodeExecution("""
             s = "abracadabra"
             suffix = "ABRA"
-            print(s.endswith(end))            
+            print(s.endswith(end))
             """)
 
         self.assertCodeExecution("""
             s = "ABRACADABRA"
             suffix = "abra"
-            print(s.endswith(end))            
+            print(s.endswith(end))
             """)
 
 
@@ -109,7 +109,7 @@ class StrTests(TranspileTestCase):
                 print(s.capitalize())
                 print(s.lower())
                 # print(s.swap())
-                # print(s.title())
+                print(s.title())
                 print(s.upper())
             """)
 
@@ -253,7 +253,7 @@ class StrTests(TranspileTestCase):
             print(s.title())
         """)
 
-    def test_title(self):
+    def test_len(self):
         self.assertCodeExecution("""
             s = ' foo  bar    baz '
             print(len(s))

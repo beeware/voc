@@ -826,6 +826,9 @@ public class Str extends org.python.types.Object {
         __doc__ = "S.title() -> str\n\nReturn a titlecased version of S, i.e. words start with title case\ncharacters, all remaining cased characters have lower case."
     )
     public org.python.Object title() {
+	if (this.value.isEmpty()){
+	    return new Str(this.value);
+	}
 	String title = "";
 	Character first = Character.toUpperCase(this.value.charAt(0));
 	title += Character.toString(first);
@@ -835,6 +838,8 @@ public class Str extends org.python.types.Object {
  	    prev = title.charAt(c - 1);
 	    if(prev == ' '){
 	        title += Character.toString(Character.toUpperCase(this.value.charAt(c)));
+	    } else if (Character.isUpperCase(this.value.charAt(c))){
+	        title += Character.toString(Character.toLowerCase(this.value.charAt(c)));
 	    } else {
 		title += Character.toString(this.value.charAt(c));
 	    }
