@@ -185,11 +185,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "len(object)\n\nReturn the number of items of a sequence or collection."
     )
     public org.python.types.Int __len__() {
-        // throw new org.python.exceptions.NotImplementedError("__len__() has not been implemented.");
-        return new org.python.types.Int(this.value.length());
+	return new org.python.types.Int(this.value.length());
     }
 
     @org.python.Method(

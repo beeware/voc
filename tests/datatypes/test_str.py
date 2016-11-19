@@ -253,6 +253,12 @@ class StrTests(TranspileTestCase):
             print(s.title())
         """)
 
+    def test_title(self):
+        self.assertCodeExecution("""
+            s = ' foo  bar    baz '
+            print(len(s))
+        """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
