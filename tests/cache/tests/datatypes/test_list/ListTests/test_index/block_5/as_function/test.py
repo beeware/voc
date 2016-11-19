@@ -1,0 +1,5 @@
+def test_function():
+    x = [1, 2, 3, 4]
+    print(x.index(2, 0, 10))
+    
+test_function()

@@ -1,0 +1,10 @@
+try:
+    print('>>> f = oct')
+    print('>>> x = NotImplemented')
+    print('>>> f(x)')
+    f = oct
+    x = NotImplemented
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

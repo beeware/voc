@@ -1,0 +1,10 @@
+try:
+    print('>>> f = compile')
+    print('>>> x = None')
+    print('>>> f(x)')
+    f = compile
+    x = None
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

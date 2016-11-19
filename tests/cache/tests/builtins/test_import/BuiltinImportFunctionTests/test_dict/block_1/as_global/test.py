@@ -1,0 +1,21 @@
+try:
+    print('>>> f = __import__')
+    print('>>> x = {}')
+    print('>>> f(x)')
+    f = __import__
+    x = {}
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = __import__')
+    print('>>> x = {"a": 1, "c": 2.3456, "d": "another"}')
+    print('>>> f(x)')
+    f = __import__
+    x = {"a": 1, "c": 2.3456, "d": "another"}
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

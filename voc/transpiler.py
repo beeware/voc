@@ -10,29 +10,36 @@ from .python.ast import Visitor
 from .python.utils import dump
 
 
-def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):
+def _transpile_file_or_dir(transpiler, file_or_dir, prefix, outdir, namespace, verbosity):
+    if os.path.isfile(file_or_dir):
+        if verbosity:
+            print("Compiling %s ..." % file_or_dir)
+
+        with open(file_or_dir) as source:
+            ast_module = ast.parse(source.read(), mode='exec')
+            transpiler.transpile(file_or_dir, ast_module, prefix)
+    elif os.path.isdir(file_or_dir):
+        for root, dirs, files in os.walk(file_or_dir, followlinks=True):
+            for filename in files:
+                if os.path.splitext(filename)[1] == '.py':
+                    source_file = os.path.join(root, filename)
+                    if verbosity:
+                        print("Compiling %s ..." % source_file)
+                    with open(source_file) as source:
+                        ast_module = ast.parse(source.read(), mode='exec')
+                        transpiler.transpile(source_file, ast_module, prefix)
+    else:
+        print("Unknown source file: %s" % file_or_dir, file=sys.stderr)
+
+
+def transpile(file_or_files, prefix='.', outdir=None, namespace='python', verbosity=0):
     transpiler = Transpiler(namespace=namespace, verbosity=verbosity)
 
-    for file_or_dir in input:
-        if os.path.isfile(file_or_dir):
-            if verbosity:
-                print("Compiling %s ..." % file_or_dir)
-
-            with open(file_or_dir) as source:
-                ast_module = ast.parse(source.read(), mode='exec')
-                transpiler.transpile(file_or_dir, ast_module, prefix)
-        elif os.path.isdir(file_or_dir):
-            for root, dirs, files in os.walk(file_or_dir, followlinks=True):
-                for filename in files:
-                    if os.path.splitext(filename)[1] == '.py':
-                        source_file = os.path.join(root, filename)
-                        if verbosity:
-                            print("Compiling %s ..." % source_file)
-                        with open(source_file) as source:
-                            ast_module = ast.parse(source.read(), mode='exec')
-                            transpiler.transpile(source_file, ast_module, prefix)
-        else:
-            print("Unknown source file: %s" % file_or_dir, file=sys.stderr)
+    if isinstance(file_or_files, (list, tuple)):
+        for file_or_dir in file_or_files:
+            _transpile_file_or_dir(transpiler, file_or_dir, prefix, outdir, namespace, verbosity)
+    else:
+        _transpile_file_or_dir(transpiler, file_or_files, prefix, outdir, namespace, verbosity)
 
     transpiler.write(outdir)
 

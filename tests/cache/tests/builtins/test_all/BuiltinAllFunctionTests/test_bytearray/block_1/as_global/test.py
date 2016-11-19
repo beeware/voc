@@ -1,0 +1,32 @@
+try:
+    print('>>> f = all')
+    print('>>> x = bytearray()')
+    print('>>> f(x)')
+    f = all
+    x = bytearray()
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = all')
+    print('>>> x = bytearray(1)')
+    print('>>> f(x)')
+    f = all
+    x = bytearray(1)
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = all')
+    print('>>> x = bytearray([1, 2, 3])')
+    print('>>> f(x)')
+    f = all
+    x = bytearray([1, 2, 3])
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

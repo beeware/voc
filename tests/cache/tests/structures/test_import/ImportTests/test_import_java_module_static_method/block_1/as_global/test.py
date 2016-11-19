@@ -1,0 +1,6 @@
+from java import lang
+
+props = lang.System.getProperties()
+print(props.get("file.separator"))
+
+print("Done.")

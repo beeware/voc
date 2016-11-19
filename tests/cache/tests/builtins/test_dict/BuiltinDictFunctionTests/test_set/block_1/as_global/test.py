@@ -1,0 +1,21 @@
+try:
+    print('>>> f = dict')
+    print('>>> x = set()')
+    print('>>> f(x)')
+    f = dict
+    x = set()
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = dict')
+    print('>>> x = {1, 2.3456, "another"}')
+    print('>>> f(x)')
+    f = dict
+    x = {1, 2.3456, "another"}
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

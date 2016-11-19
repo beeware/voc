@@ -1,0 +1,21 @@
+try:
+    print('>>> f = hex')
+    print('>>> x = True')
+    print('>>> f(x)')
+    f = hex
+    x = True
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = hex')
+    print('>>> x = False')
+    print('>>> f(x)')
+    f = hex
+    x = False
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

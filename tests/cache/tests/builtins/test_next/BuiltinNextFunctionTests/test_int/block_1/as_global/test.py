@@ -1,0 +1,65 @@
+try:
+    print('>>> f = next')
+    print('>>> x = 3')
+    print('>>> f(x)')
+    f = next
+    x = 3
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = next')
+    print('>>> x = 0')
+    print('>>> f(x)')
+    f = next
+    x = 0
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = next')
+    print('>>> x = -5')
+    print('>>> f(x)')
+    f = next
+    x = -5
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = next')
+    print('>>> x = -3')
+    print('>>> f(x)')
+    f = next
+    x = -3
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = next')
+    print('>>> x = 5')
+    print('>>> f(x)')
+    f = next
+    x = 5
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = next')
+    print('>>> x = 1')
+    print('>>> f(x)')
+    f = next
+    x = 1
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

@@ -1,0 +1,155 @@
+try:
+    print('>>> f = delattr')
+    print('>>> x = ""')
+    print('>>> y = frozenset()')
+    print('>>> f(x, y)')
+    f = delattr
+    x = ""
+    y = frozenset()
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = ""')
+    print('>>> y = frozenset({1, 2.3456, "another"})')
+    print('>>> f(x, y)')
+    f = delattr
+    x = ""
+    y = frozenset({1, 2.3456, "another"})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "3"')
+    print('>>> y = frozenset()')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "3"
+    y = frozenset()
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "3"')
+    print('>>> y = frozenset({1, 2.3456, "another"})')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "3"
+    y = frozenset({1, 2.3456, "another"})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "This is another string"')
+    print('>>> y = frozenset()')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "This is another string"
+    y = frozenset()
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "This is another string"')
+    print('>>> y = frozenset({1, 2.3456, "another"})')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "This is another string"
+    y = frozenset({1, 2.3456, "another"})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "Mÿ hôvèrçràft îß fûłl öf éêlś"')
+    print('>>> y = frozenset()')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "Mÿ hôvèrçràft îß fûłl öf éêlś"
+    y = frozenset()
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "Mÿ hôvèrçràft îß fûłl öf éêlś"')
+    print('>>> y = frozenset({1, 2.3456, "another"})')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "Mÿ hôvèrçràft îß fûłl öf éêlś"
+    y = frozenset({1, 2.3456, "another"})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "One arg: %s"')
+    print('>>> y = frozenset()')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "One arg: %s"
+    y = frozenset()
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "One arg: %s"')
+    print('>>> y = frozenset({1, 2.3456, "another"})')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "One arg: %s"
+    y = frozenset({1, 2.3456, "another"})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "Three args: %s | %s | %s"')
+    print('>>> y = frozenset()')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "Three args: %s | %s | %s"
+    y = frozenset()
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = delattr')
+    print('>>> x = "Three args: %s | %s | %s"')
+    print('>>> y = frozenset({1, 2.3456, "another"})')
+    print('>>> f(x, y)')
+    f = delattr
+    x = "Three args: %s | %s | %s"
+    y = frozenset({1, 2.3456, "another"})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
