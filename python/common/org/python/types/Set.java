@@ -357,10 +357,12 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Remove all elements of another set from this set.",
+        args = {"other"}
     )
     public org.python.Object difference_update(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("difference_update() has not been implemented.");
+        this.value.removeAll(((Set) other).value);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
