@@ -364,10 +364,12 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Remove an element from a set if it is a member.\n\nIf the element is not a member, do nothing.",
+        args = {"item"}
     )
-    public org.python.Object discard(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("discard() has not been implemented.");
+    public org.python.Object discard(org.python.Object item) {
+        this.value.remove(item);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(

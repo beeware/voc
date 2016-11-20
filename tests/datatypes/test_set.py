@@ -92,6 +92,15 @@ class SetTests(TranspileTestCase):
             print(z)
             """)
 
+    def test_discard(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            x.discard(1)
+            x.discard(4)
+            print(x)
+            """)
+
+
 
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
