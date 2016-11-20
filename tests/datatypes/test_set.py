@@ -116,6 +116,14 @@ class SetTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_union(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            z = x.union(y)
+            print(z)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'

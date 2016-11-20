@@ -459,10 +459,13 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Return the union of sets as a new set.\n\n(i.e. all elements that are in either set.)",
+        args = {"other"}
     )
     public org.python.Object union(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("union() has not been implemented.");
+        java.util.Set set = ((Set) this.copy()).value;
+        set.addAll(((Set) other).value);
+        return new Set(set);
     }
 
     @org.python.Method(
