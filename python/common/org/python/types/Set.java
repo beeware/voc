@@ -380,10 +380,13 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Return the intersection of two sets as a new set.\n\n(i.e. all elements that are in both sets.)",
+        args = {"other"}
     )
     public org.python.Object intersection(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("intersection() has not been implemented.");
+        java.util.Set set = ((Set) this.copy()).value;
+        set.retainAll(((Set) other).value);
+        return new Set(set);
     }
 
     @org.python.Method(

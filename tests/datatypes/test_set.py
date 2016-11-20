@@ -100,7 +100,13 @@ class SetTests(TranspileTestCase):
             print(x)
             """)
 
-
+    def test_intersection(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            z = x.intersection(y)
+            print(z)
+            """)
 
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
