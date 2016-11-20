@@ -392,10 +392,12 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Update a set with the intersection of itself and another.",
+        args = {"other"}
     )
     public org.python.Object intersection_update(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("intersection_update() has not been implemented.");
+        this.value.retainAll(((Set) other).value);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(

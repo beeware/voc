@@ -139,6 +139,14 @@ class SetTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_intersection_update(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            x.intersection_update(y)
+            print(x)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
