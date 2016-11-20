@@ -340,10 +340,10 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Return a shallow copy of a set."
     )
     public org.python.Object copy() {
-        throw new org.python.exceptions.NotImplementedError("copy() has not been implemented.");
+        return new Set(new java.util.HashSet<org.python.Object>(this.value));
     }
 
     @org.python.Method(

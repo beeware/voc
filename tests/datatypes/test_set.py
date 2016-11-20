@@ -69,6 +69,21 @@ class SetTests(TranspileTestCase):
             print(y in x)
         """)
 
+    def test_copy(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = x.copy()
+            print(x == y)
+            print(x is not y)
+            """)
+
+        # ensures that it did a shallow copy
+        self.assertCodeExecution("""
+            x = {(1, 2, 3)}
+            y = x.copy()
+            print(x.pop() is y.pop())
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
