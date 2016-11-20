@@ -108,6 +108,13 @@ class SetTests(TranspileTestCase):
             print(z)
             """)
 
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {4, 5}
+            z = x.intersection(y)
+            print(z)
+            """)
+
     def test_remove(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}
