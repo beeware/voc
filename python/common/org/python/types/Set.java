@@ -347,10 +347,13 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Return the difference of two or more sets as a new set.\n\n(i.e. all elements that are in this set but not the others.)",
+        args = {"other"}
     )
     public org.python.Object difference(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("difference() has not been implemented.");
+        java.util.Set set = ((Set) this.copy()).value;
+        set.removeAll(((Set) other).value);
+        return new Set(set);
     }
 
     @org.python.Method(

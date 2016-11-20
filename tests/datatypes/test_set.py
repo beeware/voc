@@ -84,6 +84,15 @@ class SetTests(TranspileTestCase):
             print(x.pop() is y.pop())
             """)
 
+    def test_difference(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            z = x.difference(y)
+            print(z)
+            """)
+
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
