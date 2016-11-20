@@ -434,10 +434,14 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Remove an element from a set; it must be a member.\n\nIf the element is not a member, raise a KeyError.",
+        args = {"item"}
     )
-    public org.python.Object remove(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("remove() has not been implemented.");
+    public org.python.Object remove(org.python.Object item) {
+        if (!this.value.remove(item)) {
+            throw new org.python.exceptions.KeyError(item);
+        }
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(

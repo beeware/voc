@@ -108,6 +108,14 @@ class SetTests(TranspileTestCase):
             print(z)
             """)
 
+    def test_remove(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            x.remove(1)
+            x.remove(4)
+            print(x)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
