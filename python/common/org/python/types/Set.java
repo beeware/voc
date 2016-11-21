@@ -473,9 +473,11 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Update a set with the union of itself and others.",
+        args = {"other"}
     )
     public org.python.Object update(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("update() has not been implemented.");
+        this.value.addAll(((Set) other).value);
+        return org.python.types.NoneType.NONE;
     }
 }

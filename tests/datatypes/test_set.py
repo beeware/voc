@@ -147,6 +147,14 @@ class SetTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_update(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            print(x.update(y))
+            print(x)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
