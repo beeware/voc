@@ -89,6 +89,8 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.difference(y)
+            print(x)
+            print(y)
             print(z)
             """)
 
@@ -105,6 +107,8 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.intersection(y)
+            print(x)
+            print(y)
             print(z)
             """)
 
@@ -112,6 +116,8 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {4, 5}
             z = x.intersection(y)
+            print(x)
+            print(y)
             print(z)
             """)
 
@@ -128,6 +134,8 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.union(y)
+            print(x)
+            print(y)
             print(z)
             """)
 
