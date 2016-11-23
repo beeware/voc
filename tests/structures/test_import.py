@@ -1,78 +1,11 @@
+from unittest import expectedFailure
+
 import os
 
 from ..utils import TranspileTestCase
 
 
 class ImportTests(TranspileTestCase):
-
-    def test_import_java_module_static_method(self):
-        "You can invoke a static method from a native Java namespace"
-        self.assertJavaExecution(
-            """
-            from java import lang
-
-            props = lang.System.getProperties()
-            print(props.get("file.separator"))
-
-            print("Done.")
-            """,
-            """
-            %s
-            Done.
-            """ % os.path.sep)
-
-    def test_import_java_class_static_method(self):
-        "You can invoke a static method from a native Java class"
-        self.assertJavaExecution(
-            """
-            from java.lang import System
-
-            props = System.getProperties()
-            print(props.get("file.separator"))
-
-            print("Done.")
-            """,
-            """
-            %s
-            Done.
-            """ % os.path.sep)
-
-    def test_import_java_module(self):
-        "You can import a native Java namespace as a Python module"
-        self.assertJavaExecution(
-            """
-            from java import lang
-
-            buf = lang.StringBuilder()
-            buf.append('Hello, ')
-            buf.append('World')
-            print(buf.toString())
-
-            print("Done.")
-            """,
-            """
-            Hello, World
-            Done.
-            """)
-
-    def test_import_java_class(self):
-        "You can import a native Java class as a Python module"
-        self.assertJavaExecution(
-            """
-            from java.lang import StringBuilder
-
-            buf = StringBuilder()
-            buf.append('Hello, ')
-            buf.append('World')
-            print(buf.toString())
-
-            print("Done.")
-            """,
-            """
-            Hello, World
-            Done.
-            """)
-
     def test_import_stdlib_module(self):
         "You can import a Python module implemented in Java (a native stdlib shim)"
         self.assertCodeExecution(
@@ -88,11 +21,10 @@ class ImportTests(TranspileTestCase):
         "You can import a Python module implemented in Python"
         self.assertCodeExecution(
             """
-            print(1)
             import example
-            print(2)
+
             example.some_method()
-            print(3)
+
             print("Done.")
             """,
             extra_code={
@@ -443,12 +375,13 @@ class ImportTests(TranspileTestCase):
                     """
             }, run_in_function=False)
 
+    @expectedFailure
     def test_import_from_dot(self):
         self.assertCodeExecution(
             """
             from example import submodule2
 
-            moduleb.method()
+            submodule2.method()
 
             print("Done.")
             """,
@@ -470,3 +403,149 @@ class ImportTests(TranspileTestCase):
                         submodule1.method()
                     """,
             })
+
+    @expectedFailure
+    def test_import_from_local_dot(self):
+        self.assertCodeExecution(
+            """
+            from submodule import method1, method2
+
+            method1()
+            method2()
+
+            print("Done.")
+            """,
+            extra_code={
+                'submodule.__init__':
+                    """
+                    print("in submodule/__init__.py")
+                    from .modulea import method2
+
+                    def method1():
+                        print("Calling method in submodule.__init__")
+                    """,
+                'submodule.modulea':
+                    """
+                    print("in submodule/modulea.py")
+
+                    def method2():
+                        print("Calling method in submodule.modulea")
+                    """,
+            })
+
+    @expectedFailure
+    def test_import_from_local_dot_deep(self):
+        self.assertCodeExecution(
+            """
+            from submodule import method1, method2, method3, method4
+
+            method1()
+            method2()
+            method3()
+            method4()
+
+            print("Done.")
+            """,
+            extra_code={
+                'submodule.__init__':
+                    """
+                    print("in submodule/__init__.py")
+                    from .modulea import method2
+                    from .subsubmodule import method3, method4
+
+                    def method1():
+                        print("Calling method in submodule.__init__")
+                    """,
+                'submodule.modulea':
+                    """
+                    print("in submodule/modulea.py")
+
+                    def method2():
+                        print("Calling method in submodule.modulea")
+                    """,
+                'submodule.subsubmodule.__init__':
+                    """
+                    print("in submodule/subsubmodule/__init__.py")
+                    from .submodulea import method4
+
+                    def method3():
+                        print("Calling method in submodule.subsubmodule.__init__")
+                    """,
+                'submodule.subsubmodule.submodulea':
+                    """
+                    print("in submodule/subsubmodule/submodulea.py")
+
+                    def method4():
+                        print("Calling method4 in submodule.subsubmodule.submodula")
+                    """,
+            })
+
+
+class NativeImportTests(TranspileTestCase):
+    def test_import_java_module_static_method(self):
+        "You can invoke a static method from a native Java namespace"
+        self.assertJavaExecution(
+            """
+            from java import lang
+
+            props = lang.System.getProperties()
+            print(props.get("file.separator"))
+
+            print("Done.")
+            """,
+            """
+            %s
+            Done.
+            """ % os.path.sep)
+
+    def test_import_java_class_static_method(self):
+        "You can invoke a static method from a native Java class"
+        self.assertJavaExecution(
+            """
+            from java.lang import System
+
+            props = System.getProperties()
+            print(props.get("file.separator"))
+
+            print("Done.")
+            """,
+            """
+            %s
+            Done.
+            """ % os.path.sep)
+
+    def test_import_java_module(self):
+        "You can import a native Java namespace as a Python module"
+        self.assertJavaExecution(
+            """
+            from java import lang
+
+            buf = lang.StringBuilder()
+            buf.append('Hello, ')
+            buf.append('World')
+            print(buf.toString())
+
+            print("Done.")
+            """,
+            """
+            Hello, World
+            Done.
+            """)
+
+    def test_import_java_class(self):
+        "You can import a native Java class as a Python module"
+        self.assertJavaExecution(
+            """
+            from java.lang import StringBuilder
+
+            buf = StringBuilder()
+            buf.append('Hello, ')
+            buf.append('World')
+            print(buf.toString())
+
+            print("Done.")
+            """,
+            """
+            Hello, World
+            Done.
+            """)
