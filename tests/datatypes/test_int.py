@@ -149,12 +149,9 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_subtract_frozenset',
         'test_subtract_float',
 
-        'test_true_divide_bool',
         'test_true_divide_class',
         'test_true_divide_complex',
         'test_true_divide_frozenset',
-        'test_true_divide_float',
-        'test_true_divide_int',
 
         'test_xor_class',
         'test_xor_frozenset',

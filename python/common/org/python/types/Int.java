@@ -637,6 +637,18 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+
+    public org.python.Object __itruediv__(org.python.Object other) {
+      if (other instanceof org.python.types.Int || other instanceof org.python.types.Float || other instanceof org.python.types.Bool) {
+        return this.__truediv__(other);
+      } else {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /=: 'int' and '" + other.typeName() + "'");
+      }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __irshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(this.value >>= (((org.python.types.Bool) other).value ? 1 : 0));
