@@ -185,7 +185,17 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__mul__ has not been implemented.");
+        if (other instanceof org.python.types.List || other instanceof org.python.types.Str || other instanceof org.python.types.Tuple || other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
+          throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        } else if (other instanceof org.python.types.Int || other instanceof org.python.types.Float || other instanceof org.python.types.Bool) {
+          return new org.python.types.Complex((org.python.types.Float)this.real.__mul__(other), (org.python.types.Float)this.imag.__mul__(other));
+        } else if (other instanceof org.python.types.Complex) {
+          org.python.types.Complex other_obj = (org.python.types.Complex) other;
+          org.python.types.Float real = (org.python.types.Float)this.real.__mul__(other_obj.real).__sub__(this.imag.__mul__(other_obj.imag));
+          org.python.types.Float imag = (org.python.types.Float)this.real.__mul__(other_obj.imag).__add__(this.imag.__mul__(other_obj.real));
+          return new org.python.types.Complex(real, imag);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
