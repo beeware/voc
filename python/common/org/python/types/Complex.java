@@ -195,6 +195,9 @@ public class Complex extends org.python.types.Object {
         if (other instanceof org.python.types.Int || other instanceof org.python.types.Float) {
             return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other), this.imag);
         } else if (other instanceof Bool) {
+            if (!((org.python.types.Bool)other).value && this.real.isNegativeZero()) {
+              return new org.python.types.Complex(new org.python.types.Float(0), this.imag);
+            }
             return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other), this.imag);
         } else if (other instanceof Complex) {
             org.python.types.Complex other_object = (org.python.types.Complex)other;
