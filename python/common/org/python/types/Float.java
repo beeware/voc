@@ -102,6 +102,13 @@ public class Float extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public boolean isNegativeZero() {
+      return Double.doubleToRawLongBits(this.value) == NEGATIVE_ZERO_RAW_BITS;
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.types.Str __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("float.__format__() has not been implemented.");
     }
