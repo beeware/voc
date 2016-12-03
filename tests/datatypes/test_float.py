@@ -63,9 +63,11 @@ class FloatTests(TranspileTestCase):
             """)
 
     def test_hex(self):
-        numbers = [0e0, -0e0, 10000152587890625e-16, -566e85,
-                   -87336362425182547697e-280, 4.9406564584124654e-324,
-                   'nan', 'inf', '-inf']
+        numbers = [
+            0e0, -0e0, 10000152587890625e-16, -566e85,
+            -87336362425182547697e-280, 4.9406564584124654e-324,
+            'nan', 'inf', '-inf'
+        ]
         template = """
             x = float('{}')
             print(x.hex())

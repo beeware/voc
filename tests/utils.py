@@ -41,7 +41,10 @@ def setUpSuite():
     def remove_output_dir():
         global _output_dir
         if _output_dir != '':
-            shutil.rmtree(_output_dir)
+            try:
+                shutil.rmtree(_output_dir)
+            except FileNotFoundError:
+                pass
 
     atexit.register(remove_output_dir)
     _output_dir = tempfile.mkdtemp(dir=TESTS_DIR)
@@ -226,6 +229,10 @@ def cleanse_java(input, substitutions):
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
     out = out.replace("'python.test.__init__'", '***EXECUTABLE***').replace("'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
 
+    # Replace references to the test script with something generic
+    out = out.replace("'test.py'", '***EXECUTABLE***')
+
+    # Replace all the explicit data substitutions
     if substitutions:
         for to_value, from_values in substitutions.items():
             for from_value in from_values:
@@ -250,7 +257,10 @@ def cleanse_python(input, substitutions):
         ),
         os.linesep if stack else ''
     )
+    # Normalize memory references from output
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
+
+    # Replace references to the test script with something generic
     out = out.replace("'test.py'", '***EXECUTABLE***')
 
     # Python 3.4.4 changed the message describing strings in exceptions
@@ -709,7 +719,8 @@ class UnaryOperationTestCase(NotImplementedToExpectedFailure):
                 for x in x_values
             ),
             "Error running %s" % operation,
-            substitutions=substitutions
+            substitutions=substitutions,
+            run_in_function=False,
         )
 
     test_unary_positive = _unary_test('test_unary_positive', '+')
@@ -763,7 +774,8 @@ class BinaryOperationTestCase(NotImplementedToExpectedFailure):
                 for x, y in data
             ),
             "Error running %s" % operation,
-            substitutions=substitutions
+            substitutions=substitutions,
+            run_in_function=False,
         )
 
     for datatype, examples in SAMPLE_DATA.items():
@@ -836,7 +848,8 @@ class InplaceOperationTestCase(NotImplementedToExpectedFailure):
                 for x, y in data
             ),
             "Error running %s" % operation,
-            substitutions=substitutions
+            substitutions=substitutions,
+            run_in_function=False,
         )
 
     for datatype, examples in SAMPLE_DATA.items():
@@ -898,7 +911,8 @@ class BuiltinFunctionTestCase(NotImplementedToExpectedFailure):
                 for f, x in data
             ),
             "Error running %s" % operation,
-            substitutions=substitutions
+            substitutions=substitutions,
+            run_in_function=False,
         )
 
     for datatype, examples in SAMPLE_DATA.items():
@@ -920,7 +934,6 @@ def _builtin_twoarg_test(test_name, operation, examples1, examples2):
 
 class BuiltinTwoargFunctionTestCase(NotImplementedToExpectedFailure):
     format = ''
-
 
     def assertBuiltinTwoargFunction(self, f_values, x_values, y_values, operation, format, substitutions):
         data = []
@@ -955,7 +968,8 @@ class BuiltinTwoargFunctionTestCase(NotImplementedToExpectedFailure):
                 for f, x, y in data
             ),
             "Error running %s" % operation,
-            substitutions=substitutions
+            substitutions=substitutions,
+            run_in_function=False,
         )
 
     for datatype1, examples1 in SAMPLE_DATA.items():
