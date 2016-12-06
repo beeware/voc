@@ -388,6 +388,8 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 JavaOpcodes.ARETURN()
             )
+            # Record how deep we were when this return was added.
+            self.context.opcodes[-1].depth = len(self.context.blocks)
 
     @node_visitor
     def visit_Delete(self, node):
@@ -1628,7 +1630,7 @@ class Visitor(ast.NodeVisitor):
 
             # Create and populate the array of arguments to pass to invoke()
             num_args = len([arg for arg in node.args if not isinstance(arg, ast.Starred)])
-            
+
             self.context.add_opcodes(
                 ICONST_val(num_args),
                 JavaOpcodes.ANEWARRAY('org/python/Object'),
@@ -1640,7 +1642,7 @@ class Visitor(ast.NodeVisitor):
                 if isinstance(arg, ast.Starred):
                     self.visit(arg)
                     continue
-                
+
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
                     ICONST_val(i),
@@ -1670,7 +1672,7 @@ class Visitor(ast.NodeVisitor):
                 if keyword.arg is None:  # Python 3.5 **kwargs
                     self.add_doublestarred_kwargs(node, keyword.value)
                     continue
-                    
+
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(keyword.arg),
@@ -1694,7 +1696,7 @@ class Visitor(ast.NodeVisitor):
         # Handle *args at a call site (Python 3.5+)
         # Evaluate the starargs
         self.visit(node.value)
-        
+
         self.context.add_opcodes(
             JavaOpcodes.INVOKESTATIC('org/Python', 'addToArgs', '([Lorg/python/Object;Lorg/python/Object;)[Lorg/python/Object;'),
         )
@@ -1707,7 +1709,7 @@ class Visitor(ast.NodeVisitor):
             func_name = node.func.id
         except AttributeError:
             func_name = node.func.attr
-            
+
         self.context.add_opcodes(
             JavaOpcodes.LDC_W(func_name),
             JavaOpcodes.INVOKESTATIC('org/Python', 'addToKwargs', '(Ljava/util/Map;Lorg/python/Object;Ljava/lang/String;)Ljava/util/Map;'),
