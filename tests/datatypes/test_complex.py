@@ -6,8 +6,6 @@ class UnaryComplexOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'complex'
 
     not_implemented = [
-        'test_unary_negative',
-        'test_unary_positive',
         'test_unary_not'
     ]
 
@@ -17,7 +15,6 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_add_class',
-        'test_add_complex',
         'test_add_frozenset',
 
         'test_and_None',
@@ -111,24 +108,8 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_str',
         'test_modulo_tuple',
 
-        'test_multiply_None',
-        'test_multiply_NotImplemented',
-        'test_multiply_slice',
-        'test_multiply_range',
-        'test_multiply_bool',
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
         'test_multiply_class',
-        'test_multiply_complex',
-        'test_multiply_dict',
-        'test_multiply_float',
         'test_multiply_frozenset',
-        'test_multiply_int',
-        'test_multiply_list',
-        'test_multiply_none',
-        'test_multiply_set',
-        'test_multiply_str',
-        'test_multiply_tuple',
 
         'test_ne_class',
         'test_ne_frozenset',
@@ -193,11 +174,7 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_str',
         'test_subscr_tuple',
 
-        'test_subtract_bool',
         'test_subtract_class',
-        'test_subtract_complex',
-        'test_subtract_float',
-        'test_subtract_int',
         'test_subtract_frozenset',
 
         'test_true_divide_None',
@@ -406,22 +383,16 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_str',
         'test_modulo_tuple',
 
-        'test_multiply_None',
-        'test_multiply_NotImplemented',
-        'test_multiply_slice',
-        'test_multiply_range',
         'test_multiply_bool',
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
         'test_multiply_complex',
-        'test_multiply_dict',
         'test_multiply_float',
         'test_multiply_frozenset',
         'test_multiply_int',
         'test_multiply_list',
         'test_multiply_none',
-        'test_multiply_set',
         'test_multiply_str',
         'test_multiply_tuple',
 

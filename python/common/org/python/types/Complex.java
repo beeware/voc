@@ -35,6 +35,43 @@ public class Complex extends org.python.types.Object {
         this.imag = new org.python.types.Float(imag);
     }
 
+    private String partToStr(org.python.types.Float x) {
+        String x_str;
+        if (x.value != 0.0) {
+          x_str = java.lang.Double.toString(x.value);
+          int dot_pos = x_str.indexOf(".");
+          int e_pos = x_str.indexOf("e");
+          if (dot_pos != -1) {
+              // Remove trailing zeroes in the fractional part
+              int last_zero = -1;
+              int i;
+              for (i = dot_pos + 1; i < x_str.length(); i++) {
+                  char c = x_str.charAt(i);
+                  if (i == e_pos) {
+                      break;
+                  } else if (c == '0') {
+                      if (last_zero == -1) {
+                          last_zero = i;
+                      }
+                  } else {
+                      last_zero = -1;
+                  }
+              }
+              if (last_zero != -1) {
+                  if (last_zero == dot_pos + 1) {
+                      last_zero -= 1;
+                  }
+                  x_str = x_str.substring(0, last_zero) + x_str.substring(i);
+              }
+          }
+        } else if (x.isNegativeZero()) {
+          x_str = "-0";
+        } else {
+          x_str = "0";
+        }
+        return x_str;
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("bool.__new__() has not been implemented.");
     // }
@@ -158,6 +195,9 @@ public class Complex extends org.python.types.Object {
         if (other instanceof org.python.types.Int || other instanceof org.python.types.Float) {
             return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other), this.imag);
         } else if (other instanceof Bool) {
+            if (!((org.python.types.Bool)other).value && this.real.isNegativeZero()) {
+              return new org.python.types.Complex(new org.python.types.Float(0), this.imag);
+            }
             return new org.python.types.Complex((org.python.types.Float)this.real.__add__(other), this.imag);
         } else if (other instanceof Complex) {
             org.python.types.Complex other_object = (org.python.types.Complex)other;
@@ -184,8 +224,48 @@ public class Complex extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.types.Str __str__(){
+      if (this.real.value != 0.0 || (this.real.isNegativeZero() && this.imag.value < 0)) {
+        return new org.python.types.Str("(" + partToStr(this.real) + ((this.imag.value >= 0.0 && !this.imag.isNegativeZero()) ? "+" : "-") + partToStr(new org.python.types.Float(Math.abs(this.imag.value))) + "j)");
+      } else {
+        return new org.python.types.Str(partToStr(this.imag) + "j");
+      }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__mul__ has not been implemented.");
+        if (other instanceof org.python.types.List || other instanceof org.python.types.Str || other instanceof org.python.types.Tuple || other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
+          throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        } else if (other instanceof org.python.types.Bool) {
+          if (((org.python.types.Bool)other).value == false && !this.real.isNegativeZero()) {
+            return new org.python.types.Complex(new org.python.types.Float(0), new org.python.types.Float(0));
+          } else if (this.real.isNegativeZero()) {
+            return new org.python.types.Complex(new org.python.types.Float(0), (org.python.types.Float)this.imag.__mul__(other));
+          }
+          return new org.python.types.Complex((org.python.types.Float)this.real.__mul__(other), (org.python.types.Float)this.imag.__mul__(other));
+        } else if (other instanceof org.python.types.Float) {
+          if (((org.python.types.Float)other).value == 0.0 && !this.real.isNegativeZero()) {
+            return new org.python.types.Complex(new org.python.types.Float(0), new org.python.types.Float(0));
+          } else if (this.real.isNegativeZero()) {
+            return new org.python.types.Complex(new org.python.types.Float(0), (org.python.types.Float)this.imag.__mul__(other));
+          }
+          return new org.python.types.Complex((org.python.types.Float)this.real.__mul__(other), (org.python.types.Float)this.imag.__mul__(other));
+        } else if (other instanceof org.python.types.Int) {
+          if (((org.python.types.Int)other).value == 0 && !this.real.isNegativeZero()) {
+            return new org.python.types.Complex(new org.python.types.Float(0), new org.python.types.Float(0));
+          } else if (this.real.isNegativeZero()) {
+            return new org.python.types.Complex(new org.python.types.Float(0), (org.python.types.Float)this.imag.__mul__(other));
+          }
+          return new org.python.types.Complex((org.python.types.Float)this.real.__mul__(other), (org.python.types.Float)this.imag.__mul__(other));
+        } else if (other instanceof org.python.types.Complex) {
+          org.python.types.Complex other_obj = (org.python.types.Complex) other;
+          org.python.types.Float real = (org.python.types.Float)this.real.__mul__(other_obj.real).__sub__(this.imag.__mul__(other_obj.imag));
+          org.python.types.Float imag = (org.python.types.Float)this.real.__mul__(other_obj.imag).__add__(this.imag.__mul__(other_obj.real));
+          return new org.python.types.Complex(real, imag);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
