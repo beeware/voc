@@ -1627,12 +1627,20 @@ class Visitor(ast.NodeVisitor):
             )
 
             # Create and populate the array of arguments to pass to invoke()
+            num_args = len([arg for arg in node.args if not isinstance(arg, ast.Starred)])
+            
             self.context.add_opcodes(
-                ICONST_val(len(node.args)),
+                ICONST_val(num_args),
                 JavaOpcodes.ANEWARRAY('org/python/Object'),
             )
 
             for i, arg in enumerate(node.args):
+
+                # This block implements *args in Python 3.5+
+                if isinstance(arg, ast.Starred):
+                    self.visit(arg)
+                    continue
+                
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
                     ICONST_val(i),
@@ -1642,7 +1650,8 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.AASTORE(),
                 )
 
-            if node.starargs is not None:
+            # This block implements *args in Python 3.4
+            if getattr(node, 'starargs', None) is not None:
                 # Evaluate the starargs
                 self.visit(node.starargs)
 
@@ -1658,6 +1667,10 @@ class Visitor(ast.NodeVisitor):
             )
 
             for keyword in node.keywords:
+                if keyword.arg is None:  # Python 3.5 **kwargs
+                    self.add_doublestarred_kwargs(node, keyword.value)
+                    continue
+                    
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(keyword.arg),
@@ -1668,25 +1681,37 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.POP()
                 )
 
-            if node.kwargs is not None:
-                # Evaluate the kwargs
-                self.visit(node.kwargs)
-
-                # Add all the kwargs to the kwargs dict.
-                try:
-                    func_name = node.func.id
-                except AttributeError:
-                    func_name = node.func.attr
-
-                self.context.add_opcodes(
-                    JavaOpcodes.LDC_W(func_name),
-                    JavaOpcodes.INVOKESTATIC('org/Python', 'addToKwargs', '(Ljava/util/Map;Lorg/python/Object;Ljava/lang/String;)Ljava/util/Map;'),
-                )
+            if getattr(node, 'kwargs', None) is not None:  # Python 3.4 **kwargs
+                self.add_doublestarred_kwargs(node, node.kwargs)
 
             # Set up the stack and invoke the callable
             self.context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Callable', 'invoke', '([Lorg/python/Object;Ljava/util/Map;)Lorg/python/Object;'),
             )
+
+    @node_visitor
+    def visit_Starred(self, node):
+        # Handle *args at a call site (Python 3.5+)
+        # Evaluate the starargs
+        self.visit(node.value)
+        
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKESTATIC('org/Python', 'addToArgs', '([Lorg/python/Object;Lorg/python/Object;)[Lorg/python/Object;'),
+        )
+
+    def add_doublestarred_kwargs(self, node, kwargs):
+        self.visit(kwargs)
+
+        # Add all the kwargs to the kwargs dict.
+        try:
+            func_name = node.func.id
+        except AttributeError:
+            func_name = node.func.attr
+            
+        self.context.add_opcodes(
+            JavaOpcodes.LDC_W(func_name),
+            JavaOpcodes.INVOKESTATIC('org/Python', 'addToKwargs', '(Ljava/util/Map;Lorg/python/Object;Ljava/lang/String;)Ljava/util/Map;'),
+        )
 
     @node_visitor
     def visit_Num(self, node):
@@ -1799,11 +1824,6 @@ class Visitor(ast.NodeVisitor):
             self.visit(node.slice)
         else:
             raise NotImplementedError("Unknown context %s" % node.ctx)
-
-    @node_visitor
-    def visit_Starred(self, node):
-        # expr value, expr_context ctx):
-        raise NotImplementedError('No handler for Starred')
 
     @node_visitor
     def visit_Name(self, node):

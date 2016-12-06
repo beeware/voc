@@ -4,8 +4,11 @@
   </description>
 
   <property environment="env"/>
-  <property name="python-version" value="3.4"/>
   <property name="release" value="2"/>
+  <exec executable="python" outputProperty="python-version">
+    <arg value="-c"/>
+    <arg value="import sys; print('.'.join(sys.version.split('.',3)[:2]))"/>
+  </exec>
 
   <condition property="build" value="${env.VOC_BUILD_DIR}" else="build">
     <isset property="env.VOC_BUILD_DIR" />

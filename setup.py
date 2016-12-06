@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 
-if sys.version_info[:2] != (3, 4):
+if sys.version_info[:2] < (3, 4):
     raise SystemExit("VOC requires Python 3.4+")
 
 import io
