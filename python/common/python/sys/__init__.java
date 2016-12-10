@@ -17,17 +17,7 @@ public class __init__ extends org.python.types.Module {
     )
     public org.python.Object __new__(org.python.Object klass) {
         org.python.types.Type cls = (org.python.types.Type) super.__new__(klass);
-
-        // Initialize sys.argv using command line arguments from environment
-        // java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("(\"[^\"]*\"|[^\"]+)(\\s+|$)");
-        java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("\\s+");
-        java.lang.String [] cmdline_args = cmdline_pattern.split(System.getProperty("sun.java.command"));
-        java.util.List<org.python.Object> arg_list = new java.util.ArrayList<org.python.Object>();
-        for (String arg: cmdline_args) {
-            arg_list.add(new org.python.types.Str(arg));
-        }
-
-        cls.__dict__.put("argv", new org.python.types.List(arg_list));
+        cls.__dict__.put("argv", python.platform.__init__.impl.args());
         return cls;
     }
 

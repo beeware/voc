@@ -37,11 +37,11 @@ public class ImportLib {
             java.lang.String mod_name = import_name.toString();
 
             try {
-                // System.out.println("IMPORT " + mod_name);
+                // org.Python.debug("IMPORT", mod_name);
                 python_module = (org.python.types.Module) python.sys.__init__.modules.__getitem__(new org.python.types.Str(mod_name));
             } catch (org.python.exceptions.KeyError ke) {
                 try {
-                    // System.out.println("handle IMPORT " + mod_name);
+                    // org.Python.debug("handle IMPORT", mod_name);
                     if (native_import) {
                         python_module = importNativeModule(mod_name);
                     } else {
@@ -63,7 +63,7 @@ public class ImportLib {
                 // If we are multiple steps into an import chain, tell the
                 // parent module of this new module.
                 if (parent_module != null) {
-                    // System.out.println("SET PARENT ATTRIBUTE " + parent_module + "." + name.toString() + " = " + python_module);
+                    // org.Python.debug("SET PARENT ATTRIBUTE " + parent_module + "." + name.toString(), python_module);
                     parent_module.__setattr__(name.toString(), python_module);
                 }
             }
@@ -74,7 +74,7 @@ public class ImportLib {
                 return_module = python_module;
             }
 
-            // System.out.println("MODULES: " + python.sys.__init__.modules);
+            // org.Python.debug("MODULES", python.sys.__init__.modules);
             // The module just imported will be the parent of the next import
             // in the chain.
             parent_module = python_module;
@@ -86,7 +86,7 @@ public class ImportLib {
             return_module = python_module;
             import_name.append(".");
             for (java.lang.String name: from_list) {
-                // System.out.println("IMPORT NAME " + name);
+                // org.Python.debug("IMPORT NAME", name);
                 if (!name.equals("*")) {
                     java.lang.String mod_name = import_name.toString() + name;
                     try {
@@ -124,7 +124,7 @@ public class ImportLib {
             python_module = new org.python.java.Module(import_name);
             python.sys.__init__.modules.__setitem__(new org.python.types.Str(import_name), python_module);
         } finally {
-        //     System.out.println("CONSTRUCTOR DONE");
+            // org.Python.debug("CONSTRUCTOR DONE");
         }
         return python_module;
     }
@@ -154,8 +154,12 @@ public class ImportLib {
             throw new org.python.exceptions.RuntimeError("Couldn't find initialization method for module " + import_name);
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
-                e.getTargetException().printStackTrace();
-                // If the Java method raised an Python exception, re-raise that
+                // org.Python.debug("Exception:", e.getTargetException());
+                // for (java.lang.StackTraceElement ste: e.getTargetException().getStackTrace()) {
+                //     org.Python.debug("     ", ste);
+                // }
+
+                // If the Java method raised a Python exception, re-raise that
                 // exception as-is. If it wasn't a Python exception, wrap it
                 // as one and continue.
                 throw (org.python.exceptions.BaseException) e.getCause();
@@ -166,7 +170,7 @@ public class ImportLib {
             // e.printStackTrace();
             throw new org.python.exceptions.RuntimeError(e.getCause().toString());
         } finally {
-        //     System.out.println("CONSTRUCTOR DONE");
+            // org.Python.debug("CONSTRUCTOR DONE");
         }
         return python_module;
     }
