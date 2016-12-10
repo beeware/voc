@@ -37,4 +37,8 @@ public class AndroidPlatform implements python.Platform {
     public org.python.Object stdin() {
         return _stdin;
     }
+
+    public org.python.Object args() {
+        return new org.python.types.List();
+    }
 }

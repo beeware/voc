@@ -390,7 +390,11 @@ public class Function extends org.python.types.Object implements org.python.Call
             throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.method);
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
-                // e.getTargetException().printStackTrace();
+                // org.Python.debug("Exception:", e.getTargetException());
+                // for (java.lang.StackTraceElement ste: e.getTargetException().getStackTrace()) {
+                //     org.Python.debug("     ", ste);
+                // }
+
                 // If the Java method raised an Python exception, re-raise that
                 // exception as-is. If it wasn"t a Python exception, wrap it
                 // as one and continue.
