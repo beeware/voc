@@ -1,0 +1,21 @@
+try:
+    print('>>> f = __import__')
+    print('>>> x = True')
+    print('>>> f(x)')
+    f = __import__
+    x = True
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = __import__')
+    print('>>> x = False')
+    print('>>> f(x)')
+    f = __import__
+    x = False
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

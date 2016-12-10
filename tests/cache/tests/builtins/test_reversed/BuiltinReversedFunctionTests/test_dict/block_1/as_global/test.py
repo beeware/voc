@@ -1,0 +1,21 @@
+try:
+    print('>>> f = reversed')
+    print('>>> x = {}')
+    print('>>> f(x)')
+    f = reversed
+    x = {}
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = reversed')
+    print('>>> x = {"a": 1, "c": 2.3456, "d": "another"}')
+    print('>>> f(x)')
+    f = reversed
+    x = {"a": 1, "c": 2.3456, "d": "another"}
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

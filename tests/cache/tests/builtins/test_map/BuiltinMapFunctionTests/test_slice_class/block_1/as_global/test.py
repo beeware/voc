@@ -1,0 +1,311 @@
+try:
+    print('>>> f = map')
+    print('>>> x = slice(0)')
+    print('>>> y = type(1)')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(0)
+    y = type(1)
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(0)')
+    print('>>> y = type("a")')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(0)
+    y = type("a")
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(0)')
+    print('>>> y = type(object())')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(0)
+    y = type(object())
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(0)')
+    print('>>> y = type("MyClass", (object,), {})')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(0)
+    y = type("MyClass", (object,), {})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(5)')
+    print('>>> y = type(1)')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(5)
+    y = type(1)
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(5)')
+    print('>>> y = type("a")')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(5)
+    y = type("a")
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(5)')
+    print('>>> y = type(object())')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(5)
+    y = type(object())
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(5)')
+    print('>>> y = type("MyClass", (object,), {})')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(5)
+    y = type("MyClass", (object,), {})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(2, 7)')
+    print('>>> y = type(1)')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(2, 7)
+    y = type(1)
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(2, 7)')
+    print('>>> y = type("a")')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(2, 7)
+    y = type("a")
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(2, 7)')
+    print('>>> y = type(object())')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(2, 7)
+    y = type(object())
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(2, 7)')
+    print('>>> y = type("MyClass", (object,), {})')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(2, 7)
+    y = type("MyClass", (object,), {})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(2, 7, 2)')
+    print('>>> y = type(1)')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(2, 7, 2)
+    y = type(1)
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(2, 7, 2)')
+    print('>>> y = type("a")')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(2, 7, 2)
+    y = type("a")
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(2, 7, 2)')
+    print('>>> y = type(object())')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(2, 7, 2)
+    y = type(object())
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(2, 7, 2)')
+    print('>>> y = type("MyClass", (object,), {})')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(2, 7, 2)
+    y = type("MyClass", (object,), {})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(7, 2, -1)')
+    print('>>> y = type(1)')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(7, 2, -1)
+    y = type(1)
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(7, 2, -1)')
+    print('>>> y = type("a")')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(7, 2, -1)
+    y = type("a")
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(7, 2, -1)')
+    print('>>> y = type(object())')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(7, 2, -1)
+    y = type(object())
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(7, 2, -1)')
+    print('>>> y = type("MyClass", (object,), {})')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(7, 2, -1)
+    y = type("MyClass", (object,), {})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(7, 2, -2)')
+    print('>>> y = type(1)')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(7, 2, -2)
+    y = type(1)
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(7, 2, -2)')
+    print('>>> y = type("a")')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(7, 2, -2)
+    y = type("a")
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(7, 2, -2)')
+    print('>>> y = type(object())')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(7, 2, -2)
+    y = type(object())
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = map')
+    print('>>> x = slice(7, 2, -2)')
+    print('>>> y = type("MyClass", (object,), {})')
+    print('>>> f(x, y)')
+    f = map
+    x = slice(7, 2, -2)
+    y = type("MyClass", (object,), {})
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()

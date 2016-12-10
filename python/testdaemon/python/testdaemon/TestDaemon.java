@@ -23,38 +23,37 @@ public class TestDaemon {
         try {
             // load the voc jar here so that they can see the runtime classes
             voc = new URL("file:" + System.getProperty("user.dir") + "/dist/python-java-support.jar");
-            // need the trailing slash so that the ClassLoader knows it's a
-            // directory instead of a jar file
-            runtime1 = new URL("file:" + System.getProperty("user.dir") + "/temp/");
-            runtime2 = new URL("file:" + System.getProperty("user.dir") + "/java/");
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return;
         }
         ClassLoader vocClassLoader = new URLClassLoader(new URL[] { voc });
-        URL[] runtimeURLs = new URL[] { runtime1, runtime2 };
 
         System.setSecurityManager(new NoExitSecurityManager());
 
         input = sc.nextLine();
 
         while (!input.equals("exit")) {
-            // separate out the params
-            String[] parts = input.split(" ");
-            String className = parts[0];
-            String[] inputArgs = Arrays.copyOfRange(parts, 1, parts.length);
-
-            // get a fresh ClassLoader so that we pick up the latest class files
-            ClassLoader runtimeClassLoader = new URLClassLoader(runtimeURLs);
-
-            ClassLoader joinedClassLoader = new JoinClassLoader(
-                TestDaemon.class.getClassLoader(),
-                vocClassLoader,
-                runtimeClassLoader);
-
-            Thread.currentThread().setContextClassLoader(joinedClassLoader);
-
+            ClassLoader joinedClassLoader = null;
             try {
+                // separate out the params
+                String[] parts = input.split(" ");
+                URL[] runtimeURLs = new URL[] {
+                    new URL("file:" + parts[0])
+                };
+                String className = parts[1];
+                String[] inputArgs = Arrays.copyOfRange(parts, 1, parts.length);
+
+                // get a fresh ClassLoader so that we pick up the latest class files
+                ClassLoader runtimeClassLoader = new URLClassLoader(runtimeURLs);
+
+                joinedClassLoader = new JoinClassLoader(
+                    TestDaemon.class.getClassLoader(),
+                    vocClassLoader,
+                    runtimeClassLoader);
+
+                Thread.currentThread().setContextClassLoader(joinedClassLoader);
+
                 // don't leave this as Class type as that's raw and compiler
                 // is required to generate a warning. add generic type <?>.
                 Class<?> klass = joinedClassLoader.loadClass(className);
@@ -65,6 +64,8 @@ public class TestDaemon {
                 // first parameter can be null since method is static
                 // cast second parameter to Object to make it a varargs call
                 method.invoke(null, (Object) inputArgs);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
             } catch (ReflectiveOperationException e) {
                 // InvocationTargetException may contain an ExitException
                 if (e instanceof InvocationTargetException && e.getCause() != null

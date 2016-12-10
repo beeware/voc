@@ -1,0 +1,10 @@
+try:
+    print('>>> f = len')
+    print('>>> x = NotImplemented')
+    print('>>> f(x)')
+    f = len
+    x = NotImplemented
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

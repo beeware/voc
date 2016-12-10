@@ -1,0 +1,3 @@
+x = [1, 2, 3, 4, 5]
+print([v**2 for v in x])
+print('Done.')

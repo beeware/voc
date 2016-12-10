@@ -1,0 +1,10 @@
+try:
+    print('>>> f = property')
+    print('>>> x = None')
+    print('>>> f(x)')
+    f = property
+    x = None
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

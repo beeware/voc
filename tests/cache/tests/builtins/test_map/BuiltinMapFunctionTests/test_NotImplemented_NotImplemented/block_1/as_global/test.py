@@ -1,0 +1,12 @@
+try:
+    print('>>> f = map')
+    print('>>> x = NotImplemented')
+    print('>>> y = NotImplemented')
+    print('>>> f(x, y)')
+    f = map
+    x = NotImplemented
+    y = NotImplemented
+    print(f(x, y))
+except Exception as e:
+    print(type(e), ':', e)
+print()

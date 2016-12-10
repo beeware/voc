@@ -1,0 +1,32 @@
+try:
+    print('>>> f = chr')
+    print('>>> x = bytearray()')
+    print('>>> f(x)')
+    f = chr
+    x = bytearray()
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = chr')
+    print('>>> x = bytearray(1)')
+    print('>>> f(x)')
+    f = chr
+    x = bytearray(1)
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> f = chr')
+    print('>>> x = bytearray([1, 2, 3])')
+    print('>>> f(x)')
+    f = chr
+    x = bytearray([1, 2, 3])
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()

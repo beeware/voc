@@ -1,0 +1,80 @@
+def test_function():
+    try:
+        print('>>> f = delattr')
+        print('>>> x = NotImplemented')
+        print('>>> y = ""')
+        print('>>> f(x, y)')
+        f = delattr
+        x = NotImplemented
+        y = ""
+        print(f(x, y))
+    except Exception as e:
+        print(type(e), ':', e)
+    print()
+    ##################################################
+    try:
+        print('>>> f = delattr')
+        print('>>> x = NotImplemented')
+        print('>>> y = "3"')
+        print('>>> f(x, y)')
+        f = delattr
+        x = NotImplemented
+        y = "3"
+        print(f(x, y))
+    except Exception as e:
+        print(type(e), ':', e)
+    print()
+    ##################################################
+    try:
+        print('>>> f = delattr')
+        print('>>> x = NotImplemented')
+        print('>>> y = "This is another string"')
+        print('>>> f(x, y)')
+        f = delattr
+        x = NotImplemented
+        y = "This is another string"
+        print(f(x, y))
+    except Exception as e:
+        print(type(e), ':', e)
+    print()
+    ##################################################
+    try:
+        print('>>> f = delattr')
+        print('>>> x = NotImplemented')
+        print('>>> y = "Mÿ hôvèrçràft îß fûłl öf éêlś"')
+        print('>>> f(x, y)')
+        f = delattr
+        x = NotImplemented
+        y = "Mÿ hôvèrçràft îß fûłl öf éêlś"
+        print(f(x, y))
+    except Exception as e:
+        print(type(e), ':', e)
+    print()
+    ##################################################
+    try:
+        print('>>> f = delattr')
+        print('>>> x = NotImplemented')
+        print('>>> y = "One arg: %s"')
+        print('>>> f(x, y)')
+        f = delattr
+        x = NotImplemented
+        y = "One arg: %s"
+        print(f(x, y))
+    except Exception as e:
+        print(type(e), ':', e)
+    print()
+    ##################################################
+    try:
+        print('>>> f = delattr')
+        print('>>> x = NotImplemented')
+        print('>>> y = "Three args: %s | %s | %s"')
+        print('>>> f(x, y)')
+        f = delattr
+        x = NotImplemented
+        y = "Three args: %s | %s | %s"
+        print(f(x, y))
+    except Exception as e:
+        print(type(e), ':', e)
+    print()
+    
+test_function()

@@ -1,0 +1,259 @@
+try:
+    print('>>> x = 1j')
+    print('>>> y = []')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 1j
+    y = []
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 1j')
+    print('>>> y = [3, 4, 5]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 1j
+    y = [3, 4, 5]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 1j')
+    print('>>> y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 1j
+    y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 1j')
+    print('>>> y = ["a","b","c"]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 1j
+    y = ["a","b","c"]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 3.14159265j')
+    print('>>> y = []')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 3.14159265j
+    y = []
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 3.14159265j')
+    print('>>> y = [3, 4, 5]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 3.14159265j
+    y = [3, 4, 5]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 3.14159265j')
+    print('>>> y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 3.14159265j
+    y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 3.14159265j')
+    print('>>> y = ["a","b","c"]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 3.14159265j
+    y = ["a","b","c"]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 1+2j')
+    print('>>> y = []')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 1+2j
+    y = []
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 1+2j')
+    print('>>> y = [3, 4, 5]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 1+2j
+    y = [3, 4, 5]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 1+2j')
+    print('>>> y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 1+2j
+    y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 1+2j')
+    print('>>> y = ["a","b","c"]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 1+2j
+    y = ["a","b","c"]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 3-4j')
+    print('>>> y = []')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 3-4j
+    y = []
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 3-4j')
+    print('>>> y = [3, 4, 5]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 3-4j
+    y = [3, 4, 5]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 3-4j')
+    print('>>> y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 3-4j
+    y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = 3-4j')
+    print('>>> y = ["a","b","c"]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = 3-4j
+    y = ["a","b","c"]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = -5j')
+    print('>>> y = []')
+    print('>>> x //= y')
+    print('>>> x')
+    x = -5j
+    y = []
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = -5j')
+    print('>>> y = [3, 4, 5]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = -5j
+    y = [3, 4, 5]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = -5j')
+    print('>>> y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = -5j
+    y = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()
+##################################################
+try:
+    print('>>> x = -5j')
+    print('>>> y = ["a","b","c"]')
+    print('>>> x //= y')
+    print('>>> x')
+    x = -5j
+    y = ["a","b","c"]
+    x //= y
+    print(x)
+except Exception as e:
+    print(type(e), ':', e)
+print()

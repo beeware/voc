@@ -1,0 +1,10 @@
+try:
+    print('>>> f = hash')
+    print('>>> x = None')
+    print('>>> f(x)')
+    f = hash
+    x = None
+    print(f(x))
+except Exception as e:
+    print(type(e), ':', e)
+print()
