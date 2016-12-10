@@ -15,4 +15,6 @@ public interface Platform {
     public org.python.Object stdout();
 
     public org.python.Object stdin();
+
+    public org.python.Object args();
 }

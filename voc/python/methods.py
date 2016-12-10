@@ -283,7 +283,22 @@ class Function(Block):
         return closure
 
     def visitor_teardown(self):
-        if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
+        if len(self.opcodes) == 0:
+            # If there is no content in this method, add a RETURN.
+            return_required = True
+        elif isinstance(self.opcodes[-1], (JavaOpcodes.RETURN, JavaOpcodes.ARETURN)):
+            # If the last opcode in the method is a RETURN, but that
+            # return was not added at the root level (i.e., it's not a return
+            # as the last statement of an IF statement), add one.
+            try:
+                return_required = self.opcodes[-1].depth > 0
+            except AttributeError:
+                return_required = True
+        else:
+            # If the last statement in the block isn't a RETURN, add one.
+            return_required = True
+
+        if return_required:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
                 JavaOpcodes.ARETURN()
