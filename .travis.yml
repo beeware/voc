@@ -3,29 +3,14 @@ python:
   - "3.4.2"
   - "3.4.4"
 env:
-  - TEST_SUITE=tests.builtins
-  - TEST_SUITE=tests.datatypes.test_bool
-  - TEST_SUITE=tests.datatypes.test_bytearray
-  - TEST_SUITE=tests.datatypes.test_bytes
-  - TEST_SUITE=tests.datatypes.test_complex
-  - TEST_SUITE=tests.datatypes.test_dict
-  - TEST_SUITE=tests.datatypes.test_float
-  - TEST_SUITE=tests.datatypes.test_frozenset
-  - TEST_SUITE=tests.datatypes.test_int
-  - TEST_SUITE=tests.datatypes.test_list
-  - TEST_SUITE=tests.datatypes.test_NoneType
-  - TEST_SUITE=tests.datatypes.test_NotImplemented
-  - TEST_SUITE=tests.datatypes.test_range
-  - TEST_SUITE=tests.datatypes.test_set
-  - TEST_SUITE=tests.datatypes.test_slice
-  - TEST_SUITE=tests.datatypes.test_str
-  - TEST_SUITE=tests.datatypes.test_tuple
-  - TEST_SUITE=tests.stdlib
-  - TEST_SUITE=tests.structures
-  - TEST_SUITE=tests.test_codecs
-  - TEST_SUITE=tests.test_utils
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=0
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=1
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=2
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=3
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=4
 install:
   - "pip install ."
-  - "ant java"
+  - "pip install pytest"
+  - "pip install git+https://github.com/pybee/pytest-circleci"
 script:
-  - "python setup.py test -q -s $TEST_SUITE"
+  - "py.test tests"
