@@ -267,7 +267,7 @@ class PythonNormalizationTests(unittest.TestCase):
             TypeError: unsupported operand type(s) for &: 'float' and 'bool'
             """,
             """
-            ### EXCEPTION ###
+            ### EXCEPTION ON CPYTHON ###
             TypeError: unsupported operand type(s) for &: 'float' and 'bool'
                 test.py:3
             """
@@ -284,7 +284,7 @@ class PythonNormalizationTests(unittest.TestCase):
             """,
             """
             Hello, world.
-            ### EXCEPTION ###
+            ### EXCEPTION ON CPYTHON ###
             TypeError: unsupported operand type(s) for &: 'float' and 'bool'
                 test.py:3
             """
