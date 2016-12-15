@@ -274,25 +274,27 @@ public class Complex extends org.python.types.Object {
     public org.python.Object __truediv__(org.python.Object other) {
 	    if ( other instanceof org.python.types.Int ) {
 	        if (((org.python.types.Int)other).value == 0) {
-                throw new org.python.exceptions.ZeroDivisionError("division by zero");
-	        }
+                throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
+	        } else if (this.real.isNegativeZero()) {
+	            return new org.python.types.Complex(this.real,(org.python.types.Float)this.imag.__truediv__(other));
+            }
             return new org.python.types.Complex((org.python.types.Float)this.real.__truediv__(other),(org.python.types.Float)this.imag.__truediv__(other));
         } else if (other instanceof org.python.types.Bool) {
             if (((Bool) other).value == false) {
-                throw new org.python.exceptions.ZeroDivisionError("division by zero");
+                throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
             }
             return new org.python.types.Complex(this.real, this.imag);
         } else if (other instanceof org.python.types.Float) {
             if (((Float)other).value == 0.0) {
-                throw new org.python.exceptions.ZeroDivisionError("division by zero");
+                throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
             }
             return new org.python.types.Complex((org.python.types.Float)this.real.__truediv__(other),(org.python.types.Float)this.imag.__truediv__(other));
         } else if (other instanceof org.python.types.Complex) {
             org.python.types.Complex other_obj = (org.python.types.Complex)other;
             if (other_obj.real.value == 0.0 && other_obj.imag.value == 0.0) {
-                throw new org.python.exceptions.ZeroDivisionError("division by zero");
+                throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
             }
-            
+
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'complex' and '" + other.typeName() + "'");
     }
