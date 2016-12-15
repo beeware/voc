@@ -225,7 +225,7 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __str__(){
-      if (this.real.value != 0.0 || (this.real.isNegativeZero() && this.imag.value < 0)) {
+      if (this.real.value != 0.0 || this.real.isNegativeZero()) {
         return new org.python.types.Str("(" + partToStr(this.real) + ((this.imag.value >= 0.0 && !this.imag.isNegativeZero()) ? "+" : "-") + partToStr(new org.python.types.Float(Math.abs(this.imag.value))) + "j)");
       } else {
         return new org.python.types.Str(partToStr(this.imag) + "j");
@@ -287,6 +287,8 @@ public class Complex extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             if (((Float)other).value == 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
+            } else if (this.real.isNegativeZero()) {
+                return new org.python.types.Complex(this.real,(org.python.types.Float)this.imag.__truediv__(other));
             }
             return new org.python.types.Complex((org.python.types.Float)this.real.__truediv__(other),(org.python.types.Float)this.imag.__truediv__(other));
         } else if (other instanceof org.python.types.Complex) {
