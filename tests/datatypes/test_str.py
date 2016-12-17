@@ -1,4 +1,3 @@
-
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
@@ -29,10 +28,9 @@ class StrTests(TranspileTestCase):
             print(s.endswith(end))
             """)
 
-
-        #self.assertCodeExecution("""
-        #  print('abracadabra'.endswith('abra'))
-        #    """)
+        # self.assertCodeExecution("""
+        #     print('abracadabra'.endswith('abra'))
+        #     """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
