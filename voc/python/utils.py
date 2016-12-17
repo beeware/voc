@@ -55,6 +55,7 @@ def dump(node, annotate_fields=True, include_attributes=True, indent='  '):
 
     return _format(node)
 
+
 ##########################################################################
 # Pseudo instructions used to flag the offset position of other
 # attributes of the code, especially those depened on opcode offset.

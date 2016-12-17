@@ -1,4 +1,4 @@
-from .. utils import TranspileTestCase, BuiltinTwoargFunctionTestCase
+from .. utils import TranspileTestCase
 
 
 class SetattrTests(TranspileTestCase):

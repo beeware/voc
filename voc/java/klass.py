@@ -336,7 +336,9 @@ class BaseClass:
                         ('enum', Class.ACC_ENUM),
                     ]
                 ] if f)
-            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % (access_description if access_description else ''))
+            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % (
+                access_description if access_description else ''
+            ))
 
         interfaces_count = reader.read_u2()
         if dump is not None:
@@ -518,7 +520,9 @@ class BaseClass:
 
 class Class(BaseClass):
     def __init__(self, name, extends=None, implements=None, public=True, final=False, abstract=False):
-        super(Class, self).__init__(name, extends, implements=implements, public=public, final=final, abstract=abstract)
+        super(Class, self).__init__(
+            name, extends, implements=implements, public=public, final=final, abstract=abstract
+        )
 
 
 class Interface(BaseClass):
