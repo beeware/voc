@@ -233,14 +233,14 @@ class JavaNormalizationTests(unittest.TestCase):
             Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0x1eb19f4e>>
             Hello from the instance!
             Done.
-            """,
+            """,  # noqa
             """
             Class is <class 'com.example.MyClass'>
             Method is <native function com.example.MyClass.method>
             Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
             Hello from the instance!
             Done.
-            """
+            """  # noqa
         )
 
 
@@ -298,14 +298,14 @@ class PythonNormalizationTests(unittest.TestCase):
             Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0x1eb19f4e>>
             Hello from the instance!
             Done.
-            """,
+            """,  # noqa
             """
             Class is <class 'com.example.MyClass'>
             Method is <native function com.example.MyClass.method>
             Method from instance is <bound native method com.example.MyClass.method of <Native class com.example.MyClass object at 0xXXXXXXXX>>
             Hello from the instance!
             Done.
-            """
+            """  # noqa
         )
 
 

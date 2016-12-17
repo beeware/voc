@@ -427,6 +427,7 @@ class BALOAD(Opcode):
     def consume_count(self):
         return 3
 
+
 class BASTORE(Opcode):
     # Store a byte or Boolean value into an array
     # Stack: arrayref, index, value →
@@ -2873,6 +2874,18 @@ class INSTANCEOF(Opcode):
         return 1
 
 
+def _compose_descriptor(descriptor, args, returns):
+    if descriptor is not None:
+        if not (args is None and returns is None):
+            raise TypeError("Cannot specify both a descriptor and args/returns")
+        return descriptor
+
+    return '(%s)%s' % (
+        ''.join(a for a in args),
+        returns
+    )
+
+
 class INVOKEDYNAMIC(Opcode):
     # Invokes a dynamic method and puts the result on the stack (might be void); the
     # method is identified by method reference index in constant pool (indexbyte1 <<
@@ -2881,8 +2894,9 @@ class INVOKEDYNAMIC(Opcode):
     # Stack: [arg1, [arg2 ...]] → result
     code = 0xba
 
-    def __init__(self, class_name, method_name, descriptor):
+    def __init__(self, class_name, method_name, descriptor=None, args=None, returns=None):
         super(INVOKEDYNAMIC, self).__init__()
+        descriptor = _compose_descriptor(descriptor, args, returns)
         self.method = Methodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
@@ -2925,8 +2939,9 @@ class INVOKEINTERFACE(Opcode):
     # Stack: objectref, [arg1, arg2, ...] → result
     code = 0xb9
 
-    def __init__(self, class_name, method_name, descriptor):
+    def __init__(self, class_name, method_name, descriptor=None, args=None, returns=None):
         super(INVOKEINTERFACE, self).__init__()
+        descriptor = _compose_descriptor(descriptor, args, returns)
         self.method = InterfaceMethodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
@@ -2971,12 +2986,17 @@ class INVOKESPECIAL(Opcode):
     # Stack: objectref, [arg1, arg2, ...] → result
     code = 0xb7
 
-    def __init__(self, class_name, method_name, descriptor):
+    def __init__(self, class_name, method_name, descriptor=None, args=None, returns=None):
         super(INVOKESPECIAL, self).__init__()
+        descriptor = _compose_descriptor(descriptor, args, returns)
         self.method = Methodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
-        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
+        return ' %s.%s %s' % (
+            self.method.klass.name,
+            self.method.name_and_type.name,
+            self.method.name_and_type.descriptor
+        )
 
     def __len__(self):
         return 3
@@ -3025,12 +3045,17 @@ class INVOKESTATIC(Opcode):
     # Stack: [arg1, arg2, ...] → result
     code = 0xb8
 
-    def __init__(self, class_name, method_name, descriptor):
+    def __init__(self, class_name, method_name, descriptor=None, args=None, returns=None):
+        descriptor = _compose_descriptor(descriptor, args, returns)
         super(INVOKESTATIC, self).__init__()
         self.method = Methodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
-        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
+        return ' %s.%s %s' % (
+            self.method.klass.name,
+            self.method.name_and_type.name,
+            self.method.name_and_type.descriptor
+        )
 
     def __len__(self):
         return 3
@@ -3067,12 +3092,17 @@ class INVOKEVIRTUAL(Opcode):
     # Stack: objectref, [arg1, arg2, ...] → result
     code = 0xb6
 
-    def __init__(self, class_name, method_name, descriptor):
+    def __init__(self, class_name, method_name, descriptor=None, args=None, returns=None):
+        descriptor = _compose_descriptor(descriptor, args, returns)
         super(INVOKEVIRTUAL, self).__init__()
         self.method = Methodref(class_name, method_name, descriptor)
 
     def __arg_repr__(self):
-        return ' %s.%s %s' % (self.method.klass.name, self.method.name_and_type.name, self.method.name_and_type.descriptor)
+        return ' %s.%s %s' % (
+            self.method.klass.name,
+            self.method.name_and_type.name,
+            self.method.name_and_type.descriptor
+        )
 
     def __len__(self):
         return 3
@@ -3823,7 +3853,8 @@ class LOOKUPSWITCH(Opcode):
 
     def __init__(self):
         super(LOOKUPSWITCH, self).__init__()
-# 4+: <0-3 bytes padding>, defaultbyte1, defaultbyte2, defaultbyte3, defaultbyte4, npairs1, npairs2, npairs3, npairs4, match-offset pairs...
+# 4+: <0-3 bytes padding>, defaultbyte1, defaultbyte2, defaultbyte3, defaultbyte4,
+#   npairs1, npairs2, npairs3, npairs4, match-offset pairs...
 # key →
 # A target address is looked up from a table using a key and execution continues
 # from the instruction at that address
@@ -4311,7 +4342,9 @@ class TABLESWITCH(Opcode):
 
     def __init__(self):
         super(TABLESWITCH, self).__init__()
-# 4+: [0-3 bytes padding], defaultbyte1, defaultbyte2, defaultbyte3, defaultbyte4, lowbyte1, lowbyte2, lowbyte3, lowbyte4, highbyte1, highbyte2, highbyte3, highbyte4, jump offsets...
+# 4+: [0-3 bytes padding], defaultbyte1, defaultbyte2, defaultbyte3, defaultbyte4,
+#   lowbyte1, lowbyte2, lowbyte3, lowbyte4,
+#   highbyte1, highbyte2, highbyte3, highbyte4, jump offsets...
 # index →
 # continue execution from an address in the table at offset index
 

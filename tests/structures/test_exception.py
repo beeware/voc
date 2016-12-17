@@ -78,7 +78,8 @@ class ExceptionTests(TranspileTestCase):
 
     @expectedFailure
     def test_raise_custom_exception_import_from(self):
-        self.assertCodeExecution("""
+        self.assertCodeExecution(
+            """
             from example import *
 
             try:

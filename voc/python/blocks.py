@@ -83,7 +83,7 @@ class Block:
             if opcode.process(self):
                 # self.opcodes.extend([
                 #     JavaOpcodes.LDC_W(str(opcode)),
-                #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', '(Ljava/lang/String;)V')
+                #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V')
                 # ])
 
                 self.opcodes.append(opcode)
@@ -95,7 +95,9 @@ class Block:
 
                 # Resolve any references to the "next" opcode.
                 for (obj, attr) in self.next_resolve_list:
-                    # print("        resolve %s reference on %s %s with %s %s" % (attr, obj, id(obj), opcode, id(opcode)))
+                    # print("        resolve %s reference on %s %s with %s %s" % (
+                    #     attr, obj, id(obj), opcode, id(opcode))
+                    # )
                     setattr(obj, attr.value, opcode)
 
                 self.next_resolve_list = []
@@ -105,7 +107,7 @@ class Block:
             JavaOpcodes.NEW('org/python/types/Str'),
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(value),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
         )
 
     def add_int(self, value):
@@ -113,7 +115,7 @@ class Block:
             JavaOpcodes.NEW('org/python/types/Int'),
             JavaOpcodes.DUP(),
             LCONST_val(value),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', args=['J'], returns='V'),
         )
 
     def add_float(self, value):
@@ -121,7 +123,7 @@ class Block:
             JavaOpcodes.NEW('org/python/types/Float'),
             JavaOpcodes.DUP(),
             DCONST_val(value),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', args=['D'], returns='V'),
         )
 
     def add_complex(self, value):
@@ -129,7 +131,7 @@ class Block:
             JavaOpcodes.NEW('org/python/types/Complex'),
             JavaOpcodes.DUP(),
             DCONST_val(value.imag),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Complex', '<init>', '(D)V'),
+            JavaOpcodes.INVOKESPECIAL('org/python/types/Complex', '<init>', args=['D'], returns='V'),
         )
 
     def add_tuple(self, data):
@@ -139,7 +141,7 @@ class Block:
 
             JavaOpcodes.NEW('java/util/ArrayList'),
             JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+            JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', args=[], returns='V'),
         )
 
         for value in data:
@@ -165,7 +167,7 @@ class Block:
                         JavaOpcodes.NEW('org/python/types/Int'),
                         JavaOpcodes.DUP(),
                         LCONST_val(value),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', '(J)V'),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', args=['J'], returns='V'),
                     )
 
                 elif isinstance(value, float):
@@ -173,7 +175,7 @@ class Block:
                         JavaOpcodes.NEW('org/python/types/Float'),
                         JavaOpcodes.DUP(),
                         JavaOpcodes.LDC2_W(value),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', '(D)V'),
+                        JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', args=['D'], returns='V'),
                     )
 
                 elif isinstance(value, str):
@@ -181,7 +183,12 @@ class Block:
                         JavaOpcodes.NEW('org/python/types/Str'),
                         JavaOpcodes.DUP(),
                         JavaOpcodes.LDC_W(value),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+                        JavaOpcodes.INVOKESPECIAL(
+                            'org/python/types/Str',
+                            '<init>',
+                            args=['Ljava/lang/String;'],
+                            returns='V'
+                        ),
                     )
 
                 elif isinstance(value, bytes):
@@ -189,7 +196,12 @@ class Block:
                         JavaOpcodes.NEW('org/python/types/Bytes'),
                         JavaOpcodes.DUP(),
                         JavaOpcodes.LDC_W(value.decode('ISO-8859-1')),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '(Ljava/lang/String;)V'),
+                        JavaOpcodes.INVOKESPECIAL(
+                            'org/python/types/Bytes',
+                            '<init>',
+                            args=['Ljava/lang/String;'],
+                            returns='V'
+                        ),
                     )
 
                 elif isinstance(value, tuple):
@@ -224,6 +236,8 @@ class Block:
     def add_callable(self, function, closure=False):
         self.add_opcodes(
             TRY(),
+        )
+        self.add_opcodes(
                 # Wrap that function into a Callable.
                 JavaOpcodes.NEW('org/python/types/Function'),
                 JavaOpcodes.DUP(),
@@ -266,7 +280,28 @@ class Block:
         self.add_tuple(function.code.co_varnames)
 
         self.add_opcodes(
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Code', '<init>', '(Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Bytes;Lorg/python/types/Tuple;Lorg/python/types/Str;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Bytes;Lorg/python/types/Str;Lorg/python/types/Tuple;Lorg/python/types/Int;Lorg/python/types/Int;Lorg/python/types/Tuple;)V'),
+                JavaOpcodes.INVOKESPECIAL(
+                    'org/python/types/Code',
+                    '<init>',
+                    args=[
+                        'Lorg/python/types/Int;',
+                        'Lorg/python/types/Tuple;',
+                        'Lorg/python/types/Bytes;',
+                        'Lorg/python/types/Tuple;',
+                        'Lorg/python/types/Str;',
+                        'Lorg/python/types/Int;',
+                        'Lorg/python/types/Int;',
+                        'Lorg/python/types/Tuple;',
+                        'Lorg/python/types/Int;',
+                        'Lorg/python/types/Bytes;',
+                        'Lorg/python/types/Str;',
+                        'Lorg/python/types/Tuple;',
+                        'Lorg/python/types/Int;',
+                        'Lorg/python/types/Int;',
+                        'Lorg/python/types/Tuple;',
+                    ],
+                    returns='V'
+                ),
 
                 # Get a Java Method representing the new function
                 JavaOpcodes.LDC_W(Classref(function.class_descriptor)),
@@ -298,7 +333,7 @@ class Block:
                 # Default args
                 JavaOpcodes.NEW('java/util/ArrayList'),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', '()V'),
+                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', args=[], returns='V'),
         )
 
         # Default arguments list
@@ -315,7 +350,7 @@ class Block:
         self.add_opcodes(
                 JavaOpcodes.NEW('java/util/HashMap'),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+                JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', args=[], returns='V'),
         )
 
         for arg in function.parameters:
@@ -324,25 +359,58 @@ class Block:
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(arg['name']),
                     ALOAD_name(self, arg['default']),
-                    JavaOpcodes.INVOKEVIRTUAL('java/util/HashMap', 'put', '(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;'),
+                    JavaOpcodes.INVOKEVIRTUAL(
+                        'java/util/HashMap',
+                        'put',
+                        args=[
+                            'Ljava/lang/Object;',
+                            'Ljava/lang/Object;',
+                        ],
+                        returns='Ljava/lang/Object;'
+                    ),
                     JavaOpcodes.POP(),
                 )
 
         # Closure. This is created and assigned when the function is accessed.
         self.add_opcodes(
-            JavaOpcodes.ACONST_NULL(),
+                JavaOpcodes.ACONST_NULL(),
         )
 
         self.add_opcodes(
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Function', '<init>', '(Lorg/python/types/Str;Lorg/python/types/Code;Ljava/lang/reflect/Method;Ljava/util/Map;Ljava/util/List;Ljava/util/Map;Lorg/python/types/Closure;)V'),
-
-            CATCH('java/lang/NoSuchMethodError'),
+                JavaOpcodes.INVOKESPECIAL(
+                    'org/python/types/Function',
+                    '<init>',
+                    args=[
+                        'Lorg/python/types/Str;',
+                        'Lorg/python/types/Code;',
+                        'Ljava/lang/reflect/Method;',
+                        'Ljava/util/Map;',
+                        'Ljava/util/List;',
+                        'Ljava/util/Map;',
+                        'Lorg/python/types/Closure;',
+                    ],
+                    returns='V'
+                ),
+        )
+        self.add_opcodes(
+            CATCH('java/lang/NoSuchMethodError')
+        )
+        self.add_opcodes(
                 ASTORE_name(self, '#EXCEPTION#'),
                 JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                 JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W('Unable to find MAKE_FUNCTION output %s.%s' % (function.class_descriptor, function.name)),
-                JavaOpcodes.INVOKESPECIAL('org/python/exceptions/RuntimeError', '<init>', '(Ljava/lang/String;)V'),
+                JavaOpcodes.LDC_W('Unable to find MAKE_FUNCTION output %s.%s' % (
+                    function.class_descriptor, function.name)
+                ),
+                JavaOpcodes.INVOKESPECIAL(
+                    'org/python/exceptions/RuntimeError',
+                    '<init>',
+                    args=['Ljava/lang/String;'],
+                    returns='V'
+                ),
                 JavaOpcodes.ATHROW(),
+        )
+        self.add_opcodes(
             END_TRY()
         )
         free_name(self, '#EXCEPTION#')
@@ -392,7 +460,10 @@ class Block:
         # initializing all variables, we can trick the verifier.
         # TODO: Ideally, we'd only initialize the variables that are ambiguous.
         init_vars = []
-        for i in range(len(self.parameters) + (1 if self.has_self else 0), len(self.active_local_vars) + len(self.deleted_vars)):
+        for i in range(
+                    len(self.parameters) + (1 if self.has_self else 0),
+                    len(self.active_local_vars) + len(self.deleted_vars)
+                ):
             if i == 0:
                 opcode = JavaOpcodes.ASTORE_0()
             elif i == 1:
@@ -465,7 +536,11 @@ class Block:
 
             # Add definitions for the finally block
             if try_catch.finally_handler:
-                # print("  FINALLY", try_catch.finally_handler.start_op.java_offset, try_catch.finally_handler.end_op.java_offset)
+                # print(
+                #     "  FINALLY",
+                #     try_catch.finally_handler.start_op.java_offset,
+                #     try_catch.finally_handler.end_op.java_offset
+                # )
                 exceptions.append(JavaExceptionInfo(
                     try_catch.start_op.java_offset,
                     try_catch.try_end_op.java_offset,
