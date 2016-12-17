@@ -12,5 +12,7 @@ install:
   - "pip install ."
   - "pip install pytest"
   - "pip install git+https://github.com/pybee/pytest-circleci"
+  - "pip install flake8"
 script:
   - "py.test tests"
+  - flake8
