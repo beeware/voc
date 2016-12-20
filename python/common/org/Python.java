@@ -75,10 +75,6 @@ public class Python {
         builtins.put("ZeroDivisionError", org.python.types.Type.pythonType(org.python.exceptions.ZeroDivisionError.class));
 
         builtins.put("NotImplemented", org.python.types.NotImplementedType.NOT_IMPLEMENTED);
-
-        builtins.put("locals", new org.python.internals.Scope("locals"));
-        builtins.put("globals", new org.python.internals.Scope("globals"));
-        builtins.put("vars", new org.python.internals.Scope("vars"));
     }
 
     public static void debug(java.lang.String msg) {

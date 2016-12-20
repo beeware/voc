@@ -155,9 +155,19 @@ class Module(Block):
             JavaOpcodes.NEW('org/python/types/Str'),
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKESPECIAL(
+                'org/python/types/Str',
+                '<init>',
+                args=['Ljava/lang/String;'],
+                returns='V'
+            ),
 
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__getitem__', '(Lorg/python/Object;)Lorg/python/Object;'),
+            JavaOpcodes.INVOKEINTERFACE(
+                'org/python/Object',
+                '__getitem__',
+                args=['Lorg/python/Object;'],
+                returns='Lorg/python/Object;'
+            ),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),

@@ -1,564 +1,156 @@
 package org.python.internals;
 
-public class Scope implements org.python.Object {
-    public java.lang.String name;
-    public java.util.Map<java.lang.String, org.python.Object> vars;
 
-    public Scope(java.lang.String name) {
-        this(name, null);
-    }
+public class Scope implements java.util.Map<org.python.Object, org.python.Object> {
+    java.util.Map<java.lang.String, org.python.Object> value;
 
-    public Scope(java.lang.String name, java.util.Map<java.lang.String, org.python.Object> vars) {
-        this.name = name;
-        this.vars = vars;
-    }
+    final class ScopeEntry<K, V> implements java.util.Map.Entry<K, V> {
+        private final K key;
+        private V value;
 
-    public java.lang.Object toJava() {
-        return this;
-    }
-
-    public java.lang.Object toObject() {
-        return this;
-    }
-
-    public org.python.Object byValue() {
-        return this;
-    }
-
-    public java.lang.String typeName() {
-        return org.Python.typeName(this.getClass());
-    }
-
-    public org.python.internals.Scope bind(java.util.Map<java.lang.String, org.python.Object> vars) {
-        return new org.python.internals.Scope(this.name, vars);
-    }
-
-    /**
-     * Proxy Java object methods onto their Python counterparts.
-     */
-
-    // @SuppressWarnings("unchecked")
-    public boolean equals(java.lang.Object other) {
-        try {
-            return ((org.python.types.Bool) __eq__((org.python.types.Object) other)).value;
-        } catch (ClassCastException e) {
-            throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
+        public ScopeEntry(K key, V value) {
+            this.key = key;
+            this.value = value;
         }
-    }
 
-    public int compareTo(java.lang.Object other) {
-        try {
-            if (((org.python.types.Bool) this.__lt__((org.python.types.Object) other)).value) {
-                return -1;
-            }
-            else if (((org.python.types.Bool) this.__gt__((org.python.types.Object) other)).value) {
-                return 1;
-            }
-            return 0;
-        } catch (ClassCastException e) {
-            throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
+        @Override
+        public K getKey() {
+            return key;
         }
-    }
 
-    // protected void finalize() throws Throwable {
-    //     try {
-    //         // this.__del__();
-    //     }
-    //     finally {
-    //         super.finalize();
-    //     }
-    // }
-
-    /**
-     * Python interface compatibility
-     * Section 3.3.1 - Basic customization
-     */
-    // @org.python.Method(
-    //     __doc__ = "Create and return a new object.  See help(type) for accurate signature."
-    // )
-    // public void __new__() {
-    //     throw new org.python.exceptions.AttributeError(this, "__new__");
-    // }
-    @org.python.Method(
-        __doc__ = "Create and return a new object.  See help(type) for accurate signature."
-    )
-    public org.python.Object __new__(org.python.Object cls) {
-        return (org.python.types.Type) cls;
-    }
-
-    // @org.python.Method(
-    //     __doc__ = "Initialize self.  See help(type(self)) for accurate signature."
-    // )
-    // public void __init__() {
-    //     throw new org.python.exceptions.AttributeError(this, "__init__");
-    // }
-
-
-    @org.python.Method(
-        __doc__ = "Return del(self)."
-    )
-    public void __del__() {
-        throw new org.python.exceptions.AttributeError(this, "__del__");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return repr(self)."
-    )
-    public org.python.Object __repr__() {
-        if (this.vars != null) {
-            java.lang.StringBuilder buffer = new java.lang.StringBuilder("{");
-            boolean first = true;
-            for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : this.vars.entrySet()) {
-                if (first) {
-                    first = false;
-                } else {
-                    buffer.append(", ");
-                }
-                if (entry.getValue() instanceof org.python.internals.Scope) {
-                    org.python.internals.Scope scope = (org.python.internals.Scope) entry.getValue();
-                    if (scope.vars != null) {
-                        buffer.append(
-                            String.format("%s: {...}", entry.getKey())
-                        );
-                    } else {
-                        buffer.append(
-                            String.format("%s: <built-in function " + scope.name + ">", entry.getKey())
-                        );
-                    }
-                } else {
-                    buffer.append(
-                        String.format("%s: %s", entry.getKey(), entry.getValue().__repr__())
-                    );
-                }
-            }
-            buffer.append("}");
-            return new org.python.types.Str(buffer.toString());
-        } else {
-            return new org.python.types.Str("<built-in function " + this.name +">");
-        }
-    }
-
-    @org.python.Method(
-        __doc__ = "Return str(self)."
-    )
-    public org.python.Object __str__() {
-        return this.__repr__();
-    }
-
-    @org.python.Method(
-        __doc__ = "Return self<value."
-    )
-    public org.python.types.Bytes __bytes__() {
-        throw new org.python.exceptions.AttributeError(this, "__bytes__");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return self<value."
-    )
-    public org.python.types.Str __format__(org.python.Object format_spec) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__format__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return self<value."
-    )
-    public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__lt__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return self<=value."
-    )
-    public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__le__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return self==value."
-    )
-    public org.python.Object __eq__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__eq__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return self!=value."
-    )
-    public org.python.Object __ne__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__ne__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return self>value."
-    )
-    public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__gt__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return self>=value."
-    )
-    public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__ge__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return hash(self)."
-    )
-    public org.python.types.Int __hash__() {
-        return new org.python.types.Int(this.hashCode());
-    }
-
-    @org.python.Method(
-        __doc__ = "Return bool(self)."
-    )
-    public org.python.types.Bool __bool__() {
-        throw new org.python.exceptions.AttributeError(this, "__bool__");
-    }
-
-    /**
-     * Section 3.3.2 - Emulating container types
-     */
-    @org.python.Method(
-        __doc__ = "Return getattr(self, name)."
-    )
-    public org.python.Object __getattr__(org.python.Object name) {
-        try {
-            return this.__getattr__(((org.python.types.Str) name).value);
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__getattr__(): attribute name must be string");
-        }
-    }
-
-    public org.python.Object __getattr__(java.lang.String name) {
-        org.python.Object value = this.__getattr_null(name);
-        if (value == null) {
-            throw new org.python.exceptions.AttributeError(this, name);
-        }
-        return value;
-    }
-
-    public org.python.Object __getattr_null(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__getattribute__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "Return getattribute(self, name)."
-    )
-    public org.python.Object __getattribute__(org.python.Object name) {
-        try {
-            return this.__getattribute__(((org.python.types.Str) name).value);
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__getattribute__(): attribute name must be string");
-        }
-    }
-
-    public org.python.Object __getattribute__(java.lang.String name) {
-        org.python.Object value = this.__getattribute_null(name);
-        if (value == null) {
-            throw new org.python.exceptions.AttributeError(this, name);
-        }
-        return value;
-    }
-
-    public org.python.Object __getattribute_null(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__getattribute__' has not been implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
-        return this;
-    }
-
-    @org.python.Method(
-        __doc__ = "Implement setattr(self, name, value)."
-    )
-    public void __setattr__(org.python.Object name, org.python.Object value) {
-        try {
-            this.__setattr__(((org.python.types.Str) name).value, value);
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__setattr__(): attribute name must be string");
-        }
-    }
-
-    public void __setattr__(java.lang.String name, org.python.Object value) {
-        if (!this.__setattr_null(name, value)) {
-            throw new org.python.exceptions.AttributeError(this, name);
-        };
-    }
-
-    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__setattr__' has not been implemented");
-    }
-
-    public void __set__(org.python.Object instance, org.python.Object value) {}
-
-    @org.python.Method(
-        __doc__ = "Implement delattr(self, name)."
-    )
-    public void __delattr__(org.python.Object name) {
-        try {
-            this.__delattr__(((org.python.types.Str) name).value);
-        } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
-        }
-    }
-
-    public void __delattr__(java.lang.String name) {
-        if (!this.__delattr_null(name)) {
-            throw new org.python.exceptions.AttributeError(this, name);
-        };
-    }
-
-    public boolean __delattr_null(java.lang.String name) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__delattr__' has not been implemented");
-    }
-
-    public void __delete__(org.python.Object instance) {}
-
-    @org.python.Method(
-        __doc__ = "Implement dir(self, name)."
-    )
-    public org.python.Object __dir__() {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__dir__' has not been implemented");
-    }
-
-    /**
-     * Section 3.3.4 - Customizing instance and subclass checks
-     */
-    // public org.python.Object __instancecheck__(org.python.Object instance) {
-    //     throw new org.python.exceptions.AttributeError(this, "__instancecheck__");
-    // }
-
-    // public org.python.Object __subclasscheck__(org.python.Object subclass) {
-    //     throw new org.python.exceptions.AttributeError(this, "__subclasscheck__");
-    // }
-
-    /**
-     * Section 3.3.5 - Emulating callable objects
-     */
-    // public org.python.Object __call__(org.python.Object... args) {
-    //     throw new org.python.exceptions.AttributeError(this, "__call__");
-    // }
-
-    /**
-     * Section 3.3.6 - Emulating container types
-     */
-
-    public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.vars.size());
-    }
-
-    public org.python.Object __getitem__(org.python.Object index) {
-        try {
-            System.out.println("this.vars = " + this.vars);
-            // System.out.println("index = " + index + " " + index.getClass());
-            // System.out.println("Jindex = " + index.toJava());
-            // System.out.println("str = " + index.toJava());
-            org.python.Object value = this.vars.get((java.lang.String) index.toJava());
-            if (value == null) {
-                throw new org.python.exceptions.KeyError(index);
-            }
+        @Override
+        public V getValue() {
             return value;
-        } catch (ClassCastException cce) {
-            throw new org.python.exceptions.KeyError(index);
+        }
+
+        @Override
+        public V setValue(V value) {
+            V old = this.value;
+            this.value = value;
+            return old;
         }
     }
 
-    public void __setitem__(org.python.Object index, org.python.Object value) {
-        this.vars.put((java.lang.String) index.toJava(), value);
-    }
-
-    public void __delitem__(org.python.Object index) {
-        throw new org.python.exceptions.AttributeError(this, "__delitem__");
-    }
-
-
-    public org.python.Iterable __iter__() {
-        throw new org.python.exceptions.AttributeError(this, "__iter__");
-    }
-
-    public org.python.Iterable __reversed__() {
-        throw new org.python.exceptions.AttributeError(this, "__reversed__");
-    }
-
-    public org.python.Object __contains__(org.python.Object item) {
-        throw new org.python.exceptions.AttributeError(this, "__contains__");
-    }
-
-    public org.python.Object __not_contains__(org.python.Object item) {
-        throw new org.python.exceptions.AttributeError(this, "__not_contains__");
+    public Scope(java.util.Map<java.lang.String, org.python.Object> scope) {
+        this.value = scope;
     }
 
     /**
-     * Section 3.3.7 - Emulating numeric types
+     * Removes all of the mappings from this map (optional operation).
      */
-
-    public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__add__");
-    }
-
-    public org.python.Object __sub__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__sub__");
-    }
-
-    public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__mul__");
-    }
-
-    public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__truediv__");
-    }
-
-    public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__floordiv__");
-    }
-
-    public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__mod__");
-    }
-
-    public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__divmod__");
-    }
-
-    public org.python.Object __pow__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__pow__");
-    }
-
-    public org.python.Object __pow__(org.python.Object other, org.python.Object modulus) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + this.typeName() + "', '" + other.typeName() + "', '" + modulus.typeName() + "'");
-    }
-
-    public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__lshift__");
-    }
-
-    public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__rshift__");
-    }
-
-    public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__and__");
-    }
-
-    public org.python.Object __xor__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__xor__");
-    }
-
-    public org.python.Object __or__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__or__");
-    }
-
-
-    public org.python.Object __iadd__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__iadd__");
-    }
-
-    public org.python.Object __isub__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__isub__");
-    }
-
-    public org.python.Object __imul__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__imul__");
-    }
-
-    public org.python.Object __itruediv__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__itruediv__");
-    }
-
-    public org.python.Object __ifloordiv__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__ifloordiv__");
-    }
-
-    public org.python.Object __imod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__imod__");
-    }
-
-    public org.python.Object __idivmod__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__idivmod__");
-    }
-
-    public org.python.Object __ipow__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__ipow__");
-    }
-
-    public org.python.Object __ilshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__ilshift__");
-    }
-
-    public org.python.Object __irshift__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__irshift__");
-    }
-
-    public org.python.Object __iand__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__iand__");
-    }
-
-    public org.python.Object __ixor__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__ixor__");
-    }
-
-    public org.python.Object __ior__(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this, "__ior__");
-    }
-
-
-    public org.python.Object __neg__() {
-        throw new org.python.exceptions.AttributeError(this, "__neg__");
-    }
-
-    public org.python.Object __pos__() {
-        throw new org.python.exceptions.AttributeError(this, "__pos__");
-    }
-
-    public org.python.Object __abs__() {
-        throw new org.python.exceptions.AttributeError(this, "__abs__");
-    }
-
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.AttributeError(this, "__invert__");
-    }
-
-    public org.python.Object __not__() {
-        throw new org.python.exceptions.AttributeError(this, "__not__");
-    }
-
-    public org.python.Object __complex__(org.python.Object real, org.python.Object imag) {
-        throw new org.python.exceptions.AttributeError(this, "__complex__");
-    }
-
-    public org.python.types.Int __int__() {
-        throw new org.python.exceptions.AttributeError(this, "__int__");
-    }
-
-    public org.python.types.Float __float__() {
-        throw new org.python.exceptions.AttributeError(this, "__float__");
-    }
-
-    public org.python.Object __round__() {
-        throw new org.python.exceptions.AttributeError(this, "__round__");
-    }
-
-    public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.AttributeError(this, "__round__");
-    }
-
-    public org.python.Object __index__() {
-        throw new org.python.exceptions.AttributeError(this, "__index__");
+    public void clear() {
+        this.value.clear();
     }
 
     /**
-     * Section 3.3.8 - With statement context
+     * Returns true if this map contains a mapping for the specified key.
      */
-    // public org.python.Object __enter__() {
-    //     throw new org.python.exceptions.AttributeError(this, "__enter__");
-    // }
+    public boolean containsKey(java.lang.Object key) {
+        return this.value.containsKey(((org.python.types.Str) key).value);
+    }
 
-    // public org.python.Object __exit__(org.python.Object exc_type, org.python.Object exc_value, org.python.Object traceback) {
-    //     throw new org.python.exceptions.AttributeError(this, "__exit__");
-    // }
+    /**
+     * Returns true if this map maps one or more keys to the specified value.
+     */
+    public boolean containsValue(java.lang.Object value) {
+        return this.value.containsValue(value);
+    }
 
+    /**
+     * Returns a Set view of the mappings contained in this map.
+     */
+    public java.util.Set<java.util.Map.Entry<org.python.Object, org.python.Object>> entrySet() {
+        java.util.Set<java.util.Map.Entry<org.python.Object, org.python.Object>> entries =
+            new java.util.HashSet<java.util.Map.Entry<org.python.Object, org.python.Object>>();
 
+        for (java.util.Map.Entry<java.lang.String, org.python.Object> entry: this.value.entrySet()) {
+            entries.add(
+                new ScopeEntry(
+                    new org.python.types.Str(entry.getKey()),
+                    entry.getValue()
+                )
+            );
+        }
+        return null;
+    }
+
+    /**
+     * Compares the specified object with this map for equality.
+     */
+    public boolean equals(java.lang.Object o) {
+        return false;
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped, or null if this map contains no mapping for the key.
+     */
+    public org.python.Object get(java.lang.Object key) {
+        return this.value.get(((org.python.types.Str) key).value);
+    }
+
+    /**
+     * Returns the hash code value for this map.
+     */
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
+    /**
+     * Returns true if this map contains no key-value mappings.
+     */
+    public boolean isEmpty() {
+        return this.value.isEmpty();
+    }
+
+    /**
+     * Returns a Set view of the keys contained in this map.
+     */
+    public java.util.Set<org.python.Object> keySet() {
+        java.util.Set<org.python.Object> keys = new java.util.HashSet<org.python.Object>();
+
+        for (java.lang.String key: this.value.keySet()) {
+            keys.add(new org.python.types.Str(key));
+        }
+        return keys;
+    }
+
+    /**
+     * Associates the specified value with the specified key in this map (optional operation).
+     */
+    public org.python.Object put(org.python.Object key, org.python.Object value) {
+        return this.value.put(((org.python.types.Str) key).value, value);
+    }
+
+    /**
+     * Copies all of the mappings from the specified map to this map (optional operation).
+     */
+    public void putAll(java.util.Map<? extends org.python.Object,? extends org.python.Object> map) {
+        for (java.util.Map.Entry<? extends org.python.Object, ? extends org.python.Object> entry: map.entrySet()) {
+            this.value.put(
+                ((org.python.types.Str) entry.getKey()).value,
+                entry.getValue()
+            );
+        }
+    }
+
+    /**
+     * Removes the mapping for a key from this map if it is present (optional operation).
+     */
+    public org.python.Object remove(java.lang.Object key) {
+        return this.value.remove(((org.python.types.Str) key).value);
+    }
+
+    /**
+     * Returns the number of key-value mappings in this map.
+     */
+    public int size() {
+        return this.value.size();
+    }
+
+    /**
+     * Returns a Collection view of the values contained in this map.
+     */
+    public java.util.Collection<org.python.Object> values() {
+        return this.value.values();
+    }
 }

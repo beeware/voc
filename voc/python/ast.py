@@ -7,7 +7,7 @@ from .modules import Module
 from .methods import MainFunction
 from .utils import (
     dump,
-    IF, ELSE, ELIF, END_IF,
+    IF, ELSE, END_IF,
     TRY, CATCH, FINALLY, END_TRY,
     START_LOOP, END_LOOP,
     ICONST_val,
@@ -43,7 +43,10 @@ def is_call(node, name):
         # ... where the function being invoked ...
         and isinstance(node.func, ast.Name)
         # ... is the provided name
-        and node.func.id == name
+        and (
+            (isinstance(name, str) and node.func.id == name)
+            or (isinstance(name, tuple) and node.func.id in name)
+        )
     )
 
 
@@ -1832,7 +1835,51 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Call(self, node):
-        if is_call(node, 'super'):
+        if is_call(node, ('locals', 'globals', 'vars')):
+            if node.kwargs:
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W(node.func.id + "() takes no keyword arguments"),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW()
+                )
+            elif node.args:
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.LDC_W(node.func.id + "() takes no arguments (" + len(node.args) + " given)"),
+                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
+                    JavaOpcodes.ATHROW()
+                )
+            else:
+                # Create a dict for storage
+                self.context.add_opcodes(
+                    JavaOpcodes.NEW('org/python/types/Dict'),
+                    JavaOpcodes.DUP(),
+
+                    JavaOpcodes.NEW('org/python/internals/Scope'),
+                    JavaOpcodes.DUP(),
+                )
+
+                getattr(self.context, 'load_%s' % node.func.id)()
+
+                self.context.add_opcodes(
+                    # Wrap the locals/globals/vars to make them look like a Python String->Object map
+                    JavaOpcodes.INVOKESPECIAL(
+                        'org/python/internals/Scope',
+                        '<init>',
+                        args=['Ljava/util/Map;'],
+                        returns='V'),
+                    # Construct a dictionary based on that map
+                    JavaOpcodes.INVOKESPECIAL(
+                        'org/python/types/Dict',
+                        '<init>',
+                        args=['Ljava/util/Map;'],
+                        returns='V'),
+                )
+
+        elif is_call(node, 'super'):
             # context.add_opcodes(
             #     JavaOpcodes.LDC_W("ATTRIBUTE ON SUPER"),
             #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
@@ -1906,104 +1953,9 @@ class Visitor(ast.NodeVisitor):
         else:
             # Evaluate the callable, and check that it *is* a callable
             self.visit(node.func)
-            # globals(), locals() and vars() are special types of callables.
+
             self.context.add_opcodes(
-                IF([
-                            JavaOpcodes.DUP(),
-                            JavaOpcodes.INSTANCEOF('org/python/internals/Scope'),
-                        ], JavaOpcodes.IFEQ),
-            )
-            self.context.add_opcodes(
-                    JavaOpcodes.CHECKCAST('org/python/internals/Scope'),
-                    IF([
-                                JavaOpcodes.DUP(),
-                                JavaOpcodes.GETFIELD('org/python/internals/Scope', 'name', 'Ljava/lang/String;'),
-                                JavaOpcodes.LDC_W('globals'),
-                                JavaOpcodes.INVOKEVIRTUAL(
-                                    'java/lang/Object',
-                                    'equals',
-                                    args=['Ljava/lang/Object;'],
-                                    returns='Z'
-                                )
-                            ], JavaOpcodes.IFEQ),
-            )
-            self.context.load_globals()
-            self.context.add_opcodes(
-                        JavaOpcodes.INVOKEVIRTUAL(
-                            'org/python/internals/Scope',
-                            'bind',
-                            args=['Ljava/util/Map;'],
-                            returns='Lorg/python/internals/Scope;'
-                        ),
-            )
-            self.context.add_opcodes(
-                    ELIF([
-                                JavaOpcodes.DUP(),
-                                JavaOpcodes.GETFIELD('org/python/internals/Scope', 'name', 'Ljava/lang/String;'),
-                                JavaOpcodes.LDC_W('locals'),
-                                JavaOpcodes.INVOKEVIRTUAL(
-                                    'java/lang/Object',
-                                    'equals',
-                                    args=['Ljava/lang/Object;'],
-                                    returns='Z'
-                                )
-                            ], JavaOpcodes.IFEQ),
-            )
-            self.context.load_locals()
-            self.context.add_opcodes(
-                        JavaOpcodes.INVOKEVIRTUAL(
-                            'org/python/internals/Scope',
-                            'bind',
-                            args=['Ljava/util/Map;'],
-                            returns='Lorg/python/internals/Scope;'
-                        ),
-            )
-            self.context.add_opcodes(
-                    ELIF([
-                                JavaOpcodes.DUP(),
-                                JavaOpcodes.GETFIELD('org/python/internals/Scope', 'name', 'Ljava/lang/String;'),
-                                JavaOpcodes.LDC_W('vars'),
-                                JavaOpcodes.INVOKEVIRTUAL(
-                                    'java/lang/Object',
-                                    'equals',
-                                    args=['Ljava/lang/Object;'],
-                                    returns='Z'
-                                )
-                            ], JavaOpcodes.IFEQ),
-            )
-            self.context.load_vars()
-            self.context.add_opcodes(
-                        JavaOpcodes.INVOKEVIRTUAL(
-                            'org/python/internals/Scope',
-                            'bind',
-                            args=['Ljava/util/Map;'],
-                            returns='Lorg/python/internals/Scope;'
-                        ),
-            )
-            self.context.add_opcodes(
-                    ELSE(),
-            )
-            self.context.add_opcodes(
-                        JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
-                        JavaOpcodes.DUP(),
-                        JavaOpcodes.LDC_W("Unknown scope type"),
-                        JavaOpcodes.INVOKESPECIAL(
-                            'org/python/exceptions/RuntimeError',
-                            '<init>',
-                            args=['Ljava/lang/String;'],
-                            returns='V'
-                        ),
-                        JavaOpcodes.ATHROW(),
-            )
-            self.context.add_opcodes(
-                    END_IF(),
-            )
-            self.context.add_opcodes(
-                ELSE(),
-            )
-            self.context.add_opcodes(
-                    # It's a normal callable.
-                    JavaOpcodes.CHECKCAST('org/python/Callable'),
+                JavaOpcodes.CHECKCAST('org/python/Callable'),
             )
 
             # Create and populate the array of arguments to pass to invoke()

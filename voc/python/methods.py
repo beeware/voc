@@ -81,7 +81,17 @@ class Function(Block):
     def store_name(self, name):
         if name in self.local_vars:
             self.add_opcodes(
-                ASTORE_name(self, name)
+                JavaOpcodes.DUP(),
+                ASTORE_name(self, name),
+                ALOAD_name(self, '#locals'),
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.INVOKEINTERFACE(
+                    'java/util/Map',
+                    'put',
+                    args=['Ljava/lang/Object;', 'Ljava/lang/Object;'],
+                    returns='Ljava/lang/Object;'
+                ),
+                JavaOpcodes.POP(),
             )
         else:
             self.add_opcodes(
@@ -156,7 +166,12 @@ class Function(Block):
             JavaOpcodes.NEW('org/python/types/Str'),
             JavaOpcodes.DUP(),
             JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
+            JavaOpcodes.INVOKESPECIAL(
+                'org/python/types/Str',
+                '<init>',
+                args=['Ljava/lang/String;'],
+                returns='V'
+            ),
 
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
@@ -171,30 +186,8 @@ class Function(Block):
 
     def load_locals(self):
         self.add_opcodes(
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V')
+            ALOAD_name(self, '#locals')
         )
-        for var_name, index in self.local_vars.items():
-            if index is not None and not var_name.startswith('#'):
-                self.add_opcodes(
-                    JavaOpcodes.DUP(),
-
-                    # JavaOpcodes.NEW('org/python/types/Str'),
-                    # JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W(var_name),
-                    # JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', '(Ljava/lang/String;)V'),
-
-                    ALOAD_name(self, var_name),
-
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'java/util/Map',
-                        'put',
-                        args=['Ljava/lang/Object;', 'Ljava/lang/Object;'],
-                        returns='Ljava/lang/Object;'
-                    ),
-                    JavaOpcodes.POP()
-                )
 
     def load_vars(self):
         self.load_locals()
@@ -391,6 +384,14 @@ class Function(Block):
         )
 
         return closure
+
+    def visitor_setup(self):
+        self.add_opcodes(
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+            ASTORE_name(self, '#locals')
+        )
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0:
@@ -1005,6 +1006,10 @@ class MainFunction(Function):
 
     def visitor_setup(self):
         self.add_opcodes(
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
+            ASTORE_name(self, '#locals'),
             # Add a TRY-CATCH for SystemExit
             TRY(),
         )
