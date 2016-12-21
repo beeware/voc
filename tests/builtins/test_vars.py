@@ -39,6 +39,7 @@ class VarsTests(TranspileTestCase):
             print('Done')
         """, run_in_function=False)
 
+    @expectedFailure
     def test_vars_delta(self):
         """This is a version of test_simple that allows for the initial
         global count to be wrong. This test can be removed once test_simple

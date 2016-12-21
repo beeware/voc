@@ -66,6 +66,9 @@ class Function(Block):
         for i, param in enumerate(self.parameters):
             self.local_vars[param['name']] = len(self.local_vars)
 
+        # Reserve space for the register that will hold locals
+        self.local_vars['#locals'] = len(self.local_vars)
+
         self.static = static
 
     def __repr__(self):
@@ -81,7 +84,10 @@ class Function(Block):
     def store_name(self, name):
         if name in self.local_vars:
             self.add_opcodes(
+                # Store in a local variable
                 ASTORE_name(self, name),
+
+                # Also store in the locals variable
                 ALOAD_name(self, '#locals'),
                 JavaOpcodes.LDC_W(name),
                 ALOAD_name(self, name),
@@ -1242,22 +1248,25 @@ class GeneratorFunction(Function):
         self.has_self = True
 
     def visitor_setup(self):
-        # Restore the variables needed for the entry of the generator.
         self.add_opcodes(
+            # Restore the variables needed for the entry of the generator.
             ALOAD_name(self, '<generator>'),
-            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', '[Lorg/python/Object;'),
+            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', 'Ljava/util/Map;'),
+            ASTORE_name(self, '#locals'),
         )
 
-        for i, param in enumerate(self.parameters):
+        for param in self.parameters:
             self.add_opcodes(
-                JavaOpcodes.DUP(),
-                ICONST_val(i),
-                JavaOpcodes.AALOAD(),
-                JavaOpcodes.ASTORE(i + 1),
+                ALOAD_name(self, '#locals'),
+                JavaOpcodes.LDC_W(param['name']),
+                JavaOpcodes.INVOKEINTERFACE(
+                    'java/util/Map',
+                    'get',
+                    args=['Ljava/lang/Object;'],
+                    returns='Ljava/lang/Object;'
+                ),
+                ASTORE_name(self, param['name'])
             )
-        self.add_opcodes(
-            JavaOpcodes.POP(),
-        )
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
@@ -1320,16 +1329,24 @@ class GeneratorFunction(Function):
 
             # p3: The arguments passed to the generator method. These will be
             # restored on the first call to the generator.
-            ICONST_val(len(self.parameters)),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
+            JavaOpcodes.NEW('java/util/HashMap'),
+            JavaOpcodes.DUP(),
+            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', '()V'),
         ]
 
         for i, param in enumerate(self.parameters):
             wrapper_opcodes.extend([
                 JavaOpcodes.DUP(),
-                ICONST_val(i),
+                JavaOpcodes.LDC_W(param['name']),
+
                 JavaOpcodes.ALOAD(i + (0 if self.static else 1)),
-                JavaOpcodes.AASTORE(),
+                JavaOpcodes.INVOKEINTERFACE(
+                    'java/util/Map',
+                    'put',
+                    args=['Ljava/lang/Object;', 'Ljava/lang/Object;'],
+                    returns='Ljava/lang/Object;'
+                ),
+                JavaOpcodes.POP(),
             ])
 
         # Construct and return the generator object.
@@ -1337,7 +1354,7 @@ class GeneratorFunction(Function):
             JavaOpcodes.INVOKESPECIAL(
                 'org/python/types/Generator',
                 '<init>',
-                args=['Ljava/lang/String;', 'Ljava/lang/reflect/Method;', '[Lorg/python/Object;'],
+                args=['Ljava/lang/String;', 'Ljava/lang/reflect/Method;', 'Ljava/util/Map;'],
                 returns='V'
             ),
             JavaOpcodes.ARETURN(),

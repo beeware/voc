@@ -949,3 +949,39 @@ def resolve_jump(opcode, context, target, position):
     # print("JUMP OP IS", opcode.jump_op)
     context.jumps.append(opcode)
     opcode.jump_op.references.append(opcode)
+
+
+##########################################################################
+# Debugging helpers
+##########################################################################
+
+class DEBUG:
+    def __init__(self, msg):
+        self.msg = msg
+
+    def process(self, context):
+        context.add_opcodes(
+            JavaOpcodes.LDC_W(self.msg),
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'debug',
+                args=['Ljava/lang/String;'],
+                returns='V'),
+        )
+
+
+class DEBUG_name:
+    def __init__(self, name):
+        self.name = name
+
+    def process(self, context):
+        context.add_opcodes(
+            JavaOpcodes.LDC_W(self.name),
+            ALOAD_name(context, self.name),
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'debug',
+                args=['Ljava/lang/String;', 'Ljava/lang/Object;'],
+                returns='V'
+            ),
+        )

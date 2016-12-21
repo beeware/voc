@@ -151,7 +151,6 @@ public class __init__ extends org.python.types.Module {
         default_args = {"status"}
     )
     public static org.python.Object exit(org.python.Object status) {
-        System.out.println("EXIT" +  status);
         if (status == null) {
             throw new org.python.exceptions.SystemExit();
         } else {
