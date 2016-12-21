@@ -588,13 +588,14 @@ class ALOAD_name:
     def process(self, context):
         # print("LOAD AVAR NAME", context, self.name)
         # print("locals: ", context.local_vars, context.deleted_vars)
-
         try:
             index = context.local_vars[self.name]
         except KeyError:
-            raise NameError(self.name)
+            index = None
 
-        if index == 0:
+        if index is None:
+            raise NameError(self.name)
+        elif index == 0:
             context.add_opcodes(JavaOpcodes.ALOAD_0())
         elif index == 1:
             context.add_opcodes(JavaOpcodes.ALOAD_1())
@@ -665,13 +666,14 @@ class ILOAD_name:
     def process(self, context):
         # print("LOAD IVAR NAME", context, self.name)
         # print("locals: ", context.local_vars)
-
         try:
             index = context.local_vars[self.name]
         except KeyError:
-            raise NameError(self.name)
+            index = None
 
-        if index == 0:
+        if index is None:
+            raise NameError(self.name)
+        elif index == 0:
             context.add_opcodes(JavaOpcodes.ILOAD_0())
         elif index == 1:
             context.add_opcodes(JavaOpcodes.ILOAD_1())
@@ -742,8 +744,19 @@ class IINC_name:
         self.value = value
 
     def process(self, context):
-        index = context.local_vars[self.name]
-        context.add_opcodes(JavaOpcodes.IINC(index, self.value))
+        # print("LOAD IVAR NAME", context, self.name)
+        # print("locals: ", context.local_vars)
+        try:
+            index = context.local_vars[self.name]
+        except KeyError:
+            index = None
+
+        if index is None:
+            raise NameError(self.name)
+
+        context.add_opcodes(
+            JavaOpcodes.IINC(index, self.value)
+        )
 
         # This opcode isn't for the final output.
         return False
@@ -760,15 +773,16 @@ class LLOAD_name:
         self.name = name
 
     def process(self, context):
+        # print("LOAD LVAR NAME", context, self.name, index)
+        # print("locals: ", context.local_vars)
         try:
             index = context.local_vars[self.name]
         except KeyError:
+            index = None
+
+        if index is None:
             raise NameError(self.name)
-
-        # print("LOAD LVAR NAME", context, self.name, index)
-        # print("locals: ", context.local_vars)
-
-        if index == 0:
+        elif index == 0:
             context.add_opcodes(JavaOpcodes.LLOAD_0())
         elif index == 1:
             context.add_opcodes(JavaOpcodes.LLOAD_1())
@@ -794,14 +808,16 @@ class FLOAD_name:
         self.name = name
 
     def process(self, context):
+        # print("LOAD FVAR NAME", context, self.name, index)
+        # print("locals: ", context.local_vars)
         try:
             index = context.local_vars[self.name]
         except KeyError:
-            raise NameError(self.name)
+            index = None
 
-        # print("LOAD FVAR NAME", context, self.name, index)
-        # print("locals: ", context.local_vars)
-        if index == 0:
+        if index is None:
+            raise NameError(self.name)
+        elif index == 0:
             context.add_opcodes(JavaOpcodes.FLOAD_0())
         elif index == 1:
             context.add_opcodes(JavaOpcodes.FLOAD_1())
@@ -827,14 +843,16 @@ class DLOAD_name:
         self.name = name
 
     def process(self, context):
+        # print("LOAD LVAR NAME", context, self.name, index)
+        # print("locals: ", context.local_vars)
         try:
             index = context.local_vars[self.name]
         except KeyError:
-            raise NameError(self.name)
+            index = None
 
-        # print("LOAD LVAR NAME", context, self.name, index)
-        # print("locals: ", context.local_vars)
-        if index == 0:
+        if index is None:
+            raise NameError(self.name)
+        elif index == 0:
             context.add_opcodes(JavaOpcodes.DLOAD_0())
         elif index == 1:
             context.add_opcodes(JavaOpcodes.DLOAD_1())
@@ -866,8 +884,10 @@ class free_name:
         try:
             index = context.local_vars[self.name]
         except KeyError:
-            if self.must_exist:
-                raise NameError(self.name)
+            index = None
+
+        if index is None and self.must_exist:
+            raise NameError(self.name)
 
         context.deleted_vars.add(index)
         context.local_vars[self.name] = None

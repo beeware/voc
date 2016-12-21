@@ -238,7 +238,7 @@ class Function(Block):
             self.add_opcodes(
                 free_name(name)
             )
-        except KeyError:
+        except NameError:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
