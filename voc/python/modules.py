@@ -8,7 +8,10 @@ from .blocks import Block
 from .methods import (
     CO_GENERATOR, GeneratorFunction, Function,
 )
-from .utils import ALOAD_name, ASTORE_name, free_name
+from .utils import (
+    ALOAD_name, ASTORE_name, free_name,
+    # DEBUG
+)
 
 
 class Module(Block):
@@ -61,13 +64,12 @@ class Module(Block):
 
     # def visitor_setup(self):
     #     self.add_opcodes(
-    #         JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.class_name),
-    #         JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+    #         DEBUG("STATIC BLOCK OF " + self.class_name),
     #     )
 
     def store_name(self, name):
         self.add_opcodes(
-            ASTORE_name(self, '#value'),
+            ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
             JavaOpcodes.NEW('org/python/types/Str'),
@@ -84,7 +86,7 @@ class Module(Block):
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
             JavaOpcodes.LDC_W(name),
-            ALOAD_name(self, '#value'),
+            ALOAD_name('#value'),
 
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
@@ -92,12 +94,12 @@ class Module(Block):
                 args=['Ljava/lang/String;', 'Lorg/python/Object;'],
                 returns='V'
             ),
+            free_name('#value')
         )
-        free_name(self, '#value')
 
     def store_dynamic(self):
         self.add_opcodes(
-            ASTORE_name(self, '#value'),
+            ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
             JavaOpcodes.NEW('org/python/types/Str'),
@@ -115,10 +117,10 @@ class Module(Block):
 
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
 
-            ALOAD_name(self, '#value'),
+            ALOAD_name('#value'),
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', args=['Ljava/util/Map;'], returns='V'),
+            free_name('#value')
         )
-        free_name(self, '#value')
 
     def store_local(self):
         self.store_global()
@@ -253,8 +255,7 @@ class Module(Block):
         self.classes.append(klass)
 
         self.add_opcodes(
-            # JavaOpcodes.LDC_W("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
 
             JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
             JavaOpcodes.INVOKESTATIC(

@@ -575,131 +575,161 @@ class END_TRY:
 # as a different name.
 ##########################################################################
 
-def ALOAD_name(context, name):
+class ALOAD_name:
     """Generate the opcode to load an object variable with the given name onto the stack.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    # print("LOAD AVAR NAME", context, name)
-    # print("locals: ", context.local_vars, context.deleted_vars)
+    def __init__(self, name):
+        self.name = name
 
-    index = context.local_vars[name]
+    def process(self, context):
+        # print("LOAD AVAR NAME", context, self.name)
+        # print("locals: ", context.local_vars, context.deleted_vars)
 
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.ALOAD_0()
-    elif index == 1:
-        return JavaOpcodes.ALOAD_1()
-    elif index == 2:
-        return JavaOpcodes.ALOAD_2()
-    elif index == 3:
-        return JavaOpcodes.ALOAD_3()
-    else:
-        return JavaOpcodes.ALOAD(index)
+        try:
+            index = context.local_vars[self.name]
+        except KeyError:
+            raise NameError(self.name)
+
+        if index == 0:
+            context.add_opcodes(JavaOpcodes.ALOAD_0())
+        elif index == 1:
+            context.add_opcodes(JavaOpcodes.ALOAD_1())
+        elif index == 2:
+            context.add_opcodes(JavaOpcodes.ALOAD_2())
+        elif index == 3:
+            context.add_opcodes(JavaOpcodes.ALOAD_3())
+        else:
+            context.add_opcodes(JavaOpcodes.ALOAD(index))
+
+        # This opcode isn't for the final output.
+        return False
 
 
-def ASTORE_name(context, name):
+class ASTORE_name:
     """Generate the opcode to store an object variable with the given name.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    try:
-        index = context.local_vars[name]
-    except KeyError:
-        index = None
+    def __init__(self, name):
+        self.name = name
 
-    if index is None:
+    def process(self, context):
         try:
-            index = context.deleted_vars.pop()
-            # print ("REUSE index", index)
+            index = context.local_vars[self.name]
         except KeyError:
-            index = len(context.active_local_vars)
-            # print ("GET NEW index", index)
-        context.local_vars[name] = index
+            index = None
 
-    # print("STORE AVAR NAME", context, index, name)
-    # print("locals: ", context.local_vars, context.deleted_vars)
+        if index is None:
+            try:
+                index = context.deleted_vars.pop()
+                # print ("REUSE index", index)
+            except KeyError:
+                index = len(context.active_local_vars)
+                # print ("GET NEW index", index)
+            context.local_vars[self.name] = index
 
-    if index == 0:
-        return JavaOpcodes.ASTORE_0()
-    elif index == 1:
-        return JavaOpcodes.ASTORE_1()
-    elif index == 2:
-        return JavaOpcodes.ASTORE_2()
-    elif index == 3:
-        return JavaOpcodes.ASTORE_3()
-    else:
-        return JavaOpcodes.ASTORE(index)
+        # print("STORE AVAR NAME", context, index, self.name)
+        # print("locals: ", context.local_vars, context.deleted_vars)
+
+        if index == 0:
+            context.add_opcodes(JavaOpcodes.ASTORE_0())
+        elif index == 1:
+            context.add_opcodes(JavaOpcodes.ASTORE_1())
+        elif index == 2:
+            context.add_opcodes(JavaOpcodes.ASTORE_2())
+        elif index == 3:
+            context.add_opcodes(JavaOpcodes.ASTORE_3())
+        else:
+            context.add_opcodes(JavaOpcodes.ASTORE(index))
+
+        # This opcode isn't for the final output.
+        return False
 
 
-def ILOAD_name(context, name):
+class ILOAD_name:
     """Generate the opcode to load an integer variable with the given name onto the stack.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    # print("LOAD IVAR NAME", context, name)
-    # print("locals: ", context.local_vars)
+    def __init__(self, name):
+        self.name = name
 
-    index = context.local_vars[name]
+    def process(self, context):
+        # print("LOAD IVAR NAME", context, self.name)
+        # print("locals: ", context.local_vars)
 
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.ILOAD_0()
-    elif index == 1:
-        return JavaOpcodes.ILOAD_1()
-    elif index == 2:
-        return JavaOpcodes.ILOAD_2()
-    elif index == 3:
-        return JavaOpcodes.ILOAD_3()
-    else:
-        return JavaOpcodes.ILOAD(index)
+        try:
+            index = context.local_vars[self.name]
+        except KeyError:
+            raise NameError(self.name)
+
+        if index == 0:
+            context.add_opcodes(JavaOpcodes.ILOAD_0())
+        elif index == 1:
+            context.add_opcodes(JavaOpcodes.ILOAD_1())
+        elif index == 2:
+            context.add_opcodes(JavaOpcodes.ILOAD_2())
+        elif index == 3:
+            context.add_opcodes(JavaOpcodes.ILOAD_3())
+        else:
+            context.add_opcodes(JavaOpcodes.ILOAD(index))
+
+        # This opcode isn't for the final output.
+        return False
 
 
-def ISTORE_name(context, name):
+class ISTORE_name:
     """Generate the opcode to store a variable with the given name.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    try:
-        index = context.local_vars[name]
-    except KeyError:
-        index = None
+    def __init__(self, name):
+        self.name = name
 
-    if index is None:
+    def process(self, context):
         try:
-            index = context.deleted_vars.pop()
-            # print ("REUSE index", index)
+            index = context.local_vars[self.name]
         except KeyError:
-            index = len(context.active_local_vars)
-            # print ("GET NEW index", index)
-        context.local_vars[name] = index
+            index = None
 
-    # print("STORE IVAR NAME", context, index, name)
-    # print("locals: ", context.local_vars)
+        if index is None:
+            try:
+                index = context.deleted_vars.pop()
+                # print ("REUSE index", index)
+            except KeyError:
+                index = len(context.active_local_vars)
+                # print ("GET NEW index", index)
+            context.local_vars[self.name] = index
 
-    if index == 0:
-        return JavaOpcodes.ISTORE_0()
-    elif index == 1:
-        return JavaOpcodes.ISTORE_1()
-    elif index == 2:
-        return JavaOpcodes.ISTORE_2()
-    elif index == 3:
-        return JavaOpcodes.ISTORE_3()
-    else:
-        return JavaOpcodes.ISTORE(index)
+        # print("STORE IVAR NAME", context, index, self.name)
+        # print("locals: ", context.local_vars)
+
+        if index == 0:
+            context.add_opcodes(JavaOpcodes.ISTORE_0())
+        elif index == 1:
+            context.add_opcodes(JavaOpcodes.ISTORE_1())
+        elif index == 2:
+            context.add_opcodes(JavaOpcodes.ISTORE_2())
+        elif index == 3:
+            context.add_opcodes(JavaOpcodes.ISTORE_3())
+        else:
+            context.add_opcodes(JavaOpcodes.ISTORE(index))
+
+        # This opcode isn't for the final output.
+        return False
 
 
-def IINC_name(context, name, value):
+class IINC_name:
     """Generate the opcode to increment an integer variable with the given name
     by the provided value.
 
@@ -707,90 +737,119 @@ def IINC_name(context, name, value):
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    index = context.local_vars[name]
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
 
-    return JavaOpcodes.IINC(index, value)
+    def process(self, context):
+        index = context.local_vars[self.name]
+        context.add_opcodes(JavaOpcodes.IINC(index, self.value))
+
+        # This opcode isn't for the final output.
+        return False
 
 
-def LLOAD_name(context, name):
+class LLOAD_name:
     """Generate the opcode to load a long variable with the given name onto the stack.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    index = context.local_vars[name]
+    def __init__(self, name):
+        self.name = name
 
-    # print("LOAD LVAR NAME", context, name, index)
-    # print("locals: ", context.local_vars)
+    def process(self, context):
+        try:
+            index = context.local_vars[self.name]
+        except KeyError:
+            raise NameError(self.name)
 
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.LLOAD_0()
-    elif index == 1:
-        return JavaOpcodes.LLOAD_1()
-    elif index == 2:
-        return JavaOpcodes.LLOAD_2()
-    elif index == 3:
-        return JavaOpcodes.LLOAD_3()
-    else:
-        return JavaOpcodes.LLOAD(index)
+        # print("LOAD LVAR NAME", context, self.name, index)
+        # print("locals: ", context.local_vars)
+
+        if index == 0:
+            context.add_opcodes(JavaOpcodes.LLOAD_0())
+        elif index == 1:
+            context.add_opcodes(JavaOpcodes.LLOAD_1())
+        elif index == 2:
+            context.add_opcodes(JavaOpcodes.LLOAD_2())
+        elif index == 3:
+            context.add_opcodes(JavaOpcodes.LLOAD_3())
+        else:
+            context.add_opcodes(JavaOpcodes.LLOAD(index))
+
+        # This opcode isn't for the final output.
+        return False
 
 
-def FLOAD_name(context, name):
+class FLOAD_name:
     """Generate the opcode to load a float variable with the given name onto the stack.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    index = context.local_vars[name]
+    def __init__(self, name):
+        self.name = name
 
-    # print("LOAD FVAR NAME", context, name, index)
-    # print("locals: ", context.local_vars)
+    def process(self, context):
+        try:
+            index = context.local_vars[self.name]
+        except KeyError:
+            raise NameError(self.name)
 
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.FLOAD_0()
-    elif index == 1:
-        return JavaOpcodes.FLOAD_1()
-    elif index == 2:
-        return JavaOpcodes.FLOAD_2()
-    elif index == 3:
-        return JavaOpcodes.FLOAD_3()
-    else:
-        return JavaOpcodes.FLOAD(index)
+        # print("LOAD FVAR NAME", context, self.name, index)
+        # print("locals: ", context.local_vars)
+        if index == 0:
+            context.add_opcodes(JavaOpcodes.FLOAD_0())
+        elif index == 1:
+            context.add_opcodes(JavaOpcodes.FLOAD_1())
+        elif index == 2:
+            context.add_opcodes(JavaOpcodes.FLOAD_2())
+        elif index == 3:
+            context.add_opcodes(JavaOpcodes.FLOAD_3())
+        else:
+            context.add_opcodes(JavaOpcodes.FLOAD(index))
+
+        # This opcode isn't for the final output.
+        return False
 
 
-def DLOAD_name(context, name):
+class DLOAD_name:
     """Generate the opcode to load a double variable with the given name onto the stack.
 
     This looks up the local variable dictionary to find which
     register is being used for that variable, using the optimized
     register operations for the first 4 local variables.
     """
-    index = context.local_vars[name]
+    def __init__(self, name):
+        self.name = name
 
-    # print("LOAD LVAR NAME", context, name, index)
-    # print("locals: ", context.local_vars)
+    def process(self, context):
+        try:
+            index = context.local_vars[self.name]
+        except KeyError:
+            raise NameError(self.name)
 
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.DLOAD_0()
-    elif index == 1:
-        return JavaOpcodes.DLOAD_1()
-    elif index == 2:
-        return JavaOpcodes.DLOAD_2()
-    elif index == 3:
-        return JavaOpcodes.DLOAD_3()
-    else:
-        return JavaOpcodes.DLOAD(index)
+        # print("LOAD LVAR NAME", context, self.name, index)
+        # print("locals: ", context.local_vars)
+        if index == 0:
+            context.add_opcodes(JavaOpcodes.DLOAD_0())
+        elif index == 1:
+            context.add_opcodes(JavaOpcodes.DLOAD_1())
+        elif index == 2:
+            context.add_opcodes(JavaOpcodes.DLOAD_2())
+        elif index == 3:
+            context.add_opcodes(JavaOpcodes.DLOAD_3())
+        else:
+            context.add_opcodes(JavaOpcodes.DLOAD(index))
+
+        # This opcode isn't for the final output.
+        return False
 
 
-def free_name(context, name, must_exist=True):
+class free_name:
     """Remove a name from the local variable pool
 
     By default the variable must exist. However, if you pass
@@ -799,16 +858,25 @@ def free_name(context, name, must_exist=True):
     are created as part of looping constructs, and may not be
     created in the case of an empty loop.
     """
-    index = context.local_vars[name]
+    def __init__(self, name, must_exist=True):
+        self.name = name
+        self.must_exist = must_exist
 
-    if index is None and must_exist:
-        raise NameError(name)
+    def process(self, context):
+        try:
+            index = context.local_vars[self.name]
+        except KeyError:
+            if self.must_exist:
+                raise NameError(self.name)
 
-    context.deleted_vars.add(index)
-    context.local_vars[name] = None
+        context.deleted_vars.add(index)
+        context.local_vars[self.name] = None
 
-    # print("FREE", context, name, index)
-    # print("locals: ", context.local_vars, context.deleted_vars)
+        # print("FREE", context, self.name, index)
+        # print("locals: ", context.local_vars, context.deleted_vars)
+
+        # This opcode isn't for the final output.
+        return False
 
 
 ##########################################################################
@@ -968,6 +1036,8 @@ class DEBUG:
                 args=['Ljava/lang/String;'],
                 returns='V'),
         )
+        # This opcode isn't for the final output.
+        return False
 
 
 class DEBUG_name:
@@ -985,3 +1055,27 @@ class DEBUG_name:
                 returns='V'
             ),
         )
+        # This opcode isn't for the final output.
+        return False
+
+
+class DEBUG_value:
+    def __init__(self, msg, dup=False):
+        self.msg = msg
+        self.dup = dup
+
+    def process(self, context):
+        if self.dup:
+            context.add_opcodes(JavaOpcodes.DUP())
+        context.add_opcodes(
+            JavaOpcodes.LDC_W(self.msg),
+            JavaOpcodes.SWAP(),
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'debug',
+                args=['Ljava/lang/String;', 'Ljava/lang/Object;'],
+                returns='V'
+            ),
+        )
+        # This opcode isn't for the final output.
+        return False

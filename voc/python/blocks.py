@@ -9,6 +9,7 @@ from .utils import (
     TRY, CATCH, END_TRY,
     jump, resolve_jump,
     ICONST_val, LCONST_val, DCONST_val, ALOAD_name, ASTORE_name, free_name
+    # DEBUG
 )
 
 
@@ -82,8 +83,7 @@ class Block:
         for opcode in opcodes:
             if opcode.process(self):
                 # self.opcodes.extend([
-                #     JavaOpcodes.LDC_W(str(opcode)),
-                #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V')
+                #     DEBUG(str(opcode)),
                 # ])
 
                 self.opcodes.append(opcode)
@@ -341,7 +341,7 @@ class Block:
             if arg['kind'] == ArgType.POSITIONAL_OR_KEYWORD and arg['default']:
                 self.add_opcodes(
                     JavaOpcodes.DUP(),
-                    ALOAD_name(self, arg['default']),
+                    ALOAD_name(arg['default']),
                     JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', '(Ljava/lang/Object;)Z'),
                     JavaOpcodes.POP(),
                 )
@@ -358,7 +358,7 @@ class Block:
                 self.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(arg['name']),
-                    ALOAD_name(self, arg['default']),
+                    ALOAD_name(arg['default']),
                     JavaOpcodes.INVOKEVIRTUAL(
                         'java/util/HashMap',
                         'put',
@@ -396,7 +396,7 @@ class Block:
             CATCH('java/lang/NoSuchMethodError')
         )
         self.add_opcodes(
-                ASTORE_name(self, '#EXCEPTION#'),
+                ASTORE_name('#EXCEPTION#'),
                 JavaOpcodes.NEW('org/python/exceptions/RuntimeError'),
                 JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W('Unable to find MAKE_FUNCTION output %s.%s' % (
@@ -411,9 +411,9 @@ class Block:
                 JavaOpcodes.ATHROW(),
         )
         self.add_opcodes(
-            END_TRY()
+            END_TRY(),
+            free_name('#EXCEPTION#')
         )
-        free_name(self, '#EXCEPTION#')
 
     def stack_depth(self):
         "Evaluate the maximum stack depth required by a sequence of Java opcodes"
@@ -445,7 +445,7 @@ class Block:
 
         for i, yield_point in enumerate(self.yield_points):
             yield_jumps.extend([
-                ALOAD_name(self, '<generator>'),
+                JavaOpcodes.ALOAD(self.local_vars['<generator>']),
                 JavaOpcodes.GETFIELD('org/python/types/Generator', 'yield_point', 'I'),
                 ICONST_val(i + 1),
                 jump(JavaOpcodes.IF_ICMPEQ(0), self, yield_point, OpcodePosition.YIELD)

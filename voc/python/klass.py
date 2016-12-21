@@ -10,7 +10,8 @@ from .methods import (
     InitMethod, ClosureInitMethod, Method
 )
 from .utils import (
-    ALOAD_name, ASTORE_name, free_name
+    ALOAD_name, ASTORE_name, free_name,
+    # DEBUG, DEBUG_value
 )
 
 
@@ -61,8 +62,7 @@ class Class(Block):
 
     def visitor_setup(self):
         self.add_opcodes(
-            # JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+            # DEBUG("STATIC BLOCK OF " + self.klass.descriptor),
 
             # Force the loading and instantiation of the module
             # that contains the class.
@@ -102,11 +102,7 @@ class Class(Block):
                 returns='Lorg/python/types/Type;'
             ),
 
-            # JavaOpcodes.DUP(),
-            # JavaOpcodes.LDC_W("__base__ for %s should be %s; is" % (self.klass, self.extends_descriptor)),
-            # JavaOpcodes.SWAP(),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug',
-            #     args=['Ljava/lang/String;', 'Ljava/lang/Object;', returns='V'),
+            # DEBUG_value("__base__ for %s should be %s; is" % (self.klass, self.extends_descriptor), dup=True),
 
             JavaOpcodes.PUTFIELD('org/python/types/Type', '__base__', 'Lorg/python/types/Type;'),
 
@@ -186,13 +182,12 @@ class Class(Block):
         self.store_name('__qualname__')
 
         # self.add_opcodes(
-        #     JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
-        #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+        #     DEBUG("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
         # )
 
     def store_name(self, name):
         self.add_opcodes(
-            ASTORE_name(self, '#value'),
+            ASTORE_name('#value'),
             JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Type',
@@ -202,7 +197,7 @@ class Class(Block):
             ),
 
             JavaOpcodes.LDC_W(name),
-            ALOAD_name(self, '#value'),
+            ALOAD_name('#value'),
 
             JavaOpcodes.INVOKEINTERFACE(
                 'org/python/Object',
@@ -210,12 +205,12 @@ class Class(Block):
                 args=['Ljava/lang/String;', 'Lorg/python/Object;'],
                 returns='V'
             ),
+            free_name('#value')
         )
-        free_name(self, '#value')
 
     def store_dynamic(self):
         self.add_opcodes(
-            ASTORE_name(self, '#value'),
+            ASTORE_name('#value'),
             JavaOpcodes.LDC_W(self.descriptor),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Type',
@@ -225,11 +220,11 @@ class Class(Block):
             ),
 
             JavaOpcodes.GETFIELD('org/python/types/Type', '__dict__', 'Ljava/util/Map;'),
-            ALOAD_name(self, '#value'),
+            ALOAD_name('#value'),
 
             JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', args=['Ljava/util/Map;'], returns='V'),
+            free_name('#value')
         )
-        free_name(self, '#value')
 
     def load_name(self, name):
         self.add_opcodes(

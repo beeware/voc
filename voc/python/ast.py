@@ -253,7 +253,7 @@ class Visitor(ast.NodeVisitor):
                 default = '#%s-default-%s-%x' % (node.name, i, id(node))
                 self.visit(node.args.defaults[index])
                 self.context.add_opcodes(
-                    ASTORE_name(self.context, default)
+                    ASTORE_name(default)
                 )
                 default_vars.append(default)
             else:
@@ -279,7 +279,7 @@ class Visitor(ast.NodeVisitor):
                 default = '#%s-kw_default-%s-%x' % (node.name, i, id(node))
                 self.visit(node.args.kw_defaults[index])
                 self.context.add_opcodes(
-                    ASTORE_name(self.context, default)
+                    ASTORE_name(default)
                 )
                 default_vars.append(default)
             else:
@@ -337,7 +337,9 @@ class Visitor(ast.NodeVisitor):
 
         # Free all the variables used for default storage.
         for default in default_vars:
-            free_name(self.context, default)
+            self.context.add_opcodes(
+                free_name(default)
+            )
 
         self.push_context(function)
 
@@ -601,7 +603,7 @@ class Visitor(ast.NodeVisitor):
         if node.exc is None:
             # Re-raise most recent exception.
             self.context.add_opcodes(
-                ALOAD_name(self.context, self.current_exc_name[-1]),
+                ALOAD_name(self.current_exc_name[-1]),
             )
         else:
             if getattr(node.exc, 'func', None) is not None:
@@ -663,19 +665,18 @@ class Visitor(ast.NodeVisitor):
 
         if node.finalbody:
             self.context.add_opcodes(
-                FINALLY()
+                FINALLY(),
+                ASTORE_name('#exception-%x' % id(node))
             )
-            ASTORE_name(self.context, '#exception-%x' % id(node))
 
             for child in node.finalbody:
                 self.visit(child)
 
-            ALOAD_name(self.context, '#exception-%x' % id(node))
             self.context.add_opcodes(
+                ALOAD_name('#exception-%x' % id(node)),
                 JavaOpcodes.ATHROW(),
+                free_name('#exception-%x' % id(node))
             )
-
-            free_name(self.context, '#exception-%x' % id(node))
 
         self.context.add_opcodes(
             END_TRY()
@@ -1085,7 +1086,7 @@ class Visitor(ast.NodeVisitor):
         for i, generator in enumerate(node.generators):
             if isinstance(generator, ast.comprehension):
                 self.context.add_opcodes(
-                    ALOAD_name(self.context, '.%s' % i),
+                    ALOAD_name('.%s' % i),
                     JavaOpcodes.INVOKEINTERFACE(
                         'org/python/Object',
                         '__iter__',
@@ -1252,7 +1253,7 @@ class Visitor(ast.NodeVisitor):
         for i, generator in enumerate(node.generators):
             if isinstance(generator, ast.comprehension):
                 self.context.add_opcodes(
-                    ALOAD_name(self.context, '.%s' % i),
+                    ALOAD_name('.%s' % i),
                     JavaOpcodes.INVOKEINTERFACE(
                         'org/python/Object',
                         '__iter__',
@@ -1400,7 +1401,7 @@ class Visitor(ast.NodeVisitor):
         for i, generator in enumerate(node.generators):
             if isinstance(generator, ast.comprehension):
                 self.context.add_opcodes(
-                    ALOAD_name(self.context, '.%s' % i),
+                    ALOAD_name('.%s' % i),
                     JavaOpcodes.INVOKEINTERFACE(
                         'org/python/Object',
                         '__iter__',
@@ -1447,20 +1448,20 @@ class Visitor(ast.NodeVisitor):
 
         self.visit(node.key)
         self.context.add_opcodes(
-            ASTORE_name(self.context, '#dictcomp-key-%x' % id(node)),
+            ASTORE_name('#dictcomp-key-%x' % id(node)),
         )
 
         self.visit(node.value)
         self.context.add_opcodes(
-            ASTORE_name(self.context, '#dictcomp-value-%x' % id(node)),
+            ASTORE_name('#dictcomp-value-%x' % id(node)),
         )
 
         # And add it to the result list
         self.context.load_name('#dictcomp-result-%x' % id(node))
         self.context.add_opcodes(
             JavaOpcodes.CHECKCAST('org/python/types/Dict'),
-            ALOAD_name(self.context, '#dictcomp-key-%x' % id(node)),
-            ALOAD_name(self.context, '#dictcomp-value-%x' % id(node)),
+            ALOAD_name('#dictcomp-key-%x' % id(node)),
+            ALOAD_name('#dictcomp-value-%x' % id(node)),
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/types/Dict',
                 '__setitem__',
@@ -1473,11 +1474,12 @@ class Visitor(ast.NodeVisitor):
         self.context.load_name('#dictcomp-result-%x' % id(node))
         self.context.add_opcodes(
             JavaOpcodes.ARETURN(),
+
+            # Clean up
+            free_name('#dictcomp-key-%x' % id(node)),
+            free_name('#dictcomp-value-%x' % id(node))
         )
 
-        # Clean up
-        free_name(self.context, '#dictcomp-key-%x' % id(node))
-        free_name(self.context, '#dictcomp-value-%x' % id(node))
         self.context.delete_name('#dictcomp-iter-%x' % id(node))
         self.context.delete_name('#dictcomp-result-%x' % id(node))
 
@@ -1551,7 +1553,7 @@ class Visitor(ast.NodeVisitor):
         for i, generator in enumerate(node.generators):
             if isinstance(generator, ast.comprehension):
                 self.context.add_opcodes(
-                    ALOAD_name(self.context, '.%s' % i),
+                    ALOAD_name('.%s' % i),
                     JavaOpcodes.INVOKEINTERFACE(
                         'org/python/Object',
                         '__iter__',
@@ -1603,8 +1605,8 @@ class Visitor(ast.NodeVisitor):
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;'),
 
             # Save the current stack and yield index
-            ALOAD_name(self.context, '<generator>'),
-            ALOAD_name(self.context, '#locals'),
+            ALOAD_name('<generator>'),
+            ALOAD_name('#locals'),
             ICONST_val(yield_point),
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/types/Generator',
@@ -1624,15 +1626,15 @@ class Visitor(ast.NodeVisitor):
 
         #  First thing to do is restore the state of the stack.
         self.context.add_opcodes(
-            ALOAD_name(self.context, '<generator>'),
+            ALOAD_name('<generator>'),
             JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', 'Ljava/util/Map;'),
-            ASTORE_name(self.context, '#locals'),
+            ASTORE_name('#locals'),
         )
 
         for var, index in self.context.local_vars.items():
             if index is not None and var not in ('<generator>', '#locals'):
                 self.context.add_opcodes(
-                    ALOAD_name(self.context, '#locals'),
+                    ALOAD_name('#locals'),
                     JavaOpcodes.LDC_W(var),
                     JavaOpcodes.INVOKEINTERFACE(
                         'java/util/Map',
@@ -1696,8 +1698,8 @@ class Visitor(ast.NodeVisitor):
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;'),
 
             # Save the current stack and yield index
-            ALOAD_name(self.context, '<generator>'),
-            ALOAD_name(self.context, '#locals'),
+            ALOAD_name('<generator>'),
+            ALOAD_name('#locals'),
             ICONST_val(yield_point),
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/types/Generator',
@@ -1717,15 +1719,15 @@ class Visitor(ast.NodeVisitor):
 
         #  First thing to do is restore the state of the stack.
         self.context.add_opcodes(
-            ALOAD_name(self.context, '<generator>'),
+            ALOAD_name('<generator>'),
             JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', 'Ljava/util/Map;'),
-            ASTORE_name(self.context, '#locals'),
+            ASTORE_name('#locals'),
         )
 
         for var, index in self.context.local_vars.items():
             if index is not None and var not in ('<generator>', '#locals'):
                 self.context.add_opcodes(
-                    ALOAD_name(self.context, '#locals'),
+                    ALOAD_name('#locals'),
                     JavaOpcodes.LDC_W(var),
                     JavaOpcodes.INVOKEINTERFACE(
                         'java/util/Map',
@@ -1874,8 +1876,7 @@ class Visitor(ast.NodeVisitor):
 
         elif is_call(node, 'super'):
             # context.add_opcodes(
-            #     JavaOpcodes.LDC_W("ATTRIBUTE ON SUPER"),
-            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+            #     DEBUG("ATTRIBUTE ON SUPER"),
             # )
 
             if len(node.args) == 0:
@@ -2172,20 +2173,20 @@ class Visitor(ast.NodeVisitor):
             )
         elif type(node.ctx) == ast.Store:
             self.context.add_opcodes(
-                ASTORE_name(self.context, '#value'),
+                ASTORE_name('#value'),
             )
             self.visit(node.value)
             self.visit(node.slice)
             self.context.add_opcodes(
-                ALOAD_name(self.context, '#value'),
+                ALOAD_name('#value'),
                 JavaOpcodes.INVOKEINTERFACE(
                     'org/python/Object',
                     '__setitem__',
                     args=['Lorg/python/Object;', 'Lorg/python/Object;'],
                     returns='V'
                 ),
+                free_name('#value'),
             )
-            free_name(self.context, '#value')
         elif type(node.ctx) == ast.Del:
             self.visit(node.value)
             self.visit(node.slice)
@@ -2382,7 +2383,7 @@ class Visitor(ast.NodeVisitor):
         # locally store it so that it can be re-raised easily.
         exc_name = '#exception-%x' % id(node)
         self.context.add_opcodes(
-            ASTORE_name(self.context, exc_name),
+            ASTORE_name(exc_name),
         )
 
         self.current_exc_name.append(exc_name)
@@ -2390,5 +2391,7 @@ class Visitor(ast.NodeVisitor):
         for child in node.body:
             self.visit(child)
 
-        free_name(self.context, exc_name)
+        self.context.add_opcodes(
+            free_name(exc_name)
+        )
         self.current_exc_name.pop()
