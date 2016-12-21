@@ -75,6 +75,7 @@ class GlobalsTests(TranspileTestCase):
             print('Done')
         """, run_in_function=False)
 
+
 class BuiltinGlobalsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["globals"]
 
