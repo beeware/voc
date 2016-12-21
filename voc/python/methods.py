@@ -81,10 +81,10 @@ class Function(Block):
     def store_name(self, name):
         if name in self.local_vars:
             self.add_opcodes(
-                JavaOpcodes.DUP(),
                 ASTORE_name(self, name),
                 ALOAD_name(self, '#locals'),
-                JavaOpcodes.SWAP(),
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name(self, name),
                 JavaOpcodes.INVOKEINTERFACE(
                     'java/util/Map',
                     'put',
