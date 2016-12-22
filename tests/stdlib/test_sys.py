@@ -55,7 +55,6 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # __name__
-    @expectedFailure
     def test___name__(self):
         self.assertCodeExecution("""
             import sys
@@ -671,7 +670,6 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # platform
-    @expectedFailure
     def test_platform(self):
         self.assertCodeExecution("""
             import sys

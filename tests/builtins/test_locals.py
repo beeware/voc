@@ -1,8 +1,116 @@
+from unittest import expectedFailure
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class LocalsTests(TranspileTestCase):
-    pass
+    @expectedFailure
+    def test_simple(self):
+        self.assertCodeExecution("""
+            print("There are %s locals" % len(locals()))
+            x = 1
+            y = 'z'
+            print("There are %s locals" % len(locals()))
+
+            def method():
+                print("In method: there are %s locals" % len(locals()))
+
+                try:
+                    print("locals()['x'] =", locals()['x'])
+                except KeyError:
+                    print("Variable x not defined")
+                try:
+                    print("locals()['y'] =", locals()['y'])
+                except KeyError:
+                    print("Variable y not defined")
+                try:
+                    print("locals()['z'] =", locals()['z'])
+                except KeyError:
+                    print("Variable z not defined")
+
+                x = 1
+                y = 'z'
+                locals()[y] = 2
+
+                print("locals()['x'] =", locals()['x'])
+                print("locals()['y'] =", locals()['y'])
+                print("locals()['z'] =", locals()['z'])
+                print('x', x)
+                print('y', y)
+                # print('z', z)
+
+                print("In method: there are %s locals" % len(locals()))
+
+            method()
+
+            print("There are %s locals" % len(locals()))
+            print("locals()['x'] =", locals()['x'])
+            print("locals()['y'] =", locals()['y'])
+            try:
+                print("locals()['z'] =", locals()['z'])
+            except KeyError:
+                print("Variable z not defined")
+            print('x', x)
+            print('y', y)
+
+            print('Done')
+        """, run_in_function=False)
+
+    def test_locals_delta(self):
+        """This is a version of test_simple that allows for the initial
+        global count to be wrong. This test can be removed once test_simple
+        passes."""
+        self.assertCodeExecution("""
+            n_locals = len(locals())
+            print("Found delta of %s locals" % (len(locals()) - n_locals))
+            x = 1
+            y = 'z'
+            print("Found delta of %s locals" % (len(locals()) - n_locals))
+
+            def method():
+                n_locals = len(locals())
+                print("In method: Found delta of %s locals" % (len(locals()) - n_locals))
+
+                try:
+                    print("locals()['x'] =", locals()['x'])
+                except KeyError:
+                    print("Variable x not defined")
+                try:
+                    print("locals()['y'] =", locals()['y'])
+                except KeyError:
+                    print("Variable y not defined")
+                try:
+                    print("locals()['z'] =", locals()['z'])
+                except KeyError:
+                    print("Variable z not defined")
+
+                x = 1
+                y = 'z'
+                locals()[y] = 2
+
+                print("locals()['x'] =", locals()['x'])
+                print("locals()['y'] =", locals()['y'])
+                print("locals()['z'] =", locals()['z'])
+                print('x', x)
+                print('y', y)
+                # print('z', z)
+
+                print("In method: Found delta of %s locals" % (len(locals()) - n_locals))
+
+            method()
+
+            print("Found delta of %s locals" % (len(locals()) - n_locals))
+            print("locals()['x'] =", locals()['x'])
+            print("locals()['y'] =", locals()['y'])
+            try:
+                print("locals()['z'] =", locals()['z'])
+            except KeyError:
+                print("Variable z not defined")
+            print('x', x)
+            print('y', y)
+
+            print('Done')
+
+        """, run_in_function=False)
 
 
 class BuiltinLocalsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

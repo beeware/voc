@@ -1,4 +1,3 @@
-import ast
 from enum import Enum
 from ..java import opcodes as JavaOpcodes
 
@@ -16,44 +15,6 @@ class OpcodePosition(Enum):
     NEXT = 'next_op'
     YIELD = 'yield_op'
 
-
-def dump(node, annotate_fields=True, include_attributes=True, indent='  '):
-    """
-    Return a formatted dump of the tree in *node*.  This is mainly useful for
-    debugging purposes.  The returned string will show the names and the values
-    for fields.  This makes the code impossible to evaluate, so if evaluation is
-    wanted *annotate_fields* must be set to False.  Attributes such as line
-    numbers and column offsets are not dumped by default.  If this is wanted,
-    *include_attributes* can be set to True.
-    """
-    def _format(node, level=0):
-        if isinstance(node, ast.AST):
-            fields = [(a, _format(b, level)) for a, b in ast.iter_fields(node)]
-            if include_attributes and node._attributes:
-                fields.extend([(a, _format(getattr(node, a), level))
-                               for a in node._attributes])
-            return ''.join([
-                node.__class__.__name__,
-                '(',
-                ', '.join(
-                    ('%s=%s' % field for field in fields)
-                    if annotate_fields else (b for a, b in fields)),
-                ')'])
-        elif isinstance(node, list):
-            lines = ['[']
-            lines.extend((indent * (level + 2) + _format(x, level + 2) + ','
-                         for x in node))
-            if len(lines) > 1:
-                lines.append(indent * (level + 1) + ']')
-            else:
-                lines[-1] += ']'
-            return '\n'.join(lines)
-        return repr(node)
-
-    if not isinstance(node, ast.AST):
-        raise TypeError('expected AST, got %r' % node.__class__.__name__)
-
-    return _format(node)
 
 ##########################################################################
 # Pseudo instructions used to flag the offset position of other
@@ -282,12 +243,12 @@ class ELIF:
                 if_block.jump_op = jump_op
             else:
                 # print("    already got an endif")
-                if_block.handlers[-1].jump_op = jump_op
+                if_block.elifs[-1].jump_op = jump_op
 
         if len(if_block.elifs) == 0:
             jump(if_block.if_op, context, self, OpcodePosition.START)
         else:
-            jump(if_block.handlers[-1].if_op, context, self, OpcodePosition.START)
+            jump(if_block.elifs[-1].if_op, context, self, OpcodePosition.START)
 
         # Record the start of the elif block
         context.next_resolve_list.append((self, OpcodePosition.START))
@@ -564,349 +525,6 @@ class END_TRY:
 
 
 ##########################################################################
-# Local variables are stored in a dictionary, keyed by name,
-# and with the value of the local variable register they are stored in.
-#
-# If an attempt is used to use a name that has been deleted, an exception
-# is raised.
-#
-# Once a name has been deleted, the index will be recycled for re-use
-# as a different name.
-##########################################################################
-
-def ALOAD_name(context, name):
-    """Generate the opcode to load an object variable with the given name onto the stack.
-
-    This looks up the local variable dictionary to find which
-    register is being used for that variable, using the optimized
-    register operations for the first 4 local variables.
-    """
-    # print("LOAD AVAR NAME", context, name)
-    # print("locals: ", context.local_vars, context.deleted_vars)
-
-    index = context.local_vars[name]
-
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.ALOAD_0()
-    elif index == 1:
-        return JavaOpcodes.ALOAD_1()
-    elif index == 2:
-        return JavaOpcodes.ALOAD_2()
-    elif index == 3:
-        return JavaOpcodes.ALOAD_3()
-    else:
-        return JavaOpcodes.ALOAD(index)
-
-
-def ASTORE_name(context, name):
-    """Generate the opcode to store an object variable with the given name.
-
-    This looks up the local variable dictionary to find which
-    register is being used for that variable, using the optimized
-    register operations for the first 4 local variables.
-    """
-    try:
-        index = context.local_vars[name]
-    except KeyError:
-        index = None
-
-    if index is None:
-        try:
-            index = context.deleted_vars.pop()
-            # print ("REUSE index", index)
-        except KeyError:
-            index = len(context.active_local_vars)
-            # print ("GET NEW index", index)
-        context.local_vars[name] = index
-
-    # print("STORE AVAR NAME", context, index, name)
-    # print("locals: ", context.local_vars, context.deleted_vars)
-
-    if index == 0:
-        return JavaOpcodes.ASTORE_0()
-    elif index == 1:
-        return JavaOpcodes.ASTORE_1()
-    elif index == 2:
-        return JavaOpcodes.ASTORE_2()
-    elif index == 3:
-        return JavaOpcodes.ASTORE_3()
-    else:
-        return JavaOpcodes.ASTORE(index)
-
-
-def ILOAD_name(context, name):
-    """Generate the opcode to load an integer variable with the given name onto the stack.
-
-    This looks up the local variable dictionary to find which
-    register is being used for that variable, using the optimized
-    register operations for the first 4 local variables.
-    """
-    # print("LOAD IVAR NAME", context, name)
-    # print("locals: ", context.local_vars)
-
-    index = context.local_vars[name]
-
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.ILOAD_0()
-    elif index == 1:
-        return JavaOpcodes.ILOAD_1()
-    elif index == 2:
-        return JavaOpcodes.ILOAD_2()
-    elif index == 3:
-        return JavaOpcodes.ILOAD_3()
-    else:
-        return JavaOpcodes.ILOAD(index)
-
-
-def ISTORE_name(context, name):
-    """Generate the opcode to store a variable with the given name.
-
-    This looks up the local variable dictionary to find which
-    register is being used for that variable, using the optimized
-    register operations for the first 4 local variables.
-    """
-    try:
-        index = context.local_vars[name]
-    except KeyError:
-        index = None
-
-    if index is None:
-        try:
-            index = context.deleted_vars.pop()
-            # print ("REUSE index", index)
-        except KeyError:
-            index = len(context.active_local_vars)
-            # print ("GET NEW index", index)
-        context.local_vars[name] = index
-
-    # print("STORE IVAR NAME", context, index, name)
-    # print("locals: ", context.local_vars)
-
-    if index == 0:
-        return JavaOpcodes.ISTORE_0()
-    elif index == 1:
-        return JavaOpcodes.ISTORE_1()
-    elif index == 2:
-        return JavaOpcodes.ISTORE_2()
-    elif index == 3:
-        return JavaOpcodes.ISTORE_3()
-    else:
-        return JavaOpcodes.ISTORE(index)
-
-
-def IINC_name(context, name, value):
-    """Generate the opcode to increment an integer variable with the given name
-    by the provided value.
-
-    This looks up the local variable dictionary to find which
-    register is being used for that variable, using the optimized
-    register operations for the first 4 local variables.
-    """
-    index = context.local_vars[name]
-
-    return JavaOpcodes.IINC(index, value)
-
-
-def LLOAD_name(context, name):
-    """Generate the opcode to load a long variable with the given name onto the stack.
-
-    This looks up the local variable dictionary to find which
-    register is being used for that variable, using the optimized
-    register operations for the first 4 local variables.
-    """
-    index = context.local_vars[name]
-
-    # print("LOAD LVAR NAME", context, name, index)
-    # print("locals: ", context.local_vars)
-
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.LLOAD_0()
-    elif index == 1:
-        return JavaOpcodes.LLOAD_1()
-    elif index == 2:
-        return JavaOpcodes.LLOAD_2()
-    elif index == 3:
-        return JavaOpcodes.LLOAD_3()
-    else:
-        return JavaOpcodes.LLOAD(index)
-
-
-def FLOAD_name(context, name):
-    """Generate the opcode to load a float variable with the given name onto the stack.
-
-    This looks up the local variable dictionary to find which
-    register is being used for that variable, using the optimized
-    register operations for the first 4 local variables.
-    """
-    index = context.local_vars[name]
-
-    # print("LOAD FVAR NAME", context, name, index)
-    # print("locals: ", context.local_vars)
-
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.FLOAD_0()
-    elif index == 1:
-        return JavaOpcodes.FLOAD_1()
-    elif index == 2:
-        return JavaOpcodes.FLOAD_2()
-    elif index == 3:
-        return JavaOpcodes.FLOAD_3()
-    else:
-        return JavaOpcodes.FLOAD(index)
-
-
-def DLOAD_name(context, name):
-    """Generate the opcode to load a double variable with the given name onto the stack.
-
-    This looks up the local variable dictionary to find which
-    register is being used for that variable, using the optimized
-    register operations for the first 4 local variables.
-    """
-    index = context.local_vars[name]
-
-    # print("LOAD LVAR NAME", context, name, index)
-    # print("locals: ", context.local_vars)
-
-    if index is None:
-        raise NameError(name)
-    elif index == 0:
-        return JavaOpcodes.DLOAD_0()
-    elif index == 1:
-        return JavaOpcodes.DLOAD_1()
-    elif index == 2:
-        return JavaOpcodes.DLOAD_2()
-    elif index == 3:
-        return JavaOpcodes.DLOAD_3()
-    else:
-        return JavaOpcodes.DLOAD(index)
-
-
-def free_name(context, name, must_exist=True):
-    """Remove a name from the local variable pool
-
-    By default the variable must exist. However, if you pass
-    in must_exist, the non-existence of the variable will not
-    be treated as an error. This is to allow for variables that
-    are created as part of looping constructs, and may not be
-    created in the case of an empty loop.
-    """
-    index = context.local_vars[name]
-
-    if index is None and must_exist:
-        raise NameError(name)
-
-    context.deleted_vars.add(index)
-    context.local_vars[name] = None
-
-    # print("FREE", context, name, index)
-    # print("locals: ", context.local_vars, context.deleted_vars)
-
-
-##########################################################################
-# Handle constant values.
-#
-# There are multiple opcodes to load and retrieve constants. Use the
-# best option available at any given time.
-##########################################################################
-
-def ICONST_val(value):
-    """Write an integer constant onto the stack.
-
-    There are a couple of opcodes that can be used to optimize the
-    loading of small integers; use them if possible.
-    """
-    if isinstance(value, bool):
-        if value:
-            return JavaOpcodes.ICONST_1()
-        else:
-            return JavaOpcodes.ICONST_0()
-    elif isinstance(value, int):
-        if value == 0:
-            return JavaOpcodes.ICONST_0()
-        elif value == 1:
-            return JavaOpcodes.ICONST_1()
-        elif value == 2:
-            return JavaOpcodes.ICONST_2()
-        elif value == 3:
-            return JavaOpcodes.ICONST_3()
-        elif value == 4:
-            return JavaOpcodes.ICONST_4()
-        elif value == 5:
-            return JavaOpcodes.ICONST_5()
-        elif value == -1:
-            return JavaOpcodes.ICONST_M1()
-        elif -32768 <= value <= 32767:
-            return JavaOpcodes.SIPUSH(value)
-        elif -2147483648 <= value <= 2147483647:
-            return JavaOpcodes.LDC(value)
-        else:
-            raise RuntimeError("%s is out of integer range" % value)
-    else:
-        raise RuntimeError("%s is not an integer constant" % value)
-
-
-def LCONST_val(value):
-    """Write an long integer constant onto the stack.
-
-    There are a couple of opcodes that can be used to optimize the
-    loading of small longs; use them if possible.
-    """
-    if isinstance(value, int):
-        if value == 0:
-            return JavaOpcodes.LCONST_0()
-        elif value == 1:
-            return JavaOpcodes.LCONST_1()
-        else:
-            return JavaOpcodes.LDC2_W(value)
-    else:
-        raise RuntimeError("%s is not a long integer constant" % value)
-
-
-def FCONST_val(value):
-    """Write a float constant onto the stack.
-
-    There are a couple of opcodes that can be used to optimize the
-    loading of some floats; use them if possible.
-    """
-    if isinstance(value, float):
-        if value == 0.0:
-            return JavaOpcodes.FCONST_0()
-        elif value == 1.0:
-            return JavaOpcodes.FCONST_1()
-        elif value == 2.0:
-            return JavaOpcodes.FCONST_2()
-        else:
-            return JavaOpcodes.LDC_W(value)
-    else:
-        raise RuntimeError("%s is not a float constant" % value)
-
-
-def DCONST_val(value):
-    """Write an double constant onto the stack.
-
-    There are a couple of opcodes that can be used to optimize the
-    loading of some doubles; use them if possible.
-    """
-    if isinstance(value, float):
-        if value == 0.0:
-            return JavaOpcodes.DCONST_0()
-        elif value == 1.0:
-            return JavaOpcodes.DCONST_1()
-        else:
-            return JavaOpcodes.LDC2_W(value)
-    else:
-        raise RuntimeError("%s is not a double constant" % value)
-
-
-##########################################################################
 # Some opcodes need to reference other opcodes (e.g., GOTO)
 #
 # These helpers help define and resolve those references.
@@ -948,3 +566,35 @@ def resolve_jump(opcode, context, target, position):
     # print("JUMP OP IS", opcode.jump_op)
     context.jumps.append(opcode)
     opcode.jump_op.references.append(opcode)
+
+
+##########################################################################
+# Not entirely common, but complex, calls.
+##########################################################################
+
+class AddToArgs:
+    def process(self, context):
+        context.add_opcodes(
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'addToArgs',
+                args=['[Lorg/python/Object;', 'Lorg/python/Object;'],
+                returns='[Lorg/python/Object;'
+            )
+        )
+
+
+class AddToKwargs:
+    def __init__(self, kwarg):
+        self.kwarg = kwarg
+
+    def process(self, context):
+        context.add_opcodes(
+            JavaOpcodes.LDC_W(self.kwarg),
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'addToKwargs',
+                args=['Ljava/util/Map;', 'Lorg/python/Object;', 'Ljava/lang/String;'],
+                returns='Ljava/util/Map;'
+            ),
+        )

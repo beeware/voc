@@ -248,7 +248,7 @@ class StreamReader(codecs.StreamReader):
         return self.decoder.decode(input, final=False), len(input)
 
 
-### encodings module API
+# encodings module API
 
 def search_function(encoding):
     if normalize_encoding(encoding) == 'mutf_8':

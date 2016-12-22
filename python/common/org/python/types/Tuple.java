@@ -363,7 +363,7 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __contains__(org.python.Object item) {
-        throw new org.python.exceptions.NotImplementedError("__contains__() has not been implemented.");
+        return new org.python.types.Bool(this.value.contains(item));
     }
 
     @org.python.Method(

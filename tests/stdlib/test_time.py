@@ -48,7 +48,6 @@ class TimeModuleTests(TranspileTestCase):
 
     #######################################################
     # __name__
-    @expectedFailure
     def test___name__(self):
         self.assertCodeExecution("""
             import time
