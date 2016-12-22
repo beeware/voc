@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 import os
 
 from ..utils import TranspileTestCase
@@ -375,7 +373,6 @@ class ImportTests(TranspileTestCase):
                     """
             }, run_in_function=False)
 
-    @expectedFailure
     def test_import_from_dot(self):
         self.assertCodeExecution(
             """
@@ -404,7 +401,6 @@ class ImportTests(TranspileTestCase):
                     """,
             })
 
-    @expectedFailure
     def test_import_from_local_dot(self):
         self.assertCodeExecution(
             """
@@ -433,7 +429,6 @@ class ImportTests(TranspileTestCase):
                     """,
             })
 
-    @expectedFailure
     def test_import_from_local_dot_deep(self):
         self.assertCodeExecution(
             """

@@ -1,15 +1,19 @@
 from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
-    RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref
+    RuntimeVisibleAnnotations, opcodes as JavaOpcodes
 )
-from .blocks import Block
-from .utils import (
+from .blocks import Block, Accumulator
+from .structures import (
     TRY, CATCH, END_TRY,
+    ArgType,
+)
+from .types import java, python
+from .types.primitives import (
     ALOAD_name, ASTORE_name, free_name,
     DLOAD_name, FLOAD_name,
     ICONST_val, ILOAD_name,
-    ArgType,
 )
+
 
 CO_VARARGS = 0x0004
 CO_VARKEYWORDS = 0x0008
@@ -66,6 +70,9 @@ class Function(Block):
         for i, param in enumerate(self.parameters):
             self.local_vars[param['name']] = len(self.local_vars)
 
+        # Reserve space for the register that will hold locals
+        self.local_vars['#locals'] = len(self.local_vars)
+
         self.static = static
 
     def __repr__(self):
@@ -81,38 +88,31 @@ class Function(Block):
     def store_name(self, name):
         if name in self.local_vars:
             self.add_opcodes(
-                ASTORE_name(self, name)
+                # Store in a local variable
+                ASTORE_name(name),
+
+                # Also store in the locals variable
+                ALOAD_name('#locals'),
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name(name),
+                java.Map.put(),
             )
         else:
             self.add_opcodes(
-                ASTORE_name(self, '#value'),
+                ASTORE_name('#value'),
 
                 JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.module.full_name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
+                python.Str(self.module.full_name),
 
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__getitem__',
-                    args=['Lorg/python/Object;'],
-                    returns='Lorg/python/Object;'
-                ),
+                python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-                JavaOpcodes.LDC_W(name),
-                ALOAD_name(self, '#value'),
+                ALOAD_name('#value'),
 
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__setattr__',
-                    args=['Ljava/lang/String;', 'Lorg/python/Object;'],
-                    returns='V'
-                ),
+                python.Object.set_attr(name),
+                free_name('#value')
             )
-            free_name(self, '#value')
 
     def store_dynamic(self):
         raise NotImplementedError('Functions cannot dynamically store variables.')
@@ -120,63 +120,55 @@ class Function(Block):
     def load_name(self, name):
         if name in self.local_vars:
             self.add_opcodes(
-                ALOAD_name(self, name)
+                ALOAD_name(name)
             )
         else:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.module.full_name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
+                python.Str(self.module.full_name),
 
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__getitem__',
-                    args=['Lorg/python/Object;'],
-                    returns='Lorg/python/Object;'
-                ),
+                python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-                JavaOpcodes.LDC_W(name),
-
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/Module',
-                    '__getattribute__',
-                    args=['Ljava/lang/String;'],
-                    returns='Lorg/python/Object;'
-                ),
+                python.Object.get_attribute(name),
             )
+
+    def load_globals(self):
+        self.add_opcodes(
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+            python.Str(self.module.full_name),
+            python.Object.get_item(),
+
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
+        )
+
+    def load_locals(self):
+        self.add_opcodes(
+            ALOAD_name('#locals')
+        )
+
+    def load_vars(self):
+        self.load_locals()
 
     def delete_name(self, name):
         try:
-            free_name(self, name)
-        except KeyError:
+            self.add_opcodes(
+                free_name(name)
+            )
+        except NameError:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
 
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.module.full_name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
+                python.Str(self.module.full_name),
 
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__getitem__',
-                    args=['Lorg/python/Object;'],
-                    returns='Lorg/python/Object;'
-                ),
+                python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-                JavaOpcodes.LDC_W(name),
-
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/Module',
-                    '__delattr__',
-                    args=['Ljava/lang/String;'],
-                    returns='V'
-                ),
+                python.Object.del_attr(name),
             )
 
     @property
@@ -221,8 +213,7 @@ class Function(Block):
         self.module.classes.append(klass)
 
         self.add_opcodes(
-            # JavaOpcodes.LDC_W("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
 
             JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
             JavaOpcodes.INVOKESTATIC(
@@ -280,13 +271,9 @@ class Function(Block):
         klass.visitor_teardown()
 
         self.add_opcodes(
-            JavaOpcodes.NEW(klass.descriptor),
-            JavaOpcodes.DUP(),
-
+            java.New(klass.descriptor),
             # Define the closure vars
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', args=[], returns='V')
+            java.Map(),
         )
 
         for var_name in code.co_freevars:
@@ -294,53 +281,31 @@ class Function(Block):
                 JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(var_name),
             )
-
             self.load_name(var_name)
-
             self.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE(
-                    'java/util/Map',
-                    'put',
-                    args=['Ljava/lang/Object;', 'Ljava/lang/Object;'],
-                    returns='Ljava/lang/Object;'
-                ),
-                JavaOpcodes.POP(),
+                java.Map.put(),
             )
 
         self.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL(klass.descriptor, '<init>', args=['Ljava/util/Map;'], returns='V'),
-
-            JavaOpcodes.LDC_W(Classref(klass.descriptor)),
-            JavaOpcodes.INVOKESTATIC(
-                'org/python/types/Type',
-                'pythonType',
-                args=['Ljava/lang/Class;'],
-                returns='Lorg/python/types/Type;'
-            ),
-
-            JavaOpcodes.LDC_W('invoke'),
+            java.Init(klass.descriptor, 'Ljava/util/Map;'),
+            python.Type.for_name(klass.descriptor),
         )
 
         # Store the closure instance as an accessible symbol.
         self.add_callable(closure)
 
         self.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__setattr__',
-                args=['Ljava/lang/String;', 'Lorg/python/Object;'],
-                returns='V'
-            ),
-            JavaOpcodes.LDC_W('invoke'),
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getattribute__',
-                args=['Ljava/lang/String;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Object.set_attr('invoke'),
+            python.Object.get_attribute('invoke'),
         )
 
         return closure
+
+    def visitor_setup(self):
+        self.add_opcodes(
+            java.Map(),
+            ASTORE_name('#locals')
+        )
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0:
@@ -360,7 +325,7 @@ class Function(Block):
 
         if return_required:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;'),
+                python.NONE(),
                 JavaOpcodes.ARETURN()
             )
 
@@ -455,23 +420,10 @@ class InitMethod(Function):
             JavaOpcodes.DUP(),
             # TODO - this only allows using the default constructor
             # for extended Java classes.
-            JavaOpcodes.INVOKESPECIAL(self.klass.extends_descriptor, '<init>', args=[], returns='V'),
+            java.Init(self.klass.extends_descriptor),
+            python.Type.to_python(),
 
-            JavaOpcodes.INVOKESTATIC(
-                'org/python/types/Type',
-                'toPython',
-                args=['Ljava/lang/Object;'],
-                returns='Lorg/python/Object;'
-            ),
-
-            JavaOpcodes.LDC_W('__init__'),
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getattribute_null',
-                args=['Ljava/lang/String;'],
-                returns='Lorg/python/Object;'
-            ),
-
+            python.Object.get_attribute('__init__', use_null=True),
             # If no __init__ exists, just return.
             JavaOpcodes.DUP(),
             JavaOpcodes.IFNULL(13),  # 3
@@ -482,12 +434,7 @@ class InitMethod(Function):
             # ...and invoke it
             JavaOpcodes.ALOAD_1(),  # 1
             JavaOpcodes.ALOAD_2(),  # 1
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Callable',
-                'invoke',
-                args=['[Lorg/python/Object;', 'Ljava/util/Map;'],
-                returns='Lorg/python/Object;'
-            ),  # 5
+            python.Callable.invoke(),  # 5
 
             JavaOpcodes.POP(),  # 1
 
@@ -534,32 +481,19 @@ class Method(Function):
         # invoked via a native call, wrap it in a Java Object - unless
         # the object is an extension type, in which case the wrapper
         # object should already exist.
-        binding_opcodes = [
-            # JavaOpcodes.LDC_W("BINDING FOR " + self.name + self.signature),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+        binding = Accumulator(self.local_vars)
 
-            # JavaOpcodes.LDC_W("BOUND AS " + self.name + self.bound_signature),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
-
-            # JavaOpcodes.LDC_W("BINDING SELF IN"),
+        binding.add_opcodes(
+            # DEBUG("BINDING FOR " + self.name + self.signature),
+            # DEBUG("BOUND AS " + self.name + self.bound_signature),
             # JavaOpcodes.ALOAD_0(),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug',
-            #     args=['Ljava/lang/String;', 'Ljava/lang/Object;'], returns='V'),
+            # DEBUG_value("BINDING SELF IN"),
 
             JavaOpcodes.ALOAD_0(),
-            JavaOpcodes.INVOKESTATIC(
-                'org/python/types/Type',
-                'toPython',
-                args=['Ljava/lang/Object;'],
-                returns='Lorg/python/Object;'
-            ),  # 3
+            python.Type.to_python(),  # 3
 
-            # JavaOpcodes.DUP(),
-            # JavaOpcodes.LDC_W("BINDING SELF OUT"),
-            # JavaOpcodes.SWAP(),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug',
-            #     args=['Ljava/lang/String;', 'Ljava/lang/Object;'], returns='V'),
-        ]
+            # DEBUG_value("BINDING SELF OUT", dup=True),
+        )
 
         # Then extract each argument, converting to Python types as required.
         for i, param in enumerate(self.parameters[1:]):
@@ -568,191 +502,166 @@ class Method(Function):
             if annotation is None:
                 raise Exception("Parameters can't be void")
             elif annotation == "bool":
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-                    JavaOpcodes.NEW('org/python/types/Bool'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', args=['Z'], returns='V'),
-                ])
+                    java.New('org/python/types/Bool'),
+                    ILOAD_name(param['name']),
+                    java.Init('org/python/types/Bool', 'Z'),
+                )
             elif annotation == "byte":
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-                    JavaOpcodes.NEW('org/python/types/Int'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', args=['B'], returns='V'),
-                ])
+                    java.New('org/python/types/Int'),
+                    ILOAD_name(param['name']),
+                    java.Init('org/python/types/Int', 'B'),
+                )
             elif annotation == 'char':
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-                    JavaOpcodes.NEW('org/python/types/Str'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['C'], returns='V'),
-                ])
+                    java.New('org/python/types/Str'),
+                    ILOAD_name(param['name']),
+                    java.Init('org/python/types/Str', 'C'),
+                )
             elif annotation == "short":
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-                    JavaOpcodes.NEW('org/python/types/Int'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', args=['S'], returns='V'),
-                ])
+                    java.New('org/python/types/Int'),
+                    ILOAD_name(param['name']),
+                    java.Init('org/python/types/Int', 'S'),
+                )
             elif annotation == "int":
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-                    JavaOpcodes.NEW('org/python/types/Int'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', args=['I'], returns='V'),
-                ])
+                    java.New('org/python/types/Int'),
+                    ILOAD_name(param['name']),
+                    java.Init('org/python/types/Int', 'I'),
+                )
             elif annotation == "long":
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-                    JavaOpcodes.NEW('org/python/types/Int'),
-                    JavaOpcodes.DUP(),
-                    ILOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Int', '<init>', args=['J'], returns='V'),
-                ])
+                    java.New('org/python/types/Int'),
+                    ILOAD_name(param['name']),
+                    java.Init('org/python/types/Int', 'J'),
+                )
             elif annotation == "float":
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-                    JavaOpcodes.NEW('org/python/types/Float'),
-                    JavaOpcodes.DUP(),
-                    FLOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', args=['F'], returns='V'),
-                ])
+                    java.New('org/python/types/Float'),
+                    FLOAD_name(param['name']),
+                    java.Init('org/python/types/Float', 'F'),
+                )
             elif annotation == "double":
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-                    JavaOpcodes.NEW('org/python/types/Float'),
-                    JavaOpcodes.DUP(),
-                    DLOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESPECIAL('org/python/types/Float', '<init>', args=['D'], returns='V'),
-                ])
+                    java.New('org/python/types/Float'),
+                    DLOAD_name(param['name']),
+                    java.Init('org/python/types/Float', 'D'),
+                )
             else:
-                binding_opcodes.extend([
-                    # JavaOpcodes.LDC_W("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
-                    ALOAD_name(self, param['name']),
-                    JavaOpcodes.INVOKESTATIC(
-                        'org/python/types/Type',
-                        'toPython',
-                        args=['Ljava/lang/Object;'],
-                        returns='Lorg/python/Object;'
-                    ),
-                ])
+                binding.add_opcodes(
+                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+                    ALOAD_name(param['name']),
+                    python.Type.to_python(),
+                )
 
-            # self.add_opcodes(
-            #     JavaOpcodes.LDC_W("INPUT %s TRANSFORMED" % (i)),
-            #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+            # binding.add_opcodes(
+            #     DEBUG("INPUT %s TRANSFORMED" % (i)),
             # )
-        # self.add_opcodes(
-        #     JavaOpcodes.LDC_W("INPUTS TRANSFORMED"),
-        #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+        # binding.add_opcodes(
+        #     DEBUG("INPUTS TRANSFORMED"),
         # )
 
         # Then call the method, and process the return type.
-        binding_opcodes.extend([
+        binding.add_opcodes(
             JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.name, self.signature),
-        ])
+        )
 
         # Now convert the return type to a native type.
         return_type = self.returns['annotation']
 
         if return_type == 'void':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.POP(),
                 JavaOpcodes.RETURN()
-            ])
+            )
         elif return_type == 'bool':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/Bool'),
                 JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
                 JavaOpcodes.IRETURN(),
-            ])
+            )
         elif return_type == 'byte':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/Int'),
                 JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
                 JavaOpcodes.L2I(),
                 JavaOpcodes.I2B(),
                 JavaOpcodes.IRETURN(),
-            ])
+            )
         elif return_type == 'char':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', args=[], returns='Ljava/lang/Object;'),
                 JavaOpcodes.CHECKCAST('java/lang/String'),
                 ICONST_val(0),
                 JavaOpcodes.INVOKEVIRTUAL('java/lang/String', 'charAt', args=['I'], returns='C'),
                 JavaOpcodes.IRETURN(),
-            ])
+            )
         elif return_type == 'short':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/Int'),
                 JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
                 JavaOpcodes.L2I(),
                 JavaOpcodes.I2S(),
                 JavaOpcodes.IRETURN(),
-            ])
+            )
         elif return_type == 'int':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/Int'),
                 JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
                 JavaOpcodes.L2I(),
                 JavaOpcodes.IRETURN(),
-            ])
+            )
         elif return_type == 'long':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/Int'),
                 JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
                 JavaOpcodes.LRETURN(),
-            ])
+            )
         elif return_type == 'float':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/Float'),
                 JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
                 JavaOpcodes.DTOF(),
                 JavaOpcodes.FRETURN(),
-            ])
+            )
         elif return_type == 'double':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/Float'),
                 JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
                 JavaOpcodes.DRETURN(),
-            ])
+            )
         elif return_type != 'org/python/Object':
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', args=[], returns='Ljava/lang/Object;'),
                 JavaOpcodes.CHECKCAST(return_type.replace('.', '/')),
                 JavaOpcodes.ARETURN(),
-            ])
+            )
         else:
-            binding_opcodes.extend([
+            binding.add_opcodes(
                 JavaOpcodes.ARETURN()
-            ])
+            )
 
-        # binding_opcodes.extend([
-        #     JavaOpcodes.LDC_W("BINDING OUTPUT to type %s" % self.returns['annotation']),
-        #     JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
-        # ])
+        # binding.add_opcodes(
+        #     DEBUG("BINDING OUTPUT to type %s" % self.returns['annotation']),
+        # )
 
         wrapper_methods = [
             JavaMethod(
@@ -762,7 +671,7 @@ class Method(Function):
                     JavaCode(
                         max_stack=len(self.parameters) + 5,
                         max_locals=len(self.parameters),
-                        code=binding_opcodes
+                        code=binding.opcodes
                     )
                 ]
             ),
@@ -770,13 +679,14 @@ class Method(Function):
 
         if self.klass.extends:
             # We also need to generate a manual call to the super
-            super_opcodes = [
+            super_wrapper = Accumulator()
+            super_wrapper.add_opcodes(
                 JavaOpcodes.ALOAD_0(),
-            ]
+            )
 
             # Then extract each argument:
             for i, param in enumerate(self.parameters[1:]):
-                super_opcodes.append({
+                super_wrapper.add_opcodes({
                         'bool': JavaOpcodes.ILOAD(i + 1),
                         'byte': JavaOpcodes.ILOAD(i + 1),
                         'char': JavaOpcodes.ILOAD(i + 1),
@@ -789,7 +699,7 @@ class Method(Function):
                 )
 
             # Then call the method, and process the return type.
-            super_opcodes.extend([
+            super_wrapper.add_opcodes(
                 JavaOpcodes.INVOKESPECIAL(self.klass.extends.replace('.', '/'), self.name, self.bound_signature),
 
                 {
@@ -804,9 +714,8 @@ class Method(Function):
                     'double': JavaOpcodes.DRETURN(),
                 }.get(self.returns['annotation'], JavaOpcodes.ARETURN()),
 
-                # JavaOpcodes.LDC_W("SUPER WRAPPER OUTPUT to type %s" % self.returns['annotation']),
-                # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
-            ])
+                # DEBUG("SUPER WRAPPER OUTPUT to type %s" % self.returns['annotation']),
+            )
 
             wrapper_methods.append(
                 JavaMethod(
@@ -816,7 +725,7 @@ class Method(Function):
                         JavaCode(
                             max_stack=len(self.parameters) + 2,
                             max_locals=len(self.parameters) + 2,
-                            code=super_opcodes
+                            code=super_wrapper.opcodes
                         )
                     ]
                 )
@@ -857,146 +766,85 @@ class MainFunction(Function):
 
     def store_name(self, name):
         self.add_opcodes(
-            ASTORE_name(self, '#value'),
+            ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.module.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-            JavaOpcodes.LDC_W(name),
-            ALOAD_name(self, '#value'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__setattr__',
-                args=['Ljava/lang/String;', 'Lorg/python/Object;'],
-                returns='V'
-            ),
+            ALOAD_name('#value'),
+            python.Object.set_attr(name),
+            free_name('#value')
         )
-        free_name(self, '#value')
 
     def store_dynamic(self):
         self.add_opcodes(
-            ASTORE_name(self, '#value'),
-            JavaOpcodes.LDC_W(self.module.class_name),
-            JavaOpcodes.INVOKESTATIC(
-                'org/python/types/Type',
-                'pythonType',
-                args=['Ljava/lang/String;'],
-                returns='Lorg/python/types/Type;'
-            ),
-
+            ASTORE_name('#value'),
+            python.Type.for_name(self.module.class_name),
             JavaOpcodes.GETFIELD('org/python/types/Type', '__dict__', 'Ljava/util/Map;'),
-            ALOAD_name(self, '#value'),
+            ALOAD_name('#value'),
 
-            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', args=['Ljava/util/Map;'], returns='V'),
+            java.Map.putAll(),
+            free_name('#value')
         )
-        free_name(self, '#value')
 
     def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            python.Str(self.module.full_name),
+            python.Object.get_item(),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getattribute__',
-                args=['Ljava/lang/String;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Object.get_attribute(name),
         )
 
     def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            python.Str(self.module.full_name),
+            python.Object.get_item(),
 
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.module.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/types/Module',
-                '__delattr__',
-                args=['Ljava/lang/String;'],
-                returns='V'
-            ),
+            python.Object.del_attr(name),
         )
 
     def visitor_setup(self):
         self.add_opcodes(
+            java.Map(),
+            ASTORE_name('#locals'),
             # Add a TRY-CATCH for SystemExit
             TRY(),
         )
         self.add_opcodes(
-                # Initialize and register this module
+                # Initialize this module
+                java.New(self.module.class_descriptor),
+                java.Init(self.module.class_descriptor),
+                ASTORE_name('#module'),
+
+                # Register the module by it's full name
                 JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-                JavaOpcodes.DUP(),
+                python.Str(self.module.full_name),
+                ALOAD_name('#module'),
+                python.Object.set_item(),
 
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.module.full_name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
+                # Register the same module as __main__
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                python.Str('__main__'),
+                ALOAD_name('#module'),
+                python.Object.set_item(),
 
-                JavaOpcodes.NEW(self.module.class_descriptor),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL(self.module.class_descriptor, '<init>', args=[], returns='V'),
-                ASTORE_name(self, '#module'),
+                # Set the module's __name__
+                ALOAD_name('#module'),
+                python.Str("__main__"),
+                python.Object.set_attr('__name__'),
 
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__setitem__',
-                    args=['Lorg/python/Object;', 'Lorg/python/Object;'],
-                    returns='V'
-                ),
-
-                # Register the same instances as __main__
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W('__main__'),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-                ALOAD_name(self, '#module'),
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__setitem__',
-                    args=['Lorg/python/Object;', 'Lorg/python/Object;'],
-                    returns='V'
-                ),
+                # Set the module's __package__
+                ALOAD_name('#module'),
+                python.NONE(),
+                python.Object.set_attr("__package__"),
 
                 # Run the module block.
-                ALOAD_name(self, '#module'),
+                ALOAD_name('#module'),
                 JavaOpcodes.INVOKEVIRTUAL(self.module.class_descriptor, 'module$import', args=[], returns='V'),
         )
 
@@ -1057,46 +905,24 @@ class Closure(Function):
     def load_name(self, name):
         if name in self.local_vars:
             self.add_opcodes(
-                ALOAD_name(self, name)
+                ALOAD_name(name)
             )
         elif name in self.klass.closure_var_names:
             self.add_opcodes(
-                ALOAD_name(self, '<closure>'),
+                ALOAD_name('<closure>'),
                 JavaOpcodes.CHECKCAST('org/python/types/Closure'),
                 JavaOpcodes.GETFIELD('org/python/types/Closure', 'closure_vars', 'Ljava/util/Map;'),
-                JavaOpcodes.LDC_W(name),
-                JavaOpcodes.INVOKEINTERFACE(
-                    'java/util/Map',
-                    'get',
-                    args=['Ljava/lang/Object;'],
-                    returns='Ljava/lang/Object;'
-                ),
+
+                java.Map.get(name),
             )
         else:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-                JavaOpcodes.NEW('org/python/types/Str'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(self.module.full_name),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__getitem__',
-                    args=['Lorg/python/Object;'],
-                    returns='Lorg/python/Object;'
-                ),
+                python.Str(self.module.full_name),
+                python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-                JavaOpcodes.LDC_W(name),
-
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/Module',
-                    '__getattribute__',
-                    args=['Ljava/lang/String;'],
-                    returns='Lorg/python/Object;'
-                ),
+                python.Object.get_attribute(name),
             )
 
 
@@ -1134,7 +960,7 @@ class ClosureInitMethod(InitMethod):
             # TODO - this only allows using the default constructor
             # for extended Java classes.
             JavaOpcodes.ALOAD_1(),
-            JavaOpcodes.INVOKESPECIAL(self.klass.extends_descriptor, '<init>', args=['Ljava/util/Map;'], returns='V'),
+            java.Init(self.klass.extends_descriptor, 'Ljava/util/Map;'),
 
             JavaOpcodes.RETURN()
         )
@@ -1161,29 +987,25 @@ class GeneratorFunction(Function):
         self.has_self = True
 
     def visitor_setup(self):
-        # Restore the variables needed for the entry of the generator.
         self.add_opcodes(
-            ALOAD_name(self, '<generator>'),
-            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', '[Lorg/python/Object;'),
+            # Restore the variables needed for the entry of the generator.
+            ALOAD_name('<generator>'),
+            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', 'Ljava/util/Map;'),
+            ASTORE_name('#locals'),
         )
 
-        for i, param in enumerate(self.parameters):
+        for param in self.parameters:
             self.add_opcodes(
-                JavaOpcodes.DUP(),
-                ICONST_val(i),
-                JavaOpcodes.AALOAD(),
-                JavaOpcodes.ASTORE(i + 1),
+                ALOAD_name('#locals'),
+                java.Map.get(param['name']),
+                ASTORE_name(param['name'])
             )
-        self.add_opcodes(
-            JavaOpcodes.POP(),
-        )
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
             self.add_opcodes(
-                JavaOpcodes.NEW('org/python/exceptions/StopIteration'),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKESPECIAL('org/python/exceptions/StopIteration', '<init>', args=[], returns='V'),
+                java.New('org/python/exceptions/StopIteration'),
+                java.Init('org/python/exceptions/StopIteration'),
                 JavaOpcodes.ATHROW(),
             )
 
@@ -1198,36 +1020,24 @@ class GeneratorFunction(Function):
         ]
 
     def transpile_wrapper(self):
-        wrapper_opcodes = [
+        wrapper = Accumulator()
+
+        wrapper.add_opcodes(
             # Construct a generator instance
-            JavaOpcodes.NEW('org/python/types/Generator'),
-            JavaOpcodes.DUP(),
+            java.New('org/python/types/Generator'),
 
             # p1: The name of the generator
             JavaOpcodes.LDC_W(self.generator),
 
             # p2: The actual generator method
-            JavaOpcodes.LDC_W(self.klass.class_name),
-            JavaOpcodes.INVOKESTATIC(
-                'java/lang/Class',
-                'forName',
-                args=['Ljava/lang/String;'],
-                returns='Ljava/lang/Class;'
-            ),
+            java.Class.forName(self.klass.class_name),
 
             JavaOpcodes.LDC_W(self.method_name + "$generator"),
-            ICONST_val(1),
-            JavaOpcodes.ANEWARRAY('java/lang/Class'),
-            JavaOpcodes.DUP(),
+            java.Array(1, 'java/lang/Class'),
 
+            JavaOpcodes.DUP(),
             ICONST_val(0),
-            JavaOpcodes.LDC_W('org.python.types.Generator'),
-            JavaOpcodes.INVOKESTATIC(
-                'java/lang/Class',
-                'forName',
-                args=['Ljava/lang/String;'],
-                returns='Ljava/lang/Class;'
-            ),
+            java.Class.forName('org.python.types.Generator'),
             JavaOpcodes.AASTORE(),
 
             JavaOpcodes.INVOKEVIRTUAL(
@@ -1239,28 +1049,28 @@ class GeneratorFunction(Function):
 
             # p3: The arguments passed to the generator method. These will be
             # restored on the first call to the generator.
-            ICONST_val(len(self.parameters)),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
-        ]
+            java.Map(),
+        )
 
         for i, param in enumerate(self.parameters):
-            wrapper_opcodes.extend([
+            wrapper.add_opcodes(
                 JavaOpcodes.DUP(),
-                ICONST_val(i),
+                JavaOpcodes.LDC_W(param['name']),
+
                 JavaOpcodes.ALOAD(i + (0 if self.static else 1)),
-                JavaOpcodes.AASTORE(),
-            ])
+                java.Map.put(),
+            )
 
         # Construct and return the generator object.
-        wrapper_opcodes.extend([
-            JavaOpcodes.INVOKESPECIAL(
+        wrapper.add_opcodes(
+            java.Init(
                 'org/python/types/Generator',
-                '<init>',
-                args=['Ljava/lang/String;', 'Ljava/lang/reflect/Method;', '[Lorg/python/Object;'],
-                returns='V'
+                'Ljava/lang/String;',
+                'Ljava/lang/reflect/Method;',
+                'Ljava/util/Map;',
             ),
             JavaOpcodes.ARETURN(),
-        ])
+        )
 
         return [
             JavaMethod(
@@ -1271,7 +1081,7 @@ class GeneratorFunction(Function):
                     JavaCode(
                         max_stack=len(self.parameters) + 8,
                         max_locals=len(self.parameters) + 8,
-                        code=wrapper_opcodes
+                        code=wrapper.opcodes
                     )
                 ]
             )

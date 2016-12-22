@@ -8,7 +8,11 @@ from .blocks import Block
 from .methods import (
     CO_GENERATOR, GeneratorFunction, Function,
 )
-from .utils import ALOAD_name, ASTORE_name, free_name
+from .types import java, python
+from .types.primitives import (
+    ALOAD_name, ASTORE_name, free_name,
+)
+# from .debug import DEBUG
 
 
 class Module(Block):
@@ -61,113 +65,76 @@ class Module(Block):
 
     # def visitor_setup(self):
     #     self.add_opcodes(
-    #         JavaOpcodes.LDC_W("STATIC BLOCK OF " + self.class_name),
-    #         JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+    #         DEBUG("STATIC BLOCK OF " + self.class_name),
     #     )
 
     def store_name(self, name):
         self.add_opcodes(
-            ASTORE_name(self, '#value'),
+            ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-            JavaOpcodes.LDC_W(name),
-            ALOAD_name(self, '#value'),
+            ALOAD_name('#value'),
+            python.Object.set_attr(name),
 
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__setattr__',
-                args=['Ljava/lang/String;', 'Lorg/python/Object;'],
-                returns='V'
-            ),
+            free_name('#value')
         )
-        free_name(self, '#value')
 
     def store_dynamic(self):
         self.add_opcodes(
-            ASTORE_name(self, '#value'),
+            ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
 
-            ALOAD_name(self, '#value'),
-            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', args=['Ljava/util/Map;'], returns='V'),
+            ALOAD_name('#value'),
+            java.Map.putAll(),
+
+            free_name('#value')
         )
-        free_name(self, '#value')
+
+    def store_local(self):
+        self.store_global()
 
     def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getattribute__',
-                args=['Ljava/lang/String;'],
-                returns='Lorg/python/Object;'
-            ),
+
+            python.Object.get_attribute(name),
         )
+
+    def load_globals(self):
+        self.add_opcodes(
+            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            python.Str(self.full_name),
+            python.Object.get_item(),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
+        )
+
+    def load_locals(self):
+        self.load_globals()
+
+    def load_vars(self):
+        self.load_globals()
 
     def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/types/Module',
-                '__delattr__',
-                args=['Ljava/lang/String;'],
-                returns='V'
-            ),
+
+            python.Object.del_attr(name),
         )
 
     def add_function(self, name, code, parameter_signatures, return_signature):
@@ -219,23 +186,10 @@ class Module(Block):
         self.classes.append(klass)
 
         self.add_opcodes(
-            # JavaOpcodes.LDC_W("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
-            # JavaOpcodes.INVOKESTATIC('org/Python', 'debug', args=['Ljava/lang/String;'], returns='V'),
+            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
 
-            JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
-            JavaOpcodes.INVOKESTATIC(
-                'java/lang/Class',
-                'forName',
-                args=['Ljava/lang/String;'],
-                returns='Ljava/lang/Class;'
-            ),
-
-            JavaOpcodes.INVOKESTATIC(
-                'org/python/types/Type',
-                'pythonType',
-                args=['Ljava/lang/Class;'],
-                returns='Lorg/python/types/Type;'
-            ),
+            java.Class.forName(klass.descriptor.replace('/', '.')),
+            python.Type.for_class(),
         )
 
         self.store_name(klass.name)

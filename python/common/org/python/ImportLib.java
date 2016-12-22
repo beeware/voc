@@ -4,10 +4,56 @@ public class ImportLib {
     /**
      * Factory method to obtain Python classes from their Java counterparts
      */
-    public static org.python.types.Module __import__(java.lang.String python_name, java.lang.String [] from_list, int level) {
+    public static org.python.types.Module __import__(
+            java.lang.String python_name,
+            java.util.Map<java.lang.String, org.python.Object> globals,
+            java.util.Map<java.lang.String, org.python.Object> locals,
+            java.lang.String [] from_list,
+            int level) {
         // Create an array containing the module path.
+        // System.out.println("Import from " + python_name + " level " + level);
+        // System.out.println("from_list");
+        // if (from_list != null) {
+        //     for (java.lang.String s: from_list) {
+        //         System.out.println("    " + s);
+        //     }
+        // }
+        // System.out.println("globals = " + globals);
+        // System.out.println("locals = " + locals);
         boolean native_import;
-        java.lang.String [] path = python_name.split("\\.");
+
+        java.lang.String [] path;
+        if (level == 0) {
+            path = python_name.split("\\.");
+        } else {
+
+            java.lang.String [] context = ((java.lang.String) globals.get("__name__").toJava()).split("\\.");
+            // System.out.println("context");
+            // for (java.lang.String s: context) {
+            //     System.out.println("    " + s);
+            // }
+
+            if (python_name != null) {
+                java.lang.String [] import_path = python_name.split("\\.");
+                // System.out.println("import_path");
+                // for (java.lang.String s: import_path) {
+                //     System.out.println("    " + s);
+                // }
+
+                path = new java.lang.String [import_path.length + context.length - (level - 1)];
+
+                System.arraycopy(context, 0, path, 0, context.length - (level - 1));
+                System.arraycopy(import_path, 0, path, context.length - (level - 1), import_path.length);
+            } else {
+                path = new java.lang.String [context.length - level];
+                System.arraycopy(context, 0, path, 0, context.length - level);
+            }
+        }
+
+        // System.out.println("final path");
+        // for (java.lang.String s: path) {
+        //     System.out.println("    " + s);
+        // }
         java.lang.StringBuilder import_name = new java.lang.StringBuilder();
         // If the package name isn't clearly identifiable as a java package path,
         // put it in the python namespace.
@@ -111,6 +157,7 @@ public class ImportLib {
                 }
             }
         }
+        // System.out.println("IMPORTED " + return_module);
         return return_module;
     }
 

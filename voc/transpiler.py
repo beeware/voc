@@ -3,7 +3,7 @@ import os
 import sys
 
 from .python.ast import Visitor
-from .python.utils import dump
+from .python.debug import dump
 
 
 def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):

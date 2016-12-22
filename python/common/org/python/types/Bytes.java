@@ -26,6 +26,14 @@ public class Bytes extends org.python.types.Object {
         this.value = Arrays.copyOf(value, value.length);
     }
 
+    public Bytes(java.lang.String value) {
+        try {
+            this.value = value.getBytes("ISO-8859-1");
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new org.python.exceptions.UnicodeDecodeError();
+        }
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("str.__new__() has not been implemented.");
     // }

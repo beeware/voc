@@ -203,11 +203,12 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // or an AttributeError representation of the NoSuchFieldException.
             try {
                 value = new org.python.java.Field(this.klass.getDeclaredField(name));
+                this.__dict__.put(name, value);
             } catch (java.lang.NoSuchFieldException e) {
-                value = new org.python.exceptions.AttributeError(this.klass, name);
+                value = null;
+                this.__dict__.put(name, new org.python.exceptions.AttributeError(this.klass, name));
             }
-            this.__dict__.put(name, value);
-            value = null;
+            // value = null;
         }
 
         // If the result of the lookup is an AttributeError, there's
