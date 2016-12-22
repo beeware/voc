@@ -259,10 +259,6 @@ class Block:
         )
 
         self.add_tuple(function.code.co_consts)
-        # self.add_opcodes(
-        #         JavaOpcodes.ACONST_NULL(),  # co_consts
-        # )
-
         self.add_str(function.code.co_filename)
         self.add_int(function.code.co_firstlineno)
         self.add_int(function.code.co_flags)
