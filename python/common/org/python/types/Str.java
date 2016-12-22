@@ -25,6 +25,10 @@ public class Str extends org.python.types.Object {
         return this.value.hashCode();
     }
 
+    public Str() {
+        this.value = "";
+    }
+
     public Str(java.lang.String str) {
         this.value = str;
     }

@@ -8,10 +8,11 @@ from .blocks import Block
 from .methods import (
     CO_GENERATOR, GeneratorFunction, Function,
 )
-from .utils import (
+from .types import java, python
+from .types.primitives import (
     ALOAD_name, ASTORE_name, free_name,
-    # DEBUG
 )
+# from .debug import DEBUG
 
 
 class Module(Block):
@@ -71,29 +72,13 @@ class Module(Block):
         self.add_opcodes(
             ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-            JavaOpcodes.LDC_W(name),
             ALOAD_name('#value'),
+            python.Object.set_attr(name),
 
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__setattr__',
-                args=['Ljava/lang/String;', 'Lorg/python/Object;'],
-                returns='V'
-            ),
             free_name('#value')
         )
 
@@ -101,24 +86,15 @@ class Module(Block):
         self.add_opcodes(
             ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
 
             ALOAD_name('#value'),
-            JavaOpcodes.INVOKEINTERFACE('java/util/Map', 'putAll', args=['Ljava/util/Map;'], returns='V'),
+            java.Map.putAll(),
+
             free_name('#value')
         )
 
@@ -128,48 +104,18 @@ class Module(Block):
     def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getattribute__',
-                args=['Ljava/lang/String;'],
-                returns='Lorg/python/Object;'
-            ),
+
+            python.Object.get_attribute(name),
         )
 
     def load_globals(self):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL(
-                'org/python/types/Str',
-                '<init>',
-                args=['Ljava/lang/String;'],
-                returns='V'
-            ),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
@@ -184,26 +130,11 @@ class Module(Block):
     def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
-            JavaOpcodes.NEW('org/python/types/Str'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.LDC_W(self.full_name),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Str', '<init>', args=['Ljava/lang/String;'], returns='V'),
-
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Object',
-                '__getitem__',
-                args=['Lorg/python/Object;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Str(self.full_name),
+            python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.LDC_W(name),
-            JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/types/Module',
-                '__delattr__',
-                args=['Ljava/lang/String;'],
-                returns='V'
-            ),
+
+            python.Object.del_attr(name),
         )
 
     def add_function(self, name, code, parameter_signatures, return_signature):
@@ -257,20 +188,8 @@ class Module(Block):
         self.add_opcodes(
             # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
 
-            JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
-            JavaOpcodes.INVOKESTATIC(
-                'java/lang/Class',
-                'forName',
-                args=['Ljava/lang/String;'],
-                returns='Ljava/lang/Class;'
-            ),
-
-            JavaOpcodes.INVOKESTATIC(
-                'org/python/types/Type',
-                'pythonType',
-                args=['Ljava/lang/Class;'],
-                returns='Lorg/python/types/Type;'
-            ),
+            java.Class.forName(klass.descriptor.replace('/', '.')),
+            python.Type.for_class(),
         )
 
         self.store_name(klass.name)

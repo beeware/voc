@@ -2,18 +2,24 @@ import ast
 import sys
 import traceback
 
-from ..java import opcodes as JavaOpcodes, Classref
+from ..java import opcodes as JavaOpcodes
 from .modules import Module
 from .methods import MainFunction
-from .utils import (
-    dump,
+from .structures import (
     IF, ELSE, END_IF,
     TRY, CATCH, FINALLY, END_TRY,
     START_LOOP, END_LOOP,
-    ICONST_val,
     ArgType,
     jump, OpcodePosition,
+    AddToArgs, AddToKwargs
+)
+from .types.primitives import (
     ASTORE_name, ALOAD_name, free_name,
+    ICONST_val,
+)
+from .types import java, python
+from .debug import (
+    dump,
     # DEBUG, DEBUG_name
 )
 
@@ -308,8 +314,7 @@ class Visitor(ast.NodeVisitor):
             self.visit(decorator)
             self.context.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/Callable'),
-                JavaOpcodes.ICONST_1(),
-                JavaOpcodes.ANEWARRAY('org/python/Object'),
+                java.Array(1),
                 JavaOpcodes.DUP(),
                 JavaOpcodes.ICONST_0(),
             )
@@ -325,11 +330,7 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 JavaOpcodes.AASTORE(),
                 JavaOpcodes.ACONST_NULL(),
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Callable',
-                    'invoke',
-                    args=['[Lorg/python/Object;', 'Ljava/util/Map;'],
-                    returns='Lorg/python/Object;'),
+                python.Callable.invoke(),
             )
 
         # Store the callable object as an accessible symbol.
@@ -409,21 +410,11 @@ class Visitor(ast.NodeVisitor):
             self.visit(target)
             if isinstance(target, ast.Attribute):
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__delattr__',
-                        args=['Ljava/lang/String;'],
-                        returns='V'
-                    ),
+                    python.Object.del_attr()
                 )
             elif isinstance(target, ast.Subscript):
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__delitem__',
-                        args=['Lorg/python/Object;'],
-                        returns='V'
-                    ),
+                    python.Object.del_item()
                 )
             else:
                 raise NotImplementedError('No handler for Delete of type %s' % target)
@@ -480,7 +471,7 @@ class Visitor(ast.NodeVisitor):
     def visit_For(self, node):
         self.visit(node.iter)
         self.context.add_opcodes(
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', args=[], returns='Lorg/python/Iterable;')
+            python.Object.iter()
         )
 
         loop = START_LOOP()
@@ -495,12 +486,7 @@ class Visitor(ast.NodeVisitor):
         self.context.load_name('#for-iter-%x' % id(node)),
         self.context.add_opcodes(
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Iterable',
-                        '__next__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
+                    python.Iterable.next(),
         )
         self.context.add_opcodes(
                 CATCH('org/python/exceptions/StopIteration'),
@@ -535,16 +521,7 @@ class Visitor(ast.NodeVisitor):
         )
         self.visit(node.test)
         self.context.add_opcodes(
-            IF([
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__bool__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
-                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
-                ], JavaOpcodes.IFNE),
+            IF([python.Object.as_boolean()], JavaOpcodes.IFNE),
         )
         self.context.add_opcodes(
                 jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
@@ -566,16 +543,7 @@ class Visitor(ast.NodeVisitor):
         self.visit(node.test)
 
         self.context.add_opcodes(
-            IF([
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__bool__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
-                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
-                ], JavaOpcodes.IFEQ),
+            IF([python.Object.as_boolean()], JavaOpcodes.IFEQ),
         )
 
         for child in node.body:
@@ -615,20 +583,14 @@ class Visitor(ast.NodeVisitor):
 
             exception = self.full_classref(name, default_prefix='org.python.exceptions')
             self.context.add_opcodes(
-                JavaOpcodes.NEW(exception),
-                JavaOpcodes.DUP(),
+                java.New(exception),
             )
 
             for arg in args:
                 self.visit(arg)
 
             self.context.add_opcodes(
-                JavaOpcodes.INVOKESPECIAL(
-                    exception,
-                    '<init>',
-                    args=['Lorg/python/Object;'] * len(args),
-                    returns='V'
-                ),
+                java.Init(exception, *(['Lorg/python/Object;'] * len(args)))
             )
 
         self.context.add_opcodes(
@@ -686,35 +648,20 @@ class Visitor(ast.NodeVisitor):
     def visit_Assert(self, node):
         self.visit(node.test)
         self.context.add_opcodes(
-            IF([
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__bool__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
-                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
-                ], JavaOpcodes.IFNE),
+            IF([python.Object.as_boolean()], JavaOpcodes.IFNE),
         )
         self.context.add_opcodes(
-                JavaOpcodes.NEW('org/python/exceptions/AssertionError'),
-                JavaOpcodes.DUP(),
+                java.New('org/python/exceptions/AssertionError'),
         )
 
         if node.msg:
             self.visit(node.msg)
             self.context.add_opcodes(
-                    JavaOpcodes.INVOKESPECIAL(
-                        'org/python/exceptions/AssertionError',
-                        '<init>',
-                        args=['Lorg/python/Object;'],
-                        returns='V'
-                    ),
+                    java.Init('org/python/exceptions/AssertionError', 'Lorg/python/Object;'),
             )
         else:
             self.context.add_opcodes(
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/AssertionError', '<init>', args=[], returns='V'),
+                    java.Init('org/python/exceptions/AssertionError'),
             )
 
         self.context.add_opcodes(
@@ -771,8 +718,7 @@ class Visitor(ast.NodeVisitor):
         self.context.load_locals()
 
         self.context.add_opcodes(
-            ICONST_val(len(node.names)),
-            JavaOpcodes.ANEWARRAY('java/lang/String'),
+            java.Array(len(node.names), 'java/lang/String'),
         )
 
         for i, alias in enumerate(node.names):
@@ -816,13 +762,7 @@ class Visitor(ast.NodeVisitor):
             for alias in node.names:
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W(alias.name),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__getattribute__',
-                        args=['Ljava/lang/String;'],
-                        returns='Lorg/python/Object;'
-                    ),
+                    python.Object.get_attribute(alias.name),
                 )
 
                 if alias.asname:
@@ -883,9 +823,7 @@ class Visitor(ast.NodeVisitor):
                 # it's truthiness. If it matches the boolean operation,
                 # we've found a match; jump to the end.
                 JavaOpcodes.DUP(),
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__bool__', args=[], returns='Lorg/python/Object;'),
-                JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-                JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+                python.Object.as_boolean(),
                 jump(comparison(0), self.context, node, OpcodePosition.END),
 
                 # This value wasn't a match; pop it off the stack.
@@ -962,16 +900,7 @@ class Visitor(ast.NodeVisitor):
         self.visit(node.test)
 
         self.context.add_opcodes(
-            IF([
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__bool__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
-                    JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-                    JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
-                ], JavaOpcodes.IFEQ),
+            IF([python.Object.as_boolean()], JavaOpcodes.IFEQ),
         )
 
         self.visit(node.body)
@@ -989,12 +918,7 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Dict(self, node):
         self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Dict'),
-            JavaOpcodes.DUP(),
-
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', args=[], returns='V')
+            python.Dict()
         )
 
         for kchild, vchild in zip(node.keys, node.values):
@@ -1006,28 +930,16 @@ class Visitor(ast.NodeVisitor):
             self.visit(vchild)
 
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE(
-                    'java/util/Map',
-                    'put',
-                    args=['Ljava/lang/Object;', 'Ljava/lang/Object;'],
-                    returns='Ljava/lang/Object;'
-                ),
-                JavaOpcodes.POP(),
+                python.Dict.set_item(),
             )
 
         self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', args=['Ljava/util/Map;'], returns='V')
         )
 
     @node_visitor
     def visit_Set(self, node):
         self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Set'),
-            JavaOpcodes.DUP(),
-
-            JavaOpcodes.NEW('java/util/HashSet'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashSet', '<init>', args=[], returns='V')
+            python.Set()
         )
 
         for child in node.elts:
@@ -1038,13 +950,8 @@ class Visitor(ast.NodeVisitor):
             self.visit(child)
 
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('java/util/Set', 'add', args=['Ljava/lang/Object;'], returns='Z'),
-                JavaOpcodes.POP(),
+                python.Set.add()
             )
-
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Set', '<init>', '(Ljava/util/Set;)V')
-        )
 
     @node_visitor
     def visit_ListComp(self, node):
@@ -1074,9 +981,7 @@ class Visitor(ast.NodeVisitor):
         LocalsVisitor(listcomp).visit(node)
 
         self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/List'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', args=[], returns='V'),
+            python.List(),
         )
         self.context.store_name('#listcomp-result-%x' % id(node))
 
@@ -1087,12 +992,7 @@ class Visitor(ast.NodeVisitor):
             if isinstance(generator, ast.comprehension):
                 self.context.add_opcodes(
                     ALOAD_name('.%s' % i),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__iter__',
-                        args=[],
-                        returns='Lorg/python/Iterable;'
-                    )
+                    python.Object.iter(),
                 )
             else:
                 raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
@@ -1109,12 +1009,7 @@ class Visitor(ast.NodeVisitor):
         self.context.load_name('#listcomp-iter-%x' % id(node))
         self.context.add_opcodes(
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Iterable',
-                        '__next__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
+                    python.Iterable.next(),
         )
         self.context.add_opcodes(
                 CATCH('org/python/exceptions/StopIteration'),
@@ -1138,13 +1033,7 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/List'),
                 JavaOpcodes.SWAP(),
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/List',
-                    'append',
-                    args=['Lorg/python/Object;'],
-                    returns='Lorg/python/Object;'
-                ),
-                JavaOpcodes.POP(),
+                python.List.append(),
         )
         self.context.add_opcodes(
             END_LOOP(),
@@ -1163,8 +1052,7 @@ class Visitor(ast.NodeVisitor):
         # Now invoke the list comprehension
         self.context.load_name('listcomp_%x' % id(node))
         self.context.add_opcodes(
-            ICONST_val(len(node.generators)),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
+            java.Array(len(node.generators))
         )
 
         for i, generator in enumerate(node.generators):
@@ -1182,17 +1070,10 @@ class Visitor(ast.NodeVisitor):
 
         self.context.add_opcodes(
             # No keyword arguments
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', args=[], returns='V'),
+            JavaOpcodes.ACONST_NULL(),
 
             # Now invoke.
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Callable',
-                'invoke',
-                args=['[Lorg/python/Object;', 'Ljava/util/Map;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Callable.invoke(),
         )
 
         # FIXME: This would be a much more efficient way to invoke
@@ -1241,9 +1122,7 @@ class Visitor(ast.NodeVisitor):
         LocalsVisitor(setcomp).visit(node)
 
         self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Set'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Set', '<init>', args=[], returns='V'),
+            python.Set(),
         )
         self.context.store_name('#setcomp-result-%x' % id(node)),
 
@@ -1254,12 +1133,7 @@ class Visitor(ast.NodeVisitor):
             if isinstance(generator, ast.comprehension):
                 self.context.add_opcodes(
                     ALOAD_name('.%s' % i),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__iter__',
-                        args=[],
-                        returns='Lorg/python/Iterable;'
-                    )
+                    python.Object.iter()
                 )
             else:
                 raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
@@ -1276,12 +1150,7 @@ class Visitor(ast.NodeVisitor):
         self.context.load_name('#setcomp-iter-%x' % id(node))
         self.context.add_opcodes(
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Iterable',
-                        '__next__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
+                    python.Iterable.next(),
         )
         self.context.add_opcodes(
                 CATCH('org/python/exceptions/StopIteration'),
@@ -1305,13 +1174,7 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
                 JavaOpcodes.CHECKCAST('org/python/types/Set'),
                 JavaOpcodes.SWAP(),
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/Set',
-                    'add',
-                    args=['Lorg/python/Object;'],
-                    returns='Lorg/python/Object;'
-                ),
-                JavaOpcodes.POP(),
+                python.Set.add(),
         )
         self.context.add_opcodes(
             END_LOOP(),
@@ -1330,8 +1193,7 @@ class Visitor(ast.NodeVisitor):
         # Now invoke the set comprehension
         self.context.load_name('setcomp_%x' % id(node))
         self.context.add_opcodes(
-            ICONST_val(len(node.generators)),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
+            java.Array(len(node.generators)),
         )
 
         for i, generator in enumerate(node.generators):
@@ -1349,17 +1211,10 @@ class Visitor(ast.NodeVisitor):
 
         self.context.add_opcodes(
             # No keyword arguments
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', args=[], returns='V'),
+            JavaOpcodes.ACONST_NULL(),
 
             # Now invoke.
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Callable',
-                'invoke',
-                args=['[Lorg/python/Object;', 'Ljava/util/Map;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Callable.invoke(),
         )
 
     @node_visitor
@@ -1389,9 +1244,8 @@ class Visitor(ast.NodeVisitor):
         LocalsVisitor(dictcomp).visit(node)
 
         self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Dict'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Dict', '<init>', args=[], returns='V'),
+            java.New('org/python/types/Dict'),
+            java.Init('org/python/types/Dict'),
         )
         self.context.store_name('#dictcomp-result-%x' % id(node))
 
@@ -1402,12 +1256,7 @@ class Visitor(ast.NodeVisitor):
             if isinstance(generator, ast.comprehension):
                 self.context.add_opcodes(
                     ALOAD_name('.%s' % i),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__iter__',
-                        args=[],
-                        returns='Lorg/python/Iterable;'
-                    )
+                    python.Object.iter()
                 )
             else:
                 raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
@@ -1424,12 +1273,7 @@ class Visitor(ast.NodeVisitor):
         self.context.load_name('#dictcomp-iter-%x' % id(node)),
         self.context.add_opcodes(
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Iterable',
-                        '__next__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
+                    python.Iterable.next(),
         )
         self.context.add_opcodes(
                 CATCH('org/python/exceptions/StopIteration'),
@@ -1462,13 +1306,7 @@ class Visitor(ast.NodeVisitor):
             JavaOpcodes.CHECKCAST('org/python/types/Dict'),
             ALOAD_name('#dictcomp-key-%x' % id(node)),
             ALOAD_name('#dictcomp-value-%x' % id(node)),
-            JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/types/Dict',
-                '__setitem__',
-                args=['Lorg/python/Object;', 'Lorg/python/Object;'],
-                returns='V'
-            ),
-
+            python.Dict.set_item(),
             END_LOOP(),
         )
         self.context.load_name('#dictcomp-result-%x' % id(node))
@@ -1488,8 +1326,7 @@ class Visitor(ast.NodeVisitor):
         # Now invoke the dict comprehension
         self.context.load_name('dictcomp_%x' % id(node))
         self.context.add_opcodes(
-            ICONST_val(len(node.generators)),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
+            java.Array(len(node.generators)),
         )
 
         for i, generator in enumerate(node.generators):
@@ -1507,17 +1344,10 @@ class Visitor(ast.NodeVisitor):
 
         self.context.add_opcodes(
             # No keyword arguments
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', args=[], returns='V'),
+            JavaOpcodes.ACONST_NULL(),
 
             # Now invoke.
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Callable',
-                'invoke',
-                args=['[Lorg/python/Object;', 'Ljava/util/Map;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Callable.invoke(),
         )
 
     @node_visitor
@@ -1554,12 +1384,7 @@ class Visitor(ast.NodeVisitor):
             if isinstance(generator, ast.comprehension):
                 self.context.add_opcodes(
                     ALOAD_name('.%s' % i),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__iter__',
-                        args=[],
-                        returns='Lorg/python/Iterable;'
-                    )
+                    python.Object.iter()
                 )
             else:
                 raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
@@ -1575,12 +1400,7 @@ class Visitor(ast.NodeVisitor):
         self.context.load_name('#genexp-iter-%x' % id(node)),
         self.context.add_opcodes(
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Iterable',
-                        '__next__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    ),
+                    python.Iterable.next(),
         )
         self.context.add_opcodes(
                 CATCH('org/python/exceptions/StopIteration'),
@@ -1607,16 +1427,7 @@ class Visitor(ast.NodeVisitor):
             # Save the current stack and yield index
             ALOAD_name('<generator>'),
             ALOAD_name('#locals'),
-            ICONST_val(yield_point),
-            JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/types/Generator',
-                'yield',
-                args=['Ljava/util/Map;', 'I'],
-                returns='V'
-            ),
-
-            # "yield" by returning from the generator method.
-            JavaOpcodes.ARETURN()
+            java.Yield(yield_point),
         )
 
         # On restore, the next instruction is the target
@@ -1635,13 +1446,7 @@ class Visitor(ast.NodeVisitor):
             if index is not None and var not in ('<generator>', '#locals'):
                 self.context.add_opcodes(
                     ALOAD_name('#locals'),
-                    JavaOpcodes.LDC_W(var),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'java/util/Map',
-                        'get',
-                        args=['Ljava/lang/Object;'],
-                        returns='Ljava/lang/Object;'
-                    ),
+                    java.Map.get(var),
                     JavaOpcodes.ASTORE(index),
                 )
 
@@ -1657,8 +1462,7 @@ class Visitor(ast.NodeVisitor):
         # Now invoke the list comprehension
         self.context.load_name('genexp_%x' % id(node))
         self.context.add_opcodes(
-            ICONST_val(len(node.generators)),
-            JavaOpcodes.ANEWARRAY('org/python/Object'),
+            java.Array(len(node.generators)),
         )
 
         for i, generator in enumerate(node.generators):
@@ -1676,17 +1480,10 @@ class Visitor(ast.NodeVisitor):
 
         self.context.add_opcodes(
             # No keyword arguments
-            JavaOpcodes.NEW('java/util/HashMap'),
-            JavaOpcodes.DUP(),
-            JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', args=[], returns='V'),
+            JavaOpcodes.ACONST_NULL(),
 
             # Now invoke.
-            JavaOpcodes.INVOKEINTERFACE(
-                'org/python/Callable',
-                'invoke',
-                args=['[Lorg/python/Object;', 'Ljava/util/Map;'],
-                returns='Lorg/python/Object;'
-            ),
+            python.Callable.invoke(),
         )
 
     @node_visitor
@@ -1700,16 +1497,7 @@ class Visitor(ast.NodeVisitor):
             # Save the current stack and yield index
             ALOAD_name('<generator>'),
             ALOAD_name('#locals'),
-            ICONST_val(yield_point),
-            JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/types/Generator',
-                'yield',
-                args=['Ljava/util/Map;', 'I'],
-                returns='V'
-            ),
-
-            # "yield" by returning from the generator method.
-            JavaOpcodes.ARETURN()
+            java.Yield(yield_point),
         )
 
         # On restore, the next instruction is the target
@@ -1728,13 +1516,7 @@ class Visitor(ast.NodeVisitor):
             if index is not None and var not in ('<generator>', '#locals'):
                 self.context.add_opcodes(
                     ALOAD_name('#locals'),
-                    JavaOpcodes.LDC_W(var),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'java/util/Map',
-                        'get',
-                        args=['Ljava/lang/Object;'],
-                        returns='Ljava/lang/Object;'
-                    ),
+                    java.Map.get(var),
                     JavaOpcodes.ASTORE(index),
                 )
 
@@ -1760,19 +1542,17 @@ class Visitor(ast.NodeVisitor):
                     IF([], JavaOpcodes.IF_ACMPNE),
                 )
                 self.context.add_opcodes(
-                        JavaOpcodes.NEW('org/python/types/Bool'),
-                        JavaOpcodes.DUP(),
+                        java.New('org/python/types/Bool'),
                         JavaOpcodes.ICONST_1(),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                        java.Init('org/python/types/Bool', 'Z'),
                 )
                 self.context.add_opcodes(
                     ELSE(),
                 )
                 self.context.add_opcodes(
-                        JavaOpcodes.NEW('org/python/types/Bool'),
-                        JavaOpcodes.DUP(),
+                        java.New('org/python/types/Bool'),
                         JavaOpcodes.ICONST_0(),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                        java.Init('org/python/types/Bool', 'Z'),
                 )
                 self.context.add_opcodes(
                     END_IF(),
@@ -1783,19 +1563,17 @@ class Visitor(ast.NodeVisitor):
                     IF([], JavaOpcodes.IF_ACMPEQ),
                 )
                 self.context.add_opcodes(
-                        JavaOpcodes.NEW('org/python/types/Bool'),
-                        JavaOpcodes.DUP(),
+                        java.New('org/python/types/Bool'),
                         JavaOpcodes.ICONST_1(),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                        java.Init('org/python/types/Bool', 'Z'),
                 )
                 self.context.add_opcodes(
                     ELSE(),
                 )
                 self.context.add_opcodes(
-                        JavaOpcodes.NEW('org/python/types/Bool'),
-                        JavaOpcodes.DUP(),
+                        java.New('org/python/types/Bool'),
                         JavaOpcodes.ICONST_0(),
-                        JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                        java.Init('org/python/types/Bool', 'Z'),
                 )
                 self.context.add_opcodes(
                     END_IF(),
@@ -1833,45 +1611,32 @@ class Visitor(ast.NodeVisitor):
         if is_call(node, ('locals', 'globals', 'vars')):
             if node.kwargs:
                 self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
-                    JavaOpcodes.DUP(),
+                    java.New('org/python/exceptions/TypeError'),
                     JavaOpcodes.LDC_W(node.func.id + "() takes no keyword arguments"),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
+                    java.Init('org/python/exceptions/TypeError', 'Ljava/lang/String;'),
                     JavaOpcodes.ATHROW()
                 )
             elif node.args:
                 self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/exceptions/TypeError'),
-                    JavaOpcodes.DUP(),
+                    java.New('org/python/exceptions/TypeError'),
                     JavaOpcodes.LDC_W(node.func.id + "() takes no arguments (" + len(node.args) + " given)"),
-                    JavaOpcodes.INVOKESPECIAL('org/python/exceptions/TypeError', '<init>', '(Ljava/lang/String;)V'),
+                    java.Init('org/python/exceptions/TypeError', 'Ljava/lang/String;'),
                     JavaOpcodes.ATHROW()
                 )
             else:
                 # Create a dict for storage
                 self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Dict'),
-                    JavaOpcodes.DUP(),
-
-                    JavaOpcodes.NEW('org/python/internals/Scope'),
-                    JavaOpcodes.DUP(),
+                    java.New('org/python/types/Dict'),
+                    java.New('org/python/internals/Scope'),
                 )
 
                 getattr(self.context, 'load_%s' % node.func.id)()
 
                 self.context.add_opcodes(
                     # Wrap the locals/globals/vars to make them look like a Python String->Object map
-                    JavaOpcodes.INVOKESPECIAL(
-                        'org/python/internals/Scope',
-                        '<init>',
-                        args=['Ljava/util/Map;'],
-                        returns='V'),
+                    java.Init('org/python/internals/Scope', 'Ljava/util/Map;'),
                     # Construct a dictionary based on that map
-                    JavaOpcodes.INVOKESPECIAL(
-                        'org/python/types/Dict',
-                        '<init>',
-                        args=['Ljava/util/Map;'],
-                        returns='V'),
+                    java.Init('org/python/types/Dict', 'Ljava/util/Map;'),
                 )
 
         elif is_call(node, 'super'):
@@ -1881,50 +1646,32 @@ class Visitor(ast.NodeVisitor):
 
             if len(node.args) == 0:
                 self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Super'),
-                    JavaOpcodes.DUP(),
+                    java.New('org/python/types/Super'),
 
                     # The super class to bind to.
-                    JavaOpcodes.LDC_W(Classref(self.context.klass.descriptor)),
-                    JavaOpcodes.INVOKESTATIC(
-                        'org/python/types/Type',
-                        'pythonType',
-                        args=['Ljava/lang/Class;'],
-                        returns='Lorg/python/types/Type;'
-                    ),
+                    python.Type.for_name(self.context.klass.descriptor),
 
                     # Bind to self. Since we know we are in a class building context,
                     # we can be certain that register 0 contains self.
                     JavaOpcodes.ALOAD_0(),
-                    JavaOpcodes.INVOKESPECIAL(
-                        'org/python/types/Super',
-                        '<init>',
-                        args=['Lorg/python/Object;', 'Lorg/python/Object;'],
-                        returns='V'),
+                    java.Init('org/python/types/Super', 'Lorg/python/Object;', 'Lorg/python/Object;'),
                 )
 
             elif len(node.args) == 1:  # Unbound super
                 self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Super'),
-                    JavaOpcodes.DUP(),
+                    java.New('org/python/types/Super'),
                 )
 
                 # The super class to bind to.
                 self.visit(node.args[0])
 
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKESPECIAL(
-                        'org/python/types/Super',
-                        '<init>',
-                        args=['Lorg/python/Object;'],
-                        returns='V'
-                    ),
+                    java.Init('org/python/types/Super', 'Lorg/python/Object;'),
                 )
 
             elif len(node.args) == 2:  # Bound super
                 self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/types/Super'),
-                    JavaOpcodes.DUP(),
+                    java.New('org/python/types/Super'),
                 )
 
                 # The super class to bind to.
@@ -1934,11 +1681,7 @@ class Visitor(ast.NodeVisitor):
                 self.visit(node.args[1])
 
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKESPECIAL(
-                        'org/python/types/Super',
-                        '<init>',
-                        args=['Lorg/python/Object;', 'Lorg/python/Object;'],
-                        returns='V'),
+                    java.Init('org/python/types/Super' 'Lorg/python/Object;', 'Lorg/python/Object;'),
                 )
 
             else:
@@ -1956,8 +1699,7 @@ class Visitor(ast.NodeVisitor):
             num_args = len([arg for arg in node.args if not isinstance(arg, ast.Starred)])
 
             self.context.add_opcodes(
-                ICONST_val(num_args),
-                JavaOpcodes.ANEWARRAY('org/python/Object'),
+                java.Array(num_args),
             )
 
             for i, arg in enumerate(node.args):
@@ -1981,19 +1723,12 @@ class Visitor(ast.NodeVisitor):
                 self.visit(node.starargs)
 
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKESTATIC(
-                        'org/Python',
-                        'addToArgs',
-                        args=['[Lorg/python/Object;', 'Lorg/python/Object;'],
-                        returns='[Lorg/python/Object;'
-                    ),
+                    AddToArgs(),
                 )
 
             # Create and populate the map of kwargs to pass to invoke().
             self.context.add_opcodes(
-                    JavaOpcodes.NEW('java/util/HashMap'),
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKESPECIAL('java/util/HashMap', '<init>', args=[], returns='V'),
+                    java.Map(),
             )
 
             for keyword in node.keywords:
@@ -2007,13 +1742,7 @@ class Visitor(ast.NodeVisitor):
                 )
                 self.visit(keyword.value)
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'java/util/Map',
-                        'put',
-                        args=['Ljava/lang/Object;', 'Ljava/lang/Object;'],
-                        returns='Ljava/lang/Object;'
-                    ),
-                    JavaOpcodes.POP()
+                    java.Map.put()
                 )
 
             if getattr(node, 'kwargs', None) is not None:  # Python 3.4 **kwargs
@@ -2021,12 +1750,7 @@ class Visitor(ast.NodeVisitor):
 
             # Set up the stack and invoke the callable
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Callable',
-                    'invoke',
-                    args=['[Lorg/python/Object;', 'Ljava/util/Map;'],
-                    returns='Lorg/python/Object;'
-                ),
+                python.Callable.invoke(),
             )
 
     @node_visitor
@@ -2036,12 +1760,7 @@ class Visitor(ast.NodeVisitor):
         self.visit(node.value)
 
         self.context.add_opcodes(
-            JavaOpcodes.INVOKESTATIC(
-                'org/Python',
-                'addToArgs',
-                args=['[Lorg/python/Object;', 'Lorg/python/Object;'],
-                returns='[Lorg/python/Object;'
-            ),
+            AddToArgs(),
         )
 
     def add_doublestarred_kwargs(self, node, kwargs):
@@ -2054,13 +1773,7 @@ class Visitor(ast.NodeVisitor):
             func_name = node.func.attr
 
         self.context.add_opcodes(
-            JavaOpcodes.LDC_W(func_name),
-            JavaOpcodes.INVOKESTATIC(
-                'org/Python',
-                'addToKwargs',
-                args=['Ljava/util/Map;', 'Lorg/python/Object;', 'Ljava/lang/String;'],
-                returns='Ljava/util/Map;'
-            ),
+            AddToKwargs(func_name)
         )
 
     @node_visitor
@@ -2081,8 +1794,7 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Bytes(self, node):
         self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Bytes'),
-            JavaOpcodes.DUP(),
+            java.New('org/python/types/Bytes'),
 
             JavaOpcodes.BIPUSH(len(node.s)),
             JavaOpcodes.NEWARRAY(JavaOpcodes.NEWARRAY.T_BYTE),
@@ -2097,28 +1809,26 @@ class Visitor(ast.NodeVisitor):
             )
 
         self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL('org/python/types/Bytes', '<init>', '([B)V')
+            java.Init('org/python/types/Bytes', '[B')
         )
 
     @node_visitor
     def visit_NameConstant(self, node):
         if node.value is None:
             self.context.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+                python.NONE()
             )
         elif node.value is True:
             self.context.add_opcodes(
-                JavaOpcodes.NEW('org/python/types/Bool'),
-                JavaOpcodes.DUP(),
+                java.New('org/python/types/Bool'),
                 JavaOpcodes.ICONST_1(),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                java.Init('org/python/types/Bool', 'Z'),
             )
         elif node.value is False:
             self.context.add_opcodes(
-                JavaOpcodes.NEW('org/python/types/Bool'),
-                JavaOpcodes.DUP(),
+                java.New('org/python/types/Bool'),
                 JavaOpcodes.ICONST_0(),
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Bool', '<init>', '(Z)V'),
+                java.Init('org/python/types/Bool', 'Z'),
             )
         else:
             raise NotImplementedError("Unknown named constant %s" % node.value)
@@ -2133,23 +1843,12 @@ class Visitor(ast.NodeVisitor):
 
         if type(node.ctx) == ast.Load:
             self.context.add_opcodes(
-                JavaOpcodes.LDC_W(node.attr),
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__getattribute__',
-                    '(Ljava/lang/String;)Lorg/python/Object;'
-                ),
+                python.Object.get_attribute(node.attr),
             )
         elif type(node.ctx) == ast.Store:
             self.context.add_opcodes(
                 JavaOpcodes.SWAP(),
-                JavaOpcodes.LDC_W(node.attr),
-                JavaOpcodes.SWAP(),
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__setattr__',
-                    args=['Ljava/lang/String;', 'Lorg/python/Object;'],
-                    returns='V'),
+                python.Object.set_attr(node.attr),
             )
         elif type(node.ctx) == ast.Del:
             self.context.add_opcodes(
@@ -2164,12 +1863,7 @@ class Visitor(ast.NodeVisitor):
             self.visit(node.value)
             self.visit(node.slice)
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__getitem__',
-                    args=['Lorg/python/Object;'],
-                    returns='Lorg/python/Object;'
-                ),
+                python.Object.get_item()
             )
         elif type(node.ctx) == ast.Store:
             self.context.add_opcodes(
@@ -2179,12 +1873,7 @@ class Visitor(ast.NodeVisitor):
             self.visit(node.slice)
             self.context.add_opcodes(
                 ALOAD_name('#value'),
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    '__setitem__',
-                    args=['Lorg/python/Object;', 'Lorg/python/Object;'],
-                    returns='V'
-                ),
+                python.Object.set_item(),
                 free_name('#value'),
             )
         elif type(node.ctx) == ast.Del:
@@ -2200,15 +1889,9 @@ class Visitor(ast.NodeVisitor):
                 self.context.load_name(node.id)
             except NameError:
                 self.context.add_opcodes(
-                    JavaOpcodes.NEW('org/python/exceptions/UnboundLocalError'),
-                    JavaOpcodes.DUP(),
+                    java.New('org/python/exceptions/UnboundLocalError'),
                     JavaOpcodes.LDC_W(node.id),
-                    JavaOpcodes.INVOKESPECIAL(
-                        'org/python/exceptions/UnboundLocalError',
-                        '<init>',
-                        args=['Ljava/lang/String;'],
-                        returns='V'
-                    ),
+                    java.Init('org/python/exceptions/UnboundLocalError', 'Ljava/lang/String;'),
                     JavaOpcodes.ATHROW()
                 )
         elif type(node.ctx) == ast.Store:
@@ -2220,13 +1903,7 @@ class Visitor(ast.NodeVisitor):
     def visit_List(self, node):
         if isinstance(node.ctx, ast.Load):
             self.context.add_opcodes(
-                JavaOpcodes.NEW('org/python/types/List'),
-                JavaOpcodes.DUP(),
-
-                JavaOpcodes.NEW('java/util/ArrayList'),
-                JavaOpcodes.DUP(),
-                ICONST_val(len(node.elts)),
-                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', args=['I'], returns='V')
+                python.List()
             )
 
             for child in node.elts:
@@ -2237,27 +1914,17 @@ class Visitor(ast.NodeVisitor):
                 self.visit(child)
 
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', args=['Ljava/lang/Object;'], returns='Z'),
-                    JavaOpcodes.POP(),
+                    python.List.append()
                 )
-
-            self.context.add_opcodes(
-                JavaOpcodes.INVOKESPECIAL('org/python/types/List', '<init>', args=['Ljava/util/List;'], returns='V')
-            )
 
         elif isinstance(node.ctx, ast.Store):
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', args=[], returns='Lorg/python/Iterable;')
+                python.Object.iter()
             )
             for child in node.elts:
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Iterable',
-                        '__next__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    )
+                    python.Iterable.next()
                 )
                 self.visit(child)
 
@@ -2265,13 +1932,9 @@ class Visitor(ast.NodeVisitor):
     def visit_Tuple(self, node):
         if isinstance(node.ctx, ast.Load):
             self.context.add_opcodes(
-                JavaOpcodes.NEW('org/python/types/Tuple'),
-                JavaOpcodes.DUP(),
+                java.New('org/python/types/Tuple'),
 
-                JavaOpcodes.NEW('java/util/ArrayList'),
-                JavaOpcodes.DUP(),
-                ICONST_val(len(node.elts)),
-                JavaOpcodes.INVOKESPECIAL('java/util/ArrayList', '<init>', args=['I'], returns='V')
+                java.List(len(node.elts))
             )
 
             for child in node.elts:
@@ -2282,27 +1945,21 @@ class Visitor(ast.NodeVisitor):
                 self.visit(child)
 
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKEINTERFACE('java/util/List', 'add', args=['Ljava/lang/Object;'], returns='Z'),
-                    JavaOpcodes.POP(),
+                    java.List.add()
                 )
 
             self.context.add_opcodes(
-                JavaOpcodes.INVOKESPECIAL('org/python/types/Tuple', '<init>', args=['Ljava/util/List;'], returns='V')
+                java.Init('org/python/types/Tuple', 'Ljava/util/List;')
             )
 
         elif isinstance(node.ctx, ast.Store):
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', '__iter__', args=[], returns='Lorg/python/Iterable;')
+                python.Object.iter()
             )
             for child in node.elts:
                 self.context.add_opcodes(
                     JavaOpcodes.DUP(),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Iterable',
-                        '__next__',
-                        args=[],
-                        returns='Lorg/python/Object;'
-                    )
+                    python.Iterable.next()
                 )
                 self.visit(child)
             self.context.add_opcodes(
@@ -2312,37 +1969,31 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Slice(self, node):
         self.context.add_opcodes(
-            JavaOpcodes.NEW('org/python/types/Slice'),
-            JavaOpcodes.DUP(),
+            java.New('org/python/types/Slice'),
         )
         if node.lower:
             self.visit(node.lower)
         else:
             self.context.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+                python.NONE()
             )
 
         if node.upper:
             self.visit(node.upper)
         else:
             self.context.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+                python.NONE()
             )
 
         if node.step:
             self.visit(node.step)
         else:
             self.context.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/types/NoneType', 'NONE', 'Lorg/python/Object;')
+                python.NONE()
             )
 
         self.context.add_opcodes(
-            JavaOpcodes.INVOKESPECIAL(
-                'org/python/types/Slice',
-                '<init>',
-                args=['Lorg/python/Object;', 'Lorg/python/Object;', 'Lorg/python/Object;'],
-                returns='V'
-            )
+            java.Init('org/python/types/Slice', 'Lorg/python/Object;', 'Lorg/python/Object;', 'Lorg/python/Object;')
         )
 
     @node_visitor
