@@ -260,7 +260,7 @@ public class Bytes extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        if (org.Python.VERSION < 30500) {
+        if (org.Python.VERSION < 0x03050000) {
             if (other instanceof org.python.types.Dict) {
                 return this;
             }
@@ -367,7 +367,7 @@ public class Bytes extends org.python.types.Object {
                 }
             }
         } else {
-            if (org.Python.VERSION < 30500) {
+            if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
             } else {
                 throw new org.python.exceptions.TypeError(
@@ -440,7 +440,7 @@ public class Bytes extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __imod__(org.python.Object other) {
-        if (org.Python.VERSION < 30500) {
+        if (org.Python.VERSION < 0x03050000) {
             throw new org.python.exceptions.TypeError(
                 "unsupported operand type(s) for %=: 'bytes' and '" + other.typeName() + "'"
             );

@@ -7,7 +7,7 @@ public class Python {
     /**
      * The version of Python that this library implements
      */
-    public static int VERSION = 30400;
+    public static int VERSION = 0x3040000;
 
     static {
         // Load all the builtins into the dictionary as callables

@@ -379,7 +379,7 @@ public class Int extends org.python.types.Object {
                 long modulo_val = ((org.python.types.Int) modulo).value;
                 /* if exponent is negative raise TypeError*/
                 if(other_val < 0) {
-                    if (org.Python.VERSION < 30500) {
+                    if (org.Python.VERSION < 0x03050000) {
                         throw new org.python.exceptions.TypeError(
                             "pow() 2nd argument cannot be negative when 3rd argument specified"
                         );

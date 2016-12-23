@@ -792,9 +792,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.split(sep=None, maxsplit=-1) -> list of strings\n\nReturn a list of the words in S, using sep as the\ndelimiter string.  If maxsplit is given, at most maxsplit\nsplits are done. If sep is not specified or is None, any\nwhitespace string is a separator and empty strings are\nremoved from the result.\n",
+        default_args = {"sep", "maxsplit"}
     )
-    public org.python.Object split() {
+    public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
         throw new org.python.exceptions.NotImplementedError("split() has not been implemented.");
     }
 
