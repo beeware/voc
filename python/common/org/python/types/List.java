@@ -323,7 +323,9 @@ public class List extends org.python.types.Object {
             }
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 30500) {
-                throw new org.python.exceptions.TypeError("list indices must be integers");
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + start.typeName()
+                );
             } else {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers or slices, not " + index.typeName()
@@ -353,7 +355,9 @@ public class List extends org.python.types.Object {
             }
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 30500) {
-                throw new org.python.exceptions.TypeError("list indices must be integers");
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + start.typeName()
+                );
             } else {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers or slices, not " + index.typeName()
@@ -383,7 +387,9 @@ public class List extends org.python.types.Object {
             }
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 30500) {
-                throw new org.python.exceptions.TypeError("list indices must be integers");
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + start.typeName()
+                );
             } else {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers or slices, not " + index.typeName()
@@ -551,7 +557,9 @@ public class List extends org.python.types.Object {
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         if (start != null && !(start instanceof org.python.types.Int)) {
             if (org.Python.VERSION < 30500) {
-                throw new org.python.exceptions.TypeError("list indices must be integers");
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + start.typeName()
+                );
             } else {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers or slices, not " + start.typeName()
@@ -560,7 +568,9 @@ public class List extends org.python.types.Object {
         }
         if (end != null && !(end instanceof org.python.types.Int)) {
             if (org.Python.VERSION < 30500) {
-                throw new org.python.exceptions.TypeError("list indices must be integers");
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + start.typeName()
+                );
             } else {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers or slices, not " + end.typeName()
