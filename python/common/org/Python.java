@@ -599,7 +599,7 @@ public class Python {
             try {
                 imag_val = (org.python.types.Float)imag_val.__add__(Python.float_cast(imag == null ? new org.python.types.Float(0) : imag));
             } catch (org.python.exceptions.TypeError e) {
-                if (org.Python.VERSION < 30404) {
+                if (org.Python.VERSION < 0x03040400) {
                     throw new org.python.exceptions.TypeError(
                         "complex() argument must be a string or a number, not '" + imag.typeName() + "'"
                     );
@@ -1012,7 +1012,7 @@ public class Python {
             try {
                 return (org.python.types.Int) x.__int__();
             } catch (org.python.exceptions.AttributeError ae) {
-                if (org.Python.VERSION < 30404) {
+                if (org.Python.VERSION < 0x03040400) {
                     throw new org.python.exceptions.TypeError(
                         "int() argument must be a string or a number, not '" + x.typeName() + "'"
                     );
@@ -1424,7 +1424,7 @@ public class Python {
             throw new org.python.exceptions.TypeError("pow() 3rd argument not allowed unless all arguments are integers");
         }
         if (z != null && ((org.python.types.Int) y).value < 0) {
-            if (org.Python.VERSION < 30500) {
+            if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError("pow() 2nd argument cannot be negative when 3rd argument specified");
             } else {
                 throw new org.python.exceptions.ValueError("pow() 2nd argument cannot be negative when 3rd argument specified");
