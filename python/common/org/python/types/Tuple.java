@@ -317,7 +317,13 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError("tuple indices must be integers");
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "tuple indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -341,7 +347,13 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError("tuple indices must be integers");
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "tuple indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 

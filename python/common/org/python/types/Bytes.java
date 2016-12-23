@@ -5,9 +5,6 @@ import java.util.Arrays;
 public class Bytes extends org.python.types.Object {
     public byte [] value;
 
-    // ugly hack to allow for Python 3.4 / 3.5 differences
-    public static final float PYTHON_VERSION = 3.4f;
-
     /**
      * A utility method to update the internal value of this object.
      *
@@ -263,8 +260,10 @@ public class Bytes extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        if (this.PYTHON_VERSION < 3.5) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'bytes' and '" + other.typeName() + "'");
+        if (org.Python.VERSION < 30500) {
+            throw new org.python.exceptions.TypeError(
+                "unsupported operand type(s) for %: 'bytes' and '" + other.typeName() + "'"
+            );
         } else {
             if (other instanceof org.python.types.List || other instanceof org.python.types.Range) {
                 return this;
@@ -364,10 +363,14 @@ public class Bytes extends org.python.types.Object {
                     return new org.python.types.Int(this.value[idx]);
                 }
             }
-        } else if (this.PYTHON_VERSION < 3.5) {
-            throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
         } else {
-            throw new org.python.exceptions.TypeError("byte indices must be integers or slices, not " + index.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "byte indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -428,6 +431,13 @@ public class Bytes extends org.python.types.Object {
     )
     public org.python.Object __imul__(org.python.Object other) {
         return this.__mul__(other);
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __imod__(org.python.Object other) {
+        return this.__mod__(other);
     }
 
     @org.python.Method(
