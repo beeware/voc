@@ -324,7 +324,7 @@ public class List extends org.python.types.Object {
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 30500) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + start.typeName()
+                    "list indices must be integers, not " + index.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
@@ -356,7 +356,7 @@ public class List extends org.python.types.Object {
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 30500) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + start.typeName()
+                    "list indices must be integers, not " + index.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
@@ -388,7 +388,7 @@ public class List extends org.python.types.Object {
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 30500) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + start.typeName()
+                    "list indices must be integers, not " + index.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
@@ -569,7 +569,7 @@ public class List extends org.python.types.Object {
         if (end != null && !(end instanceof org.python.types.Int)) {
             if (org.Python.VERSION < 30500) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + start.typeName()
+                    "list indices must be integers, not " + end.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
