@@ -5,10 +5,6 @@ import java.util.Arrays;
 public class ByteArray extends org.python.types.Object {
     public byte [] value;
 
-    // ugly hack to allow for Python 3.4 / 3.5 differences
-    public static final float PYTHON_VERSION = 3.4f;
-    // public static final float PYTHON_VERSION = 3.5f;
-
     /**
      * A utility method to update the internal value of this object.
      *
@@ -307,10 +303,14 @@ public class ByteArray extends org.python.types.Object {
                     return new org.python.types.Int(this.value[idx]);
                 }
             }
-        } else if (this.PYTHON_VERSION < 3.5) {
-            throw new org.python.exceptions.TypeError("bytearray indices must be integers");
         } else {
-            throw new org.python.exceptions.TypeError("bytearray indices must be integers or slices, not " + index.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError("bytearray indices must be integers");
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "bytearray indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -418,10 +418,14 @@ public class ByteArray extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        if (this.PYTHON_VERSION < 3.5) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'bytearray' and '" + other.typeName() + "'");
+        if (org.Python.VERSION < 30500) {
+            throw new org.python.exceptions.TypeError(
+                "unsupported operand type(s) for %: 'bytearray' and '" + other.typeName() + "'"
+            );
         } else {
-            if (other instanceof org.python.types.List || other instanceof org.python.types.Range || other instanceof org.python.types.Dict) {
+            if (other instanceof org.python.types.List
+                    || other instanceof org.python.types.Range
+                    || other instanceof org.python.types.Dict) {
                 int i;
                 for (i=0; i < this.value.length; i++) {
                     if (this.value[0] == 0) break;
@@ -438,8 +442,10 @@ public class ByteArray extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __imod__(org.python.Object other) {
-        if (this.PYTHON_VERSION < 3.5) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %=: 'bytearray' and '" + other.typeName() + "'");
+        if (org.Python.VERSION < 30500) {
+            throw new org.python.exceptions.TypeError(
+                "unsupported operand type(s) for %=: 'bytearray' and '" + other.typeName() + "'"
+            );
         } else {
             return this.__mod__(other);
         }

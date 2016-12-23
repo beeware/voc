@@ -361,7 +361,9 @@ public class Int extends org.python.types.Object {
             data.add(this.__mod__(other));
             return new org.python.types.Tuple(data);
         } catch (org.python.exceptions.TypeError ae) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'");
+            throw new org.python.exceptions.TypeError(
+                "unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'"
+            );
         }
     }
 
@@ -377,7 +379,15 @@ public class Int extends org.python.types.Object {
                 long modulo_val = ((org.python.types.Int) modulo).value;
                 /* if exponent is negative raise TypeError*/
                 if(other_val < 0) {
-                    throw new org.python.exceptions.TypeError("pow() 2nd argument cannot be negative when 3rd argument specified");
+                    if (org.Python.VERSION < 30500) {
+                        throw new org.python.exceptions.TypeError(
+                            "pow() 2nd argument cannot be negative when 3rd argument specified"
+                        );
+                    } else {
+                        throw new org.python.exceptions.ValueError(
+                            "pow() 2nd argument cannot be negative when 3rd argument specified"
+                        );
+                    }
                 }
                 /* if modulus == 0: raise ValueError() */
                 if(modulo_val == 0) {

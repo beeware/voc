@@ -322,7 +322,15 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -346,7 +354,15 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -370,7 +386,15 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -532,10 +556,26 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         if (start != null && !(start instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + start.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + start.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + start.typeName()
+                );
+            }
         }
         if (end != null && !(end instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + end.typeName());
+            if (org.Python.VERSION < 30500) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + end.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + end.typeName()
+                );
+            }
         }
 
         int iStart = 0, iEnd = this.value.size();

@@ -194,7 +194,8 @@ JAVA_EXCEPTION = re.compile(
     '([^\r\n]*?\r?\n((    |\t)at[^\r\n]*?\r?\n)*' +
     'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+)(?:\:\s)?(?P<message2>[^\r?]+))\r?)\n' +
     '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)(.*\r?\n)*' +
-    '(Exception in thread "\w+" )?'
+    '(Exception in thread "\w+" )?',
+    re.MULTILINE
 )
 JAVA_STACK = re.compile(
     '^\s+at (?P<module>.+)\((((?P<file>.*?)(:(?P<line>\d+))?)|(Native Method))\)\r?\n',
@@ -210,19 +211,29 @@ PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n
 MEMORY_REFERENCE = re.compile('0x[\dABCDEFabcdef]{4,16}')
 
 
-def cleanse_java(input, substitutions):
-    try:
-        # Test the specific message
-        out = JAVA_EXCEPTION.sub(
-            '### EXCEPTION ###{linesep}\\g<exception2>: \\g<message2>{linesep}\\g<trace>'.format(linesep=os.linesep),
-            input
-        )
-    except:
-        # Test the specific message
-        out = JAVA_EXCEPTION.sub(
-            '### EXCEPTION ###{linesep}\\g<exception1>: \\g<message1>{linesep}\\g<trace>'.format(linesep=os.linesep),
-            input
-        )
+def cleanse_java(raw, substitutions):
+    matches = JAVA_EXCEPTION.search(raw)
+    if matches is not None:
+        groups = matches.groupdict()
+        if groups['exception2'] is not None:
+            # Test the specific message
+            out = JAVA_EXCEPTION.sub(
+                '### EXCEPTION ###{linesep}\\g<exception2>: \\g<message2>{linesep}\\g<trace>'.format(
+                    linesep=os.linesep
+                ),
+                raw
+            )
+        else:
+            # Test the specific message
+            out = JAVA_EXCEPTION.sub(
+                '### EXCEPTION ###{linesep}\\g<exception1>: \\g<message1>{linesep}\\g<trace>'.format(
+                    linesep=os.linesep
+                ),
+                raw
+            )
+    else:
+        out = raw
+
     stack = JAVA_STACK.findall(out)
     out = JAVA_STACK.sub('', out)
 
@@ -235,6 +246,7 @@ def cleanse_java(input, substitutions):
         ]),
         os.linesep if stack else ''
     )
+
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
     out = out.replace(
         "'python.test.__init__'", '***EXECUTABLE***').replace(
@@ -253,14 +265,14 @@ def cleanse_java(input, substitutions):
     return out
 
 
-def cleanse_python(input, substitutions):
+def cleanse_python(raw, substitutions):
     # Test the specific message
     out = PYTHON_EXCEPTION.sub(
         '### EXCEPTION ###{linesep}\\g<exception>: \\g<message>'.format(linesep=os.linesep),
-        input
+        raw
     )
 
-    stack = PYTHON_STACK.findall(input)
+    stack = PYTHON_STACK.findall(raw)
     out = '%s%s%s' % (
         out,
         os.linesep.join(
@@ -276,12 +288,6 @@ def cleanse_python(input, substitutions):
 
     # Replace references to the test script with something generic
     out = out.replace("'test.py'", '***EXECUTABLE***')
-
-    # Python 3.4.4 changed the message describing strings in exceptions
-    out = out.replace(
-        'argument must be a string or',
-        'argument must be a string, a bytes-like object or'
-    )
 
     if substitutions:
         for to_value, from_values in substitutions.items():
@@ -580,7 +586,9 @@ SAMPLE_DATA = {
         ],
     'bytes': [
             'b""',
-            'b"This is another string of bytes"'
+            'b"This is another string of bytes"',
+            'b"One arg: %s"',
+            'b"Three args: %s | %s | %s"',
         ],
     'class': [
             'type(1)',

@@ -2,6 +2,7 @@ language: python
 python:
   - "3.4.2"
   - "3.4.4"
+  - "3.5.2"
 env:
   - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=0
   - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=1

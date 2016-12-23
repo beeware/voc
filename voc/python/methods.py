@@ -1,3 +1,4 @@
+import sys
 from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
     RuntimeVisibleAnnotations, opcodes as JavaOpcodes
@@ -810,8 +811,18 @@ class MainFunction(Function):
 
     def visitor_setup(self):
         self.add_opcodes(
+            # Set the Python version
+            JavaOpcodes.LDC(
+                sys.version_info.major * 10000
+                + sys.version_info.minor * 100
+                + sys.version_info.micro
+            ),
+            JavaOpcodes.PUTSTATIC('org/Python', 'VERSION', 'I'),
+
+            # Create storage for locals
             java.Map(),
             ASTORE_name('#locals'),
+
             # Add a TRY-CATCH for SystemExit
             TRY(),
         )
