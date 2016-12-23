@@ -261,6 +261,9 @@ public class Bytes extends org.python.types.Object {
     )
     public org.python.Object __mod__(org.python.Object other) {
         if (org.Python.VERSION < 30500) {
+            if (other instanceof org.python.types.Dict) {
+                return this;
+            }
             throw new org.python.exceptions.TypeError(
                 "unsupported operand type(s) for %: 'bytes' and '" + other.typeName() + "'"
             );
@@ -437,7 +440,16 @@ public class Bytes extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __imod__(org.python.Object other) {
-        return this.__mod__(other);
+        if (org.Python.VERSION < 30500) {
+            throw new org.python.exceptions.TypeError(
+                "unsupported operand type(s) for %=: 'bytes' and '" + other.typeName() + "'"
+            );
+        } else {
+            if (other instanceof org.python.types.List || other instanceof org.python.types.Range) {
+                return this.__mod__(other);
+            }
+            throw new org.python.exceptions.TypeError("not all arguments converted during bytes formatting");
+        }
     }
 
     @org.python.Method(

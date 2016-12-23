@@ -583,16 +583,9 @@ public class Python {
             try {
                 real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
             } catch (org.python.exceptions.TypeError e) {
-                if (org.Python.VERSION < 30404) {
-                    throw new org.python.exceptions.TypeError(
-                        "complex() argument must be a string or a number, not '" + real.typeName() + "'"
-                    );
-                } else {
-                    throw new org.python.exceptions.TypeError(
-                        "complex() argument must be a string, a bytes-like object or a number, not '" +
-                            real.typeName() + "'"
-                    );
-                }
+                throw new org.python.exceptions.TypeError(
+                    "complex() argument must be a string or a number, not '" + real.typeName() + "'"
+                );
             } catch (org.python.exceptions.ValueError e) {
                 throw new org.python.exceptions.ValueError("complex() arg is a malformed string");
             }
@@ -826,16 +819,9 @@ public class Python {
         try {
             return (org.python.types.Float) x.__float__();
         } catch (org.python.exceptions.AttributeError ae) {
-            if (org.Python.VERSION < 30404) {
-                throw new org.python.exceptions.TypeError(
-                    "float() argument must be a string or a number, not '" + x.typeName() + "'"
-                );
-            } else {
-                throw new org.python.exceptions.TypeError(
-                    "float() argument must be a string, a bytes-like object or a number, not '" +
-                        x.typeName() + "'"
-                );
-            }
+            throw new org.python.exceptions.TypeError(
+                "float() argument must be a string or a number, not '" + x.typeName() + "'"
+            );
         }
     }
 

@@ -246,7 +246,7 @@ def cleanse_java(raw, substitutions):
         ]),
         os.linesep if stack else ''
     )
-    print(5, out)
+
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
     out = out.replace(
         "'python.test.__init__'", '***EXECUTABLE***').replace(
@@ -586,7 +586,9 @@ SAMPLE_DATA = {
         ],
     'bytes': [
             'b""',
-            'b"This is another string of bytes"'
+            'b"This is another string of bytes"',
+            'b"One arg: %s"',
+            'b"Three args: %s | %s | %s"',
         ],
     'class': [
             'type(1)',

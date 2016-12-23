@@ -1609,7 +1609,8 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Call(self, node):
         if is_call(node, ('locals', 'globals', 'vars')):
-            if node.kwargs:
+            # **kwargs is node.keywords[None] in Python 3.5; node.kwargs in earlier versions
+            if None in node.keywords or getattr(node, 'kwargs', None):
                 self.context.add_opcodes(
                     java.New('org/python/exceptions/TypeError'),
                     JavaOpcodes.LDC_W(node.func.id + "() takes no keyword arguments"),
