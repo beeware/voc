@@ -322,7 +322,7 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            if (org.Python.VERSION < 30500) {
+            if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers, not " + index.typeName()
                 );
@@ -354,7 +354,7 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            if (org.Python.VERSION < 30500) {
+            if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers, not " + index.typeName()
                 );
@@ -386,7 +386,7 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            if (org.Python.VERSION < 30500) {
+            if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers, not " + index.typeName()
                 );
@@ -556,7 +556,7 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         if (start != null && !(start instanceof org.python.types.Int)) {
-            if (org.Python.VERSION < 30500) {
+            if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers, not " + start.typeName()
                 );
@@ -567,7 +567,7 @@ public class List extends org.python.types.Object {
             }
         }
         if (end != null && !(end instanceof org.python.types.Int)) {
-            if (org.Python.VERSION < 30500) {
+            if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
                     "list indices must be integers, not " + end.typeName()
                 );

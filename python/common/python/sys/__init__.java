@@ -12,6 +12,22 @@ public class __init__ extends org.python.types.Module {
         __stdin__ = python.platform.__init__.impl.stdin();
 
         platform = python.platform.__init__.impl.getPlatform();
+
+        hexversion = new org.python.types.Int(org.Python.VERSION);
+
+        int major = org.Python.VERSION >> 24;
+        int minor = (org.Python.VERSION >> 16) % 0x10;
+        int micro = (org.Python.VERSION >> 8) % 0x10;
+        int releaselevel = (org.Python.VERSION >> 4) % 0x10;
+        int serial = org.Python.VERSION % 0x10;
+
+        version_info = new org.python.stdlib.sys.VersionInfo(major, minor, micro, releaselevel, serial);
+        version = new org.python.types.Str(
+            java.lang.String.format("%x.%x.%x (VOC)\n[Java(TM) SE SE Runtime Environment (build %s)]",
+                major, minor, micro,
+                System.getProperty("java.version")
+            )
+        );
     }
 
     @org.python.Method(
@@ -43,9 +59,9 @@ public class __init__ extends org.python.types.Module {
 
     // __loader__ <class 'type'>
 
-    public static org.python.types.Str __name__;
+    public static org.python.Object __name__;
 
-    public static org.python.types.Str __package__;
+    public static org.python.Object __package__;
 
     public static org.python.types.Int __plen;
 
@@ -341,10 +357,10 @@ public class __init__ extends org.python.types.Module {
 
     // thread_info <class 'sys.thread_info'>
 
-    public static org.python.types.Str version;
+    public static org.python.Object version;
 
-    // version_info <class 'sys.version_info'>
+    public static org.python.Object version_info;
 
-    public static org.python.types.List warnoptions;
+    public static org.python.Object warnoptions;
 
 }

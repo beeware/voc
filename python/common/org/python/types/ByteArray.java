@@ -304,7 +304,7 @@ public class ByteArray extends org.python.types.Object {
                 }
             }
         } else {
-            if (org.Python.VERSION < 30500) {
+            if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError("bytearray indices must be integers");
             } else {
                 throw new org.python.exceptions.TypeError(
@@ -418,7 +418,7 @@ public class ByteArray extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        if (org.Python.VERSION < 30500) {
+        if (org.Python.VERSION < 0x03050000) {
             throw new org.python.exceptions.TypeError(
                 "unsupported operand type(s) for %: 'bytearray' and '" + other.typeName() + "'"
             );
@@ -442,7 +442,7 @@ public class ByteArray extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __imod__(org.python.Object other) {
-        if (org.Python.VERSION < 30500) {
+        if (org.Python.VERSION < 0x03050000) {
             throw new org.python.exceptions.TypeError(
                 "unsupported operand type(s) for %=: 'bytearray' and '" + other.typeName() + "'"
             );
