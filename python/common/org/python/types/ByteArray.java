@@ -336,7 +336,11 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length < other_bytes.length) return new org.python.types.Bool(0);
             return new org.python.types.Bool(1);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytearray() >= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytearray() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -361,7 +365,11 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length <= other_bytes.length) return new org.python.types.Bool(0);
             return new org.python.types.Bool(1);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytearray() > " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytearray() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -386,7 +394,11 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length <= other_bytes.length) return new org.python.types.Bool(1);
             return new org.python.types.Bool(0);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytearray() <= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytearray() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -411,7 +423,11 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length < other_bytes.length) return new org.python.types.Bool(1);
             return new org.python.types.Bool(0);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytearray() < " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytearray() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -426,12 +442,19 @@ public class ByteArray extends org.python.types.Object {
             if (other instanceof org.python.types.List
                     || other instanceof org.python.types.Range
                     || other instanceof org.python.types.Dict) {
-                int i;
-                for (i=0; i < this.value.length; i++) {
-                    if (this.value[0] == 0) break;
+                int i, size;
+                for (i = 0; i < this.value.length; i++) {
+                    if (this.value[0] == 0) {
+                        break;
+                    }
                 }
-                byte[] bytes = new byte[i];
-                System.arraycopy(this.value, 0, bytes, 0, i);
+                if (org.Python.VERSION < 0x03060000) {
+                    size = i;
+                } else {
+                    size = this.value.length;
+                }
+                byte[] bytes = new byte[size];
+                System.arraycopy(this.value, 0, bytes, 0, size);
                 return new ByteArray(bytes);
             }
             throw new org.python.exceptions.TypeError("not all arguments converted during bytes formatting");
@@ -782,6 +805,4 @@ public class ByteArray extends org.python.types.Object {
     public org.python.Object zfill(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytearray.zfill has not been implemented.");
     }
-
-
 }

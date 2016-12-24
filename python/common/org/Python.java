@@ -583,9 +583,15 @@ public class Python {
             try {
                 real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
             } catch (org.python.exceptions.TypeError e) {
-                throw new org.python.exceptions.TypeError(
-                    "complex() argument must be a string or a number, not '" + real.typeName() + "'"
-                );
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() argument must be a string or a number, not '" + real.typeName() + "'"
+                    );
+                } else {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() first argument must be a string or a number, not '" + real.typeName() + "'"
+                    );
+                }
             } catch (org.python.exceptions.ValueError e) {
                 throw new org.python.exceptions.ValueError("complex() arg is a malformed string");
             }

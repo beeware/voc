@@ -112,7 +112,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) < 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() < " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() < " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -124,7 +128,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) <= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() <= " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() <= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -160,7 +168,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) > 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() > " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() > " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -172,7 +184,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) >= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() >= " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() >= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -311,7 +327,11 @@ public class Str extends org.python.types.Object {
             }
             return new org.python.types.Int(substr_exists);
         }
-        throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
+        } else {
+            throw new org.python.exceptions.TypeError("must be str, not " + item.typeName());
+        }
         // throw new org.python.exceptions.NotImplementedError("__contains__() has not been implemented.");
     }
 
@@ -328,7 +348,11 @@ public class Str extends org.python.types.Object {
             sb.append(other_str.value);
             return new org.python.types.Str(sb.toString());
         }
-        throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
+        } else {
+            throw new org.python.exceptions.TypeError("must be str, not " + other.typeName());
+        }
     }
 
     @org.python.Method(
@@ -462,7 +486,12 @@ public class Str extends org.python.types.Object {
             this.setValue(this.__add__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to " + this.typeName() + " implicitly");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
+            } else {
+                throw new org.python.exceptions.TypeError("must be str, not " + other.typeName());
+            }
+
         }
     }
     @org.python.Method(
