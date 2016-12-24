@@ -273,7 +273,12 @@ public class Bool extends org.python.types.Object {
             if (this.value) {
                 return new org.python.types.Int(0);
             } else {
-                return new org.python.types.Bool(false);
+                if (org.Python.VERSION < 0x03060000) {
+                    return new org.python.types.Bool(false);
+                } else {
+                    return new org.python.types.Int(0);
+                }
+
             }
         } else if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
@@ -282,9 +287,17 @@ public class Bool extends org.python.types.Object {
             }
 
             if (!this.value) {
-                return new org.python.types.Bool(false);
+                if (org.Python.VERSION < 0x03060000) {
+                    return new org.python.types.Bool(false);
+                } else {
+                    return new org.python.types.Int(0);
+                }
             } else if (other_val > 1) {
-                return new org.python.types.Bool(this.value);
+                if (org.Python.VERSION < 0x03060000) {
+                    return new org.python.types.Bool(this.value);
+                } else {
+                    return new org.python.types.Int(1);
+                }
             }
         }
         try {
