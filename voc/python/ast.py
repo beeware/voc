@@ -1659,6 +1659,8 @@ class Visitor(ast.NodeVisitor):
                 )
 
             elif len(node.args) == 1:  # Unbound super
+                # FIXME: This is an unusual call pattern for super(), so it
+                # isn't obvious what the right behavior should be...
                 self.context.add_opcodes(
                     java.New('org/python/types/Super'),
                 )
@@ -1682,7 +1684,7 @@ class Visitor(ast.NodeVisitor):
                 self.visit(node.args[1])
 
                 self.context.add_opcodes(
-                    java.Init('org/python/types/Super' 'Lorg/python/Object;', 'Lorg/python/Object;'),
+                    java.Init('org/python/types/Super', 'Lorg/python/Object;', 'Lorg/python/Object;'),
                 )
 
             else:

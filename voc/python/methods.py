@@ -812,7 +812,7 @@ class MainFunction(Function):
     def visitor_setup(self):
         self.add_opcodes(
             # Set the Python version
-            JavaOpcodes.LDC(sys.hexversion),
+            JavaOpcodes.LDC_W(sys.hexversion),
             JavaOpcodes.PUTSTATIC('org/Python', 'VERSION', 'I'),
 
             # Create storage for locals
