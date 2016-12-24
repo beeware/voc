@@ -60,36 +60,44 @@ public class NotImplementedType extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: NotImplementedType() >= %s()", other.typeName())
-        );
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: NotImplementedType() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'NotImplementedType' and '" + other.typeName() + "'");
+        }
     }
 
         @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: NotImplementedType() > %s()", other.typeName())
-        );
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: NotImplementedType() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'NotImplementedType' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: NotImplementedType() < %s()", other.typeName())
-        );
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: NotImplementedType() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'NotImplementedType' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: NotImplementedType() <= %s()", other.typeName())
-        );
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: NotImplementedType() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'NotImplementedType' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(

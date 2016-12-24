@@ -142,9 +142,11 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size < otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() < %s()",
-                    Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: list() < " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'list' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -171,9 +173,11 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size <= otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() <= %s()",
-                    Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: list() <= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'list' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -219,9 +223,11 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size > otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() > %s()",
-                    Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: list() > " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'list' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -248,9 +254,11 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size >= otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() >= %s()",
-                    Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: list() >= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'list' and '" + other.typeName() + "'");
+            }
         }
     }
 

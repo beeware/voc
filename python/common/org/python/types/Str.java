@@ -112,7 +112,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) < 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() < " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() < " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -124,7 +128,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) <= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() <= " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() <= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -160,7 +168,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) > 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() > " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() > " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -172,7 +184,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) >= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() >= " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() >= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 

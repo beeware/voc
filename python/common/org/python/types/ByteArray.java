@@ -336,7 +336,11 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length < other_bytes.length) return new org.python.types.Bool(0);
             return new org.python.types.Bool(1);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytearray() >= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytearray() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -361,7 +365,11 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length <= other_bytes.length) return new org.python.types.Bool(0);
             return new org.python.types.Bool(1);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytearray() > " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytearray() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -386,7 +394,11 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length <= other_bytes.length) return new org.python.types.Bool(1);
             return new org.python.types.Bool(0);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytearray() <= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytearray() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -411,7 +423,11 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length < other_bytes.length) return new org.python.types.Bool(1);
             return new org.python.types.Bool(0);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytearray() < " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytearray() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(

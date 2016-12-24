@@ -82,7 +82,11 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) < (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() < " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: int() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'int' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -96,7 +100,11 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) <= (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() <= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: int() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'int' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -141,7 +149,11 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) > (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() > " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: int() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'int' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -155,7 +167,11 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool(((double) this.value) >= (((org.python.types.Bool) other).value ? 1 : 0));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: int() >= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: int() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'int' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(

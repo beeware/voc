@@ -124,18 +124,22 @@ public class Dict extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: dict() < %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: dict() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'dict' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: dict() <= %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: dict() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'dict' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -161,18 +165,22 @@ public class Dict extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: dict() > %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: dict() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'dict' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: dict() >= %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: dict() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'dict' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
