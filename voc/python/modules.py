@@ -229,13 +229,64 @@ class Module(Block):
                 '()V',
                 attributes=[
                     JavaCode(
-                        max_stack=2,
+                        max_stack=1,
                         max_locals=1,
                         code=[
                             JavaOpcodes.ALOAD_0(),
-                            JavaOpcodes.DUP(),
                             JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', args=[], returns='V'),
                             JavaOpcodes.RETURN(),
+                        ],
+                    ),
+                ]
+            ),
+        )
+
+        # Add a __new__ method to set the filename of the module.
+        classfile.methods.append(
+            JavaMethod(
+                '__new__',
+                '(Lorg/python/Object;)Lorg/python/Object;',
+                attributes=[
+                    JavaCode(
+                        max_stack=6,
+                        max_locals=2,
+                        code=[
+                            JavaOpcodes.ALOAD_0(),
+                            JavaOpcodes.ALOAD_1(),
+                            JavaOpcodes.INVOKESPECIAL(
+                                'org/python/types/Module',
+                                '__new__',
+                                args=['Lorg/python/Object;'],
+                                returns='Lorg/python/Object;'
+                            ),
+
+                            JavaOpcodes.ALOAD_0(),
+                            JavaOpcodes.GETFIELD('org/python/types/Object', '__dict__', 'Ljava/util/Map;'),
+
+                            JavaOpcodes.LDC_W('__file__'),
+
+                            JavaOpcodes.NEW('org/python/types/Str'),
+                            JavaOpcodes.DUP(),
+                            JavaOpcodes.LDC_W(self.sourcefile),
+                            JavaOpcodes.INVOKESPECIAL(
+                                'org/python/types/Str', 
+                                '<init>', 
+                                args=['Ljava/lang/String;'], 
+                                returns='V'
+                            ),
+
+                            JavaOpcodes.INVOKEINTERFACE(
+                                'java/util/Map', 
+                                'put', 
+                                args=[
+                                    'Ljava/lang/Object;'
+                                    'Ljava/lang/Object;'
+                                ], 
+                                returns='Ljava/lang/Object;'
+                            ),
+                            JavaOpcodes.POP(),
+
+                            JavaOpcodes.ARETURN(),
                         ],
                     ),
                 ]

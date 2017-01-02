@@ -44,7 +44,7 @@ public class Module extends org.python.types.Object {
         }
 
         // System.out.println(this.__dict__);
-        // System.out.println("__new__ module " + packageName + " " + fullPackageName);
+        // System.out.println("__new__ module " + packageName + " " + fullPackageName + " " + this.fname);
         this.__dict__.put("__package__", new org.python.types.Str(packageName));
         this.__dict__.put("__name__", new org.python.types.Str(fullPackageName));
         return cls;
