@@ -1040,10 +1040,27 @@ public class Python {
             "Return whether an object is an instance of a class or of a subclass thereof.\n" +
             "With a type as second argument, return whether that is the object's type.\n" +
             "The form using a tuple, isinstance(x, (A, B, ...)), is a shortcut for\n" +
-            "isinstance(x, A) or isinstance(x, B) or ... (etc.).\n"
+            "isinstance(x, A) or isinstance(x, B) or ... (etc.).\n",
+        default_args = {"object", "class_or_type_or_tuple"}
     )
-    public static org.python.types.Bool isinstance() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'isinstance' not implemented");
+    public static org.python.types.Bool isinstance(org.python.Object object, org.python.Object class_or_type_or_tuple) {
+        if (object == null) {
+            throw new org.python.exceptions.TypeError("isinstance expected 2 arguments, got 0");
+        } else if (class_or_type_or_tuple == null) {
+            throw new org.python.exceptions.TypeError("isinstance expected 2 arguments, got 1");
+        } else if (class_or_type_or_tuple instanceof org.python.types.Tuple) {
+            java.util.List<org.python.Object> classes = ((org.python.types.Tuple) class_or_type_or_tuple).value;
+            for (org.python.Object klass: classes) {
+                if (((org.python.types.Bool) org.Python.isinstance(object, klass).__bool__()).value) {
+                    return new org.python.types.Bool(true);
+                };
+            }
+            return new org.python.types.Bool(false);
+        } else if (class_or_type_or_tuple instanceof org.python.types.Type) {
+            return new org.python.types.Bool(object.__getattribute_null("__class__") == class_or_type_or_tuple);
+        } else {
+            throw new org.python.exceptions.TypeError("isinstance() arg 2 must be a type or tuple of types");
+        }
     }
 
     @org.python.Method(
