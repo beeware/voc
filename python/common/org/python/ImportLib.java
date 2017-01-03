@@ -11,15 +11,15 @@ public class ImportLib {
             java.lang.String [] from_list,
             int level) {
         // Create an array containing the module path.
-        // System.out.println("Import from " + python_name + " level " + level);
-        // System.out.println("from_list");
+        // org.Python.debug("Import from " + python_name + " level " + level);
+        // org.Python.debug("from_list");
         // if (from_list != null) {
         //     for (java.lang.String s: from_list) {
-        //         System.out.println("    " + s);
+        //         org.Python.debug("    " + s);
         //     }
         // }
-        // System.out.println("globals = " + globals);
-        // System.out.println("locals = " + locals);
+        // org.Python.debug("globals = " + globals);
+        // org.Python.debug("locals = " + locals);
         boolean native_import;
 
         java.lang.String [] path;
@@ -27,9 +27,9 @@ public class ImportLib {
             path = python_name.split("\\.");
         } else {
             java.lang.String [] context = ((java.lang.String) globals.get("__name__").toJava()).split("\\.");
-            // System.out.println("context");
+            // org.Python.debug("context");
             // for (java.lang.String s: context) {
-            //     System.out.println("    " + s);
+            //     org.Python.debug("    " + s);
             // }
 
             // Adjust level to deal with imports inside a __init__.py file
@@ -40,13 +40,13 @@ public class ImportLib {
             int context_length = context.length - level;
             if (context_length < 0) {
                 throw new org.python.exceptions.SystemError("Parent module '' not loaded, cannot perform relative import");
-            } 
+            }
 
             if (python_name != null) {
                 java.lang.String [] import_path = python_name.split("\\.");
-                // System.out.println("import_path");
+                // org.Python.debug("import_path");
                 // for (java.lang.String s: import_path) {
-                //     System.out.println("    " + s);
+                //     org.Python.debug("    " + s);
                 // }
 
                 path = new java.lang.String [import_path.length + context_length];
@@ -59,9 +59,9 @@ public class ImportLib {
             }
         }
 
-        // System.out.println("final path");
+        // org.Python.debug("final path");
         // for (java.lang.String s: path) {
-        //     System.out.println("    " + s);
+        //     org.Python.debug("    " + s);
         // }
 
         java.lang.StringBuilder import_name = new java.lang.StringBuilder();
@@ -78,13 +78,13 @@ public class ImportLib {
                 java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass("org.Python");
                 python_module = new org.python.types.Module(java_class);
                 python.sys.__init__.modules.__setitem__(new org.python.types.Str("builtins"), python_module);
-                
+
                 parent_module = python_module;
                 return_module = python_module;
                 import_name.append("builtins");
             } catch (java.lang.ClassNotFoundException e) {
                 throw new org.python.exceptions.SystemError("Unable to find builtins");
-            }            
+            }
         } else {
             // If the package name isn't clearly identifiable as a java package path,
             // put it in the python namespace.
@@ -112,6 +112,7 @@ public class ImportLib {
                 try {
                     // org.Python.debug("IMPORT", mod_name);
                     python_module = (org.python.types.Module) python.sys.__init__.modules.__getitem__(new org.python.types.Str(mod_name));
+                    // org.Python.debug("Already imported", mod_name);
                 } catch (org.python.exceptions.KeyError ke) {
                     try {
                         if (native_import) {
@@ -192,7 +193,7 @@ public class ImportLib {
                 }
             }
         }
-        // System.out.println("IMPORTED " + return_module);
+        // org.Python.debug("IMPORTED " + return_module);
         return return_module;
     }
 
@@ -236,10 +237,10 @@ public class ImportLib {
             throw new org.python.exceptions.RuntimeError("Couldn't find initialization method for module " + import_name);
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
-                org.Python.debug("Exception:", e.getTargetException());
-                for (java.lang.StackTraceElement ste: e.getTargetException().getStackTrace()) {
-                    org.Python.debug("     ", ste);
-                }
+                // org.Python.debug("Exception:", e.getTargetException());
+                // for (java.lang.StackTraceElement ste: e.getTargetException().getStackTrace()) {
+                //     org.Python.debug("     ", ste);
+                // }
 
                 // If the Java method raised a Python exception, re-raise that
                 // exception as-is. If it wasn't a Python exception, wrap it
