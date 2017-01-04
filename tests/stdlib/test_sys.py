@@ -55,7 +55,6 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # __name__
-    @expectedFailure
     def test___name__(self):
         self.assertCodeExecution("""
             import sys
@@ -531,7 +530,6 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # hexversion
-    @expectedFailure
     def test_hexversion(self):
         self.assertCodeExecution("""
             import sys
@@ -671,7 +669,6 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # platform
-    @expectedFailure
     def test_platform(self):
         self.assertCodeExecution("""
             import sys
@@ -835,17 +832,18 @@ class SysModuleTests(TranspileTestCase):
     def test_version(self):
         self.assertCodeExecution("""
             import sys
-            print(sys.version)
+            lines = sys.version.split('\n')
+            print("There are %d lines" % len(lines))
+            print(lines[0].split(' ')[0])
             print('Done.')
             """)
 
     ############################################################
     # version_info
-    @expectedFailure
     def test_version_info(self):
         self.assertCodeExecution("""
             import sys
-            print(sys.version_info())
+            print(sys.version_info)
             print('Done.')
             """)
 

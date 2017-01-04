@@ -94,9 +94,11 @@ public class Set extends org.python.types.Object {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(otherSet.value.containsAll(this.value) && !this.value.equals(otherSet.value));
         }
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: set() < %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: set() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'set' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -107,9 +109,11 @@ public class Set extends org.python.types.Object {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(otherSet.value.containsAll(this.value));
         }
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: set() <= %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: set() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'set' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -139,9 +143,11 @@ public class Set extends org.python.types.Object {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(this.value.containsAll(otherSet.value) && !this.value.equals(otherSet.value));
         }
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: set() > %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: set() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'set' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -152,9 +158,11 @@ public class Set extends org.python.types.Object {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(this.value.containsAll(otherSet.value));
         }
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: set() >= %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: set() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'set' and '" + other.typeName() + "'");
+        }
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {

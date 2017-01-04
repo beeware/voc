@@ -26,6 +26,10 @@ public class AndroidPlatform implements python.Platform {
         android.util.Log.d("Python", msg + " " + obj);
     }
 
+    public org.python.Object getPlatform() {
+        return new org.python.types.Str("android");
+    }
+
     public org.python.Object stderr() {
         return _stderr;
     }
@@ -36,5 +40,9 @@ public class AndroidPlatform implements python.Platform {
 
     public org.python.Object stdin() {
         return _stdin;
+    }
+
+    public org.python.Object args() {
+        return new org.python.types.List();
     }
 }

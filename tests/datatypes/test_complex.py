@@ -1,6 +1,5 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
-from unittest import expectedFailure
 
 class UnaryComplexOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'complex'

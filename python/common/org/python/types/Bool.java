@@ -72,7 +72,11 @@ public class Bool extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) < (((org.python.types.Float) other).value));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bool() < " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bool() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -86,7 +90,11 @@ public class Bool extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) <= (((org.python.types.Float) other).value));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bool() <= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bool() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -129,7 +137,11 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) > (((org.python.types.Float) other).value));
         }
 
-        throw new org.python.exceptions.TypeError("unorderable types: bool() > " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bool() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -143,7 +155,11 @@ public class Bool extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Bool( (((org.python.types.Bool) this).value ? 1.0 : 0.0) >= (((org.python.types.Float) other).value));
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bool() >= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bool() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -257,7 +273,12 @@ public class Bool extends org.python.types.Object {
             if (this.value) {
                 return new org.python.types.Int(0);
             } else {
-                return new org.python.types.Bool(false);
+                if (org.Python.VERSION < 0x03060000) {
+                    return new org.python.types.Bool(false);
+                } else {
+                    return new org.python.types.Int(0);
+                }
+
             }
         } else if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
@@ -266,9 +287,17 @@ public class Bool extends org.python.types.Object {
             }
 
             if (!this.value) {
-                return new org.python.types.Bool(false);
+                if (org.Python.VERSION < 0x03060000) {
+                    return new org.python.types.Bool(false);
+                } else {
+                    return new org.python.types.Int(0);
+                }
             } else if (other_val > 1) {
-                return new org.python.types.Bool(this.value);
+                if (org.Python.VERSION < 0x03060000) {
+                    return new org.python.types.Bool(this.value);
+                } else {
+                    return new org.python.types.Int(1);
+                }
             }
         }
         try {

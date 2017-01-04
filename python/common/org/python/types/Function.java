@@ -34,21 +34,22 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
 
         this.__dict__.put("__code__", this.code);
-
-        // org.python.Object doc;
-        // try {
-        //     org.python.types.Tuple consts = ((org.python.types.Tuple) this.code.__getattribute__("co_consts"));
-        //     if (consts != null) {
-        //         doc = consts.__getitem__(0);
-        //     } else {
-        //         doc = null;
-        //     }
-        // } catch (java.lang.ClassCastException e) {
-        //     doc = null;
-        // } catch (java.lang.IndexOutOfBoundsException e) {
-        //     doc = null;
-        // }
-        // this.__dict__.put("__doc__", doc);
+        org.python.Object doc;
+        try {
+            org.python.types.Tuple consts = (org.python.types.Tuple) this.code.co_consts;
+            if (consts != null) {
+                doc = consts.__getitem__(new org.python.types.Int(0));
+            } else {
+                doc = org.python.types.NoneType.NONE;
+            }
+        } catch (java.lang.NullPointerException e) {
+            doc = org.python.types.NoneType.NONE;
+        } catch (java.lang.ClassCastException e) {
+            doc = org.python.types.NoneType.NONE;
+        } catch (java.lang.IndexOutOfBoundsException e) {
+            doc = org.python.types.NoneType.NONE;
+        }
+        this.__dict__.put("__doc__", doc);
 
         // this.__dict__.put("__call__")
     }
@@ -390,7 +391,11 @@ public class Function extends org.python.types.Object implements org.python.Call
             throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.method);
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
-                // e.getTargetException().printStackTrace();
+                // org.Python.debug("Exception:", e.getTargetException());
+                // for (java.lang.StackTraceElement ste: e.getTargetException().getStackTrace()) {
+                //     org.Python.debug("     ", ste);
+                // }
+
                 // If the Java method raised an Python exception, re-raise that
                 // exception as-is. If it wasn"t a Python exception, wrap it
                 // as one and continue.

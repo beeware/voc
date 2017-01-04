@@ -5,9 +5,6 @@ import java.util.Arrays;
 public class Bytes extends org.python.types.Object {
     public byte [] value;
 
-    // ugly hack to allow for Python 3.4 / 3.5 differences
-    public static final float PYTHON_VERSION = 3.4f;
-
     /**
      * A utility method to update the internal value of this object.
      *
@@ -24,6 +21,14 @@ public class Bytes extends org.python.types.Object {
 
     public Bytes(byte [] value) {
         this.value = Arrays.copyOf(value, value.length);
+    }
+
+    public Bytes(java.lang.String value) {
+        try {
+            this.value = value.getBytes("ISO-8859-1");
+        } catch (java.io.UnsupportedEncodingException e) {
+            throw new org.python.exceptions.UnicodeDecodeError();
+        }
     }
 
     // public org.python.Object __new__() {
@@ -173,7 +178,11 @@ public class Bytes extends org.python.types.Object {
             if (this.value.length < other_bytes.length) return new org.python.types.Bool(0);
             return new org.python.types.Bool(1);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytes() >= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytes() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'bytes' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -198,7 +207,11 @@ public class Bytes extends org.python.types.Object {
             if (this.value.length <= other_bytes.length) return new org.python.types.Bool(0);
             return new org.python.types.Bool(1);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytes() > " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytes() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'bytes' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -223,7 +236,11 @@ public class Bytes extends org.python.types.Object {
             if (this.value.length <= other_bytes.length) return new org.python.types.Bool(1);
             return new org.python.types.Bool(0);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytes() <= " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytes() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'bytes' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -248,15 +265,24 @@ public class Bytes extends org.python.types.Object {
             if (this.value.length < other_bytes.length) return new org.python.types.Bool(1);
             return new org.python.types.Bool(0);
         }
-        throw new org.python.exceptions.TypeError("unorderable types: bytes() < " + other.typeName() + "()");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: bytes() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'bytes' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        if (this.PYTHON_VERSION < 3.5) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'bytes' and '" + other.typeName() + "'");
+        if (org.Python.VERSION < 0x03050000) {
+            if (other instanceof org.python.types.Dict) {
+                return this;
+            }
+            throw new org.python.exceptions.TypeError(
+                "unsupported operand type(s) for %: 'bytes' and '" + other.typeName() + "'"
+            );
         } else {
             if (other instanceof org.python.types.List || other instanceof org.python.types.Range) {
                 return this;
@@ -356,10 +382,14 @@ public class Bytes extends org.python.types.Object {
                     return new org.python.types.Int(this.value[idx]);
                 }
             }
-        } else if (this.PYTHON_VERSION < 3.5) {
-            throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
         } else {
-            throw new org.python.exceptions.TypeError("byte indices must be integers or slices, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "byte indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -420,6 +450,22 @@ public class Bytes extends org.python.types.Object {
     )
     public org.python.Object __imul__(org.python.Object other) {
         return this.__mul__(other);
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __imod__(org.python.Object other) {
+        if (org.Python.VERSION < 0x03050000) {
+            throw new org.python.exceptions.TypeError(
+                "unsupported operand type(s) for %=: 'bytes' and '" + other.typeName() + "'"
+            );
+        } else {
+            if (other instanceof org.python.types.List || other instanceof org.python.types.Range) {
+                return this.__mod__(other);
+            }
+            throw new org.python.exceptions.TypeError("not all arguments converted during bytes formatting");
+        }
     }
 
     @org.python.Method(

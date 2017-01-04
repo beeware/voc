@@ -122,9 +122,11 @@ public class Tuple extends org.python.types.Object {
             }
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: tuple() < %s()",
-                    org.Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: tuple() < " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'tuple' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -154,9 +156,11 @@ public class Tuple extends org.python.types.Object {
             return new org.python.types.Bool(size <= otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: tuple() <= %s()",
-                    org.Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: tuple() <= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'tuple' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -204,9 +208,11 @@ public class Tuple extends org.python.types.Object {
             return new org.python.types.Bool(size > otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: tuple() > %s()",
-                    org.Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: tuple() > " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'tuple' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -236,9 +242,11 @@ public class Tuple extends org.python.types.Object {
             return new org.python.types.Bool(size >= otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: tuple() >= %s()",
-                    org.Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: tuple() >= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'tuple' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -317,7 +325,15 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError(
+                    "tuple indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "tuple indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -341,7 +357,15 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError(
+                    "tuple indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "tuple indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -363,7 +387,7 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __contains__(org.python.Object item) {
-        throw new org.python.exceptions.NotImplementedError("__contains__() has not been implemented.");
+        return new org.python.types.Bool(this.value.contains(item));
     }
 
     @org.python.Method(

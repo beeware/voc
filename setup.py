@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
+import io
+import re
+from setuptools import setup, find_packages
 import sys
 
 if sys.version_info[:2] < (3, 4):
     raise SystemExit("VOC requires Python 3.4+")
-
-import io
-import re
-from setuptools import setup, find_packages
-
 
 with io.open('./voc/__init__.py', encoding='utf8') as version_file:
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file.read(), re.M)

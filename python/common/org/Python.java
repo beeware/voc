@@ -4,6 +4,11 @@ package org;
 public class Python {
     public static java.util.Map<java.lang.String, org.python.Object> builtins;
 
+    /**
+     * The version of Python that this library implements
+     */
+    public static int VERSION = 0x3040000;
+
     static {
         // Load all the builtins into the dictionary as callables
         builtins = new java.util.HashMap<java.lang.String, org.python.Object>();
@@ -577,9 +582,17 @@ public class Python {
         else {
             try {
                 real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
-            } catch (org.python.exceptions.TypeError e){
-                throw new org.python.exceptions.TypeError("complex() argument must be a string, a bytes-like object or a number, not '" + real.typeName() + "'");
-            } catch (org.python.exceptions.ValueError e){
+            } catch (org.python.exceptions.TypeError e) {
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() argument must be a string or a number, not '" + real.typeName() + "'"
+                    );
+                } else {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() first argument must be a string or a number, not '" + real.typeName() + "'"
+                    );
+                }
+            } catch (org.python.exceptions.ValueError e) {
                 throw new org.python.exceptions.ValueError("complex() arg is a malformed string");
             }
         }
@@ -591,8 +604,17 @@ public class Python {
         else {
             try {
                 imag_val = (org.python.types.Float)imag_val.__add__(Python.float_cast(imag == null ? new org.python.types.Float(0) : imag));
-            } catch (org.python.exceptions.TypeError e){
-                throw new org.python.exceptions.TypeError("complex() argument must be a string, a bytes-like object or a number, not '" + imag.typeName() + "'");
+            } catch (org.python.exceptions.TypeError e) {
+                if (org.Python.VERSION < 0x03040300) {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() argument must be a string or a number, not '" + imag.typeName() + "'"
+                    );
+                } else {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() argument must be a string, a bytes-like object or a number, not '" +
+                            imag.typeName() + "'"
+                    );
+                }
             }
         }
         return new org.python.types.Complex(real_val, imag_val);
@@ -803,7 +825,9 @@ public class Python {
         try {
             return (org.python.types.Float) x.__float__();
         } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError("float() argument must be a string, a bytes-like object or a number, not '" + x.typeName() + "'");
+            throw new org.python.exceptions.TypeError(
+                "float() argument must be a string or a number, not '" + x.typeName() + "'"
+            );
         }
     }
 
@@ -857,14 +881,14 @@ public class Python {
         return result;
     }
 
-    @org.python.Method(
-        __doc__ = "globals() -> dictionary" +
-            "\n" +
-            "Return the dictionary containing the current scope's global variables.\n"
-    )
-    public static org.python.types.Dict globals() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'globals' not implemented");
-    }
+    // @org.python.Method(
+    //     __doc__ = "globals() -> dictionary" +
+    //         "\n" +
+    //         "Return the dictionary containing the current scope's global variables.\n"
+    // )
+    // public static org.python.types.Dict globals() {
+    //     Implemented directly at the AST level
+    // }
 
     @org.python.Method(
         __doc__ = "hasattr(object, name) -> bool" +
@@ -994,7 +1018,16 @@ public class Python {
             try {
                 return (org.python.types.Int) x.__int__();
             } catch (org.python.exceptions.AttributeError ae) {
-                throw new org.python.exceptions.TypeError("int() argument must be a string, a bytes-like object or a number, not '" + x.typeName() + "'");
+                if (org.Python.VERSION < 0x03040300) {
+                    throw new org.python.exceptions.TypeError(
+                        "int() argument must be a string or a number, not '" + x.typeName() + "'"
+                    );
+                } else {
+                    throw new org.python.exceptions.TypeError(
+                        "int() argument must be a string, a bytes-like object or a number, not '" +
+                            x.typeName() + "'"
+                    );
+                }
             }
         } else {
             throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
@@ -1114,14 +1147,14 @@ public class Python {
         }
     }
 
-    @org.python.Method(
-        __doc__ = "locals() -> dictionary" +
-            "\n" +
-            "Update and return a dictionary containing the current scope's local variables.\n"
-    )
-    public static org.python.types.Dict locals() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'locals' not implemented");
-    }
+    // @org.python.Method(
+    //     __doc__ = "locals() -> dictionary" +
+    //         "\n" +
+    //         "Update and return a dictionary containing the current scope's local variables.\n"
+    // )
+    // public static org.python.types.Dict locals() {
+    //     Implemented directly at the AST level
+    // }
 
     @org.python.Method(
         __doc__ = "map(func, *iterables) --> map object" +
@@ -1397,7 +1430,11 @@ public class Python {
             throw new org.python.exceptions.TypeError("pow() 3rd argument not allowed unless all arguments are integers");
         }
         if (z != null && ((org.python.types.Int) y).value < 0) {
-            throw new org.python.exceptions.TypeError("pow() 2nd argument cannot be negative when 3rd argument specified");
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError("pow() 2nd argument cannot be negative when 3rd argument specified");
+            } else {
+                throw new org.python.exceptions.ValueError("pow() 2nd argument cannot be negative when 3rd argument specified");
+            }
         }
         return x.__pow__(y, z);
     }
@@ -1815,15 +1852,15 @@ public class Python {
         }
     }
 
-    @org.python.Method(
-        __doc__ = "vars([object]) -> dictionary" +
-            "\n" +
-            "Without arguments, equivalent to locals().\n" +
-            "With an argument, equivalent to object.__dict__.\n"
-    )
-    public static org.python.types.Dict vars() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'vars' not implemented");
-    }
+    // @org.python.Method(
+    //     __doc__ = "vars([object]) -> dictionary" +
+    //         "\n" +
+    //         "Without arguments, equivalent to locals().\n" +
+    //         "With an argument, equivalent to object.__dict__.\n"
+    // )
+    // public static org.python.types.Dict vars() {
+    //     Implemented directly at the AST level
+    // }
 
     @org.python.Method(
         __doc__ = "zip(iter1 [,iter2 [...]]) --> zip object" +
