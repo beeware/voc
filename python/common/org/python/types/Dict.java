@@ -36,6 +36,61 @@ public class Dict extends org.python.types.Object {
         this.value = dict;
     }
 
+    @org.python.Method(
+        __doc__ = "dict() -> new empty dictionary" +
+            "dict(mapping) -> new dictionary initialized from a mapping object's\n" +
+            "    (key, value) pairs\n" +
+            "dict(iterable) -> new dictionary initialized as if via:\n" +
+            "    d = {}\n" +
+            "    for k, v in iterable:\n" +
+            "        d[k] = v\n" +
+            "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" +
+            "    in the keyword argument list.  For example:  dict(one=1, two=2)\n",
+        default_args = {"iterable"}
+    )
+    public Dict(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = new java.util.HashMap<org.python.Object, org.python.Object>();
+        } else {
+            if (args[0] instanceof org.python.types.Dict) {
+                this.value = new java.util.HashMap<org.python.Object, org.python.Object>(
+                    ((org.python.types.Dict) args[0]).value
+                );
+            } else {
+                org.python.Iterable iterator = org.Python.iter(args[0]);
+                java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
+                try {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        java.util.List<org.python.Object> data;
+                        if (next instanceof org.python.types.Tuple) {
+                            data = ((org.python.types.Tuple) next).value;
+                        } else if (next instanceof org.python.types.List) {
+                            data = ((org.python.types.List) next).value;
+                        } else {
+                            throw new org.python.exceptions.TypeError(
+                                "cannot convert dictionary update sequence element #" + generated.size() +
+                                    " to a sequence"
+                            );
+                        }
+
+                        if (data.size() != 2) {
+                            throw new org.python.exceptions.ValueError(
+                                "dictionary update sequence element #" + generated.size() +
+                                    " has length " + data.size() +
+                                    "; 2 is required"
+                            );
+                        }
+
+                        generated.put(data.get(0), data.get(1));
+                    }
+                } catch (org.python.exceptions.StopIteration si) {
+                }
+                this.value = generated;
+            }
+        }
+    }
+
     // @org.python.Method(
     //     __doc__ = ""
     // )

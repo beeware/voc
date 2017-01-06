@@ -60,6 +60,9 @@ public class Object implements org.python.Object {
         this(org.python.types.Type.Origin.PYTHON, null);
     }
 
+    @org.python.Method(
+        __doc__ = "The most base type"
+    )
     public Object(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         this(org.python.types.Type.Origin.PYTHON, null);
         if (args != null && args.length > 0) {
@@ -337,6 +340,7 @@ public class Object implements org.python.Object {
 
         // If the attribute already exists, then it's OK to set it.
         org.python.Object attr = cls.__getattribute_null(name);
+        // org.Python.debug("ATTR ", attr);
 
         // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {

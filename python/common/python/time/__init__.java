@@ -108,7 +108,7 @@ public class __init__ extends org.python.types.Module {
     )
     public static org.python.Object sleep(org.python.Object seconds) {
         try {
-            java.lang.Thread.sleep((int) (org.Python.float_cast(seconds).value * 1000.0));
+            java.lang.Thread.sleep((int) (((org.python.types.Float) seconds.__float__()).value * 1000.0));
         } catch(ClassCastException e) {
             throw new org.python.exceptions.TypeError("a float is required");
         } catch(InterruptedException ex) {

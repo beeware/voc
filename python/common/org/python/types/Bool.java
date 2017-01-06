@@ -35,6 +35,29 @@ public class Bool extends org.python.types.Object {
         this.value = int_val != 0;
     }
 
+    @org.python.Method(
+        __doc__ = "bool(x) -> bool" +
+            "\n" +
+            "Returns True when the argument x is true, False otherwise.\n" +
+            "The builtins True and False are the only two instances of the class bool.\n" +
+            "The class bool is a subclass of the class int, and cannot be subclassed.\n",
+        default_args = {"x"}
+    )
+    public Bool(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = false;
+        } else {
+            try {
+                this.value = ((org.python.types.Bool) args[0].__bool__()).value;
+            } catch (org.python.exceptions.AttributeError ae) {
+                try {
+                    this.value = ((org.python.types.Int) args[0].__len__()).value != 0;
+                } catch (org.python.exceptions.AttributeError ae2) {
+                    this.value = true;
+                }
+            }
+        }
+    }
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("bool.__new__() has not been implemented.");
     // }

@@ -31,6 +31,81 @@ public class ByteArray extends org.python.types.Object {
         this.value = Arrays.copyOf(value, value.length);
     }
 
+    @org.python.Method(
+        __doc__ = "bytearray(iterable_of_ints) -> bytearray" +
+            "bytearray(string, encoding[, errors]) -> bytearray\n" +
+            "bytearray(bytes_or_buffer) -> mutable copy of bytes_or_buffer\n" +
+            "bytearray(int) -> bytes array of size given by the parameter initialized with null bytes\n" +
+            "bytearray() -> empty bytes array\n" +
+            "\n" +
+            "Construct an mutable bytearray object from:\n" +
+            " - an iterable yielding integers in range(256)\n" +
+            " - a text string encoded using the specified encoding\n" +
+            " - a bytes or a buffer object\n" +
+            " - any object implementing the buffer API.\n" +
+            " - an integer\n",
+        default_args = {"source", "encoding", "errors"}
+    )
+    public ByteArray(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            // bytearray()
+            this.value = new byte [0];
+        } else {
+            if (args[1] == null) {
+                if (args[0] instanceof org.python.types.Int) {
+                    // bytearray(int)
+                    this.value = new byte [(int)((org.python.types.Int) args[0].__int__()).value];
+                } else {
+
+                    org.python.Iterable iterator = null;
+                    try {
+                        iterator = org.Python.iter(args[0]);
+                    } catch (org.python.exceptions.TypeError e) {
+                        // Not an iterator
+                    }
+                    if (iterator != null) {
+                        // bytearray(iterable_of_ints)
+                        java.util.List<Byte> generated = new java.util.ArrayList<Byte>();
+                        try {
+                            while (true) {
+                                org.python.Object next = iterator.__next__();
+                                if (next instanceof org.python.types.Int) {
+                                    long value = ((org.python.types.Int) next.__int__()).value;
+                                    if ((value < 0) || (value > 255)) {
+                                        throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
+                                    } else {
+                                        generated.add(new Byte((byte)value));
+                                    }
+                                } else if (next instanceof org.python.types.Str) {
+                                    // TODO: Can take ASCII single-character strings
+                                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with strings not implemented");
+                                }
+                            }
+                        } catch (org.python.exceptions.StopIteration si) {
+                        }
+                        byte[] primative_bytes = new byte[generated.size()];
+                        for(int i = 0; i < primative_bytes.length; i++) {
+                            primative_bytes[i] = generated.get(i);
+                        }
+                        this.value = primative_bytes;
+                    } else {
+                        // bytearray(bytes_or_buffer)
+                        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with bytes_or_buffer not implemented");
+                    }
+                }
+            } else {
+                // bytearray(string, args[1][, errors])
+                if (args[2] == null) {
+                    // bytearray(string, args[1])
+                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
+                } else {
+                    // bytearray(string, args[1], errors)
+                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
+                }
+            }
+        }
+    }
+
     // public ByteArray(org.python.types.Bool bool) {
     //     this.value = new byte [(bool.value == true) ? 1 : 0];
     // }

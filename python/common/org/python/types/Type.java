@@ -167,7 +167,9 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
         if (origin == Origin.BUILTIN) {
             org.Python.initializeModule(klass, this.__dict__);
-        } else if (origin == Origin.PYTHON || origin == Origin.EXTENSION) {
+        }
+
+        if (origin == Origin.BUILTIN || origin == Origin.PYTHON || origin == Origin.EXTENSION) {
             try {
                 this.constructor = this.klass.getConstructor(org.python.Object[].class, java.util.Map.class);
             } catch (java.lang.NoSuchMethodException e) {
@@ -280,7 +282,67 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // org.Python.debug("         kwargs: ", kwargs);
 
             if (this.constructor != null) {
-                return (org.python.Object) this.constructor.newInstance(args, kwargs);
+                org.python.Method annotation = (org.python.Method) this.constructor.getAnnotation(org.python.Method.class);
+                org.python.Object [] adjusted_args;
+
+                if (annotation != null && origin == Origin.BUILTIN) {
+                    java.lang.String [] arg_names = annotation.args();
+                    java.lang.String [] default_arg_names = annotation.default_args();
+                    boolean has_varargs = annotation.varargs().equals("");
+                    int a;
+                    java.lang.String arg_name;
+                    org.python.Object arg;
+                    int n_args = arg_names.length + default_arg_names.length;
+
+                    adjusted_args = new org.python.Object [arg_names.length + default_arg_names.length];
+
+                    if (args.length < n_args) {
+                        // Take as many positional arguments as have been literally provided
+                        for (a = 0; a < args.length; a++) {
+                            adjusted_args[a] = args[a];
+                        }
+
+                        // Populate the rest from kwargs
+                        for (a = args.length; a < n_args; a++) {
+                            if (a < arg_names.length) {
+                                arg_name = arg_names[a];
+                            } else {
+                                arg_name = default_arg_names[a - arg_names.length];
+                            }
+
+                            arg = kwargs.remove(arg_name);
+                            if (arg == null && a < arg_names.length) {
+                                throw new org.python.exceptions.TypeError(
+                                    this.PYTHON_TYPE_NAME + " constructor missing positional argument '" +
+                                    arg_name + "'"
+                                );
+                            }
+                            adjusted_args[a] = arg;
+                        }
+                    } else {
+                        for (a = 0; a < n_args; a++) {
+                            adjusted_args[a] = args[a];
+                        }
+
+                        for (a = n_args; a < args.length; a++) {
+                            if (a < arg_names.length) {
+                                arg_name = arg_names[a];
+                            } else {
+                                arg_name = default_arg_names[a - arg_names.length];
+                            }
+                            kwargs.put(arg_name, args[a]);
+                        }
+                    }
+                } else {
+                    adjusted_args = args;
+                }
+
+                // for (org.python.Object arg: adjusted_args) {
+                //     org.Python.debug("            adj arg: ", arg);
+                // }
+                // org.Python.debug("         adj kwargs: ", kwargs);
+
+                return (org.python.Object) this.constructor.newInstance(adjusted_args, kwargs);
             } else {
                 throw new org.python.exceptions.RuntimeError("No Python-compatible constructor for type " + this.klass);
             }

@@ -1,6 +1,6 @@
 from unittest import expectedFailure
 
-from .. utils import TranspileTestCase, BuiltinFunctionTestCase
+from .. utils import TranspileTestCase
 
 
 class IsinstanceTests(TranspileTestCase):
@@ -70,7 +70,6 @@ class IsinstanceTests(TranspileTestCase):
             print('Done.')
             """, run_in_function=False)
 
-    @expectedFailure
     def test_types(self):
         self.assertCodeExecution("""
             print(isinstance(123, int))
