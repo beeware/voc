@@ -269,19 +269,19 @@ class Module(Block):
                             JavaOpcodes.DUP(),
                             JavaOpcodes.LDC_W(self.sourcefile),
                             JavaOpcodes.INVOKESPECIAL(
-                                'org/python/types/Str', 
-                                '<init>', 
-                                args=['Ljava/lang/String;'], 
+                                'org/python/types/Str',
+                                '<init>',
+                                args=['Ljava/lang/String;'],
                                 returns='V'
                             ),
 
                             JavaOpcodes.INVOKEINTERFACE(
-                                'java/util/Map', 
-                                'put', 
+                                'java/util/Map',
+                                'put',
                                 args=[
                                     'Ljava/lang/Object;'
                                     'Ljava/lang/Object;'
-                                ], 
+                                ],
                                 returns='Ljava/lang/Object;'
                             ),
                             JavaOpcodes.POP(),
