@@ -70,7 +70,7 @@ public class Complex extends org.python.types.Object {
                     this.real = ((org.python.types.Float) args[0].__float__());
                 }
 
-            } catch (org.python.exceptions.TypeError e) {
+            } catch (org.python.exceptions.AttributeError e) {
                 if (org.Python.VERSION < 0x03060000) {
                     throw new org.python.exceptions.TypeError(
                         "complex() argument must be a string or a number, not '" + args[0].typeName() + "'"
@@ -97,7 +97,7 @@ public class Complex extends org.python.types.Object {
                     this.imag = ((org.python.types.Float) args[1].__float__());
                 }
 
-            } catch (org.python.exceptions.TypeError e) {
+            } catch (org.python.exceptions.AttributeError e) {
                 if (org.Python.VERSION < 0x03040300) {
                     throw new org.python.exceptions.TypeError(
                         "complex() argument must be a string or a number, not '" + args[1].typeName() + "'"
