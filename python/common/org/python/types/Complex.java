@@ -340,7 +340,7 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__and__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
