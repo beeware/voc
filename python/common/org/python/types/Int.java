@@ -75,7 +75,7 @@ public class Int extends org.python.types.Object {
                 } else {
                     throw new org.python.exceptions.TypeError(
                         "int() argument must be a string, a bytes-like object or a number, not '" +
-                            args[1].typeName() + "'"
+                            args[0].typeName() + "'"
                     );
                 }
             }
