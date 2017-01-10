@@ -345,7 +345,7 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__floordiv__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't take floor of complex number.");
     }
 
     @org.python.Method(
