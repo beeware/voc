@@ -380,14 +380,15 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__lshift__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__rshift__ has not been implemented.");    }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: 'complex' and '" + other.typeName() + "'");
+    }
 
     @org.python.Method(
         __doc__ = ""
