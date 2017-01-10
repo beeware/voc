@@ -1467,7 +1467,7 @@ public class Python {
         if (bases == null && dict == null) {
             return org.python.types.Type.pythonType(object_or_name.getClass());
         } else {
-            throw new org.python.exceptions.NotImplementedError("3-argument form of builtin function 'type' not implemented");
+            return org.python.types.Type.declarePythonType(object_or_name, bases, dict);
         }
     }
 

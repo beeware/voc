@@ -255,15 +255,17 @@ public class Super implements org.python.Object {
 
         // If no super proxy exists, check the base class.
         if (value == null) {
+            java.util.List<org.python.Object> this_bases = ((org.python.types.Tuple) this.klass.__dict__.get("__bases__")).value;
+            org.python.Object this_base = this.klass.__dict__.get("__base__");
+
             // org.Python.debug("no instance attributes on super;");
             // org.Python.debug("    look to supers of ", this.klass);
-            // org.Python.debug("            which are ", this.klass.__bases__);
+            // org.Python.debug("            which are ", this_bases);
 
-            java.util.List<org.python.Object> bases = (java.util.ArrayList) this.klass.__bases__.toJava();
-            for (org.python.Object base: bases) {
+            for (org.python.Object base: this_bases) {
                 // The extends class will be the first base; ignore it,
                 // as that will be a circular reference.
-                if (base != this.klass.__base__) {
+                if (base != this_base) {
                     org.python.Object base_klass = org.python.types.Type.pythonType(base.toString());
                     // org.Python.debug("            check ", base_klass);
                     value = base_klass.__getattribute_null(name);

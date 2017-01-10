@@ -12,7 +12,7 @@ from .types import java, python
 from .types.primitives import (
     ALOAD_name, ASTORE_name, free_name,
 )
-# from .debug import DEBUG
+from .debug import DEBUG
 
 
 class Module(Block):
@@ -169,16 +169,12 @@ class Module(Block):
 
         return function
 
-    def add_class(self, class_name, bases, extends, implements):
+    def add_class(self, class_name, extends, implements):
         from .klass import Class
 
         klass = Class(
             self,
             name=class_name,
-            bases=[
-                'org/python/Object' if b == 'object' else b
-                for b in bases
-            ],
             extends=extends,
             implements=implements,
         )
@@ -186,10 +182,35 @@ class Module(Block):
         self.classes.append(klass)
 
         self.add_opcodes(
-            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % klass.descriptor),
+            # Stack contains the bases list
+            ASTORE_name('#bases'),
 
-            java.Class.forName(klass.descriptor.replace('/', '.')),
-            python.Type.for_class(),
+            java.Class.forName(klass.class_name),
+
+            # - name
+            JavaOpcodes.LDC_W(klass.name),
+
+            # - bases
+            ALOAD_name('#bases'),
+
+
+            # - dict
+            JavaOpcodes.ACONST_NULL(),
+
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Type',
+                'declarePythonType',
+                args=[
+                    'Ljava/lang/Class;',
+                    'Ljava/lang/String;',
+                    'Ljava/util/List;',
+                    'Ljava/util/Map;'
+                ],
+                returns='Lorg/python/types/Type;'
+            ),
+
+            free_name('#bases')
         )
 
         self.store_name(klass.name)

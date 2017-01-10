@@ -47,8 +47,8 @@ public class Object implements org.python.Object {
      */
     protected Object(org.python.types.Type.Origin origin, java.lang.Class klass) {
         this.origin = origin;
+        this.__dict__ = new java.util.HashMap<java.lang.String, org.python.Object>();
         if (origin != org.python.types.Type.Origin.PLACEHOLDER) {
-            this.__dict__ = new java.util.HashMap<java.lang.String, org.python.Object>();
             if (klass == null) {
                 klass = this.getClass();
             }
