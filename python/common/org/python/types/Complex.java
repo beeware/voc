@@ -253,6 +253,13 @@ public class Complex extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __getitem__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("'complex' object is not subscriptable");
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
@@ -313,10 +320,30 @@ public class Complex extends org.python.types.Object {
             return new org.python.types.Complex((org.python.types.Float)this.real.__truediv__(other),(org.python.types.Float)this.imag.__truediv__(other));
         } else if (other instanceof org.python.types.Complex) {
             org.python.types.Complex other_obj = (org.python.types.Complex)other;
-            if (other_obj.real.value == 0.0 && other_obj.imag.value == 0.0) {
-                throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
+            org.python.types.Complex result = new org.python.types.Complex(0,0);
+            double abs_breal = Math.abs(other_obj.real.value);
+            double abs_bimag = Math.abs(other_obj.imag.value);
+            if (abs_breal >= abs_bimag) {
+                if (abs_breal == 0.0) {
+                    throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
+                }
+                else {
+                    double ratio = other_obj.imag.value / other_obj.real.value;
+                    double denom = other_obj.real.value + other_obj.imag.value * ratio;
+                    result.real.value = (this.real.value + this.imag.value * ratio) / denom;
+                    result.imag.value = (this.imag.value - this.real.value * ratio) / denom;
+                }
+            } else if (abs_bimag >= abs_breal) {
+                double ratio = other_obj.real.value / other_obj.imag.value;
+                double denom = other_obj.real.value * ratio + other_obj.imag.value;
+                assert(other_obj.imag.value != 0.0);
+                result.real.value = (this.real.value * ratio + this.imag.value) / denom;
+                result.imag.value = (this.imag.value * ratio - this.real.value) / denom;
+            } else {
+                result.real.value = Double.NaN;
+                result.imag.value = Double.NaN;
             }
-
+            return result;
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'complex' and '" + other.typeName() + "'");
     }
@@ -325,21 +352,21 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__floordiv__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't take floor of complex number.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__mod__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't mod complex numbers.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__divmod__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
     }
 
     @org.python.Method(
@@ -353,14 +380,15 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__lshift__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__rshift__ has not been implemented.");    }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: 'complex' and '" + other.typeName() + "'");
+    }
 
     @org.python.Method(
         __doc__ = ""
