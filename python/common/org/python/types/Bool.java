@@ -2,6 +2,8 @@ package org.python.types;
 
 public class Bool extends org.python.types.Object {
     public boolean value;
+    public static org.python.Object TRUE = new org.python.types.Bool(true);
+    public static org.python.Object FALSE = new org.python.types.Bool(false);
 
     /**
      * A utility method to update the internal value of this object.

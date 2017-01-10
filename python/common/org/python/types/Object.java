@@ -469,7 +469,6 @@ public class Object implements org.python.Object {
         throw new org.python.exceptions.AttributeError(this, "__missing__");
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"index", "value"}
