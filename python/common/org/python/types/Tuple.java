@@ -59,9 +59,11 @@ public class Tuple extends org.python.types.Object {
             if (first) {
                 first = false;
             } else {
-                buffer.append(" ");
+                buffer.append(", ");
             }
             buffer.append(obj.__repr__());
+        }
+        if (this.value.size() == 1) {
             buffer.append(",");
         }
         buffer.append(")");
