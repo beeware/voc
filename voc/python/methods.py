@@ -200,13 +200,12 @@ class Function(Block):
     def class_descriptor(self):
         return self.module.class_descriptor
 
-    def add_class(self, class_name, bases, extends, implements):
+    def add_class(self, class_name, extends, implements):
         from .klass import Class
 
         klass = Class(
             self.module,
             name=class_name,
-            bases=bases,
             extends=extends,
             implements=implements,
         )
@@ -215,21 +214,33 @@ class Function(Block):
 
         self.add_opcodes(
             # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+            # Stack contains the bases list
+            ASTORE_name('#bases'),
 
-            JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
-            JavaOpcodes.INVOKESTATIC(
-                'java/lang/Class',
-                'forName',
-                args=['Ljava/lang/String;'],
-                returns='Ljava/lang/Class;'
-            ),
+            java.Class.forName(klass.class_name),
+
+            # - name
+            JavaOpcodes.LDC_W(klass.name),
+
+            # - bases
+            ALOAD_name('#bases'),
+
+            # - dict
+            JavaOpcodes.ACONST_NULL(),
 
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Type',
-                'pythonType',
-                args=['Ljava/lang/Class;'],
+                'declarePythonType',
+                args=[
+                    'Ljava/lang/Class;',
+                    'Ljava/lang/String;',
+                    'Ljava/util/List;',
+                    'Ljava/util/Map;'
+                ],
                 returns='Lorg/python/types/Type;'
             ),
+
+            free_name('#bases')
         )
 
         self.store_name(klass.name)
