@@ -352,7 +352,7 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__mod__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't mod complex numbers.");
     }
 
     @org.python.Method(
