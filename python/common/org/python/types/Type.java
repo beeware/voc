@@ -286,7 +286,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
         return new org.python.types.Str(
             String.format("<class '%s'%s>",
                 org.Python.typeName(this.klass),
-                this.origin == org.python.types.Type.Origin.PLACEHOLDER ? " (placeholder)" : ""
+                this.origin == Origin.PLACEHOLDER ? " (placeholder)" : ""
             )
         );
     }
@@ -304,7 +304,15 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 // with the given name exists, caching either the Field instance,
                 // or an AttributeError representation of the NoSuchFieldException.
                 try {
-                    value = new org.python.java.Field(this.klass.getDeclaredField(name));
+                    java.lang.reflect.Field field = this.klass.getDeclaredField(name);
+
+                    // A field exists. If it's a builtin type, check that the attribute
+                    // should be exposed to the Python namespace.
+                    if (this.origin == Origin.JAVA) {
+                        value = new org.python.java.Field(field);
+                    } else {
+                        value = null;
+                    }
                 } catch (java.lang.NoSuchFieldException e) {
                     value = null;
                 }

@@ -40,7 +40,6 @@ public class Super implements org.python.Object {
 
     public Super(org.python.Object klass, org.python.Object instance) {
         try {
-            // System.out.println("CREATE SUPER" + klass + " " + instance);
             this.klass = (org.python.types.Type) klass;
         } catch (java.lang.ClassCastException e) {
             throw new org.python.exceptions.TypeError(java.lang.String.format("must be type, not %s", klass.typeName()));
@@ -248,31 +247,19 @@ public class Super implements org.python.Object {
 
     public org.python.Object __getattribute_null(java.lang.String name) {
         // Look for local instance attributes first
-        // org.Python.debug("SUPER GETATTRIBUTE ", name);
+        // org.Python.debug("SUPER " + this.klass + "GETATTRIBUTE ", name);
+        org.python.Object value = null;
+        java.util.List<org.python.Object> bases = ((org.python.types.Tuple) this.klass.__dict__.get("__bases__")).value;
 
-        // Look to the class for a super-proxy attribute
-        org.python.Object value = this.klass.__getattribute_null(name + "$super");
+        // org.Python.debug("no instance attributes on super;");
+        // org.Python.debug("    look to supers of ", this.klass);
+        // org.Python.debug("            which are ", bases);
 
-        // If no super proxy exists, check the base class.
-        if (value == null) {
-            java.util.List<org.python.Object> this_bases = ((org.python.types.Tuple) this.klass.__dict__.get("__bases__")).value;
-            org.python.Object this_base = this.klass.__dict__.get("__base__");
-
-            // org.Python.debug("no instance attributes on super;");
-            // org.Python.debug("    look to supers of ", this.klass);
-            // org.Python.debug("            which are ", this_bases);
-
-            for (org.python.Object base: this_bases) {
-                // The extends class will be the first base; ignore it,
-                // as that will be a circular reference.
-                if (base != this_base) {
-                    org.python.Object base_klass = org.python.types.Type.pythonType(base.toString());
-                    // org.Python.debug("            check ", base_klass);
-                    value = base_klass.__getattribute_null(name);
-                    if (value != null) {
-                        break;
-                    }
-                }
+        for (org.python.Object base: bases) {
+            // org.Python.debug("            check ", base);
+            value = base.__getattribute_null(name);
+            if (value != null) {
+                break;
             }
         }
 
@@ -280,8 +267,7 @@ public class Super implements org.python.Object {
             throw new org.python.exceptions.NotImplementedError("Can't get attributes on super() (yet!)");
         }
 
-        // org.Python.debug("SUPER GETATTRIBUTE " + name, value);
-        // org.Python.debug("INSTANCE  ", this.instance);
+        // org.Python.debug("VALUE: SUPER GETATTRIBUTE " + name, value);
         // Post-process the value retrieved, using the binding fr
         return value.__get__(this.instance, this.klass);
     }

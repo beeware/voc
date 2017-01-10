@@ -194,7 +194,6 @@ class Module(Block):
             # - bases
             ALOAD_name('#bases'),
 
-
             # - dict
             JavaOpcodes.ACONST_NULL(),
 
