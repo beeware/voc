@@ -253,6 +253,13 @@ public class Complex extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __getitem__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("'complex' object is not subscriptable");
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
@@ -359,7 +366,7 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__divmod__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
     }
 
     @org.python.Method(
