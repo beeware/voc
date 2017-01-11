@@ -1,7 +1,7 @@
 import sys
 from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
-    RuntimeVisibleAnnotations, opcodes as JavaOpcodes
+    RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref as JavaClassref
 )
 from .blocks import Block, Accumulator
 from .structures import (
@@ -14,6 +14,7 @@ from .types.primitives import (
     DLOAD_name, FLOAD_name,
     ICONST_val, ILOAD_name,
 )
+# from .debug import DEBUG, DEBUG_value
 
 
 CO_VARARGS = 0x0004
@@ -213,11 +214,12 @@ class Function(Block):
         self.module.classes.append(klass)
 
         self.add_opcodes(
-            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
             # Stack contains the bases list
             ASTORE_name('#bases'),
 
-            java.Class.forName(klass.class_name),
+            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % klass.descriptor),
+            # - class
+            JavaOpcodes.LDC_W(JavaClassref(klass.descriptor)),
 
             # - name
             JavaOpcodes.LDC_W(klass.name),
@@ -244,6 +246,15 @@ class Function(Block):
         )
 
         self.store_name(klass.name)
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKESTATIC(
+                klass.descriptor,
+                'class$init',
+                args=[],
+                returns='V'
+            ),
+        )
 
         return klass
 
@@ -822,19 +833,15 @@ class MainFunction(Function):
 
     def visitor_setup(self):
         self.add_opcodes(
-            # Set the Python version
-            JavaOpcodes.LDC_W(sys.hexversion),
-            JavaOpcodes.PUTSTATIC('org/Python', 'VERSION', 'I'),
-
-            # Create storage for locals
-            java.Map(),
-            ASTORE_name('#locals'),
-
             # Add a TRY-CATCH for SystemExit
             TRY(),
         )
         self.add_opcodes(
-                # Initialize this module
+                # Set the Python version
+                JavaOpcodes.LDC_W(sys.hexversion),
+                JavaOpcodes.PUTSTATIC('org/Python', 'VERSION', 'I'),
+
+                # Construct this module
                 java.New(self.module.class_descriptor),
                 java.Init(self.module.class_descriptor),
                 ASTORE_name('#module'),
