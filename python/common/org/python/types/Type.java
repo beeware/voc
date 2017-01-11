@@ -14,18 +14,6 @@ public class Type extends org.python.types.Object implements org.python.Callable
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
-    public static void predeclarePythonType(java.lang.Class java_class) {
-        // Look up the class in the known types table.
-        org.python.types.Type python_type = known_types.get(java_class);
-        if (python_type != null) {
-            throw new org.python.exceptions.RuntimeError("Java class " + java_class + " is already declared.");
-        }
-
-        // Create and store a placeholder
-        PlaceholderType placeholder = new PlaceholderType(java_class);
-        known_types.put(java_class, placeholder);
-    }
-
     /**
      * Factory method to obtain Python classes from their Java counterparts
      */
@@ -337,9 +325,10 @@ public class Type extends org.python.types.Object implements org.python.Callable
         // variable defined at the module level.
         if (value == null) {
             // System.out.println("CLASS ATTRS " + this.klass);
-            org.python.Object module = this.__dict__.get("__module__");
-            if (module != null) {
-                // System.out.println("Look for attribute in " + module);
+            // System.out.println("__dict__ " + this.__dict__);
+            org.python.Object module_name = this.__dict__.get("__module__");
+            if (module_name != null) {
+                org.python.Object module = python.sys.__init__.modules.__getitem__(module_name);
                 value = module.__getattribute_null(name);
             }
         }
