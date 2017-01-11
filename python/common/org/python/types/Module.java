@@ -19,42 +19,17 @@ public class Module extends org.python.types.Object {
         this.klass = klass;
     }
 
-    /**
-     * Python interface compatibility
-     * Section 3.3.1 - Basic customization
-     */
-    @org.python.Method(
-        __doc__ = "Create and return a new object.  See help(type) for accurate signature."
-    )
-    public org.python.Object __new__(org.python.Object klass) {
-        org.python.Object cls = super.__new__(klass);
-        java.lang.String fullPackageName = this.getClass().getName();
-        java.lang.String packageName;
-        if (fullPackageName.startsWith("python.")) {
-            fullPackageName = fullPackageName.substring(7);
-        }
-
-        int last_dot = fullPackageName.lastIndexOf('.');
-        if (last_dot == -1) {
-            packageName = fullPackageName.substring(0);
-        } else {
-            java.lang.String lastPart = fullPackageName.substring(last_dot + 1);
-            fullPackageName = fullPackageName.substring(0, last_dot);
-            packageName = fullPackageName.substring(0, last_dot);
-        }
-
-        // System.out.println(this.__dict__);
-        // System.out.println("__new__ module " + packageName + " " + fullPackageName + " " + this.fname);
-        this.__dict__.put("__package__", new org.python.types.Str(packageName));
-        this.__dict__.put("__name__", new org.python.types.Str(fullPackageName));
-        return cls;
-    }
-
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<module '%s' from '%s'>", this.typeName(), this.getClass()));
+        return new org.python.types.Str(
+            String.format(
+                "<module '%s' from '%s.class'>",
+                this.getClass().getPackage().getName(),
+                this.getClass()
+            )
+        );
     }
 
     public org.python.Object __getattribute__(java.lang.String name) {
