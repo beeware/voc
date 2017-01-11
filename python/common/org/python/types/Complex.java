@@ -253,6 +253,13 @@ public class Complex extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __getitem__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("'complex' object is not subscriptable");
+    }
+
+    @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
@@ -345,21 +352,21 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__floordiv__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't take floor of complex number.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__mod__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't mod complex numbers.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__divmod__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
     }
 
     @org.python.Method(
@@ -373,14 +380,15 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__lshift__ has not been implemented.");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("complex.__rshift__ has not been implemented.");    }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: 'complex' and '" + other.typeName() + "'");
+    }
 
     @org.python.Method(
         __doc__ = ""
