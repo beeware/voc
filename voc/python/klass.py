@@ -1,7 +1,7 @@
 import os
 
 from ..java import (
-    Annotation, Class as JavaClass, Classref as JavaClassref, Code as JavaCode, ConstantElementValue,
+    Annotation, Class as JavaClass, Code as JavaCode, ConstantElementValue,
     Field as JavaField, Method as JavaMethod, RuntimeVisibleAnnotations,
     SourceFile, opcodes as JavaOpcodes,
 )
@@ -62,17 +62,10 @@ class Class(Block):
 
     def visitor_setup(self):
         self.add_opcodes(
-            # DEBUG("STATIC BLOCK OF " + self.descriptor),
-            JavaOpcodes.LDC_W(JavaClassref(self.descriptor)),
-            JavaOpcodes.INVOKESTATIC(
-                'org/python/types/Type',
-                'predeclarePythonType',
-                args=['Ljava/lang/Class;'],
-                returns="V"
-            ),
-
-            # Force the loading and instantiation of the module
-            # that contains the class.
+            # DEBUG("DEFINITION BLOCK OF " + self.descriptor),
+            # Force the loading and instantiation of the python module
+            # that defines the class.
+            # This may already be imported, but just in case
             JavaOpcodes.LDC_W(self.module.full_name),
             JavaOpcodes.ACONST_NULL(),
             JavaOpcodes.ACONST_NULL(),
@@ -104,13 +97,13 @@ class Class(Block):
         self.store_name('__qualname__')
 
         # self.add_opcodes(
-        #     DEBUG("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
+        #     DEBUG("DEFINITION BLOCK OF " + self.descriptor + " DONE"),
         # )
 
     def store_name(self, name):
         self.add_opcodes(
             ASTORE_name('#value'),
-            python.Type.for_name(self.descriptor),
+            python.Type.for_class(self.descriptor),
 
             ALOAD_name('#value'),
             python.Object.set_attr(name),
@@ -121,7 +114,7 @@ class Class(Block):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name('#value'),
-            python.Type.for_name(self.descriptor),
+            python.Type.for_class(self.descriptor),
 
             JavaOpcodes.GETFIELD('org/python/types/Type', '__dict__', 'Ljava/util/Map;'),
             ALOAD_name('#value'),
@@ -132,7 +125,7 @@ class Class(Block):
 
     def load_name(self, name):
         self.add_opcodes(
-            python.Type.for_name(self.descriptor),
+            python.Type.for_class(self.descriptor),
             python.Object.get_attribute(name),
         )
 
@@ -231,7 +224,7 @@ class Class(Block):
 
         try:
             # If we have block content, add a static block to the class
-            static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
+            static_init = JavaMethod('class$init', '()V', public=False, static=True)
             static_init.attributes.append(super().transpile())
             classfile.methods.append(static_init)
         except IgnoreBlock:

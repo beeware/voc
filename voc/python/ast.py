@@ -384,15 +384,16 @@ class Visitor(ast.NodeVisitor):
         )
 
         if extends:
-            self.context.add_opcodes(
-                JavaOpcodes.DUP(),
-                python.Type.for_name(extends),
-                java.List.add(),
-            )
+            first_base = extends
         elif not node.bases:
+            first_base = 'org/python/types/Object'
+        else:
+            first_base = None
+
+        if first_base:
             self.context.add_opcodes(
                 JavaOpcodes.DUP(),
-                python.Type.for_name('org.python.types.Object'),
+                python.Type.for_class(first_base),
                 java.List.add(),
             )
 
