@@ -1,4 +1,5 @@
 package org.python.types;
+import java.util.Locale;
 
 public class Complex extends org.python.types.Object {
     public org.python.types.Float real;
@@ -42,36 +43,37 @@ public class Complex extends org.python.types.Object {
     private String partToStr(org.python.types.Float x) {
         String x_str;
         if (x.value != 0.0) {
-          x_str = java.lang.Double.toString(x.value);
-          int dot_pos = x_str.indexOf(".");
-          int e_pos = x_str.indexOf("e");
-          if (dot_pos != -1) {
-              // Remove trailing zeroes in the fractional part
-              int last_zero = -1;
-              int i;
-              for (i = dot_pos + 1; i < x_str.length(); i++) {
-                  char c = x_str.charAt(i);
-                  if (i == e_pos) {
-                      break;
-                  } else if (c == '0') {
-                      if (last_zero == -1) {
-                          last_zero = i;
-                      }
-                  } else {
-                      last_zero = -1;
-                  }
-              }
-              if (last_zero != -1) {
-                  if (last_zero == dot_pos + 1) {
-                      last_zero -= 1;
-                  }
-                  x_str = x_str.substring(0, last_zero) + x_str.substring(i);
-              }
-          }
+            String format = "%.17g";
+            x_str =  String.format(Locale.US, format, x.value);
+            int dot_pos = x_str.indexOf(".");
+            int e_pos = x_str.indexOf("e");
+            if (dot_pos != -1) {
+                // Remove trailing zeroes in the fractional part
+                int last_zero = -1;
+                int i;
+                for (i = dot_pos + 1; i < x_str.length(); i++) {
+                    char c = x_str.charAt(i);
+                    if (i == e_pos) {
+                        break;
+                    } else if (c == '0') {
+                        if (last_zero == -1) {
+                            last_zero = i;
+                        }
+                    } else {
+                        last_zero = -1;
+                    }
+                }
+                if (last_zero != -1) {
+                    if (last_zero == dot_pos + 1) {
+                        last_zero -= 1;
+                    }
+                    x_str = x_str.substring(0, last_zero) + x_str.substring(i);
+                }
+            }
         } else if (x.isNegativeZero()) {
-          x_str = "-0";
+            x_str = "-0";
         } else {
-          x_str = "0";
+            x_str = "0";
         }
         return x_str;
     }
