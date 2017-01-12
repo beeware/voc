@@ -23,7 +23,7 @@ public class __init__ extends org.python.types.Module {
 
         version_info = new org.python.stdlib.sys.VersionInfo(major, minor, micro, releaselevel, serial);
         version = new org.python.types.Str(
-            java.lang.String.format("%x.%x.%x (VOC)\n[Java(TM) SE SE Runtime Environment (build %s)]",
+            java.lang.String.format("%x.%x.%x (VOC)\n[Java(TM) SE Runtime Environment (build %s)]",
                 major, minor, micro,
                 System.getProperty("java.version")
             )
@@ -259,6 +259,7 @@ public class __init__ extends org.python.types.Module {
 
     // hash_info <class 'sys.hash_info'>
 
+    @org.python.Attribute
     public static org.python.types.Int hexversion;
 
     // implementation <class 'types.SimpleNamespace'>

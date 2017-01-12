@@ -88,7 +88,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 java.util.Map<java.lang.String, org.python.Object> dict
             ) {
         org.python.types.Type python_type;
-        // System.out.println("DECLARE " + java_class + " as " + name + " with bases " + bases + " and dict " + dict + " - " + java_class.getName());
+        // System.out.println("DECLARE " + java_class + " as " + name + " with bases " + bases + " and dict " + dict);
 
         // Construct the new type, and store it in the types table.
         // Any type implementing org.python.Object is a Python type;
@@ -280,7 +280,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
     }
 
     public org.python.Object __getattribute_null(java.lang.String name) {
-        // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name);
+        // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name + " " + this.origin);
         // System.out.println("CLASS ATTRS " + this.__dict__);
         org.python.Object value = this.__dict__.get(name);
         if (value == null) {
@@ -294,9 +294,11 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 try {
                     java.lang.reflect.Field field = this.klass.getDeclaredField(name);
 
-                    // A field exists. If it's a builtin type, check that the attribute
+                    // A field exists. Check that the attribute
                     // should be exposed to the Python namespace.
-                    if (this.origin == Origin.JAVA) {
+                    org.python.Attribute annotation =
+                        (org.python.Attribute) field.getAnnotation(org.python.Attribute.class);
+                    if (annotation != null) {
                         value = new org.python.java.Field(field);
                     } else {
                         value = null;
