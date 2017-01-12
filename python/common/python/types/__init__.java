@@ -25,23 +25,56 @@ public class __init__ extends org.python.types.Module {
 
     private static long vm_start_time;
 
+    // @org.python.Attribute
     // public static org.python.Object BuiltinFunctionType;
+
+    // @org.python.Attribute
     // public static org.python.Object BuiltinMethodType;
+
+    @org.python.Attribute
     public static org.python.Object CodeType;
+
+    // @org.python.Attribute
     // public static org.python.Object DynamicClassAttribute;
+
+    // @org.python.Attribute
     // public static org.python.Object FrameType;
+
+    @org.python.Attribute
     public static org.python.Object FunctionType;
+
+    @org.python.Attribute
     public static org.python.Object GeneratorType;
+
+    // @org.python.Attribute
     // public static org.python.Object GetSetDescriptorType;
+
+    // @org.python.Attribute
     // public static org.python.Object LambdaType;
+
+    // @org.python.Attribute
     // public static org.python.Object MappingProxyType;
+
+    // @org.python.Attribute
     // public static org.python.Object MemberDescriptorType;
+
+    @org.python.Attribute
     public static org.python.Object MethodType;
+
+    @org.python.Attribute
     public static org.python.Object ModuleType;
+
+    // @org.python.Attribute
     // public static org.python.Object SimpleNamespace;
+
+    // @org.python.Attribute
     // public static org.python.Object TracebackType;
+
+    // @org.python.Attribute
     // public static org.python.Object __builtins__;
-    public static org.python.Object __cached__;
+
+    @org.python.Attribute
+    public static org.python.Object __cached__ = org.python.types.NoneType.NONE;  // TODO
 
     @org.python.Attribute
     public static org.python.Object __file__ = new org.python.types.Str("python/common/python/types/__init__.java");
