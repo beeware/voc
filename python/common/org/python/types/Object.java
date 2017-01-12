@@ -1,7 +1,7 @@
 package org.python.types;
 
 
-public class Object implements org.python.Object {
+public class Object extends java.lang.RuntimeException implements org.python.Object {
     public java.util.Map<java.lang.String, org.python.Object> __dict__;
     public org.python.types.Type.Origin origin;
 
@@ -45,7 +45,8 @@ public class Object implements org.python.Object {
      * the object; when wrapping Java objects, the native class of the object
      * is used.
      */
-    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass) {
+    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass, java.lang.String msg) {
+        super(msg);
         this.origin = origin;
         this.__dict__ = new java.util.HashMap<java.lang.String, org.python.Object>();
         if (origin != org.python.types.Type.Origin.PLACEHOLDER) {
@@ -56,8 +57,16 @@ public class Object implements org.python.Object {
         }
     }
 
+    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass) {
+        this(origin, klass, "");
+    }
+
     public Object() {
         this(org.python.types.Type.Origin.PYTHON, null);
+    }
+
+    public Object(java.lang.String msg) {
+        this(org.python.types.Type.Origin.PYTHON, null, msg);
     }
 
     @org.python.Method(
