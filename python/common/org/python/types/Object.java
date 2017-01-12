@@ -3,6 +3,7 @@ package org.python.types;
 
 public class Object extends java.lang.RuntimeException implements org.python.Object {
     public java.util.Map<java.lang.String, org.python.Object> __dict__;
+    public org.python.types.Type __class__;
     public org.python.types.Type.Origin origin;
 
     /**
@@ -127,12 +128,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
     public org.python.Object __new__(org.python.Object klass) {
-        org.python.types.Type cls = (org.python.types.Type) klass;
-        this.__dict__.put("__class__", cls);
-        if (cls.origin == org.python.types.Type.Origin.PLACEHOLDER) {
-            cls.add_reference(this);
+        this.__class__ = (org.python.types.Type) klass;
+        if (this.__class__.origin == org.python.types.Type.Origin.PLACEHOLDER) {
+            this.__class__.add_reference(this);
         }
-        return cls;
+        return this.__class__;
     }
 
     // public void __init__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
@@ -290,12 +290,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // org.Python.debug("ATTRS ", this.__dict__);
 
         org.python.Object value = this.__dict__.get(name);
-        org.python.types.Type cls = (org.python.types.Type) this.__dict__.get("__class__");
 
         if (value == null) {
             // Look to the class for an attribute
             // org.Python.debug("no instance attribute");
-            value = cls.__getattribute_null(name);
+            value = this.__class__.__getattribute_null(name);
             if (value == null) {
                 // org.Python.debug("no class attribute");
                 // Use the descriptor protocol
@@ -311,7 +310,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // org.Python.debug(String.format("GETATTRIBUTE %s = ", name), value);
         // Post-process the value retrieved.
 
-        return value.__get__(this, cls);
+        return value.__get__(this, this.__class__);
     }
 
     @org.python.Method(
@@ -345,10 +344,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // org.Python.debug(String.format("SETATTR %s", name), value);
         // org.Python.debug("SELF ", this.__repr__());
         // org.Python.debug("ATTRS ", this.__dict__);
-        org.python.types.Type cls = (org.python.types.Type) this.__dict__.get("__class__");
 
         // If the attribute already exists, then it's OK to set it.
-        org.python.Object attr = cls.__getattribute_null(name);
+        org.python.Object attr = this.__class__.__getattribute_null(name);
         // org.Python.debug("ATTR ", attr);
 
         // The base object can't have attribute set on it unless the attribute already exists.
@@ -395,10 +393,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // org.Python.debug(String.format("DELATTR %s", name));
         // org.Python.debug("SELF ", this.__repr__());
         // org.Python.debug("ATTRS ", this.__dict__);
-        org.python.types.Type cls = (org.python.types.Type) this.__dict__.get("__class__");
 
         // If the attribute already exists, then it's OK to set it.
-        org.python.Object attr = cls.__getattribute_null(name);
+        org.python.Object attr = this.__class__.__getattribute_null(name);
 
         if (attr == null) {
             org.python.Object result = this.__dict__.remove(name);

@@ -349,7 +349,7 @@ public class Super implements org.python.Object {
     public org.python.Object __dir__() {
         org.python.types.List names = new org.python.types.List(new java.util.ArrayList());
 
-        // names.extend(this.__dict__.get("__class__").__dir__());
+        // names.extend(this.__class__.__dir__());
         // names.sort();
 
         return names;
