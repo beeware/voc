@@ -175,6 +175,13 @@ public class Function extends org.python.types.Object implements org.python.Call
         return this;
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(true);
+    }
+
     private void checkMissingArgs(int requiredArgs, int passedArgs, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> varnames, int first_arg) {
         int n_missing_pos_args = requiredArgs - passedArgs;
         java.util.List<String> missingArgs = new ArrayList<String>();
