@@ -150,43 +150,54 @@ public class Python {
     }
 
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
+        // Get the class annotation and add any properties.
+        org.python.Module mod_annotation = (org.python.Module) cls.getAnnotation(org.python.Module.class);
+        if (mod_annotation != null) {
+            java.lang.String __doc__ = mod_annotation.__doc__();
+            if (__doc__.equals("[undocumented]")) {
+                attrs.put("__doc__", org.python.types.NoneType.NONE);
+            } else {
+                attrs.put("__doc__", new org.python.types.Str(__doc__));
+            }
+        }
+
         // Iterate over every method in the class, and if the
         // method is annotated for inclusion in the Python class,
         // add a function wrapper to the type definition.
         for (java.lang.reflect.Method method: cls.getMethods()) {
-            org.python.Method annotation = method.getAnnotation(org.python.Method.class);
-            if (annotation != null) {
+            org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
+            if (cls_annotation != null) {
                 java.lang.String method_name;
                 java.lang.String varargs_name;
                 java.lang.String kwargs_name;
 
                 // Check for any explicitly set names
-                if (annotation.name().equals("")) {
+                if (cls_annotation.name().equals("")) {
                     method_name = method.getName();
                 } else {
-                    method_name = annotation.name();
+                    method_name = cls_annotation.name();
                 }
 
-                if (annotation.varargs().equals("")) {
+                if (cls_annotation.varargs().equals("")) {
                     varargs_name = null;
                 } else {
-                    varargs_name = annotation.varargs();
+                    varargs_name = cls_annotation.varargs();
                 }
 
-                if (annotation.kwargs().equals("")) {
+                if (cls_annotation.kwargs().equals("")) {
                     kwargs_name = null;
                 } else {
-                    kwargs_name = annotation.kwargs();
+                    kwargs_name = cls_annotation.kwargs();
                 }
 
                 attrs.put(
                     method_name,
                     new org.python.types.Function(
                         method,
-                        annotation.args(),
-                        annotation.default_args(),
+                        cls_annotation.args(),
+                        cls_annotation.default_args(),
                         varargs_name,
-                        annotation.kwonlyargs(),
+                        cls_annotation.kwonlyargs(),
                         kwargs_name
                     )
                 );

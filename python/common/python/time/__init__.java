@@ -1,6 +1,52 @@
 package python.time;
 
 
+@org.python.Module(
+    __doc__ =
+        "This module provides various functions to manipulate time values.\n" +
+        "\n" +
+        "There are two standard representations of time.  One is the number\n" +
+        "of seconds since the Epoch, in UTC (a.k.a. GMT).  It may be an integer\n" +
+        "or a floating point number (to represent fractions of seconds).\n" +
+        "The Epoch is system-defined; on Unix, it is generally January 1st, 1970.\n" +
+        "The actual value can be retrieved by calling gmtime(0).\n" +
+        "\n" +
+        "The other representation is a tuple of 9 integers giving local time.\n" +
+        "The tuple items are:\n" +
+        "  year (including century, e.g. 1998)\n" +
+        "  month (1-12)\n" +
+        "  day (1-31)\n" +
+        "  hours (0-23)\n" +
+        "  minutes (0-59)\n" +
+        "  seconds (0-59)\n" +
+        "  weekday (0-6, Monday is 0)\n" +
+        "  Julian day (day in the year, 1-366)\n" +
+        "  DST (Daylight Savings Time) flag (-1, 0 or 1)\n" +
+        "If the DST flag is 0, the time is given in the regular time zone;\n" +
+        "if it is 1, the time is given in the DST time zone;\n" +
+        "if it is -1, mktime() should guess based on the date and time.\n" +
+        "\n" +
+        "Variables:\n" +
+        "\n" +
+        "timezone -- difference in seconds between UTC and local standard time\n" +
+        "altzone -- difference in  seconds between UTC and local DST time\n" +
+        "daylight -- whether local time should reflect DST\n" +
+        "tzname -- tuple of (standard time zone name, DST time zone name)\n" +
+        "\n" +
+        "Functions:\n" +
+        "\n" +
+        "time() -- return current time in seconds since the Epoch as a float\n" +
+        "clock() -- return CPU time since process start as a float\n" +
+        "sleep() -- delay for a number of seconds given as a float\n" +
+        "gmtime() -- convert seconds since Epoch to UTC tuple\n" +
+        "localtime() -- convert seconds since Epoch to local time tuple\n" +
+        "asctime() -- convert time tuple to string\n" +
+        "ctime() -- convert time in seconds to string\n" +
+        "mktime() -- convert local time tuple to seconds since Epoch\n" +
+        "strftime() -- convert time tuple to string according to format specification\n" +
+        "strptime() -- parse string to time tuple according to format specification\n" +
+        "tzset() -- change the local timezone"
+)
 public class __init__ extends org.python.types.Module {
     public __init__() {
         super();
@@ -10,13 +56,22 @@ public class __init__ extends org.python.types.Module {
 
     private static long vm_start_time;
 
-    public static org.python.types.Str _STRUCT_TM_ITEMS;
-    public static org.python.types.Str __doc__;
-    public static org.python.types.Str __file__;
-    public static org.python.types.Str __loader__;
-    public static org.python.types.Str __name__;
-    public static org.python.types.Str __package__;
-    public static org.python.types.Str __spec__;
+    public static org.python.Object _STRUCT_TM_ITEMS;
+
+    @org.python.Attribute
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/time/__init__.java");
+
+    @org.python.Attribute
+    public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
+
+    @org.python.Attribute
+    public static org.python.Object __name__ = new org.python.types.Str("time");
+
+    @org.python.Attribute
+    public static org.python.Object __package__ = new org.python.types.Str("");
+
+    @org.python.Attribute
+    public static org.python.Object __spec__ = org.python.types.NoneType.NONE;  // TODO
 
     public static org.python.types.Int altzone;
 

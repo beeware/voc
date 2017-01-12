@@ -1,6 +1,76 @@
 package python.sys;
 
-
+@org.python.Module(
+    __doc__ =
+        "This module provides access to some objects used or maintained by the\n" +
+        "interpreter and to functions that interact strongly with the interpreter.\n" +
+        "\n" +
+        "Dynamic objects:\n" +
+        "\n" +
+        "argv -- command line arguments; argv[0] is the script pathname if known\n" +
+        "path -- module search path; path[0] is the script directory, else ''\n" +
+        "modules -- dictionary of loaded modules\n" +
+        "\n" +
+        "displayhook -- called to show results in an interactive session\n" +
+        "excepthook -- called to handle any uncaught exception other than SystemExit\n" +
+        "  To customize printing in an interactive session or to install a custom\n" +
+        "  top-level exception handler, assign other functions to replace these.\n" +
+        "\n" +
+        "stdin -- standard input file object; used by input()\n" +
+        "stdout -- standard output file object; used by print()\n" +
+        "stderr -- standard error object; used for error messages\n" +
+        "  By assigning other file objects (or objects that behave like files)\n" +
+        "  to these, it is possible to redirect all of the interpreter's I/O.\n" +
+        "\n" +
+        "last_type -- type of last uncaught exception\n" +
+        "last_value -- value of last uncaught exception\n" +
+        "last_traceback -- traceback of last uncaught exception\n" +
+        "  These three are only available in an interactive session after a\n" +
+        "  traceback has been printed.\n" +
+        "\n" +
+        "Static objects:\n" +
+        "\n" +
+        "builtin_module_names -- tuple of module names built into this interpreter\n" +
+        "copyright -- copyright notice pertaining to this interpreter\n" +
+        "exec_prefix -- prefix used to find the machine-specific Python library\n" +
+        "executable -- absolute path of the executable binary of the Python interpreter\n" +
+        "float_info -- a struct sequence with information about the float implementation.\n" +
+        "float_repr_style -- string indicating the style of repr() output for floats\n" +
+        "hash_info -- a struct sequence with information about the hash algorithm.\n" +
+        "hexversion -- version information encoded as a single integer\n" +
+        "implementation -- Python implementation information.\n" +
+        "int_info -- a struct sequence with information about the int implementation.\n" +
+        "maxsize -- the largest supported length of containers.\n" +
+        "maxunicode -- the value of the largest Unicode codepoint\n" +
+        "platform -- platform identifier\n" +
+        "prefix -- prefix used to find the Python library\n" +
+        "thread_info -- a struct sequence with information about the thread implementation.\n" +
+        "version -- the version of this interpreter as a string\n" +
+        "version_info -- version information as a named tuple\n" +
+        "__stdin__ -- the original stdin; don't touch!\n" +
+        "__stdout__ -- the original stdout; don't touch!\n" +
+        "__stderr__ -- the original stderr; don't touch!\n" +
+        "__displayhook__ -- the original displayhook; don't touch!\n" +
+        "__excepthook__ -- the original excepthook; don't touch!\n" +
+        "\n" +
+        "Functions:\n" +
+        "\n" +
+        "displayhook() -- print an object to the screen, and save it in builtins._\n" +
+        "excepthook() -- print an exception and its traceback to sys.stderr\n" +
+        "exc_info() -- return thread-safe information about the current exception\n" +
+        "exit() -- exit the interpreter by raising SystemExit\n" +
+        "getdlopenflags() -- returns flags to be used for dlopen() calls\n" +
+        "getprofile() -- get the global profiling function\n" +
+        "getrefcount() -- return the reference count for an object (plus one :-)\n" +
+        "getrecursionlimit() -- return the max recursion depth for the interpreter\n" +
+        "getsizeof() -- return the size of an object in bytes\n" +
+        "gettrace() -- get the global debug tracing function\n" +
+        "setcheckinterval() -- control how often the interpreter checks for events\n" +
+        "setdlopenflags() -- set the flags to be used for dlopen() calls\n" +
+        "setprofile() -- set the global profiling function\n" +
+        "setrecursionlimit() -- set the max recursion depth for the interpreter\n" +
+        "settrace() -- set the global debug tracing function\n"
+)
 public class __init__ extends org.python.types.Module {
     static {
         stdout = python.platform.__init__.impl.stdout();
@@ -35,6 +105,10 @@ public class __init__ extends org.python.types.Module {
     )
     public org.python.Object __new__(org.python.Object klass) {
         org.python.types.Type cls = (org.python.types.Type) super.__new__(klass);
+
+        // cls.__dict__.put("__spec__", new org.python.types...);
+        // cls.__dict__.put("__loader__", new org.python.types...);
+
         cls.__dict__.put("argv", python.platform.__init__.impl.args());
         return cls;
     }
@@ -46,8 +120,6 @@ public class __init__ extends org.python.types.Module {
         throw new org.python.exceptions.NotImplementedError("sys.__displayhook__() has not been implemented.");
     }
 
-    public static org.python.types.Str __doc__;
-
     public static org.python.types.Int __egginsert;
 
     @org.python.Method(
@@ -57,15 +129,19 @@ public class __init__ extends org.python.types.Module {
         throw new org.python.exceptions.NotImplementedError("sys.__excepthook__() has not been implemented.");
     }
 
-    // __loader__ <class 'type'>
+    @org.python.Attribute()
+    public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
 
-    public static org.python.Object __name__;
+    @org.python.Attribute()
+    public static org.python.Object __name__ = new org.python.types.Str("sys");
 
-    public static org.python.Object __package__;
+    @org.python.Attribute()
+    public static org.python.Object __package__ = new org.python.types.Str("");
+
+    @org.python.Attribute()
+    public static org.python.Object __spec__ = org.python.types.NoneType.NONE;  // TODO
 
     public static org.python.types.Int __plen;
-
-    // __spec__ <class '_frozen_importlib.ModuleSpec'>
 
     @org.python.Attribute()
     public static org.python.Object __stderr__;
@@ -108,20 +184,20 @@ public class __init__ extends org.python.types.Module {
 
     public static org.python.types.Dict _xoptions;
 
-    public static org.python.types.Str abiflags;
+    public static org.python.Object abiflags;
 
     public static org.python.types.Int api_version;
 
     @org.python.Attribute()
     public static org.python.types.List argv;
 
-    public static org.python.types.Str base_exec_prefix;
+    public static org.python.Object base_exec_prefix;
 
-    public static org.python.types.Str base_prefix;
+    public static org.python.Object base_prefix;
 
     public static org.python.types.Tuple builtin_module_names;
 
-    public static org.python.types.Str byteorder;
+    public static org.python.Object byteorder;
 
     @org.python.Method(
         __doc__ = ""
@@ -137,7 +213,7 @@ public class __init__ extends org.python.types.Module {
         throw new org.python.exceptions.NotImplementedError("sys.callstats() has not been implemented.");
     }
 
-    public static org.python.types.Str copyright;
+    public static org.python.Object copyright;
 
     // displayhook <class 'IPython.core.displayhook.DisplayHook'>
 
@@ -152,9 +228,9 @@ public class __init__ extends org.python.types.Module {
 
     // excepthook <class 'method'>
 
-    public static org.python.types.Str exec_prefix;
+    public static org.python.Object exec_prefix;
 
-    public static org.python.types.Str executable;
+    public static org.python.Object executable;
 
     @org.python.Method(
         __doc__ = "exit([status])\n" +
@@ -178,7 +254,7 @@ public class __init__ extends org.python.types.Module {
 
     // float_info <class 'sys.float_info'>
 
-    public static org.python.types.Str float_repr_style;
+    public static org.python.Object float_repr_style;
 
     @org.python.Method(
         __doc__ = ""
@@ -293,17 +369,18 @@ public class __init__ extends org.python.types.Module {
 
     public static org.python.types.Dict path_importer_cache;
 
+    @org.python.Attribute
     public static org.python.Object platform;
 
-    public static org.python.types.Str prefix;
+    public static org.python.Object prefix;
 
-    public static org.python.types.Str ps1;
+    public static org.python.Object ps1;
 
-    public static org.python.types.Str ps2;
+    public static org.python.Object ps2;
 
-    public static org.python.types.Str ps3;
+    public static org.python.Object ps3;
 
-    public static org.python.types.Str real_prefix;
+    public static org.python.Object real_prefix;
 
     @org.python.Method(
         __doc__ = ""
@@ -358,8 +435,10 @@ public class __init__ extends org.python.types.Module {
 
     // thread_info <class 'sys.thread_info'>
 
+    @org.python.Attribute
     public static org.python.Object version;
 
+    @org.python.Attribute
     public static org.python.Object version_info;
 
     public static org.python.Object warnoptions;

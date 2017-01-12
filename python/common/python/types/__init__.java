@@ -1,6 +1,9 @@
 package python.types;
 
 
+@org.python.Module(
+    __doc__ = "\nDefine names for built-in types that aren't directly accessible as a builtin.\n"
+)
 public class __init__ extends org.python.types.Module {
     static {
         // BuiltinFunctionType = org.python.types.Type.pythonType(org.python.types.BuiltinFunction.class);
@@ -38,13 +41,22 @@ public class __init__ extends org.python.types.Module {
     // public static org.python.Object SimpleNamespace;
     // public static org.python.Object TracebackType;
     // public static org.python.Object __builtins__;
-    // public static org.python.Object __cached__;
-    // public static org.python.Object __doc__;
-    // public static org.python.Object __file__;
-    // public static org.python.Object __loader__;
-    // public static org.python.Object __name__;
-    // public static org.python.Object __package__;
-    // public static org.python.Object __spec__;
+    public static org.python.Object __cached__;
+
+    @org.python.Attribute
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/types/__init__.java");
+
+    @org.python.Attribute
+    public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
+
+    @org.python.Attribute
+    public static org.python.Object __name__ = new org.python.types.Str("types");
+
+    @org.python.Attribute
+    public static org.python.Object __package__ = new org.python.types.Str("");
+
+    @org.python.Attribute
+    public static org.python.Object __spec__ = org.python.types.NoneType.NONE;  // TODO
 
     @org.python.Method(
         __doc__ = ""

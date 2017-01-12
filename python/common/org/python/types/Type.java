@@ -236,10 +236,6 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
         if (origin != Origin.PLACEHOLDER) {
             this.klass = klass;
-
-            java.lang.String klass_name = this.klass.getName();
-            this.__dict__.put("__name__", new org.python.types.Str(klass_name));
-            this.__dict__.put("__qualname__", new org.python.types.Str(klass_name));
         }
 
         if (origin == Origin.BUILTIN || origin == Origin.PYTHON || origin == Origin.EXTENSION) {
