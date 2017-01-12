@@ -29,6 +29,13 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return this;
     }
 
+    /**
+     * Return the Python type for this object.
+     */
+    public org.python.types.Type type() {
+        return this.__class__;
+    }
+
     public java.lang.String typeName() {
         return org.Python.typeName(this.getClass());
     }

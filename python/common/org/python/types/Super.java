@@ -27,6 +27,10 @@ public class Super implements org.python.Object {
         return this;
     }
 
+    public org.python.types.Type type() {
+        return null;
+    }
+
     public java.lang.String typeName() {
         return "super";
     }

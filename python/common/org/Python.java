@@ -822,7 +822,7 @@ public class Python {
             }
             return new org.python.types.Bool(false);
         } else if (class_or_type_or_tuple instanceof org.python.types.Type) {
-            return new org.python.types.Bool(object.__getattribute_null("__class__") == class_or_type_or_tuple);
+            return new org.python.types.Bool(object.type() == class_or_type_or_tuple);
         } else {
             throw new org.python.exceptions.TypeError("isinstance() arg 2 must be a type or tuple of types");
         }
