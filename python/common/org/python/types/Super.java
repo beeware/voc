@@ -251,15 +251,18 @@ public class Super implements org.python.Object {
         org.python.Object value = null;
         java.util.List<org.python.Object> bases = ((org.python.types.Tuple) this.klass.__dict__.get("__bases__")).value;
 
-        // org.Python.debug("no instance attributes on super;");
-        // org.Python.debug("    look to supers of ", this.klass);
-        // org.Python.debug("            which are ", bases);
+        value = this.klass.__getattribute_null(name + "$super");
 
-        for (org.python.Object base: bases) {
-            // org.Python.debug("            check ", base);
-            value = base.__getattribute_null(name);
-            if (value != null) {
-                break;
+        if (value == null) {
+            // org.Python.debug("    look to bases of ", this.klass);
+            // org.Python.debug("            which are ", bases);
+
+            for (org.python.Object base: bases) {
+                // org.Python.debug("            check ", base);
+                value = base.__getattribute_null(name);
+                if (value != null) {
+                    break;
+                }
             }
         }
 

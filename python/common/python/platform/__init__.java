@@ -55,7 +55,7 @@ public class __init__ extends org.python.types.Module {
     // __copyright__',
 
     @org.python.Attribute()
-    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/os/__init__.java");
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/platform/__init__.java");
 
     @org.python.Attribute()
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
