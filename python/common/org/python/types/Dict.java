@@ -379,17 +379,17 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        default_args = {"other", "default_value"}
+        __doc__ = "D.get(k[,d]) -> D[k] if k in D, else d.  d defaults to None.",
+        default_args = {"k", "d"}
     )
-    public org.python.Object get(org.python.Object other, org.python.Object default_value) {
+    public org.python.Object get(org.python.Object k, org.python.Object d) {
         try {
-            return this.__getitem__(other);
+            return this.__getitem__(k);
         } catch (org.python.exceptions.KeyError e){ // allow unhashable type error to be percolated up.
-            if (default_value == null) {
+            if (d == null) {
                 return org.python.types.NoneType.NONE;
             }
-            return default_value;
+            return d;
         }
     }
 
@@ -408,14 +408,24 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "D.pop(k[,d]) -> v, remove specified key and return the corresponding value.\nIf key is not found, d is returned if given, otherwise KeyError is raised",
+        args = {"k"},
+        default_args = {"d"}
     )
-    public org.python.Object pop(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.pop() has not been implemented.");
+    public org.python.Object pop(org.python.Object k, org.python.Object d) {
+        org.python.Object value = this.value.remove(k);
+        if (value == null) {
+            if (d == null) {
+                throw new org.python.exceptions.KeyError(k);
+            } else {
+                value = d;
+            }
+        }
+        return value;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "D.popitem() -> (k, v), remove and return some (key, value) pair as a\n2-tuple; but raise KeyError if D is empty."
     )
     public org.python.Object popitem() {
         if (this.value.size() == 0) {
@@ -432,18 +442,18 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        default_args = {"other", "default_value"}
+        __doc__ = "D.setdefault(k[,d]) -> D.get(k,d), also set D[k]=d if k not in D",
+        default_args = {"k", "d"}
     )
-    public org.python.Object setdefault(org.python.Object other, org.python.Object default_value) {
+    public org.python.Object setdefault(org.python.Object k, org.python.Object d) {
         try {
-            return this.__getitem__(other);
+            return this.__getitem__(k);
         } catch (org.python.exceptions.KeyError e){ // allow unhashable type error to be percolated up.
-            if (default_value == null) {
-                default_value = org.python.types.NoneType.NONE;
+            if (d == null) {
+                d = org.python.types.NoneType.NONE;
             }
-            __setitem__(other, default_value);
-            return default_value;
+            __setitem__(k, d);
+            return d;
         }
     }
 
