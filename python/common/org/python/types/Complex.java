@@ -362,18 +362,86 @@ public class Complex extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("can't mod complex numbers.");
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __divmod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
-    }
 
     @org.python.Method(
         __doc__ = ""
     )
+    public org.python.Object __divmod__(org.python.Object other) {
+
+        throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
+    }
+
+    private org.python.Object calCPow(org.python.types.Complex b) {
+        org.python.types.Complex r = new org.python.types.Complex(0,0);
+        double vabs, len, at, phase;
+        if (b.real.value == 0.0 && b.imag.value == 0) {
+            r.real.value = 1.0;
+            r.imag.value = 0.0;
+        } else if (this.real.value == 0.0 && this.imag.value == 0.0) {
+            if (b.imag.value != 0. || b.real.value < 0.) {
+                throw new org.python.exceptions.ZeroDivisionError("0.0 to a negative or complex power");
+            }
+            r.real.value = 1.0;
+            r.imag.value = 0.0;
+        } else {
+            vabs = Math.hypot(this.real.value, this.imag.value);
+            len = Math.pow(vabs, b.real.value);
+            at = Math.atan2(this.imag.value, this.real.value);
+            phase = at * b.real.value;
+            if (b.imag.value != 0.0) {
+                len /= Math.exp(at * b.imag.value);
+                phase += b.imag.value * Math.log(vabs);
+            }
+            r.real.value = len * Math.cos(phase);
+            r.imag.value = len * Math.sin(phase);
+        }
+        return r;
+    }
+
+    private org.python.Object calUPow(long n){
+        org.python.types.Complex r,p;
+        long mask = 1;
+        r = new org.python.types.Complex(1,0);
+        p = this;
+        while (mask > 0 && n >= mask) {
+            if ((n & mask) != 0) {
+                r = (org.python.types.Complex) r.__mul__(p);
+            }
+            mask <<= 1;
+            p = (Complex) p.__mul__(p);
+        }
+        return r;
+    }
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
-        throw new org.python.exceptions.NotImplementedError("complex.__pow__ has not been implemented.");
+        if (modulo == null) {
+            if (other instanceof org.python.types.Bool) {
+                if (((org.python.types.Bool) other).value) {
+                    return this.__mul__(other);
+                }
+                return calCPow(new org.python.types.Complex(0,0));
+            } else if (other instanceof org.python.types.Int) {
+                org.python.types.Int other_obj = (org.python.types.Int) other;
+                if (other_obj.value > 100 || other_obj.value < -100) {
+                    return calCPow(new org.python.types.Complex(other_obj.value, 0));
+                } else if (other_obj.value > 0) {
+                    return calUPow(other_obj.value);
+                } else {
+                    org.python.types.Complex c1 = new org.python.types.Complex(1,0);
+                    return c1.__truediv__(calUPow(-other_obj.value));
+                }
+            } else  if (other instanceof org.python.types.Float) {
+                org.python.types.Float other_obj = (org.python.types.Float) other;
+                return calCPow(new org.python.types.Complex(other_obj.value,0));
+            } else if (other instanceof org.python.types.Complex) {
+                org.python.types.Complex other_obj = (org.python.types.Complex) other;
+                return calCPow(other_obj);
+            }
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'complex' and '" + other.typeName() + "'");
+        }
+        throw new org.python.exceptions.ValueError("complex modulo");
     }
 
     @org.python.Method(
