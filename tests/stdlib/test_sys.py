@@ -30,12 +30,14 @@ class SysModuleTests(TranspileTestCase):
         else:
             substitutions = None
 
-        self.assertCodeExecution("""
+        self.assertCodeExecution(
+            """
             import sys
             print(sys.__doc__)
             print('Done.')
             """,
-            substitutions=substitutions)
+            substitutions=substitutions
+        )
 
     ############################################################
     # __egginsert

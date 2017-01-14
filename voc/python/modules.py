@@ -338,7 +338,6 @@ class Module(Block):
                 java.Map.put(),
             )
 
-
         new_method.add_opcodes(
             # last entry doesn't need to be duped, because we don't need to
             # reuse the value on the stack.

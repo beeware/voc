@@ -176,6 +176,7 @@ class DictTests(TranspileTestCase):
             print(x.get([], 1))
             """)
 
+
 class UnaryDictOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'dict'
 
