@@ -394,10 +394,23 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "D.items() -> a set-like object providing a view on D's items"
     )
     public org.python.Object items() {
-        throw new org.python.exceptions.NotImplementedError("dict.items() has not been implemented.");
+        // FIXME: This should return a dict_view object, not compose a new list.
+        org.python.types.List result = new org.python.types.List();
+        java.util.List<org.python.Object> item;
+        org.python.types.Tuple tuple;
+
+        for (org.python.Object key: this.value.keySet()) {
+            item = new java.util.ArrayList<org.python.Object>();
+            item.add(key);
+            item.add(this.value.get(key));
+
+            tuple = new org.python.types.Tuple(item);
+            result.append(tuple);
+        }
+        return result;
     }
 
     @org.python.Method(
