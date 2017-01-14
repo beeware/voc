@@ -76,6 +76,23 @@ class TupleTests(TranspileTestCase):
                     print(p1, "<", p2, ":", p1 < p2)
             """, run_in_function=False)
 
+    def test_immutable(self):
+        self.assertCodeExecution("""
+            x = (1, 2)
+            try:
+                x[0] = 3
+            except TypeError as err:
+                print(err)
+            try:
+                x[-1] = 3
+            except TypeError as err:
+                print(err)
+            try:
+                x[2] = 3
+            except TypeError as err:
+                print(err)
+            """, run_in_function=False)
+
 
 class UnaryTupleOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'tuple'

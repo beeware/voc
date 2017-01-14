@@ -341,32 +341,9 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
-        try {
-            int idx = (int) ((org.python.types.Int) index).value;
-            if (idx < 0) {
-                if (-idx > this.value.size()) {
-                    throw new org.python.exceptions.IndexError("tuple index out of range");
-                } else {
-                    this.value.set(this.value.size() + idx, value);
-                }
-            } else {
-                if (idx >= this.value.size()) {
-                    throw new org.python.exceptions.IndexError("tuple index out of range");
-                } else {
-                    this.value.set(idx, value);
-                }
-            }
-        } catch (ClassCastException e) {
-            if (org.Python.VERSION < 0x03050000) {
-                throw new org.python.exceptions.TypeError(
-                    "tuple indices must be integers, not " + index.typeName()
-                );
-            } else {
-                throw new org.python.exceptions.TypeError(
-                    "tuple indices must be integers or slices, not " + index.typeName()
-                );
-            }
-        }
+        throw new org.python.exceptions.TypeError(
+            "'tuple' object does not support item assignment"
+        );
     }
 
     @org.python.Method(
