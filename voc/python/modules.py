@@ -1,4 +1,5 @@
 import os
+import sys
 
 from ..java import (
     Class as JavaClass,
@@ -326,7 +327,19 @@ class Module(Block):
             JavaOpcodes.LDC_W("__loader__"),
             python.Str(),
             java.Map.put(),
+        )
 
+        # Python 3.6 introduced __annotations__ at the module level.
+        if sys.hexversion > 0x03060000:
+            new_method.add_opcodes(
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W("__annotations__"),
+                python.Dict(),
+                java.Map.put(),
+            )
+
+
+        new_method.add_opcodes(
             # last entry doesn't need to be duped, because we don't need to
             # reuse the value on the stack.
             JavaOpcodes.LDC_W("__spec__"),
