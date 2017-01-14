@@ -79,9 +79,18 @@ class TupleTests(TranspileTestCase):
     def test_immutable(self):
         self.assertCodeExecution("""
             x = (1, 2)
-            x[0] = 3
-            x[-1] = 3
-            x[2] = 3
+            try:
+                x[0] = 3
+            except TypeError as err:
+                print(err)
+            try:
+                x[-1] = 3
+            except TypeError as err:
+                print(err)
+            try:
+                x[2] = 3
+            except TypeError as err:
+                print(err)
             """, run_in_function=False)
 
 
