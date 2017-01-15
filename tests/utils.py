@@ -115,11 +115,11 @@ def adjust(text, run_in_function=False):
     return '\n'.join(final_lines)
 
 
-def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
+def runAsPython(test_dir, main_code, extra_code=None, args=None):
     """Run a block of Python code with the Python interpreter."""
     # Output source code into test directory
     with open(os.path.join(test_dir, 'test.py'), 'w', encoding='utf-8') as py_source:
-        py_source.write(adjust(main_code, run_in_function=run_in_function))
+        py_source.write(main_code)
 
     if extra_code:
         for name, code in extra_code.items():
@@ -371,8 +371,9 @@ class TranspileTestCase(TestCase):
             try:
                 self.makeTempDir()
                 # Run the code as Python and as Java.
-                py_out = runAsPython(self.temp_dir, code, extra_code, False, args=args)
-                java_out = self.runAsJava(code, extra_code, False, args=args)
+                adj_code = adjust(code, run_in_function=False)
+                py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args)
+                java_out = self.runAsJava(adj_code, extra_code, args=args)
             except Exception as e:
                 self.fail(e)
             finally:
@@ -399,8 +400,9 @@ class TranspileTestCase(TestCase):
             try:
                 self.makeTempDir()
                 # Run the code as Python and as Java.
-                py_out = runAsPython(self.temp_dir, code, extra_code, True, args=args)
-                java_out = self.runAsJava(code, extra_code, True, args=args)
+                adj_code = adjust(code, run_in_function=True)
+                py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args)
+                java_out = self.runAsJava(adj_code, extra_code, args=args)
             except Exception as e:
                 self.fail(e)
             finally:
@@ -457,7 +459,7 @@ class TranspileTestCase(TestCase):
                 try:
                     self.makeTempDir()
                     # Run the code as Java.
-                    java_out = self.runAsJava(code, extra_code, False, args=args)
+                    java_out = self.runAsJava(adjust(code), extra_code, args=args)
                 except Exception as e:
                     self.fail(e)
                 finally:
@@ -479,7 +481,9 @@ class TranspileTestCase(TestCase):
                 try:
                     self.makeTempDir()
                     # Run the code as Java.
-                    java_out = self.runAsJava(code, extra_code, True, args=args)
+                    java_out = self.runAsJava(
+                        adjust(code, run_in_function=True),
+                        extra_code, args=args)
                 except Exception as e:
                     self.fail(e)
                 finally:
@@ -506,7 +510,7 @@ class TranspileTestCase(TestCase):
         except FileExistsError:
             pass
 
-    def runAsJava(self, main_code, extra_code=None, run_in_function=False, args=None):
+    def runAsJava(self, main_code, extra_code=None, args=None):
         """Run a block of Python code as a Java program."""
         # Output source code into test directory
         transpiler = Transpiler(verbosity=0)
@@ -514,7 +518,7 @@ class TranspileTestCase(TestCase):
         # Don't redirect stderr; we want to see any errors from the transpiler
         # as top level test failures.
         with capture_output(redirect_stderr=False):
-            transpiler.transpile_string("test.py", adjust(main_code, run_in_function=run_in_function))
+            transpiler.transpile_string("test.py", main_code)
 
             if extra_code:
                 for name, code in extra_code.items():
