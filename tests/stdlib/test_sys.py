@@ -355,7 +355,7 @@ class SysModuleTests(TranspileTestCase):
             import sys
             print(sys.exit())
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_exit(self):
         # From inside main

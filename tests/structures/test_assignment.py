@@ -55,7 +55,7 @@ class AssignmentTests(TranspileTestCase):
             else:
                 print("No")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_assign_to_argument(self):
         self.assertCodeExecution("""

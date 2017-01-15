@@ -7,14 +7,14 @@ class ListTests(TranspileTestCase):
             x = [1, 2, 3]
             x.attr = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = [1, 2, 3]
             print(x.attr)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_creation(self):
         # Empty list
@@ -45,13 +45,15 @@ class ListTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
             print(x[10])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         # Negative index out of range
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
             print(x[-10])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_setitem(self):
         self.assertCodeExecution("""
@@ -71,13 +73,15 @@ class ListTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = []
             x[0] = 5
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         # Out of bounds (negative)
         self.assertCodeExecution("""
             x = [1]
             x[-2] = 5
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_append(self):
         # New list

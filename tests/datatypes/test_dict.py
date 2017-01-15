@@ -7,14 +7,14 @@ class DictTests(TranspileTestCase):
             x = {}
             x.attr = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = {}
             print(x.attr)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_creation(self):
         # Empty dict
@@ -44,7 +44,8 @@ class DictTests(TranspileTestCase):
             print('c' in x)
             print('c' not in x)
             print(x['c'])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_clear(self):
         # Clear a dictionary
@@ -97,21 +98,29 @@ class DictTests(TranspileTestCase):
             print('c' in x)
 
             # Test __contains__ throws unhashable exception
-            print([] in x)
-            print([] not in x)
+            try:
+                print([] in x)
+            except TypeError as err:
+                print(err)
+            try:
+                print([] not in x)
+            except TypeError as err:
+                print(err)
         """)
 
     def test_builtin_non_2_tuples(self):
         # One of the elements isn't a 2-tuple
         self.assertCodeExecution("""
             x = dict([('a', 1), ('b', 2, False)])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_builtin_non_sequence(self):
         # One of the elements isn't a sequence
         self.assertCodeExecution("""
             x = dict([('a', 1), False, ('b', 2)])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_method_popitem(self):
         self.assertCodeExecution("""
@@ -124,7 +133,11 @@ class DictTests(TranspileTestCase):
             popped_2 = x.popitem()
             print(popped_2 in ITEMS and popped_2 != popped_1)
 
-            print(x.popitem()) # Check for exception
+            # Check for exception
+            try:
+                print(x.popitem())
+            except TypeError as err:
+                print(err)
             """)
 
     def test_method_setdefault(self):
@@ -138,7 +151,10 @@ class DictTests(TranspileTestCase):
             print(x.setdefault('David', 'Gilmour')) # should return 'Gilmour'
 
             # Check unhashable exceptions
-            x.setdefault([], 42)
+            try:
+                x.setdefault([], 42)
+            except TypeError as err:
+                print(err)
             """)
 
     def test_method_get(self):
@@ -152,8 +168,14 @@ class DictTests(TranspileTestCase):
         # check for unhashable type errors
         self.assertCodeExecution("""
             x = {1: 2}
-            print(x.get([]))
-            print(x.get([], 1))
+            try:
+                print(x.get([]))
+            except TypeError as err:
+                print(err)
+            try:
+                print(x.get([], 1))
+            except TypeError as err:
+                print(err)
             """)
 
 

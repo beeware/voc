@@ -7,14 +7,14 @@ class NoneTypeTests(TranspileTestCase):
             x = None
             x.thing = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = None
             y = x.thing
             print('Done.')
-            """)
+            """, exits_early=True)
 
 
 class UnaryNoneTypeOperationTests(UnaryOperationTestCase, TranspileTestCase):

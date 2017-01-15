@@ -10,7 +10,7 @@ class AssertTests(TranspileTestCase):
             print("Pre assert 2")
             assert x < 0, "It isn't big"
             print("Done.")
-            """)
+            """, exits_early=True)
 
     def test_assert_without_message(self):
         self.assertCodeExecution("""
@@ -20,4 +20,4 @@ class AssertTests(TranspileTestCase):
             print("Pre assert 2")
             assert x < 0
             print("Done.")
-            """)
+            """, exits_early=True)

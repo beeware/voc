@@ -8,14 +8,14 @@ class BoolTests(TranspileTestCase):
             x = True
             x.attr = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = True
             print(x.attr)
             print('Done.')
-            """)
+            """, exits_early=True)
 
 
 class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):

@@ -7,14 +7,14 @@ class BytesTests(TranspileTestCase):
             x = b'hello, world'
             x.attr = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = b'hello, world'
             print(x.attr)
             print('Done.')
-            """)
+            """, exits_early=True)
 
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):

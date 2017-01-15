@@ -9,14 +9,14 @@ class IntTests(TranspileTestCase):
             x = 37
             x.attr = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = 37
             print(x.attr)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     @expectedFailure
     def test_invalid_literal(self):

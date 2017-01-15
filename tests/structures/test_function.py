@@ -235,11 +235,12 @@ class FunctionTests(TranspileTestCase):
 
     def test_noarg_unexpected_extra_arg(self):
         self.assertCodeExecution("""
-        def myfunc():
-            pass
+            def myfunc():
+                pass
 
-        myfunc(5)
-            """)
+            myfunc(5)
+            print('Done.')
+            """, exits_early=True)
 
     def test_noarg_unexpected_extra_several_args(self):
         self.assertCodeExecution("""
@@ -247,7 +248,8 @@ class FunctionTests(TranspileTestCase):
                 return 16
 
             print(myfunc(1, 2, 3))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_unexpected_extra_several_args(self):
         self.assertCodeExecution("""
@@ -255,7 +257,8 @@ class FunctionTests(TranspileTestCase):
                 return 16
 
             print(myfunc(1, 2, 3))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_multiple_args_unexpected_extra_several_args(self):
         self.assertCodeExecution("""
@@ -263,7 +266,8 @@ class FunctionTests(TranspileTestCase):
                 return 16
 
             print(myfunc(1, 2, 3))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_missing_sole_arg(self):
         self.assertCodeExecution("""
@@ -271,7 +275,8 @@ class FunctionTests(TranspileTestCase):
                 return 16
 
             print(myfunc())
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_missing_args_more_args(self):
         self.assertCodeExecution("""
@@ -279,7 +284,8 @@ class FunctionTests(TranspileTestCase):
                 return 'ok'
 
             print(otherfunc(1))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_missing_args_with_varargs(self):
         self.assertCodeExecution("""
@@ -287,7 +293,8 @@ class FunctionTests(TranspileTestCase):
                 return 'ok'
 
             print(myfunc(1))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_a_method_missing_args(self):
         self.assertCodeExecution("""
@@ -297,4 +304,5 @@ class FunctionTests(TranspileTestCase):
 
             i = MyClass()
             print(i.a_method())
-            """)
+            print('Done.')
+            """, exits_early=True)

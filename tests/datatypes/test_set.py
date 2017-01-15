@@ -7,14 +7,14 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             x.attr = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}
             print(x.attr)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_creation(self):
         # Empty dict

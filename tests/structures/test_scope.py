@@ -25,7 +25,7 @@ class ScopeTests(TranspileTestCase):
             print("4: x =", x)
 
             print('Done.')
-            """, run_in_function=False)
+            """, run_in_function=False, exits_early=True)
 
     def test_global_scope(self):
         self.assertCodeExecution("""

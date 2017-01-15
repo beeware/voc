@@ -7,14 +7,14 @@ class FloatTests(TranspileTestCase):
             x = 3.14159
             x.attr = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = 3.14159
             print(x.attr)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_repr(self):
         self.assertCodeExecution("""

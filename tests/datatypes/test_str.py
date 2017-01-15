@@ -7,7 +7,7 @@ class StrTests(TranspileTestCase):
             x = "Hello, world"
             x.attr = 42
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_endswith(self):
         self.assertCodeExecution("""
@@ -37,7 +37,7 @@ class StrTests(TranspileTestCase):
             x = "Hello, world"
             print(x.attr)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_getitem(self):
         # Simple positive index
@@ -56,13 +56,15 @@ class StrTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = "12345"
             print(x[10])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         # Negative index out of range
         self.assertCodeExecution("""
             x = "12345"
             print(x[-10])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_slice(self):
         # Full slice
