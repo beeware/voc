@@ -125,7 +125,11 @@ class ListTests(TranspileTestCase):
         # Not in list
         self.assertCodeExecution("""
             x = [1, 2]
-            x.remove(3)
+            try:
+                x.remove(3)
+            except ValueError as err:
+                print(err)
+            print(x)
             """)
 
     def test_slice(self):
@@ -193,13 +197,13 @@ class ListTests(TranspileTestCase):
         # Normal Contains
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            print(x.contains(1))
+            print(1 in x)
             """)
 
         # Element doesn't exist
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            print(x.contains(0))
+            print(0 in x)
             """)
 
         # Checking for boolean
@@ -269,19 +273,28 @@ class ListTests(TranspileTestCase):
     def test_pop_exceptions(self):
         self.assertCodeExecution("""
             x = []
-            print(x.pop())
+            try:
+                print(x.pop())
+            except IndexError as err:
+                print(err)
             print(x)
             """)
 
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            print(x.pop(3))
+            try:
+                print(x.pop(3))
+            except IndexError as err:
+                print(err)
             print(x)
             """)
 
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            print(x.pop(-4))
+            try:
+                print(x.pop(-4))
+            except IndexError as err:
+                print(err)
             print(x)
             """)
 
@@ -357,37 +370,44 @@ class ListTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = [1, 2, 3]
             print(x.index(4))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         self.assertCodeExecution("""
             x = [1, 2, 1]
             print(x.index(2, 0, 1))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         self.assertCodeExecution("""
             x = [1, 2, 3, 4]
             print(x.index(4, 0, 3))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         self.assertCodeExecution("""
             x = [1, 2, 1]
             print(x.index(3, 0, 10))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         self.assertCodeExecution("""
             x = [1, 2, 3, 4]
             print(x.index(2, 10, 20))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         self.assertCodeExecution("""
             x = [1, 2, 3, 4]
             print(x.index(2, 10, 0))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         self.assertCodeExecution("""
             x = []
             print(x.index(1, 0, 10))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):

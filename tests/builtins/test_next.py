@@ -24,7 +24,8 @@ class NextTests(TranspileTestCase):
         self.assertCodeExecution("""
             i = iter([])
             print(next(i))
-        """)
+            print('Done.')
+        """, exits_early=True)
 
 
 class BuiltinNextFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

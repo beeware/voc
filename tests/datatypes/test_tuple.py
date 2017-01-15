@@ -56,13 +56,15 @@ class TupleTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = (1, 2, 3, 4, 5)
             print(x[10])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
         # Negative index out of range
         self.assertCodeExecution("""
             x = (1, 2, 3, 4, 5)
             print(x[-10])
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_lt(self):
         self.assertCodeExecution("""

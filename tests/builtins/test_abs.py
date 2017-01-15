@@ -8,7 +8,8 @@ class AbsTests(TranspileTestCase):
                 pass
             x = NotAbsLike()
             print(abs(x))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
 
 class BuiltinAbsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

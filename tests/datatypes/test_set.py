@@ -52,7 +52,8 @@ class SetTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = set()
             x.pop()
-        """)
+            print('Done.')
+        """, exits_early=True)
 
         # Test populated set popping.
         self.assertCodeExecution("""
@@ -125,7 +126,10 @@ class SetTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = {1, 2, 3}
             x.remove(1)
-            x.remove(4)
+            try:
+                x.remove(4)
+            except KeyError as err:
+                print(err)
             print(x)
             """)
 

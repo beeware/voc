@@ -16,7 +16,8 @@ class PowTests(TranspileTestCase):
             y = -4
             z = 5
             print(pow(x, y, z))
-        """)
+            print('Done.')
+        """, exits_early=True)
 
     def test_int_neg_y_neg_z(self):
         self.assertCodeExecution("""
@@ -24,7 +25,8 @@ class PowTests(TranspileTestCase):
             y = -4
             z = -5
             print(pow(x, y, z))
-        """)
+            print('Done.')
+        """, exits_early=True)
 
     def test_float_x_with_z(self):
         self.assertCodeExecution("""
@@ -32,7 +34,8 @@ class PowTests(TranspileTestCase):
             y = 4
             z = 5
             print(pow(x, y, z))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_float_y_with_z(self):
         self.assertCodeExecution("""
@@ -40,7 +43,8 @@ class PowTests(TranspileTestCase):
             y = 4.4
             z = 5
             print(pow(x, y, z))
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_float(self):
         self.assertCodeExecution("""
@@ -48,7 +52,8 @@ class PowTests(TranspileTestCase):
             y = 4.4
             z = 5.5
             print(pow(x, y, z))
-        """)
+            print('Done.')
+        """, exits_early=True)
 
     def test_float_neg_y_with_z(self):
         self.assertCodeExecution("""
@@ -56,7 +61,8 @@ class PowTests(TranspileTestCase):
             y = -4.4
             z = 5.5
             print(pow(x, y, z))
-        """)
+            print('Done.')
+        """, exits_early=True)
 
 
 class BuiltinPowFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

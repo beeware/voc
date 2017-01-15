@@ -136,7 +136,7 @@ class DictTests(TranspileTestCase):
             # Check for exception
             try:
                 print(x.popitem())
-            except TypeError as err:
+            except KeyError as err:
                 print(err)
             """)
 
