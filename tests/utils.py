@@ -210,6 +210,9 @@ PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n
 
 MEMORY_REFERENCE = re.compile('0x[\dABCDEFabcdef]{4,16}')
 
+END_OF_CODE_STRING = '===end of test==='
+END_OF_CODE_STRING_NEWLINE = END_OF_CODE_STRING + '\n'
+
 
 def cleanse_java(raw, substitutions):
     matches = JAVA_EXCEPTION.search(raw)
@@ -360,7 +363,7 @@ class TranspileTestCase(TestCase):
             self, code,
             message=None,
             extra_code=None,
-            run_in_global=True, run_in_function=True,
+            run_in_global=True, run_in_function=True, exits_early=False,
             args=None, substitutions=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
@@ -372,6 +375,7 @@ class TranspileTestCase(TestCase):
                 self.makeTempDir()
                 # Run the code as Python and as Java.
                 adj_code = adjust(code, run_in_function=False)
+                adj_code += '\nprint("%s")\n' % END_OF_CODE_STRING
                 py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args)
                 java_out = self.runAsJava(adj_code, extra_code, args=args)
             except Exception as e:
@@ -393,6 +397,15 @@ class TranspileTestCase(TestCase):
                 context = 'Global context'
             self.assertEqual(java_out, py_out, context)
 
+            # Confirm that both output strings end with the canary statement
+            substring_start = - (len(END_OF_CODE_STRING)+1)
+            if exits_early:
+                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+            else:
+                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+
         # ==================================================
         # Pass 2 - run the code in a function's context
         # ==================================================
@@ -401,6 +414,7 @@ class TranspileTestCase(TestCase):
                 self.makeTempDir()
                 # Run the code as Python and as Java.
                 adj_code = adjust(code, run_in_function=True)
+                adj_code += '\nprint("%s")\n' % END_OF_CODE_STRING
                 py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args)
                 java_out = self.runAsJava(adj_code, extra_code, args=args)
             except Exception as e:
@@ -421,6 +435,15 @@ class TranspileTestCase(TestCase):
             else:
                 context = 'Function context'
             self.assertEqual(java_out, py_out, context)
+
+            # Confirm that both output strings end with the canary statement
+            substring_start = - (len(END_OF_CODE_STRING)+1)
+            if exits_early:
+                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+            else:
+                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
 
     def assertJavaExecution(
                 self, code, out,
