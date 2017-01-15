@@ -27,6 +27,7 @@ print('Done.')
 print('Done.')
 """))
 
+
 class AssertCodeExecutionTests(TranspileTestCase):
     @unittest.expectedFailure
     def test_fail_unexpected_exception(self):
@@ -44,6 +45,7 @@ class AssertCodeExecutionTests(TranspileTestCase):
         self.assertCodeExecution("""
             print('Done.')
             """, exits_early=True)
+
 
 class JavaNormalizationTests(unittest.TestCase):
     def assertNormalized(self, actual, expected):
