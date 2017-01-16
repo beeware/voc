@@ -31,6 +31,16 @@ public class Tuple extends org.python.types.Object {
         this.value = tuple;
     }
 
+    @org.python.Method(
+        __doc__ = "tuple() -> empty tuple" +
+            "tuple(iterable) -> tuple initialized from iterable's items\n" +
+            "\n" +
+            "If the argument is a tuple, the return value is the same object.\n"
+    )
+    public Tuple(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("__new__() has not been implemented.");
     // }
@@ -52,6 +62,9 @@ public class Tuple extends org.python.types.Object {
                 buffer.append(", ");
             }
             buffer.append(obj.__repr__());
+        }
+        if (this.value.size() == 1) {
+            buffer.append(",");
         }
         buffer.append(")");
         return new org.python.types.Str(buffer.toString());

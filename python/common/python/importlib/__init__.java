@@ -1,6 +1,9 @@
 package python.importlib;
 
 
+@org.python.Module(
+    __doc__ = "A pure Python implementation of import."
+)
 public class __init__ extends org.python.types.Module {
     static {
     }
@@ -20,17 +23,14 @@ public class __init__ extends org.python.types.Module {
     @org.python.Attribute()
     public static org.python.Object __all__;
 
-    @org.python.Attribute()
-    public static org.python.Object __builtins__;
+    // @org.python.Attribute()
+    // public static org.python.Object __builtins__;
 
     @org.python.Attribute()
     public static org.python.Object __cached__;
 
-    @org.python.Attribute()
-    public static org.python.Object __doc__;
-
-    @org.python.Attribute()
-    public static org.python.Object __file__;
+    @org.python.Attribute
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/importlib/__init__.java");
 
     @org.python.Method(
         __doc__ = "",
@@ -42,20 +42,20 @@ public class __init__ extends org.python.types.Module {
         throw new org.python.exceptions.NotImplementedError("'__import__' has not been implemented");
     }
 
-    @org.python.Attribute()
-    public static org.python.Object __loader__;
+    @org.python.Attribute
+    public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
 
-    @org.python.Attribute()
-    public static org.python.Object __name__;
+    @org.python.Attribute
+    public static org.python.Object __name__ = new org.python.types.Str("importlib");
 
-    @org.python.Attribute()
-    public static org.python.Object __package__;
+    @org.python.Attribute
+    public static org.python.Object __package__ = new org.python.types.Str("");
 
     @org.python.Attribute()
     public static org.python.Object __path__;
 
-    @org.python.Attribute()
-    public static org.python.Object __spec__;
+    @org.python.Attribute
+    public static org.python.Object __spec__ = org.python.types.NoneType.NONE;  // TODO
 
     @org.python.Attribute()
     public static org.python.Object _bootstrap;

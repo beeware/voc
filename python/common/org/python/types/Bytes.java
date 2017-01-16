@@ -31,6 +31,24 @@ public class Bytes extends org.python.types.Object {
         }
     }
 
+    @org.python.Method(
+        __doc__ = "bytes(iterable_of_ints) -> bytes" +
+            "bytes(string, encoding[, errors]) -> bytes\n" +
+            "bytes(bytes_or_buffer) -> immutable copy of bytes_or_buffer\n" +
+            "bytes(int) -> bytes object of size given by the parameter initialized with null bytes\n" +
+            "bytes() -> empty bytes object\n" +
+            "\n" +
+            "Construct an immutable array of bytes from:\n" +
+            " - an iterable yielding integers in range(256)\n" +
+            " - a text string encoded using the specified encoding\n" +
+            " - any object implementing the buffer API.\n" +
+            " - an integer\n",
+        default_args = {"source", "encoding", "errors"}
+    )
+    public Bytes(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytes' not implemented");
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("str.__new__() has not been implemented.");
     // }
