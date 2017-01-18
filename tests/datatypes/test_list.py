@@ -82,7 +82,7 @@ class ListTests(TranspileTestCase):
             x = []
             try:
                 x[0] = 5
-            except AttributeError as err:
+            except IndexError as err:
                 print(err)
             """)
 
@@ -91,7 +91,7 @@ class ListTests(TranspileTestCase):
             x = [1]
             try:
                 x[-2] = 5
-            except AttributeError as err:
+            except IndexError as err:
                 print(err)
             """)
 

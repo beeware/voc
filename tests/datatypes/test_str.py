@@ -61,7 +61,7 @@ class StrTests(TranspileTestCase):
             x = "12345"
             try:
                 print(x[10])
-            except AttributeError as err:
+            except IndexError as err:
                 print(err)
             """)
 
@@ -70,7 +70,7 @@ class StrTests(TranspileTestCase):
             x = "12345"
             try:
                 print(x[-10])
-            except AttributeError as err:
+            except IndexError as err:
                 print(err)
             """)
 
