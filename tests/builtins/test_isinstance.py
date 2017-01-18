@@ -6,20 +6,26 @@ from .. utils import TranspileTestCase
 class IsinstanceTests(TranspileTestCase):
     def test_no_args(self):
         self.assertCodeExecution("""
-            print(isinstance())
-            print('Done.')
+            try:
+                print(isinstance())
+            except TypeError as err:
+                print(err)
             """, run_in_function=False)
 
     def test_one_arg(self):
         self.assertCodeExecution("""
-            print(isinstance(123))
-            print('Done.')
+            try:
+                print(isinstance(123))
+            except TypeError as err:
+                print(err)
             """, run_in_function=False)
 
     def test_non_tuple_second_arg(self):
         self.assertCodeExecution("""
-            print(isinstance(123, [int, float]))
-            print('Done.')
+            try:
+                print(isinstance(123, [int, float]))
+            except TypeError as err:
+                print(err)
             """, run_in_function=False)
 
     def test_single_class(self):
@@ -34,8 +40,6 @@ class IsinstanceTests(TranspileTestCase):
 
             print(isinstance(obj, MyClass1))
             print(isinstance(obj, MyClass2))
-
-            print('Done.')
             """, run_in_function=False)
 
     def test_multiple_classes(self):
@@ -49,8 +53,6 @@ class IsinstanceTests(TranspileTestCase):
             obj = MyClass1()
 
             print(isinstance(obj, (MyClass1, MyClass2)))
-
-            print('Done.')
             """, run_in_function=False)
 
     @expectedFailure
@@ -66,8 +68,6 @@ class IsinstanceTests(TranspileTestCase):
 
             print(isinstance(obj, MyClass1))
             print(isinstance(obj, MyClass2))
-
-            print('Done.')
             """, run_in_function=False)
 
     def test_types(self):
@@ -87,6 +87,4 @@ class IsinstanceTests(TranspileTestCase):
             print(isinstance(123, (int, float)))
             print(isinstance("asdf", (int, float)))
             print(isinstance(123.45, (int, float)))
-
-            print('Done.')
             """, run_in_function=False)

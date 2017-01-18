@@ -204,8 +204,14 @@ class DictTests(TranspileTestCase):
         # check for unhashable type errors
         self.assertCodeExecution("""
             x = {1: 2}
-            print(x.get([]))
-            print(x.get([], 1))
+            try:
+                print(x.get([]))
+            except TypeError as err:
+                print(err)
+            try:
+                print(x.get([], 1))
+            except TypeError as err:
+                print(err)
             """)
 
 
