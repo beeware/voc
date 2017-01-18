@@ -8,8 +8,6 @@ class ClassTests(TranspileTestCase):
                 pass
 
             obj = MyClass()
-
-            print('Done.')
             """, run_in_function=False)
 
     def test_simple(self):
@@ -25,8 +23,6 @@ class ClassTests(TranspileTestCase):
 
             obj = MyClass(4)
             obj.stuff(5)
-
-            print('Done.')
             """, run_in_function=False)
 
     def test_subclass_object(self):
@@ -42,8 +38,6 @@ class ClassTests(TranspileTestCase):
 
             obj = MyClass(4)
             obj.stuff(5)
-
-            print('Done.')
             """, run_in_function=False)
 
     def test_method_override(self):
@@ -58,7 +52,6 @@ class ClassTests(TranspileTestCase):
             obj = MyObject(37)
 
             print(obj)
-            print('Done.')
             """, run_in_function=False)
 
     def test_subclass(self):
@@ -92,7 +85,6 @@ class ClassTests(TranspileTestCase):
             print(obj.first())
             print(obj.y)
             print(obj.second())
-            print('Done.')
             """)
 
     def test_subclass_2_clause_super(self):
@@ -126,7 +118,6 @@ class ClassTests(TranspileTestCase):
             print(obj.first())
             print(obj.y)
             print(obj.second())
-            print('Done.')
             """)
 
     def test_redefine(self):
@@ -146,6 +137,4 @@ class ClassTests(TranspileTestCase):
 
             obj = MyClass(4)
             obj.stuff(5)
-
-            print('Done.')
             """, run_in_function=False)

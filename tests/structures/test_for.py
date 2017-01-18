@@ -11,7 +11,6 @@ class ForLoopTests(TranspileTestCase):
             for i in range(0, 5):
                 total = total + i
                 print(i, total)
-            print('Done.')
             """)
 
         # Empty range
@@ -20,7 +19,6 @@ class ForLoopTests(TranspileTestCase):
               for i in range(0, 0):
                   total = total + i
                   print(i, total)
-              print('Done.')
               """)
 
         # Stepped range
@@ -29,7 +27,6 @@ class ForLoopTests(TranspileTestCase):
               for i in range(0, 10, 2):
                   total = total + i
                   print(i, total)
-              print('Done.')
               """)
 
         # Reverse range
@@ -38,7 +35,6 @@ class ForLoopTests(TranspileTestCase):
               for i in range(5, 0, -1):
                   total = total + i
                   print(i, total)
-              print('Done.')
               """)
 
     def test_for_over_iterable(self):
@@ -47,7 +43,6 @@ class ForLoopTests(TranspileTestCase):
             for i in [1, 2, 3, 5]:
                 total = total + i
                 print(i, total)
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -55,7 +50,6 @@ class ForLoopTests(TranspileTestCase):
             for i in []:
                 total = total + i
                 print(i, total)
-            print('Done.')
             """)
 
     @expectedFailure
@@ -91,7 +85,6 @@ class ForLoopTests(TranspileTestCase):
                     if i % 5 == 0:
                         break
                     print ("after")
-                print("Done")
             """)
 
     def test_continue(self):
@@ -102,7 +95,6 @@ class ForLoopTests(TranspileTestCase):
                     if i % 5 == 0:
                         continue
                     print ("after")
-                print("Done")
             """)
 
     def test_nested(self):
@@ -113,7 +105,6 @@ class ForLoopTests(TranspileTestCase):
                 for i in range(1, 10):
                     for k in range(0, i):
                         print(i, j)
-                print("Done")
             """)
 
     def test_multiple_values(self):
@@ -125,7 +116,6 @@ class ForLoopTests(TranspileTestCase):
             ]
             for x, y, z, in values:
                 print(x, y, z)
-            print('Done.')
             """)
 
     @expectedFailure
@@ -141,5 +131,4 @@ class ForLoopTests(TranspileTestCase):
             print('And once again...')
             for item in values.items():
                 print(item[0], item[1])
-            print('Done.')
             """)

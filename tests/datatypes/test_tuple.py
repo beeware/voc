@@ -5,16 +5,20 @@ class TupleTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = (1, 2, 3)
-            x.attr = 42
-            print('Done.')
-            """, exits_early=True)
+            try:
+                x.attr = 42
+            except AttributeError as err:
+                print(err)
+            """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = (1, 2, 3)
-            print(x.attr)
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.attr)
+            except AttributeError as err:
+                print(err)
+            """)
 
     def test_creation(self):
         self.assertCodeExecution("""
@@ -55,16 +59,20 @@ class TupleTests(TranspileTestCase):
         # Positive index out of range
         self.assertCodeExecution("""
             x = (1, 2, 3, 4, 5)
-            print(x[10])
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x[10])
+            except IndexError as err:
+                print(err)
+            """)
 
         # Negative index out of range
         self.assertCodeExecution("""
             x = (1, 2, 3, 4, 5)
-            print(x[-10])
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x[-10])
+            except IndexError as err:
+                print(err)
+            """)
 
     def test_lt(self):
         self.assertCodeExecution("""

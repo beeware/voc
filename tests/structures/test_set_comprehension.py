@@ -12,7 +12,6 @@ class SetComprehensionTests(TranspileTestCase):
             print(9 in s)
             print(16 in s)
             print(25 in s)
-            print('Done.')
             """)
 
     def test_method(self):
@@ -25,5 +24,4 @@ class SetComprehensionTests(TranspileTestCase):
             print(9 in s)
             print(16 in s)
             print(25 in s)
-            print('Done.')
             """)

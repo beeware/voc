@@ -10,7 +10,6 @@ class DocstringTests(TranspileTestCase):
 
             print(test())
             print(test.__doc__)
-            print('Done.')
             """)
 
     def test_naked_string(self):
@@ -22,5 +21,4 @@ class DocstringTests(TranspileTestCase):
 
             print(test())
             print(test.__doc__)
-            print('Done.')
             """)

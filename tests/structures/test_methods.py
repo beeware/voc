@@ -11,7 +11,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             print("value =", obj.myfunc(5))
-            print('Done.')
             """)
 
     def test_noargs_method(self):
@@ -23,7 +22,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             print("value =", obj.myfunc())
-            print('Done.')
             """)
 
     def test_void_method(self):
@@ -34,7 +32,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             obj.myfunc(5)
-            print('Done.')
             """)
 
     def test_inner_function(self):
@@ -52,7 +49,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             print("outer =", obj.myfunc(5))
-            print('Done.')
             """, run_in_function=False)
 
     def test_closure(self):
@@ -70,7 +66,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             print("outer =", obj.myfunc(5))
-            print('Done.')
             """)
 
     def test_default_args(self):
@@ -83,7 +78,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             obj.myfunc(37)
-            print('Done.')
             """, run_in_function=False)
 
     def test_override_some_default_args(self):
@@ -96,7 +90,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             obj.myfunc(37, 42)
-            print('Done.')
             """, run_in_function=False)
 
     def test_overide_all_default_args(self):
@@ -109,7 +102,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             obj.myfunc(37, 42, 99)
-            print('Done.')
             """, run_in_function=False)
 
     def test_use_kwargs(self):
@@ -122,7 +114,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             obj.myfunc(37, y=42)
-            print('Done.')
             """, run_in_function=False)
 
     def test_use_kwargs_non_sequential(self):
@@ -135,7 +126,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             obj.myfunc(37, z=42)
-            print('Done.')
             """, run_in_function=False)
 
     def test_use_all_kwargs(self):
@@ -148,7 +138,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             obj.myfunc(x=37, y=42, z=99)
-            print('Done.')
             """, run_in_function=False)
 
     def test_use_all_kwargs_different_order(self):
@@ -161,7 +150,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             obj.myfunc(z=99, y=42, x=37)
-            print('Done.')
             """, run_in_function=False)
 
     def test_call_method_with_var_args(self):
@@ -173,7 +161,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             print("first arg =", obj.myfunc(1, 2, 3, 4, 5))
-            print('Done.')
             """, run_in_function=False)
 
     def test_call_method_with_kw(self):
@@ -187,7 +174,6 @@ class MethodTests(TranspileTestCase):
 
             obj = TestObj()
             print("values sum =", obj.myfunc(first=1, second=2))
-            print('Done.')
             """, run_in_function=False)
 
     def test_call_method_kw(self):
@@ -202,7 +188,6 @@ class MethodTests(TranspileTestCase):
             obj = TestObj()
             values = {'first': 1, 'second': 2}
             print("values sum =", obj.myfunc(**values))
-            print('Done.')
             """, run_in_function=False)
 
     def test_call_method_var_kw(self):
@@ -219,7 +204,6 @@ class MethodTests(TranspileTestCase):
             values_tuple = (1, 2, 3, 4)
             values_dict = {'first': 1, 'second': 2}
             print("values sum =", obj.myfunc(*values_tuple, **values_dict))
-            print('Done.')
             """, run_in_function=False)
 
     def test_call_method_var(self):
@@ -233,5 +217,4 @@ class MethodTests(TranspileTestCase):
             obj = TestObj()
             values_tuple = (1, 2, 3, 4)
             print("values count =", obj.myfunc(*values_tuple))
-            print('Done.')
             """, run_in_function=False)

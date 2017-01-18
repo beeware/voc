@@ -5,16 +5,20 @@ class DictTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = {}
-            x.attr = 42
-            print('Done.')
-            """, exits_early=True)
+            try:
+                x.attr = 42
+            except AttributeError as err:
+                print(err)
+            """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = {}
-            print(x.attr)
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.attr)
+            except AttributeError as err:
+                print(err)
+            """)
 
     def test_creation(self):
         # Empty dict
@@ -43,9 +47,11 @@ class DictTests(TranspileTestCase):
             x = {'a': 1, 'b': 2}
             print('c' in x)
             print('c' not in x)
-            print(x['c'])
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x['c'])
+            except KeyError as err:
+                print(err)
+            """)
 
     def test_clear(self):
         # Clear a dictionary
@@ -111,16 +117,20 @@ class DictTests(TranspileTestCase):
     def test_builtin_non_2_tuples(self):
         # One of the elements isn't a 2-tuple
         self.assertCodeExecution("""
-            x = dict([('a', 1), ('b', 2, False)])
-            print('Done.')
-            """, exits_early=True)
+            try:
+                x = dict([('a', 1), ('b', 2, False)])
+            except ValueError as err:
+                print(err)
+            """)
 
     def test_builtin_non_sequence(self):
         # One of the elements isn't a sequence
         self.assertCodeExecution("""
-            x = dict([('a', 1), False, ('b', 2)])
-            print('Done.')
-            """, exits_early=True)
+            try:
+                x = dict([('a', 1), False, ('b', 2)])
+            except TypeError as err:
+                print(err)
+            """)
 
     def test_method_popitem(self):
         self.assertCodeExecution("""

@@ -13,7 +13,6 @@ class RangeTests(TranspileTestCase):
                 print("x[5] = ", x[5])
             except IndexError as err:
                 print(err)
-            print('Done.')
             """)
 
     def test_step(self):
@@ -44,8 +43,11 @@ class RangeTests(TranspileTestCase):
 
     def test_zero_step(self):
         self.assertCodeExecution("""
-            range(0, 5, 0)
-        """, exits_early=True)
+            try:
+                range(0, 5, 0)
+            except ValueError as err:
+                print(err)
+        """)
 
     def test_len_empty(self):
         self.assertCodeExecution("""

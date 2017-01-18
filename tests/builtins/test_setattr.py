@@ -23,6 +23,4 @@ class SetattrTests(TranspileTestCase):
             setattr(obj, 'other_value', 42)
             print('  value =', obj.value)
             print('  other_value =', obj.other_value)
-
-            print('Done.')
             """, run_in_function=False)

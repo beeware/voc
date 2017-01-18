@@ -7,7 +7,10 @@ class PowTests(TranspileTestCase):
             x = 3
             y = 4
             z = 5
-            print(pow(x, y, z))
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
         """)
 
     def test_int_neg_y_pos_z(self):
@@ -15,54 +18,66 @@ class PowTests(TranspileTestCase):
             x = 3
             y = -4
             z = 5
-            print(pow(x, y, z))
-            print('Done.')
-        """, exits_early=True)
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
+        """)
 
     def test_int_neg_y_neg_z(self):
         self.assertCodeExecution("""
             x = 3
             y = -4
             z = -5
-            print(pow(x, y, z))
-            print('Done.')
-        """, exits_early=True)
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
+        """)
 
     def test_float_x_with_z(self):
         self.assertCodeExecution("""
             x = 3.3
             y = 4
             z = 5
-            print(pow(x, y, z))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
+            """)
 
     def test_float_y_with_z(self):
         self.assertCodeExecution("""
             x = 3
             y = 4.4
             z = 5
-            print(pow(x, y, z))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
+            """)
 
     def test_float(self):
         self.assertCodeExecution("""
             x = 3.3
             y = 4.4
             z = 5.5
-            print(pow(x, y, z))
-            print('Done.')
-        """, exits_early=True)
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
+        """)
 
     def test_float_neg_y_with_z(self):
         self.assertCodeExecution("""
             x = 3.3
             y = -4.4
             z = 5.5
-            print(pow(x, y, z))
-            print('Done.')
-        """, exits_early=True)
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
+        """)
 
 
 class BuiltinPowFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

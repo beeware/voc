@@ -27,8 +27,6 @@ class HasattrTests(TranspileTestCase):
             print('obj.value', hasattr(obj, 'value'))
             print('obj.class_value', hasattr(obj, 'class_value'))
             print('obj.stuff', hasattr(obj, 'stuff'))
-
-            print('Done.')
             """, run_in_function=False)
 
 

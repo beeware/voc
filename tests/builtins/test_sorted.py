@@ -19,8 +19,6 @@ class SortedTests(TranspileTestCase):
                     print('Reverse sorted:', sorted(seq, key=key, reverse=True))
                 except Exception as e:
                     print(e)
-
-            print('Done.')
             """, run_in_function=False)
 
 

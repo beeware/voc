@@ -12,7 +12,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__displayhook__())
-            print('Done.')
             """)
 
     ############################################################
@@ -22,7 +21,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__doc__)
-            print('Done.')
             """)
 
     ############################################################
@@ -32,7 +30,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__egginsert)
-            print('Done.')
             """)
 
     ############################################################
@@ -42,7 +39,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__excepthook__())
-            print('Done.')
             """)
 
     ############################################################
@@ -50,7 +46,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__excepthook__())
-            print('Done.')
             """)
 
     ############################################################
@@ -59,7 +54,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__name__)
-            print('Done.')
             """)
 
     ############################################################
@@ -69,7 +63,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__package__)
-            print('Done.')
             """)
 
     ############################################################
@@ -79,7 +72,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__plen)
-            print('Done.')
             """)
 
     ############################################################
@@ -89,7 +81,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__spec__())
-            print('Done.')
             """)
 
     ############################################################
@@ -99,7 +90,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__stderr__())
-            print('Done.')
             """)
 
     ############################################################
@@ -109,7 +99,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__stdin__())
-            print('Done.')
             """)
 
     ############################################################
@@ -119,7 +108,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.__stdout__())
-            print('Done.')
             """)
 
     ############################################################
@@ -129,7 +117,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys._clear_type_cache())
-            print('Done.')
             """)
 
     ############################################################
@@ -139,7 +126,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys._current_frames())
-            print('Done.')
             """)
 
     ############################################################
@@ -149,7 +135,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys._debugmallocstats())
-            print('Done.')
             """)
 
     ############################################################
@@ -159,7 +144,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys._getframe())
-            print('Done.')
             """)
 
     ############################################################
@@ -169,7 +153,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys._mercurial)
-            print('Done.')
             """)
 
     ############################################################
@@ -179,7 +162,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys._xoptions)
-            print('Done.')
             """)
 
     ############################################################
@@ -189,7 +171,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.abiflags)
-            print('Done.')
             """)
 
     ############################################################
@@ -199,7 +180,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.api_version)
-            print('Done.')
             """)
 
     ############################################################
@@ -208,13 +188,11 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print('ARGS =', sys.argv)
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
             import sys
             print('ARGS =', sys.argv)
-            print('Done.')
             """, args=['1', 'asdf', '3'])
 
     ############################################################
@@ -224,7 +202,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.base_exec_prefix)
-            print('Done.')
             """)
 
     ############################################################
@@ -234,7 +211,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.base_prefix)
-            print('Done.')
             """)
 
     ############################################################
@@ -244,7 +220,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.builtin_module_names)
-            print('Done.')
             """)
 
     ############################################################
@@ -254,7 +229,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.byteorder)
-            print('Done.')
             """)
 
     ############################################################
@@ -264,7 +238,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.call_tracing())
-            print('Done.')
             """)
 
     ############################################################
@@ -274,7 +247,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.callstats())
-            print('Done.')
             """)
 
     ############################################################
@@ -284,7 +256,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.copyright)
-            print('Done.')
             """)
 
     ############################################################
@@ -294,7 +265,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.displayhook)
-            print('Done.')
             """)
 
     ############################################################
@@ -304,7 +274,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.dont_write_bytecode)
-            print('Done.')
             """)
 
     ############################################################
@@ -314,7 +283,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             prexc_info()int(sys.exc_info())
-            print('Done.')
             """)
 
     ############################################################
@@ -324,7 +292,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.excepthook)
-            print('Done.')
             """)
 
     ############################################################
@@ -334,7 +301,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.exec_prefix)
-            print('Done.')
             """)
 
     ############################################################
@@ -344,7 +310,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.executable)
-            print('Done.')
             """)
 
     ############################################################
@@ -354,7 +319,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.exit())
-            print('Done.')
             """, exits_early=True)
 
     def test_exit(self):
@@ -363,7 +327,6 @@ class SysModuleTests(TranspileTestCase):
             import sys
             if __name__ == '__main__':
                 print(sys.exit())
-                print('Done.')
             """, run_in_function=False)
 
         # From a method called from inside main
@@ -375,7 +338,6 @@ class SysModuleTests(TranspileTestCase):
 
             if __name__ == '__main__':
                 foo()
-                print('Done.')
             """, run_in_function=False)
 
     ############################################################
@@ -385,7 +347,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.flags())
-            print('Done.')
             """)
 
     ############################################################
@@ -395,7 +356,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.float_info())
-            print('Done.')
             """)
 
     ############################################################
@@ -405,7 +365,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.float_repr_style)
-            print('Done.')
             """)
 
     ############################################################
@@ -415,7 +374,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getallocatedblocks())
-            print('Done.')
             """)
 
     ############################################################
@@ -425,7 +383,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getcheckinterval())
-            print('Done.')
             """)
 
     ############################################################
@@ -435,7 +392,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getdefaultencoding())
-            print('Done.')
             """)
 
     ############################################################
@@ -445,7 +401,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getdlopenflags())
-            print('Done.')
             """)
 
     ############################################################
@@ -455,7 +410,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getfilesystemencoding())
-            print('Done.')
             """)
 
     ############################################################
@@ -465,7 +419,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getprofile())
-            print('Done.')
             """)
 
     ############################################################
@@ -475,7 +428,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getrecursionlimit())
-            print('Done.')
             """)
 
     ############################################################
@@ -485,7 +437,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getrefcount())
-            print('Done.')
             """)
 
     ############################################################
@@ -495,7 +446,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getsizeof())
-            print('Done.')
             """)
 
     ############################################################
@@ -505,7 +455,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.getswi())
-            print('Done.')
             """)
 
     ############################################################
@@ -515,7 +464,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.gettrace())
-            print('Done.')
             """)
 
     ############################################################
@@ -525,7 +473,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.hash_info)
-            print('Done.')
             """)
 
     ############################################################
@@ -534,7 +481,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.hexversion)
-            print('Done.')
             """)
 
     ############################################################
@@ -544,7 +490,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.implementati())
-            print('Done.')
             """)
 
     ############################################################
@@ -554,7 +499,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.int_info())
-            print('Done.')
             """)
 
     ############################################################
@@ -564,7 +508,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.intern())
-            print('Done.')
             """)
 
     ############################################################
@@ -574,7 +517,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.last_traceba())
-            print('Done.')
             """)
 
     ############################################################
@@ -584,7 +526,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.last_type())
-            print('Done.')
             """)
 
     ############################################################
@@ -594,7 +535,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.last_value())
-            print('Done.')
             """)
 
     ############################################################
@@ -604,7 +544,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.maxsize)
-            print('Done.')
             """)
 
     ############################################################
@@ -614,7 +553,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.maxunicode)
-            print('Done.')
             """)
 
     ############################################################
@@ -624,7 +562,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.meta_path)
-            print('Done.')
             """)
 
     ############################################################
@@ -634,7 +571,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.modules)
-            print('Done.')
             """)
 
     ############################################################
@@ -644,7 +580,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.path)
-            print('Done.')
             """)
 
     ############################################################
@@ -654,7 +589,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.path_hooks)
-            print('Done.')
             """)
 
     ############################################################
@@ -664,7 +598,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.path_importer_cache)
-            print('Done.')
             """)
 
     ############################################################
@@ -673,7 +606,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.platform)
-            print('Done.')
             """)
 
     ############################################################
@@ -683,7 +615,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.prefix)
-            print('Done.')
             """)
 
     ############################################################
@@ -693,7 +624,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.ps1)
-            print('Done.')
             """)
 
     ############################################################
@@ -703,7 +633,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.ps2)
-            print('Done.')
             """)
 
     ############################################################
@@ -713,7 +642,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.ps3)
-            print('Done.')
             """)
 
     ############################################################
@@ -723,7 +651,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.real_prefix)
-            print('Done.')
             """)
 
     ############################################################
@@ -733,7 +660,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.setcheckinterval())
-            print('Done.')
             """)
 
     ############################################################
@@ -743,7 +669,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.setdlopenflags())
-            print('Done.')
             """)
 
     ############################################################
@@ -753,7 +678,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.setprofile())
-            print('Done.')
             """)
 
     ############################################################
@@ -763,7 +687,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.setrecursionlimit())
-            print('Done.')
             """)
 
     ############################################################
@@ -773,7 +696,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.setswitchinterval())
-            print('Done.')
             """)
 
     ############################################################
@@ -783,7 +705,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.settrace())
-            print('Done.')
             """)
 
     ############################################################
@@ -793,7 +714,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.stderr())
-            print('Done.')
             """)
 
     ############################################################
@@ -803,7 +723,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.stdin())
-            print('Done.')
             """)
 
     ############################################################
@@ -813,7 +732,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.stdout())
-            print('Done.')
             """)
 
     ############################################################
@@ -823,7 +741,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.thread_info())
-            print('Done.')
             """)
 
     ############################################################
@@ -835,7 +752,6 @@ class SysModuleTests(TranspileTestCase):
             lines = sys.version.split('\n')
             print("There are %d lines" % len(lines))
             print(lines[0].split(' ')[0])
-            print('Done.')
             """)
 
     ############################################################
@@ -844,7 +760,6 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.version_info)
-            print('Done.')
             """)
 
     ############################################################
@@ -854,5 +769,4 @@ class SysModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import sys
             print(sys.warnoptions)
-            print('Done.')
             """)

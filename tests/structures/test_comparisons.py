@@ -9,7 +9,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -18,7 +17,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -27,7 +25,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -36,7 +33,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
     def test_is_not(self):
@@ -46,7 +42,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -55,7 +50,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -64,7 +58,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -73,7 +66,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
     def test_lt(self):
@@ -83,7 +75,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -92,7 +83,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -101,7 +91,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
     def test_le(self):
@@ -111,7 +100,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -120,7 +108,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -129,7 +116,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
     def test_gt(self):
@@ -139,7 +125,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -148,7 +133,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -157,7 +141,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
     def test_ge(self):
@@ -167,7 +150,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -176,7 +158,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -185,7 +166,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
     def test_eq(self):
@@ -195,7 +175,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -204,7 +183,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
     def test_ne(self):
@@ -214,7 +192,6 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -223,5 +200,4 @@ class ComparisonTests(TranspileTestCase):
                 print('True')
             else:
                 print('False')
-            print('Done.')
             """)

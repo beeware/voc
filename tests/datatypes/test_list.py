@@ -5,16 +5,20 @@ class ListTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            x.attr = 42
-            print('Done.')
-            """, exits_early=True)
+            try:
+                x.attr = 42
+            except AttributeError as err:
+                print(err)
+            """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            print(x.attr)
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.attr)
+            except AttributeError as err:
+                print(err)
+            """)
 
     def test_creation(self):
         # Empty list
@@ -44,16 +48,20 @@ class ListTests(TranspileTestCase):
         # Positive index out of range
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            print(x[10])
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x[10])
+            except IndexError as err:
+                print(err)
+            """)
 
         # Negative index out of range
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            print(x[-10])
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x[-10])
+            except IndexError as err:
+                print(err)
+            """)
 
     def test_setitem(self):
         self.assertCodeExecution("""
@@ -72,16 +80,20 @@ class ListTests(TranspileTestCase):
         # Out of bounds
         self.assertCodeExecution("""
             x = []
-            x[0] = 5
-            print('Done.')
-            """, exits_early=True)
+            try:
+                x[0] = 5
+            except AttributeError as err:
+                print(err)
+            """)
 
         # Out of bounds (negative)
         self.assertCodeExecution("""
             x = [1]
-            x[-2] = 5
-            print('Done.')
-            """, exits_early=True)
+            try:
+                x[-2] = 5
+            except AttributeError as err:
+                print(err)
+            """)
 
     def test_append(self):
         # New list
@@ -369,45 +381,47 @@ class ListTests(TranspileTestCase):
         # cases for 'ValueError: not in list'
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            print(x.index(4))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.index(4))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 1]
-            print(x.index(2, 0, 1))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.index(2, 0, 1))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 3, 4]
-            print(x.index(4, 0, 3))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.index(4, 0, 3))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 1]
-            print(x.index(3, 0, 10))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.index(3, 0, 10))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 3, 4]
-            print(x.index(2, 10, 20))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.index(2, 10, 20))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 3, 4]
-            print(x.index(2, 10, 0))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.index(2, 10, 0))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = []
-            print(x.index(1, 0, 10))
-            print('Done.')
-            """, exits_early=True)
+            try:
+                print(x.index(1, 0, 10))
+            except ValueError as err:
+                print(err)
+            """)
 
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):

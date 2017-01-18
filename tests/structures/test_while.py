@@ -12,7 +12,6 @@ class WhileLoopTests(TranspileTestCase):
                 i += 1
                 total += i
                 print(i, total)
-            print('Done.')
             """)
 
     def test_break(self):
@@ -25,7 +24,6 @@ class WhileLoopTests(TranspileTestCase):
                     if i % 5 == 0:
                         break
                     print("after")
-                print("Done")
             """)
 
     def test_continue(self):
@@ -38,7 +36,6 @@ class WhileLoopTests(TranspileTestCase):
                     if i % 5 == 0:
                         continue
                     print("after")
-                print("Done")
             """)
 
     def test_nested(self):
@@ -53,7 +50,6 @@ class WhileLoopTests(TranspileTestCase):
                         k = k + 1
                     print("While done")
                     i = i + 1
-                print("Done")
             """)
 
     def test_while_forever(self):
@@ -65,7 +61,6 @@ class WhileLoopTests(TranspileTestCase):
                     i = i + 1
                     if i == 10:
                         break
-                print("Done")
             """)
 
     def test_while_forever_with_if_not(self):
@@ -77,7 +72,6 @@ class WhileLoopTests(TranspileTestCase):
                     i = i + 1
                     if not i < 10:
                         break
-                print("Done")
             """)
 
     def test_while_not_forever(self):
@@ -86,7 +80,6 @@ class WhileLoopTests(TranspileTestCase):
                 while not 0:
                     print("Loop")
                     break
-                print("Done")
             """)
 
     @expectedFailure
@@ -100,7 +93,6 @@ class WhileLoopTests(TranspileTestCase):
                     i = i + 1
                 else:
                     print("Else")
-                print("Done")
             """)
 
     def test_while_else_break(self):
@@ -114,7 +106,6 @@ class WhileLoopTests(TranspileTestCase):
                     break
                 else:
                     print("Else")
-                print("Done")
             """)
 
     def test_while_forever_inside_try(self):

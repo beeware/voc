@@ -36,8 +36,6 @@ class GetattrTests(TranspileTestCase):
             except AttributeError:
                 print("  Can't get attribute foo")
             print('  foo (default) =', getattr(obj, 'foo', 42))
-
-            print('Done.')
             """, run_in_function=False)
 
 
