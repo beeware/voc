@@ -22,6 +22,7 @@ class RangeTests(TranspileTestCase):
             print("x[0] = ", x[0])
             print("x[1] = ", x[1])
             print("x[-1] = ", x[-1])
+            print("x[-3] = ", x[-3])
             try:
                 print("x[3] = ", x[3])
             except IndexError as err:
@@ -30,6 +31,15 @@ class RangeTests(TranspileTestCase):
                 print("x[5] = ", x[5])
             except IndexError as err:
                 print(err)
+            try:
+                print("x[-4] = ", x[-4])
+            except IndexError as err:
+                print(err)
+
+            y = range(7, 1, -3)
+            print("y[0] = ", y[0])
+            print("y[1] = ", y[1])
+            print("y[-2] = ", y[-2])
             """)
 
     def test_zero_step(self):

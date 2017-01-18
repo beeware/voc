@@ -100,21 +100,17 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
                     slice.step == null ? this.__dict__.get("step") : slice.step
                 );
             } else {
+                long len = ((org.python.types.Int) (this.__len__())).value;
                 long idx = ((org.python.types.Int)index).value;
-                long value;
-                if (idx >= 0) {
-                    value = this.start + idx * this.step;
-                } else {
-                    value = this.stop + idx * this.step;
+
+                if (idx < 0) {
+                    idx = len + idx;
+                }
+                if (idx < 0 || idx >= len) {
+                    throw new org.python.exceptions.IndexError("range object index out of range");
                 }
 
-                if (this.step > 0 && value >= this.stop) {
-                    throw new org.python.exceptions.IndexError("range object index out of range");
-                } else if (this.step < 0 && value <= this.stop) {
-                    throw new org.python.exceptions.IndexError("range object index out of range");
-                }
-                org.python.Object result = new org.python.types.Int(value);
-                return result;
+                return new org.python.types.Int(this.start + idx * this.step);
             }
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 0x03050000) {
