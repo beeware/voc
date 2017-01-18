@@ -33,7 +33,6 @@ class SysModuleTests(TranspileTestCase):
             """
             import sys
             print(sys.__doc__)
-            """)
             """,
             substitutions=substitutions
         )
