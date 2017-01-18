@@ -17,7 +17,6 @@ class TimeModuleTests(TranspileTestCase):
 
     #######################################################
     # __doc__
-    @expectedFailure
     def test___doc__(self):
         self.assertCodeExecution("""
             import time
@@ -52,7 +51,6 @@ class TimeModuleTests(TranspileTestCase):
 
     #######################################################
     # __package__
-    @expectedFailure
     def test___package__(self):
         self.assertCodeExecution("""
             import time

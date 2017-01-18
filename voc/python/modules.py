@@ -1,10 +1,15 @@
 import os
+import sys
 
 from ..java import (
-    Class as JavaClass, Code as JavaCode, Method as JavaMethod, SourceFile,
+    Class as JavaClass,
+    Classref as JavaClassref,
+    Code as JavaCode,
+    Method as JavaMethod,
+    SourceFile as JavaSourceFile,
     opcodes as JavaOpcodes
 )
-from .blocks import Block
+from .blocks import Block, Accumulator
 from .methods import (
     CO_GENERATOR, GeneratorFunction, Function,
 )
@@ -63,14 +68,10 @@ class Module(Block):
     def class_descriptor(self):
         return '/'.join(self.namespace.split('.') + [self.name, '__init__'])
 
-    # def visitor_setup(self):
-    #     self.add_opcodes(
-    #         DEBUG("STATIC BLOCK OF " + self.class_name),
-    #     )
-
     def store_name(self, name):
         self.add_opcodes(
             ASTORE_name('#value'),
+
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.full_name),
             python.Object.get_item(),
@@ -169,16 +170,12 @@ class Module(Block):
 
         return function
 
-    def add_class(self, class_name, bases, extends, implements):
+    def add_class(self, class_name, extends, implements):
         from .klass import Class
 
         klass = Class(
             self,
             name=class_name,
-            bases=[
-                'org/python/Object' if b == 'object' else b
-                for b in bases
-            ],
             extends=extends,
             implements=implements,
         )
@@ -186,13 +183,47 @@ class Module(Block):
         self.classes.append(klass)
 
         self.add_opcodes(
-            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+            # Stack contains the bases list
+            ASTORE_name('#bases'),
 
-            java.Class.forName(klass.descriptor.replace('/', '.')),
-            python.Type.for_class(),
+            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % klass.descriptor),
+            # - class
+            JavaOpcodes.LDC_W(JavaClassref(klass.descriptor)),
+
+            # - name
+            JavaOpcodes.LDC_W(klass.name),
+
+            # - bases
+            ALOAD_name('#bases'),
+
+            # - dict
+            JavaOpcodes.ACONST_NULL(),
+
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Type',
+                'declarePythonType',
+                args=[
+                    'Ljava/lang/Class;',
+                    'Ljava/lang/String;',
+                    'Ljava/util/List;',
+                    'Ljava/util/Map;'
+                ],
+                returns='Lorg/python/types/Type;'
+            ),
+
+            free_name('#bases')
         )
 
         self.store_name(klass.name)
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKESTATIC(
+                klass.descriptor,
+                'class$init',
+                args=[],
+                returns='V'
+            ),
+        )
 
         return klass
 
@@ -214,7 +245,7 @@ class Module(Block):
         # If there is any static content, generate a classfile
         # for this module
         classfile = JavaClass(self.class_descriptor, extends='org/python/types/Module')
-        classfile.attributes.append(SourceFile(os.path.basename(self.sourcefile)))
+        classfile.attributes.append(JavaSourceFile(os.path.basename(self.sourcefile)))
 
         # Add a static method to the module, populated with the
         # body content of the module.
@@ -229,14 +260,103 @@ class Module(Block):
                 '()V',
                 attributes=[
                     JavaCode(
-                        max_stack=2,
+                        max_stack=1,
                         max_locals=1,
                         code=[
                             JavaOpcodes.ALOAD_0(),
-                            JavaOpcodes.DUP(),
                             JavaOpcodes.INVOKESPECIAL('org/python/types/Module', '<init>', args=[], returns='V'),
                             JavaOpcodes.RETURN(),
                         ],
+                    ),
+                ]
+            ),
+        )
+
+        # Add a __new__ method to set the filename of the module.
+        new_method = Accumulator({'self': 0, 'klass': 1})
+
+        new_method.add_opcodes(
+            # Call super.__new__()
+            ALOAD_name('self'),
+            ALOAD_name('klass'),
+            JavaOpcodes.INVOKESPECIAL(
+                'org/python/types/Module',
+                '__new__',
+                args=['Lorg/python/Object;'],
+                returns='Lorg/python/Object;'
+            ),
+
+            ALOAD_name('self'),
+            JavaOpcodes.GETFIELD(
+                'org/python/types/Object',
+                '__dict__',
+                'Ljava/util/Map;'
+            ),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W("__file__"),
+            python.Str(self.sourcefile),
+            java.Map.put(),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W("__package__"),
+            python.Str(self.name),
+            java.Map.put(),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W("__name__"),
+            python.Str(self.full_name),
+            java.Map.put(),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W("__builtins__"),
+            python.NONE(),
+            java.Map.put(),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W("__cached__"),
+            python.NONE(),
+            java.Map.put(),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W("__doc__"),
+            python.NONE(),
+            java.Map.put(),
+
+            JavaOpcodes.DUP(),
+            JavaOpcodes.LDC_W("__loader__"),
+            python.Str(),
+            java.Map.put(),
+        )
+
+        # Python 3.6 introduced __annotations__ at the module level.
+        if sys.hexversion > 0x03060000:
+            new_method.add_opcodes(
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W("__annotations__"),
+                python.Dict(),
+                java.Map.put(),
+            )
+
+        new_method.add_opcodes(
+            # last entry doesn't need to be duped, because we don't need to
+            # reuse the value on the stack.
+            JavaOpcodes.LDC_W("__spec__"),
+            python.Str(),
+            java.Map.put(),
+
+            JavaOpcodes.ARETURN()
+        )
+
+        classfile.methods.append(
+            JavaMethod(
+                '__new__',
+                '(Lorg/python/Object;)Lorg/python/Object;',
+                attributes=[
+                    JavaCode(
+                        max_stack=new_method.max_stack(),
+                        max_locals=new_method.max_locals(),
+                        code=new_method.opcodes,
                     ),
                 ]
             )

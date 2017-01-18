@@ -32,4 +32,11 @@ public class Method extends org.python.types.Object implements org.python.Callab
     public org.python.Object __get__(org.python.Object instance, org.python.types.Type klass) {
         return this;
     }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(true);
+    }
 }

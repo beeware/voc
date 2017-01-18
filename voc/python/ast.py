@@ -357,11 +357,6 @@ class Visitor(ast.NodeVisitor):
 
         name_visitor = NameVisitor()
 
-        bases = [
-            name_visitor.evaluate(base).ref_name
-            for base in node.bases
-        ]
-
         extends = None
         implements = []
 
@@ -384,7 +379,34 @@ class Visitor(ast.NodeVisitor):
             else:
                 raise Exception("Unknown meta keyword " + str(key))
 
-        klass = self.context.add_class(class_name, bases, extends, implements)
+        self.context.add_opcodes(
+            java.List(),
+        )
+
+        if extends:
+            first_base = extends
+        elif not node.bases:
+            first_base = 'org/python/types/Object'
+        else:
+            first_base = None
+
+        if first_base:
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                python.Type.for_class(first_base),
+                java.List.add(),
+            )
+
+        for base in node.bases:
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+            )
+            self.visit(base)
+            self.context.add_opcodes(
+                java.List.add(),
+            )
+
+        klass = self.context.add_class(class_name, extends, implements)
 
         self.push_context(klass)
         for child in node.body:

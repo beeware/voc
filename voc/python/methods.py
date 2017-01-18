@@ -1,7 +1,7 @@
 import sys
 from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
-    RuntimeVisibleAnnotations, opcodes as JavaOpcodes
+    RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref as JavaClassref
 )
 from .blocks import Block, Accumulator
 from .structures import (
@@ -14,6 +14,7 @@ from .types.primitives import (
     DLOAD_name, FLOAD_name,
     ICONST_val, ILOAD_name,
 )
+# from .debug import DEBUG, DEBUG_value
 
 
 CO_VARARGS = 0x0004
@@ -200,13 +201,12 @@ class Function(Block):
     def class_descriptor(self):
         return self.module.class_descriptor
 
-    def add_class(self, class_name, bases, extends, implements):
+    def add_class(self, class_name, extends, implements):
         from .klass import Class
 
         klass = Class(
             self.module,
             name=class_name,
-            bases=bases,
             extends=extends,
             implements=implements,
         )
@@ -214,25 +214,47 @@ class Function(Block):
         self.module.classes.append(klass)
 
         self.add_opcodes(
-            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % self.klass.descriptor),
+            # Stack contains the bases list
+            ASTORE_name('#bases'),
 
-            JavaOpcodes.LDC_W(klass.descriptor.replace('/', '.')),
-            JavaOpcodes.INVOKESTATIC(
-                'java/lang/Class',
-                'forName',
-                args=['Ljava/lang/String;'],
-                returns='Ljava/lang/Class;'
-            ),
+            # DEBUG("FORCE LOAD OF CLASS %s AT DEFINITION" % klass.descriptor),
+            # - class
+            JavaOpcodes.LDC_W(JavaClassref(klass.descriptor)),
+
+            # - name
+            JavaOpcodes.LDC_W(klass.name),
+
+            # - bases
+            ALOAD_name('#bases'),
+
+            # - dict
+            JavaOpcodes.ACONST_NULL(),
 
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Type',
-                'pythonType',
-                args=['Ljava/lang/Class;'],
+                'declarePythonType',
+                args=[
+                    'Ljava/lang/Class;',
+                    'Ljava/lang/String;',
+                    'Ljava/util/List;',
+                    'Ljava/util/Map;'
+                ],
                 returns='Lorg/python/types/Type;'
             ),
+
+            free_name('#bases')
         )
 
         self.store_name(klass.name)
+
+        self.add_opcodes(
+            JavaOpcodes.INVOKESTATIC(
+                klass.descriptor,
+                'class$init',
+                args=[],
+                returns='V'
+            ),
+        )
 
         return klass
 
@@ -811,19 +833,15 @@ class MainFunction(Function):
 
     def visitor_setup(self):
         self.add_opcodes(
-            # Set the Python version
-            JavaOpcodes.LDC_W(sys.hexversion),
-            JavaOpcodes.PUTSTATIC('org/Python', 'VERSION', 'I'),
-
-            # Create storage for locals
-            java.Map(),
-            ASTORE_name('#locals'),
-
             # Add a TRY-CATCH for SystemExit
             TRY(),
         )
         self.add_opcodes(
-                # Initialize this module
+                # Set the Python version
+                JavaOpcodes.LDC_W(sys.hexversion),
+                JavaOpcodes.PUTSTATIC('org/Python', 'VERSION', 'I'),
+
+                # Construct this module
                 java.New(self.module.class_descriptor),
                 java.Init(self.module.class_descriptor),
                 ASTORE_name('#module'),

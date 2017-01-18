@@ -1,3 +1,5 @@
+import sys
+
 from unittest import expectedFailure
 
 from ..utils import TranspileTestCase
@@ -16,12 +18,25 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # __doc__
-    @expectedFailure
     def test___doc__(self):
-        self.assertCodeExecution("""
+        if sys.hexversion < 0x03040500:
+            # A minor change in the docstring for 3.4.5
+            substitutions = {
+                'the value of the largest Unicode code point': [
+                    'the value of the largest Unicode codepoint'
+                ]
+            }
+        else:
+            substitutions = None
+
+        self.assertCodeExecution(
+            """
             import sys
             print(sys.__doc__)
             """)
+            """,
+            substitutions=substitutions
+        )
 
     ############################################################
     # __egginsert
@@ -58,7 +73,6 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # __package__
-    @expectedFailure
     def test___package__(self):
         self.assertCodeExecution("""
             import sys

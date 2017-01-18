@@ -42,6 +42,48 @@ public class Int extends org.python.types.Object {
         this.value = value;
     }
 
+    @org.python.Method(
+        name = "int",
+        __doc__ = "int(x=0) -> integer" +
+            "int(x, base=10) -> integer\n" +
+            "\n" +
+            "Convert a number or string to an integer, or return 0 if no arguments\n" +
+            "are given.  If x is a number, return x.__int__().  For floating point\n" +
+            "numbers, this truncates towards zero.\n" +
+            "\n" +
+            "If x is not a number or if base is given, then x must be a string,\n" +
+            "bytes, or bytearray instance representing an integer literal in the\n" +
+            "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" +
+            "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" +
+            "Base 0 means to interpret the base from the string as an integer literal.\n" +
+            "\n" +
+            "  >>> int('0b100', base=0)\n" +
+            "  4\n",
+        default_args = {"x", "base"}
+    )
+    public Int(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = 0;
+        } else if (args[1] == null) {
+            try {
+                this.value = ((org.python.types.Int) args[0].__int__()).value;
+            } catch (org.python.exceptions.AttributeError ae) {
+                if (org.Python.VERSION < 0x03040300) {
+                    throw new org.python.exceptions.TypeError(
+                        "int() argument must be a string or a number, not '" + args[0].typeName() + "'"
+                    );
+                } else {
+                    throw new org.python.exceptions.TypeError(
+                        "int() argument must be a string, a bytes-like object or a number, not '" +
+                            args[0].typeName() + "'"
+                    );
+                }
+            }
+        } else if (args.length > 3) {
+            throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
+        }
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("int.__new__() has not been implemented");
     // }
@@ -719,14 +761,14 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Int __int__() {
+    public org.python.Object __int__() {
         return new org.python.types.Int(this.value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Float __float__() {
+    public org.python.Object __float__() {
         return new org.python.types.Float((float) this.value);
     }
 

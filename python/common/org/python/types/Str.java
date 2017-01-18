@@ -37,6 +37,27 @@ public class Str extends org.python.types.Object {
         this.value = new java.lang.String(new char [] {chr});
     }
 
+    @org.python.Method(
+        __doc__ = "str(object='') -> str" +
+            "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" +
+            "\n" +
+            "Create a new string object from the given object. If encoding or\n" +
+            "errors is specified, then the object must expose a data buffer\n" +
+            "that will be decoded using the given encoding and error handler.\n" +
+            "Otherwise, returns the result of object.__str__() (if defined)\n" +
+            "or repr(object).\n" +
+            "encoding defaults to sys.getdefaultencoding().\n" +
+            "errors defaults to 'strict'.\n",
+        default_args = {"object"}
+    )
+    public Str(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = "";
+        } else {
+            this.value = ((org.python.types.Str) args[0].__str__()).value;
+        }
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("__new__() has not been implemented.");
     // }
@@ -48,28 +69,28 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __repr__() {
+    public org.python.Object __repr__() {
         return new org.python.types.Str("'" + this.value + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __str__() {
+    public org.python.Object __str__() {
         return new org.python.types.Str(this.value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __format__(org.python.Object format_string) {
+    public org.python.Object __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Int __int__() {
+    public org.python.Object __int__() {
         try {
             return new org.python.types.Int(Long.parseLong(this.value));
         } catch (NumberFormatException e) {
@@ -80,7 +101,7 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Float __float__() {
+    public org.python.Object __float__() {
         double result;
         try {
             result = Double.parseDouble(this.value);

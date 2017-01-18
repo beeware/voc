@@ -36,6 +36,13 @@ public class Method extends org.python.types.Object implements org.python.Callab
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(true);
+    }
+
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         // System.out.println("METHOD Invocation: " + this.im_self);
         return this.im_func.invoke(this.im_self, args, kwargs);

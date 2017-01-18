@@ -190,9 +190,9 @@ def compileJava(java_dir, java):
 
 
 JAVA_EXCEPTION = re.compile(
-    '(((Exception in thread "[\w-]+" )?org\.python\.exceptions\.(?P<exception1>[\w]+): (?P<message1>[^\r?\n]+))|' +
+    '(((Exception in thread "[\w-]+" )?(?P<exception1>[\w]+): (?P<message1>[^\r?\n]+))|' +
     '([^\r\n]*?\r?\n((    |\t)at[^\r\n]*?\r?\n)*' +
-    'Caused by: org\.python\.exceptions\.(?P<exception2>[\w]+)(?:\:\s)?(?P<message2>[^\r?]+))\r?)\n' +
+    'Caused by: (?P<exception2>[\w]+)(?:\:\s)?(?P<message2>[^\r?]+))\r?)\n' +
     '(?P<trace>(\s+at .+\((((.*)(:(\d+))?)|(Native Method))\)\r?\n)+)(.*\r?\n)*' +
     '(Exception in thread "\w+" )?',
     re.MULTILINE
@@ -691,6 +691,7 @@ SAMPLE_DATA = {
             '"Three args: %s | %s | %s"',
         ],
     'tuple': [
+            '(1,)',
             '(1, 2)',
             '(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)',
             '(3, 1.2, True, )',

@@ -61,7 +61,7 @@ class TryExceptTests(TranspileTestCase):
                 obj = 3
                 print('OK')
             except NameError as e:
-                print("Got a NameError", e)
+                print("Got a", e)
             print('Done.')
             """)
 
@@ -71,7 +71,7 @@ class TryExceptTests(TranspileTestCase):
                 obj.no_such_attribute
                 print('OK')
             except NameError as e:
-                print("Got a NameError", e)
+                print("Got a", e)
             print('Done.')
             """)
 
@@ -81,7 +81,7 @@ class TryExceptTests(TranspileTestCase):
                 obj = int('asdf')
                 print('OK')
             except NameError as e:
-                print("Got a NameError", e)
+                print("Got a", e)
             print('Done.')
             """, exits_early=True)
 

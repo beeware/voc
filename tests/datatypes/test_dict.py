@@ -132,6 +132,19 @@ class DictTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_method_pop(self):
+        self.assertCodeExecution("""
+            x = {1: 2, 3: 4, 5: 6}
+            print(x.pop(1))
+            print(x.pop(3, 37))
+            try:
+                print(x.pop(7))
+            except KeyError as e:
+                print("Dict doesn't contain 7")
+            print(x.pop(7, 42))
+            print("Done")
+            """)
+
     def test_method_popitem(self):
         self.assertCodeExecution("""
             ITEMS = [(1, 2), (3, ("4", 5))]
@@ -186,6 +199,13 @@ class DictTests(TranspileTestCase):
                 print(x.get([], 1))
             except TypeError as err:
                 print(err)
+            """)
+
+        # check for unhashable type errors
+        self.assertCodeExecution("""
+            x = {1: 2}
+            print(x.get([]))
+            print(x.get([], 1))
             """)
 
 
