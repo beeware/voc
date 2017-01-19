@@ -56,6 +56,36 @@ class Accumulator:
 
                 self.next_resolve_list = []
 
+    @property
+    def active_local_vars(self):
+        return {
+            name: index
+            for name, index in self.local_vars.items()
+            if index is not None
+        }
+
+    def stack_depth(self):
+        "Evaluate the maximum stack depth required by a sequence of Java opcodes"
+        depth = 0
+        max_depth = 0
+
+        for opcode in self.opcodes:
+            depth = depth + opcode.stack_effect
+            # print("   ", opcode, depth)
+            if depth > max_depth:
+                max_depth = depth
+        return max_depth
+
+    def max_stack(self, exceptions=None):
+        stack_depth = self.stack_depth()
+        if exceptions:
+            return stack_depth + len(exceptions)
+        else:
+            return stack_depth
+
+    def max_locals(self):
+        return len(self.active_local_vars) + len(self.deleted_vars)
+
 
 class Block(Accumulator):
     def __init__(self, parent=None, verbosity=0):
@@ -77,14 +107,6 @@ class Block(Accumulator):
         self.unknown_jump_targets = {}
         self.returns = {
             'annotation': None
-        }
-
-    @property
-    def active_local_vars(self):
-        return {
-            name: index
-            for name, index in self.local_vars.items()
-            if index is not None
         }
 
     def store_name(self, name):
@@ -363,18 +385,6 @@ class Block(Accumulator):
             free_name('#EXCEPTION#')
         )
 
-    def stack_depth(self):
-        "Evaluate the maximum stack depth required by a sequence of Java opcodes"
-        depth = 0
-        max_depth = 0
-
-        for opcode in self.opcodes:
-            depth = depth + opcode.stack_effect
-            # print("   ", opcode, depth)
-            if depth > max_depth:
-                max_depth = depth
-        return max_depth
-
     def visitor_setup(self):
         """Tweak the bytecode generated for this block."""
         pass
@@ -512,8 +522,8 @@ class Block(Accumulator):
         line_number_table = LineNumberTable(line_numbers)
 
         return JavaCode(
-            max_stack=self.stack_depth() + len(exceptions),
-            max_locals=len(self.active_local_vars) + len(self.deleted_vars),
+            max_stack=self.max_stack(exceptions),
+            max_locals=self.max_locals(),
             code=self.opcodes,
             exceptions=exceptions,
             attributes=[

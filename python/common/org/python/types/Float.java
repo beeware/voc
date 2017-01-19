@@ -37,6 +37,23 @@ public class Float extends org.python.types.Object {
         this.value = value;
     }
 
+    @org.python.Method(
+        name = "float",
+        __doc__ = "float(x) -> floating point number" +
+            "\n" +
+            "Convert a string or number to a floating point number, if possible.\n",
+        args = {"x"}
+    )
+    public Float(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        try {
+            this.value = ((org.python.types.Float) args[0].__float__()).value;
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError(
+                "float() argument must be a string or a number, not '" + args[0].typeName() + "'"
+            );
+        }
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("float.__new__() has not been implemented.");
     // }
@@ -580,14 +597,14 @@ public class Float extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Int __int__() {
+    public org.python.Object __int__() {
         return new org.python.types.Int((int) this.value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Float __float__() {
+    public org.python.Object __float__() {
         return new org.python.types.Float(this.value);
     }
 

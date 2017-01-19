@@ -1,4 +1,4 @@
-from ...java import opcodes as JavaOpcodes
+from ...java import opcodes as JavaOpcodes, Classref as JavaClassref
 
 from . import java as Java
 
@@ -35,8 +35,12 @@ class Iterable:
 
 class Type:
     class for_class:
+        def __init__(self, name):
+            self.name = name
+
         def process(self, context):
             context.add_opcodes(
+                JavaOpcodes.LDC_W(JavaClassref(self.name)),
                 JavaOpcodes.INVOKESTATIC(
                     'org/python/types/Type',
                     'pythonType',

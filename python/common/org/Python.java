@@ -12,74 +12,129 @@ public class Python {
     static {
         // Load all the builtins into the dictionary as callables
         builtins = new java.util.HashMap<java.lang.String, org.python.Object>();
-        org.Python.initializeModule(org.Python.class, builtins);
+
+        // Add the most basic type
+        builtins.put("object", org.python.types.Type.pythonType(org.python.types.Object.class));
+
+        // Add the constants
+        builtins.put("Ellipsis", org.python.types.Ellipsis.ELLIPSIS);
+        builtins.put("None", org.python.types.NoneType.NONE);
+        builtins.put("NotImplemented", org.python.types.NotImplementedType.NOT_IMPLEMENTED);
+        builtins.put("True", org.python.types.Bool.TRUE);
+        builtins.put("False", org.python.types.Bool.FALSE);
+
+        // Primitives, which are both functions and types.
+        builtins.put("bool", org.python.types.Type.pythonType(org.python.types.Bool.class));
+        builtins.put("bytearray", org.python.types.Type.pythonType(org.python.types.ByteArray.class));
+        builtins.put("bytes", org.python.types.Type.pythonType(org.python.types.Bytes.class));
+        builtins.put("complex", org.python.types.Type.pythonType(org.python.types.Complex.class));
+        builtins.put("dict", org.python.types.Type.pythonType(org.python.types.Dict.class));
+        builtins.put("int", org.python.types.Type.pythonType(org.python.types.Int.class));
+        builtins.put("float", org.python.types.Type.pythonType(org.python.types.Float.class));
+        builtins.put("frozenset", org.python.types.Type.pythonType(org.python.types.FrozenSet.class));
+        builtins.put("list", org.python.types.Type.pythonType(org.python.types.List.class));
+        builtins.put("memoryview", org.python.types.Type.pythonType(org.python.types.MemoryView.class));
+        builtins.put("set", org.python.types.Type.pythonType(org.python.types.Set.class));
+        builtins.put("str", org.python.types.Type.pythonType(org.python.types.Str.class));
+        builtins.put("tuple", org.python.types.Type.pythonType(org.python.types.Tuple.class));
 
         // Add all the builtin exceptions
+        builtins.put("BaseException", org.python.types.Type.pythonType(org.python.exceptions.BaseException.class));
+
+        builtins.put("SystemExit", org.python.types.Type.pythonType(org.python.exceptions.SystemExit.class));
+        builtins.put("KeyboardInterrupt", org.python.types.Type.pythonType(org.python.exceptions.KeyboardInterrupt.class));
+        builtins.put("GeneratorExit", org.python.types.Type.pythonType(org.python.exceptions.GeneratorExit.class));
+        builtins.put("Exception", org.python.types.Type.pythonType(org.python.exceptions.Exception.class));
+
+        // subclasses of Exception
+        builtins.put("StopIteration", org.python.types.Type.pythonType(org.python.exceptions.StopIteration.class));
+        // New in Python 3.5: builtins.put("StopAsyncIteration", org.python.types.Type.pythonType(org.python.exceptions.StopAsyncIteration.class));
         builtins.put("ArithmeticError", org.python.types.Type.pythonType(org.python.exceptions.ArithmeticError.class));
         builtins.put("AssertionError", org.python.types.Type.pythonType(org.python.exceptions.AssertionError.class));
         builtins.put("AttributeError", org.python.types.Type.pythonType(org.python.exceptions.AttributeError.class));
-        builtins.put("BaseException", org.python.types.Type.pythonType(org.python.exceptions.BaseException.class));
-        builtins.put("BlockingIOError", org.python.types.Type.pythonType(org.python.exceptions.BlockingIOError.class));
-        builtins.put("BrokenPipeError", org.python.types.Type.pythonType(org.python.exceptions.BrokenPipeError.class));
         builtins.put("BufferError", org.python.types.Type.pythonType(org.python.exceptions.BufferError.class));
-        builtins.put("BytesWarning", org.python.types.Type.pythonType(org.python.exceptions.BytesWarning.class));
-        builtins.put("ChildProcessError", org.python.types.Type.pythonType(org.python.exceptions.ChildProcessError.class));
-        builtins.put("ConnectionAbortedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionAbortedError.class));
-        builtins.put("ConnectionError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionError.class));
-        builtins.put("ConnectionRefusedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionRefusedError.class));
-        builtins.put("ConnectionResetError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionResetError.class));
-        builtins.put("DeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.DeprecationWarning.class));
         builtins.put("EOFError", org.python.types.Type.pythonType(org.python.exceptions.EOFError.class));
-        builtins.put("EnvironmentError", org.python.types.Type.pythonType(org.python.exceptions.EnvironmentError.class));
-        builtins.put("Exception", org.python.types.Type.pythonType(org.python.exceptions.Exception.class));
-        builtins.put("FileExistsError", org.python.types.Type.pythonType(org.python.exceptions.FileExistsError.class));
-        builtins.put("FileNotFoundError", org.python.types.Type.pythonType(org.python.exceptions.FileNotFoundError.class));
-        builtins.put("FloatingPointError", org.python.types.Type.pythonType(org.python.exceptions.FloatingPointError.class));
-        builtins.put("FutureWarning", org.python.types.Type.pythonType(org.python.exceptions.FutureWarning.class));
-        builtins.put("GeneratorExit", org.python.types.Type.pythonType(org.python.exceptions.GeneratorExit.class));
-        builtins.put("IOError", org.python.types.Type.pythonType(org.python.exceptions.IOError.class));
         builtins.put("ImportError", org.python.types.Type.pythonType(org.python.exceptions.ImportError.class));
-        builtins.put("ImportWarning", org.python.types.Type.pythonType(org.python.exceptions.ImportWarning.class));
-        builtins.put("IndentationError", org.python.types.Type.pythonType(org.python.exceptions.IndentationError.class));
-        builtins.put("IndexError", org.python.types.Type.pythonType(org.python.exceptions.IndexError.class));
-        builtins.put("InterruptedError", org.python.types.Type.pythonType(org.python.exceptions.InterruptedError.class));
-        builtins.put("IsADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.IsADirectoryError.class));
-        builtins.put("KeyError", org.python.types.Type.pythonType(org.python.exceptions.KeyError.class));
-        builtins.put("KeyboardInterrupt", org.python.types.Type.pythonType(org.python.exceptions.KeyboardInterrupt.class));
         builtins.put("LookupError", org.python.types.Type.pythonType(org.python.exceptions.LookupError.class));
         builtins.put("MemoryError", org.python.types.Type.pythonType(org.python.exceptions.MemoryError.class));
         builtins.put("NameError", org.python.types.Type.pythonType(org.python.exceptions.NameError.class));
-        builtins.put("NotADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.NotADirectoryError.class));
-        builtins.put("NotImplementedError", org.python.types.Type.pythonType(org.python.exceptions.NotImplementedError.class));
         builtins.put("OSError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class));
-        builtins.put("OverflowError", org.python.types.Type.pythonType(org.python.exceptions.OverflowError.class));
-        builtins.put("PendingDeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.PendingDeprecationWarning.class));
-        builtins.put("PermissionError", org.python.types.Type.pythonType(org.python.exceptions.PermissionError.class));
-        builtins.put("ProcessLookupError", org.python.types.Type.pythonType(org.python.exceptions.ProcessLookupError.class));
         builtins.put("ReferenceError", org.python.types.Type.pythonType(org.python.exceptions.ReferenceError.class));
-        builtins.put("ResourceWarning", org.python.types.Type.pythonType(org.python.exceptions.ResourceWarning.class));
         builtins.put("RuntimeError", org.python.types.Type.pythonType(org.python.exceptions.RuntimeError.class));
-        builtins.put("RuntimeWarning", org.python.types.Type.pythonType(org.python.exceptions.RuntimeWarning.class));
-        builtins.put("StopIteration", org.python.types.Type.pythonType(org.python.exceptions.StopIteration.class));
         builtins.put("SyntaxError", org.python.types.Type.pythonType(org.python.exceptions.SyntaxError.class));
-        builtins.put("SyntaxWarning", org.python.types.Type.pythonType(org.python.exceptions.SyntaxWarning.class));
         builtins.put("SystemError", org.python.types.Type.pythonType(org.python.exceptions.SystemError.class));
-        builtins.put("SystemExit", org.python.types.Type.pythonType(org.python.exceptions.SystemExit.class));
-        builtins.put("TabError", org.python.types.Type.pythonType(org.python.exceptions.TabError.class));
-        builtins.put("TimeoutError", org.python.types.Type.pythonType(org.python.exceptions.TimeoutError.class));
         builtins.put("TypeError", org.python.types.Type.pythonType(org.python.exceptions.TypeError.class));
-        builtins.put("UnboundLocalError", org.python.types.Type.pythonType(org.python.exceptions.UnboundLocalError.class));
-        builtins.put("UnicodeDecodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeDecodeError.class));
-        builtins.put("UnicodeEncodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeEncodeError.class));
-        builtins.put("UnicodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeError.class));
-        builtins.put("UnicodeTranslateError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeTranslateError.class));
-        builtins.put("UnicodeWarning", org.python.types.Type.pythonType(org.python.exceptions.UnicodeWarning.class));
-        builtins.put("UserWarning", org.python.types.Type.pythonType(org.python.exceptions.UserWarning.class));
         builtins.put("ValueError", org.python.types.Type.pythonType(org.python.exceptions.ValueError.class));
         builtins.put("Warning", org.python.types.Type.pythonType(org.python.exceptions.Warning.class));
+
+        // subclasses of ArithmeticError
+        builtins.put("FloatingPointError", org.python.types.Type.pythonType(org.python.exceptions.FloatingPointError.class));
+        builtins.put("OverflowError", org.python.types.Type.pythonType(org.python.exceptions.OverflowError.class));
         builtins.put("ZeroDivisionError", org.python.types.Type.pythonType(org.python.exceptions.ZeroDivisionError.class));
 
-        builtins.put("NotImplemented", org.python.types.NotImplementedType.NOT_IMPLEMENTED);
+        // subclasses of ImportError
+        // New in 3.6: builtins.put("ModuleNotFoundError", org.python.types.Type.pythonType(org.python.exceptions.ModuleNotFoundError.class));
+
+        // subclasses of LookupError
+        builtins.put("IndexError", org.python.types.Type.pythonType(org.python.exceptions.IndexError.class));
+        builtins.put("KeyError", org.python.types.Type.pythonType(org.python.exceptions.KeyError.class));
+
+        // subclasses of NameError
+        builtins.put("UnboundLocalError", org.python.types.Type.pythonType(org.python.exceptions.UnboundLocalError.class));
+
+        // subclasses of OSError
+        builtins.put("BlockingIOError", org.python.types.Type.pythonType(org.python.exceptions.BlockingIOError.class));
+        builtins.put("ChildProcessError", org.python.types.Type.pythonType(org.python.exceptions.ChildProcessError.class));
+        builtins.put("ConnectionError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionError.class));
+        builtins.put("FileExistsError", org.python.types.Type.pythonType(org.python.exceptions.FileExistsError.class));
+        builtins.put("FileNotFoundError", org.python.types.Type.pythonType(org.python.exceptions.FileNotFoundError.class));
+        builtins.put("InterruptedError", org.python.types.Type.pythonType(org.python.exceptions.InterruptedError.class));
+        builtins.put("IsADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.IsADirectoryError.class));
+        builtins.put("NotADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.NotADirectoryError.class));
+        builtins.put("PermissionError", org.python.types.Type.pythonType(org.python.exceptions.PermissionError.class));
+        builtins.put("ProcessLookupError", org.python.types.Type.pythonType(org.python.exceptions.ProcessLookupError.class));
+        builtins.put("TimeoutError", org.python.types.Type.pythonType(org.python.exceptions.TimeoutError.class));
+
+        builtins.put("IOError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class));
+        builtins.put("EnvironmentError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class));
+
+        // subclasses of ConnectionError
+        builtins.put("BrokenPipeError", org.python.types.Type.pythonType(org.python.exceptions.BrokenPipeError.class));
+        builtins.put("ConnectionAbortedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionAbortedError.class));
+        builtins.put("ConnectionRefusedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionRefusedError.class));
+        builtins.put("ConnectionResetError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionResetError.class));
+
+        // subclasses of RuntimeError
+        builtins.put("NotImplementedError", org.python.types.Type.pythonType(org.python.exceptions.NotImplementedError.class));
+        // new in Python 3.5: builtins.put("RecursionError", org.python.types.Type.pythonType(org.python.exceptions.RecursionError.class));
+
+        // subclasses of SyntaxError
+        builtins.put("IndentationError", org.python.types.Type.pythonType(org.python.exceptions.IndentationError.class));
+
+        // subclasses of IndentationError
+        builtins.put("TabError", org.python.types.Type.pythonType(org.python.exceptions.TabError.class));
+
+        // subclasses of ValueError
+        builtins.put("UnicodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeError.class));
+
+        // subclasses of UnicodeError
+        builtins.put("UnicodeDecodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeDecodeError.class));
+        builtins.put("UnicodeEncodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeEncodeError.class));
+        builtins.put("UnicodeTranslateError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeTranslateError.class));
+
+        // subclasses of Warning
+        builtins.put("DeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.DeprecationWarning.class));
+        builtins.put("PendingDeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.PendingDeprecationWarning.class));
+        builtins.put("RuntimeWarning", org.python.types.Type.pythonType(org.python.exceptions.RuntimeWarning.class));
+        builtins.put("SyntaxWarning", org.python.types.Type.pythonType(org.python.exceptions.SyntaxWarning.class));
+        builtins.put("UserWarning", org.python.types.Type.pythonType(org.python.exceptions.UserWarning.class));
+        builtins.put("FutureWarning", org.python.types.Type.pythonType(org.python.exceptions.FutureWarning.class));
+        builtins.put("ImportWarning", org.python.types.Type.pythonType(org.python.exceptions.ImportWarning.class));
+        builtins.put("UnicodeWarning", org.python.types.Type.pythonType(org.python.exceptions.UnicodeWarning.class));
+        builtins.put("BytesWarning", org.python.types.Type.pythonType(org.python.exceptions.BytesWarning.class));
+        builtins.put("ResourceWarning", org.python.types.Type.pythonType(org.python.exceptions.ResourceWarning.class));
+
+        org.Python.initializeModule(org.Python.class, builtins);
     }
 
     public static void debug(java.lang.String msg) {
@@ -95,43 +150,54 @@ public class Python {
     }
 
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
+        // Get the class annotation and add any properties.
+        org.python.Module mod_annotation = (org.python.Module) cls.getAnnotation(org.python.Module.class);
+        if (mod_annotation != null) {
+            java.lang.String __doc__ = mod_annotation.__doc__();
+            if (__doc__.equals("[undocumented]")) {
+                attrs.put("__doc__", org.python.types.NoneType.NONE);
+            } else {
+                attrs.put("__doc__", new org.python.types.Str(__doc__));
+            }
+        }
+
         // Iterate over every method in the class, and if the
         // method is annotated for inclusion in the Python class,
         // add a function wrapper to the type definition.
         for (java.lang.reflect.Method method: cls.getMethods()) {
-            org.python.Method annotation = method.getAnnotation(org.python.Method.class);
-            if (annotation != null) {
+            org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
+            if (cls_annotation != null) {
                 java.lang.String method_name;
                 java.lang.String varargs_name;
                 java.lang.String kwargs_name;
 
                 // Check for any explicitly set names
-                if (annotation.name().equals("")) {
+                if (cls_annotation.name().equals("")) {
                     method_name = method.getName();
                 } else {
-                    method_name = annotation.name();
+                    method_name = cls_annotation.name();
                 }
 
-                if (annotation.varargs().equals("")) {
+                if (cls_annotation.varargs().equals("")) {
                     varargs_name = null;
                 } else {
-                    varargs_name = annotation.varargs();
+                    varargs_name = cls_annotation.varargs();
                 }
 
-                if (annotation.kwargs().equals("")) {
+                if (cls_annotation.kwargs().equals("")) {
                     kwargs_name = null;
                 } else {
-                    kwargs_name = annotation.kwargs();
+                    kwargs_name = cls_annotation.kwargs();
                 }
 
                 attrs.put(
                     method_name,
                     new org.python.types.Function(
                         method,
-                        annotation.args(),
-                        annotation.default_args(),
+                        cls_annotation.args(),
+                        cls_annotation.default_args(),
                         varargs_name,
-                        annotation.kwonlyargs(),
+                        cls_annotation.kwonlyargs(),
                         kwargs_name
                     )
                 );
@@ -350,7 +416,7 @@ public class Python {
                 number.__index__();
             }
 
-            String s = Long.toString(int_cast(number, null).value, 2);
+            java.lang.String s = java.lang.Long.toString(((org.python.types.Int) number.__int__()).value, 2);
             if (s.charAt(0) == '-') {
                 s = "-0b" + s.substring(1);
             } else {
@@ -360,119 +426,6 @@ public class Python {
         } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError("'" + number.typeName() + "' object cannot be interpreted as an integer");
         }
-    }
-
-    @org.python.Method(
-        __doc__ = "bool(x) -> bool" +
-            "\n" +
-            "Returns True when the argument x is true, False otherwise.\n" +
-            "The builtins True and False are the only two instances of the class bool.\n" +
-            "The class bool is a subclass of the class int, and cannot be subclassed.\n",
-        default_args = {"x"}
-    )
-    public static org.python.types.Bool bool(org.python.Object x) {
-        if (x == null) {
-            return new org.python.types.Bool(false);
-        }
-        try {
-            return (org.python.types.Bool) x.__bool__();
-        } catch (org.python.exceptions.AttributeError ae) {
-            try {
-                return new org.python.types.Bool(((org.python.types.Int) x.__len__()).value != 0);
-            } catch (org.python.exceptions.AttributeError ae2) {
-                return new org.python.types.Bool(true);
-            }
-        }
-    }
-
-    @org.python.Method(
-        __doc__ = "bytearray(iterable_of_ints) -> bytearray" +
-            "bytearray(string, encoding[, errors]) -> bytearray\n" +
-            "bytearray(bytes_or_buffer) -> mutable copy of bytes_or_buffer\n" +
-            "bytearray(int) -> bytes array of size given by the parameter initialized with null bytes\n" +
-            "bytearray() -> empty bytes array\n" +
-            "\n" +
-            "Construct an mutable bytearray object from:\n" +
-            " - an iterable yielding integers in range(256)\n" +
-            " - a text string encoded using the specified encoding\n" +
-            " - a bytes or a buffer object\n" +
-            " - any object implementing the buffer API.\n" +
-            " - an integer\n",
-        default_args = {"source", "encoding", "errors"}
-    )
-    public static org.python.types.ByteArray bytearray(org.python.Object source, org.python.Object encoding, org.python.Object errors) {
-        if (source == null) {
-            // bytearray()
-            return new org.python.types.ByteArray();
-        } else {
-            if (encoding == null) {
-                if (source instanceof org.python.types.Int) {
-                    // bytearray(int)
-                    return new org.python.types.ByteArray((int)((org.python.types.Int) source.__int__()).value);
-                }
-                org.python.Iterable iterator = null;
-                try {
-                    iterator = org.Python.iter(source);
-                } catch (org.python.exceptions.TypeError e) {
-                    // Not an iterator
-                }
-                if (iterator != null) {
-                    // bytearray(iterable_of_ints)
-                    java.util.List<Byte> generated = new java.util.ArrayList<Byte>();
-                    try {
-                        while (true) {
-                            org.python.Object next = iterator.__next__();
-                            if (next instanceof org.python.types.Int) {
-                                long value = ((org.python.types.Int) next.__int__()).value;
-                                if ((value < 0) || (value > 255)) {
-                                    throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
-                                } else {
-                                    generated.add(new Byte((byte)value));
-                                }
-                            } else if (next instanceof org.python.types.Str) {
-                                // TODO: Can take ASCII single-character strings
-                                throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with strings not implemented");
-                            }
-                        }
-                    } catch (org.python.exceptions.StopIteration si) {
-                    }
-                    byte[] primative_bytes = new byte[generated.size()];
-                    for(int i = 0; i < primative_bytes.length; i++) {
-                        primative_bytes[i] = generated.get(i);
-                    }
-                    return new org.python.types.ByteArray(primative_bytes);
-                } else {
-                    // bytearray(bytes_or_buffer)
-                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with bytes_or_buffer not implemented");
-                }
-            } else {
-                // bytearray(string, encoding[, errors])
-                if (errors == null) {
-                    // bytearray(string, encoding)
-                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
-                } else {
-                    // bytearray(string, encoding, errors)
-                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
-                }
-            }
-        }
-    }
-
-    @org.python.Method(
-        __doc__ = "bytes(iterable_of_ints) -> bytes" +
-            "bytes(string, encoding[, errors]) -> bytes\n" +
-            "bytes(bytes_or_buffer) -> immutable copy of bytes_or_buffer\n" +
-            "bytes(int) -> bytes object of size given by the parameter initialized with null bytes\n" +
-            "bytes() -> empty bytes object\n" +
-            "\n" +
-            "Construct an immutable array of bytes from:\n" +
-            " - an iterable yielding integers in range(256)\n" +
-            " - a text string encoded using the specified encoding\n" +
-            " - any object implementing the buffer API.\n" +
-            " - an integer\n"
-    )
-    public static org.python.types.Bytes bytes() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytes' not implemented");
     }
 
     @org.python.Method(
@@ -505,7 +458,7 @@ public class Python {
 
             long value = ((org.python.types.Int) i.__int__()).value;
             if (value < 0) {
-                throw new org.python.exceptions.ValueError("chr() arg not in range(" + String.format("0x%x", (int) int_cast(i, null).value) + ")");
+                throw new org.python.exceptions.ValueError("chr() arg not in range(" + String.format("0x%x", (int) ((org.python.types.Int) i.__int__()).value) + ")");
             }
 
             return new org.python.types.Str(Character.toChars((int) value)[0]);
@@ -559,68 +512,6 @@ public class Python {
     }
 
     @org.python.Method(
-        __doc__ = "complex(real[, imag]) -> complex number" +
-            "\n" +
-            "Create a complex number from a real part and an optional imaginary part.\n" +
-            "This is equivalent to (real + imag*1j) where imag defaults to 0.\n",
-        default_args = {"real", "imag"}
-    )
-    public static org.python.types.Complex complex(org.python.Object real, org.python.Object imag) {
-        org.python.types.Float real_val = new org.python.types.Float(0);
-        org.python.types.Float imag_val = new org.python.types.Float(0);
-        if (real instanceof org.python.types.Str && imag != null) {
-            throw new org.python.exceptions.TypeError("complex() can't take second arg if first is a string");
-        }
-        if (imag instanceof org.python.types.Str) {
-            throw new org.python.exceptions.TypeError("complex() second arg can't be a string");
-        }
-        if (real instanceof org.python.types.Complex) {
-            org.python.types.Complex real_cmplx_obj = (org.python.types.Complex) real;
-            real_val = (org.python.types.Float) real_val.__add__(real_cmplx_obj.real);
-            imag_val = (org.python.types.Float) imag_val.__add__(real_cmplx_obj.imag);
-        }
-        else {
-            try {
-                real_val = Python.float_cast(real == null ? new org.python.types.Float(0) : real);
-            } catch (org.python.exceptions.TypeError e) {
-                if (org.Python.VERSION < 0x03060000) {
-                    throw new org.python.exceptions.TypeError(
-                        "complex() argument must be a string or a number, not '" + real.typeName() + "'"
-                    );
-                } else {
-                    throw new org.python.exceptions.TypeError(
-                        "complex() first argument must be a string or a number, not '" + real.typeName() + "'"
-                    );
-                }
-            } catch (org.python.exceptions.ValueError e) {
-                throw new org.python.exceptions.ValueError("complex() arg is a malformed string");
-            }
-        }
-        if (imag instanceof org.python.types.Complex) {
-            org.python.types.Complex imag_cmplx_obj = (org.python.types.Complex) imag;
-            real_val = (org.python.types.Float) real_val.__sub__(imag_cmplx_obj.imag);
-            imag_val = (org.python.types.Float) imag_val.__add__(imag_cmplx_obj.real);
-        }
-        else {
-            try {
-                imag_val = (org.python.types.Float)imag_val.__add__(Python.float_cast(imag == null ? new org.python.types.Float(0) : imag));
-            } catch (org.python.exceptions.TypeError e) {
-                if (org.Python.VERSION < 0x03040300) {
-                    throw new org.python.exceptions.TypeError(
-                        "complex() argument must be a string or a number, not '" + imag.typeName() + "'"
-                    );
-                } else {
-                    throw new org.python.exceptions.TypeError(
-                        "complex() argument must be a string, a bytes-like object or a number, not '" +
-                            imag.typeName() + "'"
-                    );
-                }
-            }
-        }
-        return new org.python.types.Complex(real_val, imag_val);
-    }
-
-    @org.python.Method(
         __doc__ = "interactive prompt objects for printing the license text, a list of" +
             "contributors and the copyright notice.\n"
     )
@@ -666,63 +557,6 @@ public class Python {
     public static org.python.Object delattr(org.python.Object object, org.python.Object name) {
         object.__delattr__(name);
         return org.python.types.NoneType.NONE;
-    }
-
-    @org.python.Method(
-        __doc__ = "dict() -> new empty dictionary" +
-            "dict(mapping) -> new dictionary initialized from a mapping object's\n" +
-            "    (key, value) pairs\n" +
-            "dict(iterable) -> new dictionary initialized as if via:\n" +
-            "    d = {}\n" +
-            "    for k, v in iterable:\n" +
-            "        d[k] = v\n" +
-            "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" +
-            "    in the keyword argument list.  For example:  dict(one=1, two=2)\n",
-        default_args = {"iterable"}
-    )
-    public static org.python.types.Dict dict(org.python.Object iterable) {
-        if (iterable == null) {
-            return new org.python.types.Dict();
-        } else {
-            if (iterable instanceof org.python.types.Dict) {
-                return new org.python.types.Dict(
-                    new java.util.HashMap<org.python.Object, org.python.Object>(
-                        ((org.python.types.Dict) iterable).value
-                    )
-                );
-            } else {
-                org.python.Iterable iterator = org.Python.iter(iterable);
-                java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
-                try {
-                    while (true) {
-                        org.python.Object next = iterator.__next__();
-                        java.util.List<org.python.Object> data;
-                        if (next instanceof org.python.types.Tuple) {
-                            data = ((org.python.types.Tuple) next).value;
-                        } else if (next instanceof org.python.types.List) {
-                            data = ((org.python.types.List) next).value;
-                        } else {
-                            throw new org.python.exceptions.TypeError(
-                                "cannot convert dictionary update sequence element #" + generated.size() +
-                                    " to a sequence"
-                            );
-                        }
-
-                        if (data.size() != 2) {
-                            throw new org.python.exceptions.ValueError(
-                                "dictionary update sequence element #" + generated.size() +
-                                    " has length " + data.size() +
-                                    "; 2 is required"
-                            );
-                        }
-
-                        generated.put(data.get(0), data.get(1));
-                    }
-                } catch (org.python.exceptions.StopIteration si) {
-                }
-                return new org.python.types.Dict(generated);
-            }
-        }
     }
 
     @org.python.Method(
@@ -815,23 +649,6 @@ public class Python {
     }
 
     @org.python.Method(
-        name = "float",
-        __doc__ = "float(x) -> floating point number" +
-            "\n" +
-            "Convert a string or number to a floating point number, if possible.\n",
-        args = {"x"}
-    )
-    public static org.python.types.Float float_cast(org.python.Object x) {
-        try {
-            return (org.python.types.Float) x.__float__();
-        } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError(
-                "float() argument must be a string or a number, not '" + x.typeName() + "'"
-            );
-        }
-    }
-
-    @org.python.Method(
         __doc__ = "format(value[, format_spec]) -> string" +
             "\n" +
             "Returns value.__format__(format_spec)\n" +
@@ -845,16 +662,6 @@ public class Python {
         } else {
             return (org.python.types.Str) value.__format__(format_spec);
         }
-    }
-
-    @org.python.Method(
-        __doc__ = "frozenset() -> empty frozenset object" +
-            "frozenset(iterable) -> frozenset object\n" +
-            "\n" +
-            "Build an immutable unordered collection of unique elements.\n"
-    )
-    public static org.python.types.FrozenSet frozenset() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'frozenset' not implemented");
     }
 
     @org.python.Method(
@@ -945,7 +752,7 @@ public class Python {
                 number.__index__();
             }
 
-            String s = Long.toString(int_cast(number, null).value, 16);
+            String s = Long.toString(((org.python.types.Int) number.__int__()).value, 16);
             if (s.charAt(0) == '-') {
                 s = "-0x" + s.substring(1);
             } else {
@@ -993,57 +800,32 @@ public class Python {
     }
 
     @org.python.Method(
-        name = "int",
-        __doc__ = "int(x=0) -> integer" +
-            "int(x, base=10) -> integer\n" +
-            "\n" +
-            "Convert a number or string to an integer, or return 0 if no arguments\n" +
-            "are given.  If x is a number, return x.__int__().  For floating point\n" +
-            "numbers, this truncates towards zero.\n" +
-            "\n" +
-            "If x is not a number or if base is given, then x must be a string,\n" +
-            "bytes, or bytearray instance representing an integer literal in the\n" +
-            "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" +
-            "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" +
-            "Base 0 means to interpret the base from the string as an integer literal.\n" +
-            "\n" +
-            "  >>> int('0b100', base=0)\n" +
-            "  4\n",
-        default_args = {"x", "base"}
-    )
-    public static org.python.types.Int int_cast(org.python.Object x, org.python.Object base) {
-        if (x == null) {
-            return new org.python.types.Int(0);
-        } else if (base == null) {
-            try {
-                return (org.python.types.Int) x.__int__();
-            } catch (org.python.exceptions.AttributeError ae) {
-                if (org.Python.VERSION < 0x03040300) {
-                    throw new org.python.exceptions.TypeError(
-                        "int() argument must be a string or a number, not '" + x.typeName() + "'"
-                    );
-                } else {
-                    throw new org.python.exceptions.TypeError(
-                        "int() argument must be a string, a bytes-like object or a number, not '" +
-                            x.typeName() + "'"
-                    );
-                }
-            }
-        } else {
-            throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
-        }
-    }
-
-    @org.python.Method(
         __doc__ = "isinstance(object, class-or-type-or-tuple) -> bool" +
             "\n" +
             "Return whether an object is an instance of a class or of a subclass thereof.\n" +
             "With a type as second argument, return whether that is the object's type.\n" +
             "The form using a tuple, isinstance(x, (A, B, ...)), is a shortcut for\n" +
-            "isinstance(x, A) or isinstance(x, B) or ... (etc.).\n"
+            "isinstance(x, A) or isinstance(x, B) or ... (etc.).\n",
+        default_args = {"object", "class_or_type_or_tuple"}
     )
-    public static org.python.types.Bool isinstance() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'isinstance' not implemented");
+    public static org.python.types.Bool isinstance(org.python.Object object, org.python.Object class_or_type_or_tuple) {
+        if (object == null) {
+            throw new org.python.exceptions.TypeError("isinstance expected 2 arguments, got 0");
+        } else if (class_or_type_or_tuple == null) {
+            throw new org.python.exceptions.TypeError("isinstance expected 2 arguments, got 1");
+        } else if (class_or_type_or_tuple instanceof org.python.types.Tuple) {
+            java.util.List<org.python.Object> classes = ((org.python.types.Tuple) class_or_type_or_tuple).value;
+            for (org.python.Object klass: classes) {
+                if (((org.python.types.Bool) org.Python.isinstance(object, klass).__bool__()).value) {
+                    return new org.python.types.Bool(true);
+                };
+            }
+            return new org.python.types.Bool(false);
+        } else if (class_or_type_or_tuple instanceof org.python.types.Type) {
+            return new org.python.types.Bool(object.type() == class_or_type_or_tuple);
+        } else {
+            throw new org.python.exceptions.TypeError("isinstance() arg 2 must be a type or tuple of types");
+        }
     }
 
     @org.python.Method(
@@ -1105,48 +887,6 @@ public class Python {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'license' not implemented");
     }
 
-    @org.python.Method(
-        __doc__ = "list() -> new empty list" +
-            "list(iterable) -> new list initialized from iterable's items\n",
-        default_args = {"iterable"}
-    )
-    public static org.python.types.List list(org.python.Object iterable) {
-        if (iterable == null) {
-            return new org.python.types.List();
-        } else {
-            if (iterable instanceof org.python.types.List) {
-                return new org.python.types.List(
-                    new java.util.ArrayList<org.python.Object>(
-                        ((org.python.types.List) iterable).value
-                    )
-                );
-            } else if (iterable instanceof org.python.types.Set) {
-                return new org.python.types.List(
-                    new java.util.ArrayList<org.python.Object>(
-                        ((org.python.types.Set) iterable).value
-                    )
-                );
-            } else if (iterable instanceof org.python.types.Tuple) {
-                return new org.python.types.List(
-                    new java.util.ArrayList<org.python.Object>(
-                        ((org.python.types.Tuple) iterable).value
-                    )
-                );
-            } else {
-                org.python.Iterable iterator = org.Python.iter(iterable);
-                java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
-                try {
-                    while (true) {
-                        org.python.Object next = iterator.__next__();
-                        generated.add(next);
-                    }
-                } catch (org.python.exceptions.StopIteration si) {
-                }
-                return new org.python.types.List(generated);
-            }
-        }
-    }
-
     // @org.python.Method(
     //     __doc__ = "locals() -> dictionary" +
     //         "\n" +
@@ -1179,15 +919,6 @@ public class Python {
     )
     public static org.python.Object max() {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'max' not implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "memoryview(object)" +
-            "\n" +
-            "Create a new memoryview object which references the given object.\n"
-    )
-    public static org.python.types.MemoryView memoryview() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'memoryview' not implemented");
     }
 
     @org.python.Method(
@@ -1228,13 +959,6 @@ public class Python {
     }
 
     @org.python.Method(
-        __doc__ = "The most base type"
-    )
-    public static org.python.types.Object object() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'object' not implemented");
-    }
-
-    @org.python.Method(
         __doc__ = "oct(number) -> string" +
             "\n" +
             "Return the octal representation of an integer.\n" +
@@ -1249,7 +973,7 @@ public class Python {
                 number.__index__();
             }
 
-            String s = Long.toString(int_cast(number, null).value, 8);
+            String s = Long.toString(((org.python.types.Int) number.__int__()).value, 8);
             if (s.charAt(0) == '-') {
                 s = "-0o" + s.substring(1);
             } else {
@@ -1408,7 +1132,7 @@ public class Python {
         try {
             int length = ((org.python.types.Str) c).value.length();
             if (length == 1) {
-                return new org.python.types.Int((int) (org.Python.str(c).value).charAt(0));
+                return new org.python.types.Int((int) (((org.python.types.Str) c.__str__()).value).charAt(0));
             } else {
                 throw new org.python.exceptions.TypeError("ord() expected a character, but string of length " + length + " found");
             }
@@ -1590,50 +1314,6 @@ public class Python {
     }
 
     @org.python.Method(
-        __doc__ = "set() -> new empty set object" +
-            "set(iterable) -> new set object\n" +
-            "\n" +
-            "Build an unordered collection of unique elements.\n",
-        default_args = {"iterable"}
-    )
-    public static org.python.types.Set set(org.python.Object iterable) {
-        if (iterable == null) {
-            return new org.python.types.Set();
-        } else {
-            if (iterable instanceof org.python.types.Set) {
-                return new org.python.types.Set(
-                    new java.util.HashSet<org.python.Object>(
-                        ((org.python.types.Set) iterable).value
-                    )
-                );
-            } else if (iterable instanceof org.python.types.List) {
-                return new org.python.types.Set(
-                    new java.util.HashSet<org.python.Object>(
-                        ((org.python.types.List) iterable).value
-                    )
-                );
-            } else if (iterable instanceof org.python.types.Tuple) {
-                return new org.python.types.Set(
-                    new java.util.HashSet<org.python.Object>(
-                        ((org.python.types.Tuple) iterable).value
-                    )
-                );
-            } else {
-                org.python.Iterable iterator = org.Python.iter(iterable);
-                java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
-                try {
-                    while (true) {
-                        org.python.Object next = iterator.__next__();
-                        generated.add(next);
-                    }
-                } catch (org.python.exceptions.StopIteration si) {
-                }
-                return new org.python.types.Set(generated);
-            }
-        }
-    }
-
-    @org.python.Method(
         __doc__ = "setattr(object, name, value)" +
             "\n" +
             "Set a named attribute on an object; setattr(x, 'y', v) is equivalent to\n" +
@@ -1753,26 +1433,6 @@ public class Python {
     }
 
     @org.python.Method(
-        __doc__ = "str(object='') -> str" +
-            "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" +
-            "\n" +
-            "Create a new string object from the given object. If encoding or\n" +
-            "errors is specified, then the object must expose a data buffer\n" +
-            "that will be decoded using the given encoding and error handler.\n" +
-            "Otherwise, returns the result of object.__str__() (if defined)\n" +
-            "or repr(object).\n" +
-            "encoding defaults to sys.getdefaultencoding().\n" +
-            "errors defaults to 'strict'.\n",
-        default_args = {"object"}
-    )
-    public static org.python.types.Str str(org.python.Object object) {
-        if (object == null) {
-            return new org.python.types.Str("");
-        }
-        return (org.python.types.Str) object.__str__();
-    }
-
-    @org.python.Method(
         __doc__ = "sum(iterable[, start]) -> value" +
             "\n" +
             "Return the sum of an iterable of numbers (NOT strings) plus the value\n" +
@@ -1804,36 +1464,6 @@ public class Python {
     }
 
     @org.python.Method(
-        name = "super",
-        __doc__ = "super() -> same as super(__class__, <first argument>)" +
-            "super(type) -> unbound super object\n" +
-            "super(type, obj) -> bound super object; requires isinstance(obj, type)\n" +
-            "super(type, type2) -> bound super object; requires issubclass(type2, type)\n" +
-            "Typical use to call a cooperative superclass method:\n" +
-            "class C(B):\n" +
-            "def meth(self, arg):\n" +
-            "   super().meth(arg)\n" +
-            "This works for class methods too:\n" +
-            "class C(B):\n" +
-            "@classmethod\n" +
-            "def cmeth(cls, arg):\n" +
-            "   super().cmeth(arg)\n"
-    )
-    public static org.python.Object super_call() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'super' not implemented");
-    }
-
-    @org.python.Method(
-        __doc__ = "tuple() -> empty tuple" +
-            "tuple(iterable) -> tuple initialized from iterable's items\n" +
-            "\n" +
-            "If the argument is a tuple, the return value is the same object.\n"
-    )
-    public static org.python.types.Tuple tuple() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
-    }
-
-    @org.python.Method(
         __doc__ = "type(object_or_name, bases, dict)" +
             "type(object) -> the object's type\n" +
             "type(name, bases, dict) -> a new type\n",
@@ -1848,7 +1478,7 @@ public class Python {
         if (bases == null && dict == null) {
             return org.python.types.Type.pythonType(object_or_name.getClass());
         } else {
-            throw new org.python.exceptions.NotImplementedError("3-argument form of builtin function 'type' not implemented");
+            return org.python.types.Type.declarePythonType(object_or_name, bases, dict);
         }
     }
 

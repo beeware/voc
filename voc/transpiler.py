@@ -70,7 +70,7 @@ class Transpiler:
             os.path.abspath(filename)
         ])
 
-        self.transpile_code(os.path.abspath(filename)[len(common):], ast_module)
+        self.transpile_code(os.path.abspath(filename)[len(common) + 1:], ast_module)
 
     def transpile_string(self, filename, code_string):
         "Transpile a string containing Python code into class files"

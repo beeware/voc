@@ -19,7 +19,7 @@ from .types.primitives import (
 class Class(Block):
     def __init__(
             self, module, name,
-            namespace=None, bases=None, extends=None, implements=None,
+            namespace=None, extends=None, implements=None,
             public=True, final=False, methods=None, fields=None, init=None,
             verbosity=0, include_default_constructor=True):
         super().__init__(parent=module, verbosity=verbosity)
@@ -29,7 +29,6 @@ class Class(Block):
         else:
             self.namespace = namespace
 
-        self.bases = bases if bases else []
         self._extends = extends
 
         self.implements = implements if implements else []
@@ -63,10 +62,10 @@ class Class(Block):
 
     def visitor_setup(self):
         self.add_opcodes(
-            # DEBUG("STATIC BLOCK OF " + self.klass.descriptor),
-
-            # Force the loading and instantiation of the module
-            # that contains the class.
+            # DEBUG("DEFINITION BLOCK OF " + self.descriptor),
+            # Force the loading and instantiation of the python module
+            # that defines the class.
+            # This may already be imported, but just in case
             JavaOpcodes.LDC_W(self.module.full_name),
             JavaOpcodes.ACONST_NULL(),
             JavaOpcodes.ACONST_NULL(),
@@ -86,47 +85,8 @@ class Class(Block):
             ),
             JavaOpcodes.POP(),
 
-            # Set __base__ on the type
-            python.Type.for_name(self.descriptor),
-            python.Type.for_name(self.extends_descriptor),
-
-            # DEBUG_value("__base__ for %s should be %s; is" % (self.klass, self.extends_descriptor), dup=True),
-
-            JavaOpcodes.PUTFIELD('org/python/types/Type', '__base__', 'Lorg/python/types/Type;'),
-
-            # Set __bases__ on the type
-            python.Type.for_name(self.descriptor),
-
-            java.New('org/python/types/Tuple'),
-            java.List(),
-        )
-
-        if self.extends:
-            self.add_opcodes(
-                JavaOpcodes.DUP(),
-                python.Str(self.extends.replace('.', '/')),
-                java.List.add(),
-            )
-
-        for base in self.bases:
-            base_namespace = self.namespace.replace('.', '/') + '/'
-            self.add_opcodes(
-                JavaOpcodes.DUP(),
-                python.Str(base if base.startswith('org/python/') else base_namespace + base),
-                java.List.add()
-            )
-
-        self.add_opcodes(
-            java.Init('org/python/types/Tuple', 'Ljava/util/List;'),
-
-            JavaOpcodes.PUTFIELD('org/python/types/Type', '__bases__', 'Lorg/python/types/Tuple;'),
-
-            # Load the globals module
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
-
+            # Set the module name
             python.Str(self.module.full_name),
-
-            python.Object.get_item(),
         )
 
         self.store_name('__module__')
@@ -137,13 +97,13 @@ class Class(Block):
         self.store_name('__qualname__')
 
         # self.add_opcodes(
-        #     DEBUG("STATIC BLOCK OF " + self.klass.descriptor + " DONE"),
+        #     DEBUG("DEFINITION BLOCK OF " + self.descriptor + " DONE"),
         # )
 
     def store_name(self, name):
         self.add_opcodes(
             ASTORE_name('#value'),
-            python.Type.for_name(self.descriptor),
+            python.Type.for_class(self.descriptor),
 
             ALOAD_name('#value'),
             python.Object.set_attr(name),
@@ -154,7 +114,7 @@ class Class(Block):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name('#value'),
-            python.Type.for_name(self.descriptor),
+            python.Type.for_class(self.descriptor),
 
             JavaOpcodes.GETFIELD('org/python/types/Type', '__dict__', 'Ljava/util/Map;'),
             ALOAD_name('#value'),
@@ -165,7 +125,7 @@ class Class(Block):
 
     def load_name(self, name):
         self.add_opcodes(
-            python.Type.for_name(self.descriptor),
+            python.Type.for_class(self.descriptor),
             python.Object.get_attribute(name),
         )
 
@@ -232,10 +192,7 @@ class Class(Block):
         if self._extends:
             return self._extends
         else:
-            if 'Exception' in self.bases:
-                return 'org.python.exceptions.Exception'
-            else:
-                return 'org.python.types.Object'
+            return 'org.python.types.Object'
 
     @property
     def extends_descriptor(self):
@@ -267,7 +224,7 @@ class Class(Block):
 
         try:
             # If we have block content, add a static block to the class
-            static_init = JavaMethod('<clinit>', '()V', public=False, static=True)
+            static_init = JavaMethod('class$init', '()V', public=False, static=True)
             static_init.attributes.append(super().transpile())
             classfile.methods.append(static_init)
         except IgnoreBlock:

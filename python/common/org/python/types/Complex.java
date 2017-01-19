@@ -40,6 +40,79 @@ public class Complex extends org.python.types.Object {
         this.imag = new org.python.types.Float(imag);
     }
 
+    @org.python.Method(
+        __doc__ = "complex(real[, imag]) -> complex number" +
+            "\n" +
+            "Create a complex number from a real part and an optional imaginary part.\n" +
+            "This is equivalent to (real + imag*1j) where imag defaults to 0.\n",
+        default_args = {"real", "imag"}
+    )
+    public Complex(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        this.real = new org.python.types.Float(0);
+        this.imag = new org.python.types.Float(0);
+
+        if (args[0] instanceof org.python.types.Str && args[1] != null) {
+            throw new org.python.exceptions.TypeError("complex() can't take second arg if first is a string");
+        }
+
+        if (args[1] instanceof org.python.types.Str) {
+            throw new org.python.exceptions.TypeError("complex() second arg can't be a string");
+        }
+
+        if (args[0] instanceof org.python.types.Complex) {
+            org.python.types.Complex real_cmplx_obj = (org.python.types.Complex) args[0];
+            this.real = (org.python.types.Float) this.real.__add__(real_cmplx_obj.real);
+            this.imag = (org.python.types.Float) this.imag.__add__(real_cmplx_obj.imag);
+        } else {
+            try {
+                if (args[0] == null) {
+                    this.real = new org.python.types.Float(0);
+                } else {
+                    this.real = ((org.python.types.Float) args[0].__float__());
+                }
+
+            } catch (org.python.exceptions.AttributeError e) {
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() argument must be a string or a number, not '" + args[0].typeName() + "'"
+                    );
+                } else {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() first argument must be a string or a number, not '" + args[0].typeName() + "'"
+                    );
+                }
+            } catch (org.python.exceptions.ValueError e) {
+                throw new org.python.exceptions.ValueError("complex() arg is a malformed string");
+            }
+        }
+
+        if (args[1] instanceof org.python.types.Complex) {
+            org.python.types.Complex imag_cmplx_obj = (org.python.types.Complex) args[1];
+            this.real = (org.python.types.Float) this.real.__sub__(imag_cmplx_obj.imag);
+            this.imag = (org.python.types.Float) this.imag.__add__(imag_cmplx_obj.real);
+        } else {
+            try {
+                if (args[1] == null) {
+                    this.imag = new org.python.types.Float(0);
+                } else {
+                    this.imag = ((org.python.types.Float) args[1].__float__());
+                }
+
+            } catch (org.python.exceptions.AttributeError e) {
+                if (org.Python.VERSION < 0x03040300) {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() argument must be a string or a number, not '" + args[1].typeName() + "'"
+                    );
+                } else {
+                    throw new org.python.exceptions.TypeError(
+                        "complex() argument must be a string, a bytes-like object or a number, not '" +
+                            args[1].typeName() + "'"
+                    );
+                }
+            }
+        }
+    }
+
     private String partToStr(org.python.types.Float x) {
         String x_str;
         if (x.value != 0.0) {
@@ -89,15 +162,15 @@ public class Complex extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __repr__() {
+    public org.python.Object __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder();
         boolean real_present = true;
         if(this.real.value != 0) {
             buffer.append("(");
             if (((org.python.types.Bool)((this.real).__int__().__eq__(this.real))).value) {
-                buffer.append((this.real).__int__().__repr__().value);
+                buffer.append(((org.python.types.Str) this.real.__int__().__repr__()).value);
             } else {
-                buffer.append((this.real).__repr__().value);
+                buffer.append(((org.python.types.Str) this.real.__repr__()).value);
             }
         } else {
             real_present = false;
@@ -106,9 +179,9 @@ public class Complex extends org.python.types.Object {
             buffer.append("+");
         }
         if (((org.python.types.Bool)((this.imag).__int__().__eq__(this.imag))).value) {
-            buffer.append((this.imag).__int__().__repr__().value);
+            buffer.append(((org.python.types.Str) (this.imag).__int__().__repr__()).value);
         } else {
-            buffer.append((this.imag).__repr__().value);
+            buffer.append(((org.python.types.Str) (this.imag).__repr__()).value);
         }
         buffer.append("j");
         if(real_present) {
@@ -120,7 +193,7 @@ public class Complex extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __format__(org.python.Object format_string) {
+    public org.python.Object __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("complex.__format__ has not been implemented.");
     }
 
@@ -246,7 +319,7 @@ public class Complex extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __str__(){
+    public org.python.Object __str__(){
       if (this.real.value != 0.0 || this.real.isNegativeZero()) {
         return new org.python.types.Str("(" + partToStr(this.real) + ((this.imag.value >= 0.0 && !this.imag.isNegativeZero()) ? "+" : "-") + partToStr(new org.python.types.Float(Math.abs(this.imag.value))) + "j)");
       } else {
@@ -603,14 +676,14 @@ public class Complex extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Int __int__() {
+    public org.python.Object __int__() {
         throw new org.python.exceptions.TypeError("can't convert complex to int");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Float __float__() {
+    public org.python.Object __float__() {
         throw new org.python.exceptions.NotImplementedError("complex.__float__ has not been implemented.");
     }
 

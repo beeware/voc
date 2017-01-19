@@ -36,6 +36,44 @@ public class Set extends org.python.types.Object {
         this.value = set;
     }
 
+    @org.python.Method(
+        __doc__ = "set() -> new empty set object" +
+            "set(iterable) -> new set object\n" +
+            "\n" +
+            "Build an unordered collection of unique elements.\n",
+        default_args = {"iterable"}
+    )
+    public Set(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = new java.util.HashSet<org.python.Object>();
+        } else {
+            if (args[0] instanceof org.python.types.Set) {
+                this.value = new java.util.HashSet<org.python.Object>(
+                    ((org.python.types.Set) args[0]).value
+                );
+            } else if (args[0] instanceof org.python.types.List) {
+                this.value = new java.util.HashSet<org.python.Object>(
+                    ((org.python.types.List) args[0]).value
+                );
+            } else if (args[0] instanceof org.python.types.Tuple) {
+                this.value = new java.util.HashSet<org.python.Object>(
+                    ((org.python.types.Tuple) args[0]).value
+                );
+            } else {
+                org.python.Iterable iterator = org.Python.iter(args[0]);
+                java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
+                try {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        generated.add(next);
+                    }
+                } catch (org.python.exceptions.StopIteration si) {
+                }
+                this.value = generated;
+            }
+        }
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("__new__() has not been implemented");
     // }

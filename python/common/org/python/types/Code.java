@@ -1,20 +1,49 @@
 package org.python.types;
 
 public class Code extends org.python.types.Object {
+    @org.python.Attribute
     org.python.types.Int co_argcount;
+
+    @org.python.Attribute
     org.python.types.Tuple co_cellvars;
+
+    @org.python.Attribute
     org.python.types.Bytes co_code;
+
+    @org.python.Attribute
     org.python.types.Tuple co_consts;
+
+    @org.python.Attribute
     org.python.types.Str co_filename;
+
+    @org.python.Attribute
     org.python.types.Int co_firstlineno;
+
+    @org.python.Attribute
     org.python.types.Int co_flags;
+
+    @org.python.Attribute
     org.python.types.Tuple co_freevars;
+
+    @org.python.Attribute
     org.python.types.Int co_kwonlyargcount;
+
+    @org.python.Attribute
     org.python.types.Bytes co_lnotab;
+
+    @org.python.Attribute
     org.python.types.Str co_name;
+
+    @org.python.Attribute
     org.python.types.Tuple co_names;
+
+    @org.python.Attribute
     org.python.types.Int co_nlocals;
+
+    @org.python.Attribute
     org.python.types.Int co_stacksize;
+
+    @org.python.Attribute
     org.python.types.Tuple co_varnames;
 
     /**

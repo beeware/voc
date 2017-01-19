@@ -31,6 +31,16 @@ public class Tuple extends org.python.types.Object {
         this.value = tuple;
     }
 
+    @org.python.Method(
+        __doc__ = "tuple() -> empty tuple" +
+            "tuple(iterable) -> tuple initialized from iterable's items\n" +
+            "\n" +
+            "If the argument is a tuple, the return value is the same object.\n"
+    )
+    public Tuple(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("__new__() has not been implemented.");
     // }
@@ -52,6 +62,9 @@ public class Tuple extends org.python.types.Object {
                 buffer.append(", ");
             }
             buffer.append(obj.__repr__());
+        }
+        if (this.value.size() == 1) {
+            buffer.append(",");
         }
         buffer.append(")");
         return new org.python.types.Str(buffer.toString());
@@ -341,32 +354,9 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
-        try {
-            int idx = (int) ((org.python.types.Int) index).value;
-            if (idx < 0) {
-                if (-idx > this.value.size()) {
-                    throw new org.python.exceptions.IndexError("tuple index out of range");
-                } else {
-                    this.value.set(this.value.size() + idx, value);
-                }
-            } else {
-                if (idx >= this.value.size()) {
-                    throw new org.python.exceptions.IndexError("tuple index out of range");
-                } else {
-                    this.value.set(idx, value);
-                }
-            }
-        } catch (ClassCastException e) {
-            if (org.Python.VERSION < 0x03050000) {
-                throw new org.python.exceptions.TypeError(
-                    "tuple indices must be integers, not " + index.typeName()
-                );
-            } else {
-                throw new org.python.exceptions.TypeError(
-                    "tuple indices must be integers or slices, not " + index.typeName()
-                );
-            }
-        }
+        throw new org.python.exceptions.TypeError(
+            "'tuple' object does not support item assignment"
+        );
     }
 
     @org.python.Method(
