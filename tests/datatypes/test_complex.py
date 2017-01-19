@@ -12,6 +12,12 @@ class UnaryComplexOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'complex'
 
+    substitutions = {
+        "(-161.18751321137705+195.77962956590406j)":[
+            "(-161.18751321137705+195.77962956590403j)"
+        ]
+    }
+
     not_implemented = [
         'test_add_class',
         'test_add_frozenset',
