@@ -20,7 +20,8 @@ class PowTests(TranspileTestCase):
             z = 5
             try:
                 print(pow(x, y, z))
-            except TypeError as err:
+            except (TypeError, ValueError) as err:
+                print(type(err))
                 print(err)
         """)
 
@@ -31,7 +32,8 @@ class PowTests(TranspileTestCase):
             z = -5
             try:
                 print(pow(x, y, z))
-            except TypeError as err:
+            except (TypeError, ValueError) as err:
+                print(type(err))
                 print(err)
         """)
 
