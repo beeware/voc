@@ -13,7 +13,7 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'complex'
 
     substitutions = {
-        "(-161.18751321137705+195.77962956590406j)":[
+        "(-161.18751321137705+195.77962956590406j)": [
             "(-161.18751321137705+195.77962956590403j)"
         ]
     }
@@ -58,24 +58,8 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_or_class',
         'test_or_frozenset',
 
-        #'test_power_None',
-        #'test_power_NotImplemented',
-        #'test_power_slice',
-        #'test_power_range',
-        #'test_power_bool',
-        #'test_power_bytearray',
-        #'test_power_bytes',
         'test_power_class',
-        #'test_power_complex',
-        #'test_power_dict',
-        #'test_power_float',
         'test_power_frozenset',
-        #'test_power_int',
-        #'test_power_list',
-        #'test_power_none',
-        #'test_power_set',
-        #'test_power_str',
-        #'test_power_tuple',
 
         'test_rshift_class',
         'test_rshift_frozenset',
