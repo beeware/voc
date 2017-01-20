@@ -1,5 +1,7 @@
 from ..utils import TranspileTestCase
 
+from unittest import expectedFailure
+
 
 class FunctionTests(TranspileTestCase):
     def test_function(self):
@@ -39,6 +41,7 @@ class FunctionTests(TranspileTestCase):
             myfunc(5)
             """)
 
+    @expectedFailure
     def test_mainline(self):
         self.assertCodeExecution("""
             if __name__ == '__main__':

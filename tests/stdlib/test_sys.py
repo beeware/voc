@@ -334,6 +334,7 @@ class SysModuleTests(TranspileTestCase):
             print(sys.exit())
             """, exits_early=True)
 
+    @expectedFailure
     def test_exit(self):
         # From inside main
         self.assertCodeExecution("""
