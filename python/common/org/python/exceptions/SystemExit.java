@@ -9,8 +9,8 @@ public class SystemExit extends org.python.exceptions.BaseException {
     }
 
     public SystemExit(org.python.Object val) {
-        super(java.lang.String.format("%s", org.Python.int_cast(val, null)));
-        this.return_code = (int) org.Python.int_cast(val, null).value;
+        super(java.lang.String.format("%s", ((org.python.types.Int) val.__int__()).value));
+        this.return_code = (int) ((org.python.types.Int) val.__int__()).value;
     }
 
     public SystemExit(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {

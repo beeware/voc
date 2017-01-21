@@ -25,12 +25,37 @@ public class Str extends org.python.types.Object {
         return this.value.hashCode();
     }
 
+    public Str() {
+        this.value = "";
+    }
+
     public Str(java.lang.String str) {
         this.value = str;
     }
 
     public Str(char chr) {
         this.value = new java.lang.String(new char [] {chr});
+    }
+
+    @org.python.Method(
+        __doc__ = "str(object='') -> str" +
+            "str(bytes_or_buffer[, encoding[, errors]]) -> str\n" +
+            "\n" +
+            "Create a new string object from the given object. If encoding or\n" +
+            "errors is specified, then the object must expose a data buffer\n" +
+            "that will be decoded using the given encoding and error handler.\n" +
+            "Otherwise, returns the result of object.__str__() (if defined)\n" +
+            "or repr(object).\n" +
+            "encoding defaults to sys.getdefaultencoding().\n" +
+            "errors defaults to 'strict'.\n",
+        default_args = {"object"}
+    )
+    public Str(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = "";
+        } else {
+            this.value = ((org.python.types.Str) args[0].__str__()).value;
+        }
     }
 
     // public org.python.Object __new__() {
@@ -44,28 +69,28 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __repr__() {
+    public org.python.Object __repr__() {
         return new org.python.types.Str("'" + this.value + "'");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __str__() {
+    public org.python.Object __str__() {
         return new org.python.types.Str(this.value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Str __format__(org.python.Object format_string) {
+    public org.python.Object __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Int __int__() {
+    public org.python.Object __int__() {
         try {
             return new org.python.types.Int(Long.parseLong(this.value));
         } catch (NumberFormatException e) {
@@ -76,7 +101,7 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Float __float__() {
+    public org.python.Object __float__() {
         double result;
         try {
             result = Double.parseDouble(this.value);
@@ -108,7 +133,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) < 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() < " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() < " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -120,7 +149,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) <= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() <= " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() <= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -156,7 +189,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) > 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() > " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() > " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -168,7 +205,11 @@ public class Str extends org.python.types.Object {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) >= 0);
         } else {
-            throw new org.python.exceptions.TypeError("unorderable types: " + this.typeName() + "() >= " + other.typeName() + "()");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: str() >= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'str' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -185,11 +226,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "len(object)\n\nReturn the number of items of a sequence or collection."
     )
     public org.python.types.Int __len__() {
-        // throw new org.python.exceptions.NotImplementedError("__len__() has not been implemented.");
-        return new org.python.types.Int(this.value.length());
+	return new org.python.types.Int(this.value.length());
     }
 
     @org.python.Method(
@@ -308,7 +348,11 @@ public class Str extends org.python.types.Object {
             }
             return new org.python.types.Int(substr_exists);
         }
-        throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
+        } else {
+            throw new org.python.exceptions.TypeError("must be str, not " + item.typeName());
+        }
         // throw new org.python.exceptions.NotImplementedError("__contains__() has not been implemented.");
     }
 
@@ -325,7 +369,11 @@ public class Str extends org.python.types.Object {
             sb.append(other_str.value);
             return new org.python.types.Str(sb.toString());
         }
-        throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
+        } else {
+            throw new org.python.exceptions.TypeError("must be str, not " + other.typeName());
+        }
     }
 
     @org.python.Method(
@@ -459,7 +507,12 @@ public class Str extends org.python.types.Object {
             this.setValue(this.__add__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to " + this.typeName() + " implicitly");
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
+            } else {
+                throw new org.python.exceptions.TypeError("must be str, not " + other.typeName());
+            }
+
         }
     }
     @org.python.Method(
@@ -789,9 +842,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.split(sep=None, maxsplit=-1) -> list of strings\n\nReturn a list of the words in S, using sep as the\ndelimiter string.  If maxsplit is given, at most maxsplit\nsplits are done. If sep is not specified or is None, any\nwhitespace string is a separator and empty strings are\nremoved from the result.\n",
+        default_args = {"sep", "maxsplit"}
     )
-    public org.python.Object split() {
+    public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
         throw new org.python.exceptions.NotImplementedError("split() has not been implemented.");
     }
 
@@ -840,6 +894,9 @@ public class Str extends org.python.types.Object {
         __doc__ = "S.title() -> str\n\nReturn a titlecased version of S, i.e. words start with title case\ncharacters, all remaining cased characters have lower case."
     )
     public org.python.Object title() {
+	if (this.value.isEmpty()){
+	    return new Str(this.value);
+	}
 	String title = "";
 	Character first = Character.toUpperCase(this.value.charAt(0));
 	title += Character.toString(first);
@@ -849,6 +906,8 @@ public class Str extends org.python.types.Object {
  	    prev = title.charAt(c - 1);
 	    if(prev == ' '){
 	        title += Character.toString(Character.toUpperCase(this.value.charAt(c)));
+	    } else if (Character.isUpperCase(this.value.charAt(c))){
+	        title += Character.toString(Character.toLowerCase(this.value.charAt(c)));
 	    } else {
 		title += Character.toString(this.value.charAt(c));
 	    }

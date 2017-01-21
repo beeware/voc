@@ -71,8 +71,22 @@ class MUTF8Test(ReadTest, unittest.TestCase):
         self.assertEqual('a\x00b'.encode(self.encoding), b'a\xc0\x80b')
 
     def test_surrogates(self):
-        self.assertEqual('Hot \U00010400iggity'.encode(self.encoding), b'Hot \xed\xa0\x81\xed\xb0\x80iggity', 'no match')
-        self.assertEqual('How \u0205ccentric'.encode(self.encoding), b'How \xc8\x85ccentric')
+        self.assertEqual(
+            'Hot \U00010400iggity'.encode(self.encoding),
+            b'Hot \xed\xa0\x81\xed\xb0\x80iggity',
+            'no match'
+        )
+        self.assertEqual(
+            'How \u0205ccentric'.encode(self.encoding),
+            b'How \xc8\x85ccentric'
+        )
 
-        self.assertEqual(b'Hot \xed\xa0\x81\xed\xb0\x80iggity'.decode(self.encoding), 'Hot \U00010400iggity', 'no match')
-        self.assertEqual(b'How \xc8\x85ccentric'.decode(self.encoding), 'How \u0205ccentric')
+        self.assertEqual(
+            b'Hot \xed\xa0\x81\xed\xb0\x80iggity'.decode(self.encoding),
+            'Hot \U00010400iggity',
+            'no match'
+        )
+        self.assertEqual(
+            b'How \xc8\x85ccentric'.decode(self.encoding),
+            'How \u0205ccentric'
+        )

@@ -1,4 +1,4 @@
-from .. utils import TranspileTestCase, BuiltinFunctionTestCase
+from .. utils import TranspileTestCase  # , BuiltinFunctionTestCase
 
 
 class InputTests(TranspileTestCase):

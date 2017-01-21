@@ -1,13 +1,9 @@
 import ast
-import importlib
-import marshal
 import os
-import py_compile
 import sys
 
-from .python.modules import Module
 from .python.ast import Visitor
-from .python.utils import dump
+from .python.debug import dump
 
 
 def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):
@@ -74,7 +70,7 @@ class Transpiler:
             os.path.abspath(filename)
         ])
 
-        self.transpile_code(os.path.abspath(filename)[len(common):], ast_module)
+        self.transpile_code(os.path.abspath(filename)[len(common) + 1:], ast_module)
 
     def transpile_string(self, filename, code_string):
         "Transpile a string containing Python code into class files"
@@ -85,9 +81,9 @@ class Transpiler:
         "Transpile a code object into class files"
         # Convert the AST into Java opcodes
         if self.verbosity > 1:
-            print ('=' * 75)
+            print('=' * 75)
             print(dump(ast_module))
-            print ('=' * 75)
+            print('=' * 75)
 
         module = Visitor(self.namespace, filename, verbosity=self.verbosity).visit(ast_module)
 

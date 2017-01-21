@@ -69,6 +69,100 @@ class SetTests(TranspileTestCase):
             print(y in x)
         """)
 
+    def test_copy(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = x.copy()
+            print(x == y)
+            print(x is not y)
+            """)
+
+        # ensures that it did a shallow copy
+        self.assertCodeExecution("""
+            x = {(1, 2, 3)}
+            y = x.copy()
+            print(x.pop() is y.pop())
+            """)
+
+    def test_difference(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            z = x.difference(y)
+            print(x)
+            print(y)
+            print(z)
+            """)
+
+    def test_discard(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            x.discard(1)
+            x.discard(4)
+            print(x)
+            """)
+
+    def test_intersection(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            z = x.intersection(y)
+            print(x)
+            print(y)
+            print(z)
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {4, 5}
+            z = x.intersection(y)
+            print(x)
+            print(y)
+            print(z)
+            """)
+
+    def test_remove(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            x.remove(1)
+            x.remove(4)
+            print(x)
+            """)
+
+    def test_union(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            z = x.union(y)
+            print(x)
+            print(y)
+            print(z)
+            """)
+
+    def test_difference_update(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            x.difference_update(y)
+            print(x)
+            """)
+
+    def test_intersection_update(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            x.intersection_update(y)
+            print(x)
+            """)
+
+    def test_update(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {3, 4, 5}
+            print(x.update(y))
+            print(x)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'

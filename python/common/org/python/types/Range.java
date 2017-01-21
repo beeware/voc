@@ -117,7 +117,13 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
                 return result;
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError("range indices must be integers");
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "range indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 

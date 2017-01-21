@@ -36,6 +36,61 @@ public class Dict extends org.python.types.Object {
         this.value = dict;
     }
 
+    @org.python.Method(
+        __doc__ = "dict() -> new empty dictionary" +
+            "dict(mapping) -> new dictionary initialized from a mapping object's\n" +
+            "    (key, value) pairs\n" +
+            "dict(iterable) -> new dictionary initialized as if via:\n" +
+            "    d = {}\n" +
+            "    for k, v in iterable:\n" +
+            "        d[k] = v\n" +
+            "dict(**kwargs) -> new dictionary initialized with the name=value pairs\n" +
+            "    in the keyword argument list.  For example:  dict(one=1, two=2)\n",
+        default_args = {"iterable"}
+    )
+    public Dict(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = new java.util.HashMap<org.python.Object, org.python.Object>();
+        } else {
+            if (args[0] instanceof org.python.types.Dict) {
+                this.value = new java.util.HashMap<org.python.Object, org.python.Object>(
+                    ((org.python.types.Dict) args[0]).value
+                );
+            } else {
+                org.python.Iterable iterator = org.Python.iter(args[0]);
+                java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
+                try {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        java.util.List<org.python.Object> data;
+                        if (next instanceof org.python.types.Tuple) {
+                            data = ((org.python.types.Tuple) next).value;
+                        } else if (next instanceof org.python.types.List) {
+                            data = ((org.python.types.List) next).value;
+                        } else {
+                            throw new org.python.exceptions.TypeError(
+                                "cannot convert dictionary update sequence element #" + generated.size() +
+                                    " to a sequence"
+                            );
+                        }
+
+                        if (data.size() != 2) {
+                            throw new org.python.exceptions.ValueError(
+                                "dictionary update sequence element #" + generated.size() +
+                                    " has length " + data.size() +
+                                    "; 2 is required"
+                            );
+                        }
+
+                        generated.put(data.get(0), data.get(1));
+                    }
+                } catch (org.python.exceptions.StopIteration si) {
+                }
+                this.value = generated;
+            }
+        }
+    }
+
     // @org.python.Method(
     //     __doc__ = ""
     // )
@@ -56,15 +111,22 @@ public class Dict extends org.python.types.Object {
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("{");
         boolean first = true;
-        for (org.python.Object key : this.value.keySet()) {
+        for (org.python.Object key: this.value.keySet()) {
             if (first) {
                 first = false;
             } else {
                 buffer.append(", ");
             }
-            buffer.append(
-                String.format("%s: %s", key.__repr__(), value.get(key).__repr__())
-            );
+            org.python.Object val = this.value.get(key);
+            if (val.toJava() instanceof org.python.internals.Scope) {
+                buffer.append(
+                    String.format("%s: {...}", key.__repr__())
+                );
+            } else {
+                buffer.append(
+                    String.format("%s: %s", key.__repr__(), val.__repr__())
+                );
+            }
         }
         buffer.append("}");
         return new org.python.types.Str(buffer.toString());
@@ -117,18 +179,22 @@ public class Dict extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: dict() < %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: dict() < " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'dict' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: dict() <= %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: dict() <= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'dict' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -154,18 +220,22 @@ public class Dict extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: dict() > %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: dict() > " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'dict' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError(
-            String.format("unorderable types: dict() >= %s()",
-                org.Python.typeName(other.getClass())));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("unorderable types: dict() >= " + other.typeName() + "()");
+        } else {
+            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'dict' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -309,25 +379,38 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        default_args = {"other", "default_value"}
+        __doc__ = "D.get(k[,d]) -> D[k] if k in D, else d.  d defaults to None.",
+        default_args = {"k", "d"}
     )
-    public org.python.Object get(org.python.Object other, org.python.Object default_value) {
+    public org.python.Object get(org.python.Object k, org.python.Object d) {
         try {
-            return this.__getitem__(other);
+            return this.__getitem__(k);
         } catch (org.python.exceptions.KeyError e){ // allow unhashable type error to be percolated up.
-            if (default_value == null) {
+            if (d == null) {
                 return org.python.types.NoneType.NONE;
             }
-            return default_value;
+            return d;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "D.items() -> a set-like object providing a view on D's items"
     )
     public org.python.Object items() {
-        throw new org.python.exceptions.NotImplementedError("dict.items() has not been implemented.");
+        // FIXME: This should return a dict_view object, not compose a new list.
+        org.python.types.List result = new org.python.types.List();
+        java.util.List<org.python.Object> item;
+        org.python.types.Tuple tuple;
+
+        for (org.python.Object key: this.value.keySet()) {
+            item = new java.util.ArrayList<org.python.Object>();
+            item.add(key);
+            item.add(this.value.get(key));
+
+            tuple = new org.python.types.Tuple(item);
+            result.append(tuple);
+        }
+        return result;
     }
 
     @org.python.Method(
@@ -338,14 +421,24 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "D.pop(k[,d]) -> v, remove specified key and return the corresponding value.\nIf key is not found, d is returned if given, otherwise KeyError is raised",
+        args = {"k"},
+        default_args = {"d"}
     )
-    public org.python.Object pop(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.pop() has not been implemented.");
+    public org.python.Object pop(org.python.Object k, org.python.Object d) {
+        org.python.Object value = this.value.remove(k);
+        if (value == null) {
+            if (d == null) {
+                throw new org.python.exceptions.KeyError(k);
+            } else {
+                value = d;
+            }
+        }
+        return value;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "D.popitem() -> (k, v), remove and return some (key, value) pair as a\n2-tuple; but raise KeyError if D is empty."
     )
     public org.python.Object popitem() {
         if (this.value.size() == 0) {
@@ -355,25 +448,25 @@ public class Dict extends org.python.types.Object {
         org.python.Object key = entry.getKey();
         org.python.Object value = this.value.remove(key);
 
-        java.util.List<org.python.Object> item_pair = new java.util.ArrayList<>();
+        java.util.List<org.python.Object> item_pair = new java.util.ArrayList<org.python.Object>();
         item_pair.add(key);
         item_pair.add(value);
         return new org.python.types.Tuple(item_pair);
     }
 
     @org.python.Method(
-        __doc__ = "",
-        default_args = {"other", "default_value"}
+        __doc__ = "D.setdefault(k[,d]) -> D.get(k,d), also set D[k]=d if k not in D",
+        default_args = {"k", "d"}
     )
-    public org.python.Object setdefault(org.python.Object other, org.python.Object default_value) {
+    public org.python.Object setdefault(org.python.Object k, org.python.Object d) {
         try {
-            return this.__getitem__(other);
+            return this.__getitem__(k);
         } catch (org.python.exceptions.KeyError e){ // allow unhashable type error to be percolated up.
-            if (default_value == null) {
-                default_value = org.python.types.NoneType.NONE;
+            if (d == null) {
+                d = org.python.types.NoneType.NONE;
             }
-            __setitem__(other, default_value);
-            return default_value;
+            __setitem__(k, d);
+            return d;
         }
     }
 

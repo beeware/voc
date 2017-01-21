@@ -19,6 +19,11 @@ public interface Object extends Comparable {
     public java.lang.Object toObject();
 
     /**
+     * Return the Python type for this object.
+     */
+    public org.python.types.Type type();
+
+    /**
      * Return the Python type name for this object.
      */
     public java.lang.String typeName();

@@ -1,4 +1,3 @@
-
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
@@ -14,25 +13,24 @@ class StrTests(TranspileTestCase):
         self.assertCodeExecution("""
             s = "abracadabra"
             suffix = "abra"
-            print(s.endswith(end))            
+            print(s.endswith(end))
             """)
 
         self.assertCodeExecution("""
             s = "abracadabra"
             suffix = "ABRA"
-            print(s.endswith(end))            
+            print(s.endswith(end))
             """)
 
         self.assertCodeExecution("""
             s = "ABRACADABRA"
             suffix = "abra"
-            print(s.endswith(end))            
+            print(s.endswith(end))
             """)
 
-
-        #self.assertCodeExecution("""
-        #  print('abracadabra'.endswith('abra'))
-        #    """)
+        # self.assertCodeExecution("""
+        #     print('abracadabra'.endswith('abra'))
+        #     """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
@@ -109,7 +107,7 @@ class StrTests(TranspileTestCase):
                 print(s.capitalize())
                 print(s.lower())
                 # print(s.swap())
-                # print(s.title())
+                print(s.title())
                 print(s.upper())
             """)
 
@@ -258,6 +256,12 @@ class StrTests(TranspileTestCase):
             words = ['PyBee', 'Voc', 'fOo', 'Bar', 'BaZ', 'ABRACADABRA']
             for word in words:
                 print(word.swapcase())
+        """)
+                
+    def test_len(self):
+        self.assertCodeExecution("""
+            s = ' foo  bar    baz '
+            print(len(s))
         """)
 
 

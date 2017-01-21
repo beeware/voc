@@ -235,7 +235,37 @@ class IfElifElseTests(TranspileTestCase):
             print('Done')
             """)
 
+    def test_simple_end_of_function_block_with_return(self):
+        # Ensure that if the last instruction in an if block
+        # is a return, a GOTO isn't added to the end of the block.
+        self.assertCodeExecution("""
+            def foo(x):
+                print("Testing", x)
+                if x == 0:
+                    return 42
+            y = foo(0)
+            print("Result", y)
+            y = foo(100)
+            print("Result", y)
+            print('Done')
+            """)
+
     def test_end_of_function_block_with_return(self):
+        # Ensure that if the last instruction in an if/else block
+        # is a return, a GOTO isn't added to the end of the block.
+        self.assertCodeExecution("""
+            def foo(x):
+                print("Testing", x)
+                if x == 0:
+                    return 42
+            y = foo(0)
+            print("Result", y)
+            y = foo(100)
+            print("Result", y)
+            print('Done')
+            """)
+
+    def test_end_of_function_block_with_return_in_else(self):
         # Ensure that if the last instruction in an if/else block
         # is a return, a GOTO isn't added to the end of the block.
         self.assertCodeExecution("""
@@ -245,7 +275,11 @@ class IfElifElseTests(TranspileTestCase):
                     return 42
                 else:
                     return 37
+            y = foo(0)
+            print("Result", y)
             y = foo(100)
+            print("Result", y)
+            y = foo(0)
             print("Result", y)
             print('Done')
             """)

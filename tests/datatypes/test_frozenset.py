@@ -1,7 +1,5 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
-import unittest
-
 
 class FrozensetTests(TranspileTestCase):
     pass

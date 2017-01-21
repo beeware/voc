@@ -72,11 +72,17 @@ class ClassFileWriter:
     def write_u2(self, u2):
         self._outfile.write(struct.pack('>H', u2))
 
+    def write_s4(self, u4):
+        self._outfile.write(struct.pack('>i', u4))
+
     def write_u4(self, u4):
         self._outfile.write(struct.pack('>I', u4))
 
     def write_f(self, f):
         self._outfile.write(struct.pack('>f', f))
+
+    def write_s8(self, u8):
+        self._outfile.write(struct.pack('>q', u8))
 
     def write_u8(self, u8):
         self._outfile.write(struct.pack('>Q', u8))
@@ -336,7 +342,9 @@ class BaseClass:
                         ('enum', Class.ACC_ENUM),
                     ]
                 ] if f)
-            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % (access_description if access_description else ''))
+            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % (
+                access_description if access_description else ''
+            ))
 
         interfaces_count = reader.read_u2()
         if dump is not None:
@@ -518,7 +526,9 @@ class BaseClass:
 
 class Class(BaseClass):
     def __init__(self, name, extends=None, implements=None, public=True, final=False, abstract=False):
-        super(Class, self).__init__(name, extends, implements=implements, public=public, final=final, abstract=abstract)
+        super(Class, self).__init__(
+            name, extends, implements=implements, public=public, final=final, abstract=abstract
+        )
 
 
 class Interface(BaseClass):

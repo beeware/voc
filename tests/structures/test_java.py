@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from ..utils import TranspileTestCase
 
 
@@ -21,7 +19,8 @@ class JavaTests(TranspileTestCase):
             """
             Hello, world
             Done.
-            """, run_in_function=False)
+            """,
+            run_in_function=False)
 
     def test_most_specific_constructor(self):
         "The most specific constructor for a native Java class will be selected based on argument."
@@ -63,17 +62,18 @@ class JavaTests(TranspileTestCase):
 
     def test_field(self):
         "Native fields on an instance can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
 
-                print("Class is", MyClass)
-                obj1 = MyClass()
-                print("Field is", MyClass.field)
-                print("Field from instance is", obj1.field)
-                obj1.field = 37
-                print("Updated Field from instance is", obj1.field)
-                print("Done.")
-                """,
+            print("Class is", MyClass)
+            obj1 = MyClass()
+            print("Field is", MyClass.field)
+            print("Field from instance is", obj1.field)
+            obj1.field = 37
+            print("Updated Field from instance is", obj1.field)
+            print("Done.")
+            """,
             java={
                 'com/example/MyClass': """
                 package com.example;
@@ -93,19 +93,20 @@ class JavaTests(TranspileTestCase):
 
     def test_static_field(self):
         "Class constants can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
 
-                print("Class is", MyClass)
-                obj1 = MyClass()
-                print("Static field is", MyClass.static_field)
-                MyClass.static_field = 37
-                print("Updated static field is", MyClass.static_field)
-                print("Static field from instance is", obj1.static_field)
-                MyClass.static_field = 42
-                print("Updated static field from instance is", obj1.static_field)
-                print("Done.")
-                """,
+            print("Class is", MyClass)
+            obj1 = MyClass()
+            print("Static field is", MyClass.static_field)
+            MyClass.static_field = 37
+            print("Updated static field is", MyClass.static_field)
+            print("Static field from instance is", obj1.static_field)
+            MyClass.static_field = 42
+            print("Updated static field from instance is", obj1.static_field)
+            print("Done.")
+            """,
             java={
                 'com/example/MyClass': """
                 package com.example;
@@ -126,19 +127,20 @@ class JavaTests(TranspileTestCase):
 
     def test_superclass_field(self):
         "Native fields defined on a superclass can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyBase, MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyBase, MyClass
 
-                print("Base class is", MyBase)
-                print("Class is", MyClass)
-                obj1 = MyClass()
-                print("Base field on superclass is", MyBase.base_field)
-                print("Base field is", MyClass.base_field)
-                print("Base field from instance is", obj1.base_field)
-                print("Field is", MyClass.field)
-                print("Field from instance is", obj1.field)
-                print("Done.")
-                """,
+            print("Base class is", MyBase)
+            print("Class is", MyClass)
+            obj1 = MyClass()
+            print("Base field on superclass is", MyBase.base_field)
+            print("Base field is", MyClass.base_field)
+            print("Base field from instance is", obj1.base_field)
+            print("Field is", MyClass.field)
+            print("Field from instance is", obj1.field)
+            print("Done.")
+            """,
             java={
                 'com/example/MyBase': """
                 package com.example;
@@ -168,19 +170,20 @@ class JavaTests(TranspileTestCase):
 
     def test_superclass_static_field(self):
         "Native static fields defined on a superclass can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyBase, MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyBase, MyClass
 
-                print("Base class is", MyBase)
-                print("Class is", MyClass)
-                obj1 = MyClass()
-                print("Static base field on superclass is", MyBase.base_static_field)
-                print("Static base field is", MyClass.base_static_field)
-                print("Static base field from instance is", obj1.base_static_field)
-                print("Static field is", MyClass.static_field)
-                print("Static field from instance is", obj1.static_field)
-                print("Done.")
-                """,
+            print("Base class is", MyBase)
+            print("Class is", MyClass)
+            obj1 = MyClass()
+            print("Static base field on superclass is", MyBase.base_static_field)
+            print("Static base field is", MyClass.base_static_field)
+            print("Static base field from instance is", obj1.base_static_field)
+            print("Static field is", MyClass.static_field)
+            print("Static field from instance is", obj1.static_field)
+            print("Done.")
+            """,
             java={
                 'com/example/MyBase': """
                 package com.example;
@@ -210,15 +213,16 @@ class JavaTests(TranspileTestCase):
 
     def test_constant(self):
         "Instance constants can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
 
-                print("Class is", MyClass)
-                obj1 = MyClass()
-                print("Constant is", MyClass.CONSTANT)
-                print("Constant from instance is", obj1.CONSTANT)
-                print("Done.")
-                """,
+            print("Class is", MyClass)
+            obj1 = MyClass()
+            print("Constant is", MyClass.CONSTANT)
+            print("Constant from instance is", obj1.CONSTANT)
+            print("Done.")
+            """,
             java={
                 'com/example/MyClass': """
                 package com.example;
@@ -237,15 +241,16 @@ class JavaTests(TranspileTestCase):
 
     def test_static_constant(self):
         "Class constants can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
 
-                print("Class is", MyClass)
-                obj1 = MyClass()
-                print("Static constant is", MyClass.STATIC_CONSTANT)
-                print("Static constant from instance is", obj1.STATIC_CONSTANT)
-                print("Done.")
-                """,
+            print("Class is", MyClass)
+            obj1 = MyClass()
+            print("Static constant is", MyClass.STATIC_CONSTANT)
+            print("Static constant from instance is", obj1.STATIC_CONSTANT)
+            print("Done.")
+            """,
             java={
                 'com/example/MyClass': """
                 package com.example;
@@ -264,16 +269,17 @@ class JavaTests(TranspileTestCase):
 
     def test_method(self):
         "Native methods on an instance can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
 
-                print("Class is", MyClass)
-                obj = MyClass()
-                print("Method is", MyClass.method)
-                print("Method from instance is", obj.method)
-                obj.method()
-                print("Done.")
-                """,
+            print("Class is", MyClass)
+            obj = MyClass()
+            print("Method is", MyClass.method)
+            print("Method from instance is", obj.method)
+            obj.method()
+            print("Done.")
+            """,
             java={
                 'com/example/MyClass': """
                 package com.example;
@@ -291,21 +297,22 @@ class JavaTests(TranspileTestCase):
                 Method from instance is <bound native method com.example.MyClass.method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the instance!
                 Done.
-                """)
+                """) # noqa
 
     def test_static_method(self):
         "Native static methods on an instance can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyClass
 
-                print("Class is", MyClass)
-                obj = MyClass()
-                print("Static method is", MyClass.method)
-                MyClass.method()
-                print("Static method from instance is", obj.method)
-                obj.method()
-                print("Done.")
-                """,
+            print("Class is", MyClass)
+            obj = MyClass()
+            print("Static method is", MyClass.method)
+            MyClass.method()
+            print("Static method from instance is", obj.method)
+            obj.method()
+            print("Done.")
+            """,
             java={
                 'com/example/MyClass': """
                 package com.example;
@@ -324,35 +331,36 @@ class JavaTests(TranspileTestCase):
                 Static method from instance is <bound native method com.example.MyClass.method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the class!
                 Done.
-                """)
+                """) # noqa
 
     def test_superclass_method(self):
         "Native methods defined on a superclass can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyBase, MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyBase, MyClass
 
-                print("Base class is", MyBase)
-                print("Class is", MyClass)
+            print("Base class is", MyBase)
+            print("Class is", MyClass)
 
-                print("Base method on superclass is", MyBase.base_method)
-                print("Method on superclass is", MyBase.method)
+            print("Base method on superclass is", MyBase.base_method)
+            print("Method on superclass is", MyBase.method)
 
-                print("Base method is", MyClass.base_method)
-                print("Method is", MyClass.method)
+            print("Base method is", MyClass.base_method)
+            print("Method is", MyClass.method)
 
-                obj1 = MyBase()
-                print("Base method from superclass instance is", obj1.base_method)
-                obj1.base_method()
-                print("Method from superclass instance is", obj1.method)
-                obj1.method()
+            obj1 = MyBase()
+            print("Base method from superclass instance is", obj1.base_method)
+            obj1.base_method()
+            print("Method from superclass instance is", obj1.method)
+            obj1.method()
 
-                obj2 = MyClass()
-                print("Base method from instance is", obj2.base_method)
-                obj2.base_method()
-                print("Method from instance is", obj2.method)
-                obj2.method()
-                print("Done.")
-                """,
+            obj2 = MyClass()
+            print("Base method from instance is", obj2.base_method)
+            obj2.base_method()
+            print("Method from instance is", obj2.method)
+            obj2.method()
+            print("Done.")
+            """,
             java={
                 'com/example/MyBase': """
                 package com.example;
@@ -393,39 +401,40 @@ class JavaTests(TranspileTestCase):
                 Method from instance is <bound native method com.example.MyClass.method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the instance!
                 Done.
-                """)
+                """) # noqa
 
     def test_superclass_static_method(self):
         "Native static methods defined on a superclass can be accessed"
-        self.assertJavaExecution("""
-                from com.example import MyBase, MyClass
+        self.assertJavaExecution(
+            """
+            from com.example import MyBase, MyClass
 
-                print("Base class is", MyBase)
-                print("Class is", MyClass)
+            print("Base class is", MyBase)
+            print("Class is", MyClass)
 
-                print("Static base method on superclass is", MyBase.base_static_method)
-                MyBase.base_static_method()
-                print("Static method on superclass is", MyBase.static_method)
-                MyBase.static_method()
+            print("Static base method on superclass is", MyBase.base_static_method)
+            MyBase.base_static_method()
+            print("Static method on superclass is", MyBase.static_method)
+            MyBase.static_method()
 
-                print("Static base method is", MyClass.base_static_method)
-                MyClass.base_static_method()
-                print("Static method is", MyClass.static_method)
-                MyClass.static_method()
+            print("Static base method is", MyClass.base_static_method)
+            MyClass.base_static_method()
+            print("Static method is", MyClass.static_method)
+            MyClass.static_method()
 
-                obj1 = MyBase()
-                print("Base static method from superclass instance is", obj1.base_static_method)
-                obj1.base_static_method()
-                print("Static method from superclass instance is", obj1.static_method)
-                obj1.static_method()
+            obj1 = MyBase()
+            print("Base static method from superclass instance is", obj1.base_static_method)
+            obj1.base_static_method()
+            print("Static method from superclass instance is", obj1.static_method)
+            obj1.static_method()
 
-                obj2 = MyClass()
-                print("Base static method from instance is", obj2.base_static_method)
-                obj2.base_static_method()
-                print("Static method from instance is", obj2.static_method)
-                obj2.static_method()
-                print("Done.")
-                """,
+            obj2 = MyClass()
+            print("Base static method from instance is", obj2.base_static_method)
+            obj2.base_static_method()
+            print("Static method from instance is", obj2.static_method)
+            obj2.static_method()
+            print("Done.")
+            """,
             java={
                 'com/example/MyBase': """
                 package com.example;
@@ -470,21 +479,22 @@ class JavaTests(TranspileTestCase):
                 Static method from instance is <bound native method com.example.MyClass.static_method of <Native com.example.MyClass object at 0xXXXXXXXX>>
                 Hello from the class!
                 Done.
-                """)
+                """)  # noqa
 
     def test_inner_class_constant(self):
         "Constants on an inner class can be accessed"
-        self.assertJavaExecution("""
-                from com.example import OuterClass
+        self.assertJavaExecution(
+            """
+            from com.example import OuterClass
 
-                print("Outer class is", OuterClass)
-                print("Outer constant is", OuterClass.OUTER_CONSTANT)
+            print("Outer class is", OuterClass)
+            print("Outer constant is", OuterClass.OUTER_CONSTANT)
 
-                print("Inner class is", OuterClass.InnerClass)
-                print("Inner constant is", OuterClass.InnerClass.INNER_CONSTANT)
+            print("Inner class is", OuterClass.InnerClass)
+            print("Inner constant is", OuterClass.InnerClass.INNER_CONSTANT)
 
-                print("Done.")
-                """,
+            print("Done.")
+            """,
             java={
                 'com/example/OuterClass': """
                 package com.example;
@@ -508,19 +518,20 @@ class JavaTests(TranspileTestCase):
 
     def test_inner_class_method(self):
         "Inner classes can be instantiated, and methods invoked"
-        self.assertJavaExecution("""
-                from com.example import OuterClass
+        self.assertJavaExecution(
+            """
+            from com.example import OuterClass
 
-                print("Outer class is", OuterClass)
-                obj1 = OuterClass()
-                obj1.method()
+            print("Outer class is", OuterClass)
+            obj1 = OuterClass()
+            obj1.method()
 
-                print("Inner class is", OuterClass.InnerClass)
-                obj2 = OuterClass.InnerClass(obj1)
-                obj2.method()
+            print("Inner class is", OuterClass.InnerClass)
+            obj2 = OuterClass.InnerClass(obj1)
+            obj2.method()
 
-                print("Done.")
-                """,
+            print("Done.")
+            """,
             java={
                 'com/example/OuterClass': """
                 package com.example;
@@ -546,20 +557,20 @@ class JavaTests(TranspileTestCase):
                 Done.
                 """)
 
-
     def test_static_inner_class_constant(self):
         "Constants on a static inner class can be accessed"
-        self.assertJavaExecution("""
-                from com.example import OuterClass
+        self.assertJavaExecution(
+            """
+            from com.example import OuterClass
 
-                print("Outer class is", OuterClass)
-                print("Outer constant is", OuterClass.OUTER_CONSTANT)
+            print("Outer class is", OuterClass)
+            print("Outer constant is", OuterClass.OUTER_CONSTANT)
 
-                print("Inner class is", OuterClass.InnerClass)
-                print("Inner constant is", OuterClass.InnerClass.INNER_CONSTANT)
+            print("Inner class is", OuterClass.InnerClass)
+            print("Inner constant is", OuterClass.InnerClass.INNER_CONSTANT)
 
-                print("Done.")
-                """,
+            print("Done.")
+            """,
             java={
                 'com/example/OuterClass': """
                 package com.example;
@@ -583,19 +594,20 @@ class JavaTests(TranspileTestCase):
 
     def test_static_inner_class_method(self):
         "Static inner classes can be instantiated, and methods invoked"
-        self.assertJavaExecution("""
-                from com.example import OuterClass
+        self.assertJavaExecution(
+            """
+            from com.example import OuterClass
 
-                print("Outer class is", OuterClass)
-                obj1 = OuterClass()
-                obj1.method()
+            print("Outer class is", OuterClass)
+            obj1 = OuterClass()
+            obj1.method()
 
-                print("Inner class is", OuterClass.InnerClass)
-                obj2 = OuterClass.InnerClass()
-                obj2.method()
+            print("Inner class is", OuterClass.InnerClass)
+            obj2 = OuterClass.InnerClass()
+            obj2.method()
 
-                print("Done.")
-                """,
+            print("Done.")
+            """,
             java={
                 'com/example/OuterClass': """
                 package com.example;
@@ -623,22 +635,23 @@ class JavaTests(TranspileTestCase):
 
     def test_primitive_conversion(self):
         "Primitive types are converted correctly"
-        self.assertJavaExecution("""
-                from com.example import MyObject
+        self.assertJavaExecution(
+            """
+            from com.example import MyObject
 
-                obj = MyObject()
+            obj = MyObject()
 
-                result = obj.method(3)
-                print('Result is', result)
+            result = obj.method(3)
+            print('Result is', result)
 
-                result = obj.method(3.14159)
-                print('Result is', result)
+            result = obj.method(3.14159)
+            print('Result is', result)
 
-                result = obj.method(True)
-                print('Result is', result)
+            result = obj.method(True)
+            print('Result is', result)
 
-                print("Done.")
-                """,
+            print("Done.")
+            """,
             java={
                 'com/example/MyObject': """
                 package com.example;
@@ -673,22 +686,23 @@ class JavaTests(TranspileTestCase):
 
     def test_primitive_zero_conversion(self):
         "Primitive representations of 'false' values are converted correctly"
-        self.assertJavaExecution("""
-                from com.example import MyObject
+        self.assertJavaExecution(
+            """
+            from com.example import MyObject
 
-                obj = MyObject()
+            obj = MyObject()
 
-                result = obj.method(0)
-                print('Result is', result)
+            result = obj.method(0)
+            print('Result is', result)
 
-                result = obj.method(0.0)
-                print('Result is', result)
+            result = obj.method(0.0)
+            print('Result is', result)
 
-                result = obj.method(False)
-                print('Result is', result)
+            result = obj.method(False)
+            print('Result is', result)
 
-                print("Done.")
-                """,
+            print("Done.")
+            """,
             java={
                 'com/example/MyObject': """
                 package com.example;
@@ -722,34 +736,35 @@ class JavaTests(TranspileTestCase):
                 """)
 
     def test_attribute_on_reference(self):
-        self.assertJavaExecution("""
-                from com.example import BaseObject, Controller
+        self.assertJavaExecution(
+            """
+            from com.example import BaseObject, Controller
 
-                class TestObject(extends=com.example.BaseObject):
-                    def __init__(self, v1, v2):
-                        # super().__init__(v1)
-                        self.extra1 = v2
+            class TestObject(extends=com.example.BaseObject):
+                def __init__(self, v1, v2):
+                    # super().__init__(v1)
+                    self.extra1 = v2
 
-                    def process(self) -> None:
-                        print("Processed Base data is %s" % self.base)
-                        print("Processed Extra data 1 is %s" % self.extra1)
-                        print("Processed Extra data 2 is %s" % self.extra2)
+                def process(self) -> None:
+                    print("Processed Base data is %s" % self.base)
+                    print("Processed Extra data 1 is %s" % self.extra1)
+                    print("Processed Extra data 2 is %s" % self.extra2)
 
-                obj = TestObject(37, 99)
-                obj.extra2 = 42
+            obj = TestObject(37, 99)
+            obj.extra2 = 42
 
-                print("Base data is %s" % obj.base)
-                print("Extra data 1 is %s" % obj.extra1)
-                print("Extra data 2 is %s" % obj.extra2)
+            print("Base data is %s" % obj.base)
+            print("Extra data 1 is %s" % obj.extra1)
+            print("Extra data 2 is %s" % obj.extra2)
 
-                controller = Controller()
+            controller = Controller()
 
-                controller.setObject(obj)
+            controller.setObject(obj)
 
-                controller.poke()
+            controller.poke()
 
-                print("Done.")
-                """,
+            print("Done.")
+            """,
             java={
                 'com/example/ObjIFace': """
                 package com.example;

@@ -5,7 +5,7 @@ public class Exception extends org.python.exceptions.BaseException {
         super();
     }
 
-    public Exception(String msg) {
+    public Exception(java.lang.String msg) {
         super(msg);
     }
 

@@ -41,6 +41,43 @@ public class List extends org.python.types.Object {
         this.value = list;
     }
 
+    @org.python.Method(
+        __doc__ = "list() -> new empty list" +
+            "list(iterable) -> new list initialized from iterable's items\n",
+        default_args = {"iterable"}
+    )
+    public List(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super();
+        if (args[0] == null) {
+            this.value = new java.util.ArrayList<org.python.Object>();
+        } else {
+            if (args[0] instanceof org.python.types.List) {
+                this.value = new java.util.ArrayList<org.python.Object>(
+                    ((org.python.types.List) args[0]).value
+                );
+            } else if (args[0] instanceof org.python.types.Set) {
+                this.value = new java.util.ArrayList<org.python.Object>(
+                    ((org.python.types.Set) args[0]).value
+                );
+            } else if (args[0] instanceof org.python.types.Tuple) {
+                this.value = new java.util.ArrayList<org.python.Object>(
+                    ((org.python.types.Tuple) args[0]).value
+                );
+            } else {
+                org.python.Iterable iterator = org.Python.iter(args[0]);
+                java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
+                try {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        generated.add(next);
+                    }
+                } catch (org.python.exceptions.StopIteration si) {
+                }
+                this.value = generated;
+            }
+        }
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("list.__new__() has not been implemented.");
     // }
@@ -142,9 +179,11 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size < otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() < %s()",
-                    Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: list() < " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'list' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -171,9 +210,11 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size <= otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() <= %s()",
-                    Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: list() <= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'list' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -219,9 +260,11 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size > otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() > %s()",
-                    Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: list() > " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'list' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -248,9 +291,11 @@ public class List extends org.python.types.Object {
             return new org.python.types.Bool(size >= otherSize);
 
         } else {
-            throw new org.python.exceptions.TypeError(
-                String.format("unorderable types: list() >= %s()",
-                    Python.typeName(other.getClass())));
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("unorderable types: list() >= " + other.typeName() + "()");
+            } else {
+                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'list' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -322,7 +367,15 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -346,7 +399,15 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -370,7 +431,15 @@ public class List extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -532,10 +601,26 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         if (start != null && !(start instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + start.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + start.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + start.typeName()
+                );
+            }
         }
         if (end != null && !(end instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + end.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers, not " + end.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "list indices must be integers or slices, not " + end.typeName()
+                );
+            }
         }
 
         int iStart = 0, iEnd = this.value.size();

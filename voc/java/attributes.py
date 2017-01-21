@@ -171,9 +171,21 @@ class Attribute:
 # 4.7.2. The ConstantValue Attribute
 # ------------------------------------------------------------------------
 
-# The ConstantValue attribute is a fixed-length attribute in the attributes table of a field_info structure (§4.5). A ConstantValue attribute represents the value of a constant field. There can be no more than one ConstantValue attribute in the attributes table of a given field_info structure. If the field is static (that is, the ACC_STATIC flag (Table 4.4) in the access_flags item of the field_info structure is set) then the constant field represented by the field_info structure is assigned the value referenced by its ConstantValue attribute as part of the initialization of the class or interface declaring the constant field (§5.5). This occurs prior to the invocation of the class or interface initialization method (§2.9) of that class or interface.
+# The ConstantValue attribute is a fixed-length attribute in the attributes
+# table of a field_info structure (§4.5). A ConstantValue attribute represents
+# the value of a constant field. There can be no more than one ConstantValue
+# attribute in the attributes table of a given field_info structure. If the
+# field is static (that is, the ACC_STATIC flag (Table 4.4) in the access_flags
+# item of the field_info structure is set) then the constant field represented
+# by the field_info structure is assigned the value referenced by its
+# ConstantValue attribute as part of the initialization of the class or
+# interface declaring the constant field (§5.5). This occurs prior to the
+# invocation of the class or interface initialization method (§2.9) of that
+# class or interface.
 
-# If a field_info structure representing a non-static field has a ConstantValue attribute, then that attribute must silently be ignored. Every Java Virtual Machine implementation must recognize ConstantValue attributes.
+# If a field_info structure representing a non-static field has a ConstantValue
+# attribute, then that attribute must silently be ignored. Every Java Virtual
+# Machine implementation must recognize ConstantValue attributes.
 
 # The ConstantValue attribute has the following format:
 
@@ -185,13 +197,20 @@ class Attribute:
 # The items of the ConstantValue_attribute structure are as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "ConstantValue".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info (§4.4.7) structure representing the string
+# "ConstantValue".
 
 # attribute_length
-# The value of the attribute_length item of a ConstantValue_attribute structure must be 2.
+# The value of the attribute_length item of a ConstantValue_attribute structure
+# must be 2.
 
 # constantvalue_index
-# The value of the constantvalue_index item must be a valid index into the constant_pool table. The constant_pool entry at that index gives the constant value represented by this attribute. The constant_pool entry must be of a type appropriate to the field, as shown by Table 4.7.
+# The value of the constantvalue_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index gives the constant
+# value represented by this attribute. The constant_pool entry must be of a
+# type appropriate to the field, as shown by Table 4.7.
 
 # Table 4.7. Constant value attribute types
 
@@ -914,7 +933,11 @@ class FullFrame(StackMapFrame):
         return '<FullFrame %s, locals=%s, stack=%s>' % (self.offset_delta, self.locals, self.stack)
 
     def __len__(self):
-        return 7 + sum(len(local) for local in local_vars) + sum(len(frame) for frame in self.stack)
+        return (
+            7
+            + sum(len(local) for local in self.locals)
+            + sum(len(frame) for frame in self.stack)
+        )
 
     @staticmethod
     def read_info(reader, frame_type):
@@ -1175,7 +1198,10 @@ class UninitializedVariableInfo(VerificationTypeInfo):
 # 4.7.5. The Exceptions Attribute
 # ------------------------------------------------------------------------
 
-# The Exceptions attribute is a variable-length attribute in the attributes table of a method_info structure (§4.6). The Exceptions attribute indicates which checked exceptions a method may throw. There may be at most one Exceptions attribute in each method_info structure.
+# The Exceptions attribute is a variable-length attribute in the attributes
+# table of a method_info structure (§4.6). The Exceptions attribute indicates
+# which checked exceptions a method may throw. There may be at most one
+# Exceptions attribute in each method_info structure.
 
 # The Exceptions attribute has the following format:
 
@@ -1188,26 +1214,36 @@ class UninitializedVariableInfo(VerificationTypeInfo):
 # The items of the Exceptions_attribute structure are as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be the CONSTANT_Utf8_info (§4.4.7) structure representing the string "Exceptions".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be the
+# CONSTANT_Utf8_info (§4.4.7) structure representing the string "Exceptions".
 
 # attribute_length
-# The value of the attribute_length item indicates the attribute length, excluding the initial six bytes.
+# The value of the attribute_length item indicates the attribute length,
+# excluding the initial six bytes.
 
 # number_of_exceptions
-# The value of the number_of_exceptions item indicates the number of entries in the exception_index_table.
+# The value of the number_of_exceptions item indicates the number of entries in
+# the exception_index_table.
 
 # exception_index_table[]
-# Each value in the exception_index_table array must be a valid index into the constant_pool table. The constant_pool entry referenced by each table item must be a CONSTANT_Class_info structure (§4.4.1) representing a class type that this method is declared to throw.
+# Each value in the exception_index_table array must be a valid index into the
+# constant_pool table. The constant_pool entry referenced by each table item
+# must be a CONSTANT_Class_info structure (§4.4.1) representing a class type
+# that this method is declared to throw.
 
-# A method should throw an exception only if at least one of the following three criteria is met:
+# A method should throw an exception only if at least one of the following
+# three criteria is met:
 
 # The exception is an instance of RuntimeException or one of its subclasses.
 
 # The exception is an instance of Error or one of its subclasses.
 
-# The exception is an instance of one of the exception classes specified in the exception_index_table just described, or one of their subclasses.
+# The exception is an instance of one of the exception classes specified in the
+# exception_index_table just described, or one of their subclasses.
 
-# These requirements are not enforced in the Java Virtual Machine; they are enforced only at compile-time.
+# These requirements are not enforced in the Java Virtual Machine; they are
+# enforced only at compile-time.
 
 # ------------------------------------------------------------------------
 # 4.7.6. The InnerClasses Attribute
@@ -1233,7 +1269,8 @@ class InnerClass:
     ACC_ANNOTATION = 0x2000  # Declared as an annotation type.
     ACC_ENUM = 0x4000  # Declared as an enum type.
 
-    def __init__(self, inner_class_name, outer_class_name, inner_name,
+    def __init__(
+            self, inner_class_name, outer_class_name, inner_name,
             public=True, private=False, protected=False, static=False,
             final=False, interface=False, abstract=False, synthetic=False,
             annotation=False, enum=False):
@@ -1417,7 +1454,9 @@ class InnerClasses(Attribute):
                             ('enum', InnerClass.ACC_ENUM),
                         ]
                     ] if f)
-                reader.debug("    " * (dump + 3), 'Flags: 0x%04x%s' % (flags, ' (%s)') % (access_description if access_description else ''))
+                reader.debug("    " * (dump + 3), 'Flags: 0x%04x%s' % (flags, ' (%s)') % (
+                    access_description if access_description else ''
+                ))
 
             classes.append(
                 InnerClass(
@@ -1687,7 +1726,10 @@ class SourceFile(Attribute):
 # 4.7.11. The SourceDebugExtension Attribute
 # ------------------------------------------------------------------------
 
-# The SourceDebugExtension attribute is an optional attribute in the attributes table of a ClassFile structure (§4.1). There can be no more than one SourceDebugExtension attribute in the attributes table of a given ClassFile structure.
+# The SourceDebugExtension attribute is an optional attribute in the attributes
+# table of a ClassFile structure (§4.1). There can be no more than one
+# SourceDebugExtension attribute in the attributes table of a given ClassFile
+# structure.
 
 # The SourceDebugExtension attribute has the following format:
 
@@ -1699,17 +1741,25 @@ class SourceFile(Attribute):
 # The items of the SourceDebugExtension_attribute structure are as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "SourceDebugExtension".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info (§4.4.7) structure representing the string
+# "SourceDebugExtension".
 
 # attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+# The value of the attribute_length item indicates the length of the attribute,
+# excluding the initial six bytes.
 
-# The value of the attribute_length item is thus the number of bytes in the debug_extension[] item.
+# The value of the attribute_length item is thus the number of bytes in the
+# debug_extension[] item.
 
 # debug_extension[]
-# The debug_extension array holds extended debugging information which has no semantic effect on the Java Virtual Machine. The information is represented using a modified UTF-8 string (§4.4.7) with no terminating zero byte.
+# The debug_extension array holds extended debugging information which has no
+# semantic effect on the Java Virtual Machine. The information is represented
+# using a modified UTF-8 string (§4.4.7) with no terminating zero byte.
 
-# Note that the debug_extension array may denote a string longer than that which can be represented with an instance of class String.
+# Note that the debug_extension array may denote a string longer than that
+# which can be represented with an instance of class String.
 
 # ------------------------------------------------------------------------
 # 4.7.12. The LineNumberTable Attribute
@@ -1937,11 +1987,21 @@ class LocalVariable:
 # 4.7.14. The LocalVariableTypeTable Attribute
 # ------------------------------------------------------------------------
 
-# The LocalVariableTypeTable attribute is an optional variable-length attribute in the attributes table of a Code (§4.7.3) attribute. It may be used by debuggers to determine the value of a given local variable during the execution of a method.
+# The LocalVariableTypeTable attribute is an optional variable-length attribute
+# in the attributes table of a Code (§4.7.3) attribute. It may be used by
+# debuggers to determine the value of a given local variable during the
+# execution of a method.
 
-# If LocalVariableTypeTable attributes are present in the attributes table of a given Code attribute, then they may appear in any order. There may be no more than one LocalVariableTypeTable attribute per local variable in the Code attribute.
+# If LocalVariableTypeTable attributes are present in the attributes table of a
+# given Code attribute, then they may appear in any order. There may be no more
+# than one LocalVariableTypeTable attribute per local variable in the Code
+# attribute.
 
-# The LocalVariableTypeTable attribute differs from the LocalVariableTable attribute in that it provides signature information rather than descriptor information. This difference is only significant for variables whose type is a generic reference type. Such variables will appear in both tables, while variables of other types will appear only in LocalVariableTable.
+# The LocalVariableTypeTable attribute differs from the LocalVariableTable
+# attribute in that it provides signature information rather than descriptor
+# information. This difference is only significant for variables whose type is
+# a generic reference type. Such variables will appear in both tables, while
+# variables of other types will appear only in LocalVariableTable.
 
 # The LocalVariableTypeTable attribute has the following format:
 
@@ -1959,43 +2019,70 @@ class LocalVariable:
 # The items of the LocalVariableTypeTable_attribute structure are as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "LocalVariableTypeTable".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info (§4.4.7) structure representing the string
+# "LocalVariableTypeTable".
 
 # attribute_length
 # The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
 
 # local_variable_type_table_length
-# The value of the local_variable_type_table_length item indicates the number of entries in the local_variable_type_table array.
+# The value of the local_variable_type_table_length item indicates the number
+# of entries in the local_variable_type_table array.
 
 # local_variable_type_table[]
-# Each entry in the local_variable_type_table array indicates a range of code array offsets within which a local variable has a value. It also indicates the index into the local variable array of the current frame at which that local variable can be found. Each entry must contain the following five items:
+# Each entry in the local_variable_type_table array indicates a range of code
+# array offsets within which a local variable has a value. It also indicates
+# the index into the local variable array of the current frame at which that
+# local variable can be found. Each entry must contain the following five
+# items:
 
 # start_pc, length
-# The given local variable must have a value at indices into the code array in the interval [start_pc, start_pc + length), that is, between start_pc inclusive and start_pc + length exclusive.
+# The given local variable must have a value at indices into the code array in
+# the interval [start_pc, start_pc + length), that is, between start_pc
+# inclusive and start_pc + length exclusive.
 
-# The value of start_pc must be a valid index into the code array of this Code attribute and must be the index of the opcode of an instruction.
+# The value of start_pc must be a valid index into the code array of this Code
+# attribute and must be the index of the opcode of an instruction.
 
-# The value of start_pc + length must either be a valid index into the code array of this Code attribute and be the index of the opcode of an instruction, or it must be the first index beyond the end of that code array.
+# The value of start_pc + length must either be a valid index into the code
+# array of this Code attribute and be the index of the opcode of an
+# instruction, or it must be the first index beyond the end of that code array.
 
 # name_index
-# The value of the name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must contain a CONSTANT_Utf8_info (§4.4.7) structure representing a valid unqualified name (§4.2.2) denoting a local variable.
+# The value of the name_index item must be a valid index into the constant_pool
+# table. The constant_pool entry at that index must contain a
+# CONSTANT_Utf8_info (§4.4.7) structure representing a valid unqualified name
+# (§4.2.2) denoting a local variable.
 
 # signature_index
-# The value of the signature_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must contain a CONSTANT_Utf8_info structure (§4.4.7) representing a field type signature (§4.3.4) encoding the type of a local variable in the source program.
+# The value of the signature_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must contain a
+# CONSTANT_Utf8_info structure (§4.4.7) representing a field type signature
+# (§4.3.4) encoding the type of a local variable in the source program.
 
 # index
-# The given local variable must be at index in the local variable array of the current frame.
+# The given local variable must be at index in the local variable array of the
+# current frame.
 
-# If the local variable at index is of type double or long, it occupies both index and index + 1.
+# If the local variable at index is of type double or long, it occupies both
+# index and index + 1.
 
 # ------------------------------------------------------------------------
 # 4.7.15. The Deprecated Attribute
 # ------------------------------------------------------------------------
 
-# The Deprecated attribute is an optional fixed-length attribute in the attributes table of a ClassFile, field_info, or method_info structure (§4.1, §4.5, §4.6). A class, interface, method, or field may be marked using a Deprecated attribute to indicate that the class, interface, method, or field has been superseded.
+# The Deprecated attribute is an optional fixed-length attribute in the
+# attributes table of a ClassFile, field_info, or method_info structure (§4.1,
+# §4.5, §4.6). A class, interface, method, or field may be marked using a
+# Deprecated attribute to indicate that the class, interface, method, or field
+# has been superseded.
 
-# A run-time interpreter or tool that reads the class file format, such as a compiler, can use this marking to advise the user that a superceded class, interface, method, or field is being referred to. The presence of a Deprecated attribute does not alter the semantics of a class or interface.
-
+# A run-time interpreter or tool that reads the class file format, such as a
+# compiler, can use this marking to advise the user that a superceded class,
+# interface, method, or field is being referred to. The presence of a
+# Deprecated attribute does not alter the semantics of a class or interface.
 # The Deprecated attribute has the following format:
 
 # Deprecated_attribute {
@@ -2005,7 +2092,9 @@ class LocalVariable:
 # The items of the Deprecated_attribute structure are as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing the string "Deprecated".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info (§4.4.7) structure representing the string "Deprecated".
 
 # attribute_length
 # The value of the attribute_length item is zero.
@@ -2534,9 +2623,18 @@ class RuntimeInvisibleAnnotations(Attribute):
 # 4.7.18. The RuntimeVisibleParameterAnnotations attribute
 # ------------------------------------------------------------------------
 
-# The RuntimeVisibleParameterAnnotations attribute is a variable-length attribute in the attributes table of the method_info structure (§4.6). The RuntimeVisibleParameterAnnotations attribute records run-time-visible Java programming language annotations on the parameters of the corresponding method.
+# The RuntimeVisibleParameterAnnotations attribute is a variable-length
+# attribute in the attributes table of the method_info structure (§4.6). The
+# RuntimeVisibleParameterAnnotations attribute records run-time-visible Java
+# programming language annotations on the parameters of the corresponding
+# method.
 
-# Each method_info structure may contain at most one RuntimeVisibleParameterAnnotations attribute, which records all the run-time-visible Java programming language annotations on the parameters of the corresponding method. The Java Virtual Machine must make these annotations available so they can be returned by the appropriate reflective APIs.
+# Each method_info structure may contain at most one
+# RuntimeVisibleParameterAnnotations attribute, which records all the
+# run-time-visible Java programming language annotations on the parameters of
+# the corresponding method. The Java Virtual Machine must make these
+# annotations available so they can be returned by the appropriate reflective
+# APIs.
 
 # The RuntimeVisibleParameterAnnotations attribute has the following format:
 
@@ -2548,37 +2646,67 @@ class RuntimeInvisibleAnnotations(Attribute):
 #         annotation annotations[num_annotations];
 #     } parameter_annotations[num_parameters];
 # }
-# The items of the RuntimeVisibleParameterAnnotations_attribute structure are as follows:
+# The items of the RuntimeVisibleParameterAnnotations_attribute structure are
+# as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) representing the string "RuntimeVisibleParameterAnnotations".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info structure (§4.4.7) representing the string
+# "RuntimeVisibleParameterAnnotations".
 
 # attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+# The value of the attribute_length item indicates the length of the attribute,
+# excluding the initial six bytes.
 
-# The value of the attribute_length item is thus dependent on the number of parameters, the number of run-time-visible annotations on each parameter, and their values.
+# The value of the attribute_length item is thus dependent on the number of
+# parameters, the number of run-time-visible annotations on each parameter, and
+# their values.
 
 # num_parameters
-# The value of the num_parameters item gives the number of parameters of the method represented by the method_info structure on which the annotation occurs. (This duplicates information that could be extracted from the method descriptor (§4.3.3).)
+# The value of the num_parameters item gives the number of parameters of the
+# method represented by the method_info structure on which the annotation
+# occurs. (This duplicates information that could be extracted from the method
+# descriptor (§4.3.3).)
 
 # parameter_annotations
-# Each value of the parameter_annotations table represents all of the run-time-visible annotations on a single parameter. The sequence of values in the table corresponds to the sequence of parameters in the method descriptor. Each parameter_annotations entry contains the following two items:
+# Each value of the parameter_annotations table represents all of the
+# run-time-visible annotations on a single parameter. The sequence of values in
+# the table corresponds to the sequence of parameters in the method descriptor.
+# Each parameter_annotations entry contains the following two items:
 
 # num_annotations
-# The value of the num_annotations item indicates the number of run-time-visible annotations on the parameter corresponding to the sequence number of this parameter_annotations element.
+# The value of the num_annotations item indicates the number of
+# run-time-visible annotations on the parameter corresponding to the sequence
+# number of this parameter_annotations element.
 
 # annotations
-# Each value of the annotations table represents a single run-time-visible annotation on the parameter corresponding to the sequence number of this parameter_annotations element.
+# Each value of the annotations table represents a single run-time-visible
+# annotation on the parameter corresponding to the sequence number of this
+# parameter_annotations element.
 
 # ------------------------------------------------------------------------
 # 4.7.19. The RuntimeInvisibleParameterAnnotations attribute
 # ------------------------------------------------------------------------
 
-# The RuntimeInvisibleParameterAnnotations attribute is similar to the RuntimeVisibleParameterAnnotations attribute, except that the annotations represented by a RuntimeInvisibleParameterAnnotations attribute must not be made available for return by reflective APIs, unless the Java Virtual Machine has specifically been instructed to retain these annotations via some implementation-specific mechanism such as a command line flag. In the absence of such instructions, the Java Virtual Machine ignores this attribute.
+# The RuntimeInvisibleParameterAnnotations attribute is similar to the
+# RuntimeVisibleParameterAnnotations attribute, except that the annotations
+# represented by a RuntimeInvisibleParameterAnnotations attribute must not be
+# made available for return by reflective APIs, unless the Java Virtual Machine
+# has specifically been instructed to retain these annotations via some
+# implementation-specific mechanism such as a command line flag. In the absence
+# of such instructions, the Java Virtual Machine ignores this attribute.
 
-# The RuntimeInvisibleParameterAnnotations attribute is a variable-length attribute in the attributes table of a method_info structure (§4.6). The RuntimeInvisibleParameterAnnotations attribute records run-time-invisible Java programming language annotations on the parameters of the corresponding method.
+# The RuntimeInvisibleParameterAnnotations attribute is a variable-length
+# attribute in the attributes table of a method_info structure (§4.6). The
+# RuntimeInvisibleParameterAnnotations attribute records run-time-invisible
+# Java programming language annotations on the parameters of the corresponding
+# method.
 
-# Each method_info structure may contain at most one RuntimeInvisibleParameterAnnotations attribute, which records all the run-time-invisible Java programming language annotations on the parameters of the corresponding method.
+# Each method_info structure may contain at most one
+# RuntimeInvisibleParameterAnnotations attribute, which records all the
+# run-time-invisible Java programming language annotations on the parameters of
+# the corresponding method.
 
 # The RuntimeInvisibleParameterAnnotations attribute has the following format:
 
@@ -2590,35 +2718,60 @@ class RuntimeInvisibleAnnotations(Attribute):
 #         annotation annotations[num_annotations];
 #     } parameter_annotations[num_parameters];
 # }
-# The items of the RuntimeInvisibleParameterAnnotations_attribute structure are as follows:
+# The items of the RuntimeInvisibleParameterAnnotations_attribute structure are
+# as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) representing the string "RuntimeInvisibleParameterAnnotations".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info structure (§4.4.7) representing the string
+# "RuntimeInvisibleParameterAnnotations".
 
 # attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+# The value of the attribute_length item indicates the length of the attribute,
+# excluding the initial six bytes.
 
-# The value of the attribute_length item is thus dependent on the number of parameters, the number of run-time-invisible annotations on each parameter, and their values.
+# The value of the attribute_length item is thus dependent on the number of
+# parameters, the number of run-time-invisible annotations on each parameter,
+# and their values.
 
 # num_parameters
-# The value of the num_parameters item gives the number of parameters of the method represented by the method_info structure on which the annotation occurs. (This duplicates information that could be extracted from the method descriptor (§4.3.3).)
+# The value of the num_parameters item gives the number of parameters of the
+# method represented by the method_info structure on which the annotation
+# occurs. (This duplicates information that could be extracted from the method
+# descriptor (§4.3.3).)
 
 # parameter_annotations
-# Each value of the parameter_annotations table represents all of the run-time-invisible annotations on a single parameter. The sequence of values in the table corresponds to the sequence of parameters in the method descriptor. Each parameter_annotations entry contains the following two items:
+# Each value of the parameter_annotations table represents all of the
+# run-time-invisible annotations on a single parameter. The sequence of values
+# in the table corresponds to the sequence of parameters in the method
+# descriptor. Each parameter_annotations entry contains the following two
+# items:
 
 # num_annotations
-# The value of the num_annotations item indicates the number of run-time-invisible annotations on the parameter corresponding to the sequence number of this parameter_annotations element.
+# The value of the num_annotations item indicates the number of
+# run-time-invisible annotations on the parameter corresponding to the sequence
+# number of this parameter_annotations element.
 
 # annotations
-# Each value of the annotations table represents a single run-time-invisible annotation on the parameter corresponding to the sequence number of this parameter_annotations element.
+# Each value of the annotations table represents a single run-time-invisible
+# annotation on the parameter corresponding to the sequence number of this
+# parameter_annotations element.
 
 # ------------------------------------------------------------------------
 # 4.7.20. The AnnotationDefault attribute
 # ------------------------------------------------------------------------
 
-# The AnnotationDefault attribute is a variable-length attribute in the attributes table of certain method_info structures (§4.6), namely those representing elements of annotation types. The AnnotationDefault attribute records the default value for the element represented by the method_info structure.
+# The AnnotationDefault attribute is a variable-length attribute in the
+# attributes table of certain method_info structures (§4.6), namely those
+# representing elements of annotation types. The AnnotationDefault attribute
+# records the default value for the element represented by the method_info
+# structure.
 
-# Each method_info structure representing an element of an annotation type may contain at most one AnnotationDefault attribute. The Java Virtual Machine must make this default value available so it can be applied by appropriate reflective APIs.
+# Each method_info structure representing an element of an annotation type may
+# contain at most one AnnotationDefault attribute. The Java Virtual Machine
+# must make this default value available so it can be applied by appropriate
+# reflective APIs.
 
 # The AnnotationDefault attribute has the following format:
 
@@ -2630,23 +2783,36 @@ class RuntimeInvisibleAnnotations(Attribute):
 # The items of the AnnotationDefault_attribute structure are as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) representing the string "AnnotationDefault".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info structure (§4.4.7) representing the string
+# "AnnotationDefault".
 
 # attribute_length
-# The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
+# The value of the attribute_length item indicates the length of the attribute,
+# excluding the initial six bytes.
 
 # The value of the attribute_length item is thus dependent on the default value.
 
 # default_value
-# The default_value item represents the default value of the annotation type element whose default value is represented by this AnnotationDefault attribute.
+# The default_value item represents the default value of the annotation type
+# element whose default value is represented by this AnnotationDefault
+# attribute.
 
 # ------------------------------------------------------------------------
 # 4.7.21. The BootstrapMethods attribute
 # ------------------------------------------------------------------------
 
-# The BootstrapMethods attribute is a variable-length attribute in the attributes table of a ClassFile structure (§4.1). The BootstrapMethods attribute records bootstrap method specifiers referenced by invokedynamic instructions (§invokedynamic).
+# The BootstrapMethods attribute is a variable-length attribute in the
+# attributes table of a ClassFile structure (§4.1). The BootstrapMethods
+# attribute records bootstrap method specifiers referenced by invokedynamic
+# instructions (§invokedynamic).
 
-# There must be exactly one BootstrapMethods attribute in the attributes table of a given ClassFile structure if the constant_pool table of the ClassFile structure has at least one CONSTANT_InvokeDynamic_info entry (§4.4.10). There can be no more than one BootstrapMethods attribute in the attributes table of a given ClassFile structure.
+# There must be exactly one BootstrapMethods attribute in the attributes table
+# of a given ClassFile structure if the constant_pool table of the ClassFile
+# structure has at least one CONSTANT_InvokeDynamic_info entry (§4.4.10). There
+# can be no more than one BootstrapMethods attribute in the attributes table of
+# a given ClassFile structure.
 
 # The BootstrapMethods attribute has the following format:
 
@@ -2662,28 +2828,46 @@ class RuntimeInvisibleAnnotations(Attribute):
 # The items of the BootstrapMethods_attribute structure are as follows:
 
 # attribute_name_index
-# The value of the attribute_name_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) representing the string "BootstrapMethods".
+# The value of the attribute_name_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info structure (§4.4.7) representing the string
+# "BootstrapMethods".
 
 # attribute_length
 # The value of the attribute_length item indicates the length of the attribute, excluding the initial six bytes.
 
-# The value of the attribute_length item is thus dependent on the number of invokedynamic instructions in this ClassFile structure.
+# The value of the attribute_length item is thus dependent on the number of
+# invokedynamic instructions in this ClassFile structure.
 
 # num_bootstrap_methods
-# The value of the num_bootstrap_methods item determines the number of bootstrap method specifiers in the bootstrap_methods array.
+# The value of the num_bootstrap_methods item determines the number of
+# bootstrap method specifiers in the bootstrap_methods array.
 
 # bootstrap_methods[]
-# Each entry in the bootstrap_methods array contains an index to a CONSTANT_MethodHandle_info structure (§4.4.8) which specifies a bootstrap method, and a sequence (perhaps empty) of indexes to static arguments for the bootstrap method.
+# Each entry in the bootstrap_methods array contains an index to a
+# CONSTANT_MethodHandle_info structure (§4.4.8) which specifies a bootstrap
+# method, and a sequence (perhaps empty) of indexes to static arguments for the
+# bootstrap method.
 
 # Each bootstrap_methods entry must contain the following three items:
 
 # bootstrap_method_ref
-# The value of the bootstrap_method_ref item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_MethodHandle_info structure (§4.4.8).
+# The value of the bootstrap_method_ref item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_MethodHandle_info structure (§4.4.8).
 
-# The reference_kind item of the CONSTANT_MethodHandle_info structure should have the value 6 (REF_invokeStatic) or 8 (REF_newInvokeSpecial) (§5.4.3.5) or else invocation of the bootstrap method handle during call site specifier resolution for an invokedynamic instruction will complete abruptly.
+# The reference_kind item of the CONSTANT_MethodHandle_info structure should
+# have the value 6 (REF_invokeStatic) or 8 (REF_newInvokeSpecial) (§5.4.3.5) or
+# else invocation of the bootstrap method handle during call site specifier
+# resolution for an invokedynamic instruction will complete abruptly.
 
 # num_bootstrap_arguments
 # The value of the num_bootstrap_arguments item gives the number of items in the bootstrap_arguments array.
 
 # bootstrap_arguments
-# Each entry in the bootstrap_arguments array must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_String_info, CONSTANT_Class_info, CONSTANT_Integer_info, CONSTANT_Long_info, CONSTANT_Float_info, CONSTANT_Double_info, CONSTANT_MethodHandle_info, or CONSTANT_MethodType_info structure (§4.4.3, §4.4.1, §4.4.4, §4.4.5), §4.4.8, §4.4.9).
+# Each entry in the bootstrap_arguments array must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_String_info, CONSTANT_Class_info, CONSTANT_Integer_info,
+# CONSTANT_Long_info, CONSTANT_Float_info, CONSTANT_Double_info,
+# CONSTANT_MethodHandle_info, or CONSTANT_MethodType_info structure (§4.4.3,
+# §4.4.1, §4.4.4, §4.4.5), §4.4.8, §4.4.9).

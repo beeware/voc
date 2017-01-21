@@ -140,7 +140,9 @@ class Field:
                         ('enum', Field.ACC_ENUM),
                     ]
                 ] if f)
-            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % access_description if access_description else '')
+            reader.debug("    " * dump, '    Flags: 0x%04x%s' % (access_flags, ' (%s)') % (
+                access_description if access_description else ''
+            ))
 
             reader.debug("    " * dump, '    Attributes: (%s)' % attributes_count)
 
