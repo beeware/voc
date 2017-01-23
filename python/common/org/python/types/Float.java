@@ -77,7 +77,6 @@ public class Float extends org.python.types.Object {
                 result = "-inf";
             }
         } else {
-            result = java.lang.Double.toString(this.value);
             String format = "%.17g";
             result = String.format(Locale.US, format, value);
             int dot_pos = result.indexOf(".");
