@@ -115,11 +115,11 @@ def adjust(text, run_in_function=False):
     return '\n'.join(final_lines)
 
 
-def runAsPython(test_dir, main_code, extra_code=None, run_in_function=False, args=None):
+def runAsPython(test_dir, main_code, extra_code=None, args=None):
     """Run a block of Python code with the Python interpreter."""
     # Output source code into test directory
     with open(os.path.join(test_dir, 'test.py'), 'w', encoding='utf-8') as py_source:
-        py_source.write(adjust(main_code, run_in_function=run_in_function))
+        py_source.write(main_code)
 
     if extra_code:
         for name, code in extra_code.items():
@@ -209,6 +209,9 @@ PYTHON_EXCEPTION = re.compile(
 PYTHON_STACK = re.compile('  File "(?P<file>.*)", line (?P<line>\d+), in .*\r?\n    .*\r?\n')
 
 MEMORY_REFERENCE = re.compile('0x[\dABCDEFabcdef]{4,16}')
+
+END_OF_CODE_STRING = '===end of test==='
+END_OF_CODE_STRING_NEWLINE = END_OF_CODE_STRING + '\n'
 
 
 def cleanse_java(raw, substitutions):
@@ -360,7 +363,7 @@ class TranspileTestCase(TestCase):
             self, code,
             message=None,
             extra_code=None,
-            run_in_global=True, run_in_function=True,
+            run_in_global=True, run_in_function=True, exits_early=False,
             args=None, substitutions=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
@@ -371,8 +374,10 @@ class TranspileTestCase(TestCase):
             try:
                 self.makeTempDir()
                 # Run the code as Python and as Java.
-                py_out = runAsPython(self.temp_dir, code, extra_code, False, args=args)
-                java_out = self.runAsJava(code, extra_code, False, args=args)
+                adj_code = adjust(code, run_in_function=False)
+                adj_code += '\nprint("%s")\n' % END_OF_CODE_STRING
+                py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args)
+                java_out = self.runAsJava(adj_code, extra_code, args=args)
             except Exception as e:
                 self.fail(e)
             finally:
@@ -392,6 +397,15 @@ class TranspileTestCase(TestCase):
                 context = 'Global context'
             self.assertEqual(java_out, py_out, context)
 
+            # Confirm that both output strings end with the canary statement
+            substring_start = - (len(END_OF_CODE_STRING)+1)
+            if exits_early:
+                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+            else:
+                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+
         # ==================================================
         # Pass 2 - run the code in a function's context
         # ==================================================
@@ -399,8 +413,10 @@ class TranspileTestCase(TestCase):
             try:
                 self.makeTempDir()
                 # Run the code as Python and as Java.
-                py_out = runAsPython(self.temp_dir, code, extra_code, True, args=args)
-                java_out = self.runAsJava(code, extra_code, True, args=args)
+                adj_code = adjust(code, run_in_function=True)
+                adj_code += '\nprint("%s")\n' % END_OF_CODE_STRING
+                py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args)
+                java_out = self.runAsJava(adj_code, extra_code, args=args)
             except Exception as e:
                 self.fail(e)
             finally:
@@ -419,6 +435,15 @@ class TranspileTestCase(TestCase):
             else:
                 context = 'Function context'
             self.assertEqual(java_out, py_out, context)
+
+            # Confirm that both output strings end with the canary statement
+            substring_start = - (len(END_OF_CODE_STRING)+1)
+            if exits_early:
+                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+            else:
+                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
 
     def assertJavaExecution(
                 self, code, out,
@@ -457,7 +482,7 @@ class TranspileTestCase(TestCase):
                 try:
                     self.makeTempDir()
                     # Run the code as Java.
-                    java_out = self.runAsJava(code, extra_code, False, args=args)
+                    java_out = self.runAsJava(adjust(code), extra_code, args=args)
                 except Exception as e:
                     self.fail(e)
                 finally:
@@ -479,7 +504,9 @@ class TranspileTestCase(TestCase):
                 try:
                     self.makeTempDir()
                     # Run the code as Java.
-                    java_out = self.runAsJava(code, extra_code, True, args=args)
+                    java_out = self.runAsJava(
+                        adjust(code, run_in_function=True),
+                        extra_code, args=args)
                 except Exception as e:
                     self.fail(e)
                 finally:
@@ -506,7 +533,7 @@ class TranspileTestCase(TestCase):
         except FileExistsError:
             pass
 
-    def runAsJava(self, main_code, extra_code=None, run_in_function=False, args=None):
+    def runAsJava(self, main_code, extra_code=None, args=None):
         """Run a block of Python code as a Java program."""
         # Output source code into test directory
         transpiler = Transpiler(verbosity=0)
@@ -514,7 +541,7 @@ class TranspileTestCase(TestCase):
         # Don't redirect stderr; we want to see any errors from the transpiler
         # as top level test failures.
         with capture_output(redirect_stderr=False):
-            transpiler.transpile_string("test.py", adjust(main_code, run_in_function=run_in_function))
+            transpiler.transpile_string("test.py", main_code)
 
             if extra_code:
                 for name, code in extra_code.items():

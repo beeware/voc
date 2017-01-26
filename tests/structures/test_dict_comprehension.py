@@ -12,7 +12,6 @@ class DictComprehensionTests(TranspileTestCase):
             print(d[3])
             print(d[4])
             print(d[5])
-            print('Done.')
             """)
 
     def test_method(self):
@@ -25,5 +24,4 @@ class DictComprehensionTests(TranspileTestCase):
             print(d[3])
             print(d[4])
             print(d[5])
-            print('Done.')
             """)

@@ -8,7 +8,6 @@ class IfElifElseTests(TranspileTestCase):
             x = 1
             if x < 5:
                 print('Small x')
-            print('Done.')
             """)
 
         # No match on if
@@ -16,7 +15,6 @@ class IfElifElseTests(TranspileTestCase):
             x = 10
             if x < 5:
                 print('Small x')
-            print('Done.')
             """)
 
     def test_if_else(self):
@@ -26,7 +24,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Small x')
             else:
                 print('Large x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -35,7 +32,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Small x')
             else:
                 print('Large x')
-            print('Done.')
             """)
 
     def test_if_elif_else(self):
@@ -47,7 +43,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Medium x')
             else:
                 print('Large x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -58,7 +53,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Medium x')
             else:
                 print('Large x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -69,7 +63,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Medium x')
             else:
                 print('Large x')
-            print('Done.')
             """)
 
     def test_if_elif_elif_else(self):
@@ -83,7 +76,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Large x')
             else:
                 print('Huge x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -96,7 +88,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Large x')
             else:
                 print('Huge x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -109,7 +100,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Large x')
             else:
                 print('Huge x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -122,7 +112,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Large x')
             else:
                 print('Huge x')
-            print('Done.')
             """)
 
     def test_if_elif_elif(self):
@@ -134,7 +123,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Medium x')
             elif x < 500:
                 print('Large x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -145,7 +133,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Medium x')
             elif x < 500:
                 print('Large x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -156,7 +143,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Medium x')
             elif x < 500:
                 print('Large x')
-            print('Done.')
             """)
 
         self.assertCodeExecution("""
@@ -167,7 +153,6 @@ class IfElifElseTests(TranspileTestCase):
                 print('Medium x')
             elif x < 500:
                 print('Large x')
-            print('Done.')
             """)
 
     def test_multiple_if(self):

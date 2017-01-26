@@ -7,7 +7,10 @@ class PowTests(TranspileTestCase):
             x = 3
             y = 4
             z = 5
-            print(pow(x, y, z))
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
         """)
 
     def test_int_neg_y_pos_z(self):
@@ -15,7 +18,11 @@ class PowTests(TranspileTestCase):
             x = 3
             y = -4
             z = 5
-            print(pow(x, y, z))
+            try:
+                print(pow(x, y, z))
+            except (TypeError, ValueError) as err:
+                print(type(err))
+                print(err)
         """)
 
     def test_int_neg_y_neg_z(self):
@@ -23,7 +30,11 @@ class PowTests(TranspileTestCase):
             x = 3
             y = -4
             z = -5
-            print(pow(x, y, z))
+            try:
+                print(pow(x, y, z))
+            except (TypeError, ValueError) as err:
+                print(type(err))
+                print(err)
         """)
 
     def test_float_x_with_z(self):
@@ -31,7 +42,10 @@ class PowTests(TranspileTestCase):
             x = 3.3
             y = 4
             z = 5
-            print(pow(x, y, z))
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_float_y_with_z(self):
@@ -39,7 +53,10 @@ class PowTests(TranspileTestCase):
             x = 3
             y = 4.4
             z = 5
-            print(pow(x, y, z))
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_float(self):
@@ -47,7 +64,10 @@ class PowTests(TranspileTestCase):
             x = 3.3
             y = 4.4
             z = 5.5
-            print(pow(x, y, z))
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
         """)
 
     def test_float_neg_y_with_z(self):
@@ -55,7 +75,10 @@ class PowTests(TranspileTestCase):
             x = 3.3
             y = -4.4
             z = 5.5
-            print(pow(x, y, z))
+            try:
+                print(pow(x, y, z))
+            except TypeError as err:
+                print(err)
         """)
 
 

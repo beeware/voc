@@ -7,15 +7,19 @@ class IntTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = 37
-            x.attr = 42
-            print('Done.')
+            try:
+                x.attr = 42
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = 37
-            print(x.attr)
-            print('Done.')
+            try:
+                print(x.attr)
+            except AttributeError as err:
+                print(err)
             """)
 
     @expectedFailure

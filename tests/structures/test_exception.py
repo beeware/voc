@@ -9,17 +9,20 @@ class ExceptionTests(TranspileTestCase):
         # Caught exception
         self.assertCodeExecution("""
             raise KeyError("This is the name")
-            """)
+            print('Done.')
+            """, exits_early=True)
 
     def test_raise_without_any_params(self):
         self.assertCodeExecution("""
             raise ValueError()
-        """)
+            print('Done.')
+        """, exits_early=True)
 
     def test_raise_by_classname(self):
         self.assertCodeExecution("""
             raise ValueError
-        """)
+            print('Done.')
+        """, exits_early=True)
 
     def test_raise_catch(self):
         self.assertCodeExecution("""
@@ -40,7 +43,7 @@ class ExceptionTests(TranspileTestCase):
                 print("Got error")
                 raise
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_reraise_anonymous(self):
         self.assertCodeExecution("""
@@ -51,7 +54,7 @@ class ExceptionTests(TranspileTestCase):
                 print("Got error")
                 raise
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_reraise_named(self):
         self.assertCodeExecution("""
@@ -62,7 +65,7 @@ class ExceptionTests(TranspileTestCase):
                 print("Got error")
                 raise
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_raise_custom_exception(self):
         self.assertCodeExecution("""

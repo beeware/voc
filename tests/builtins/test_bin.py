@@ -11,7 +11,10 @@ class BinTests(TranspileTestCase):
                     return self.val
 
             x = IntLike(5)
-            print(bin(x))
+            try:
+                print(bin(x))
+            except TypeError as err:
+                print(err)
             """)
 
 

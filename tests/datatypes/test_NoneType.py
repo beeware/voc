@@ -5,15 +5,19 @@ class NoneTypeTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = None
-            x.thing = 42
-            print('Done.')
+            try:
+                x.thing = 42
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = None
-            y = x.thing
-            print('Done.')
+            try:
+                y = x.thing
+            except AttributeError as err:
+                print(err)
             """)
 
 

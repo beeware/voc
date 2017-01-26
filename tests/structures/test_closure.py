@@ -11,6 +11,4 @@ class ClosureTests(TranspileTestCase):
                     level1()
                 level2()
             level3()
-
-            print('Done.')
             """, run_in_function=False)

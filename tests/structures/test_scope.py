@@ -8,7 +8,6 @@ class ScopeTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = 1
             print('x =', x)
-            print('Done.')
             """)
 
     def test_local_scope(self):
@@ -21,10 +20,11 @@ class ScopeTests(TranspileTestCase):
                 print("2: x =", x)
 
             print("3: x =", x)
-            foo()
+            try:
+                foo()
+            except UnboundLocalError as err:
+                print(err)
             print("4: x =", x)
-
-            print('Done.')
             """, run_in_function=False)
 
     def test_global_scope(self):
@@ -41,7 +41,6 @@ class ScopeTests(TranspileTestCase):
             foo()
             print("4: x =", x)
 
-            print('Done.')
             """, run_in_function=False)
 
     def test_class_scope(self):
@@ -75,5 +74,4 @@ class ScopeTests(TranspileTestCase):
             except AttributeError:
                 pass
             print("3: f.z =", f.z)
-            print('Done.')
             """, run_in_function=False)

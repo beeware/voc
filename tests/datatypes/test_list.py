@@ -5,15 +5,19 @@ class ListTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            x.attr = 42
-            print('Done.')
+            try:
+                x.attr = 42
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            print(x.attr)
-            print('Done.')
+            try:
+                print(x.attr)
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_creation(self):
@@ -44,13 +48,19 @@ class ListTests(TranspileTestCase):
         # Positive index out of range
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            print(x[10])
+            try:
+                print(x[10])
+            except IndexError as err:
+                print(err)
             """)
 
         # Negative index out of range
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            print(x[-10])
+            try:
+                print(x[-10])
+            except IndexError as err:
+                print(err)
             """)
 
     def test_setitem(self):
@@ -70,13 +80,19 @@ class ListTests(TranspileTestCase):
         # Out of bounds
         self.assertCodeExecution("""
             x = []
-            x[0] = 5
+            try:
+                x[0] = 5
+            except IndexError as err:
+                print(err)
             """)
 
         # Out of bounds (negative)
         self.assertCodeExecution("""
             x = [1]
-            x[-2] = 5
+            try:
+                x[-2] = 5
+            except IndexError as err:
+                print(err)
             """)
 
     def test_append(self):
@@ -121,7 +137,11 @@ class ListTests(TranspileTestCase):
         # Not in list
         self.assertCodeExecution("""
             x = [1, 2]
-            x.remove(3)
+            try:
+                x.remove(3)
+            except ValueError as err:
+                print(err)
+            print(x)
             """)
 
     def test_slice(self):
@@ -189,13 +209,13 @@ class ListTests(TranspileTestCase):
         # Normal Contains
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            print(x.contains(1))
+            print(1 in x)
             """)
 
         # Element doesn't exist
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
-            print(x.contains(0))
+            print(0 in x)
             """)
 
         # Checking for boolean
@@ -265,19 +285,28 @@ class ListTests(TranspileTestCase):
     def test_pop_exceptions(self):
         self.assertCodeExecution("""
             x = []
-            print(x.pop())
+            try:
+                print(x.pop())
+            except IndexError as err:
+                print(err)
             print(x)
             """)
 
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            print(x.pop(3))
+            try:
+                print(x.pop(3))
+            except IndexError as err:
+                print(err)
             print(x)
             """)
 
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            print(x.pop(-4))
+            try:
+                print(x.pop(-4))
+            except IndexError as err:
+                print(err)
             print(x)
             """)
 
@@ -352,37 +381,46 @@ class ListTests(TranspileTestCase):
         # cases for 'ValueError: not in list'
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            print(x.index(4))
-            """)
+            try:
+                print(x.index(4))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 1]
-            print(x.index(2, 0, 1))
-            """)
+            try:
+                print(x.index(2, 0, 1))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 3, 4]
-            print(x.index(4, 0, 3))
-            """)
+            try:
+                print(x.index(4, 0, 3))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 1]
-            print(x.index(3, 0, 10))
-            """)
+            try:
+                print(x.index(3, 0, 10))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 3, 4]
-            print(x.index(2, 10, 20))
-            """)
+            try:
+                print(x.index(2, 10, 20))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = [1, 2, 3, 4]
-            print(x.index(2, 10, 0))
-            """)
+            try:
+                print(x.index(2, 10, 0))
+            except ValueError as err:
+                print(err)
 
-        self.assertCodeExecution("""
             x = []
-            print(x.index(1, 0, 10))
+            try:
+                print(x.index(1, 0, 10))
+            except ValueError as err:
+                print(err)
             """)
 
 

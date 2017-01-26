@@ -2,7 +2,7 @@ package org.python.exceptions;
 
 public class AssertionError extends org.python.exceptions.Exception {
     public AssertionError() {
-        super();
+        super("");
     }
 
     public AssertionError(java.lang.String msg) {

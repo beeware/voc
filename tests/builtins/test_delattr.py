@@ -51,8 +51,6 @@ class DelattrTests(TranspileTestCase):
                 print("  Shouldn't be able to delete attribute other_value")
             except AttributeError:
                 print("  Can't delete attribute other_value")
-
-            print('Done.')
             """, run_in_function=False)
 
 

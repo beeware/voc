@@ -1,7 +1,10 @@
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
+from unittest import expectedFailure
+
 
 class VarsTests(TranspileTestCase):
+    @expectedFailure
     def test_simple(self):
         self.assertCodeExecution("""
             print("There are %s vars" % len(vars()))

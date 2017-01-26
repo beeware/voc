@@ -23,7 +23,11 @@ class NextTests(TranspileTestCase):
     def test_next_exhausted_without_default(self):
         self.assertCodeExecution("""
             i = iter([])
-            print(next(i))
+            try:
+                print(next(i))
+            except StopIteration as err:
+                print(err)
+            print('Done.')
         """)
 
 

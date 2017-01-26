@@ -5,15 +5,19 @@ class BytearrayTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = bytearray([1,2,3])
-            x.attr = 42
-            print('Done.')
+            try:
+                x.attr = 42
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = bytearray([1,2,3])
-            print(x.attr)
-            print('Done.')
+            try:
+                print(x.attr)
+            except AttributeError as err:
+                print(err)
             """)
 
 

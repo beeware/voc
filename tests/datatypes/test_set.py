@@ -5,15 +5,19 @@ class SetTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}
-            x.attr = 42
-            print('Done.')
+            try:
+                x.attr = 42
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_getattr(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}
-            print(x.attr)
-            print('Done.')
+            try:
+                print(x.attr)
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_creation(self):
@@ -51,7 +55,10 @@ class SetTests(TranspileTestCase):
         # Test empty set popping.
         self.assertCodeExecution("""
             x = set()
-            x.pop()
+            try:
+                x.pop()
+            except KeyError as err:
+                print(err)
         """)
 
         # Test populated set popping.
@@ -125,7 +132,10 @@ class SetTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = {1, 2, 3}
             x.remove(1)
-            x.remove(4)
+            try:
+                x.remove(4)
+            except KeyError as err:
+                print(err)
             print(x)
             """)
 

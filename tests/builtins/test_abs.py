@@ -7,7 +7,10 @@ class AbsTests(TranspileTestCase):
             class NotAbsLike:
                 pass
             x = NotAbsLike()
-            print(abs(x))
+            try:
+                print(abs(x))
+            except TypeError as err:
+                print(err)
             """)
 
 

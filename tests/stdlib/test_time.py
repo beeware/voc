@@ -13,7 +13,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time._STRUCT_TM_ITEMS)
-            print('Done.')
             """)
 
     #######################################################
@@ -22,7 +21,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.__doc__)
-            print('Done.')
             """)
 
     #######################################################
@@ -32,7 +30,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.__file__)
-            print('Done.')
             """)
 
     #######################################################
@@ -42,7 +39,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.__loader__)
-            print('Done.')
             """)
 
     #######################################################
@@ -51,7 +47,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.__name__)
-            print('Done.')
             """)
 
     #######################################################
@@ -60,7 +55,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.__package__)
-            print('Done.')
             """)
 
     #######################################################
@@ -70,7 +64,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.__spec__)
-            print('Done.')
             """)
 
     #######################################################
@@ -80,7 +73,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.altzone)
-            print('Done.')
             """)
 
     #######################################################
@@ -90,7 +82,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.asctime())
-            print('Done.')
             """)
 
     #######################################################
@@ -111,7 +102,6 @@ class TimeModuleTests(TranspileTestCase):
             diff = end - start - {diff_offset}
             print(type(diff))
             print(diff < 0.1)
-            print('Done.')
             """.format(sleepy_time=sleepy_time, diff_offset=diff_offset))
 
     #######################################################
@@ -121,7 +111,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.ctime())
-            print('Done.')
             """)
 
     #######################################################
@@ -131,7 +120,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.daylight)
-            print('Done.')
             """)
 
     #######################################################
@@ -141,7 +129,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.get_clock_info())
-            print('Done.')
             """)
 
     #######################################################
@@ -151,7 +138,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.gmtime())
-            print('Done.')
             """)
 
     #######################################################
@@ -161,7 +147,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.localtime())
-            print('Done.')
             """)
 
     #######################################################
@@ -171,7 +156,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.mktime())
-            print('Done.')
             """)
 
     #######################################################
@@ -181,7 +165,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.monotonic())
-            print('Done.')
             """)
 
     #######################################################
@@ -191,7 +174,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.perf_counter())
-            print('Done.')
             """)
 
     #######################################################
@@ -201,7 +183,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.process_time())
-            print('Done.')
             """)
 
     #######################################################
@@ -210,7 +191,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.sleep(1))
-            print('Done.')
             """)
 
     #######################################################
@@ -220,7 +200,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.strftime())
-            print('Done.')
             """)
 
     #######################################################
@@ -230,7 +209,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.strptime())
-            print('Done.')
             """)
 
     #######################################################
@@ -240,7 +218,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.struct_time())
-            print('Done.')
             """)
 
     #######################################################
@@ -249,7 +226,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(int(time.time() / 10000))
-            print('Done.')
             """)
 
     #######################################################
@@ -259,7 +235,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.timezone)
-            print('Done.')
             """)
 
     #######################################################
@@ -270,7 +245,6 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.tzname)
-            print('Done.')
             """)
 
     #######################################################
@@ -280,5 +254,4 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.tzset())
-            print('Done.')
             """)

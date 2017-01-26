@@ -5,26 +5,28 @@ class StrTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
             x = "Hello, world"
-            x.attr = 42
-            print('Done.')
+            try:
+                x.attr = 42
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_endswith(self):
         self.assertCodeExecution("""
             s = "abracadabra"
-            suffix = "abra"
+            end = "abra"
             print(s.endswith(end))
             """)
 
         self.assertCodeExecution("""
             s = "abracadabra"
-            suffix = "ABRA"
+            end = "ABRA"
             print(s.endswith(end))
             """)
 
         self.assertCodeExecution("""
             s = "ABRACADABRA"
-            suffix = "abra"
+            end = "abra"
             print(s.endswith(end))
             """)
 
@@ -35,8 +37,10 @@ class StrTests(TranspileTestCase):
     def test_getattr(self):
         self.assertCodeExecution("""
             x = "Hello, world"
-            print(x.attr)
-            print('Done.')
+            try:
+                print(x.attr)
+            except AttributeError as err:
+                print(err)
             """)
 
     def test_getitem(self):
@@ -55,13 +59,19 @@ class StrTests(TranspileTestCase):
         # Positive index out of range
         self.assertCodeExecution("""
             x = "12345"
-            print(x[10])
+            try:
+                print(x[10])
+            except IndexError as err:
+                print(err)
             """)
 
         # Negative index out of range
         self.assertCodeExecution("""
             x = "12345"
-            print(x[-10])
+            try:
+                print(x[-10])
+            except IndexError as err:
+                print(err)
             """)
 
     def test_slice(self):
@@ -119,7 +129,10 @@ class StrTests(TranspileTestCase):
 
         self.assertCodeExecution("""
             s = 'hello hell'
-            print(s.index('world'))
+            try:
+                print(s.index('world'))
+            except ValueError as err:
+                print(err)
             """)
 
         self.assertCodeExecution("""
@@ -129,7 +142,10 @@ class StrTests(TranspileTestCase):
 
         self.assertCodeExecution("""
             s = 'hello hell'
-            print(s.index('hell', 1, 3))
+            try:
+                print(s.index('hell', 1, 3))
+            except ValueError as err:
+                print(err)
             """)
 
         self.assertCodeExecution("""
@@ -139,7 +155,10 @@ class StrTests(TranspileTestCase):
 
         self.assertCodeExecution("""
             s = 'hello hell'
-            print(s.index('hell', 1, -1))
+            try:
+                print(s.index('hell', 1, -1))
+            except ValueError as err:
+                print(err)
             """)
 
         self.assertCodeExecution("""
