@@ -24,25 +24,6 @@ from .debug import (
 )
 
 
-def is_mainline_def(node):
-    return (
-        # Node is an if statement...
-        isinstance(node, ast.If)
-        # ... doing a comparison ...
-        and isinstance(node.test, ast.Compare)
-        # ... that is an equality comparison ...
-        and len(node.test.ops) == 1
-        and isinstance(node.test.ops[0], ast.Eq)
-        # ... where the LHS is the symbol __name__
-        and isinstance(node.test.left, ast.Name)
-        and node.test.left.id == '__name__'
-        # ... and the RHS is the string '__main__'
-        and len(node.test.comparators) == 1
-        and isinstance(node.test.comparators[0], ast.Str)
-        and node.test.comparators[0].s == '__main__'
-    )
-
-
 def is_call(node, name):
     return (
         # Node is a Call statement...
@@ -196,30 +177,15 @@ class Visitor(ast.NodeVisitor):
         if self._root_module is None:
             self._root_module = module
 
-        main = None
-
         for child in node.body:
-            if is_mainline_def(child):
-                if main is not None:
-                    print("Found duplicate main block... replacing previous main", file=sys.stderr)
+            self.visit(child)
 
-                main = MainFunction(module)
-                self.push_context(main)
-                for c in child.body:
-                    self.visit(c)
-                self.pop_context()
-            else:
-                self.visit(child)
-
-        if main is None:
-            if self.verbosity:
-                print("Adding default main method...")
-            main = MainFunction(module)
-            self.push_context(main)
-            # No content, so pop right away.
-            # We need to push to make sure setup/teardown
-            # logic is invoked.
-            self.pop_context()
+        main = MainFunction(module)
+        self.push_context(main)
+        # No content, so pop right away.
+        # We need to push to make sure setup/teardown
+        # logic is invoked.
+        self.pop_context()
 
         module.functions.append(main)
 

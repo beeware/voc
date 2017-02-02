@@ -334,14 +334,13 @@ class SysModuleTests(TranspileTestCase):
             print(sys.exit())
             """, exits_early=True)
 
-    @expectedFailure
     def test_exit(self):
         # From inside main
         self.assertCodeExecution("""
             import sys
             if __name__ == '__main__':
                 print(sys.exit())
-            """, run_in_function=False)
+            """, run_in_function=False, exits_early=True)
 
         # From a method called from inside main
         self.assertCodeExecution("""
@@ -352,7 +351,7 @@ class SysModuleTests(TranspileTestCase):
 
             if __name__ == '__main__':
                 foo()
-            """, run_in_function=False)
+            """, run_in_function=False, exits_early=True)
 
     ############################################################
     # flags
