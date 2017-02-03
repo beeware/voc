@@ -552,7 +552,40 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_With(self, node):
         # withitem* items, stmt* body):
-        raise NotImplementedError('No handler for With')
+        #     withitem = (expr context_expr, expr? optional_vars)
+        for it in node.items:
+            self.visit(it.context_expr)
+
+            # get and invoke __enter__
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                python.Object.get_attribute('__enter__'),
+                JavaOpcodes.ACONST_NULL(),
+                JavaOpcodes.ACONST_NULL(),
+                python.Callable.invoke(),
+            )
+
+            if it.optional_vars:
+                self.context.store_name(it.optional_vars.id)
+            else:
+                self.context.add_opcodes(JavaOpcodes.POP())
+
+            # push __exit__ to the stack
+            self.context.add_opcodes(
+                python.Object.get_attribute('__exit__'),
+            )
+
+        # TODO: use TRY helper and put exception information in the array passed to __exit__
+        for child in node.body:
+            self.visit(child)
+
+        for _ in node.items:
+            # pop __exit__ from stack and invoke it
+            self.context.add_opcodes(
+                java.Array(3),
+                JavaOpcodes.ACONST_NULL(),
+                python.Callable.invoke(),
+            )
 
     @node_visitor
     def visit_Raise(self, node):
