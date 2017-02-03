@@ -35,6 +35,31 @@ class ImportTests(TranspileTestCase):
                     """
             })
 
+    def test_import_module_main(self):
+        "You can import a Python module with if __name__ == '__main__'"
+        self.assertCodeExecution(
+            """
+            import example
+
+            print('A')
+
+            if __name__ == "__main__":
+                print('main')
+
+            print('B')
+            """,
+            extra_code={
+                'example':
+                    """
+                    print('C')
+
+                    if __name__ == "__main__":
+                        print('example main')
+
+                    print('D')
+                    """
+            })
+
     def test_multiple_module_import(self):
         "You can import a multiple Python modules implemented in Python"
         self.assertCodeExecution(
