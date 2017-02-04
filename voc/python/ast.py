@@ -553,13 +553,35 @@ class Visitor(ast.NodeVisitor):
     def visit_With(self, node):
         # withitem* items, stmt* body):
         #     withitem = (expr context_expr, expr? optional_vars)
+        def opcodes_raise_ifnull(exception, message):
+            return [
+                JavaOpcodes.DUP(),
+                JavaOpcodes.IFNONNULL(14),  # size of IFNONNULL + exception handling opcodes
+                java.New(exception),
+                JavaOpcodes.LDC_W(message),
+                java.Init(exception, 'Ljava/lang/String;'),
+                JavaOpcodes.ATHROW(),
+            ]
+
         for it in node.items:
             self.visit(it.context_expr)
 
-            # get and invoke __enter__
+            # push __exit__ to the stack
             self.context.add_opcodes(
                 JavaOpcodes.DUP(),
-                python.Object.get_attribute('__enter__'),
+                python.Object.get_attribute('__exit__', use_null=True),
+                *opcodes_raise_ifnull('org/python/exceptions/AttributeError', '__exit__')
+            )
+            self.context.add_opcodes(
+                JavaOpcodes.SWAP(),
+            )
+
+            self.context.add_opcodes(
+                python.Object.get_attribute('__enter__', use_null=True),
+                *opcodes_raise_ifnull('org/python/exceptions/AttributeError', '__enter__')
+            )
+
+            self.context.add_opcodes(
                 JavaOpcodes.ACONST_NULL(),
                 JavaOpcodes.ACONST_NULL(),
                 python.Callable.invoke(),
@@ -569,11 +591,6 @@ class Visitor(ast.NodeVisitor):
                 self.context.store_name(it.optional_vars.id)
             else:
                 self.context.add_opcodes(JavaOpcodes.POP())
-
-            # push __exit__ to the stack
-            self.context.add_opcodes(
-                python.Object.get_attribute('__exit__'),
-            )
 
         # TODO: use TRY helper and put exception information in the array passed to __exit__
         for child in node.body:
