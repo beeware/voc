@@ -554,22 +554,28 @@ class Visitor(ast.NodeVisitor):
         # withitem* items, stmt* body):
         #     withitem = (expr context_expr, expr? optional_vars)
         def opcodes_raise_ifnull(exception, message):
+            """Raise exception if top of stack is null.
+            If non-null, leave the stack as-is.
+            """
             return [
                 JavaOpcodes.DUP(),
-                JavaOpcodes.IFNONNULL(14),  # size of IFNONNULL + exception handling opcodes
+                JavaOpcodes.IFNONNULL(offset=14),  # size of IFNONNULL + exception handling opcodes
                 java.New(exception),
                 JavaOpcodes.LDC_W(message),
                 java.Init(exception, 'Ljava/lang/String;'),
                 JavaOpcodes.ATHROW(),
             ]
 
-        for it in node.items:
+        exit_names = ['#exit-%d-%x' % (i, id(node)) for i, _ in enumerate(node.items)]
+
+        for i, it in enumerate(node.items):
             self.visit(it.context_expr)
 
-            # push __exit__ to the stack
             self.context.add_opcodes(
                 JavaOpcodes.DUP(),
                 python.Object.get_attribute('__exit__', use_null=True),
+                JavaOpcodes.DUP(),
+                ASTORE_name(exit_names[i]),
                 *opcodes_raise_ifnull('org/python/exceptions/AttributeError', '__exit__')
             )
             self.context.add_opcodes(
@@ -590,19 +596,44 @@ class Visitor(ast.NodeVisitor):
             if it.optional_vars:
                 self.context.store_name(it.optional_vars.id)
             else:
-                self.context.add_opcodes(JavaOpcodes.POP())
+                self.context.add_opcodes(
+                    JavaOpcodes.POP(),
+                )
 
-        # TODO: use TRY helper and put exception information in the array passed to __exit__
+        self.context.add_opcodes(
+            TRY(),
+        )
+
         for child in node.body:
             self.visit(child)
 
-        for _ in node.items:
-            # pop __exit__ from stack and invoke it
+        for name in exit_names[::-1]:
             self.context.add_opcodes(
+                ALOAD_name(name),
                 java.Array(3),
                 JavaOpcodes.ACONST_NULL(),
                 python.Callable.invoke(),
+                JavaOpcodes.POP(),
             )
+
+        self.context.add_opcodes(
+            CATCH(),
+        )
+
+        # finally content:
+        for name in exit_names[::-1]:
+            self.context.add_opcodes(
+                ALOAD_name(name),
+                java.Array(3),
+                JavaOpcodes.ACONST_NULL(),
+                python.Callable.invoke(),
+                JavaOpcodes.POP(),
+            )
+
+        self.context.add_opcodes(
+            JavaOpcodes.ATHROW(),
+            END_TRY(),
+        )
 
     @node_visitor
     def visit_Raise(self, node):

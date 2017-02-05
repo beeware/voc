@@ -19,18 +19,17 @@ class WithLoopTests(TranspileTestCase):
                 print('in another ctx, val now is', val)
             """)
 
-    # TODO: make this test pass
-    # def test_with_body_fails(self):
-    #     self.assertCodeExecution("""
-    #         class CtxMgr:
-    #             def __enter__(self):
-    #                 print('entering CtxMgr')
-    #             def __exit__(self, *args):
-    #                 print('exiting CtxMgr')
-    #
-    #         with CtxMgr():
-    #             raise ValueError
-    #         """)
+    def test_with_body_fails(self):
+        self.assertCodeExecution("""
+            class CtxMgr:
+                def __enter__(self):
+                    print('entering CtxMgr')
+                def __exit__(self, *args):
+                    print('exiting CtxMgr')
+
+            with CtxMgr():
+                raise ValueError
+            """)
 
     def test_with_noexit(self):
         self.assertCodeExecution("""
@@ -49,3 +48,24 @@ class WithLoopTests(TranspileTestCase):
             with CtxMgrMissingEnter():
                 print('inside')
         """)
+
+    def test_with_nested(self):
+        self.assertCodeExecution("""
+            class CtxMgr:
+                def __enter__(self):
+                    print('entering CtxMgr')
+                    return 42
+                def __exit__(self, *args):
+                    print('exiting CtxMgr')
+
+            class CtxMgr2:
+                def __enter__(self):
+                    print('entering CtxMgr2')
+                    return 24
+                def __exit__(self, *args):
+                    print('exiting CtxMgr2')
+
+            with CtxMgr() as val, CtxMgr2() as val2:
+                print('val', val)
+                print('val2', val2)
+            """)
