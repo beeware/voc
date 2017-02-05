@@ -310,7 +310,6 @@ class StrTests(TranspileTestCase):
             """)
 
 
-
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
