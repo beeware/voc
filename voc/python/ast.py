@@ -566,6 +566,17 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.ATHROW(),
             ]
 
+        def array_of_nones(size):
+            opcodes = [java.Array(size)]
+            for i in range(size):
+                opcodes += [
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                    python.NONE(),
+                    JavaOpcodes.AASTORE(),
+                ]
+            return opcodes
+
         exit_names = ['#exit-%d-%x' % (i, id(node)) for i, _ in enumerate(node.items)]
 
         for i, it in enumerate(node.items):
@@ -610,27 +621,46 @@ class Visitor(ast.NodeVisitor):
         for name in exit_names[::-1]:
             self.context.add_opcodes(
                 ALOAD_name(name),
-                java.Array(3),
+            )
+            self.context.add_opcodes(*array_of_nones(3))
+            self.context.add_opcodes(
                 JavaOpcodes.ACONST_NULL(),
                 python.Callable.invoke(),
                 JavaOpcodes.POP(),
             )
 
         self.context.add_opcodes(
-            CATCH(),
+            CATCH('org/python/exceptions/Exception'),
+            ASTORE_name('#exception-%x' % id(node)),
         )
 
-        # finally content:
         for name in exit_names[::-1]:
             self.context.add_opcodes(
                 ALOAD_name(name),
+            )
+            self.context.add_opcodes(
                 java.Array(3),
+                JavaOpcodes.DUP(),
+                ICONST_val(0),
+                python.NONE(),  # TODO: pass the exception type here
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.DUP(),
+                ICONST_val(1),
+                ALOAD_name('#exception-%x' % id(node)),
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.DUP(),
+                ICONST_val(2),
+                python.NONE(),  # TODO: pass the traceback info here
+                JavaOpcodes.AASTORE(),
+            ),
+            self.context.add_opcodes(
                 JavaOpcodes.ACONST_NULL(),
                 python.Callable.invoke(),
                 JavaOpcodes.POP(),
             )
 
         self.context.add_opcodes(
+            ALOAD_name('#exception-%x' % id(node)),
             JavaOpcodes.ATHROW(),
             END_TRY(),
         )

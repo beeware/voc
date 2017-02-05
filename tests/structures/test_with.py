@@ -9,7 +9,7 @@ class WithLoopTests(TranspileTestCase):
                     print('entering CtxMgr')
                     return 42
                 def __exit__(self, *args):
-                    print('exiting CtxMgr')
+                    print('exiting CtxMgr', args)
 
             with CtxMgr() as val:
                 print('val', val)
@@ -20,15 +20,19 @@ class WithLoopTests(TranspileTestCase):
             """)
 
     def test_with_body_fails(self):
+        # TODO: add support for exc_type and traceback information
         self.assertCodeExecution("""
             class CtxMgr:
                 def __enter__(self):
                     print('entering CtxMgr')
-                def __exit__(self, *args):
+                def __exit__(self, exc_type, exc_value, traceback):
                     print('exiting CtxMgr')
+                    # print('exc_type', exc_type)
+                    print('exc_value', exc_value)
+                    # print('traceback', traceback)
 
             with CtxMgr():
-                raise ValueError
+                raise KeyError('ola')
             """)
 
     def test_with_noexit(self):
