@@ -33,7 +33,7 @@ class WithLoopTests(TranspileTestCase):
 
             with CtxMgr():
                 raise KeyError('ola')
-            """)
+            """, exits_early=True)
 
     def test_with_noexit(self):
         self.assertCodeExecution("""
@@ -42,7 +42,7 @@ class WithLoopTests(TranspileTestCase):
                     print('entering CtxMgrMissingExit')
             with CtxMgrMissingExit():
                 print('inside')
-        """)
+        """, exits_early=True)
 
     def test_with_noenter(self):
         self.assertCodeExecution("""
@@ -51,7 +51,7 @@ class WithLoopTests(TranspileTestCase):
                     print('exiting CtxMgrMissingEnter')
             with CtxMgrMissingEnter():
                 print('inside')
-        """)
+        """, exits_early=True)
 
     def test_with_nested(self):
         self.assertCodeExecution("""
