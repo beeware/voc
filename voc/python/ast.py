@@ -555,10 +555,9 @@ class Visitor(ast.NodeVisitor):
         #     withitem = (expr context_expr, expr? optional_vars)
         def opcodes_raise_ifnull(exception, message):
             """Raise exception if top of stack is null.
-            If non-null, leave the stack as-is.
+            Stack: value →
             """
             return [
-                JavaOpcodes.DUP(),
                 JavaOpcodes.IFNONNULL(offset=14),  # size of IFNONNULL + exception handling opcodes
                 java.New(exception),
                 JavaOpcodes.LDC_W(message),
@@ -567,6 +566,9 @@ class Visitor(ast.NodeVisitor):
             ]
 
         def array_of_nones(size):
+            """Create an array containing Python None objects with given size.
+            Stack:   → arrayref
+            """
             opcodes = [java.Array(size)]
             for i in range(size):
                 opcodes += [
@@ -589,12 +591,10 @@ class Visitor(ast.NodeVisitor):
                 ASTORE_name(exit_names[i]),
                 *opcodes_raise_ifnull('org/python/exceptions/AttributeError', '__exit__')
             )
-            self.context.add_opcodes(
-                JavaOpcodes.SWAP(),
-            )
 
             self.context.add_opcodes(
                 python.Object.get_attribute('__enter__', use_null=True),
+                JavaOpcodes.DUP(),
                 *opcodes_raise_ifnull('org/python/exceptions/AttributeError', '__enter__')
             )
 
@@ -663,7 +663,10 @@ class Visitor(ast.NodeVisitor):
             ALOAD_name('#exception-%x' % id(node)),
             JavaOpcodes.ATHROW(),
             END_TRY(),
+            free_name('#exception-%x' % id(node)),
         )
+        for name in exit_names:
+            self.context.add_opcodes(free_name(name))
 
     @node_visitor
     def visit_Raise(self, node):
