@@ -276,6 +276,40 @@ class StrTests(TranspileTestCase):
             print(len(s))
         """)
 
+    def test_center(self):
+        # test ok
+        self.assertCodeExecution("""
+            s = "abc"
+            print(s.center(10, "-"))
+            """)
+        # less length
+        self.assertCodeExecution("""
+            s = "abc"
+            print(s.center(2,"-"))
+            """)
+        # more than one fillChar
+        self.assertCodeExecution("""
+            s = "abc"
+            try:
+                print(s.center(10,"-*"))
+            except TypeError as err:
+                print(err)
+            """)
+        # called method is not string
+        self.assertCodeExecution("""
+            s = 123
+            try:
+                print(s.center(10,"-"))
+            except AttributeError as err:
+                print(err)
+            """)
+        # bool as width
+        self.assertCodeExecution("""
+            s = "abc"
+            print(s.center(True,"-"))
+            """)
+
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
