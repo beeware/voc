@@ -979,21 +979,4 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.AttributeError(this, "__round__");
     }
-
-    /**
-     * Section 3.3.8 - With statement context
-     */
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __enter__() {
-        throw new org.python.exceptions.AttributeError(this, "__enter__");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __exit__(org.python.Object exc_type, org.python.Object exc_value, org.python.Object traceback) {
-        throw new org.python.exceptions.AttributeError(this, "__exit__");
-    }
 }

@@ -552,7 +552,105 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_With(self, node):
         # withitem* items, stmt* body):
-        raise NotImplementedError('No handler for With')
+        #     withitem = (expr context_expr, expr? optional_vars)
+        exit_names = ['#exit-%d-%x' % (i, id(node)) for i, _ in enumerate(node.items)]
+
+        for i, item in enumerate(node.items):
+            self.visit(item.context_expr)
+
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                python.Object.get_attribute('__exit__', use_null=True),
+                JavaOpcodes.DUP(),
+                ASTORE_name(exit_names[i]),
+                IF([], JavaOpcodes.IFNONNULL),
+                java.THROW(
+                    'org/python/exceptions/AttributeError',
+                    ['Ljava/lang/String;', JavaOpcodes.LDC_W('__exit__')]
+                ),
+                END_IF(),
+            )
+
+            self.context.add_opcodes(
+                python.Object.get_attribute('__enter__', use_null=True),
+                JavaOpcodes.DUP(),
+                IF([], JavaOpcodes.IFNONNULL),
+                java.THROW(
+                    'org/python/exceptions/AttributeError',
+                    ['Ljava/lang/String;', JavaOpcodes.LDC_W('__enter__')]
+                ),
+                END_IF(),
+            )
+
+            self.context.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),
+                JavaOpcodes.ACONST_NULL(),
+                python.Callable.invoke(),
+            )
+
+            if item.optional_vars:
+                self.context.store_name(item.optional_vars.id)
+            else:
+                self.context.add_opcodes(
+                    JavaOpcodes.POP(),
+                )
+
+        self.context.add_opcodes(
+            TRY(),
+        )
+
+        for child in node.body:
+            self.visit(child)
+
+        for name in exit_names[::-1]:
+            self.context.add_opcodes(
+                ALOAD_name(name),
+            )
+            self.context.add_opcodes(java.Array(3, fill=python.NONE()))
+            self.context.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),
+                python.Callable.invoke(),
+                JavaOpcodes.POP(),
+            )
+
+        self.context.add_opcodes(
+            CATCH('org/python/exceptions/Exception'),
+            ASTORE_name('#exception-%x' % id(node)),
+        )
+
+        for name in exit_names[::-1]:
+            self.context.add_opcodes(
+                ALOAD_name(name),
+            )
+            self.context.add_opcodes(
+                java.Array(3),
+                JavaOpcodes.DUP(),
+                ICONST_val(0),
+                python.NONE(),  # TODO: pass the exception type here
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.DUP(),
+                ICONST_val(1),
+                ALOAD_name('#exception-%x' % id(node)),
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.DUP(),
+                ICONST_val(2),
+                python.NONE(),  # TODO: pass the traceback info here
+                JavaOpcodes.AASTORE(),
+            ),
+            self.context.add_opcodes(
+                JavaOpcodes.ACONST_NULL(),
+                python.Callable.invoke(),
+                JavaOpcodes.POP(),
+            )
+
+        self.context.add_opcodes(
+            ALOAD_name('#exception-%x' % id(node)),
+            JavaOpcodes.ATHROW(),
+            END_TRY(),
+            free_name('#exception-%x' % id(node)),
+        )
+        for name in exit_names:
+            self.context.add_opcodes(free_name(name))
 
     @node_visitor
     def visit_Raise(self, node):

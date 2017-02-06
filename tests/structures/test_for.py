@@ -113,7 +113,6 @@ class ForLoopTests(TranspileTestCase):
                 print(x, y, z)
             """)
 
-    @expectedFailure
     def test_multiple_values_iterator(self):
         self.assertCodeExecution("""
             values = {
@@ -121,9 +120,9 @@ class ForLoopTests(TranspileTestCase):
                 'b': 2,
                 'c': 3,
             }
-            for k, v in values.items():
+            for k, v in sorted(values.items()):
                 print(k, v)
             print('And once again...')
-            for item in values.items():
+            for item in sorted(values.items()):
                 print(item[0], item[1])
             """)

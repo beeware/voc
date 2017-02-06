@@ -57,15 +57,24 @@ class Yield:
 ##########################################################################
 
 class Array:
-    def __init__(self, size, classname='org/python/Object'):
+    def __init__(self, size, classname='org/python/Object', fill=None):
         self.size = size
         self.classname = classname
+        self.fill = fill
 
     def process(self, context):
         context.add_opcodes(
             ICONST_val(self.size),
             JavaOpcodes.ANEWARRAY(self.classname),
         )
+        if self.fill:
+            for i in range(self.size):
+                context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    ICONST_val(i),
+                    self.fill,
+                    JavaOpcodes.AASTORE(),
+                )
 
 
 class List:
@@ -163,3 +172,26 @@ class Class:
                     returns='Ljava/lang/Class;'
                 ),
             )
+
+
+class THROW:
+    # Raise an exception of given type with given arguments
+    # Example:
+    #    THROW(
+    #        'org/python/exceptions/AttributeError',
+    #        ['Ljava/lang/String;', JavaOpcodes.LDC_W("Invalid attribute")],
+    #    )
+    def __init__(self, exception_class, *exception_args):
+        self.exception_class = exception_class
+        self.exc_arg_types = [e[0] for e in exception_args]
+        self.exc_arg_values = [e[1] for e in exception_args]
+
+    def process(self, context):
+        context.add_opcodes(
+            New(self.exception_class),
+            *self.exc_arg_values
+        )
+        context.add_opcodes(
+            Init(self.exception_class, *self.exc_arg_types),
+            JavaOpcodes.ATHROW(),
+        )
