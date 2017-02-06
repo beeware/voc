@@ -14,6 +14,8 @@ class WithLoopTests(TranspileTestCase):
             with CtxMgr() as val:
                 print('val', val)
 
+            print('val outside block', val)
+
             val = 16
             with CtxMgr():
                 print('in another ctx, val now is', val)
