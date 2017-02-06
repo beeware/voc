@@ -1,5 +1,5 @@
-Getting Started
-===============
+Installation
+============
 
 In this guide we will walk you through setting up your VOC environment for
 development and testing. We will assume that you have a working Python 3, JDK,

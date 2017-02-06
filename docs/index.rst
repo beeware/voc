@@ -20,7 +20,4 @@ defined in Java code.
 
    intro/index
    tutorials/index
-   howto/index
-   topics/index
-   reference/index
    internals/index

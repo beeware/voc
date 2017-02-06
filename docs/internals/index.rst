@@ -1,5 +1,5 @@
-Project Internals
-=================
+Development
+===========
 
 .. toctree::
    :maxdepth: 1
