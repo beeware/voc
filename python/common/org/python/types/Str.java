@@ -544,65 +544,52 @@ public class Str extends org.python.types.Object {
 
     @org.python.Method(
         __doc__ = "",
-		args = {"width"},
-		default_args = {"charToFill"}
+        args = {"width"},
+        default_args = {"charToFill"}
     )
     public org.python.Object center(org.python.Object width, org.python.Object charToFill) {
-		if(this instanceof org.python.types.Str)
-		{
-			java.lang.String fillChar = new java.lang.String();
-			if(charToFill instanceof org.python.types.Str)
-			{
-				// fillChar has right type
-				if( ((org.python.types.Str)charToFill).value.length() != 1) {
-					throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
-				}
-				fillChar = ((org.python.types.Str) charToFill).value;
-			}
-			else if(charToFill == null)
-			{
-				fillChar = " ";
-			}
-			else {
-				throw new org.python.exceptions.TypeError("Fill char must of type String");
-			}
-			
-			if(width instanceof org.python.types.Int)
-			{
-				String str = this.value;
-				int widthVal = (int)((org.python.types.Int)width).value;
-				int strLen = str.length();
-				if(strLen >= widthVal )
-				{
-					return new org.python.types.Str(str);
-				}
-				else {
-					int diff = widthVal - strLen;
-					int lenFirst = (diff)/2;
-					int lenSecond = diff - lenFirst;
-					
-					java.lang.StringBuffer returnString = new java.lang.StringBuffer(widthVal);
-					
-					for(int i=0; i<lenFirst; i++) {
-						returnString.append(fillChar);
-					}
-					returnString.append(str);
-					for(int i=0; i<lenSecond; i++) {
-						returnString.append(fillChar);
-					}
-					return new org.python.types.Str(returnString.toString());
-				}
-			}
-			else if(width instanceof org.python.types.Bool) {
-				return new org.python.types.Str(this.value);
-			}
-			else {
-				throw new org.python.exceptions.TypeError("Length must be of type Integer or Bool");
-			}
-		}
-		else {
-			throw new org.python.exceptions.AttributeError("Object must be of type Str");
-		}
+        java.lang.String fillChar = new java.lang.String();
+        if (charToFill instanceof org.python.types.Str) {
+            // fillChar has right type
+            if( ((org.python.types.Str)charToFill).value.length() != 1) {
+                throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
+            }
+            fillChar = ((org.python.types.Str) charToFill).value;
+        } else if (charToFill == null) {
+            fillChar = " ";
+        } else {
+            throw new org.python.exceptions.TypeError("Fill char must of type String");
+        }
+        
+        if (width instanceof org.python.types.Int) {
+            String str = this.value;
+            int widthVal = (int)((org.python.types.Int)width).value;
+            int strLen = str.length();
+            if (strLen >= widthVal ) {
+                return new org.python.types.Str(str);
+            } else {
+                int diff = widthVal - strLen;
+                int lenFirst = (diff)/2;
+                int lenSecond = diff - lenFirst;
+                
+                java.lang.StringBuffer returnString = new java.lang.StringBuffer(widthVal);
+                
+                for (int i = 0; i < lenFirst; i++) {
+                    returnString.append(fillChar);
+                }
+                returnString.append(str);
+                for (int i = 0; i < lenSecond; i++) {
+                    returnString.append(fillChar);
+                }
+                return new org.python.types.Str(returnString.toString());
+            }
+        }
+        else if (width instanceof org.python.types.Bool) {
+            return new org.python.types.Str(this.value);
+        }
+        else {
+            throw new org.python.exceptions.TypeError("Length must be of type Integer or Bool");
+        }
     }
 
     @org.python.Method(
