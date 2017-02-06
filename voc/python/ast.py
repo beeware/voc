@@ -553,49 +553,33 @@ class Visitor(ast.NodeVisitor):
     def visit_With(self, node):
         # withitem* items, stmt* body):
         #     withitem = (expr context_expr, expr? optional_vars)
-        def opcodes_raise_ifnull(exception, message):
-            """Raise exception if top of stack is null.
-            Stack: value →
-            """
-            return [
-                JavaOpcodes.IFNONNULL(offset=14),  # size of IFNONNULL + exception handling opcodes
-                java.New(exception),
-                JavaOpcodes.LDC_W(message),
-                java.Init(exception, 'Ljava/lang/String;'),
-                JavaOpcodes.ATHROW(),
-            ]
-
-        def array_of_nones(size):
-            """Create an array containing Python None objects with given size.
-            Stack:   → arrayref
-            """
-            opcodes = [java.Array(size)]
-            for i in range(size):
-                opcodes += [
-                    JavaOpcodes.DUP(),
-                    ICONST_val(i),
-                    python.NONE(),
-                    JavaOpcodes.AASTORE(),
-                ]
-            return opcodes
-
         exit_names = ['#exit-%d-%x' % (i, id(node)) for i, _ in enumerate(node.items)]
 
-        for i, it in enumerate(node.items):
-            self.visit(it.context_expr)
+        for i, item in enumerate(node.items):
+            self.visit(item.context_expr)
 
             self.context.add_opcodes(
                 JavaOpcodes.DUP(),
                 python.Object.get_attribute('__exit__', use_null=True),
                 JavaOpcodes.DUP(),
                 ASTORE_name(exit_names[i]),
-                *opcodes_raise_ifnull('org/python/exceptions/AttributeError', '__exit__')
+                IF([], JavaOpcodes.IFNONNULL),
+                java.THROW(
+                    'org/python/exceptions/AttributeError',
+                    ['Ljava/lang/String;', JavaOpcodes.LDC_W('__exit__')]
+                ),
+                END_IF(),
             )
 
             self.context.add_opcodes(
                 python.Object.get_attribute('__enter__', use_null=True),
                 JavaOpcodes.DUP(),
-                *opcodes_raise_ifnull('org/python/exceptions/AttributeError', '__enter__')
+                IF([], JavaOpcodes.IFNONNULL),
+                java.THROW(
+                    'org/python/exceptions/AttributeError',
+                    ['Ljava/lang/String;', JavaOpcodes.LDC_W('__enter__')]
+                ),
+                END_IF(),
             )
 
             self.context.add_opcodes(
@@ -604,8 +588,8 @@ class Visitor(ast.NodeVisitor):
                 python.Callable.invoke(),
             )
 
-            if it.optional_vars:
-                self.context.store_name(it.optional_vars.id)
+            if item.optional_vars:
+                self.context.store_name(item.optional_vars.id)
             else:
                 self.context.add_opcodes(
                     JavaOpcodes.POP(),
@@ -622,7 +606,7 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 ALOAD_name(name),
             )
-            self.context.add_opcodes(*array_of_nones(3))
+            self.context.add_opcodes(java.Array(3, fill=python.NONE()))
             self.context.add_opcodes(
                 JavaOpcodes.ACONST_NULL(),
                 python.Callable.invoke(),
