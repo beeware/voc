@@ -33,3 +33,14 @@ class GeneratorTests(TranspileTestCase):
 
             print(list(fizz_buzz(1, 20)))
             """)
+
+    def test_simplest_generator(self):
+        self.assertCodeExecution("""
+            def somegen():
+                yield 1
+                yield 2
+                yield 3
+
+            for i in somegen():
+                print(i)
+            """)
