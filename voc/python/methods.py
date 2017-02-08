@@ -1104,7 +1104,7 @@ class GeneratorFunction(Function):
                 static=self.static,
                 attributes=[
                     JavaCode(
-                        max_stack=len(self.parameters) + 8,
+                        max_stack=len(self.parameters) + 9,
                         max_locals=len(self.parameters) + 8,
                         code=wrapper.opcodes
                     )
