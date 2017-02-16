@@ -1,4 +1,3 @@
-from unittest import expectedFailure
 
 from ..utils import TranspileTestCase
 
@@ -76,7 +75,6 @@ class WhileLoopTests(TranspileTestCase):
                 break
             """)
 
-    @expectedFailure
     def test_while_else(self):
         self.assertCodeExecution("""
             i = 1

@@ -15,7 +15,7 @@ from .structures import (
 )
 from .types.primitives import (
     ASTORE_name, ALOAD_name, free_name,
-    ICONST_val,
+    ICONST_val, ISTORE_name, ILOAD_name
 )
 from .types import java, python
 from .debug import (
@@ -463,12 +463,12 @@ class Visitor(ast.NodeVisitor):
         )
 
         loop = START_LOOP()
+
         self.context.add_opcodes(
-            java.New('org/python/types/Bool'),
             JavaOpcodes.ICONST_1(),
-            java.Init('org/python/types/Bool', 'Z'),
-            ASTORE_name('#for-orelse-%x' % id(loop))
+            ISTORE_name('#loop-orelse-%x' % id(loop))
         )
+
         self.context.store_name('#for-iter-%x' % id(node))
         self.context.add_opcodes(
             loop,
@@ -503,8 +503,9 @@ class Visitor(ast.NodeVisitor):
 
         if node.orelse:
             self.context.add_opcodes(
-                ALOAD_name('#for-orelse-%x' % id(loop)),
-                IF([python.Object.as_boolean()], JavaOpcodes.IFEQ)
+                ILOAD_name('#loop-orelse-%x' % id(loop)),
+                IF([], JavaOpcodes.IFEQ)
+                #IF([python.Object.as_boolean()], JavaOpcodes.IFEQ)
             )
             for child in node.orelse:
                 self.visit(child)
@@ -520,6 +521,16 @@ class Visitor(ast.NodeVisitor):
         # expr test, stmt* body, stmt* orelse):
 
         loop = START_LOOP()
+
+        self.context.add_opcodes(
+            # java.New('org/python/types/Bool'),
+            # JavaOpcodes.ICONST_1(),
+            # java.Init('org/python/types/Bool', 'Z'),
+            # ASTORE_name('#loop-else-%x' % id(loop))
+            JavaOpcodes.ICONST_1(),
+            ISTORE_name('#loop-orelse-%x' % id(loop)),
+        )
+
         self.context.add_opcodes(
             loop
         )
@@ -540,6 +551,17 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
             END_LOOP()
         )
+
+        if node.orelse:
+            self.context.add_opcodes(
+                ILOAD_name('#loop-orelse-%x' % id(loop)),
+                IF([], JavaOpcodes.IFEQ)
+            )
+            for child in node.orelse:
+                self.visit(child)
+            self.context.add_opcodes(
+                END_IF()
+            )
 
     @node_visitor
     def visit_If(self, node):
@@ -895,11 +917,10 @@ class Visitor(ast.NodeVisitor):
         for loop in self.context.loops[::-1]:
             if loop.end_op is None:
                 break
+
         self.context.add_opcodes(
-            java.New('org/python/types/Bool'),
             JavaOpcodes.ICONST_0(),
-            java.Init('org/python/types/Bool', 'Z'),
-            ASTORE_name('#for-orelse-%x' % id(loop))
+            ISTORE_name('#loop-orelse-%x' % id(loop)),
         )
         self.context.add_opcodes(
             jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
@@ -1170,7 +1191,7 @@ class Visitor(ast.NodeVisitor):
                     ICONST_val(i),
                 )
 
-                self.visit(generator.iter)
+                self.visit(generator.iter) 
 
                 self.context.add_opcodes(
                     JavaOpcodes.AASTORE(),
