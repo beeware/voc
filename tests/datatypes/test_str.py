@@ -11,6 +11,19 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_join(self):
+        self.assertCodeExecution("""
+            print(','.join(None))
+            """, exits_early=True)
+        self.assertCodeExecution("""
+            print(','.join(12))
+            """, exits_early=True)
+        self.assertCodeExecution("""
+            print(','.join(['1', '2', '3']))
+            print(','.join([]))
+            print('asdf'.join(','))
+            """)
+
     def test_endswith(self):
         self.assertCodeExecution("""
             s = "abracadabra"
