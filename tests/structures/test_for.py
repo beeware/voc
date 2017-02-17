@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from ..utils import TranspileTestCase
 
 
@@ -52,7 +50,6 @@ class ForLoopTests(TranspileTestCase):
                 print(i, total)
             """)
 
-    @expectedFailure
     def test_for_else(self):
         self.assertCodeExecution("""
             total = 0
@@ -63,7 +60,6 @@ class ForLoopTests(TranspileTestCase):
             print(total)
             """)
 
-    @expectedFailure
     def test_for_else_break(self):
         self.assertCodeExecution("""
             total = 0
