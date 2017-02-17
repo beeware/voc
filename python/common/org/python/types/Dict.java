@@ -89,6 +89,9 @@ public class Dict extends org.python.types.Object {
                 this.value = generated;
             }
         }
+        for(java.util.Map.Entry<java.lang.String, org.python.Object> entry: kwargs.entrySet()){
+            this.value.put(new Str(entry.getKey()), entry.getValue());
+        }
     }
 
     // @org.python.Method(
