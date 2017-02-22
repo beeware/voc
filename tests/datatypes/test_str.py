@@ -37,7 +37,7 @@ class StrTests(TranspileTestCase):
         self.assertCodeExecution("""
             s = "ABRACADABRA"
             suffix = ""
-            print(s.endswith(suffix))            
+            print(s.endswith(suffix))
             """)
 
     def test_getattr(self):
