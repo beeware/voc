@@ -114,6 +114,21 @@ class DictTests(TranspileTestCase):
                 print(err)
         """)
 
+    def test_builtin_constructor_kwargs(self):
+        self.assertCodeExecution("""
+            d = dict(a=1, b=2)
+            print('a' in d)
+            print('b' in d)
+            print('c' not in d)
+            print(d['b'])
+
+            d = dict(d, b=3)
+            print('a' in d)
+            print('b' in d)
+            print('c' in d)
+            print(d['b'])
+        """)
+
     def test_builtin_non_2_tuples(self):
         # One of the elements isn't a 2-tuple
         self.assertCodeExecution("""
