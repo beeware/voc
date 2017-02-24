@@ -1,5 +1,7 @@
 package org.python.types;
 
+import java.util.ArrayList;
+
 public class Str extends org.python.types.Object {
     public java.lang.String value;
 
@@ -317,7 +319,11 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Iterable __iter__() {
-        throw new org.python.exceptions.NotImplementedError("__iter__() has not been implemented.");
+        java.util.List<org.python.Object> listOfStrs = new ArrayList<>();
+        for (int i = 0; i < this.value.length(); i++) {
+            listOfStrs.add(new Str(this.value.substring(i, i + 1)));
+        }
+        return new org.python.types.List(listOfStrs).__iter__();
     }
 
     @org.python.Method(
@@ -794,10 +800,34 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.join(iterable) -> str",
+        args = {"iterable"}
     )
-    public org.python.Object join() {
-        throw new org.python.exceptions.NotImplementedError("join() has not been implemented.");
+    public org.python.Object join(org.python.Object iterable) {
+        java.util.List<org.python.Object> temp_list = new java.util.ArrayList<org.python.Object>();
+        org.python.Iterable iter = null;
+        try {
+            iter = org.Python.iter(iterable);
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("can only join an iterable");
+        }
+        try {
+            while (true) {
+                org.python.Object item = iter.__next__();
+                temp_list.add(item);
+            }
+        } catch (org.python.exceptions.StopIteration e) { }
+        StringBuilder buf = new StringBuilder();
+        boolean firstTime = true;
+        for (org.python.Object each : temp_list) {
+            if (firstTime) {
+                buf.append(each.toString());
+                firstTime = false;
+            } else {
+                buf.append(this.value).append(each.toString());
+            }
+        }
+        return new Str(buf.toString());
     }
 
     @org.python.Method(
