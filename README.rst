@@ -62,7 +62,7 @@ Why "VOC"?
 ----------
 
 The `Vereenigde Oostindische Compagnie (VOC)`_, or Dutch East India Company,
-is often considered the be the world's first multinational corporation. It was
+is often considered to be the world's first multinational corporation. It was
 also the first company to issue shares, and facilitate the trading of those
 shares. It was granted a 21 year monopoly to carry out trade activities in
 Asia, primarily the Spice Islands - the Dutch East Indies. They established a
