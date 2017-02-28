@@ -48,7 +48,7 @@ with `the first tutorial`_.
 
 If you'd like to contribute to VOC development, we have a `guide for first time contributors`_.
 
-.. _Getting Started guide: https://voc.readthedocs.io/en/latest/intro/getting-started.html
+.. _Getting Started guide: https://voc.readthedocs.io/en/latest/intro/index.html
 .. _the first tutorial: https://voc.readthedocs.io/en/latest/tutorials/tutorial-0.html
 
 .. _guide for first time contributors: https://github.com/pybee/voc/wiki/Your-first-VOC-contribution
