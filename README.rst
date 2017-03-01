@@ -93,7 +93,7 @@ We foster a welcoming and respectful community as described in our
 Contributing
 ------------
 
-To get started with contributing to VOC, head over to the `wiki`_.
+To get started with contributing to VOC, head over to our `First Timers Guide`_.
 
 If you experience problems with VOC, `log them on GitHub`_. If you
 want to contribute code, please `fork the code`_ and `submit a pull request`_.
@@ -103,7 +103,7 @@ want to contribute code, please `fork the code`_ and `submit a pull request`_.
 .. _@pybeeware on Twitter: https://twitter.com/pybeeware
 .. _pybee/general: https://gitter.im/pybee/general
 .. _BeeWare Community Code of Conduct: http://pybee.org/community/behavior/
-.. _wiki: https://github.com/pybee/voc/wiki/Your-first-VOC-contribution
+.. _First Timers Guide: http://pybee.org/contributing/how/first-time/what/voc/
 .. _log them on Github: https://github.com/pybee/voc/issues
 .. _fork the code: https://github.com/pybee/voc
 .. _submit a pull request: https://github.com/pybee/voc/pulls
