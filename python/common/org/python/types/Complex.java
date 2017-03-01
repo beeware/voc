@@ -693,6 +693,6 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object conjugate() {
-        throw new org.python.exceptions.NotImplementedError("complex.conjugate has not been implemented.");
+        return new org.python.types.Complex(this.real, (org.python.types.Float) this.imag.__neg__());
     }
 }
