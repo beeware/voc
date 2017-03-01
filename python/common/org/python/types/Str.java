@@ -761,7 +761,10 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object islower() {
-        throw new org.python.exceptions.NotImplementedError("islower() has not been implemented.");
+        if (!this.value.isEmpty() && this.value.toLowerCase().equals(this.value)) {
+        	return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -796,7 +799,10 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isupper() {
-        throw new org.python.exceptions.NotImplementedError("isupper() has not been implemented.");
+        if (!this.value.isEmpty() && this.value.toUpperCase().equals(this.value)) {
+        	return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
