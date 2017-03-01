@@ -688,7 +688,7 @@ class Method(Function):
 
         wrapper_methods = [
             JavaMethod(
-                self.java_name,
+                self.java_name + "$py",
                 self.bound_signature,
                 attributes=[
                     JavaCode(
