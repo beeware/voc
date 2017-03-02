@@ -229,6 +229,38 @@ class DictTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_copy(self):
+        self.assertCodeExecution("""
+            x = {42: 'Babel'}
+            y = x.copy()
+            print(y)
+            """)
+
+        self.assertCodeExecution("""
+            x = {42: 'Babel'}
+            y = x.copy()
+            print(x == y)
+            """)
+
+        self.assertCodeExecution("""
+            x = {42: 'Babel'}
+            y = x.copy()
+            print(x is not y)
+            """)
+
+        self.assertCodeExecution("""
+            x = {42: 'Babel'}
+            y = x.copy()
+            y['42'] = 'Babel'
+            print(x == y)
+            """)
+
+        self.assertCodeExecution("""
+            x = {'key': {42: 'Babel'}, 42: 'Babel'}
+            y = x.copy()
+            print(x['key'] is y['key'])
+            """)
+
 
 class UnaryDictOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'dict'

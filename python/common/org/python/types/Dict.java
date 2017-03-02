@@ -348,10 +348,10 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "D.copy() -> dict -- a shallow copy of D"
     )
     public org.python.Object copy() {
-        throw new org.python.exceptions.NotImplementedError("dict.copy() has not been implemented.");
+        return new org.python.types.Dict(new java.util.HashMap<org.python.Object, org.python.Object>(this.value));
     }
 
     @org.python.Method(
