@@ -323,14 +323,14 @@ class StrTests(TranspileTestCase):
 
     def test_isalphanumeric(self):
         self.assertCodeExecution("""
-            for s in [' ', '\r\t', '\n \n\n', 'hello world', u'\u00B2', 'áello? world', '']:
+            for s in ['hello, World!', 'HELLO, WORLD.', u'\u00B2', 'áello? world', '']:
                 print(s.isalnum())
                 print(s.isalpha())
             """)
 
     def test_isspace(self):
         self.assertCodeExecution("""
-            for s in ['hello, World!', 'HELLO, WORLD.', u'\u00B2', 'áello? world', '']:
+            for s in [' ', '\t', '\n \n\n', 'hello world', u'\u00B2', 'áello? world', '']:
                 print(s.isspace())
             """)
 
