@@ -663,7 +663,9 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __abs__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__abs__ has not been implemented.");
+        double real = this.real.value;
+        double imag = this.imag.value;
+        return new org.python.types.Float(java.lang.Math.sqrt(real * real + imag * imag));
     }
 
     @org.python.Method(
@@ -691,6 +693,6 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object conjugate() {
-        throw new org.python.exceptions.NotImplementedError("complex.conjugate has not been implemented.");
+        return new org.python.types.Complex(this.real, (org.python.types.Float) this.imag.__neg__());
     }
 }
