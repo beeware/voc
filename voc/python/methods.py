@@ -194,6 +194,10 @@ class Function(Block):
         return self.name + self._java_suffix
 
     @property
+    def pyimpl_name(self):
+        return self.name + self._java_suffix
+
+    @property
     def module(self):
         return self._parent
 
@@ -367,7 +371,7 @@ class Function(Block):
     def transpile_method(self):
         return [
             JavaMethod(
-                self.java_name,
+                self.pyimpl_name,
                 self.signature,
                 static=self.static,
                 attributes=[self.transpile_code()] + self.method_attributes()
@@ -478,6 +482,10 @@ class Method(Function):
 
     def __repr__(self):
         return '<InstanceMethod %s.%s (%s parameters)>' % (self.klass.name, self.name, len(self.parameters))
+
+    @property
+    def pyimpl_name(self):
+        return self.java_name + "$py" + self._java_suffix
 
     @property
     def klass(self):
@@ -604,7 +612,7 @@ class Method(Function):
 
         # Then call the method, and process the return type.
         binding.add_opcodes(
-            JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.name, self.signature),
+            JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.pyimpl_name, self.signature),
         )
 
         # Now convert the return type to a native type.
@@ -688,7 +696,7 @@ class Method(Function):
 
         wrapper_methods = [
             JavaMethod(
-                self.java_name + "$py",
+                self.java_name,
                 self.bound_signature,
                 attributes=[
                     JavaCode(
@@ -774,6 +782,10 @@ class MainFunction(Function):
     @property
     def java_name(self):
         return 'main'
+
+    @property
+    def pyimpl_name(self):
+        return self.java_name
 
     @property
     def module(self):
