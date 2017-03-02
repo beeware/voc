@@ -1,11 +1,27 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
+from unittest import expectedFailure
+
 
 class ComplexTests(TranspileTestCase):
     def test_conjugate(self):
         self.assertCodeExecution("""
             x = complex(1.5, 1)
             print(x.conjugate())
+            """)
+
+    @expectedFailure
+    def test_real(self):
+        self.assertCodeExecution("""
+            x = complex(1, 1)
+            print(x.real)
+            """)
+
+    @expectedFailure
+    def test_complex(self):
+        self.assertCodeExecution("""
+            x = complex(1, 1)
+            print(x.imag)
             """)
 
 
