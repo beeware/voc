@@ -11,6 +11,13 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_iscase(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'HELLO, WORLD.', 'ello? world', '']:
+                print(s.islower())
+                print(s.isupper())
+            """)
+
     def test_join(self):
         self.assertCodeExecution("""
             print(','.join(None))
