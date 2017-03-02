@@ -726,28 +726,52 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isalnum() {
-        throw new org.python.exceptions.NotImplementedError("isalnum() has not been implemented.");
+    	if (this.value.isEmpty()) { // Incomplete implementation. Also needs to return true for superscripts etc
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isLetterOrDigit(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isalpha() {
-        throw new org.python.exceptions.NotImplementedError("isalpha() has not been implemented.");
+    	if (this.value.isEmpty()) {
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isLetter(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isdecimal() {
-        throw new org.python.exceptions.NotImplementedError("isdecimal() has not been implemented.");
+		if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+		}
+		for (int i = 0; i < this.value.length(); i++) {
+			if (!Character.isDigit(this.value.charAt(i))) {
+				return new org.python.types.Bool(false);
+			}
+		}
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isdigit() {
-        throw new org.python.exceptions.NotImplementedError("isdigit() has not been implemented.");
+    	return this.isdecimal(); // Incomplete implementation. Also needs to return true for superscripts etc
     }
 
     @org.python.Method(
@@ -761,10 +785,15 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object islower() {
-        if (!this.value.isEmpty() && this.value.toLowerCase().equals(this.value)) {
-        	return new org.python.types.Bool(true);
-        }
-        return new org.python.types.Bool(false);
+    	if (this.value.isEmpty()) {
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isLowerCase(this.value.charAt(i)) && Character.isLetter(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -785,7 +814,15 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isspace() {
-        throw new org.python.exceptions.NotImplementedError("isspace() has not been implemented.");
+    	if (this.value.isEmpty()) {
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isWhitespace(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -799,10 +836,15 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isupper() {
-        if (!this.value.isEmpty() && this.value.toUpperCase().equals(this.value)) {
-        	return new org.python.types.Bool(true);
-        }
-        return new org.python.types.Bool(false);
+    	if (this.value.isEmpty()) {
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isUpperCase(this.value.charAt(i)) && Character.isLetter(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(

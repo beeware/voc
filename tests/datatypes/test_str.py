@@ -11,13 +11,6 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
-    def test_iscase(self):
-        self.assertCodeExecution("""
-            for s in ['hello, World!', 'HELLO, WORLD.', 'ello? world', '']:
-                print(s.islower())
-                print(s.isupper())
-            """)
-
     def test_join(self):
         self.assertCodeExecution("""
             print(','.join(None))
@@ -319,6 +312,34 @@ class StrTests(TranspileTestCase):
                 print(s.center(10,"-"))
             except AttributeError as err:
                 print(err)
+            """)
+
+    def test_iscase(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'HELLO, WORLD.', 'á', 'ello? world', '']:
+                print(s.islower())
+                print(s.isupper())
+            """)
+
+    def test_isalphanumeric(self):
+        self.assertCodeExecution("""
+            for s in [' ', '\r\t', '\n \n\n', 'hello world', u'\u00B2', 'áello? world', '']:
+                print(s.isalnum())
+                print(s.isalpha())
+            """)
+
+    def test_isspace(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'HELLO, WORLD.', u'\u00B2', 'áello? world', '']:
+                print(s.isspace())
+            """)
+
+    def test_isnumeric(self):
+        self.assertCodeExecution("""
+            for s in [u'239871', '493', u'\u00B2', '0', '05', u'23.43', '0.32', 'J', 'á', '23 3', 'ello? world', '']:
+                print(s.isdecimal())
+                print(s.isdigit())
+                #print(s.isnumeric())
             """)
 
 
