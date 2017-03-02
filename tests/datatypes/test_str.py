@@ -139,7 +139,7 @@ class StrTests(TranspileTestCase):
 
     def test_case_changes(self):
         self.assertCodeExecution("""
-            for s in ['hello, world', 'HEllo, WORLD', 'tomo', '']:
+            for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
                 print(s.capitalize())
                 print(s.lower())
                 # print(s.swap())
