@@ -1,5 +1,5 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
-
+from unittest import expectedFailure
 
 class StrTests(TranspileTestCase):
     def test_setattr(self):
@@ -316,27 +316,29 @@ class StrTests(TranspileTestCase):
 
     def test_iscase(self):
         self.assertCodeExecution("""
-            for s in ['hello, World!', 'HELLO, WORLD.', 'á', 'ello? world', '']:
+            for s in ['hello, World!', 'HELLO, WORLD.', 'Ɠx', 'á', 'ello? world', '']:
                 print(s.islower())
                 print(s.isupper())
             """)
 
+    @expectedFailure
     def test_isalphanumeric(self):
         self.assertCodeExecution("""
-            for s in ['hello, World!', 'HELLO, WORLD.', u'\u00B2', 'áello? world', '']:
+            for s in ['hello, World!', 'word', 'HELLO, WORLD.', 'Ɠ', '²', 'áello? world', '']:
                 print(s.isalnum())
                 print(s.isalpha())
             """)
 
     def test_isspace(self):
         self.assertCodeExecution("""
-            for s in [' ', '\t', '\n \n\n', 'hello world', u'\u00B2', 'áello? world', '']:
+            for s in [' ', '\t', '            ', 'Ɠ\t', 'hello world', u'\u00B2', 'áello? world', '']:
                 print(s.isspace())
             """)
 
+    @expectedFailure
     def test_isnumeric(self):
         self.assertCodeExecution("""
-            for s in [u'239871', '493', u'\u00B2', '0', '05', u'23.43', '0.32', 'J', 'á', '23 3', 'ello? world', '']:
+            for s in [u'239871', '493', '²', u'\u00B2', '0', 'Ⅲ', 'Ɠx', '05', u'23.43', '0.32', 'J', 'á', '23 3', 'ello? world', '']:
                 print(s.isdecimal())
                 print(s.isdigit())
                 #print(s.isnumeric())
