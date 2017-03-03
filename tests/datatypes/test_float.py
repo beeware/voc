@@ -85,6 +85,7 @@ class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
         'test_unary_invert',
     ]
 
+
 class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
