@@ -1386,7 +1386,7 @@ public class Python {
             }
             result = o2.__lt__(o1);
             if (result instanceof org.python.types.NotImplementedType) {
-                o1.__gt__(o2);
+                result = o1.__gt__(o2);
             }
             if (result instanceof org.python.types.NotImplementedType) {
                 if (org.Python.VERSION < 0x03060000) {
