@@ -1370,10 +1370,32 @@ public class Python {
                     throw new org.python.exceptions.TypeError("'" + key.typeName() + "' object is not callable");
                 }
             }
-            if (((org.python.types.Bool) o1.__lt__(o2).__bool__()).value) {
+            org.python.Object result = o1.__lt__(o2);
+            if (result instanceof org.python.types.NotImplementedType) {
+                result = o2.__gt__(o1);
+            }
+            if (result instanceof org.python.types.NotImplementedType) {
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError("unorderable types: " + o1.typeName() + "() < " + o2.typeName() + "()");
+                } else {
+                    throw new org.python.exceptions.TypeError("'<' not supported between instances of '" + o1.typeName() + "' and '" + o2.typeName() + "'");
+                }
+            }
+            if (((org.python.types.Bool) result.__bool__()).value) {
                 return reverse ? 1 : -1;
             }
-            if (((org.python.types.Bool) o2.__lt__(o1).__bool__()).value) {
+            result = o2.__lt__(o1);
+            if (result instanceof org.python.types.NotImplementedType) {
+                o1.__gt__(o2);
+            }
+            if (result instanceof org.python.types.NotImplementedType) {
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError("unorderable types: " + o1.typeName() + "() < " + o2.typeName() + "()");
+                } else {
+                    throw new org.python.exceptions.TypeError("'<' not supported between instances of '" + o1.typeName() + "' and '" + o2.typeName() + "'");
+                }
+            }
+            if (((org.python.types.Bool) result.__bool__()).value) {
                 return reverse ? -1 : 1;
             }
             return 0;
