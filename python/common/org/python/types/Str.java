@@ -773,15 +773,10 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object islower() {
-    	if (this.value.isEmpty()) {
-    		return new org.python.types.Bool(false);
-	        }
-       	for (int i = 0; i < this.value.length(); i++) {
-    	   if (!Character.isLowerCase(this.value.charAt(i)) && Character.isLetter(this.value.charAt(i))) {
-    		   return new org.python.types.Bool(false);
-    	   }
-       	}
-       	return new org.python.types.Bool(true);
+		if (this.value.matches("(\\p{Ll}|[^\\p{L}])+")) {
+            return new org.python.types.Bool(true);
+		}
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -819,15 +814,10 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isupper() {
-    	if (this.value.isEmpty()) {
-    		return new org.python.types.Bool(false);
-	        }
-       	for (int i = 0; i < this.value.length(); i++) {
-    	   if (!Character.isUpperCase(this.value.charAt(i)) && Character.isLetter(this.value.charAt(i))) {
-    		   return new org.python.types.Bool(false);
-    	   }
-       	}
-       	return new org.python.types.Bool(true);
+		if (this.value.matches("(\\p{Lu}|[^\\p{L}])+")) {
+            return new org.python.types.Bool(true);
+		}
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(

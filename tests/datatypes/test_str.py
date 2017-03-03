@@ -315,7 +315,7 @@ class StrTests(TranspileTestCase):
 
     def test_iscase(self):
         self.assertCodeExecution("""
-            for s in ['hello, World!', 'HELLO, WORLD.', 'ÉX', 'á', 'ello? world', '']:
+            for s in ['hello, World!', 'HELLO, WORLD.', 'ÉX', 'á', 'ello? world', 'ǅ', '']:
                 print(s.islower())
                 print(s.isupper())
             """)
@@ -329,7 +329,7 @@ class StrTests(TranspileTestCase):
 
     def test_isnumeric(self):
         self.assertCodeExecution("""
-            for s in ['239871', '493', '²', '\u00B2', '९', '0', 'Ⅲ', 'x', '05', u'23.43', '0.32', 'J', 'á', '23 3', 'ello?ֆworld', '']:
+            for s in ['239871', '493', '²', '\\u00B2', '९', '0', 'Ⅲ', 'x', '05', u'23.43', '0.32', 'J', 'á', '23 3', 'ello?ֆworld', '']:
                 print(s.isdecimal())
                 print(s.isdigit())
                 print(s.isnumeric())
