@@ -135,7 +135,7 @@ class StrTests(TranspileTestCase):
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
                 print(s.capitalize())
                 print(s.lower())
-                # print(s.swap())
+                print(s.swapcase())
                 print(s.title())
                 print(s.upper())
             """)
@@ -331,7 +331,7 @@ class StrTests(TranspileTestCase):
 
     def test_isspace(self):
         self.assertCodeExecution("""
-            for s in [' ', '\t', '            ', 'Ɠ\t', 'hello world', u'\u00B2', 'áello? world', '']:
+            for s in [' ', '\t', '            ', '\\n\\n\\t', 'Ɠ\t', 'hello world', u'\u00B2', 'áello? world', '']:
                 print(s.isspace())
             """)
 
