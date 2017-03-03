@@ -315,24 +315,33 @@ class StrTests(TranspileTestCase):
 
     def test_iscase(self):
         self.assertCodeExecution("""
-            for s in ['hello, World!', 'HELLO, WORLD.', 'á', 'ello? world', '']:
+            for s in ['hello, World!', 'HELLO, WORLD.', 'ÉX', 'á', 'ello? world', 'ǅ', '']:
                 print(s.islower())
                 print(s.isupper())
             """)
 
     def test_isalphanumeric(self):
         self.assertCodeExecution("""
-            for s in ['hello, World!', 'word', 'HELLO, WORLD.', 'áello? world', '']:
+            for s in ['hello, World!', 'word', '९Ⅲwow', 'HELLO, WORLD.', '९', '²', 'ֆ', 'áello? world', '']:
                 print(s.isalnum())
                 print(s.isalpha())
             """)
 
     def test_isnumeric(self):
         self.assertCodeExecution("""
-            for s in ['239871', '493', 'x', '05', '23.43', '0.32', 'J', 'á', '23 3', 'ello? world', '']:
+            for s in ['239871', '493', '²', '\\u00B2', '९', '0', 'Ⅲ', 'x', '05', u'23.43', '0.32', 'J', 'á',
+             '23 3', 'ello?ֆworld', '']:
                 print(s.isdecimal())
                 print(s.isdigit())
                 print(s.isnumeric())
+            """)
+
+    def test_isprintable(self):
+        self.assertCodeExecution("""
+            for s in [' ', '\\t\\r', '            ', '\\n\\n\\t', '९', 'É', 'ֆ', 'hello world', u'\u00B2',
+             'áello? world', '']:
+                #print(s.isprintable())
+                print(s.isspace())
             """)
 
 

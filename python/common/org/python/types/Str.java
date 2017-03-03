@@ -800,7 +800,10 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isspace() {
-        throw new org.python.exceptions.NotImplementedError("isspace() has not been implemented.");
+		if (this.value.matches("\\p{javaWhitespace}+")) {
+            return new org.python.types.Bool(true);
+		}
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
