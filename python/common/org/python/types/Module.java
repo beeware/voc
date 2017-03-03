@@ -23,7 +23,13 @@ public class Module extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Str __repr__() {
-        return new org.python.types.Str(String.format("<module '%s' from '%s'>", this.typeName(), this.getClass()));
+        return new org.python.types.Str(
+            String.format(
+                "<module '%s' from '%s.class'>",
+                this.getClass().getPackage().getName(),
+                this.getClass()
+            )
+        );
     }
 
     public org.python.Object __getattribute__(java.lang.String name) {

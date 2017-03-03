@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
@@ -22,11 +20,14 @@ class NextTests(TranspileTestCase):
             print(next(i, 0))
         """)
 
-    @expectedFailure
     def test_next_exhausted_without_default(self):
         self.assertCodeExecution("""
             i = iter([])
-            print(next(i))
+            try:
+                print(next(i))
+            except StopIteration as err:
+                print(err)
+            print('Done.')
         """)
 
 
@@ -34,10 +35,7 @@ class BuiltinNextFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["next"]
 
     not_implemented = [
-        'test_bytearray',
         'test_class',
-        'test_complex',
         'test_frozenset',
         'test_range',
-        'test_slice',
     ]

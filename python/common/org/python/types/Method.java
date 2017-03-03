@@ -25,10 +25,6 @@ public class Method extends org.python.types.Object implements org.python.Callab
                     this.im_func.__dict__.get("__name__")
                 )
             );
-        } else if (org.python.types.Closure.class.isAssignableFrom(this.im_class.klass)) {
-            // Closures *should* just be just functions, but they're implemented as
-            // methods on an instance in Java, so we have to fake it a little bit.
-            return new org.python.types.Str(String.format("<function object at 0x%x>", this.im_func.hashCode()));
         } else {
             return new org.python.types.Str(
                 String.format("<bound method %s.%s of %s>",
@@ -40,7 +36,15 @@ public class Method extends org.python.types.Object implements org.python.Callab
         }
     }
 
+    @org.python.Method(
+        __doc__ = ""
+    )
+    public org.python.Object __bool__() {
+        return new org.python.types.Bool(true);
+    }
+
     public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        // System.out.println("METHOD Invocation: " + this.im_self);
         return this.im_func.invoke(this.im_self, args, kwargs);
     }
 }

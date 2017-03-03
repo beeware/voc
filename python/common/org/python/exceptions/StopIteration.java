@@ -4,7 +4,7 @@ public class StopIteration extends org.python.exceptions.Exception {
     org.python.Object value;
 
     public StopIteration() {
-        super();
+        super("");
     }
 
     public StopIteration(org.python.Object value) {

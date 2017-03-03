@@ -1,9 +1,20 @@
 language: python
 python:
   - "3.4.2"
-  - "3.4.4"
+  - "3.4.5"
+  - "3.5"
+  - "3.6"
+env:
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=0
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=1
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=2
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=3
+  - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=4
 install:
   - "pip install ."
-  - "ant java"
+  - "pip install pytest"
+  - "pip install git+https://github.com/pybee/pytest-circleci"
+  - "pip install flake8"
 script:
-  - "python setup.py test"
+  - "py.test tests"
+  - flake8

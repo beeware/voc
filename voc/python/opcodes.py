@@ -2118,21 +2118,6 @@ class COMPARE_OP(Opcode):
                 END_IF(),
             )
         else:
-            comparator = {
-                '<': '__lt__',
-                '<=': '__le__',
-                '>': '__gt__',
-                '>=': '__ge__',
-                '==': '__eq__',
-                '!=': '__ne__',
-                'is': '__eq__',
-                'is not': '__ne__',
-                'exception match': '__eq__',
-                'in': '__contains__',
-                'not in': '__contains__',
-                'not in': '__not_contains__',
-            }[self.comparison]
-
             # Some operators take their operands in reverse order:
             if self.comparison in ('in', 'not in'):
                 context.add_opcodes(

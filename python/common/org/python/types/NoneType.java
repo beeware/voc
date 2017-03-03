@@ -89,11 +89,10 @@ public class NoneType extends org.python.types.Object {
     )
     public org.python.Object __ne__(org.python.Object other) {
         org.python.Object result = this.__eq__(other);
-        if (result instanceof org.python.types.NotImplementedType) {
-            return new org.python.types.Bool(true);
-        } else {
+        if (result instanceof org.python.types.Bool) {
             return new org.python.types.Bool(!((org.python.types.Bool) result).value);
         }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -150,7 +149,7 @@ public class NoneType extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-           
-      throw new org.python.exceptions.TypeError("type NoneType doesn't define __round__ method");    
+
+      throw new org.python.exceptions.TypeError("type NoneType doesn't define __round__ method");
     }
 }

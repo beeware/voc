@@ -8,7 +8,10 @@ from .signatures import method_descriptor
 
 def multieq(obj1, obj2, *attrs):
     "Compare two objects using the provided attributes"
-    return type(obj1) == type(obj2) and all(getattr(obj1, attr) == getattr(obj2, attr) for attr in attrs)
+    return (
+        type(obj1) == type(obj2)
+        and all(getattr(obj1, attr) == getattr(obj2, attr) for attr in attrs)
+    )
 
 
 def multihash(obj, *attrs):
@@ -264,7 +267,7 @@ class Classref(Constant):
         return '<Class %s>' % self.name
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'name')
+        return isinstance(other, Classref) and other.tag == self.tag and other.name == self.name
 
     def __hash__(self):
         return multihash(self, 'tag', 'name')
@@ -322,7 +325,12 @@ class Fieldref(Constant):
         return '<Fieldref %s.%s (%s)>' % (self.class_name, self.name, self.descriptor)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'klass', 'name_and_type')
+        return (
+            isinstance(other, Fieldref)
+            and other.tag == self.tag
+            and other.klass == self.klass
+            and other.name_and_type == self.name_and_type
+        )
 
     def __hash__(self):
         return multihash(self, 'tag', 'klass', 'name_and_type')
@@ -394,7 +402,12 @@ class Methodref(Constant):
         return '<Methodref %s.%s %s>' % (self.class_name, self.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'klass', 'name_and_type')
+        return (
+            isinstance(other, Methodref)
+            and other.tag == self.tag
+            and other.klass == self.klass
+            and other.name_and_type == self.name_and_type
+        )
 
     def __hash__(self):
         return multihash(self, 'tag', 'klass', 'name_and_type')
@@ -455,7 +468,12 @@ class InterfaceMethodref(Constant):
         return '<InterfaceMethodref %s.%s %s>' % (self.class_name, self.name, self.name_and_type.descriptor)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'klass', 'name_and_type')
+        return (
+            isinstance(other, InterfaceMethodref)
+            and other.tag == self.tag
+            and other.klass == self.klass
+            and other.name_and_type == self.name_and_type
+        )
 
     def __hash__(self):
         return multihash(self, 'tag', 'klass', 'name_and_type')
@@ -505,7 +523,7 @@ class String(Constant):
         return "<String '%s'>" % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, String) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -552,7 +570,7 @@ class Integer(Constant):
         return '<Integer %s>' % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, Integer) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -609,7 +627,7 @@ class Float(Constant):
         return '<Float %s>' % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, Float) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -665,7 +683,7 @@ class Long(Constant):
         return '<Long %s>' % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, Long) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -676,7 +694,7 @@ class Long(Constant):
         return Long, (value,)
 
     def write_info(self, writer):
-        writer.write_u8(self.value)
+        writer.write_s8(self.value)
 
 
 class Double(Constant):
@@ -728,7 +746,7 @@ class Double(Constant):
         return '<Double %s>' % self.value
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'value')
+        return isinstance(other, Double) and other.tag == self.tag and other.value == self.value
 
     def __hash__(self):
         return multihash(self, 'tag', 'value')
@@ -779,7 +797,12 @@ class NameAndType(Constant):
         return '<NameAndType: name:%s descriptor:%s>' % (self.name, self.descriptor)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', 'name', 'descriptor')
+        return (
+            isinstance(other, NameAndType)
+            and other.tag == self.tag
+            and other.name == self.name
+            and other.descriptor == self.descriptor
+        )
 
     def __hash__(self):
         return multihash(self, 'tag', 'name', 'descriptor')
@@ -959,7 +982,7 @@ class Utf8(Constant):
         writer.write_bytes(self.bytes)
 
     def __eq__(self, other):
-        return multieq(self, other, 'tag', '_bytes')
+        return isinstance(other, Utf8) and other.tag == self.tag and other._bytes == self._bytes
 
     def __hash__(self):
         return multihash(self, 'tag', '_bytes')
@@ -987,23 +1010,41 @@ class Utf8(Constant):
 # The items of the CONSTANT_MethodHandle_info structure are the following:
 
 # tag
-# The tag item of the CONSTANT_MethodHandle_info structure has the value CONSTANT_MethodHandle (15).
+# The tag item of the CONSTANT_MethodHandle_info structure has the value
+# CONSTANT_MethodHandle (15).
 
 # reference_kind
-# The value of the reference_kind item must be in the range 1 to 9. The value denotes the kind of this method handle, which characterizes its bytecode behavior (§5.4.3.5).
+# The value of the reference_kind item must be in the range 1 to 9. The value
+# denotes the kind of this method handle, which characterizes its bytecode
+# behavior (§5.4.3.5).
 
 # reference_index
-# The value of the reference_index item must be a valid index into the constant_pool table.
+# The value of the reference_index item must be a valid index into the
+# constant_pool table.
 
-# If the value of the reference_kind item is 1 (REF_getField), 2 (REF_getStatic), 3 (REF_putField), or 4 (REF_putStatic), then the constant_pool entry at that index must be a CONSTANT_Fieldref_info (§4.4.2) structure representing a field for which a method handle is to be created.
+# If the value of the reference_kind item is 1 (REF_getField), 2
+# (REF_getStatic), 3 (REF_putField), or 4 (REF_putStatic), then the
+# constant_pool entry at that index must be a CONSTANT_Fieldref_info (§4.4.2)
+# structure representing a field for which a method handle is to be created.
 
-# If the value of the reference_kind item is 5 (REF_invokeVirtual), 6 (REF_invokeStatic), 7 (REF_invokeSpecial), or 8 (REF_newInvokeSpecial), then the constant_pool entry at that index must be a CONSTANT_Methodref_info structure (§4.4.2) representing a class's method or constructor (§2.9) for which a method handle is to be created.
+# If the value of the reference_kind item is 5 (REF_invokeVirtual), 6
+# (REF_invokeStatic), 7 (REF_invokeSpecial), or 8 (REF_newInvokeSpecial), then
+# the constant_pool entry at that index must be a CONSTANT_Methodref_info
+# structure (§4.4.2) representing a class's method or constructor (§2.9) for
+# which a method handle is to be created.
 
-# If the value of the reference_kind item is 9 (REF_invokeInterface), then the constant_pool entry at that index must be a CONSTANT_InterfaceMethodref_info (§4.4.2) structure representing an interface's method for which a method handle is to be created.
+# If the value of the reference_kind item is 9 (REF_invokeInterface), then the
+# constant_pool entry at that index must be a CONSTANT_InterfaceMethodref_info
+# (§4.4.2) structure representing an interface's method for which a method
+# handle is to be created.
 
-# If the value of the reference_kind item is 5 (REF_invokeVirtual), 6 (REF_invokeStatic), 7 (REF_invokeSpecial), or 9 (REF_invokeInterface), the name of the method represented by a CONSTANT_Methodref_info structure must not be <init> or <clinit>.
+# If the value of the reference_kind item is 5 (REF_invokeVirtual), 6
+# (REF_invokeStatic), 7 (REF_invokeSpecial), or 9 (REF_invokeInterface), the
+# name of the method represented by a CONSTANT_Methodref_info structure must
+# not be <init> or <clinit>.
 
-# If the value is 8 (REF_newInvokeSpecial), the name of the method represented by a CONSTANT_Methodref_info structure must be <init>.
+# If the value is 8 (REF_newInvokeSpecial), the name of the method represented
+# by a CONSTANT_Methodref_info structure must be <init>.
 
 # ------------------------------------------------------------------------
 # 4.4.9. The CONSTANT_MethodType_info Structure
@@ -1018,16 +1059,24 @@ class Utf8(Constant):
 # The items of the CONSTANT_MethodType_info structure are as follows:
 
 # tag
-# The tag item of the CONSTANT_MethodType_info structure has the value CONSTANT_MethodType (16).
+# The tag item of the CONSTANT_MethodType_info structure has the value
+# CONSTANT_MethodType (16).
 
 # descriptor_index
-# The value of the descriptor_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_Utf8_info (§4.4.7) structure representing a method descriptor (§4.3.3).
+# The value of the descriptor_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_Utf8_info (§4.4.7) structure representing a method descriptor
+# (§4.3.3).
 
 # ------------------------------------------------------------------------
 # 4.4.10. The CONSTANT_InvokeDynamic_info Structure
 # ------------------------------------------------------------------------
 
-# The CONSTANT_InvokeDynamic_info structure is used by an invokedynamic instruction (§invokedynamic) to specify a bootstrap method, the dynamic invocation name, the argument and return types of the call, and optionally, a sequence of additional constants called static arguments to the bootstrap method.
+# The CONSTANT_InvokeDynamic_info structure is used by an invokedynamic
+# instruction (§invokedynamic) to specify a bootstrap method, the dynamic
+# invocation name, the argument and return types of the call, and optionally, a
+# sequence of additional constants called static arguments to the bootstrap
+# method.
 
 # CONSTANT_InvokeDynamic_info {
 #     u1 tag;
@@ -1037,10 +1086,16 @@ class Utf8(Constant):
 # The items of the CONSTANT_InvokeDynamic_info structure are as follows:
 
 # tag
-# The tag item of the CONSTANT_InvokeDynamic_info structure has the value CONSTANT_InvokeDynamic (18).
+# The tag item of the CONSTANT_InvokeDynamic_info structure has the value
+# CONSTANT_InvokeDynamic (18).
 
 # bootstrap_method_attr_index
-# The value of the bootstrap_method_attr_index item must be a valid index into the bootstrap_methods array of the bootstrap method table (§4.7.21) of this class file.
+# The value of the bootstrap_method_attr_index item must be a valid index into
+# the bootstrap_methods array of the bootstrap method table (§4.7.21) of this
+# class file.
 
 # name_and_type_index
-# The value of the name_and_type_index item must be a valid index into the constant_pool table. The constant_pool entry at that index must be a CONSTANT_NameAndType_info (§4.4.6) structure representing a method name and method descriptor (§4.3.3).
+# The value of the name_and_type_index item must be a valid index into the
+# constant_pool table. The constant_pool entry at that index must be a
+# CONSTANT_NameAndType_info (§4.4.6) structure representing a method name and
+# method descriptor (§4.3.3).

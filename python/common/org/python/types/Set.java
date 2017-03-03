@@ -36,6 +36,44 @@ public class Set extends org.python.types.Object {
         this.value = set;
     }
 
+    @org.python.Method(
+        __doc__ = "set() -> new empty set object" +
+            "set(iterable) -> new set object\n" +
+            "\n" +
+            "Build an unordered collection of unique elements.\n",
+        default_args = {"iterable"}
+    )
+    public Set(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = new java.util.HashSet<org.python.Object>();
+        } else {
+            if (args[0] instanceof org.python.types.Set) {
+                this.value = new java.util.HashSet<org.python.Object>(
+                    ((org.python.types.Set) args[0]).value
+                );
+            } else if (args[0] instanceof org.python.types.List) {
+                this.value = new java.util.HashSet<org.python.Object>(
+                    ((org.python.types.List) args[0]).value
+                );
+            } else if (args[0] instanceof org.python.types.Tuple) {
+                this.value = new java.util.HashSet<org.python.Object>(
+                    ((org.python.types.Tuple) args[0]).value
+                );
+            } else {
+                org.python.Iterable iterator = org.Python.iter(args[0]);
+                java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
+                try {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        generated.add(next);
+                    }
+                } catch (org.python.exceptions.StopIteration si) {
+                }
+                this.value = generated;
+            }
+        }
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("__new__() has not been implemented");
     // }
@@ -328,7 +366,8 @@ public class Set extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object add(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("add() has not been implemented.");
+        this.value.add(other);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -340,31 +379,38 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Return a shallow copy of a set."
     )
     public org.python.Object copy() {
-        throw new org.python.exceptions.NotImplementedError("copy() has not been implemented.");
+        return new Set(new java.util.HashSet<org.python.Object>(this.value));
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Return the difference of two or more sets as a new set.\n\n(i.e. all elements that are in this set but not the others.)",
+        args = {"other"}
     )
     public org.python.Object difference(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("difference() has not been implemented.");
+        java.util.Set set = ((Set) this.copy()).value;
+        set.removeAll(((Set) other).value);
+        return new Set(set);
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Remove all elements of another set from this set.",
+        args = {"other"}
     )
     public org.python.Object difference_update(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("difference_update() has not been implemented.");
+        this.value.removeAll(((Set) other).value);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Remove an element from a set if it is a member.\n\nIf the element is not a member, do nothing.",
+        args = {"item"}
     )
-    public org.python.Object discard(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("discard() has not been implemented.");
+    public org.python.Object discard(org.python.Object item) {
+        this.value.remove(item);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -375,17 +421,22 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Return the intersection of two sets as a new set.\n\n(i.e. all elements that are in both sets.)",
+        args = {"other"}
     )
     public org.python.Object intersection(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("intersection() has not been implemented.");
+        java.util.Set set = ((Set) this.copy()).value;
+        set.retainAll(((Set) other).value);
+        return new Set(set);
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Update a set with the intersection of itself and another.",
+        args = {"other"}
     )
     public org.python.Object intersection_update(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("intersection_update() has not been implemented.");
+        this.value.retainAll(((Set) other).value);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -410,17 +461,30 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = "",
+            args = {}
     )
-    public org.python.Object pop(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("pop() has not been implemented.");
+    public org.python.Object pop() {
+        if (this.value.size() == 0) {
+            throw new org.python.exceptions.KeyError(new org.python.types.Str("pop from an empty set"));
+        }
+
+        java.util.Iterator<org.python.Object> iterator = this.value.iterator();
+        org.python.Object popped = iterator.next();
+        iterator.remove();
+
+        return popped;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Remove an element from a set; it must be a member.\n\nIf the element is not a member, raise a KeyError.",
+        args = {"item"}
     )
-    public org.python.Object remove(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("remove() has not been implemented.");
+    public org.python.Object remove(org.python.Object item) {
+        if (!this.value.remove(item)) {
+            throw new org.python.exceptions.KeyError(item);
+        }
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -438,16 +502,21 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Return the union of sets as a new set.\n\n(i.e. all elements that are in either set.)",
+        args = {"other"}
     )
     public org.python.Object union(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("union() has not been implemented.");
+        java.util.Set set = ((Set) this.copy()).value;
+        set.addAll(((Set) other).value);
+        return new Set(set);
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "Update a set with the union of itself and others.",
+        args = {"other"}
     )
     public org.python.Object update(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("update() has not been implemented.");
+        this.value.addAll(((Set) other).value);
+        return org.python.types.NoneType.NONE;
     }
 }

@@ -31,6 +31,16 @@ public class Tuple extends org.python.types.Object {
         this.value = tuple;
     }
 
+    @org.python.Method(
+        __doc__ = "tuple() -> empty tuple" +
+            "tuple(iterable) -> tuple initialized from iterable's items\n" +
+            "\n" +
+            "If the argument is a tuple, the return value is the same object.\n"
+    )
+    public Tuple(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("__new__() has not been implemented.");
     // }
@@ -52,6 +62,9 @@ public class Tuple extends org.python.types.Object {
                 buffer.append(", ");
             }
             buffer.append(obj.__repr__());
+        }
+        if (this.value.size() == 1) {
+            buffer.append(",");
         }
         buffer.append(")");
         return new org.python.types.Str(buffer.toString());
@@ -104,25 +117,24 @@ public class Tuple extends org.python.types.Object {
             int otherSize = otherTuple.value.size();
             int count = Math.min(size, otherSize);
 
-            boolean cmp = false;
             for (int i = 0; i < count; i++) {
-                org.python.Object r = this.value.get(i).__lt__(otherTuple.value.get(i));
-                if (r instanceof org.python.types.NotImplementedType) {
-                    throw new org.python.exceptions.TypeError(
-                        String.format("unorderable types: %s() < %s()",
-                            this.value.get(i).typeName(),
-                            otherTuple.value.get(i).typeName()));
+                org.python.types.Bool b =
+                    (org.python.types.Bool) this.value.get(i).__lt__(otherTuple.value.get(i));
+                org.python.types.Bool b2 =
+                    (org.python.types.Bool) otherTuple.value.get(i).__lt__(this.value.get(i));
+                if (b.value) {
+                    return new org.python.types.Bool(true);
+                } else if (b2.value) {
+                    return new org.python.types.Bool(false);
                 }
-
-                cmp = cmp & ((org.python.types.Bool) r).value;
             }
 
-            if (cmp) {
-                return new org.python.types.Bool(cmp);
+            if (size == otherSize) {
+                return new org.python.types.Bool(false);
+            } else {
+                return new org.python.types.Bool(size < otherSize);
             }
 
-            // At this point the lists are different sizes or every comparison is true.
-            return new org.python.types.Bool(size < otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -143,10 +155,7 @@ public class Tuple extends org.python.types.Object {
             for (int i = 0; i < count; i++) {
                 org.python.Object r = this.value.get(i).__le__(otherTuple.value.get(i));
                 if (r instanceof org.python.types.NotImplementedType) {
-                    throw new org.python.exceptions.TypeError(
-                        String.format("unorderable types: %s() <= %s()",
-                            this.value.get(i).typeName(),
-                            otherTuple.value.get(i).typeName()));
+                    return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
                 }
 
                 cmp = cmp & ((org.python.types.Bool) r).value;
@@ -202,10 +211,7 @@ public class Tuple extends org.python.types.Object {
             for (int i = 0; i < count; i++) {
                 org.python.Object r = this.value.get(i).__gt__(otherTuple.value.get(i));
                 if (r instanceof org.python.types.NotImplementedType) {
-                    throw new org.python.exceptions.TypeError(
-                        String.format("unorderable types: %s() > %s()",
-                            this.value.get(i).typeName(),
-                            otherTuple.value.get(i).typeName()));
+                    return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
                 }
 
                 cmp = cmp & ((org.python.types.Bool) r).value;
@@ -237,10 +243,7 @@ public class Tuple extends org.python.types.Object {
             for (int i = 0; i < count; i++) {
                 org.python.Object r = this.value.get(i).__ge__(otherTuple.value.get(i));
                 if (r instanceof org.python.types.NotImplementedType) {
-                    throw new org.python.exceptions.TypeError(
-                        String.format("unorderable types: %s() >= %s()",
-                            this.value.get(i).typeName(),
-                            otherTuple.value.get(i).typeName()));
+                    return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
                 }
 
                 cmp = cmp & ((org.python.types.Bool) r).value;
@@ -273,7 +276,7 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.types.Int __len__() {
-        throw new org.python.exceptions.NotImplementedError("__len__() has not been implemented.");
+        return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
@@ -332,7 +335,15 @@ public class Tuple extends org.python.types.Object {
                 }
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError(
+                    "tuple indices must be integers, not " + index.typeName()
+                );
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "tuple indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -340,24 +351,9 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
-        try {
-            int idx = (int) ((org.python.types.Int) index).value;
-            if (idx < 0) {
-                if (-idx > this.value.size()) {
-                    throw new org.python.exceptions.IndexError("tuple index out of range");
-                } else {
-                    this.value.set(this.value.size() + idx, value);
-                }
-            } else {
-                if (idx >= this.value.size()) {
-                    throw new org.python.exceptions.IndexError("tuple index out of range");
-                } else {
-                    this.value.set(idx, value);
-                }
-            }
-        } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("tuple indices must be integers, not " + index.typeName());
-        }
+        throw new org.python.exceptions.TypeError(
+            "'tuple' object does not support item assignment"
+        );
     }
 
     @org.python.Method(
@@ -378,7 +374,7 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __contains__(org.python.Object item) {
-        throw new org.python.exceptions.NotImplementedError("__contains__() has not been implemented.");
+        return new org.python.types.Bool(this.value.contains(item));
     }
 
     @org.python.Method(
@@ -455,8 +451,8 @@ public class Tuple extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-           
-         throw new org.python.exceptions.TypeError("type tuple doesn't define __round__ method");    
-        
+
+         throw new org.python.exceptions.TypeError("type tuple doesn't define __round__ method");
+
     }
 }

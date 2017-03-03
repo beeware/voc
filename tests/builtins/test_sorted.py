@@ -2,28 +2,35 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class SortedTests(TranspileTestCase):
-    pass
+    def test_minimal(self):
+        self.assertCodeExecution("""
+            samples = [
+                ([1, 5, 3, 2, 4, 9, 12], None),
+                (["foo", "bar"], None),
+                (["foo", "bar"], "invalid"),
+                (["one", "two", "three", "four"], len),
+                ([(1, 2), (5, 6), (3, 4)], None),
+                ([(1, 2), (3, 4), (5, 6, 7)], len),
+            ]
+            for seq, key in samples:
+                try:
+                    print('Sample:', seq)
+                    print('Sorted:', sorted(seq, key=key))
+                    print('Reverse sorted:', sorted(seq, key=key, reverse=True))
+                except Exception as e:
+                    print(e)
+            """, run_in_function=False)
 
 
 class BuiltinSortedFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["sorted"]
 
     not_implemented = [
-        'test_bool',
         'test_bytearray',
         'test_bytes',
         'test_class',
-        'test_complex',
         'test_dict',
-        'test_float',
         'test_frozenset',
-        'test_int',
-        'test_list',
-        'test_None',
-        'test_NotImplemented',
-        'test_range',
-        'test_set',
-        'test_slice',
         'test_str',
-        'test_tuple',
+        'test_set',
     ]

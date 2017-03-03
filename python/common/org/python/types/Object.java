@@ -1,8 +1,9 @@
 package org.python.types;
 
 
-public class Object implements org.python.Object {
+public class Object extends java.lang.RuntimeException implements org.python.Object {
     public java.util.Map<java.lang.String, org.python.Object> __dict__;
+    public org.python.types.Type __class__;
     public org.python.types.Type.Origin origin;
 
     /**
@@ -28,31 +29,37 @@ public class Object implements org.python.Object {
         return this;
     }
 
+    /**
+     * Return the Python type for this object.
+     */
+    public org.python.types.Type type() {
+        return this.__class__;
+    }
+
     public java.lang.String typeName() {
         return org.Python.typeName(this.getClass());
     }
 
-    static final java.util.Map<java.lang.String, java.lang.String> COMPARISON_OPERATORS_TO_FUNCTION_NAME = new java.util.HashMap<java.lang.String, java.lang.String>();
-    static final java.util.Map<java.lang.String, java.lang.String> COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME = new java.util.HashMap<java.lang.String, java.lang.String>();
+    static final java.util.Map<java.lang.String, java.lang.String> FUNCTION_NAMES_TO_COMPARISON_OPERATOR = new java.util.HashMap<java.lang.String, java.lang.String>();
+    static final java.util.Map<java.lang.String, java.lang.String> FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME = new java.util.HashMap<java.lang.String, java.lang.String>();
     static {
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("<", "__lt__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("<=", "__le__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put(">", "__gt__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put(">=", "__ge__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("==", "__eq__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("!=", "__ne__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("is", "__eq__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("is not", "__ne__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("exception match", "__eq__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("in", "__contains__");
-        COMPARISON_OPERATORS_TO_FUNCTION_NAME.put("not in", "__not_contains__");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__lt__", "<");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__le__", "<=");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__gt__", ">");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__ge__", ">=");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__eq__", "==");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__ne__", "!=");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__eq__", "is");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__ne__", "is not");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__contains__", "in");
+        FUNCTION_NAMES_TO_COMPARISON_OPERATOR.put("__not_contains__", "not in");
 
-        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("<", "__gt__");
-        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("<=", "__ge__");
-        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put(">", "__lt__");
-        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put(">=", "__le__");
-        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("==", "__eq__");
-        COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.put("!=", "__ne__");
+        FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME.put("__lt__", "__gt__");
+        FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME.put("__le__", "__ge__");
+        FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME.put("__gt__", "__lt__");
+        FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME.put("__ge__", "__le__");
+        FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME.put("__eq__", "__eq__");
+        FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME.put("__ne__", "__ne__");
     }
 
     public org.python.Object __cmp__(org.python.Object other, String operator) {
@@ -61,34 +68,43 @@ public class Object implements org.python.Object {
 
         if (this.getClass() != other.getClass() && this.getClass().isInstance(other)) {
             reflectedChecked = true;
-            result = invokeComparison(other, this, COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.get(operator));
+            result = invokeComparison(other, this, FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME.get(operator));
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
                 return result;
             }
         }
 
-        result = invokeComparison(this, other, COMPARISON_OPERATORS_TO_FUNCTION_NAME.get(operator));
+        // switched the 'operator' parameter to the __method name__ instead of the symbol to speed up this
+        // happy flow. however, it means we can't distinguish between is/== and is not/!= in the TypeError
+        // later. may have to flip the FUNCTION_NAMES_TO_COMPARISON_OPERATOR map back and change this
+        // to COMPARISON_OPERATORS_TO_FUNCTION_NAME.get(operator) instead.
+        result = invokeComparison(this, other, operator);
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
         }
 
         if (!reflectedChecked) {
-            result = invokeComparison(other, this, COMPARISON_OPERATORS_TO_REFLECTED_FUNCTION_NAME.get(operator));
+            result = invokeComparison(other, this, FUNCTION_NAMES_TO_REFLECTED_FUNCTION_NAME.get(operator));
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
                 return result;
             }
         }
 
         // 4.3: Objects of different types, except different numeric types, never compare equal.
-        if (operator.equals("==")) {
+        if (operator.equals("__eq__")) {
             return new org.python.types.Bool(false);
-        } else if (operator.equals("!=")) {
+        } else if (operator.equals("__ne__")) {
             // Non-identical instances of a class normally compare as non-equal unless the class defines the __eq__() method.
             return new org.python.types.Bool(true);
         }
         // 4.3: The <, <=, > and >= operators will raise a TypeError exception when comparing a complex number with another built-in numeric type, when the objects are of different types that cannot be compared, or in other cases where there is no defined ordering.
-        throw new org.python.exceptions.TypeError(String.format(
-            "unorderable types: %s() %s %s()", this.typeName(), operator, other.typeName()));
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unorderable types: %s() %s %s()", this.typeName(), FUNCTION_NAMES_TO_COMPARISON_OPERATOR.get(operator), other.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", FUNCTION_NAMES_TO_COMPARISON_OPERATOR.get(operator), this.typeName(), other.typeName()));
+        }
     }
 
     private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {
@@ -123,10 +139,11 @@ public class Object implements org.python.Object {
      * the object; when wrapping Java objects, the native class of the object
      * is used.
      */
-    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass) {
+    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass, java.lang.String msg) {
+        super(msg);
         this.origin = origin;
+        this.__dict__ = new java.util.HashMap<java.lang.String, org.python.Object>();
         if (origin != org.python.types.Type.Origin.PLACEHOLDER) {
-            this.__dict__ = new java.util.HashMap<java.lang.String, org.python.Object>();
             if (klass == null) {
                 klass = this.getClass();
             }
@@ -134,10 +151,21 @@ public class Object implements org.python.Object {
         }
     }
 
+    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass) {
+        this(origin, klass, "");
+    }
+
     public Object() {
         this(org.python.types.Type.Origin.PYTHON, null);
     }
 
+    public Object(java.lang.String msg) {
+        this(org.python.types.Type.Origin.PYTHON, null, msg);
+    }
+
+    @org.python.Method(
+        __doc__ = "The most base type"
+    )
     public Object(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         this(org.python.types.Type.Origin.PYTHON, null);
         if (args != null && args.length > 0) {
@@ -197,12 +225,11 @@ public class Object implements org.python.Object {
         __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
     public org.python.Object __new__(org.python.Object klass) {
-        org.python.types.Type cls = (org.python.types.Type) klass;
-        this.__dict__.put("__class__", cls);
-        if (cls.origin == org.python.types.Type.Origin.PLACEHOLDER) {
-            cls.add_reference(this);
+        this.__class__ = (org.python.types.Type) klass;
+        if (this.__class__.origin == org.python.types.Type.Origin.PLACEHOLDER) {
+            this.__class__.add_reference(this);
         }
-        return cls;
+        return this.__class__;
     }
 
     // public void __init__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
@@ -360,12 +387,11 @@ public class Object implements org.python.Object {
         // org.Python.debug("ATTRS ", this.__dict__);
 
         org.python.Object value = this.__dict__.get(name);
-        org.python.types.Type cls = (org.python.types.Type) this.__dict__.get("__class__");
 
         if (value == null) {
             // Look to the class for an attribute
             // org.Python.debug("no instance attribute");
-            value = cls.__getattribute_null(name);
+            value = this.__class__.__getattribute_null(name);
             if (value == null) {
                 // org.Python.debug("no class attribute");
                 // Use the descriptor protocol
@@ -381,7 +407,7 @@ public class Object implements org.python.Object {
         // org.Python.debug(String.format("GETATTRIBUTE %s = ", name), value);
         // Post-process the value retrieved.
 
-        return value.__get__(this, cls);
+        return value.__get__(this, this.__class__);
     }
 
     @org.python.Method(
@@ -415,10 +441,10 @@ public class Object implements org.python.Object {
         // org.Python.debug(String.format("SETATTR %s", name), value);
         // org.Python.debug("SELF ", this.__repr__());
         // org.Python.debug("ATTRS ", this.__dict__);
-        org.python.types.Type cls = (org.python.types.Type) this.__dict__.get("__class__");
 
         // If the attribute already exists, then it's OK to set it.
-        org.python.Object attr = cls.__getattribute_null(name);
+        org.python.Object attr = this.__class__.__getattribute_null(name);
+        // org.Python.debug("ATTR ", attr);
 
         // The base object can't have attribute set on it unless the attribute already exists.
         if (this.getClass() == org.python.types.Object.class) {
@@ -435,7 +461,12 @@ public class Object implements org.python.Object {
         return true;
     }
 
-    public void __set__(org.python.Object instance, org.python.Object value) {}
+    @org.python.Method(
+        __doc__ = "",
+        args = {"instance", "value"}
+    )
+    public void __set__(org.python.Object instance, org.python.Object value) {
+    }
 
     @org.python.Method(
         __doc__ = "",
@@ -445,7 +476,7 @@ public class Object implements org.python.Object {
         try {
             this.__delattr__(((org.python.types.Str) name).value);
         } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("__delattr__(): attribute name must be string");
+            throw new org.python.exceptions.TypeError("attribute name must be string, not '" + name.typeName() + "'");
         }
     }
 
@@ -456,9 +487,27 @@ public class Object implements org.python.Object {
     }
 
     public boolean __delattr_null(java.lang.String name) {
-        // System.out.println("DELETE ATTR from " + this.__dict__);
-        org.python.Object result = this.__dict__.remove(name);
-        return (result != null);
+        // org.Python.debug(String.format("DELATTR %s", name));
+        // org.Python.debug("SELF ", this.__repr__());
+        // org.Python.debug("ATTRS ", this.__dict__);
+
+        // If the attribute already exists, then it's OK to set it.
+        org.python.Object attr = this.__class__.__getattribute_null(name);
+
+        if (attr == null) {
+            org.python.Object result = this.__dict__.remove(name);
+            return result != null && !(result instanceof org.python.exceptions.AttributeError);
+        } else {
+            attr.__delete__(this);
+            return true;
+        }
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"instance", "value"}
+    )
+    public void __delete__(org.python.Object instance) {
     }
 
     @org.python.Method(
@@ -468,7 +517,7 @@ public class Object implements org.python.Object {
         org.python.types.List names = new org.python.types.List(new java.util.ArrayList(this.__dict__.keySet()));
 
         names.extend(this.__dict__.get("__class__").__dir__());
-        names.sort();
+        names.sort(null, null);
 
         return names;
     }
@@ -484,14 +533,12 @@ public class Object implements org.python.Object {
     //     throw new org.python.exceptions.AttributeError(this, "__subclasscheck__");
     // }
 
-
     /**
      * Section 3.3.5 - Emulating callable objects
      */
     // public org.python.Object __call__(org.python.Object... args) {
     //     throw new org.python.exceptions.AttributeError(this, "__call__");
     // }
-
 
     /**
      * Section 3.3.6 - Emulating container types
@@ -524,7 +571,6 @@ public class Object implements org.python.Object {
     public org.python.Object __missing__(org.python.Object key) {
         throw new org.python.exceptions.AttributeError(this, "__missing__");
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -786,20 +832,18 @@ public class Object implements org.python.Object {
         throw new org.python.exceptions.AttributeError(this, "__ror__");
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
     )
     public org.python.Object __iadd__(org.python.Object other) {
         try {
-            this.setValue(this.__iadd__(other));
+            this.setValue(this.__add__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -814,7 +858,6 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
@@ -827,7 +870,6 @@ public class Object implements org.python.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -855,7 +897,6 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
@@ -869,21 +910,18 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
     )
     public org.python.Object __idivmod__(org.python.Object other) {
         try {
-            // this.setValue(this.__idivmod__(other, null));
-            this.setValue(this.__idivmod__(other));
+            this.setValue(this.__divmod__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for //=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -908,7 +946,6 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
@@ -922,7 +959,6 @@ public class Object implements org.python.Object {
         }
     }
 
-
     @org.python.Method(
         __doc__ = "",
         args = {"other"}
@@ -935,7 +971,6 @@ public class Object implements org.python.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for &=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = "",
@@ -962,7 +997,6 @@ public class Object implements org.python.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for |=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
         __doc__ = ""
@@ -1034,22 +1068,5 @@ public class Object implements org.python.Object {
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.AttributeError(this, "__round__");
-    }
-
-    /**
-     * Section 3.3.8 - With statement context
-     */
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __enter__() {
-        throw new org.python.exceptions.AttributeError(this, "__enter__");
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __exit__(org.python.Object exc_type, org.python.Object exc_value, org.python.Object traceback) {
-        throw new org.python.exceptions.AttributeError(this, "__exit__");
     }
 }

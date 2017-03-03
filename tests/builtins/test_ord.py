@@ -12,7 +12,5 @@ class BuiltinOrdFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_bytes',
         'test_bytearray',
         'test_class',
-        'test_complex',
         'test_frozenset',
-        'test_slice',
     ]

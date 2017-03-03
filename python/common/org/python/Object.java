@@ -1,7 +1,7 @@
 package org.python;
 
 
-public interface Object {
+public interface Object extends Comparable {
     /**
      * Return a Java object that is the underlying data representation
      * of this object (e.g., the java.util.Map behind a Python dict()).
@@ -17,6 +17,11 @@ public interface Object {
      * Java objects will return the wrapped object.
      */
     public java.lang.Object toObject();
+
+    /**
+     * Return the Python type for this object.
+     */
+    public org.python.types.Type type();
 
     /**
      * Return the Python type name for this object.
@@ -89,12 +94,15 @@ public interface Object {
     // Lastly, these methods are the public inteface to attribute
     // manipulation. This means they take Python objects as attributes,
     // and raise exceptions on failure.
-    public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
-    public void __set__(org.python.Object instance, org.python.Object value);
     public org.python.Object __getattr__(org.python.Object name);
     public org.python.Object __getattribute__(org.python.Object name);
     public void __setattr__(org.python.Object name, org.python.Object value);
     public void __delattr__(org.python.Object name);
+
+    // These are the prototypes for the descriptor protocol.
+    public org.python.Object __get__(org.python.Object instance, org.python.Object klass);
+    public void __set__(org.python.Object instance, org.python.Object value);
+    public void __delete__(org.python.Object instance);
 
     // Attribute name retrieval.
     public org.python.Object __dir__();
@@ -108,8 +116,7 @@ public interface Object {
     /**
      * Section 3.3.5 - Emulating callable objects
      */
-    // public org.python.Object __call__(
-    // );
+    // public org.python.Object __call__();
 
     /**
      * Section 3.3.6 - Emulating container types

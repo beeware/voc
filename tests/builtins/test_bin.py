@@ -11,7 +11,10 @@ class BinTests(TranspileTestCase):
                     return self.val
 
             x = IntLike(5)
-            print(bin(x))
+            try:
+                print(bin(x))
+            except TypeError as err:
+                print(err)
             """)
 
 
@@ -19,9 +22,6 @@ class BuiltinBinFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["bin"]
 
     not_implemented = [
-        'test_bytearray',
         'test_class',
-        'test_complex',
         'test_frozenset',
-        'test_slice',
     ]

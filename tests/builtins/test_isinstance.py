@@ -1,29 +1,90 @@
-from .. utils import TranspileTestCase, BuiltinFunctionTestCase
+from unittest import expectedFailure
+
+from .. utils import TranspileTestCase
 
 
 class IsinstanceTests(TranspileTestCase):
-    pass
+    def test_no_args(self):
+        self.assertCodeExecution("""
+            try:
+                print(isinstance())
+            except TypeError as err:
+                print(err)
+            """, run_in_function=False)
 
+    def test_one_arg(self):
+        self.assertCodeExecution("""
+            try:
+                print(isinstance(123))
+            except TypeError as err:
+                print(err)
+            """, run_in_function=False)
 
-class BuiltinIsinstanceFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
-    functions = ["isinstance"]
+    def test_non_tuple_second_arg(self):
+        self.assertCodeExecution("""
+            try:
+                print(isinstance(123, [int, float]))
+            except TypeError as err:
+                print(err)
+            """, run_in_function=False)
 
-    not_implemented = [
-        'test_bool',
-        'test_bytearray',
-        'test_bytes',
-        'test_class',
-        'test_complex',
-        'test_dict',
-        'test_float',
-        'test_frozenset',
-        'test_int',
-        'test_list',
-        'test_None',
-        'test_NotImplemented',
-        'test_range',
-        'test_set',
-        'test_slice',
-        'test_str',
-        'test_tuple',
-    ]
+    def test_single_class(self):
+        self.assertCodeExecution("""
+            class MyClass1:
+                pass
+
+            class MyClass2:
+                pass
+
+            obj = MyClass1()
+
+            print(isinstance(obj, MyClass1))
+            print(isinstance(obj, MyClass2))
+            """, run_in_function=False)
+
+    def test_multiple_classes(self):
+        self.assertCodeExecution("""
+            class MyClass1:
+                pass
+
+            class MyClass2:
+                pass
+
+            obj = MyClass1()
+
+            print(isinstance(obj, (MyClass1, MyClass2)))
+            """, run_in_function=False)
+
+    @expectedFailure
+    def test_subclass(self):
+        self.assertCodeExecution("""
+            class MyClass1:
+                pass
+
+            class MyClass2(MyClass1):
+                pass
+
+            obj = MyClass2()
+
+            print(isinstance(obj, MyClass1))
+            print(isinstance(obj, MyClass2))
+            """, run_in_function=False)
+
+    def test_types(self):
+        self.assertCodeExecution("""
+            print(isinstance(123, int))
+            print(isinstance(123, str))
+            print(isinstance(123, float))
+
+            print(isinstance("asdf", int))
+            print(isinstance("asdf", str))
+            print(isinstance("asdf", float))
+
+            print(isinstance(123.45, int))
+            print(isinstance(123.45, str))
+            print(isinstance(123.45, float))
+
+            print(isinstance(123, (int, float)))
+            print(isinstance("asdf", (int, float)))
+            print(isinstance(123.45, (int, float)))
+            """, run_in_function=False)

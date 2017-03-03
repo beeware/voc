@@ -100,24 +100,26 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
                     slice.step == null ? this.__dict__.get("step") : slice.step
                 );
             } else {
+                long len = ((org.python.types.Int) (this.__len__())).value;
                 long idx = ((org.python.types.Int)index).value;
-                long value;
-                if (idx >= 0) {
-                    value = this.start + idx * this.step;
-                } else {
-                    value = this.stop + idx * this.step;
+
+                if (idx < 0) {
+                    idx = len + idx;
+                }
+                if (idx < 0 || idx >= len) {
+                    throw new org.python.exceptions.IndexError("range object index out of range");
                 }
 
-                if (this.step > 0 && value >= this.stop) {
-                    throw new org.python.exceptions.IndexError("range object index out of range");
-                } else if (this.step < 0 && value <= this.stop) {
-                    throw new org.python.exceptions.IndexError("range object index out of range");
-                }
-                org.python.Object result = new org.python.types.Int(value);
-                return result;
+                return new org.python.types.Int(this.start + idx * this.step);
             }
         } catch (ClassCastException e) {
-            throw new org.python.exceptions.TypeError("list indices must be integers, not " + index.typeName());
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError("range indices must be integers");
+            } else {
+                throw new org.python.exceptions.TypeError(
+                    "range indices must be integers or slices, not " + index.typeName()
+                );
+            }
         }
     }
 
@@ -166,5 +168,57 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     )
     public org.python.Object __pos__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary +: 'range'");
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __ge__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __gt__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __eq__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __ne__(org.python.Object other) {
+        org.python.Object result = this.__eq__(other);
+        if (result instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(!((org.python.types.Bool) result).value);
+        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __lt__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __le__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 }

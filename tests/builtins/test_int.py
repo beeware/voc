@@ -12,7 +12,5 @@ class BuiltinIntFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_bytearray',
         'test_bytes',
         'test_class',
-        'test_complex',
         'test_frozenset',
-        'test_slice',
     ]

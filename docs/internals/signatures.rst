@@ -59,7 +59,7 @@ no arguments, there is no need to supply any of the named
     @org.python.Method(
         __doc__ = "Return 4, always and ever."
     )
-    public function org.python.Object constant_4() {
+    public org.python.Object constant_4() {
         return org.python.types.Int(4);
     }
 
@@ -81,7 +81,7 @@ Another simple function is that of adding two given numbers.
         __doc__ = "Add two numbers.",
         args = {"num1", "num2"}
     )
-    public function org.python.Object add(org.python.Object num1, org.python.Object num2) {
+    public org.python.Object add(org.python.Object num1, org.python.Object num2) {
         // Left as exercise for the reader.
     }
 
@@ -102,10 +102,10 @@ to either add ``1`` to the number, or the supplied argument.
 
     @org.python.Method(
         __doc__ = "Add two numbers.",
-        args = {"num", "delta"},
+        args = {"num"},
         default_args = {"delta"}
     )
-    public function org.python.Object inc(org.python.Object num, org.python.Object delta) {
+    public org.python.Object inc(org.python.Object num, org.python.Object delta) {
         if (delta == null) {
             delta = new org.python.types.Int(1);
         }
@@ -132,13 +132,13 @@ but accept as many as you can get. For instance, the ``min`` function.
 .. code-block:: java
 
     @org.python.Method(
-        __doc__ = "Get the minimum of the suppliend arguments.""",
-        args = {"first", "others"},
+        __doc__ = "Get the minimum of the supplied arguments.""",
+        args = {"first"},
         varargs = "others"
     )
-    public function org.python.Object min(org.python.Object first, org.python.Object [] others) {
+    public org.python.Object min(org.python.Object first, org.python.types.Tuple others) {
         org.python.Object val = first;
-        for (other: others) {
+        for (org.python.Object other: others) {
             if (other.__lt__(val)) {
                 val = other;
             }
@@ -149,5 +149,25 @@ but accept as many as you can get. For instance, the ``min`` function.
 A function accepting keyword arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Of course, sometimes you want to use keyword arguments. Unfortunately, that is
-currently not used. Be the first to contribute an example!
+.. code-block:: python
+
+    def loop_kwargs(**kwargs):
+        """Loop over the kwargs to this function."""
+        for k in kwargs:
+          pass
+
+.. code-block:: java
+
+    @org.python.Method(
+        __doc__ = "Loop over the kwargs to this function.",
+        args = {},
+        kwargs = "kwargs"
+    )
+    public org.python.Object loop_kwargs(org.python.types.Dict kwargs) {
+        Map<org.python.Object, org.python.Object> kwargValues = kwargs.value;
+        for (org.python.Object key : kwargValues.keySet()) {
+          // The keys will always be python Str objects
+          org.python.types.Str keyStr = (org.python.types.Str) key;
+        }
+        return org.python.types.NoneType.NONE;
+    }

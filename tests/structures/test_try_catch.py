@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from ..utils import TranspileTestCase
 
 
@@ -54,7 +52,7 @@ class TryExceptTests(TranspileTestCase):
             except NameError:
                 print("Got an error")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_except_named(self):
         # No exception
@@ -63,7 +61,7 @@ class TryExceptTests(TranspileTestCase):
                 obj = 3
                 print('OK')
             except NameError as e:
-                print("Got a NameError", e)
+                print("Got a", e)
             print('Done.')
             """)
 
@@ -73,7 +71,7 @@ class TryExceptTests(TranspileTestCase):
                 obj.no_such_attribute
                 print('OK')
             except NameError as e:
-                print("Got a NameError", e)
+                print("Got a", e)
             print('Done.')
             """)
 
@@ -83,9 +81,9 @@ class TryExceptTests(TranspileTestCase):
                 obj = int('asdf')
                 print('OK')
             except NameError as e:
-                print("Got a NameError", e)
+                print("Got a", e)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_except(self):
         # No exception
@@ -134,7 +132,7 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError:
                 print("Got an AttributeError")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_except_named(self):
         # No exception
@@ -183,7 +181,7 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError as e:
                 print("Got an AttributeError", e)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_match_except_unnamed(self):
         # No exception
@@ -256,7 +254,7 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError:
                 print("Got an AttributeError")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_match_except_named(self):
         # No exception
@@ -329,7 +327,7 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError as e:
                 print("Got an AttributeError", e)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_except_mixed1(self):
         # No exception
@@ -366,7 +364,7 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError as e:
                 print("Got an AttributeError", e)
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_except_mixed2(self):
         self.assertCodeExecution("""
@@ -400,7 +398,7 @@ class TryExceptTests(TranspileTestCase):
             except AttributeError:
                 print("Got an AttributeError")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_except_mixed3(self):
         # No exception
@@ -454,7 +452,6 @@ class TryExceptTests(TranspileTestCase):
                     print('whoops')
             """)
 
-    @expectedFailure
     def test_try_nested(self):
         self.assertCodeExecution("""
             try:
@@ -467,7 +464,6 @@ class TryExceptTests(TranspileTestCase):
                 print('outer except')
         """)
 
-    @expectedFailure
     def test_try_if_else_in_try(self):
         self.assertCodeExecution("""
             try:
@@ -492,7 +488,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             print('Done.')
             """)
 
-        # Uncaugt Exception
+        # Uncaught Exception
         self.assertCodeExecution("""
             try:
                 obj = int('asdf')
@@ -500,7 +496,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_except_finally(self):
         # No exception
@@ -562,7 +558,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_except_named_finally(self):
         # No exception
@@ -599,7 +595,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_except_finally(self):
         # No exception
@@ -656,7 +652,7 @@ class TryExceptFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """)
+            """, exits_early=True)
 
 
 class TryExceptElseTests(TranspileTestCase):
@@ -720,7 +716,7 @@ class TryExceptElseTests(TranspileTestCase):
             else:
                 print("Do else handling")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_except_else(self):
         # No exception
@@ -763,7 +759,7 @@ class TryExceptElseTests(TranspileTestCase):
             else:
                 print("Do else handling")
             print('Done.')
-            """)
+            """, exits_early=True)
 
 
 class TryExceptElseFinallyTests(TranspileTestCase):
@@ -837,7 +833,7 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """)
+            """, exits_early=True)
 
     def test_try_multiple_except_else_finally(self):
         # No exception
@@ -886,4 +882,4 @@ class TryExceptElseFinallyTests(TranspileTestCase):
             finally:
                 print("Do final cleanup")
             print('Done.')
-            """)
+            """, exits_early=True)

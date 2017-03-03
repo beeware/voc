@@ -42,6 +42,48 @@ public class Int extends org.python.types.Object {
         this.value = value;
     }
 
+    @org.python.Method(
+        name = "int",
+        __doc__ = "int(x=0) -> integer" +
+            "int(x, base=10) -> integer\n" +
+            "\n" +
+            "Convert a number or string to an integer, or return 0 if no arguments\n" +
+            "are given.  If x is a number, return x.__int__().  For floating point\n" +
+            "numbers, this truncates towards zero.\n" +
+            "\n" +
+            "If x is not a number or if base is given, then x must be a string,\n" +
+            "bytes, or bytearray instance representing an integer literal in the\n" +
+            "given base.  The literal can be preceded by '+' or '-' and be surrounded\n" +
+            "by whitespace.  The base defaults to 10.  Valid bases are 0 and 2-36.\n" +
+            "Base 0 means to interpret the base from the string as an integer literal.\n" +
+            "\n" +
+            "  >>> int('0b100', base=0)\n" +
+            "  4\n",
+        default_args = {"x", "base"}
+    )
+    public Int(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        if (args[0] == null) {
+            this.value = 0;
+        } else if (args[1] == null) {
+            try {
+                this.value = ((org.python.types.Int) args[0].__int__()).value;
+            } catch (org.python.exceptions.AttributeError ae) {
+                if (org.Python.VERSION < 0x03040300) {
+                    throw new org.python.exceptions.TypeError(
+                        "int() argument must be a string or a number, not '" + args[0].typeName() + "'"
+                    );
+                } else {
+                    throw new org.python.exceptions.TypeError(
+                        "int() argument must be a string, a bytes-like object or a number, not '" +
+                            args[0].typeName() + "'"
+                    );
+                }
+            }
+        } else if (args.length > 3) {
+            throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
+        }
+    }
+
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("int.__new__() has not been implemented");
     // }
@@ -105,9 +147,14 @@ public class Int extends org.python.types.Object {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool(this.value == ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool(
-                (this.value == 0 && !((org.python.types.Bool) other).value)
-            );
+            org.python.types.Bool temp = (org.python.types.Bool)other;
+            if(this.value == 1 && true == temp.value) {
+                return new org.python.types.Bool(1);
+            }
+            if(this.value == 0 && false == temp.value) {
+                return new org.python.types.Bool(1);
+            }
+            return new org.python.types.Bool(0);
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -117,12 +164,9 @@ public class Int extends org.python.types.Object {
         args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool(this.value != ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool(
-                (this.value != 0 || ((org.python.types.Bool) other).value)
-            );
+        org.python.Object result = this.__eq__(other);
+        if (result instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(!((org.python.types.Bool) result).value);
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -182,8 +226,12 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Float(((double) this.value) + ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(this.value + (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex other_cmplx_object = (org.python.types.Complex)other;
+            return new org.python.types.Complex((org.python.types.Float)this.__add__(other_cmplx_object.real), (org.python.types.Float)(new org.python.types.Float(0)).__add__(other_cmplx_object.imag));
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + other.typeName() + "'");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'int' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -196,6 +244,9 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Float(((double) this.value) - ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(this.value - (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex other_cmplx_object = (org.python.types.Complex)other;
+            return new org.python.types.Complex((org.python.types.Float)this.__sub__(other_cmplx_object.real), (org.python.types.Float)(new org.python.types.Float(0)).__sub__(other_cmplx_object.imag));
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'int' and '" + other.typeName() + "'");
     }
@@ -216,6 +267,24 @@ public class Int extends org.python.types.Object {
             return other.__mul__(this);
         } else if (other instanceof org.python.types.Tuple) {
             return other.__mul__(this);
+        } else if (other instanceof org.python.types.Bytes){
+            byte[] other_value = ((org.python.types.Bytes) other).value;
+            int value = Math.max(0, (int) this.value);
+            int len = other_value.length;
+            byte[] bytes = new byte[value * len];
+            for(int i=0; i < value; i++){
+                System.arraycopy(other_value, 0, bytes, i * len, len);
+            }
+            return new org.python.types.Bytes(bytes);
+        } else if (other instanceof org.python.types.ByteArray) {
+            byte[] other_value = ((org.python.types.ByteArray) other).value;
+            int value = Math.max(0, (int) this.value);
+            int len = other_value.length;
+            byte[] bytes = new byte[value * len];
+            for(int i=0; i < value; i++){
+                System.arraycopy(other_value, 0, bytes, i * len, len);
+            }
+            return new org.python.types.ByteArray(bytes);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'int' and '" + other.typeName() + "'");
     }
@@ -331,25 +400,69 @@ public class Int extends org.python.types.Object {
             data.add(this.__mod__(other));
             return new org.python.types.Tuple(data);
         } catch (org.python.exceptions.TypeError ae) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'");
+            throw new org.python.exceptions.TypeError(
+                "unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'"
+            );
         }
     }
 
-    @org.python.Method(
-        __doc__ = ""
-    )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
         if (modulo != null) {
-            throw new org.python.exceptions.NotImplementedError("int.__pow__() with modulo has not been implemented");
+            /* if exponent is not int and modulo specified raise TypeError*/
+            if(other instanceof org.python.types.Float) {
+                throw new org.python.exceptions.TypeError("pow() 3rd argument not allowed unless all arguments are integers");
+            }
+            if(other instanceof org.python.types.Int || other instanceof org.python.types.Bool) {
+                long this_val = ((org.python.types.Int) this).value;
+                long other_val = ((org.python.types.Int) other).value;
+                long modulo_val = ((org.python.types.Int) modulo).value;
+                /* if exponent is negative raise TypeError*/
+                if(other_val < 0) {
+                    if (org.Python.VERSION < 0x03050000) {
+                        throw new org.python.exceptions.TypeError(
+                            "pow() 2nd argument cannot be negative when 3rd argument specified"
+                        );
+                    } else {
+                        throw new org.python.exceptions.ValueError(
+                            "pow() 2nd argument cannot be negative when 3rd argument specified"
+                        );
+                    }
+                }
+                /* if modulus == 0: raise ValueError() */
+                if(modulo_val == 0) {
+                    throw new org.python.exceptions.ValueError("pow() 3rd argument cannot be 0");
+                }
+                /* if modulus == 1:
+                       return 0 */
+                if(modulo_val == 1) {
+                    return new org.python.types.Int(0);
+                }
+                /* if base < 0:
+                       base = base % modulus */
+                if(this_val < 0) {
+                    this_val = this_val % modulo_val;
+                }
+                /* At this point a, b, and c are guaranteed non-negative UNLESS
+                c is NULL, in which case a may be negative. */
+                long result = 1;
+                this_val = this_val % modulo_val;
+                while(other_val != 0) {
+                    if(other_val % 2 == 1) {
+                        result = (result * this_val) % modulo_val;
+                    }
+                    this_val = (this_val * this_val) % modulo_val;
+                    other_val /= 2;
+                }
+                return new org.python.types.Int(result);
+            }
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for pow(): 'int', '" + other.typeName() + "', 'int");
         }
-
         if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
             if (other_val < 0) {
                 if (this.value == 0) {
                     throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
                 }
-
                 double result = 1.0;
                 for (long count = 0; count < -other_val; count++) {
                     result *= this.value;
@@ -573,6 +686,18 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
+
+    public org.python.Object __itruediv__(org.python.Object other) {
+      if (other instanceof org.python.types.Int || other instanceof org.python.types.Float || other instanceof org.python.types.Bool) {
+        return this.__truediv__(other);
+      } else {
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /=: 'int' and '" + other.typeName() + "'");
+      }
+    }
+
+    @org.python.Method(
+        __doc__ = ""
+    )
     public org.python.Object __irshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(this.value >>= (((org.python.types.Bool) other).value ? 1 : 0));
@@ -584,7 +709,7 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Int(this.value >>= other_val);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: 'int' and '" + other.typeName() + "'");
-    }   
+    }
 
     @org.python.Method(
         __doc__ = ""
@@ -617,14 +742,14 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Int __int__() {
+    public org.python.Object __int__() {
         return new org.python.types.Int(this.value);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
-    public org.python.types.Float __float__() {
+    public org.python.Object __float__() {
         return new org.python.types.Float((float) this.value);
     }
 
