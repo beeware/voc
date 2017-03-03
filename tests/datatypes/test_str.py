@@ -320,6 +320,21 @@ class StrTests(TranspileTestCase):
                 print(s.isupper())
             """)
 
+    def test_isalphanumeric(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'word', '९Ⅲwow', 'HELLO, WORLD.', '९', '²', 'ֆ', 'áello? world', '']:
+                print(s.isalnum())
+                print(s.isalpha())
+            """)
+
+    def test_isnumeric(self):
+        self.assertCodeExecution("""
+            for s in ['239871', '493', '²', '\u00B2', '९', '0', 'Ⅲ', 'x', '05', u'23.43', '0.32', 'J', 'á', '23 3', 'ello?ֆworld', '']:
+                print(s.isdecimal())
+                print(s.isdigit())
+                print(s.isnumeric())
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

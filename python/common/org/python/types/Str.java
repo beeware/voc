@@ -726,28 +726,40 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isalnum() {
-        throw new org.python.exceptions.NotImplementedError("isalnum() has not been implemented.");
+		if (this.value.matches("(\\p{N}|\\p{L})+")) {
+            return new org.python.types.Bool(true);
+		}
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isalpha() {
-        throw new org.python.exceptions.NotImplementedError("isalpha() has not been implemented.");
+    	if (this.value.matches("\\p{L}+")) {
+            return new org.python.types.Bool(true);
+		}
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isdecimal() {
-        throw new org.python.exceptions.NotImplementedError("isdecimal() has not been implemented.");
+    	if (this.value.matches("\\p{Nd}+")) {
+            return new org.python.types.Bool(true);
+		}
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isdigit() {
-        throw new org.python.exceptions.NotImplementedError("isdigit() has not been implemented.");
+    	if (this.value.matches("\\p{Nd}+")) {
+            return new org.python.types.Bool(true);
+		}
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -776,7 +788,10 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isnumeric() {
-        throw new org.python.exceptions.NotImplementedError("isnumeric() has not been implemented.");
+		if (this.value.matches("\\p{N}+")) {
+            return new org.python.types.Bool(true);
+		}
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
