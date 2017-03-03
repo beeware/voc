@@ -474,7 +474,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
         boolean found = false;
