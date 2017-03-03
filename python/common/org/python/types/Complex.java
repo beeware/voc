@@ -2,7 +2,10 @@ package org.python.types;
 import java.util.Locale;
 
 public class Complex extends org.python.types.Object {
+    @org.python.Attribute
     public org.python.types.Float real;
+
+    @org.python.Attribute
     public org.python.types.Float imag;
 
     /**
@@ -13,8 +16,7 @@ public class Complex extends org.python.types.Object {
      */
 
     public java.lang.Object toJava() {
-        // return this.value;
-        throw new org.python.exceptions.NotImplementedError("complex.toJava() has not been implemented.");
+        return this;
     }
 
     public org.python.Object byValue() {
