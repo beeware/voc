@@ -11,13 +11,6 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
-    def test_iscase(self):
-        self.assertCodeExecution("""
-            for s in ['hello, World!', 'HELLO, WORLD.', 'ello? world', '']:
-                print(s.islower())
-                print(s.isupper())
-            """)
-
     def test_join(self):
         self.assertCodeExecution("""
             print(','.join(None))
@@ -303,7 +296,6 @@ class StrTests(TranspileTestCase):
         """)
 
     def test_center(self):
-        # test ok
         self.assertCodeExecution("""
             s = "abc"
             print(s.center(10, "-"))
@@ -319,6 +311,13 @@ class StrTests(TranspileTestCase):
                 print(s.center(10,"-"))
             except AttributeError as err:
                 print(err)
+            """)
+
+    def test_iscase(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'HELLO, WORLD.', 'ÉX', 'á', 'ello? world', '']:
+                print(s.islower())
+                print(s.isupper())
             """)
 
 
