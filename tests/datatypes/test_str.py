@@ -327,12 +327,13 @@ class StrTests(TranspileTestCase):
                 print(s.isalpha())
             """)
 
+    @expectedFailure
     def test_isnumeric(self):
         self.assertCodeExecution("""
             for s in ['239871', '493', '²', '\\u00B2', '९', '0', 'Ⅲ', 'x', '05', u'23.43', '0.32', 'J', 'á',
              '23 3', 'ello?ֆworld', '']:
                 print(s.isdecimal())
-                #print(s.isdigit())
+                print(s.isdigit())
                 print(s.isnumeric())
             """)
 
