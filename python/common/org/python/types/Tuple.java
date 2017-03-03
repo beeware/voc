@@ -117,22 +117,27 @@ public class Tuple extends org.python.types.Object {
             int otherSize = otherTuple.value.size();
             int count = Math.min(size, otherSize);
 
-            boolean cmp = false;
             for (int i = 0; i < count; i++) {
                 org.python.Object r = this.value.get(i).__lt__(otherTuple.value.get(i));
-                if (r instanceof org.python.types.NotImplementedType) {
-                    r = otherTuple.value.get(i).__gt__(this.value.get(i));
-                }
                 if (r instanceof org.python.types.NotImplementedType) {
                     throw new org.python.exceptions.TypeError(
                         String.format("unorderable types: %s() < %s()",
                             this.value.get(i).typeName(),
                             otherTuple.value.get(i).typeName()));
                 }
-                cmp = cmp & ((org.python.types.Bool) r).value;
-            }
-            if (cmp) {
-                return new org.python.types.Bool(true);
+                if (((org.python.types.Bool) r).value) {
+                    return new org.python.types.Bool(true);
+                }
+                r = otherTuple.value.get(i).__lt__(this.value.get(i));
+                if (r instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() < %s()",
+                            otherTuple.value.get(i).typeName(),
+                            this.value.get(i).typeName()));
+                }
+                if (((org.python.types.Bool) r).value) {
+                    return new org.python.types.Bool(false);
+                }
             }
 
             if (size == otherSize) {
