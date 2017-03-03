@@ -86,6 +86,9 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_lt_frozenset',
         'test_direct_ne_frozenset',
 
+        'test_direct_eq_range',
+        'test_direct_ne_range',
+
         'test_eq_class',
         'test_eq_frozenset',
         'test_eq_range',

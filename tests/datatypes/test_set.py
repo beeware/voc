@@ -191,14 +191,19 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_direct_eq_bytes',
         'test_direct_eq_set',
+        'test_direct_ge_bytearray',
         'test_direct_ge_bytes',
         'test_direct_ge_set',
+        'test_direct_gt_bytearray',
         'test_direct_gt_bytes',
         'test_direct_gt_set',
+        'test_direct_le_bytearray',
         'test_direct_le_bytes',
         'test_direct_le_set',
+        'test_direct_lt_bytearray',
         'test_direct_lt_bytes',
         'test_direct_lt_set',
+        'test_direct_ne_bytearray',
         'test_direct_ne_bytes',
         'test_direct_ne_set',
 
@@ -208,6 +213,16 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_le_frozenset',
         'test_direct_lt_frozenset',
         'test_direct_ne_frozenset',
+
+        'test_direct_eq_list',
+
+        'test_direct_eq_slice',
+        'test_direct_ne_slice',
+        'test_direct_ge_slice',
+        'test_direct_le_slice',
+
+        'test_direct_gt_tuple',
+        'test_direct_le_tuple',
 
         'test_eq_class',
         'test_eq_frozenset',

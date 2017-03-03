@@ -445,6 +445,11 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_lt_bytes',
         'test_direct_ne_bytes',
 
+        'test_direct_ge_list',
+        'test_direct_gt_list',
+        'test_direct_le_list',
+        'test_direct_lt_list',
+
         'test_direct_eq_frozenset',
         'test_direct_ge_frozenset',
         'test_direct_gt_frozenset',

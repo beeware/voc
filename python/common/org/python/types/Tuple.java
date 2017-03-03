@@ -117,16 +117,22 @@ public class Tuple extends org.python.types.Object {
             int otherSize = otherTuple.value.size();
             int count = Math.min(size, otherSize);
 
+            boolean cmp = false;
             for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__lt__(otherTuple.value.get(i));
-                org.python.types.Bool b2 =
-                    (org.python.types.Bool) otherTuple.value.get(i).__lt__(this.value.get(i));
-                if (b.value) {
-                    return new org.python.types.Bool(true);
-                } else if (b2.value) {
-                    return new org.python.types.Bool(false);
+                org.python.Object r = this.value.get(i).__lt__(otherTuple.value.get(i));
+                if (r instanceof org.python.types.NotImplementedType) {
+                    r = otherTuple.value.get(i).__gt__(this.value.get(i));
                 }
+                if (r instanceof org.python.types.NotImplementedType) {
+                    throw new org.python.exceptions.TypeError(
+                        String.format("unorderable types: %s() < %s()",
+                            this.value.get(i).typeName(),
+                            otherTuple.value.get(i).typeName()));
+                }
+                cmp = cmp & ((org.python.types.Bool) r).value;
+            }
+            if (cmp) {
+                return new org.python.types.Bool(true);
             }
 
             if (size == otherSize) {
