@@ -313,6 +313,7 @@ class StrTests(TranspileTestCase):
             except AttributeError as err:
                 print(err)
             """)
+
     def test_ljust(self):
         self.assertCodeExecution("""
             s = "abc"
