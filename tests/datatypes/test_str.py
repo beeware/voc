@@ -1,5 +1,5 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
-
+from unittest import expectedFailure
 
 class StrTests(TranspileTestCase):
     def test_setattr(self):
