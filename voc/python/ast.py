@@ -1885,9 +1885,13 @@ class Visitor(ast.NodeVisitor):
                 self.context.add_opcodes(
                                 IF([], JavaOpcodes.IFNE),
                 )
+                # assign this to a variable to set as jump target later
+                pop_landing = JavaOpcodes.POP()
+                self.context.next_resolve_list.append((pop_landing, OpcodePosition.START))
                 self.context.add_opcodes(
                                     # result = y.__reflect_oper__(x)
-                                    JavaOpcodes.POP(),
+                                    # we want the if jump to land here instead
+                                    pop_landing,
                                     ALOAD_name('#compare-y'),
                                     ALOAD_name('#compare-x'),
                                     JavaOpcodes.INVOKEINTERFACE(
@@ -1895,6 +1899,9 @@ class Visitor(ast.NodeVisitor):
                                         reflect_oper,
                                         '(Lorg/python/Object;)Lorg/python/Object;'
                                     ),
+                )
+                self.context.add_opcodes(
+                                END_IF(),
                 )
                 self.context.add_opcodes(
                                     # fourth round, check again
@@ -2003,19 +2010,18 @@ class Visitor(ast.NodeVisitor):
                                     END_IF(),
                 )
                 self.context.add_opcodes(
-                                END_IF(),
-                )
-                self.context.add_opcodes(
-                            END_IF(),
+                                # END_IF(),
                 )
                 # do some magic to implement
                 #   if (x.getClass() == y.getClass() || !y.getClass().isInstance(x))
-                # for the third-last if block (context.blocks[-2]),
-                # set the jump target (when ==) to the START of second-last if block instead,
-                # so that either case will end up at y.__reflect_oper__(x)
-                block_inner = self.context.blocks[-3]
-                block_outer = self.context.blocks[-2]
-                jump(block_outer.if_op, self.context, block_inner, OpcodePosition.START)
+                # for the third-last if block (context.blocks[-3]),
+                # set the jump target (when ==) to the POP before y.__reflect_oper__(x)
+                block_outer = self.context.blocks[-3]
+                print("MODIFYING %s 0x%x" % (block_outer.if_op, id(block_outer.if_op)))
+                jump(block_outer.if_op, self.context, pop_landing, OpcodePosition.START)
+                self.context.add_opcodes(
+                            END_IF(),
+                )
                 self.context.add_opcodes(
                         END_IF(),  # third round's result == NOT_IMPLEMENTED
                 )
