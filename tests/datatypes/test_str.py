@@ -321,10 +321,6 @@ class StrTests(TranspileTestCase):
             print(s.ljust(2))
             print(s.ljust(15, "0"))
             try:
-                print(s.ljust(16, 5.6))
-            except TypeError as err:
-                print(err)
-            try:
                 print(s.ljust(5.0, "P"))
             except TypeError as err:
                 print(err)
