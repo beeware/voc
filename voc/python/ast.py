@@ -1908,79 +1908,97 @@ class Visitor(ast.NodeVisitor):
                 self.context.add_opcodes(
                                     IF([], JavaOpcodes.IF_ACMPNE),
                 )
-                self.context.add_opcodes(
+                if isinstance(node.ops[0], (ast.Eq, ast.NotEq)):
+                    # for == and !=, default to false and true respectively
+                    # instead of throwing TypeError
+                    if isinstance(node.ops[0], ast.Eq):
+                        self.context.add_opcodes(
+                                        JavaOpcodes.POP(),
+                                        java.New('org/python/types/Bool'),
+                                        JavaOpcodes.ICONST_0(),
+                                        java.Init('org/python/types/Bool', 'Z'),
+                        )
+                    else:
+                        self.context.add_opcodes(
+                                        JavaOpcodes.POP(),
+                                        java.New('org/python/types/Bool'),
+                                        JavaOpcodes.ICONST_1(),
+                                        java.Init('org/python/types/Bool', 'Z'),
+                        )
+                else:
+                    self.context.add_opcodes(
                                         # still cannot, make TypeError
-                                        JavaOpcodes.NEW('org/python/exceptions/TypeError'),
-                                        JavaOpcodes.DUP(),
-                )
-                # different message
-                if sys.hexversion < 0x3060000:
-                    self.context.add_opcodes(
-                                            JavaOpcodes.LDC_W('unorderable types: %s() %s %s()'),
+                                            JavaOpcodes.NEW('org/python/exceptions/TypeError'),
+                                            JavaOpcodes.DUP(),
                     )
-                else:
+                    # different message
+                    if sys.hexversion < 0x3060000:
+                        self.context.add_opcodes(
+                                                JavaOpcodes.LDC_W('unorderable types: %s() %s %s()'),
+                        )
+                    else:
+                        self.context.add_opcodes(
+                                                JavaOpcodes.LDC_W(
+                                                    "'%s' not supported between instances of '%s' and '%s'"
+                                                ),
+                        )
                     self.context.add_opcodes(
-                                            JavaOpcodes.LDC_W(
-                                                "'%s' not supported between instances of '%s' and '%s'"
+                                            JavaOpcodes.ICONST_3(),
+                                            JavaOpcodes.ANEWARRAY('java/lang/Object'),
+                                            JavaOpcodes.DUP(),
+                    )
+                    # different order of params for different message
+                    if sys.hexversion < 0x3060000:
+                        self.context.add_opcodes(
+                                                JavaOpcodes.ICONST_0(),
+                        )
+                    else:
+                        self.context.add_opcodes(
+                                                JavaOpcodes.ICONST_1(),
+                        )
+                    self.context.add_opcodes(
+                                            ALOAD_name('#compare-x'),
+                                            JavaOpcodes.INVOKEINTERFACE(
+                                                'org/python/Object',
+                                                'typeName',
+                                                '()Ljava/lang/String;'
                                             ),
+                                            JavaOpcodes.AASTORE(),
+                                            JavaOpcodes.DUP(),
                     )
-                self.context.add_opcodes(
-                                        JavaOpcodes.ICONST_3(),
-                                        JavaOpcodes.ANEWARRAY('java/lang/Object'),
-                                        JavaOpcodes.DUP(),
-                )
-                # different order of params for different message
-                if sys.hexversion < 0x3060000:
+                    # different order of params for different message
+                    if sys.hexversion < 0x3060000:
+                        self.context.add_opcodes(
+                                                JavaOpcodes.ICONST_1(),
+                        )
+                    else:
+                        self.context.add_opcodes(
+                                                JavaOpcodes.ICONST_0(),
+                        )
                     self.context.add_opcodes(
-                                            JavaOpcodes.ICONST_0(),
+                                            JavaOpcodes.LDC_W(oper_symbol),
+                                            JavaOpcodes.AASTORE(),
+                                            JavaOpcodes.DUP(),
+                                            JavaOpcodes.ICONST_2(),
+                                            ALOAD_name('#compare-y'),
+                                            JavaOpcodes.INVOKEINTERFACE(
+                                                'org/python/Object',
+                                                'typeName',
+                                                '()Ljava/lang/String;'
+                                            ),
+                                            JavaOpcodes.AASTORE(),
+                                            JavaOpcodes.INVOKESTATIC(
+                                                'java/lang/String',
+                                                'format',
+                                                '(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;'
+                                            ),
+                                            JavaOpcodes.INVOKESPECIAL(
+                                                'org/python/exceptions/TypeError',
+                                                '<init>',
+                                                '(Ljava/lang/String;)V'
+                                            ),
+                                            JavaOpcodes.ATHROW(),
                     )
-                else:
-                    self.context.add_opcodes(
-                                            JavaOpcodes.ICONST_1(),
-                    )
-                self.context.add_opcodes(
-                                        ALOAD_name('#compare-x'),
-                                        JavaOpcodes.INVOKEINTERFACE(
-                                            'org/python/Object',
-                                            'typeName',
-                                            '()Ljava/lang/String;'
-                                        ),
-                                        JavaOpcodes.AASTORE(),
-                                        JavaOpcodes.DUP(),
-                )
-                # different order of params for different message
-                if sys.hexversion < 0x3060000:
-                    self.context.add_opcodes(
-                                            JavaOpcodes.ICONST_1(),
-                    )
-                else:
-                    self.context.add_opcodes(
-                                            JavaOpcodes.ICONST_0(),
-                    )
-                self.context.add_opcodes(
-                                        JavaOpcodes.LDC_W(oper_symbol),
-                                        JavaOpcodes.AASTORE(),
-                                        JavaOpcodes.DUP(),
-                                        JavaOpcodes.ICONST_2(),
-                                        ALOAD_name('#compare-y'),
-                                        JavaOpcodes.INVOKEINTERFACE(
-                                            'org/python/Object',
-                                            'typeName',
-                                            '()Ljava/lang/String;'
-                                        ),
-                                        JavaOpcodes.AASTORE(),
-                                        JavaOpcodes.INVOKESTATIC(
-                                            'java/lang/String',
-                                            'format',
-                                            '(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;'
-                                        ),
-                                        JavaOpcodes.INVOKESPECIAL(
-                                            'org/python/exceptions/TypeError',
-                                            '<init>',
-                                            '(Ljava/lang/String;)V'
-                                        ),
-                                        JavaOpcodes.ATHROW(),
-                )
                 self.context.add_opcodes(
                                     END_IF(),
                 )
