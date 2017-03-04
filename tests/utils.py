@@ -313,7 +313,7 @@ class TranspileTestCase(TestCase):
             os.path.join('dist', 'python-java-support.jar'),
         ])
         cls.jvm = subprocess.Popen(
-            ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
+            ["java", "-noverify", "-classpath", classpath, "python.testdaemon.TestDaemon"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
