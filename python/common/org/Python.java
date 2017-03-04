@@ -917,8 +917,22 @@ public class Python {
             "the provided iterable is empty.\n" +
             "With two or more arguments, return the largest argument.\n"
     )
-    public static org.python.Object max() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'max' not implemented");
+    public static org.python.Object max(/*org.python.Object first, org.python.types.Tuple others/*,type of function pointer key*/) {
+        /*try{
+        	//if(key==null){
+        		org.python.Object val = first;
+    			for (org.python.Object other: others) {
+        		if (other.__gt__(val)) {
+            		val = other;
+        			}
+    			}
+    			return val;
+        	}
+        //}
+        catch(org.python.exceptions.TypeError te){
+        	te.TypeError("unorderable types: "+other.typeName()+"() > "+val.typeName()+"()");
+        	}
+        //*/throw new org.python.exceptions.NotImplementedError("Builtin function 'max' not implemented");
     }
 
     @org.python.Method(
