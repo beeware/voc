@@ -313,6 +313,26 @@ class StrTests(TranspileTestCase):
             except AttributeError as err:
                 print(err)
             """)
+        def test_ljust(self):
+        self.assertCodeExecution("""
+            s = "abc"
+            print(s.ljust(5, "P"))
+            print(s.ljust(2))
+            print(s.ljust(15, "0"))
+            try:
+                print(s.ljust(16, 5.6))
+            except TypeError as err:
+                print(err)
+            try:
+                print(s.ljust(5.0, "P"))
+            except TypeError as err:
+                print(err)
+            s = 9
+            try:
+                print(s.ljust(8))
+            except AttributeError as err:
+                print(err)
+            """)
 
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
