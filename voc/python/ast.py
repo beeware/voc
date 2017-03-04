@@ -1709,24 +1709,300 @@ class Visitor(ast.NodeVisitor):
                         JavaOpcodes.SWAP()
                     )
 
+                oper = {
+                        ast.Eq: '__eq__',
+                        ast.Gt: '__gt__',
+                        ast.GtE: '__ge__',
+                        ast.Lt: '__lt__',
+                        ast.LtE: '__le__',
+                        ast.In: '__contains__',
+                        # ast.Is: '__eq__',
+                        # ast.IsNot: '__ne__',
+                        ast.NotEq: '__ne__',
+                        ast.NotIn: '__not_contains__',
+                }[type(node.ops[0])]
+                oper_symbol = {
+                        ast.Eq: '==',
+                        ast.Gt: '>',
+                        ast.GtE: '>=',
+                        ast.Lt: '<',
+                        ast.LtE: '<=',
+                        ast.In: 'in',
+                        # ast.Is: '__eq__',
+                        # ast.IsNot: '__ne__',
+                        ast.NotEq: '!=',
+                        ast.NotIn: 'not in',
+                }[type(node.ops[0])]
+                reflect_oper = {
+                        ast.Eq: '__eq__',
+                        ast.Gt: '__lt__',
+                        ast.GtE: '__le__',
+                        ast.Lt: '__gt__',
+                        ast.LtE: '__ge__',
+                        ast.In: '__contains__',
+                        ast.NotEq: '__ne__',
+                        ast.NotIn: '__not_contains__',
+                }[type(node.ops[0])]
+
+                # pop off left and right operands from stack
                 self.context.add_opcodes(
-                    JavaOpcodes.LDC_W({
-                            ast.Eq: '__eq__',
-                            ast.Gt: '__gt__',
-                            ast.GtE: '__ge__',
-                            ast.Lt: '__lt__',
-                            ast.LtE: '__le__',
-                            ast.In: '__contains__',
-                            ast.Is: '__eq__',
-                            ast.IsNot: '__ne__',
-                            ast.NotEq: '__ne__',
-                            ast.NotIn: '__not_contains__',
-                        }[type(node.ops[0])]),
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        '__cmp__',
-                        '(Lorg/python/Object;Ljava/lang/String;)Lorg/python/Object;'
+                    ASTORE_name('#compare-y'),
+                    ASTORE_name('#compare-x'),
+                )
+
+                # result variable
+                self.context.add_opcodes(
+                    JavaOpcodes.GETSTATIC(
+                        'org/python/types/NotImplementedType',
+                        'NOT_IMPLEMENTED',
+                        'Lorg/python/Object;'
+                    ),
+                )
+
+                self.context.add_opcodes(
+                    # first round of checks, x.getClass() == y.getClass()?
+                    ALOAD_name('#compare-x'),
+                    JavaOpcodes.INVOKEVIRTUAL(
+                        'java/lang/Object',
+                        'getClass',
+                        '()Ljava/lang/Class;'
+                    ),
+                    ALOAD_name('#compare-y'),
+                    JavaOpcodes.INVOKEVIRTUAL(
+                        'java/lang/Object',
+                        'getClass',
+                        '()Ljava/lang/Class;'
+                    ),
+                )
+                self.context.add_opcodes(
+                    IF([], JavaOpcodes.IF_ACMPEQ),
+                )
+                self.context.add_opcodes(
+                        # y.getClass().isInstance(x)?
+                        ALOAD_name('#compare-y'),
+                        JavaOpcodes.INVOKEVIRTUAL(
+                            'java/lang/Object',
+                            'getClass',
+                            '()Ljava/lang/Class;'
+                        ),
+                        ALOAD_name('#compare-x'),
+                        JavaOpcodes.INVOKEVIRTUAL(
+                            'java/lang/Class',
+                            'isInstance',
+                            '(Ljava/lang/Object;)Z'
+                        ),
+                ),
+                self.context.add_opcodes(
+                        IF([], JavaOpcodes.IFEQ),
+                )
+                self.context.add_opcodes(
+                            # result = y.__reflect_oper__(x)
+                            JavaOpcodes.POP(),
+                            ALOAD_name('#compare-y'),
+                            ALOAD_name('#compare-x'),
+                            JavaOpcodes.INVOKEINTERFACE(
+                                'org/python/Object',
+                                reflect_oper,
+                                '(Lorg/python/Object;)Lorg/python/Object;'
+                            ),
+                )
+                self.context.add_opcodes(
+                        END_IF(),
+                )
+                self.context.add_opcodes(
+                    END_IF(),
+                )
+
+                # second round, result == NOT_IMPLEMENTED?
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.GETSTATIC(
+                        'org/python/types/NotImplementedType',
+                        'NOT_IMPLEMENTED',
+                        'Lorg/python/Object;'
+                    ),
+                )
+                self.context.add_opcodes(
+                    IF([], JavaOpcodes.IF_ACMPNE),
+                )
+                self.context.add_opcodes(
+                        # x.__oper__(y)
+                        JavaOpcodes.POP(),
+                        ALOAD_name('#compare-x'),
+                        ALOAD_name('#compare-y'),
+                        JavaOpcodes.INVOKEINTERFACE(
+                            'org/python/Object',
+                            oper,
+                            '(Lorg/python/Object;)Lorg/python/Object;'
+                        ),
+                )
+
+                # third round, result == NOT_IMPLEMENTED?
+                self.context.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.GETSTATIC(
+                            'org/python/types/NotImplementedType',
+                            'NOT_IMPLEMENTED',
+                            'Lorg/python/Object;'
+                        ),
+                )
+                self.context.add_opcodes(
+                        IF([], JavaOpcodes.IF_ACMPNE),
+                )
+                self.context.add_opcodes(
+                            ALOAD_name('#compare-x'),
+                            JavaOpcodes.INVOKEVIRTUAL(
+                                'java/lang/Object',
+                                'getClass',
+                                '()Ljava/lang/Class;'
+                            ),
+                            ALOAD_name('#compare-y'),
+                            JavaOpcodes.INVOKEVIRTUAL(
+                                'java/lang/Object',
+                                'getClass',
+                                '()Ljava/lang/Class;'
+                            ),
+                )
+                self.context.add_opcodes(
+                            # later we will modify the target of this if jump
+                            IF([], JavaOpcodes.IF_ACMPEQ),
+                )
+                self.context.add_opcodes(
+                                # y.getClass().isInstance(x)?
+                                ALOAD_name('#compare-y'),
+                                JavaOpcodes.INVOKEVIRTUAL(
+                                    'java/lang/Object',
+                                    'getClass',
+                                    '()Ljava/lang/Class;'
+                                ),
+                                ALOAD_name('#compare-x'),
+                                JavaOpcodes.INVOKEVIRTUAL(
+                                    'java/lang/Class',
+                                    'isInstance',
+                                    '(Ljava/lang/Object;)Z'
+                                ),
+                )
+                self.context.add_opcodes(
+                                IF([], JavaOpcodes.IFNE),
+                )
+                self.context.add_opcodes(
+                                    # result = y.__reflect_oper__(x)
+                                    JavaOpcodes.POP(),
+                                    ALOAD_name('#compare-y'),
+                                    ALOAD_name('#compare-x'),
+                                    JavaOpcodes.INVOKEINTERFACE(
+                                        'org/python/Object',
+                                        reflect_oper,
+                                        '(Lorg/python/Object;)Lorg/python/Object;'
+                                    ),
+                )
+                self.context.add_opcodes(
+                                    # fourth round, check again
+                                    JavaOpcodes.DUP(),
+                                    JavaOpcodes.GETSTATIC(
+                                        'org/python/types/NotImplementedType',
+                                        'NOT_IMPLEMENTED',
+                                        'Lorg/python/Object;'
+                                    ),
+                )
+                self.context.add_opcodes(
+                                    IF([], JavaOpcodes.IF_ACMPNE),
+                )
+                self.context.add_opcodes(
+                                        # still cannot, make TypeError
+                                        JavaOpcodes.NEW('org/python/exceptions/TypeError'),
+                                        JavaOpcodes.DUP(),
+                )
+                # different message
+                if sys.hexversion < 0x3060000:
+                    self.context.add_opcodes(
+                                            JavaOpcodes.LDC_W('unorderable types: %s() %s %s()'),
                     )
+                else:
+                    self.context.add_opcodes(
+                                            JavaOpcodes.LDC_W(
+                                                "'%s' not supported between instances of '%s' and '%s'"
+                                            ),
+                    )
+                self.context.add_opcodes(
+                                        JavaOpcodes.ICONST_3(),
+                                        JavaOpcodes.ANEWARRAY('java/lang/Object'),
+                                        JavaOpcodes.DUP(),
+                )
+                # different order of params for different message
+                if sys.hexversion < 0x3060000:
+                    self.context.add_opcodes(
+                                            JavaOpcodes.ICONST_0(),
+                    )
+                else:
+                    self.context.add_opcodes(
+                                            JavaOpcodes.ICONST_1(),
+                    )
+                self.context.add_opcodes(
+                                        ALOAD_name('#compare-x'),
+                                        JavaOpcodes.INVOKEINTERFACE(
+                                            'org/python/Object',
+                                            'typeName',
+                                            '()Ljava/lang/String;'
+                                        ),
+                                        JavaOpcodes.AASTORE(),
+                                        JavaOpcodes.DUP(),
+                )
+                # different order of params for different message
+                if sys.hexversion < 0x3060000:
+                    self.context.add_opcodes(
+                                            JavaOpcodes.ICONST_1(),
+                    )
+                else:
+                    self.context.add_opcodes(
+                                            JavaOpcodes.ICONST_0(),
+                    )
+                self.context.add_opcodes(
+                                        JavaOpcodes.LDC_W(oper_symbol),
+                                        JavaOpcodes.AASTORE(),
+                                        JavaOpcodes.DUP(),
+                                        JavaOpcodes.ICONST_2(),
+                                        ALOAD_name('#compare-y'),
+                                        JavaOpcodes.INVOKEINTERFACE(
+                                            'org/python/Object',
+                                            'typeName',
+                                            '()Ljava/lang/String;'
+                                        ),
+                                        JavaOpcodes.AASTORE(),
+                                        JavaOpcodes.INVOKESTATIC(
+                                            'java/lang/String',
+                                            'format',
+                                            '(Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;'
+                                        ),
+                                        JavaOpcodes.INVOKESPECIAL(
+                                            'org/python/exceptions/TypeError',
+                                            '<init>',
+                                            '(Ljava/lang/String;)V'
+                                        ),
+                                        JavaOpcodes.ATHROW(),
+                )
+                self.context.add_opcodes(
+                                    END_IF(),
+                )
+                self.context.add_opcodes(
+                                END_IF(),
+                )
+                self.context.add_opcodes(
+                            END_IF(),
+                )
+                # do some magic to implement
+                #   if (x.getClass() == y.getClass() || !y.getClass().isInstance(x))
+                # for the third-last if block (context.blocks[-2]),
+                # set the jump target (when ==) to the START of second-last if block instead,
+                # so that either case will end up at y.__reflect_oper__(x)
+                block_inner = self.context.blocks[-3]
+                block_outer = self.context.blocks[-2]
+                jump(block_outer.if_op, self.context, block_inner, OpcodePosition.START)
+                self.context.add_opcodes(
+                        END_IF(),  # third round's result == NOT_IMPLEMENTED
+                )
+                self.context.add_opcodes(
+                    END_IF(),  # second round's result == NOT_IMPLEMENTED
                 )
         else:
             raise NotImplementedError("Don't know how to resolve multiple operators")

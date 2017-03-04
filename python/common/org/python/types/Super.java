@@ -35,10 +35,6 @@ public class Super implements org.python.Object {
         return "super";
     }
 
-    public org.python.Object __cmp__(org.python.Object other, String operator) {
-        return null;
-    }
-
     /**
      * Construct a new object instance.
      */
