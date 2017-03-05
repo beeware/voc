@@ -6,9 +6,9 @@ class ReturnTests(TranspileTestCase):
         # Empty return
         self.assertCodeExecution("""
             def m():
-                print('haha')
+                print('before return')
                 return
-                print('haha')
+                print('after return')
 
             print(m())
         """)
@@ -16,9 +16,9 @@ class ReturnTests(TranspileTestCase):
         # Single return
         self.assertCodeExecution("""
             def m():
-                print('haha')
+                print('before return')
                 return 1
-                print('haha')
+                print('after return')
 
             print(m() + 1)
         """)
@@ -26,9 +26,9 @@ class ReturnTests(TranspileTestCase):
         # Multiple return
         self.assertCodeExecution("""
             def m():
-                print('haha')
+                print('before return')
                 return 1, 2
-                print('haha')
+                print('after return')
 
             print(m())
         """)
