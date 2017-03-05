@@ -32,4 +32,3 @@ class ReturnTests(TranspileTestCase):
 
             print(m())
         """)
-
