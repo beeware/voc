@@ -16,5 +16,4 @@ install:
   - "pip install git+https://github.com/pybee/pytest-circleci"
   - "pip install flake8"
 script:
-  - flake8
-  - "py.test tests"
+  - flake8 && py.test tests
