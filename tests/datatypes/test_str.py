@@ -321,6 +321,23 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_ljust(self):
+        self.assertCodeExecution("""
+            s = "abc"
+            print(s.ljust(5, "P"))
+            print(s.ljust(2))
+            print(s.ljust(15, "0"))
+            print(s.ljust(20, "ã"))
+            try:
+                print(s.ljust(5, b'_'))
+            except TypeError as err:
+                print(TypeError)
+            try:
+                print(s.ljust(5.0, "P"))
+            except TypeError as err:
+                print(err)
+                """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
