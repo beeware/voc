@@ -1,5 +1,5 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
-
+from unittest import expectedFailure
 
 class StrTests(TranspileTestCase):
     def test_setattr(self):
@@ -9,13 +9,6 @@ class StrTests(TranspileTestCase):
                 x.attr = 42
             except AttributeError as err:
                 print(err)
-            """)
-
-    def test_iscase(self):
-        self.assertCodeExecution("""
-            for s in ['hello, World!', 'HELLO, WORLD.', 'ello? world', '']:
-                print(s.islower())
-                print(s.isupper())
             """)
 
     def test_join(self):
@@ -142,7 +135,7 @@ class StrTests(TranspileTestCase):
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
                 print(s.capitalize())
                 print(s.lower())
-                # print(s.swap())
+                print(s.swapcase())
                 print(s.title())
                 print(s.upper())
             """)
@@ -319,6 +312,36 @@ class StrTests(TranspileTestCase):
                 print(s.center(10,"-"))
             except AttributeError as err:
                 print(err)
+            """)
+
+    def test_iscase(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'HELLO, WORLD.', 'Ɠx', 'á', 'ello? world', '']:
+                print(s.islower())
+                print(s.isupper())
+            """)
+
+    @expectedFailure
+    def test_isalphanumeric(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'word', 'HELLO, WORLD.', 'Ɠ', '²', 'áello? world', '']:
+                print(s.isalnum())
+                print(s.isalpha())
+            """)
+
+    def test_isspace(self):
+        self.assertCodeExecution("""
+            for s in [' ', '\t', '            ', '\\n\\n\\t', 'Ɠ\t', 'hello world', u'\u00B2', 'áello? world', '']:
+                print(s.isspace())
+            """)
+
+    @expectedFailure
+    def test_isnumeric(self):
+        self.assertCodeExecution("""
+            for s in [u'239871', '493', '²', u'\u00B2', '0', 'Ⅲ', 'Ɠx', '05', u'23.43', '0.32', 'J', 'á', '23 3', 'ello? world', '']:
+                print(s.isdecimal())
+                print(s.isdigit())
+                #print(s.isnumeric())
             """)
 
 

@@ -726,28 +726,52 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isalnum() {
-        throw new org.python.exceptions.NotImplementedError("isalnum() has not been implemented.");
+    	if (this.value.isEmpty()) { // Incomplete implementation. Also needs to return true for superscripts etc
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isLetterOrDigit(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isalpha() {
-        throw new org.python.exceptions.NotImplementedError("isalpha() has not been implemented.");
+    	if (this.value.isEmpty()) {
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isLetter(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isdecimal() {
-        throw new org.python.exceptions.NotImplementedError("isdecimal() has not been implemented.");
+		if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+		}
+		for (int i = 0; i < this.value.length(); i++) {
+			if (!Character.isDigit(this.value.charAt(i))) {
+				return new org.python.types.Bool(false);
+			}
+		}
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object isdigit() {
-        throw new org.python.exceptions.NotImplementedError("isdigit() has not been implemented.");
+    	return this.isdecimal(); // Incomplete implementation. Also needs to return true for superscripts etc
     }
 
     @org.python.Method(
@@ -761,10 +785,15 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object islower() {
-        if (!this.value.isEmpty() && this.value.toLowerCase().equals(this.value)) {
-        	return new org.python.types.Bool(true);
-        }
-        return new org.python.types.Bool(false);
+    	if (this.value.isEmpty()) {
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isLowerCase(this.value.charAt(i)) && Character.isLetter(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -785,7 +814,15 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isspace() {
-        throw new org.python.exceptions.NotImplementedError("isspace() has not been implemented.");
+    	if (this.value.isEmpty()) {
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isWhitespace(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -799,10 +836,15 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isupper() {
-        if (!this.value.isEmpty() && this.value.toUpperCase().equals(this.value)) {
-        	return new org.python.types.Bool(true);
-        }
-        return new org.python.types.Bool(false);
+    	if (this.value.isEmpty()) {
+    		return new org.python.types.Bool(false);
+	        }
+       	for (int i = 0; i < this.value.length(); i++) {
+    	   if (!Character.isUpperCase(this.value.charAt(i)) && Character.isLetter(this.value.charAt(i))) {
+    		   return new org.python.types.Bool(false);
+    	   }
+       	}
+       	return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -953,31 +995,44 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object swapcase() {
-        throw new org.python.exceptions.NotImplementedError("swapcase() has not been implemented.");
+    	if (this.value.isEmpty()) {
+    	    return new Str(this.value);
+    	}
+    	String swapped = "";
+    	int i = 0;
+    	while(i < this.value.length()){
+    		if (Character.isUpperCase(this.value.charAt(i))) {
+    	    	swapped += Character.toString(Character.toLowerCase(this.value.charAt(i)));
+    	    } else {
+    	    	swapped += Character.toString(Character.toUpperCase(this.value.charAt(i)));
+    	    }
+    	    i++;
+    	}
+    	return new Str(swapped);
     }
 
     @org.python.Method(
         __doc__ = "S.title() -> str\n\nReturn a titlecased version of S, i.e. words start with title case\ncharacters, all remaining cased characters have lower case."
     )
     public org.python.Object title() {
-	if (this.value.isEmpty()){
+	if (this.value.isEmpty()) {
 	    return new Str(this.value);
 	}
 	String title = "";
 	Character first = Character.toUpperCase(this.value.charAt(0));
 	title += Character.toString(first);
-	int c = 1;
+	int i = 1;
 	char prev;
-	while(c < this.value.length()){
- 	    prev = title.charAt(c - 1);
+	while(i < this.value.length()){
+ 	    prev = title.charAt(i - 1);
 	    if(prev == ' '){
-	        title += Character.toString(Character.toUpperCase(this.value.charAt(c)));
-	    } else if (Character.isUpperCase(this.value.charAt(c))){
-	        title += Character.toString(Character.toLowerCase(this.value.charAt(c)));
+	        title += Character.toString(Character.toUpperCase(this.value.charAt(i)));
+	    } else if (Character.isUpperCase(this.value.charAt(i))){
+	        title += Character.toString(Character.toLowerCase(this.value.charAt(i)));
 	    } else {
-		title += Character.toString(this.value.charAt(c));
+		title += Character.toString(this.value.charAt(i));
 	    }
-	    c ++;
+	    i++;
 	}
 	return new Str(title);
     }
@@ -993,7 +1048,7 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object upper() {
-        return new org.python.types.Str(this.value.toUpperCase());
+        return new Str(this.value.toUpperCase());
     }
 
 }
