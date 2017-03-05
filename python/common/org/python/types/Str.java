@@ -319,7 +319,7 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Iterable __iter__() {
-        java.util.List<org.python.Object> listOfStrs = new ArrayList<>();
+        java.util.List<org.python.Object> listOfStrs = new java.util.ArrayList<org.python.Object>();
         for (int i = 0; i < this.value.length(); i++) {
             listOfStrs.add(new Str(this.value.substring(i, i + 1)));
         }
@@ -566,7 +566,7 @@ public class Str extends org.python.types.Object {
         } else {
             throw new org.python.exceptions.TypeError("Fill char must of type String");
         }
-        
+
         if (width instanceof org.python.types.Int) {
             String str = this.value;
             int widthVal = (int)((org.python.types.Int)width).value;
@@ -577,9 +577,9 @@ public class Str extends org.python.types.Object {
                 int diff = widthVal - strLen;
                 int lenFirst = (diff)/2;
                 int lenSecond = diff - lenFirst;
-                
+
                 java.lang.StringBuffer returnString = new java.lang.StringBuffer(widthVal);
-                
+
                 for (int i = 0; i < lenFirst; i++) {
                     returnString.append(fillChar);
                 }
