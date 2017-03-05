@@ -1,6 +1,11 @@
 Release History
 ===============
 
+0.1.2
+-----
+
+Progress release. VOC is able to compile the Toga and Colosseum libraries.
+
 0.1.0
 -----
 
