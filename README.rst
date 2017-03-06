@@ -23,7 +23,7 @@ VOC
 .. image:: https://badges.gitter.im/pybee/general.svg
     :target: https://gitter.im/pybee/general
 
-A transpiler that converts Python bytecode into Java bytecode.
+A transpiler that converts Python code into Java bytecode.
 
 This is experimental code. If it breaks, you get to keep all the shiny pieces.
 
@@ -35,7 +35,7 @@ What it does:
   Python code on a JVM (including Android's VM).
 
 It isn't a *completely* compliant Python 3.4 implementation - there are some
-language features (like generators and context managers) that still need to be
+language features (like lambdas and some builtin functions) that still need to be
 implemented, and there is only a bare bones standard library implementation.
 However, it is possible to convert simple Python programs, and even write
 simple Android applications.

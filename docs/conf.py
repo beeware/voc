@@ -228,7 +228,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'voc', u'VOC Documentation',
-   u'Russell Keith-Magee', 'VOC', 'Tools to run Python bytecode on other bytecode platforms.',
+   u'Russell Keith-Magee', 'VOC', 'Tools to run Python code on other bytecode platforms.',
    'Miscellaneous'),
 ]
 
