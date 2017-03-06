@@ -11,6 +11,13 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_iscase(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'HELLO, WORLD.', 'ello? world', '']:
+                print(s.islower())
+                print(s.isupper())
+            """)
+
     def test_join(self):
         self.assertCodeExecution("""
             print(','.join(None))
@@ -313,6 +320,23 @@ class StrTests(TranspileTestCase):
             except AttributeError as err:
                 print(err)
             """)
+
+    def test_ljust(self):
+        self.assertCodeExecution("""
+            s = "abc"
+            print(s.ljust(5, "P"))
+            print(s.ljust(2))
+            print(s.ljust(15, "0"))
+            print(s.ljust(20, "ã"))
+            try:
+                print(s.ljust(5, b'_'))
+            except TypeError as err:
+                print(TypeError)
+            try:
+                print(s.ljust(5.0, "P"))
+            except TypeError as err:
+                print(err)
+                """)
 
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):

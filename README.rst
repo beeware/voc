@@ -48,7 +48,7 @@ with `the first tutorial`_.
 
 If you'd like to contribute to VOC development, we have a `guide for first time contributors`_.
 
-.. _Getting Started guide: https://voc.readthedocs.io/en/latest/intro/getting-started.html
+.. _Getting Started guide: https://voc.readthedocs.io/en/latest/intro/index.html
 .. _the first tutorial: https://voc.readthedocs.io/en/latest/tutorials/tutorial-0.html
 
 .. _guide for first time contributors: https://github.com/pybee/voc/wiki/Your-first-VOC-contribution
@@ -62,7 +62,7 @@ Why "VOC"?
 ----------
 
 The `Vereenigde Oostindische Compagnie (VOC)`_, or Dutch East India Company,
-is often considered the be the world's first multinational corporation. It was
+is often considered to be the world's first multinational corporation. It was
 also the first company to issue shares, and facilitate the trading of those
 shares. It was granted a 21 year monopoly to carry out trade activities in
 Asia, primarily the Spice Islands - the Dutch East Indies. They established a
@@ -93,7 +93,7 @@ We foster a welcoming and respectful community as described in our
 Contributing
 ------------
 
-To get started with contributing to VOC, head over to the `wiki`_.
+To get started with contributing to VOC, head over to our `First Timers Guide`_.
 
 If you experience problems with VOC, `log them on GitHub`_. If you
 want to contribute code, please `fork the code`_ and `submit a pull request`_.
@@ -103,7 +103,7 @@ want to contribute code, please `fork the code`_ and `submit a pull request`_.
 .. _@pybeeware on Twitter: https://twitter.com/pybeeware
 .. _pybee/general: https://gitter.im/pybee/general
 .. _BeeWare Community Code of Conduct: http://pybee.org/community/behavior/
-.. _wiki: https://github.com/pybee/voc/wiki/Your-first-VOC-contribution
+.. _First Timers Guide: http://pybee.org/contributing/how/first-time/what/voc/
 .. _log them on Github: https://github.com/pybee/voc/issues
 .. _fork the code: https://github.com/pybee/voc
 .. _submit a pull request: https://github.com/pybee/voc/pulls

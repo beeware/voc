@@ -1,4 +1,5 @@
 package org.python.types;
+import org.Python;
 
 import java.util.ArrayList;
 
@@ -296,7 +297,7 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Iterable __iter__() {
-        java.util.List<org.python.Object> listOfStrs = new ArrayList<>();
+        java.util.List<org.python.Object> listOfStrs = new java.util.ArrayList<org.python.Object>();
         for (int i = 0; i < this.value.length(); i++) {
             listOfStrs.add(new Str(this.value.substring(i, i + 1)));
         }
@@ -543,7 +544,7 @@ public class Str extends org.python.types.Object {
         } else {
             throw new org.python.exceptions.TypeError("Fill char must of type String");
         }
-        
+
         if (width instanceof org.python.types.Int) {
             String str = this.value;
             int widthVal = (int)((org.python.types.Int)width).value;
@@ -554,9 +555,9 @@ public class Str extends org.python.types.Object {
                 int diff = widthVal - strLen;
                 int lenFirst = (diff)/2;
                 int lenSecond = diff - lenFirst;
-                
+
                 java.lang.StringBuffer returnString = new java.lang.StringBuffer(widthVal);
-                
+
                 for (int i = 0; i < lenFirst; i++) {
                     returnString.append(fillChar);
                 }
@@ -738,7 +739,10 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object islower() {
-        throw new org.python.exceptions.NotImplementedError("islower() has not been implemented.");
+        if (!this.value.isEmpty() && this.value.toLowerCase().equals(this.value)) {
+        	return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -773,7 +777,10 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isupper() {
-        throw new org.python.exceptions.NotImplementedError("isupper() has not been implemented.");
+        if (!this.value.isEmpty() && this.value.toUpperCase().equals(this.value)) {
+        	return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -808,10 +815,38 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "S.ljust(width, fillChar=' ') -> str\nReturns the string left justified in a string of length width." + 
+        "\nPadding is done using the specified fillchar (default is a space)." +
+        "\nThe original string is returned if width is less than len(s)",
+        args = {"width"},
+        default_args = {"fillChar"}
     )
-    public org.python.Object ljust() {
-        throw new org.python.exceptions.NotImplementedError("ljust() has not been implemented.");
+    public org.python.Object ljust(org.python.Object width, org.python.Object fillChar) {
+        java.lang.String ch = new java.lang.String();
+        if (fillChar instanceof org.python.types.Str) {
+        	if(((org.python.types.Str) fillChar).value.length() != 1) {
+        		throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
+        	}
+        	ch = ((org.python.types.Str) fillChar).value;
+        } else if (fillChar == null) {
+        	ch = " ";
+        } else {
+        	throw new org.python.exceptions.TypeError("The fill character cannot be converted to Unicode");
+        }
+        if (width instanceof org.python.types.Int) {
+        	int w = (int)((org.python.types.Int) width).value;
+        	if (w < this.value.length()) {
+        		return new org.python.types.Str(this.value);
+        	}
+        	java.lang.StringBuffer str = new java.lang.StringBuffer(w);
+        	str.append(this.value);
+        	int balance = w - this.value.length();
+        	for (int i = 0; i < balance; i++) {
+        		str.append(ch); 
+        	}
+        	return new org.python.types.Str(str.toString());
+        }
+        return new org.python.exceptions.TypeError("integer argument expected, got " + Python.typeName(width.getClass()));
     }
 
     @org.python.Method(
