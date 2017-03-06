@@ -165,18 +165,6 @@ public class Set extends org.python.types.Object {
         __doc__ = "",
         args = {"other"}
     )
-    public org.python.Object __ne__(org.python.Object other) {
-        org.python.Object result = this.__eq__(other);
-        if (result instanceof org.python.types.NotImplementedType) {
-            return result;
-        }
-        return new org.python.types.Bool(!((org.python.types.Bool) result).value);
-    }
-
-    @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
-    )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;

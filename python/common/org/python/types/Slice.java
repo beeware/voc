@@ -73,14 +73,6 @@ public class Slice extends org.python.types.Object {
         __doc__ = "",
         args = {"other"}
     )
-    public org.python.Object __ne__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
-    }
-
-    @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
-    )
     public org.python.Object __lt__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }

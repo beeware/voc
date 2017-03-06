@@ -172,7 +172,13 @@ public class Super implements org.python.Object {
         args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(System.identityHashCode(this) != System.identityHashCode(other));
+        // By default, __ne__() delegates to __eq__() and inverts the result unless it is NotImplemented.
+        // see: http://bugs.python.org/issue4395
+        org.python.Object result = this.__eq__(other);
+        if (result instanceof org.python.types.NotImplementedType) {
+            return result;
+        }
+        return new org.python.types.Bool(!((org.python.types.Bool) result).value);
     }
 
     @org.python.Method(

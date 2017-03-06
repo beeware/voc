@@ -475,18 +475,6 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
-    )
-    public org.python.Object __ne__(org.python.Object other) {
-        org.python.Object result = this.__eq__(other);
-        if (result instanceof org.python.types.Bool) {
-            return new org.python.types.Bool(!((org.python.types.Bool) result).value);
-        }
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
-    }
-
-    @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object __reduce__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {

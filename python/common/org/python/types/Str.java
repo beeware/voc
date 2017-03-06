@@ -170,19 +170,6 @@ public class Str extends org.python.types.Object {
         __doc__ = "",
         args = {"other"}
     )
-    public org.python.Object __ne__(org.python.Object other) {
-        if (other instanceof org.python.types.Str) {
-            java.lang.String value = ((org.python.types.Str) other).value;
-            return new org.python.types.Bool(!this.value.equals(value));
-        } else {
-            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
-        }
-    }
-
-    @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
-    )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;

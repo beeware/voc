@@ -129,19 +129,6 @@ public class Bool extends org.python.types.Object {
         __doc__ = "",
         args = {"other"}
     )
-    public org.python.Object __ne__(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) != ((org.python.types.Int) other).value);
-        } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) != (((org.python.types.Bool) other).value ? 1 : 0));
-        }
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
-    }
-
-    @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
-    )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) > ((org.python.types.Int) other).value);
