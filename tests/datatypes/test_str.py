@@ -18,6 +18,24 @@ class StrTests(TranspileTestCase):
                 print(s.isupper())
             """)
 
+    def test_isdigit(self):
+        self.assertCodeExecution("""
+            for s in ['112358132134', '3.14159', '12312344df', '']:
+                print(s.isdigit())
+            """)
+
+    def test_isspace(self):
+        self.assertCodeExecution("""
+            for s in ['''  \t \r''', ' ', '\t\tnope\t\t', '']:
+                print(s.isspace())
+            """)
+
+    def test_istitle(self):
+        self.assertCodeExecution("""
+            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '']:
+                print(s.istitle())
+            """)
+
     def test_join(self):
         self.assertCodeExecution("""
             print(','.join(None))
