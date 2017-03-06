@@ -1716,8 +1716,8 @@ class Visitor(ast.NodeVisitor):
                         ast.Lt: '__lt__',
                         ast.LtE: '__le__',
                         ast.In: '__contains__',
-                        # ast.Is: '__eq__',
-                        # ast.IsNot: '__ne__',
+                        ast.Is: '__eq__',
+                        ast.IsNot: '__ne__',
                         ast.NotEq: '__ne__',
                         ast.NotIn: '__not_contains__',
                 }[type(node.ops[0])]
@@ -1728,8 +1728,8 @@ class Visitor(ast.NodeVisitor):
                         ast.Lt: '<',
                         ast.LtE: '<=',
                         ast.In: 'in',
-                        # ast.Is: '__eq__',
-                        # ast.IsNot: '__ne__',
+                        ast.Is: 'is',
+                        ast.IsNot: 'is not',
                         ast.NotEq: '!=',
                         ast.NotIn: 'not in',
                 }[type(node.ops[0])]
