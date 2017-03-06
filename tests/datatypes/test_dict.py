@@ -261,6 +261,34 @@ class DictTests(TranspileTestCase):
             print(x['key'] is y['key'])
             """)
 
+    def test_fromkeys(self):
+        self.assertCodeExecution("""
+            keys = [1, 2]
+            print({}.fromkeys(keys))
+            """)
+
+        # non-iterable error test
+        self.assertCodeExecution("""
+            keys = [1, 2]
+            value = 2
+            print({}.fromkeys(keys, value))
+            """)
+
+        self.assertCodeExecution("""
+            keys = (1, 2)
+            value = 5
+            print({}.fromkeys(keys, 5))
+            """)
+
+        # non-hashable error on key test
+        self.assertCodeExecution("""
+            keys = [[1], 2]
+            try:
+                print({}.fromkeys(keys))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryDictOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'dict'
