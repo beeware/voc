@@ -267,12 +267,11 @@ public class Dict extends org.python.types.Object {
             // exception is thrown.
             org.python.Object hashcode = item.__hash__();
 
-        org.python.Object value = this.value.get(item);
-        if (value == null) {
-            throw new org.python.exceptions.KeyError(item);
-        }
-        return value;
-
+            org.python.Object value = this.value.get(item);
+            if (value == null) {
+                throw new org.python.exceptions.KeyError(item);
+            }
+            return value;
         } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError(
                 String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
@@ -289,7 +288,7 @@ public class Dict extends org.python.types.Object {
             // exception is thrown.
             org.python.Object hashcode = item.__hash__();
 
-        this.value.put(item, value);
+            this.value.put(item, value);
         } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError(
                 String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
