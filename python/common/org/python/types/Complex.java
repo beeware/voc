@@ -222,11 +222,14 @@ public class Complex extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Complex) {
             org.python.types.Complex other_obj = (org.python.types.Complex) other;
-            if (((org.python.types.Bool) this.real.__eq__(other_obj.real)).value && ((org.python.types.Bool) this.imag.__eq__(other_obj.imag)).value) {
-                return new org.python.types.Bool(true);
-            } else {
-                return new org.python.types.Bool(false);
-            }
+            return new org.python.types.Bool(
+                    ((org.python.types.Bool) this.real.__eq__(other_obj.real)).value
+                    && ((org.python.types.Bool) this.imag.__eq__(other_obj.imag)).value);
+        } else if (other instanceof org.python.types.Float || other instanceof org.python.types.Int
+                || other instanceof org.python.types.Bool) {
+            return new org.python.types.Bool(
+                    ((org.python.types.Bool) this.real.__eq__(other)).value
+                    && ((org.python.types.Bool) this.imag.__eq__(new org.python.types.Int(0))).value);
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
