@@ -1754,36 +1754,41 @@ class Visitor(ast.NodeVisitor):
 
                 # do rhs checks first
                 self.context.add_opcodes(
-                    # first round of checks, x.getClass() == y.getClass()?
+                    # first round of checks, x.type() == y.type()?
                     ALOAD_name('#compare-x'),
-                    JavaOpcodes.INVOKEVIRTUAL(
-                        'java/lang/Object',
-                        'getClass',
-                        '()Ljava/lang/Class;'
+                    JavaOpcodes.INVOKEINTERFACE(
+                        'org/python/Object',
+                        'type',
+                        '()Lorg/python/types/Type;'
                     ),
                     ALOAD_name('#compare-y'),
-                    JavaOpcodes.INVOKEVIRTUAL(
-                        'java/lang/Object',
-                        'getClass',
-                        '()Ljava/lang/Class;'
+                    JavaOpcodes.INVOKEINTERFACE(
+                        'org/python/Object',
+                        'type',
+                        '()Lorg/python/types/Type;'
                     ),
                 )
                 self.context.add_opcodes(
                     IF([], JavaOpcodes.IF_ACMPEQ),
                 )
                 self.context.add_opcodes(
-                        # y.getClass().isInstance(x)?
+                        # org.Python.isinstance(y, x.getClass())
                         ALOAD_name('#compare-y'),
-                        JavaOpcodes.INVOKEVIRTUAL(
-                            'java/lang/Object',
-                            'getClass',
-                            '()Ljava/lang/Class;'
-                        ),
                         ALOAD_name('#compare-x'),
-                        JavaOpcodes.INVOKEVIRTUAL(
-                            'java/lang/Class',
-                            'isInstance',
-                            '(Ljava/lang/Object;)Z'
+                        JavaOpcodes.INVOKEINTERFACE(
+                            'org/python/Object',
+                            'type',
+                            '()Lorg/python/types/Type;'
+                        ),
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/Python',
+                            'isinstance',
+                            '(Lorg/python/Object;Lorg/python/Object;)Lorg/python/types/Bool;'
+                        ),
+                        JavaOpcodes.GETFIELD(
+                            'org/python/types/Bool',
+                            'value',
+                            'Z'
                         ),
                 )
                 self.context.add_opcodes(
