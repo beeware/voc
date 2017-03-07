@@ -822,7 +822,18 @@ public class Python {
             }
             return new org.python.types.Bool(false);
         } else if (class_or_type_or_tuple instanceof org.python.types.Type) {
-            return new org.python.types.Bool(object.type() == class_or_type_or_tuple);
+            boolean result = object.type() == class_or_type_or_tuple;
+
+            if (!result && object.type().__dict__.get("__bases__") != null) {
+                for (org.python.Object base: ((org.python.types.Tuple) object.type().__dict__.get("__bases__")).value) {
+                    result = base == class_or_type_or_tuple;
+                    if (result) {
+                        break;
+                    }
+                }
+            }
+
+            return new org.python.types.Bool(result);
         } else {
             throw new org.python.exceptions.TypeError("isinstance() arg 2 must be a type or tuple of types");
         }

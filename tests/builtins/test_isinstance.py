@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from .. utils import TranspileTestCase
 
 
@@ -55,7 +53,6 @@ class IsinstanceTests(TranspileTestCase):
             print(isinstance(obj, (MyClass1, MyClass2)))
             """, run_in_function=False)
 
-    @expectedFailure
     def test_subclass(self):
         self.assertCodeExecution("""
             class MyClass1:
