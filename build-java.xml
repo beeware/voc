@@ -57,7 +57,7 @@
   <target name="checkstyle" description="Runs checkstyle">
     <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
       <classpath>
-        <pathelement location="lib/checkstyle-7.6-all.jar" />
+        <pathelement location="lib/checkstyle-6.19-all.jar" />
       </classpath>
     </taskdef>
     <checkstyle config="checkstyle.xml" failureProperty="checkstyle.failure.property">
