@@ -725,7 +725,14 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isdigit() {
-        throw new org.python.exceptions.NotImplementedError("isdigit() has not been implemented.");
+        if (!this.value.isEmpty()) {
+            for (char ch : this.value.toCharArray()) {
+                if (!(Character.isDigit(ch)))
+                    return new org.python.types.Bool(false);
+            }
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -763,14 +770,40 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object isspace() {
-        throw new org.python.exceptions.NotImplementedError("isspace() has not been implemented.");
+        if (!this.value.isEmpty()) {
+            for (char ch : this.value.toCharArray()) {
+                if (" \t\n\r".indexOf(ch) == -1)
+                    return new org.python.types.Bool(false);
+            }
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
         __doc__ = ""
     )
     public org.python.Object istitle() {
-        throw new org.python.exceptions.NotImplementedError("istitle() has not been implemented.");
+        if (!this.value.isEmpty()) {
+            Character first = Character.toUpperCase(this.value.charAt(0));
+            java.lang.String title = "";
+            title += Character.toString(first);
+            int c = 1;
+            char prev;
+            while (c < this.value.length()) {
+                prev = title.charAt(c - 1);
+                if (prev == ' ') {
+                    if (!(Character.isUpperCase(this.value.charAt(c)))) {
+                        return new org.python.types.Bool(false);
+                    }
+
+                }
+                title += Character.toString(this.value.charAt(c));
+                c++;
+            }
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -966,26 +999,26 @@ public class Str extends org.python.types.Object {
         __doc__ = "S.title() -> str\n\nReturn a titlecased version of S, i.e. words start with title case\ncharacters, all remaining cased characters have lower case."
     )
     public org.python.Object title() {
-	if (this.value.isEmpty()){
-	    return new Str(this.value);
-	}
-	String title = "";
-	Character first = Character.toUpperCase(this.value.charAt(0));
-	title += Character.toString(first);
-	int c = 1;
-	char prev;
-	while(c < this.value.length()){
- 	    prev = title.charAt(c - 1);
-	    if(prev == ' '){
-	        title += Character.toString(Character.toUpperCase(this.value.charAt(c)));
-	    } else if (Character.isUpperCase(this.value.charAt(c))){
-	        title += Character.toString(Character.toLowerCase(this.value.charAt(c)));
-	    } else {
-		title += Character.toString(this.value.charAt(c));
-	    }
-	    c ++;
-	}
-	return new Str(title);
+        if (this.value.isEmpty()){
+            return new Str(this.value);
+        }
+        String title = "";
+        Character first = Character.toUpperCase(this.value.charAt(0));
+        title += Character.toString(first);
+        int c = 1;
+        char prev;
+        while(c < this.value.length()){
+            prev = title.charAt(c - 1);
+            if(prev == ' '){
+                title += Character.toString(Character.toUpperCase(this.value.charAt(c)));
+            } else if (Character.isUpperCase(this.value.charAt(c))){
+                title += Character.toString(Character.toLowerCase(this.value.charAt(c)));
+            } else {
+                title += Character.toString(this.value.charAt(c));
+            }
+            c ++;
+        }
+        return new Str(title);
     }
 
     @org.python.Method(

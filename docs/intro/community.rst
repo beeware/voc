@@ -1,6 +1,10 @@
 The VOC Developer and User community
 ====================================
 
+.. note::
+    If you're a newcomer to the project looking for how to start contributing,
+    check out the `First Timers Guide`_.
+
 VOC is part of the `BeeWare suite`_. You can talk to the community through:
 
 * `@pybeeware on Twitter`_
@@ -30,3 +34,4 @@ want to contribute code, please `fork the code`_ and `submit a pull request`_.
 
 .. _Code of Conduct: http://pybee.org/contributing/index.html
 .. _Russell Keith-Magee: mailto:russell@keith-magee.com
+.. _First Timers Guide: http://pybee.org/contributing/how/first-time/what/voc/
