@@ -53,7 +53,7 @@ class IsinstanceTests(TranspileTestCase):
             print(isinstance(obj, (MyClass1, MyClass2)))
             """, run_in_function=False)
 
-    def test_subclass(self):
+    def test_parent(self):
         self.assertCodeExecution("""
             class MyClass1:
                 pass
@@ -67,7 +67,7 @@ class IsinstanceTests(TranspileTestCase):
             print(isinstance(obj, MyClass2))
             """, run_in_function=False)
 
-    def test_subclass_grandparent(self):
+    def test_grandparent(self):
         self.assertCodeExecution("""
             class MyClass1:
                 pass

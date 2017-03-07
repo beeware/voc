@@ -60,7 +60,7 @@ class IssubclassTests(TranspileTestCase):
             print(issubclass(MyClass1, (MyClass1, MyClass2)))
             """, run_in_function=False)
 
-    def test_subclass_parent(self):
+    def test_parent(self):
         self.assertCodeExecution("""
             class MyClass1:
                 pass
@@ -72,7 +72,7 @@ class IssubclassTests(TranspileTestCase):
             print(issubclass(MyClass1, MyClass2))
             """, run_in_function=False)
 
-    def test_subclass_grandparent(self):
+    def test_grandparent(self):
         self.assertCodeExecution("""
             class MyClass1:
                 pass
