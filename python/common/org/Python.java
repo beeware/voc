@@ -846,7 +846,7 @@ public class Python {
             }
             return new org.python.types.Bool(false);
         } else if (classinfo_or_tuple instanceof org.python.types.Type) {
-            org.python.types.Object klass_obj = (org.python.types.Object) klass;
+            org.python.types.Type klass_obj = (org.python.types.Type) klass;
             if (klass == classinfo_or_tuple) {
                 return new org.python.types.Bool(true);
             } else if (klass_obj.__dict__.get("__bases__") != null) {
@@ -856,7 +856,6 @@ public class Python {
                     }
                 }
             }
-
             return new org.python.types.Bool(false);
         } else {
             throw new org.python.exceptions.TypeError("issubclass() arg 2 must be a class or tuple of classes");
