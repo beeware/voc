@@ -2,12 +2,17 @@ Contributing to VOC
 =======================
 
 
-If you experience problems with VOC, `log them on GitHub`_. If you want to contribute code, please `fork the code`_ and `submit a pull request`_.
+If you experience problems with VOC, `log them on GitHub`_.
+
+If you want to contribute code, please `fork the code`_ and `submit a pull request`_.
+
+If you're a newcomer to the project looking for how to start contributing,
+you may find useful the `First Timers Guide`_.
 
 .. _log them on Github: https://github.com/pybee/voc/issues
 .. _fork the code: https://github.com/pybee/voc
 .. _submit a pull request: https://github.com/pybee/voc/pulls
-
+.. _First Timers Guide: http://pybee.org/contributing/how/first-time/what/voc/
 
 Setting up your development environment
 ---------------------------------------
