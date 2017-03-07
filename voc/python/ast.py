@@ -1740,6 +1740,8 @@ class Visitor(ast.NodeVisitor):
                         ast.Lt: '__gt__',
                         ast.LtE: '__ge__',
                         ast.In: '__contains__',
+                        ast.Is: '__eq__',
+                        ast.IsNot: '__ne__',
                         ast.NotEq: '__ne__',
                         ast.NotIn: '__not_contains__',
                 }[type(node.ops[0])]
