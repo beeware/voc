@@ -13,7 +13,7 @@ public class SystemExit extends org.python.exceptions.BaseException {
         this.return_code = (int) ((org.python.types.Int) val.__int__()).value;
     }
 
-    public SystemExit(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public SystemExit(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         this(args[0]);
     }
 }

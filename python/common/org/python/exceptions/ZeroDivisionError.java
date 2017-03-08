@@ -9,7 +9,7 @@ public class ZeroDivisionError extends org.python.exceptions.ArithmeticError {
         super(msg);
     }
 
-    public ZeroDivisionError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public ZeroDivisionError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

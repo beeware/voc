@@ -1,6 +1,5 @@
 package org.python.types;
 
-
 public class Object extends java.lang.RuntimeException implements org.python.Object {
     public java.util.Map<java.lang.String, org.python.Object> __dict__;
     public org.python.types.Type __class__;
@@ -78,9 +77,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "The most base type"
+            __doc__ = "The most base type"
     )
-    public Object(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public Object(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         this(org.python.types.Type.Origin.PYTHON, null);
         if (args != null && args.length > 0) {
             throw new org.python.exceptions.TypeError("object() takes no parameters");
@@ -104,8 +103,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         try {
             if (((org.python.types.Bool) this.__lt__((org.python.Object) other)).value) {
                 return -1;
-            }
-            else if (((org.python.types.Bool) this.__gt__((org.python.Object) other)).value) {
+            } else if (((org.python.types.Bool) this.__gt__((org.python.Object) other)).value) {
                 return 1;
             }
             return 0;
@@ -121,8 +119,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     protected void finalize() throws Throwable {
         try {
             this.__del__();
-        }
-        finally {
+        } finally {
             super.finalize();
         }
     }
@@ -132,7 +129,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
      * Section 3.3.1 - Basic customization
      */
     @org.python.Method(
-        __doc__ = "Create and return a new object.  See help(type) for accurate signature."
+            __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
     public org.python.Object __new__(org.python.Object klass) {
         this.__class__ = (org.python.types.Type) klass;
@@ -147,96 +144,97 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     // }
 
     @org.python.Method(
-        __doc__ = "Destroy an existing object. See help(type) for accurate signature."
+            __doc__ = "Destroy an existing object. See help(type) for accurate signature."
     )
-    public void __del__() {}
+    public void __del__() {
+    }
 
     @org.python.Method(
-        __doc__ = "Return repr(self)."
+            __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
         return new org.python.types.Str(String.format("<%s object at 0x%x>", this.typeName(), this.hashCode()));
     }
 
     @org.python.Method(
-        __doc__ = "Return str(self)."
+            __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
         return this.__repr__();
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __bytes__() {
         throw new org.python.exceptions.AttributeError(this, "__bytes__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"format_string"}
+            __doc__ = "",
+            args = {"format_string"}
     )
     public org.python.Object __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__format__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__lt__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__le__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         return new org.python.types.Bool(System.identityHashCode(this) == System.identityHashCode(other));
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
         return new org.python.types.Bool(System.identityHashCode(this) != System.identityHashCode(other));
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__gt__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__ge__' has not been implemented");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __hash__() {
         return new org.python.types.Int(this.hashCode());
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __bool__() {
         throw new org.python.exceptions.AttributeError(this, "__bool__");
@@ -245,10 +243,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     /**
      * Section 3.3.2 - Emulating container types
      */
-
     @org.python.Method(
-        __doc__ = "",
-        args = {"attr"}
+            __doc__ = "",
+            args = {"attr"}
     )
     public org.python.Object __getattr__(org.python.Object name) {
         try {
@@ -271,8 +268,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"name"}
+            __doc__ = "",
+            args = {"name"}
     )
     public org.python.Object __getattribute__(org.python.Object name) {
         try {
@@ -321,8 +318,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"instance", "klass"}
+            __doc__ = "",
+            args = {"instance", "klass"}
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         // System.out.println("__GET__ on " + this + " " + this.getClass());
@@ -330,8 +327,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"name", "value"}
+            __doc__ = "",
+            args = {"name", "value"}
     )
     public void __setattr__(org.python.Object name, org.python.Object value) {
         try {
@@ -372,15 +369,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"instance", "value"}
+            __doc__ = "",
+            args = {"instance", "value"}
     )
     public void __set__(org.python.Object instance, org.python.Object value) {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"attr"}
+            __doc__ = "",
+            args = {"attr"}
     )
     public void __delattr__(org.python.Object name) {
         try {
@@ -414,14 +411,14 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"instance", "value"}
+            __doc__ = "",
+            args = {"instance", "value"}
     )
     public void __delete__(org.python.Object instance) {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __dir__() {
         org.python.types.List names = new org.python.types.List(new java.util.ArrayList(this.__dict__.keySet()));
@@ -453,9 +450,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     /**
      * Section 3.3.6 - Emulating container types
      */
-
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __len__() {
         throw new org.python.exceptions.AttributeError(this, "__len__");
@@ -465,64 +461,63 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     //     throw new org.python.exceptions.AttributeError(this, "__length_hint__");
     // }
 
-
     @org.python.Method(
-        __doc__ = "",
-        args = {"index"}
+            __doc__ = "",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         throw new org.python.exceptions.AttributeError(this, "__getitem__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"key"}
+            __doc__ = "",
+            args = {"key"}
     )
     public org.python.Object __missing__(org.python.Object key) {
         throw new org.python.exceptions.AttributeError(this, "__missing__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"index", "value"}
+            __doc__ = "",
+            args = {"index", "value"}
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
         throw new org.python.exceptions.AttributeError(this, "__setitem__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"index"}
+            __doc__ = "",
+            args = {"index"}
     )
     public void __delitem__(org.python.Object index) {
         throw new org.python.exceptions.AttributeError(this, "__delitem__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Iterable __iter__() {
         throw new org.python.exceptions.AttributeError(this, "__iter__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Iterable __reversed__() {
         throw new org.python.exceptions.AttributeError(this, "__reversed__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"item"}
+            __doc__ = "",
+            args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
         throw new org.python.exceptions.AttributeError(this, "__contains__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"item"}
+            __doc__ = "",
+            args = {"item"}
     )
     public org.python.Object __not_contains__(org.python.Object item) {
         throw new org.python.exceptions.AttributeError(this, "__not_contains__");
@@ -531,220 +526,217 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     /**
      * Section 3.3.7 - Emulating numeric types
      */
-
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __sub__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
-
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __truediv__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __floordiv__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __divmod__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other", "modulus"}
+            __doc__ = "",
+            args = {"other", "modulus"}
     )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulus) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
-
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lshift__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rshift__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __and__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __xor__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __or__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
-
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __radd__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__radd__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rsub__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rsub__");
     }
+
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rmul__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rtruediv__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rtruediv__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rfloordiv__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rfloordiv__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rmod__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rdivmod__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rdivmod__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rpow__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rpow__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rlshift__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rlshift__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rrshift__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rrshift__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rand__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rand__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rxor__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__rxor__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ror__(org.python.Object other) {
         throw new org.python.exceptions.AttributeError(this, "__ror__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __iadd__(org.python.Object other) {
         try {
@@ -756,8 +748,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __isub__(org.python.Object other) {
         try {
@@ -769,8 +761,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __imul__(org.python.Object other) {
         try {
@@ -782,8 +774,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __itruediv__(org.python.Object other) {
         try {
@@ -795,8 +787,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ifloordiv__(org.python.Object other) {
         try {
@@ -808,8 +800,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __imod__(org.python.Object other) {
         try {
@@ -821,8 +813,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __idivmod__(org.python.Object other) {
         try {
@@ -834,18 +826,17 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ipow__(org.python.Object other) {
         this.setValue(this.__pow__(other, null));
         return this;
     }
 
-
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ilshift__(org.python.Object other) {
         try {
@@ -857,8 +848,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __irshift__(org.python.Object other) {
         try {
@@ -870,8 +861,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __iand__(org.python.Object other) {
         try {
@@ -883,8 +874,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ixor__(org.python.Object other) {
         try {
@@ -896,8 +887,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ior__(org.python.Object other) {
         try {
@@ -909,72 +900,72 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __neg__() {
         throw new org.python.exceptions.AttributeError(this, "__neg__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __pos__() {
         throw new org.python.exceptions.AttributeError(this, "__pos__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __abs__() {
         throw new org.python.exceptions.AttributeError(this, "__abs__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __invert__() {
         throw new org.python.exceptions.AttributeError(this, "__invert__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __not__() {
         return new org.python.types.Bool(!((org.python.types.Bool) this.__bool__()).value);
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"real", "imag"}
+            __doc__ = "",
+            args = {"real", "imag"}
     )
     public org.python.Object __complex__(org.python.Object real, org.python.Object imag) {
         throw new org.python.exceptions.AttributeError(this, "__complex__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __int__() {
         throw new org.python.exceptions.AttributeError(this, "__int__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __float__() {
         throw new org.python.exceptions.AttributeError(this, "__float__");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __index__() {
         throw new org.python.exceptions.AttributeError(this, "__index__");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"ndigits"}
+            __doc__ = "",
+            args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.AttributeError(this, "__round__");

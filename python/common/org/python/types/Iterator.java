@@ -16,7 +16,7 @@ class Iterator extends org.python.types.Object implements org.python.Iterable {
     }
 
     @org.python.Method(
-        __doc__ = "Implement iter(self)."
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Iterable __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         if (kwargs != null && kwargs.size() != 0) {
@@ -33,7 +33,7 @@ class Iterator extends org.python.types.Object implements org.python.Iterable {
     }
 
     @org.python.Method(
-        __doc__ = "Implement next(self)."
+            __doc__ = "Implement next(self)."
     )
     public org.python.Object __next__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         if (kwargs != null && kwargs.size() != 0) {

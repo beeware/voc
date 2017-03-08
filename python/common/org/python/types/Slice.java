@@ -1,6 +1,5 @@
 package org.python.types;
 
-
 public class Slice extends org.python.types.Object {
     org.python.types.Int start;
     org.python.types.Int stop;
@@ -42,6 +41,5 @@ public class Slice extends org.python.types.Object {
         } else {
             throw new org.python.exceptions.TypeError("'" + step.typeName() + "' object cannot be interpreted as an integer");
         }
-
     }
 }

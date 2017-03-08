@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.security.SecureClassLoader;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -12,6 +11,7 @@ import java.util.Map;
 import java.util.Vector;
 
 // http://www.source-code.biz/snippets/java/12.htm
+
 /**
  * A class loader that combines multiple class loaders into one.<br>
  * The classes loaded by this class loader are associated with this class loader,
@@ -22,20 +22,18 @@ import java.util.Vector;
  * Please contact the author if you need another license.
  */
 public class JoinClassLoader extends ClassLoader {
-
     // made static to be retained between different instances of JoinClassLoader
-    static private Map<URL, Class> cache = Collections.synchronizedMap(new HashMap<URL, Class>());
-
+    private static Map<URL, Class> cache = Collections.synchronizedMap(new HashMap<URL, Class>());
     private ClassLoader[] delegateClassLoaders;
     private ClassLoader cacheableClassLoader;
 
-    public JoinClassLoader(ClassLoader parent, ClassLoader cacheableClassLoader, ClassLoader...delegateClassLoaders) {
+    public JoinClassLoader(ClassLoader parent, ClassLoader cacheableClassLoader, ClassLoader... delegateClassLoaders) {
         super(parent);
         this.cacheableClassLoader = cacheableClassLoader;
         this.delegateClassLoaders = delegateClassLoaders;
     }
 
-    protected Class <?> findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
         String path = name.replace('.', '/') + ".class";
 
         URL url = cacheableClassLoader.getResource(path);
@@ -78,10 +76,11 @@ public class JoinClassLoader extends ClassLoader {
         try {
             stream = url.openStream();
             int initialBufferCapacity = Math.min(0x40000, stream.available() + 1);
-            if (initialBufferCapacity <= 2)
+            if (initialBufferCapacity <= 2) {
                 initialBufferCapacity = 0x10000;
-            else
+            } else {
                 initialBufferCapacity = Math.max(initialBufferCapacity, 0x200);
+            }
             ByteBuffer buf = ByteBuffer.allocate(initialBufferCapacity);
             while (true) {
                 if (!buf.hasRemaining()) {
@@ -91,33 +90,38 @@ public class JoinClassLoader extends ClassLoader {
                     buf = newBuf;
                 }
                 int len = stream.read(buf.array(), buf.position(), buf.remaining());
-                if (len <= 0) break;
+                if (len <= 0) {
+                    break;
+                }
                 buf.position(buf.position() + len);
             }
             buf.flip();
             return buf;
         } finally {
-            if (stream != null) stream.close();
+            if (stream != null) {
+                stream.close();
+            }
         }
     }
 
     protected URL findResource(String name) {
         for (ClassLoader delegate : delegateClassLoaders) {
             URL resource = delegate.getResource(name);
-            if (resource != null) return resource;
+            if (resource != null) {
+                return resource;
+            }
         }
         return null;
     }
 
-    protected Enumeration <URL> findResources(String name) throws IOException {
-        Vector <URL> vector = new Vector <URL> ();
+    protected Enumeration<URL> findResources(String name) throws IOException {
+        Vector<URL> vector = new Vector<URL>();
         for (ClassLoader delegate : delegateClassLoaders) {
-            Enumeration <URL> enumeration = delegate.getResources(name);
+            Enumeration<URL> enumeration = delegate.getResources(name);
             while (enumeration.hasMoreElements()) {
                 vector.add(enumeration.nextElement());
             }
         }
         return vector.elements();
     }
-
 }

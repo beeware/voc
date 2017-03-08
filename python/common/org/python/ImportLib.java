@@ -8,7 +8,7 @@ public class ImportLib {
             java.lang.String python_name,
             java.util.Map<java.lang.String, org.python.Object> globals,
             java.util.Map<java.lang.String, org.python.Object> locals,
-            java.lang.String [] from_list,
+            java.lang.String[] from_list,
             int level) {
         // Create an array containing the module path.
         // org.Python.debug("Import from " + python_name + " level " + level);
@@ -22,11 +22,11 @@ public class ImportLib {
         // org.Python.debug("locals = " + locals);
         boolean native_import;
 
-        java.lang.String [] path;
+        java.lang.String[] path;
         if (level == 0) {
             path = python_name.split("\\.");
         } else {
-            java.lang.String [] context = ((java.lang.String) globals.get("__name__").toJava()).split("\\.");
+            java.lang.String[] context = ((java.lang.String) globals.get("__name__").toJava()).split("\\.");
             // org.Python.debug("context");
             // for (java.lang.String s: context) {
             //     org.Python.debug("    " + s);
@@ -43,18 +43,18 @@ public class ImportLib {
             }
 
             if (python_name != null) {
-                java.lang.String [] import_path = python_name.split("\\.");
+                java.lang.String[] import_path = python_name.split("\\.");
                 // org.Python.debug("import_path");
                 // for (java.lang.String s: import_path) {
                 //     org.Python.debug("    " + s);
                 // }
 
-                path = new java.lang.String [import_path.length + context_length];
+                path = new java.lang.String[import_path.length + context_length];
 
                 System.arraycopy(context, 0, path, 0, context_length);
                 System.arraycopy(import_path, 0, path, context_length, import_path.length);
             } else {
-                path = new java.lang.String [context.length - level];
+                path = new java.lang.String[context.length - level];
                 System.arraycopy(context, 0, path, 0, context.length - level);
             }
         }
@@ -88,7 +88,7 @@ public class ImportLib {
         } else {
             // If the package name isn't clearly identifiable as a java package path,
             // put it in the python namespace.
-            if (       path[0].equals("java")
+            if (path[0].equals("java")
                     || path[0].equals("javax")
                     || path[0].equals("org")
                     || path[0].equals("com")
@@ -102,7 +102,7 @@ public class ImportLib {
 
             // Iterate down the full dotted path, making sure that each module
             // along the way has been imported.
-            for (java.lang.String name: path) {
+            for (java.lang.String name : path) {
                 if (import_name.length() > 0) {
                     import_name.append(".");
                 }
@@ -130,7 +130,6 @@ public class ImportLib {
                                 // org.Python.debug("handle NATIVE IMPORT as fallback", mod_name);
                                 python_module = importNativeModule(mod_name);
                             }
-
                         }
                     } catch (java.lang.ClassNotFoundException e) {
                         throw new org.python.exceptions.ImportError("No module named '" + python_name + "'");
@@ -162,7 +161,7 @@ public class ImportLib {
             // unless the symbol is *, in which case we know it exists.
             return_module = python_module;
             import_name.append(".");
-            for (java.lang.String name: from_list) {
+            for (java.lang.String name : from_list) {
                 // org.Python.debug("IMPORT NAME", name);
                 if (!name.equals("*")) {
                     java.lang.String mod_name = import_name.toString() + name;
@@ -275,7 +274,7 @@ public class ImportLib {
         java.util.Map<java.lang.String, org.python.Object> exports = new java.util.HashMap<java.lang.String, org.python.Object>();
         org.python.Object all_obj = module.__getattribute_null("__all__");
         if (all_obj == null) {
-            for (java.lang.String name: module.__dict__.keySet()) {
+            for (java.lang.String name : module.__dict__.keySet()) {
                 if (!name.startsWith("_")) {
                     exports.put(name, module.__dict__.get(name));
                 }
@@ -287,7 +286,8 @@ public class ImportLib {
                     java.lang.String name = ((org.python.types.Str) iter.__next__()).value;
                     exports.put(name, module.__dict__.get(name));
                 }
-            } catch (org.python.exceptions.StopIteration e) {}
+            } catch (org.python.exceptions.StopIteration e) {
+            }
         }
         return exports;
     }

@@ -1,16 +1,14 @@
 package python.testdaemon;
 
-import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.MalformedURLException;
 import java.security.Permission;
 import java.util.Arrays;
 import java.util.Scanner;
-
 
 public class TestDaemon {
     public static void main(String[] args) {
@@ -31,8 +29,8 @@ public class TestDaemon {
             e.printStackTrace();
             return;
         }
-        ClassLoader vocClassLoader = new URLClassLoader(new URL[] { voc });
-        URL[] runtimeURLs = new URL[] { runtime1, runtime2 };
+        ClassLoader vocClassLoader = new URLClassLoader(new URL[]{voc});
+        URL[] runtimeURLs = new URL[]{runtime1, runtime2};
 
         System.setSecurityManager(new NoExitSecurityManager());
 
@@ -48,9 +46,9 @@ public class TestDaemon {
             ClassLoader runtimeClassLoader = new URLClassLoader(runtimeURLs);
 
             ClassLoader joinedClassLoader = new JoinClassLoader(
-                TestDaemon.class.getClassLoader(),
-                vocClassLoader,
-                runtimeClassLoader);
+                    TestDaemon.class.getClassLoader(),
+                    vocClassLoader,
+                    runtimeClassLoader);
 
             Thread.currentThread().setContextClassLoader(joinedClassLoader);
 
@@ -102,15 +100,16 @@ public class TestDaemon {
 
             input = sc.nextLine();
         }
-
     }
 
     private static class NoExitSecurityManager extends SecurityManager {
         @Override
-        public void checkPermission(Permission perm) {}
+        public void checkPermission(Permission perm) {
+        }
 
         @Override
-        public void checkPermission(Permission perm, Object context) {}
+        public void checkPermission(Permission perm, Object context) {
+        }
 
         // System.exit() checks this
         @Override
