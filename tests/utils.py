@@ -60,7 +60,7 @@ def setUpSuite():
     )
 
     try:
-        out, err = proc.communicate(timeout=15)
+        out, err = proc.communicate(timeout=30)
     except subprocess.TimeoutExpired:
         proc.kill()
         out, err = proc.communicate()

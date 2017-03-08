@@ -386,11 +386,11 @@ class Visitor(ast.NodeVisitor):
         # expr? value):
         if node.value:
             self.visit(node.value)
-            self.context.add_opcodes(
-                JavaOpcodes.ARETURN()
-            )
-            # Record how deep we were when this return was added.
-            self.context.opcodes[-1].depth = len(self.context.blocks)
+        else:
+            self.context.add_opcodes(python.NONE())
+        self.context.add_opcodes(JavaOpcodes.ARETURN())
+        # Record how deep we were when this return was added.
+        self.context.opcodes[-1].depth = len(self.context.blocks)
 
     @node_visitor
     def visit_Delete(self, node):

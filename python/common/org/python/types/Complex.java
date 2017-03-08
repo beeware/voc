@@ -2,7 +2,10 @@ package org.python.types;
 import java.util.Locale;
 
 public class Complex extends org.python.types.Object {
+    @org.python.Attribute
     public org.python.types.Float real;
+
+    @org.python.Attribute
     public org.python.types.Float imag;
 
     /**
@@ -13,8 +16,7 @@ public class Complex extends org.python.types.Object {
      */
 
     public java.lang.Object toJava() {
-        // return this.value;
-        throw new org.python.exceptions.NotImplementedError("complex.toJava() has not been implemented.");
+        return this;
     }
 
     public org.python.Object byValue() {
@@ -663,7 +665,9 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __abs__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__abs__ has not been implemented.");
+        double real = this.real.value;
+        double imag = this.imag.value;
+        return new org.python.types.Float(java.lang.Math.sqrt(real * real + imag * imag));
     }
 
     @org.python.Method(
@@ -691,6 +695,6 @@ public class Complex extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object conjugate() {
-        throw new org.python.exceptions.NotImplementedError("complex.conjugate has not been implemented.");
+        return new org.python.types.Complex(this.real, (org.python.types.Float) this.imag.__neg__());
     }
 }

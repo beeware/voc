@@ -1,6 +1,5 @@
 language: python
 python:
-  - "3.4.2"
   - "3.4.5"
   - "3.5"
   - "3.6"
@@ -16,5 +15,4 @@ install:
   - "pip install git+https://github.com/pybee/pytest-circleci"
   - "pip install flake8"
 script:
-  - "py.test tests"
-  - flake8
+  - flake8 && py.test tests

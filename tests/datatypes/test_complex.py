@@ -1,6 +1,21 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
+class ComplexTests(TranspileTestCase):
+    def test_conjugate(self):
+        self.assertCodeExecution("""
+            x = complex(1.5, 1)
+            print(x.conjugate())
+            """)
+
+    def test_real_imag(self):
+        self.assertCodeExecution("""
+            x = complex(1, 2.0)
+            print(x.real)
+            print(x.imag)
+            """)
+
+
 class UnaryComplexOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'complex'
 

@@ -22,7 +22,7 @@ with io.open('README.rst', encoding='utf8') as readme:
 setup(
     name='voc',
     version=version,
-    description='Tools to convert Python bytecode into Java bytecode.',
+    description='Tools to convert Python code into Java bytecode.',
     long_description=long_description,
     author='Russell Keith-Magee',
     author_email='russell@keith-magee.com',
