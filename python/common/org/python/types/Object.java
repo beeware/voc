@@ -993,4 +993,60 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.AttributeError(this, "__round__");
     }
+    /* This method is invoked from the AST for Compare nodes */
+    public static org.python.Object __cmp__(org.python.Object v, org.python.Object w, java.lang.String oper,
+            java.lang.String operMethod, java.lang.String reflOperMethod) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        if (reflectedChecked) {
+            result = invokeComparison(w, v, reflOperMethod);
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
+        }
+
+        result = invokeComparison(v, w, operMethod);
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        if (!reflectedChecked) {
+            result = invokeComparison(w, v, reflOperMethod);
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
+        }
+
+        if (oper.equals("==")) {
+            return new org.python.types.Bool(false);
+        } else if (oper.equals("!=")) {
+            return new org.python.types.Bool(true);
+        }
+
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unorderable types: %s() %s %s()", v.typeName(), oper, w.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", oper, v.typeName(), w.typeName()));
+        }
+    }
+
+    private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {
+        if (methodName == null) {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
+
+        org.python.Object comparator = x.__getattribute_null(methodName);
+        if (comparator == null) {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
+
+        org.python.Object[] args = new org.python.Object[1];
+        args[0] = y;
+        java.util.Map<java.lang.String, org.python.Object> kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
+        return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, kwargs);
+    }
 }
