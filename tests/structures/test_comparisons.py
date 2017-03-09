@@ -296,6 +296,96 @@ class ComparisonTests(TranspileTestCase):
             print(x != x) # False, same object
             """)
 
+    def test_eq_within_datatypes(self):
+        self.assertCodeExecution("""
+            class F:
+                def __init__(self, v):
+                    self.v = v
+                def __eq__(self, other):
+                    return self.v == other.v + 1
+            k = F(5)
+            l = F(6)
+
+            print(k == k) # False
+            print([k] == [k]) # True as identity tested first before trying __eq__()
+            print({'hi': k} == {'hi': k})
+            print((k,) == (k,))
+
+            print(k == l) # False as 5 == 6 + 1
+            print(l == k) # True as 6 == 5 + 1
+            print([l] == [k]) # True
+            print({'hi': l} == {'hi': k}) # True
+            print((l,) == (k,))
+            """)
+
+    def test_eq_reflected_within_datatypes(self):
+        self.assertCodeExecution("""
+            class F:
+                def __init__(self, v):
+                    self.v = v
+                def __eq__(self, other):
+                    return NotImplemented
+            class G:
+                def __init__(self, v):
+                    self.v = v
+                def __eq__(self, other):
+                    return self.v == other.v + 1
+            f = F(5)
+            g = G(6)
+
+            print([f] == [g]) # True (reflected)
+            print([g] == [f]) # True (not reflected)
+            print({'hi': f} == {'hi': g})
+            print({'hi': g} == {'hi': f})
+            print((f,) == (g,))
+            print((g,) == (f,))
+            """)
+
+    def test_ne_within_datatypes(self):
+        self.assertCodeExecution("""
+            class F:
+                def __init__(self, v):
+                    self.v = v
+                def __ne__(self, other):
+                    return self.v == other.v + 1
+            k = F(5)
+            l = F(6)
+
+            print(k != k) # False
+            print([k] != [k]) # True as identity tested first before trying __eq__()
+            print({'hi': k} != {'hi': k})
+            print((k,) != (k,))
+
+            print(k != l) # False as 5 != 6 + 1
+            print(l != k) # True as 6 != 5 + 1
+            print([l] != [k]) # True
+            print({'hi': l} != {'hi': k}) # True
+            print((l,) != (k,))
+            """)
+
+    def test_ne_reflected_within_datatypes(self):
+        self.assertCodeExecution("""
+            class F:
+                def __init__(self, v):
+                    self.v = v
+                def __eq__(self, other):
+                    return NotImplemented
+            class G:
+                def __init__(self, v):
+                    self.v = v
+                def __ne__(self, other):
+                    return self.v != other.v + 1
+            f = F(5)
+            g = G(6)
+
+            print([f] != [g]) # True (reflected)
+            print([g] != [f]) # True (not reflected)
+            print({'hi': f} != {'hi': g})
+            print({'hi': g} != {'hi': f})
+            print((f,) != (g,))
+            print((g,) != (f,))
+            """)
+
     # next few tests from cpython's Lib/test/test_compare.py @ v3.6.0
     def test_comparisons(self):
         self.assertCodeExecution("""

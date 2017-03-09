@@ -93,13 +93,10 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
      * Proxy Java object methods onto their Python counterparts.
      */
     public boolean equals(java.lang.Object other) {
-        try {
-            org.python.Object result = this.__eq__((org.python.Object) other);
-            if (result instanceof org.python.types.NotImplementedType) {
-                return false;
-            }
+        if (other instanceof org.python.Object) {
+            org.python.Object result = org.python.types.Object.__cmp_bool__(this, (org.python.Object) other, org.python.types.Object.CMP_OP.EQ);
             return ((org.python.types.Bool) result).value;
-        } catch (ClassCastException e) {
+        } else {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
         }
     }
@@ -993,6 +990,56 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.AttributeError(this, "__round__");
     }
+
+    // Need to implement Is __eq__ Is Not __ne__
+    // In __contains__ (reversed operands) Not In __not_contains__ (reversed operands)
+    //
+    // for Is and Is Not, falls through to here only when either side is a constant in python
+    // which ends up as org.python.types.[Int|Float|Complex], otherwise it's dealt with
+    // by object reference comparison IF_ACMEQ. so we fall through to __eq__!
+    public enum CMP_OP {
+        GE(">=", "__ge__", "__le__"),
+        GT(">", "__gt__", "__lt__"),
+        EQ("==", "__eq__", "__eq__"),
+        NE("!=", "__ne__", "__ne__"),
+        LE("<=", "__le__", "__ge__"),
+        LT("<", "__lt__", "__gt__"),
+        ;
+        public final String oper;
+        public final String operMethod;
+        public final String reflOperMethod;
+        CMP_OP(java.lang.String oper, java.lang.String operMethod, java.lang.String reflOperMethod) {
+            this.oper = oper;
+            this.operMethod = operMethod;
+            this.reflOperMethod = reflOperMethod;
+        }
+    }
+
+    /* This method is used from standard library datatypes, etc */
+    public static org.python.Object __cmp__(org.python.Object v, org.python.Object w,
+            org.python.types.Object.CMP_OP op) {
+        return __cmp__(v, w, op.oper, op.operMethod, op.reflOperMethod);
+    }
+
+    /* This method is used from standard library container datatypes */
+    public static org.python.Object __cmp_bool__(org.python.Object v, org.python.Object w,
+            org.python.types.Object.CMP_OP op) {
+        // identity implies equality
+        if (v == w) {
+            if (op == org.python.types.Object.CMP_OP.EQ) {
+                return new org.python.types.Bool(true);
+            } else if (op == org.python.types.Object.CMP_OP.NE) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        org.python.Object result = __cmp__(v, w, op.oper, op.operMethod, op.reflOperMethod);
+        if (result instanceof org.python.types.Bool) {
+            return result;
+        } else {
+            return result.__bool__();
+        }
+    }
+
     /* This method is invoked from the AST for Compare nodes */
     public static org.python.Object __cmp__(org.python.Object v, org.python.Object w, java.lang.String oper,
             java.lang.String operMethod, java.lang.String reflOperMethod) {
