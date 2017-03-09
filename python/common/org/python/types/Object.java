@@ -1020,9 +1020,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         if (oper.equals("==")) {
-            return new org.python.types.Bool(false);
+            return new org.python.types.Bool(v == w);
         } else if (oper.equals("!=")) {
-            return new org.python.types.Bool(true);
+            return new org.python.types.Bool(v != w);
         }
 
         if (org.Python.VERSION < 0x03060000) {

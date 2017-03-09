@@ -281,6 +281,21 @@ class ComparisonTests(TranspileTestCase):
                 print('C')
             """)
 
+    def test_eq_ne_notimplemented(self):
+        self.assertCodeExecution("""
+            class A:
+                def __eq__(self, other):
+                    return NotImplemented
+                def __ne__(self, other):
+                    return NotImplemented
+            x = A()
+
+            # == and != are special, should fallback to testing for object equality
+            # instead of TypeError
+            print(x == x) # True, same object
+            print(x != x) # False, same object
+            """)
+
     # next few tests from cpython's Lib/test/test_compare.py @ v3.6.0
     def test_comparisons(self):
         self.assertCodeExecution("""
