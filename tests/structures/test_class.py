@@ -138,3 +138,23 @@ class ClassTests(TranspileTestCase):
             obj = MyClass(4)
             obj.stuff(5)
             """, run_in_function=False)
+
+    def test_overwrite_class_attributes(self):
+        self.assertCodeExecution("""
+            class MyClass:
+                x = 1
+
+            print(MyClass.x)
+
+            inst = MyClass()
+            print(inst.x)
+
+            inst.x = 123
+            print(inst.x)
+
+            print(MyClass.x)
+
+            inst2 = MyClass()
+            inst2.x = 5
+            print(inst2.x)
+            """, run_in_function=False)
