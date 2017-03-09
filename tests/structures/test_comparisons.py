@@ -231,6 +231,56 @@ class ComparisonTests(TranspileTestCase):
             print(y.__ne__(x))
             """)
 
+    def test_eq_non_bool(self):
+        self.assertCodeExecution("""
+            class A:
+                def __init__(self, num):
+                    self.num = num
+                def __eq__(self, other):
+                    return self.num
+            x = A(0)
+            y = A(1)
+            print(x == x) # 0
+            print(x == y) # __eq__() returns 0 => False
+            print(y == x) # __eq__() returns 1 => True
+            print(x.__eq__(x)) # 0
+            print(x.__eq__(y)) # 0
+            print(y.__eq__(x)) # 1
+
+            # test evaluation by ==
+            if (x == x):
+                print('A')
+            if (x == y):
+                print('B')
+            if (y == x):
+                print('C')
+            """)
+
+    def test_ne_non_bool(self):
+        self.assertCodeExecution("""
+            class A:
+                def __init__(self, num):
+                    self.num = num
+                def __ne__(self, other):
+                    return self.num
+            x = A(0)
+            y = A(1)
+            print(x != x) # 0
+            print(x != y) # __eq__() returns 0 => False
+            print(y != x) # __eq__() returns 1 => True
+            print(x.__ne__(x)) # 0
+            print(x.__ne__(y)) # 0
+            print(y.__ne__(x)) # 1
+
+            # test evaluation by !=
+            if (x != x):
+                print('A')
+            if (x != y):
+                print('B')
+            if (y != x):
+                print('C')
+            """)
+
     # next few tests from cpython's Lib/test/test_compare.py @ v3.6.0
     def test_comparisons(self):
         self.assertCodeExecution("""
