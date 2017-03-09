@@ -204,6 +204,33 @@ class ComparisonTests(TranspileTestCase):
                 print('False')
             """)
 
+    def test_eq_empty_class(self):
+        self.assertCodeExecution("""
+            class A:
+                pass
+            x = A()
+            y = A()
+            # fallback to object identity
+            print(x == x)
+            print(x == y)
+            print(x.__eq__(x))
+            print(x.__eq__(y))
+            print(y.__eq__(x))
+            """)
+
+    def test_ne_empty_class(self):
+        self.assertCodeExecution("""
+            class A:
+                pass
+            x = A()
+            y = A()
+            print(x != x)
+            print(x != y)
+            print(x.__ne__(x))
+            print(x.__ne__(y))
+            print(y.__ne__(x))
+            """)
+
     # next few tests from cpython's Lib/test/test_compare.py @ v3.6.0
     def test_comparisons(self):
         self.assertCodeExecution("""

@@ -205,7 +205,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        return new org.python.types.Bool(System.identityHashCode(this) == System.identityHashCode(other));
+        if (this == other) {
+            return new org.python.types.Bool(true);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
