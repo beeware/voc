@@ -103,6 +103,122 @@ class TupleTests(TranspileTestCase):
                 print(err)
             """, run_in_function=False)
 
+    def test_lt_reflected(self):
+        self.assertCodeExecution("""
+            class A:
+                def __gt__(self, other):
+                    return True
+
+            x = A()
+            y = A()
+
+            # verify that A doesn't have __lt__()
+            print(x.__lt__(x))
+
+            # ensure rich comparison logic is used
+            print((x,) < (x,)) # False, x is x and same size
+            print((x,) < (y,)) # True, x is not y, reflected
+
+            # when elements are non-identical, return that comparison, even if size is not
+            print((x, y) < (y,)) # True, x is not y, reflected
+
+            # ensure tie breaker by size is still used when identical elements
+            print((x, y) < (x,)) # False, larger size
+            print((x,) < (x, y)) # True, smaller size
+            """)
+
+    def test_le_reflected(self):
+        self.assertCodeExecution("""
+            class A:
+                def __ge__(self, other):
+                    return True
+
+            x = A()
+            y = A()
+
+            # verify that A doesn't have __le__()
+            print(x.__le__(x))
+
+            # ensure rich comparison logic is used
+            print((x,) <= (x,)) # False, x is x and same size
+            print((x,) <= (y,)) # True, x is not y, reflected
+
+            # when elements are non-identical, return that comparison, even if size is not
+            print((x, y) <= (y,)) # True, x is not y, reflected
+
+            # ensure tie breaker by size is still used when identical elements
+            print((x, y) <= (x,)) # False, larger size
+            print((x,) <= (x, y)) # True, smaller size
+            """)
+
+    def test_gt_reflected(self):
+        self.assertCodeExecution("""
+            class A:
+                def __lt__(self, other):
+                    return True
+
+            x = A()
+            y = A()
+
+            # verify that A doesn't have __gt__()
+            print(x.__gt__(x))
+
+            # ensure rich comparison logic is used
+            print((x,) > (x,)) # False, x is x and same size
+            print((x,) > (y,)) # True, x is not y, reflected
+
+            # when elements are non-identical, return that comparison, even if size is not
+            print((x, y) > (y,)) # True, x is not y, reflected
+
+            # ensure tie breaker by size is still used when identical elements
+            print((x, y) > (x,)) # False, larger size
+            print((x,) > (x, y)) # True, smaller size
+            """)
+
+    def test_ge_reflected(self):
+        self.assertCodeExecution("""
+            class A:
+                def __le__(self, other):
+                    return True
+
+            x = A()
+            y = A()
+
+            # verify that A doesn't have __ge__()
+            print(x.__ge__(x))
+
+            # ensure rich comparison logic is used
+            print((x,) >= (x,)) # False, x is x and same size
+            print((x,) >= (y,)) # True, x is not y, reflected
+
+            # when elements are non-identical, return that comparison, even if size is not
+            print((x, y) >= (y,)) # True, x is not y, reflected
+
+            # ensure tie breaker by size is still used when identical elements
+            print((x, y) >= (x,)) # False, larger size
+            print((x,) >= (x, y)) # True, smaller size
+            """)
+
+    def test_eq_reflected(self):
+        self.assertCodeExecution("""
+            class A:
+                def __eq__(self, other):
+                    return True
+
+            class B:
+                def __eq__(self, other):
+                    return False
+
+            x = A()
+            y = B()
+
+            print((x,) == (x,)) # True, identity implies equality
+            print((x, x) == (x,)) # False, size not equal
+
+            print((x,) == (y,)) # True, x is not y, x.__eq__(y)
+            print((y,) == (x,)) # False, y is not x, y.__eq__(x)
+            """)
+
 
 class UnaryTupleOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
