@@ -55,13 +55,10 @@ public class Super implements org.python.Object {
      * Proxy Java object methods onto their Python counterparts.
      */
     public boolean equals(java.lang.Object other) {
-        try {
-            org.python.Object result = this.__eq__((org.python.Object) other);
-            if (result instanceof org.python.types.NotImplementedType) {
-                return false;
-            }
+        if (other instanceof org.python.Object) {
+            org.python.Object result = org.python.types.Object.__cmp_bool__(this, (org.python.Object) other, org.python.types.Object.CMP_OP.EQ);
             return ((org.python.types.Bool) result).value;
-        } catch (java.lang.ClassCastException e) {
+        } else {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
         }
     }
