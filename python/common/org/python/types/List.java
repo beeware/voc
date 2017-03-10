@@ -468,9 +468,9 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object __contains__(org.python.Object item) {
         boolean found = false;
-        int len = (int) this.__len__().value;
-        for(int i=0;i<len;i++) {
-            if(((org.python.types.Bool)item.__eq__(this.value.get(i))).value){
+        for (int i = 0; i < this.value.size(); i++) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 found = true;
                 break;
             }
@@ -577,9 +577,9 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object count(org.python.Object other) {
         int count = 0;
-        int len = (int) this.__len__().value;
-        for(int i=0;i<len;i++) {
-            if(((org.python.types.Bool)other.__eq__(this.value.get(i))).value){
+        for (int i = 0; i < this.value.size(); i++) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                    other, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 count++;
             }
         }
@@ -638,7 +638,8 @@ public class List extends org.python.types.Object {
         }
 
         for (int i = iStart; i < Math.min(iEnd, this.value.size()); i++) {
-            if (((org.python.types.Bool) this.value.get(i).__eq__(item)).value) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 return new org.python.types.Int(i);
             }
         }
@@ -671,7 +672,8 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object remove(org.python.Object item) {
         for(int i = 0; i < this.value.size(); i++) {
-            if(((org.python.types.Bool)item.__eq__(this.value.get(i))).value){
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 this.value.remove(i);
                 return org.python.types.NoneType.NONE;
             }
