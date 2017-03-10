@@ -181,7 +181,7 @@ class ListTests(TranspileTestCase):
             print(x[6:7])
             """)
 
-    @expectedFailure
+    
     # when step is 0
     def test_slice_with_zero_step(self):    
         self.assertCodeExecution("""
@@ -192,7 +192,7 @@ class ListTests(TranspileTestCase):
                 print(err)
             """)
 
-    @expectedFailure
+    @expectedFailure 
     def test_slice_in_reverse(self):
         # Full slice with a negative step
         self.assertCodeExecution("""
