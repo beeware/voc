@@ -386,6 +386,19 @@ class ComparisonTests(TranspileTestCase):
             print((g,) != (f,))
             """)
 
+    def test_cmp_notimplemented(self):
+        self.assertCodeExecution("""
+            class A:
+                pass
+            x = A()
+
+            # NotImplemented, not NotImplementedError
+            print(x.__le__(x))
+            print(x.__lt__(x))
+            print(x.__ge__(x))
+            print(x.__gt__(x))
+            """)
+
     # next few tests from cpython's Lib/test/test_compare.py @ v3.6.0
     def test_comparisons(self):
         self.assertCodeExecution("""
