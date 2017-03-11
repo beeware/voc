@@ -369,6 +369,7 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
