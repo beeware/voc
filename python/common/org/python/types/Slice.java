@@ -39,7 +39,7 @@ public class Slice extends org.python.types.Object {
             if (this.step.value == 0) {
                 throw new org.python.exceptions.ValueError("slice step cannot be zero");
             } else {
-                this.__dict__.put("step", step);   
+                this.__dict__.put("step", step);
             }
         } else if (step instanceof org.python.types.NoneType) {
             this.__dict__.put("step", step);
