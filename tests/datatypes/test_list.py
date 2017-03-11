@@ -196,25 +196,25 @@ class ListTests(TranspileTestCase):
     def test_slice_in_reverse(self):
         # Full slice with a negative step
         self.assertCodeExecution("""
-            x = [1,2,3,4,5]
+            x = [1, 2, 3, 4, 5]
             print (x[::-1])
             """)
 
         # left bound slice with a negative step
         self.assertCodeExecution("""
-            x = [1,2,3,4,5]
+            x = [1, 2, 3, 4, 5]
             print (x[4::-2])
             """)
 
         # Right bound slice with a negative step
         self.assertCodeExecution("""
-            x = [1,2,3,4,5]
+            x = [1, 2, 3, 4, 5]
             print (x[:4:-1])
             """)
 
         # Right bound and left bound slice with a negative step
         self.assertCodeExecution("""
-            x = [1,2,3,4,5]
+            x = [1, 2, 3, 4, 5]
             print (x[1:4:-2])
             """)
 
