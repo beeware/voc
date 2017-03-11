@@ -3,7 +3,7 @@ package org.python.types;
 import java.util.Arrays;
 
 public class ByteArray extends org.python.types.Object {
-    public byte [] value;
+    public byte[] value;
 
     /**
      * A utility method to update the internal value of this object.
@@ -84,7 +84,7 @@ public class ByteArray extends org.python.types.Object {
                         } catch (org.python.exceptions.StopIteration si) {
                         }
                         byte[] primative_bytes = new byte[generated.size()];
-                        for(int i = 0; i < primative_bytes.length; i++) {
+                        for (int i = 0; i < primative_bytes.length; i++) {
                             primative_bytes[i] = generated.get(i);
                         }
                         this.value = primative_bytes;
@@ -209,7 +209,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -218,16 +219,8 @@ public class ByteArray extends org.python.types.Object {
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_value = ((org.python.types.ByteArray) other).value;
             return new org.python.types.Bool(Arrays.equals(this.value, other_value));
-        } else {
-            return new org.python.types.Bool(false);
         }
-    }
-
-    @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(((org.python.types.Bool)this.__eq__(other)).value ? 0 : 1);
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -390,7 +383,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -411,15 +405,12 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length < other_bytes.length) return new org.python.types.Bool(0);
             return new org.python.types.Bool(1);
         }
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: bytearray() >= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -440,15 +431,12 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length <= other_bytes.length) return new org.python.types.Bool(0);
             return new org.python.types.Bool(1);
         }
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: bytearray() > " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -469,15 +457,12 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length <= other_bytes.length) return new org.python.types.Bool(1);
             return new org.python.types.Bool(0);
         }
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: bytearray() <= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -498,11 +483,7 @@ public class ByteArray extends org.python.types.Object {
             if (this.value.length < other_bytes.length) return new org.python.types.Bool(1);
             return new org.python.types.Bool(0);
         }
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: bytearray() < " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'bytearray' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(

@@ -107,7 +107,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -116,35 +117,32 @@ public class Tuple extends org.python.types.Object {
             int otherSize = otherTuple.value.size();
             int count = Math.min(size, otherSize);
 
-            for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__lt__(otherTuple.value.get(i));
-                org.python.types.Bool b2 =
-                    (org.python.types.Bool) otherTuple.value.get(i).__lt__(this.value.get(i));
-                if (b.value) {
-                    return new org.python.types.Bool(true);
-                } else if (b2.value) {
-                    return new org.python.types.Bool(false);
+            // check how many items are identical on the lists
+            int i = 0;
+            for (i = 0; i < count; i++) {
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                if (!result.value) {
+                    break;
                 }
             }
 
-            if (size == otherSize) {
-                return new org.python.types.Bool(false);
-            } else {
-                return new org.python.types.Bool(size < otherSize);
+            // not all items were identical, result is that of the first non-identical item
+            if (i < count) {
+                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
+                        org.python.types.Object.CMP_OP.LT);
             }
 
+            // all items were identical, break tie by size
+            return new org.python.types.Bool(size < otherSize);
         } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: tuple() < " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'tuple' and '" + other.typeName() + "'");
-            }
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -153,51 +151,44 @@ public class Tuple extends org.python.types.Object {
             int otherSize = otherTuple.value.size();
             int count = Math.min(size, otherSize);
 
-            boolean cmp = false;
-            for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__le__(otherTuple.value.get(i));
-
-                cmp = cmp & b.value;
+            // check how many items are identical on the lists
+            int i = 0;
+            for (i = 0; i < count; i++) {
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                if (!result.value) {
+                    break;
+                }
             }
 
-            if (cmp) {
-                return new org.python.types.Bool(cmp);
+            // not all items were identical, result is that of the first non-identical item
+            if (i < count) {
+                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
+                        org.python.types.Object.CMP_OP.LE);
             }
 
-            // At this point the lists are different sizes or every comparison is true.
+            // all items were identical, break tie by size
             return new org.python.types.Bool(size <= otherSize);
-
         } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: tuple() <= " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'tuple' and '" + other.typeName() + "'");
-            }
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        boolean eq = false;
         if (other instanceof org.python.types.Tuple) {
             org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
-            eq = this.value.equals(otherTuple.value);
+            return new org.python.types.Bool(this.value.equals(otherTuple.value));
         }
-        return new org.python.types.Bool(eq);
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(!((org.python.types.Bool) this.__eq__(other)).value);
-    }
-
-    @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -206,31 +197,32 @@ public class Tuple extends org.python.types.Object {
             int otherSize = otherTuple.value.size();
             int count = Math.min(size, otherSize);
 
-            boolean cmp = true;
-            for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__gt__(otherTuple.value.get(i));
-
-                cmp = cmp & b.value;
+            // check how many items are identical on the lists
+            int i = 0;
+            for (i = 0; i < count; i++) {
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                if (!result.value) {
+                    break;
+                }
             }
-            if (!cmp) {
-                return new org.python.types.Bool(cmp);
+
+            // not all items were identical, result is that of the first non-identical item
+            if (i < count) {
+                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
+                        org.python.types.Object.CMP_OP.GT);
             }
 
-            // At this point the lists are different sizes or every comparison is true.
+            // all items were identical, break tie by size
             return new org.python.types.Bool(size > otherSize);
-
         } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: tuple() > " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'tuple' and '" + other.typeName() + "'");
-            }
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -239,27 +231,26 @@ public class Tuple extends org.python.types.Object {
             int otherSize = otherTuple.value.size();
             int count = Math.min(size, otherSize);
 
-            boolean cmp = true;
-            for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__ge__(otherTuple.value.get(i));
-
-                cmp = cmp & b.value;
+            // check how many items are identical on the lists
+            int i = 0;
+            for (i = 0; i < count; i++) {
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                if (!result.value) {
+                    break;
+                }
             }
 
-            if (!cmp) {
-                return new org.python.types.Bool(cmp);
+            // not all items were identical, result is that of the first non-identical item
+            if (i < count) {
+                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
+                        org.python.types.Object.CMP_OP.GE);
             }
 
-            // At this point the lists are different sizes or every comparison is true.
+            // all items were identical, break tie by size
             return new org.python.types.Bool(size >= otherSize);
-
         } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: tuple() >= " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'tuple' and '" + other.typeName() + "'");
-            }
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 

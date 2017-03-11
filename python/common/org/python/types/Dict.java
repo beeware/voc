@@ -48,7 +48,7 @@ public class Dict extends org.python.types.Object {
             "    in the keyword argument list.  For example:  dict(one=1, two=2)\n",
         default_args = {"iterable"}
     )
-    public Dict(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public Dict(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
             this.value = new java.util.HashMap<org.python.Object, org.python.Object>();
         } else {
@@ -179,66 +179,47 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: dict() < " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'dict' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: dict() <= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'dict' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        boolean eq = false;
         if (other instanceof org.python.types.Dict) {
             org.python.types.Dict otherDict = (org.python.types.Dict) other;
-            eq = this.value.equals(otherDict.value);
+            return new org.python.types.Bool(this.value.equals(otherDict.value));
         }
-        return new org.python.types.Bool(eq);
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(!((org.python.types.Bool) this.__eq__(other)).value);
-    }
-
-    @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: dict() > " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'dict' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: dict() >= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'dict' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -291,7 +272,6 @@ public class Dict extends org.python.types.Object {
                 throw new org.python.exceptions.KeyError(item);
             }
             return value;
-
         } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError(
                 String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
@@ -334,7 +314,8 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
          // allow unhashable type error to be percolated up.
@@ -347,7 +328,8 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object __not_contains__(org.python.Object item) {
          // allow unhashable type error to be percolated up.

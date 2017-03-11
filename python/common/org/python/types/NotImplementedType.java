@@ -57,51 +57,51 @@ public class NotImplementedType extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: NotImplementedType() >= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'NotImplementedType' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
-        @org.python.Method(
-        __doc__ = ""
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: NotImplementedType() > " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'NotImplementedType' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __eq__(org.python.Object other) {
+        if (other instanceof org.python.types.NotImplementedType) {
+            return new org.python.types.Bool(true);
+        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: NotImplementedType() < " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'NotImplementedType' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: NotImplementedType() <= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'NotImplementedType' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
@@ -115,7 +115,8 @@ public class NotImplementedType extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __getitem__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("'NotImplementedType' object is not subscriptable");

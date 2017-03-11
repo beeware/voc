@@ -157,7 +157,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -166,29 +167,32 @@ public class List extends org.python.types.Object {
             int otherSize = otherList.value.size();
             int count = Math.min(size, otherSize);
 
-            for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__lt__(otherList.value.get(i));
-
-                if (b.value) {
-                    return b;
+            // check how many items are identical on the lists
+            int i = 0;
+            for (i = 0; i < count; i++) {
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                        this.value.get(i), otherList.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                if (!result.value) {
+                    break;
                 }
             }
 
-            // At this point the lists are different sizes or every comparison is true.
-            return new org.python.types.Bool(size < otherSize);
-
-        } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: list() < " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'list' and '" + other.typeName() + "'");
+            // not all items were identical, result is that of the first non-identical item
+            if (i < count) {
+                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherList.value.get(i),
+                        org.python.types.Object.CMP_OP.LT);
             }
+
+            // all items were identical, break tie by size
+            return new org.python.types.Bool(size < otherSize);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -197,48 +201,44 @@ public class List extends org.python.types.Object {
             int otherSize = otherList.value.size();
             int count = Math.min(size, otherSize);
 
-            for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__le__(otherList.value.get(i));
-
-                if (b.value) {
-                    return b;
+            // check how many items are identical on the lists
+            int i = 0;
+            for (i = 0; i < count; i++) {
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                        this.value.get(i), otherList.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                if (!result.value) {
+                    break;
                 }
             }
 
-            // At this point the lists are different sizes or every comparison is true.
-            return new org.python.types.Bool(size <= otherSize);
-
-        } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: list() <= " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'list' and '" + other.typeName() + "'");
+            // not all items were identical, result is that of the first non-identical item
+            if (i < count) {
+                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherList.value.get(i),
+                        org.python.types.Object.CMP_OP.LE);
             }
+
+            // all items were identical, break tie by size
+            return new org.python.types.Bool(size <= otherSize);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        boolean eq = false;
         if (other instanceof org.python.types.List) {
             org.python.types.List otherList = (org.python.types.List) other;
-            eq = this.value.equals(otherList.value);
+            return new org.python.types.Bool(this.value.equals(otherList.value));
         }
-        return new org.python.types.Bool(eq);
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(!((org.python.types.Bool) this.__eq__(other)).value);
-    }
-
-    @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -247,29 +247,32 @@ public class List extends org.python.types.Object {
             int otherSize = otherList.value.size();
             int count = Math.min(size, otherSize);
 
-            for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__gt__(otherList.value.get(i));
-
-                if (!b.value) {
-                    return b;
+            // check how many items are identical on the lists
+            int i = 0;
+            for (i = 0; i < count; i++) {
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                        this.value.get(i), otherList.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                if (!result.value) {
+                    break;
                 }
             }
 
-            // At this point the lists are different sizes or every comparison is true.
-            return new org.python.types.Bool(size > otherSize);
-
-        } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: list() > " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'list' and '" + other.typeName() + "'");
+            // not all items were identical, result is that of the first non-identical item
+            if (i < count) {
+                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherList.value.get(i),
+                        org.python.types.Object.CMP_OP.GT);
             }
+
+            // all items were identical, break tie by size
+            return new org.python.types.Bool(size > otherSize);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -278,24 +281,26 @@ public class List extends org.python.types.Object {
             int otherSize = otherList.value.size();
             int count = Math.min(size, otherSize);
 
-            for (int i = 0; i < count; i++) {
-                org.python.types.Bool b =
-                    (org.python.types.Bool) this.value.get(i).__ge__(otherList.value.get(i));
-
-                if (!b.value) {
-                    return b;
+            // check how many items are identical on the lists
+            int i = 0;
+            for (i = 0; i < count; i++) {
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                        this.value.get(i), otherList.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                if (!result.value) {
+                    break;
                 }
             }
 
-            // At this point the lists are different sizes or every comparison is true.
-            return new org.python.types.Bool(size >= otherSize);
-
-        } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: list() >= " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'list' and '" + other.typeName() + "'");
+            // not all items were identical, result is that of the first non-identical item
+            if (i < count) {
+                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherList.value.get(i),
+                        org.python.types.Object.CMP_OP.GE);
             }
+
+            // all items were identical, break tie by size
+            return new org.python.types.Bool(size >= otherSize);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
@@ -458,13 +463,14 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
         boolean found = false;
-        int len = (int) this.__len__().value;
-        for(int i=0;i<len;i++) {
-            if(((org.python.types.Bool)item.__eq__(this.value.get(i))).value){
+        for (int i = 0; i < this.value.size(); i++) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 found = true;
                 break;
             }
@@ -571,9 +577,9 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object count(org.python.Object other) {
         int count = 0;
-        int len = (int) this.__len__().value;
-        for(int i=0;i<len;i++) {
-            if(((org.python.types.Bool)other.__eq__(this.value.get(i))).value){
+        for (int i = 0; i < this.value.size(); i++) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                    other, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 count++;
             }
         }
@@ -632,7 +638,8 @@ public class List extends org.python.types.Object {
         }
 
         for (int i = iStart; i < Math.min(iEnd, this.value.size()); i++) {
-            if (((org.python.types.Bool) this.value.get(i).__eq__(item)).value) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 return new org.python.types.Int(i);
             }
         }
@@ -665,7 +672,8 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object remove(org.python.Object item) {
         for(int i = 0; i < this.value.size(); i++) {
-            if(((org.python.types.Bool)item.__eq__(this.value.get(i))).value){
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
+                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 this.value.remove(i);
                 return org.python.types.NoneType.NONE;
             }

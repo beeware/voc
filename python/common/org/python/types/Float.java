@@ -130,7 +130,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -146,37 +147,33 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Bool(this.value < 0.0);
             }
         }
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: float() < " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'float' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool(this.value <= ((double)((org.python.types.Int) other).value));
-        } else if (other instanceof Float) {
-            return new org.python.types.Bool(this.value <= ((org.python.types.Float) other).value);
-        } else if (other instanceof Bool) {
+            long other_val = ((org.python.types.Int) other).value;
+            return new org.python.types.Bool(this.value <= ((double) other_val));
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            return new org.python.types.Bool(this.value <= other_val);
+        } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value <= 1.0);
             } else {
                 return new org.python.types.Bool(this.value <= 0.0);
             }
         }
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: float() <= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'float' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -190,60 +187,48 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Bool(this.value == 0.0);
             }
         }
-        return new org.python.types.Bool(false);
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __ne__(org.python.Object other) {
-        if (((org.python.types.Bool) this.__eq__((org.python.Object) other)).value) {
-            return new org.python.types.Bool(false);
-        }
-        return new org.python.types.Bool(true);
-    }
-
-    @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool(this.value > ((double)((org.python.types.Int) other).value));
-        } else if (other instanceof Float) {
-            return new org.python.types.Bool(this.value > ((org.python.types.Float) other).value);
-        } else if (other instanceof Bool) {
+            long other_val = ((org.python.types.Int) other).value;
+            return new org.python.types.Bool(this.value > ((double) other_val));
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            return new org.python.types.Bool(this.value > other_val);
+        } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value > 1.0);
             } else {
                 return new org.python.types.Bool(this.value > 0.0);
             }
         }
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: float() > " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'float' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool(this.value >= ((double)((org.python.types.Int) other).value));
-        } else if (other instanceof Float) {
-            return new org.python.types.Bool(this.value >= ((org.python.types.Float) other).value);
-        } else if (other instanceof Bool) {
+            long other_val = ((org.python.types.Int) other).value;
+            return new org.python.types.Bool(this.value >= ((double) other_val));
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            return new org.python.types.Bool(this.value >= other_val);
+        } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Bool(this.value >= 1.0);
             } else {
                 return new org.python.types.Bool(this.value >= 0.0);
             }
         }
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: float() >= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'float' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
     @org.python.Method(
         __doc__ = ""

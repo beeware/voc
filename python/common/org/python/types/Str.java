@@ -129,90 +129,67 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) < 0);
         } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: str() < " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'<' not supported between instances of 'str' and '" + other.typeName() + "'");
-            }
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) <= 0);
         } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: str() <= " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'str' and '" + other.typeName() + "'");
-            }
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.equals(value));
         } else {
-            return new org.python.types.Bool(false);
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
-    )
-    public org.python.Object __ne__(org.python.Object other) {
-        if (other instanceof org.python.types.Str) {
-            java.lang.String value = ((org.python.types.Str) other).value;
-            return new org.python.types.Bool(!this.value.equals(value));
-        } else {
-            return new org.python.types.Bool(true);
-        }
-    }
-
-    @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) > 0);
         } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: str() > " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'>' not supported between instances of 'str' and '" + other.typeName() + "'");
-            }
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.compareTo(value) >= 0);
         } else {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("unorderable types: str() >= " + other.typeName() + "()");
-            } else {
-                throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'str' and '" + other.typeName() + "'");
-            }
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 

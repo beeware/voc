@@ -814,15 +814,9 @@ public class Python {
         } else if (class_or_type_or_tuple == null) {
             throw new org.python.exceptions.TypeError("isinstance expected 2 arguments, got 1");
         } else if (class_or_type_or_tuple instanceof org.python.types.Tuple) {
-            java.util.List<org.python.Object> classes = ((org.python.types.Tuple) class_or_type_or_tuple).value;
-            for (org.python.Object klass: classes) {
-                if (((org.python.types.Bool) org.Python.isinstance(object, klass).__bool__()).value) {
-                    return new org.python.types.Bool(true);
-                };
-            }
-            return new org.python.types.Bool(false);
+            return org.Python.issubclass(org.Python.type(object, null, null), class_or_type_or_tuple);
         } else if (class_or_type_or_tuple instanceof org.python.types.Type) {
-            return new org.python.types.Bool(object.type() == class_or_type_or_tuple);
+            return org.Python.issubclass(org.Python.type(object, null, null), class_or_type_or_tuple);
         } else {
             throw new org.python.exceptions.TypeError("isinstance() arg 2 must be a type or tuple of types");
         }
@@ -833,10 +827,39 @@ public class Python {
             "\n" +
             "Return whether class C is a subclass (i.e., a derived class) of class B.\n" +
             "When using a tuple as the second argument issubclass(X, (A, B, ...)),\n" +
-            "is a shortcut for issubclass(X, A) or issubclass(X, B) or ... (etc.).\n"
+            "is a shortcut for issubclass(X, A) or issubclass(X, B) or ... (etc.).\n",
+        default_args = {"class", "classinfo_or_tuple"}
     )
-    public static org.python.types.Bool issubclass() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'issubclass' not implemented");
+    public static org.python.types.Bool issubclass(org.python.Object klass, org.python.Object classinfo_or_tuple) {
+        if (klass == null) {
+            throw new org.python.exceptions.TypeError("issubclass expected 2 arguments, got 0");
+        } else if (classinfo_or_tuple == null) {
+            throw new org.python.exceptions.TypeError("issubclass expected 2 arguments, got 1");
+        } else if (!(klass instanceof org.python.types.Type)) {
+            throw new org.python.exceptions.TypeError("issubclass() arg 1 must be a class");
+        } else if (classinfo_or_tuple instanceof org.python.types.Tuple) {
+            java.util.List<org.python.Object> target_classes = ((org.python.types.Tuple) classinfo_or_tuple).value;
+            for (org.python.Object target_klass: target_classes) {
+                if (((org.python.types.Bool) org.Python.issubclass(klass, target_klass).__bool__()).value) {
+                    return new org.python.types.Bool(true);
+                };
+            }
+            return new org.python.types.Bool(false);
+        } else if (classinfo_or_tuple instanceof org.python.types.Type) {
+            org.python.types.Type klass_obj = (org.python.types.Type) klass;
+            if (klass == classinfo_or_tuple) {
+                return new org.python.types.Bool(true);
+            } else if (klass_obj.__dict__.get("__bases__") != null) {
+                for (org.python.Object base: ((org.python.types.Tuple) klass_obj.__dict__.get("__bases__")).value) {
+                    if (base == classinfo_or_tuple || org.Python.issubclass(base, classinfo_or_tuple).value) {
+                        return new org.python.types.Bool(true);
+                    }
+                }
+            }
+            return new org.python.types.Bool(false);
+        } else {
+            throw new org.python.exceptions.TypeError("issubclass() arg 2 must be a class or tuple of classes");
+        }
     }
 
     @org.python.Method(
@@ -1370,10 +1393,12 @@ public class Python {
                     throw new org.python.exceptions.TypeError("'" + key.typeName() + "' object is not callable");
                 }
             }
-            if (((org.python.types.Bool) o1.__lt__(o2).__bool__()).value) {
+            org.python.Object result = org.python.types.Object.__cmp_bool__(o1, o2, org.python.types.Object.CMP_OP.LT);
+            if (((org.python.types.Bool) result.__bool__()).value) {
                 return reverse ? 1 : -1;
             }
-            if (((org.python.types.Bool) o2.__lt__(o1).__bool__()).value) {
+            result = org.python.types.Object.__cmp_bool__(o2, o1, org.python.types.Object.CMP_OP.LT);
+            if (((org.python.types.Bool) result.__bool__()).value) {
                 return reverse ? -1 : 1;
             }
             return 0;
