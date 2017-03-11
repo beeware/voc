@@ -1753,8 +1753,14 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.INVOKESTATIC(
                         'org/python/types/Object',
                         '__cmp__',
-                        '(Lorg/python/Object;Lorg/python/Object;Ljava/lang/String;Ljava/lang/String;'
-                        + 'Ljava/lang/String;)Lorg/python/Object;'
+                        args=[
+                            'Lorg/python/Object;',
+                            'Lorg/python/Object;',
+                            'Ljava/lang/String;',
+                            'Ljava/lang/String;',
+                            'Ljava/lang/String;',
+                        ],
+                        returns='Lorg/python/Object;',
                     ),
                 )
         else:
