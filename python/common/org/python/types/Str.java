@@ -597,11 +597,11 @@ public class Str extends org.python.types.Object {
             default_args = {"start", "end"}
     )
     public org.python.Object endswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
-        if (suffix instanceof org.python.types.Str){
-            if (start == null){
+        if (suffix instanceof org.python.types.Str) {
+            if (start == null) {
                 start = new Int(0);
             }
-            if (end == null){
+            if (end == null) {
                 end = new Int(this.value.length());
             }
             String original = this.__getitem__(new Slice(start, end)).toString();
@@ -989,11 +989,11 @@ public class Str extends org.python.types.Object {
             default_args = {"start", "end"}
     )
     public org.python.Object startswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
-        if (suffix instanceof org.python.types.Str){
-            if (start == null){
+        if (suffix instanceof org.python.types.Str) {
+            if (start == null) {
                 start = new Int(0);
             }
-            if (end == null){
+            if (end == null) {
                 end = new Int(this.value.length());
             }
             String original = this.__getitem__(new Slice(start, end)).toString();
