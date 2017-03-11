@@ -113,8 +113,8 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"index"}
+            __doc__ = "",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
@@ -125,8 +125,8 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
@@ -137,8 +137,8 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
@@ -149,8 +149,8 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
@@ -161,8 +161,8 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
@@ -173,8 +173,8 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
@@ -239,16 +239,16 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"item"}
+            __doc__ = "",
+            args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object other) {
         return new org.python.types.Bool(this.value.contains(other));
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"item"}
+            __doc__ = "",
+            args = {"item"}
     )
     public org.python.Object __not_contains__(org.python.Object other) {
         return new org.python.types.Bool(!this.value.contains(other));

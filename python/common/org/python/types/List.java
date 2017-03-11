@@ -156,8 +156,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -190,8 +190,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -224,8 +224,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -236,8 +236,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -270,8 +270,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -461,8 +461,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"item"}
+            __doc__ = "",
+            args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
         boolean found = false;
@@ -667,7 +667,7 @@ public class List extends org.python.types.Object {
             args = {"item"}
     )
     public org.python.Object remove(org.python.Object item) {
-        for(int i = 0; i < this.value.size(); i++) {
+        for (int i = 0; i < this.value.size(); i++) {
             if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
                     item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 this.value.remove(i);

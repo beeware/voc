@@ -822,12 +822,12 @@ public class Python {
     }
 
     @org.python.Method(
-        __doc__ = "issubclass(C, B) -> bool" +
-            "\n" +
-            "Return whether class C is a subclass (i.e., a derived class) of class B.\n" +
-            "When using a tuple as the second argument issubclass(X, (A, B, ...)),\n" +
-            "is a shortcut for issubclass(X, A) or issubclass(X, B) or ... (etc.).\n",
-        default_args = {"class", "classinfo_or_tuple"}
+            __doc__ = "issubclass(C, B) -> bool" +
+                "\n" +
+                "Return whether class C is a subclass (i.e., a derived class) of class B.\n" +
+                "When using a tuple as the second argument issubclass(X, (A, B, ...)),\n" +
+                "is a shortcut for issubclass(X, A) or issubclass(X, B) or ... (etc.).\n",
+            default_args = {"class", "classinfo_or_tuple"}
     )
     public static org.python.types.Bool issubclass(org.python.Object klass, org.python.Object classinfo_or_tuple) {
         if (klass == null) {
@@ -841,7 +841,7 @@ public class Python {
             for (org.python.Object target_klass: target_classes) {
                 if (((org.python.types.Bool) org.Python.issubclass(klass, target_klass).__bool__()).value) {
                     return new org.python.types.Bool(true);
-                };
+                }
             }
             return new org.python.types.Bool(false);
         } else if (classinfo_or_tuple instanceof org.python.types.Type) {

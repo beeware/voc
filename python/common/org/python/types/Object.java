@@ -999,8 +999,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         EQ("==", "__eq__", "__eq__"),
         NE("!=", "__ne__", "__ne__"),
         LE("<=", "__le__", "__ge__"),
-        LT("<", "__lt__", "__gt__"),
-        ;
+        LT("<", "__lt__", "__gt__");
+
         public final String oper;
         public final String operMethod;
         public final String reflOperMethod;

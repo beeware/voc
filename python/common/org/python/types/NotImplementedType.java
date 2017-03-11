@@ -58,24 +58,24 @@ public class NotImplementedType extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.NotImplementedType) {
@@ -85,24 +85,24 @@ public class NotImplementedType extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
@@ -116,8 +116,8 @@ public class NotImplementedType extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __getitem__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("'NotImplementedType' object is not subscriptable");

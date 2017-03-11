@@ -197,24 +197,24 @@ public class Complex extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Complex) {
@@ -232,16 +232,16 @@ public class Complex extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
