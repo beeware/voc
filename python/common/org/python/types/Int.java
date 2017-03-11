@@ -240,7 +240,8 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {

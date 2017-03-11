@@ -361,7 +361,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+        __doc__ = "",
+        args = {"other"} 
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -451,6 +452,7 @@ public class Str extends org.python.types.Object {
         __doc__ = ""
     )
     public org.python.Object __rmul__(org.python.Object other) {
+
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
