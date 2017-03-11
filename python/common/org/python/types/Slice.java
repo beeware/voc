@@ -42,4 +42,44 @@ public class Slice extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("'" + step.typeName() + "' object cannot be interpreted as an integer");
         }
     }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __ge__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __gt__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __eq__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __lt__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __le__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
 }

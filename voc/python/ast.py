@@ -1709,23 +1709,59 @@ class Visitor(ast.NodeVisitor):
                         JavaOpcodes.SWAP()
                     )
 
+                oper = {
+                        ast.Eq: '__eq__',
+                        ast.Gt: '__gt__',
+                        ast.GtE: '__ge__',
+                        ast.Lt: '__lt__',
+                        ast.LtE: '__le__',
+                        ast.In: '__contains__',
+                        ast.Is: '__eq__',
+                        ast.IsNot: '__ne__',
+                        ast.NotEq: '__ne__',
+                        ast.NotIn: '__not_contains__',
+                }[type(node.ops[0])]
+                oper_symbol = {
+                        ast.Eq: '==',
+                        ast.Gt: '>',
+                        ast.GtE: '>=',
+                        ast.Lt: '<',
+                        ast.LtE: '<=',
+                        ast.In: 'in',
+                        ast.Is: 'is',
+                        ast.IsNot: 'is not',
+                        ast.NotEq: '!=',
+                        ast.NotIn: 'not in',
+                }[type(node.ops[0])]
+                reflect_oper = {
+                        ast.Eq: '__eq__',
+                        ast.Gt: '__lt__',
+                        ast.GtE: '__le__',
+                        ast.Lt: '__gt__',
+                        ast.LtE: '__ge__',
+                        ast.In: '__contains__',
+                        ast.Is: '__eq__',
+                        ast.IsNot: '__ne__',
+                        ast.NotEq: '__ne__',
+                        ast.NotIn: '__not_contains__',
+                }[type(node.ops[0])]
+
                 self.context.add_opcodes(
-                    JavaOpcodes.INVOKEINTERFACE(
-                        'org/python/Object',
-                        {
-                            ast.Eq: '__eq__',
-                            ast.Gt: '__gt__',
-                            ast.GtE: '__ge__',
-                            ast.Lt: '__lt__',
-                            ast.LtE: '__le__',
-                            ast.In: '__contains__',
-                            ast.Is: '__eq__',
-                            ast.IsNot: '__ne__',
-                            ast.NotEq: '__ne__',
-                            ast.NotIn: '__not_contains__',
-                        }[type(node.ops[0])],
-                        '(Lorg/python/Object;)Lorg/python/Object;'
-                    )
+                    JavaOpcodes.LDC_W(oper_symbol),
+                    JavaOpcodes.LDC_W(oper),
+                    JavaOpcodes.LDC_W(reflect_oper),
+                    JavaOpcodes.INVOKESTATIC(
+                        'org/python/types/Object',
+                        '__cmp__',
+                        args=[
+                            'Lorg/python/Object;',
+                            'Lorg/python/Object;',
+                            'Ljava/lang/String;',
+                            'Ljava/lang/String;',
+                            'Ljava/lang/String;',
+                        ],
+                        returns='Lorg/python/Object;',
+                    ),
                 )
         else:
             raise NotImplementedError("Don't know how to resolve multiple operators")

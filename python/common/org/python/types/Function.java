@@ -34,7 +34,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         org.python.Object doc;
         try {
             org.python.types.Tuple consts = (org.python.types.Tuple) this.code.co_consts;
-            if (consts != null) {
+            if (consts != null && ((org.python.types.Int)consts.count()).value != 0) {
                 doc = consts.__getitem__(new org.python.types.Int(0));
             } else {
                 doc = org.python.types.NoneType.NONE;

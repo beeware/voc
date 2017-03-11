@@ -55,9 +55,10 @@ public class Super implements org.python.Object {
      * Proxy Java object methods onto their Python counterparts.
      */
     public boolean equals(java.lang.Object other) {
-        try {
-            return ((org.python.types.Bool) this.__eq__((org.python.Object) other)).value;
-        } catch (java.lang.ClassCastException e) {
+        if (other instanceof org.python.Object) {
+            org.python.Object result = org.python.types.Object.__cmp_bool__(this, (org.python.Object) other, org.python.types.Object.CMP_OP.EQ);
+            return ((org.python.types.Bool) result).value;
+        } else {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
         }
     }
@@ -167,7 +168,13 @@ public class Super implements org.python.Object {
             args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(System.identityHashCode(this) != System.identityHashCode(other));
+        // By default, __ne__() delegates to __eq__() and inverts the result unless it is NotImplemented.
+        // see: http://bugs.python.org/issue4395
+        org.python.Object result = this.__eq__(other);
+        if (result instanceof org.python.types.NotImplementedType) {
+            return result;
+        }
+        return new org.python.types.Bool(!((org.python.types.Bool) result).value);
     }
 
     @org.python.Method(

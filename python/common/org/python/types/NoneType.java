@@ -59,47 +59,46 @@ public class NoneType extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() >= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>=' not supported between instances of 'NoneType' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() > " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'>' not supported between instances of 'NoneType' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
+    )
+    public org.python.Object __eq__(org.python.Object other) {
+        if (other instanceof org.python.types.NoneType) {
+            return new org.python.types.Bool(true);
+        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() < " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<' not supported between instances of 'NoneType' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+        __doc__ = "",
+        args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError("unorderable types: NoneType() <= " + other.typeName() + "()");
-        } else {
-            throw new org.python.exceptions.TypeError("'<=' not supported between instances of 'NoneType' and '" + other.typeName() + "'");
-        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(

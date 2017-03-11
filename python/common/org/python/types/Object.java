@@ -92,9 +92,10 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
      * Proxy Java object methods onto their Python counterparts.
      */
     public boolean equals(java.lang.Object other) {
-        try {
-            return ((org.python.types.Bool) this.__eq__((org.python.Object) other)).value;
-        } catch (ClassCastException e) {
+        if (other instanceof org.python.Object) {
+            org.python.Object result = org.python.types.Object.__cmp_bool__(this, (org.python.Object) other, org.python.types.Object.CMP_OP.EQ);
+            return ((org.python.types.Bool) result).value;
+        } else {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
         }
     }
@@ -183,7 +184,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__lt__' has not been implemented");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -191,7 +192,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__le__' has not been implemented");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -199,7 +200,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        return new org.python.types.Bool(System.identityHashCode(this) == System.identityHashCode(other));
+        if (this == other) {
+            return new org.python.types.Bool(true);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -207,7 +212,13 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
-        return new org.python.types.Bool(System.identityHashCode(this) != System.identityHashCode(other));
+        // By default, __ne__() delegates to __eq__() and inverts the result unless it is NotImplemented.
+        // see: http://bugs.python.org/issue4395
+        org.python.Object result = this.__eq__(other);
+        if (result instanceof org.python.types.NotImplementedType) {
+            return result;
+        }
+        return new org.python.types.Bool(!((org.python.types.Bool) result).value);
     }
 
     @org.python.Method(
@@ -215,7 +226,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__gt__' has not been implemented");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -223,7 +234,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__ge__' has not been implemented");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -363,8 +374,13 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         if (attr == null) {
             this.__dict__.put(name, value);
         } else {
+            // if attribute is not a descriptor add it to local instance
+            if (!(attr instanceof org.python.types.Property)) {
+                this.__dict__.put(name, value);
+            }
             attr.__set__(this, value);
         }
+
         return true;
     }
 
@@ -969,5 +985,111 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.AttributeError(this, "__round__");
+    }
+
+    // Need to implement Is __eq__ Is Not __ne__
+    // In __contains__ (reversed operands) Not In __not_contains__ (reversed operands)
+    //
+    // for Is and Is Not, falls through to here only when either side is a constant in python
+    // which ends up as org.python.types.[Int|Float|Complex], otherwise it's dealt with
+    // by object reference comparison IF_ACMEQ. so we fall through to __eq__!
+    public enum CMP_OP {
+        GE(">=", "__ge__", "__le__"),
+        GT(">", "__gt__", "__lt__"),
+        EQ("==", "__eq__", "__eq__"),
+        NE("!=", "__ne__", "__ne__"),
+        LE("<=", "__le__", "__ge__"),
+        LT("<", "__lt__", "__gt__"),
+        ;
+        public final String oper;
+        public final String operMethod;
+        public final String reflOperMethod;
+        CMP_OP(java.lang.String oper, java.lang.String operMethod, java.lang.String reflOperMethod) {
+            this.oper = oper;
+            this.operMethod = operMethod;
+            this.reflOperMethod = reflOperMethod;
+        }
+    }
+
+    /* This method is used from standard library datatypes, etc */
+    public static org.python.Object __cmp__(org.python.Object v, org.python.Object w,
+            org.python.types.Object.CMP_OP op) {
+        return __cmp__(v, w, op.oper, op.operMethod, op.reflOperMethod);
+    }
+
+    /* This method is used from standard library container datatypes */
+    public static org.python.Object __cmp_bool__(org.python.Object v, org.python.Object w,
+            org.python.types.Object.CMP_OP op) {
+        // identity implies equality
+        if (v == w) {
+            if (op == org.python.types.Object.CMP_OP.EQ) {
+                return new org.python.types.Bool(true);
+            } else if (op == org.python.types.Object.CMP_OP.NE) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        org.python.Object result = __cmp__(v, w, op.oper, op.operMethod, op.reflOperMethod);
+        if (result instanceof org.python.types.Bool) {
+            return result;
+        } else {
+            return result.__bool__();
+        }
+    }
+
+    /* This method is invoked from the AST for Compare nodes */
+    public static org.python.Object __cmp__(org.python.Object v, org.python.Object w, java.lang.String oper,
+            java.lang.String operMethod, java.lang.String reflOperMethod) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        if (reflectedChecked) {
+            result = invokeComparison(w, v, reflOperMethod);
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
+        }
+
+        result = invokeComparison(v, w, operMethod);
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        if (!reflectedChecked) {
+            result = invokeComparison(w, v, reflOperMethod);
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
+        }
+
+        if (oper.equals("==")) {
+            return new org.python.types.Bool(v == w);
+        } else if (oper.equals("!=")) {
+            return new org.python.types.Bool(v != w);
+        }
+
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unorderable types: %s() %s %s()", v.typeName(), oper, w.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", oper, v.typeName(), w.typeName()));
+        }
+    }
+
+    private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {
+        if (methodName == null) {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
+
+        org.python.Object comparator = x.__getattribute_null(methodName);
+        if (comparator == null) {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
+
+        org.python.Object[] args = new org.python.Object[1];
+        args[0] = y;
+        java.util.Map<java.lang.String, org.python.Object> kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
+        return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, kwargs);
     }
 }
