@@ -356,6 +356,18 @@ class StrTests(TranspileTestCase):
                 print(err)
                 """)
 
+    def test_partition(self):
+        self.assertCodeExecution("""
+            s = "foobar"
+            print(s.partition("ob"))
+            print(s.partition("o"))
+            print(s.partition("f"))
+            print(s.partition("r"))
+            try:
+                print(s.partition(""))
+            except ValueError as err:
+                print(err)
+            """)
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
