@@ -9,7 +9,7 @@ public class OSError extends org.python.exceptions.Exception {
         super(msg);
     }
 
-    public OSError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public OSError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

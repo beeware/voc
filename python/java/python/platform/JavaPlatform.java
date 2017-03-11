@@ -3,7 +3,6 @@ package python.platform;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
-
 public class JavaPlatform implements python.Platform {
     private org.python.stdlib._io.TextIOWrapper _stderr;
     private org.python.stdlib._io.TextIOWrapper _stdout;
@@ -60,9 +59,9 @@ public class JavaPlatform implements python.Platform {
     public org.python.Object args() {
         // java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("(\"[^\"]*\"|[^\"]+)(\\s+|$)");
         java.util.regex.Pattern cmdline_pattern = java.util.regex.Pattern.compile("\\s+");
-        java.lang.String [] cmdline_args = cmdline_pattern.split(System.getProperty("sun.java.command"));
+        java.lang.String[] cmdline_args = cmdline_pattern.split(System.getProperty("sun.java.command"));
         java.util.List<org.python.Object> arg_list = new java.util.ArrayList<org.python.Object>();
-        for (String arg: cmdline_args) {
+        for (String arg : cmdline_args) {
             arg_list.add(new org.python.types.Str(arg));
         }
 

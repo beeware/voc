@@ -9,7 +9,7 @@ public class EOFError extends org.python.exceptions.Exception {
         super(msg);
     }
 
-    public EOFError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public EOFError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

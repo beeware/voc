@@ -1,6 +1,5 @@
 package python.platform;
 
-
 public class LogStream extends java.io.OutputStream {
     protected java.lang.String tag;
     protected byte[] buf;

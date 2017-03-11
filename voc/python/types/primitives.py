@@ -21,8 +21,9 @@ class ALOAD_index:
         self.index = index
 
     def process(self, context):
-        # print("LOAD AVAR NAME", context, self.name)
-        # print("locals: ", context.local_vars, context.deleted_vars)
+        # if self.index is None:
+        #     print("LOAD AVAR NAME", context, self.name)
+        #     print("locals: ", context.local_vars, context.deleted_vars)
         if self.index is None:
             raise NameError(self.name)
         elif self.index == 0:
@@ -80,8 +81,9 @@ class ASTORE_index:
                 # print ("GET NEW index", self.index)
             context.local_vars[self.name] = self.index
 
-        # print("STORE AVAR NAME", context, self.index, self.name)
-        # print("locals: ", context.local_vars, context.deleted_vars)
+        # if self.index is None:
+        #     print("STORE AVAR NAME", context, self.index, self.name)
+        #     print("locals: ", context.local_vars, context.deleted_vars)
 
         if self.index == 0:
             context.add_opcodes(JavaOpcodes.ASTORE_0())
