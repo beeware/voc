@@ -9,7 +9,7 @@ public class ProcessLookupError extends org.python.exceptions.OSError {
         super(msg);
     }
 
-    public ProcessLookupError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public ProcessLookupError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

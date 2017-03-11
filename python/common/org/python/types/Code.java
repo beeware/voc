@@ -87,7 +87,7 @@ public class Code extends org.python.types.Object {
             org.python.types.Int co_nlocals,
             org.python.types.Int co_stacksize,
             org.python.types.Tuple co_varnames
-        ) {
+    ) {
         super();
 
         this.co_argcount = co_argcount;
@@ -115,11 +115,11 @@ public class Code extends org.python.types.Object {
             location = String.format("file \"%s\", line %s", this.co_filename, this.co_firstlineno);
         }
         return new org.python.types.Str(
-            String.format("<%s object at 0x%x, %s>",
-                this.typeName(),
-                this.hashCode(),
-                location
-            )
+                String.format("<%s object at 0x%x, %s>",
+                        this.typeName(),
+                        this.hashCode(),
+                        location
+                )
         );
     }
 }

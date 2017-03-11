@@ -14,7 +14,7 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "Return repr(self)."
+            __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
         // if (this.expression.getName().startswith("genexpr_"))
@@ -22,8 +22,8 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"instance", "klass"}
+            __doc__ = "",
+            args = {"instance", "klass"}
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         // System.out.println("Property __get__ on " + instance);
@@ -39,14 +39,14 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"instance", "value"}
+            __doc__ = "",
+            args = {"instance", "value"}
     )
     public void __set__(org.python.Object instance, org.python.Object value) {
         // System.out.println("Property __set__ on " + instance);
         if (this.fset != null) {
             try {
-                ((org.python.types.Function) this.fset).invoke(instance, new org.python.Object [] { value }, null);
+                ((org.python.types.Function) this.fset).invoke(instance, new org.python.Object[]{value}, null);
             } catch (java.lang.ClassCastException e) {
                 throw new org.python.exceptions.TypeError("'" + this.fset.typeName() + "' object is not callable");
             }
@@ -56,8 +56,8 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"instance"}
+            __doc__ = "",
+            args = {"instance"}
     )
     public void __delete__(org.python.Object instance) {
         // System.out.println("Property __delete__ on " + instance);
@@ -73,8 +73,8 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"fn"}
+            __doc__ = "",
+            args = {"fn"}
     )
     public org.python.Object setter(org.python.Object fn) {
         // Duplicate the property, substituting the new setter.
@@ -82,8 +82,8 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"fn"}
+            __doc__ = "",
+            args = {"fn"}
     )
     public org.python.Object deleter(org.python.Object fn) {
         // Duplicate the property, substituting the new deleter.

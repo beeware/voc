@@ -1,6 +1,5 @@
 package org.python;
 
-
 public interface Object extends Comparable {
     /**
      * Return a Java object that is the underlying data representation

@@ -9,7 +9,7 @@ public class PermissionError extends org.python.exceptions.OSError {
         super(msg);
     }
 
-    public PermissionError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public PermissionError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

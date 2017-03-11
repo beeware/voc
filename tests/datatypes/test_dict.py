@@ -244,6 +244,20 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_class',
         'test_and_frozenset',
 
+        'test_direct_eq_bytes',
+        'test_direct_ge_bytes',
+        'test_direct_gt_bytes',
+        'test_direct_le_bytes',
+        'test_direct_lt_bytes',
+        'test_direct_ne_bytes',
+
+        'test_direct_eq_frozenset',
+        'test_direct_ge_frozenset',
+        'test_direct_gt_frozenset',
+        'test_direct_le_frozenset',
+        'test_direct_lt_frozenset',
+        'test_direct_ne_frozenset',
+
         'test_eq_class',
         'test_eq_frozenset',
 

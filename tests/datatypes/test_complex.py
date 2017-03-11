@@ -15,6 +15,30 @@ class ComplexTests(TranspileTestCase):
             print(x.imag)
             """)
 
+    def test_equality_with_numbers_when_zero_imag(self):
+        self.assertCodeExecution("""
+            x = 2
+            y = complex(2, 0)
+            print(x == y)
+            print(y.__eq__(x))
+            print(x != y)
+            print(y.__ne__(x))
+
+            x = 2.0
+            y = complex(3, 0)
+            print(x == y)
+            print(y.__eq__(x))
+            print(x != y)
+            print(y.__ne__(x))
+
+            x = True
+            y = complex(1, 0)
+            print(x == y)
+            print(y.__eq__(x))
+            print(x != y)
+            print(y.__ne__(x))
+            """)
+
 
 class UnaryComplexOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'complex'
@@ -45,6 +69,21 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_and_class',
         'test_and_frozenset',
+
+        'test_direct_eq_frozenset',
+        'test_direct_ge_frozenset',
+        'test_direct_gt_frozenset',
+        'test_direct_le_frozenset',
+        'test_direct_lt_frozenset',
+        'test_direct_ne_frozenset',
+
+        'test_direct_eq_bool',
+        'test_direct_eq_float',
+        'test_direct_eq_int',
+
+        'test_direct_ne_bool',
+        'test_direct_ne_float',
+        'test_direct_ne_int',
 
         'test_eq_class',
         'test_eq_frozenset',
