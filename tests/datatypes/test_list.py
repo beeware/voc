@@ -1,6 +1,7 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 from unittest import expectedFailure
 
+
 class ListTests(TranspileTestCase):
     def test_setattr(self):
         self.assertCodeExecution("""
@@ -181,9 +182,8 @@ class ListTests(TranspileTestCase):
             print(x[6:7])
             """)
 
-    
     # when step is 0
-    def test_slice_with_zero_step(self):    
+    def test_slice_with_zero_step(self):
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
             try:
@@ -192,7 +192,7 @@ class ListTests(TranspileTestCase):
                 print(err)
             """)
 
-    @expectedFailure 
+    @expectedFailure
     def test_slice_in_reverse(self):
         # Full slice with a negative step
         self.assertCodeExecution("""
@@ -205,13 +205,13 @@ class ListTests(TranspileTestCase):
             print (x[4::-2])
             """)
 
-        #Right bound slice with a negative step
+        # Right bound slice with a negative step
         self.assertCodeExecution("""
             x=[1,2,3,4,5]
             print (x[:4:-1])
             """)
 
-        #Right bound and left bound slice with a negative step
+        # Right bound and left bound slice with a negative step
         self.assertCodeExecution("""
             x=[1,2,3,4,5]
             print (x[1:4:-2])
