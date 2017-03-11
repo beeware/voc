@@ -814,9 +814,9 @@ public class Python {
         } else if (class_or_type_or_tuple == null) {
             throw new org.python.exceptions.TypeError("isinstance expected 2 arguments, got 1");
         } else if (class_or_type_or_tuple instanceof org.python.types.Tuple) {
-            return org.Python.issubclass(object.type(), class_or_type_or_tuple);
+            return org.Python.issubclass(org.Python.type(object, null, null), class_or_type_or_tuple);
         } else if (class_or_type_or_tuple instanceof org.python.types.Type) {
-            return org.Python.issubclass(object.type(), class_or_type_or_tuple);
+            return org.Python.issubclass(org.Python.type(object, null, null), class_or_type_or_tuple);
         } else {
             throw new org.python.exceptions.TypeError("isinstance() arg 2 must be a type or tuple of types");
         }
