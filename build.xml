@@ -22,6 +22,10 @@
     <ant antfile="build-java.xml" target="dist-testdaemon"/>
   </target>
 
+  <target name="checkstyle">
+    <ant antfile="build-java.xml" target="checkstyle"/>
+  </target>
+
   <target name="android">
     <ant antfile="build-android.xml" target="dist"/>
   </target>

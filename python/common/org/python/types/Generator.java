@@ -11,10 +11,10 @@ public class Generator extends org.python.types.Object implements org.python.Ite
     }
 
     public Generator(
-                java.lang.String name,
-                java.lang.reflect.Method expression,
-                java.util.Map<java.lang.String, org.python.Object> stack
-            ) {
+            java.lang.String name,
+            java.lang.reflect.Method expression,
+            java.util.Map<java.lang.String, org.python.Object> stack
+    ) {
         // System.out.println("GENERATOR: " + expression);
         // for (org.python.Object obj: stack) {
         //     System.out.println("     : " + obj);
@@ -35,7 +35,7 @@ public class Generator extends org.python.types.Object implements org.python.Ite
     }
 
     @org.python.Method(
-        __doc__ = "Return repr(self)."
+            __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
         // if (this.expression.getName().startswith("genexpr_"))
@@ -43,18 +43,18 @@ public class Generator extends org.python.types.Object implements org.python.Ite
     }
 
     @org.python.Method(
-        __doc__ = "Implement iter(self)."
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Iterable __iter__() {
         return this;
     }
 
     @org.python.Method(
-        __doc__ = "Implement next(self)."
+            __doc__ = "Implement next(self)."
     )
     public org.python.Object __next__() {
         try {
-            return (org.python.Object) this.expression.invoke(null, new java.lang.Object [] { this });
+            return (org.python.Object) this.expression.invoke(null, new java.lang.Object[]{this});
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.expression);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -76,7 +76,7 @@ public class Generator extends org.python.types.Object implements org.python.Ite
                 throw new org.python.exceptions.RuntimeError(message);
             }
         } finally {
-        //     System.out.println("INVOKE METHOD DONE");
+            //     System.out.println("INVOKE METHOD DONE");
         }
     }
 }

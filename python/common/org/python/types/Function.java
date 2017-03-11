@@ -1,6 +1,6 @@
 package org.python.types;
-import java.util.ArrayList;
 
+import java.util.ArrayList;
 
 public class Function extends org.python.types.Object implements org.python.Callable {
     public static final int CO_OPTIMIZED = 0x1;
@@ -10,13 +10,10 @@ public class Function extends org.python.types.Object implements org.python.Call
     public static final int CO_NESTED = 0x10;
     public static final int CO_GENERATOR = 0x20;
     public static final int CO_NOFREE = 0x40;
-
     org.python.types.Type.Origin origin;
-
     org.python.types.Str name;
     org.python.types.Code code;
     java.lang.reflect.Method method;
-
     java.util.Map<java.lang.String, org.python.Object> globals;
     java.util.List<org.python.Object> default_args;
     java.util.Map<java.lang.String, org.python.Object> default_kwargs;
@@ -37,7 +34,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         org.python.Object doc;
         try {
             org.python.types.Tuple consts = (org.python.types.Tuple) this.code.co_consts;
-            if (consts != null && ((org.python.types.Int)consts.count()).value != 0) {
+            if (consts != null && ((org.python.types.Int) consts.count()).value != 0) {
                 doc = consts.__getitem__(new org.python.types.Int(0));
             } else {
                 doc = org.python.types.NoneType.NONE;
@@ -57,10 +54,10 @@ public class Function extends org.python.types.Object implements org.python.Call
     // Constructor for builtins
     public Function(
             java.lang.reflect.Method method,
-            java.lang.String [] args,
-            java.lang.String [] default_args,
+            java.lang.String[] args,
+            java.lang.String[] default_args,
             java.lang.String vararg_name,
-            java.lang.String [] kwonlyargs,
+            java.lang.String[] kwonlyargs,
             java.lang.String kwargs_name) {
         super();
         this.origin = org.python.types.Type.Origin.BUILTIN;
@@ -75,12 +72,12 @@ public class Function extends org.python.types.Object implements org.python.Call
         long kwonly = 0;
         java.util.List<org.python.Object> varnames = new java.util.ArrayList<org.python.Object>();
 
-        for (java.lang.String arg: args) {
+        for (java.lang.String arg : args) {
             varnames.add(new org.python.types.Str(arg));
         }
 
         this.default_args = new java.util.ArrayList<org.python.Object>();
-        for (java.lang.String arg: default_args) {
+        for (java.lang.String arg : default_args) {
             this.default_args.add(null);
             varnames.add(new org.python.types.Str(arg));
         }
@@ -94,7 +91,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
 
         this.default_kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
-        for (java.lang.String arg: kwonlyargs) {
+        for (java.lang.String arg : kwonlyargs) {
             varnames.add(new org.python.types.Str(arg));
             this.default_kwargs.put(arg, null);
         }
@@ -105,21 +102,21 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
 
         this.code = new org.python.types.Code(
-            new org.python.types.Int(argcount),  // co_argcount
-            new org.python.types.Tuple(),  // co_cellvars
-            null,  // new org.python.types.Bytes(),  // co_code
-            null,  // new org.python.types.Tuple(),  // co_consts
-            null,  // new org.python.types.Str(),  // co_filename
-            null,  // new org.python.types.Int(),  // co_firstlineno
-            new org.python.types.Int(flags),  // co_flags
-            new org.python.types.Tuple(),  // co_freevars
-            new org.python.types.Int(kwonlyargs.length),  // co_kwonlyargcount
-            null,  // new org.python.types.Bytes(),  // co_lnotab
-            this.name,  // co_name
-            null,  // new org.python.types.Tuple(),  // co_names
-            null,  // new org.python.types.Int(),  // co_nlocals
-            null,  // new org.python.types.Int(),  // co_stacksize
-            new org.python.types.Tuple(varnames)  // co_varnames
+                new org.python.types.Int(argcount),  // co_argcount
+                new org.python.types.Tuple(),  // co_cellvars
+                null,  // new org.python.types.Bytes(),  // co_code
+                null,  // new org.python.types.Tuple(),  // co_consts
+                null,  // new org.python.types.Str(),  // co_filename
+                null,  // new org.python.types.Int(),  // co_firstlineno
+                new org.python.types.Int(flags),  // co_flags
+                new org.python.types.Tuple(),  // co_freevars
+                new org.python.types.Int(kwonlyargs.length),  // co_kwonlyargcount
+                null,  // new org.python.types.Bytes(),  // co_lnotab
+                this.name,  // co_name
+                null,  // new org.python.types.Tuple(),  // co_names
+                null,  // new org.python.types.Int(),  // co_nlocals
+                null,  // new org.python.types.Int(),  // co_stacksize
+                new org.python.types.Tuple(varnames)  // co_varnames
         );
         populateAttrs();
     }
@@ -154,14 +151,14 @@ public class Function extends org.python.types.Object implements org.python.Call
     }
 
     @org.python.Method(
-        __doc__ = "Return repr(self)."
+            __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
         return new org.python.types.Str(String.format("<%s %s at 0x%x>", this.typeName(), this.name, this.hashCode()));
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         // System.out.println("__GET__ on function " + this + " " + this.getClass() + " " + instance + " " + instance.getClass());
@@ -176,7 +173,7 @@ public class Function extends org.python.types.Object implements org.python.Call
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __bool__() {
         return new org.python.types.Bool(true);
@@ -216,11 +213,11 @@ public class Function extends org.python.types.Object implements org.python.Call
     private void throwUnexpectedPositionalArgumentsError(int numExpected, int numGot) {
         String posArgs = numExpected + " positional argument" + (numExpected == 1 ? "" : "s");
         String givenArgs = numGot + (numGot == 1 ? " was given" : " were given");
-        String mesg = this.name.value + "() takes " + posArgs  + " but " + givenArgs;
+        String mesg = this.name.value + "() takes " + posArgs + " but " + givenArgs;
         throw new org.python.exceptions.TypeError(mesg);
     }
 
-    java.lang.Object [] adjustArguments(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    java.lang.Object[] adjustArguments(org.python.Object instance, org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         // if (kwargs.size() > 0) {
         //     // TODO: This doesn't have to be so - we *could* introspect argument names.
         //     throw new org.python.exceptions.RuntimeError("Cannot use kwargs to invoke a native Java method.");
@@ -265,7 +262,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             return null;
         }
 
-        java.lang.Object [] adjusted = new java.lang.Object [n_args];
+        java.lang.Object[] adjusted = new java.lang.Object[n_args];
 
         // If this is an instance, the first argument will be self; we don't
         // need to pass this to the Java function.
@@ -313,7 +310,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             // System.out.println("Handle varargs");
             // Construct Python tuple object
             org.python.types.Tuple tuple = new org.python.types.Tuple(
-                java.util.Arrays.asList(java.util.Arrays.copyOfRange(args, argcount - first_arg, args.length)));
+                    java.util.Arrays.asList(java.util.Arrays.copyOfRange(args, argcount - first_arg, args.length)));
 
             adjusted[argcount] = tuple;
             // System.out.println("   dARG " + argcount + ": " + tuple);
@@ -346,11 +343,11 @@ public class Function extends org.python.types.Object implements org.python.Call
         return adjusted;
     }
 
-    public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return this.invoke(null, args, kwargs);
     }
 
-    public org.python.Object invoke(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object instance, org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // org.Python.debug("Function:", this.name);
             // org.Python.debug("       instance: ", instance);
@@ -370,7 +367,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             //     retval = gen
             // else:
 
-            java.lang.Object [] adjusted_args = adjustArguments(instance, args, kwargs);
+            java.lang.Object[] adjusted_args = adjustArguments(instance, args, kwargs);
 
             // if (adjusted_args != null) {
             //     for (java.lang.Object arg: adjusted_args) {
@@ -415,7 +412,7 @@ public class Function extends org.python.types.Object implements org.python.Call
                 throw new org.python.exceptions.RuntimeError(message);
             }
         } finally {
-        //     System.out.println("INVOKE METHOD DONE");
+            //     System.out.println("INVOKE METHOD DONE");
         }
     }
 }

@@ -9,7 +9,7 @@ public class FileNotFoundError extends org.python.exceptions.OSError {
         super(msg);
     }
 
-    public FileNotFoundError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public FileNotFoundError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

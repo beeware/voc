@@ -1,13 +1,11 @@
 package org.python.stdlib.sys;
 
-
 public class VersionInfo extends org.python.types.Object {
     org.python.Object major;
     org.python.Object minor;
     org.python.Object micro;
     org.python.Object releaselevel;
     org.python.Object serial;
-
     public static final java.lang.String PYTHON_TYPE_NAME = "sys.version_info";
 
     public VersionInfo(int major, int minor, int micro, int releaselevel, int serial) {
@@ -35,18 +33,18 @@ public class VersionInfo extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "Return repr(self)."
+            __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
         return new org.python.types.Str(
-            java.lang.String.format(
-                "sys.version_info(major=%x, minor=%x, micro=%x, releaselevel='%s', serial=%x)",
-                ((org.python.types.Int) (this.major)).value,
-                ((org.python.types.Int) (this.minor)).value,
-                ((org.python.types.Int) (this.micro)).value,
-                this.releaselevel.__str__().toString(),
-                ((org.python.types.Int) (this.serial)).value
-            )
+                java.lang.String.format(
+                        "sys.version_info(major=%x, minor=%x, micro=%x, releaselevel='%s', serial=%x)",
+                        ((org.python.types.Int) (this.major)).value,
+                        ((org.python.types.Int) (this.minor)).value,
+                        ((org.python.types.Int) (this.micro)).value,
+                        this.releaselevel.__str__().toString(),
+                        ((org.python.types.Int) (this.serial)).value
+                )
         );
     }
 

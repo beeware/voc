@@ -9,7 +9,7 @@ public class PendingDeprecationWarning extends org.python.exceptions.Warning {
         super(msg);
     }
 
-    public PendingDeprecationWarning(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public PendingDeprecationWarning(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

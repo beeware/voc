@@ -32,12 +32,12 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "tuple() -> empty tuple" +
-            "tuple(iterable) -> tuple initialized from iterable's items\n" +
-            "\n" +
-            "If the argument is a tuple, the return value is the same object.\n"
+            __doc__ = "tuple() -> empty tuple" +
+                    "tuple(iterable) -> tuple initialized from iterable's items\n" +
+                    "\n" +
+                    "If the argument is a tuple, the return value is the same object.\n"
     )
-    public Tuple(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public Tuple(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
     }
 
@@ -50,7 +50,7 @@ public class Tuple extends org.python.types.Object {
     // }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("(");
@@ -71,44 +71,43 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Str __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __pos__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary +: 'tuple'");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __neg__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary -: 'tuple'");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __invert__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'tuple'");
     }
 
-
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __bool__() {
         return new org.python.types.Bool(!this.value.isEmpty());
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -141,8 +140,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -175,8 +174,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -187,8 +186,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -221,8 +220,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -260,21 +259,21 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented.");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
@@ -311,7 +310,6 @@ public class Tuple extends org.python.types.Object {
                     }
                 }
                 return new org.python.types.Tuple(sliced);
-
             } else {
                 int idx = (int) ((org.python.types.Int) index).value;
                 if (idx < 0) {
@@ -331,48 +329,48 @@ public class Tuple extends org.python.types.Object {
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
-                    "tuple indices must be integers, not " + index.typeName()
+                        "tuple indices must be integers, not " + index.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
-                    "tuple indices must be integers or slices, not " + index.typeName()
+                        "tuple indices must be integers or slices, not " + index.typeName()
                 );
             }
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
         throw new org.python.exceptions.TypeError(
-            "'tuple' object does not support item assignment"
+                "'tuple' object does not support item assignment"
         );
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public void __delitem__(org.python.Object item) {
         throw new org.python.exceptions.TypeError("'tuple' object doesn't support item deletion");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Iterable __iter__() {
         return new org.python.types.Iterator(this);
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __contains__(org.python.Object item) {
         return new org.python.types.Bool(this.value.contains(item));
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -382,12 +380,12 @@ public class Tuple extends org.python.types.Object {
             return result;
         } else {
             throw new org.python.exceptions.TypeError(
-                String.format("can only concatenate tuple (not \"%s\") to tuple", org.Python.typeName(other.getClass())));
+                    String.format("can only concatenate tuple (not \"%s\") to tuple", org.Python.typeName(other.getClass())));
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -409,21 +407,21 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object count() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __iadd__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -431,22 +429,22 @@ public class Tuple extends org.python.types.Object {
             return this;
         } else {
             throw new org.python.exceptions.TypeError(
-                String.format("can only concatenate tuple (not \"%s\") to tuple", org.Python.typeName(other.getClass())));
+                    String.format("can only concatenate tuple (not \"%s\") to tuple", org.Python.typeName(other.getClass())));
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         throw new org.python.exceptions.NotImplementedError("tuple.index() has not been implemented.");
     }
+
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
 
-         throw new org.python.exceptions.TypeError("type tuple doesn't define __round__ method");
-
+        throw new org.python.exceptions.TypeError("type tuple doesn't define __round__ method");
     }
 }

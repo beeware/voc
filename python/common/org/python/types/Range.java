@@ -1,9 +1,7 @@
 package org.python.types;
 
-
 public class Range extends org.python.types.Object implements org.python.Iterable {
     private long index;
-
     private long start;
     private long stop;
     private long step;
@@ -47,7 +45,7 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     }
 
     @org.python.Method(
-        __doc__ = "Implement iter(self)."
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Object __repr__() {
         if (this.step == 1) {
@@ -58,21 +56,21 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __iadd__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'range' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-        __doc__ = "Implement iter(self)."
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Iterable __iter__() {
         return this;
     }
 
     @org.python.Method(
-        __doc__ = "Implement iter(self)."
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Object __next__() {
         if (this.step > 0 && this.index >= this.stop) {
@@ -87,21 +85,21 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     }
 
     @org.python.Method(
-        __doc__ = "Implement __getitem__(self).",
-        args = {"index"}
+            __doc__ = "Implement __getitem__(self).",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
                 org.python.types.Slice slice = (org.python.types.Slice) index;
                 return new org.python.types.Range(
-                    slice.start == null ? this.__dict__.get("start") : slice.start,
-                    slice.stop == null ? this.__dict__.get("stop") : slice.stop,
-                    slice.step == null ? this.__dict__.get("step") : slice.step
+                        slice.start == null ? this.__dict__.get("start") : slice.start,
+                        slice.stop == null ? this.__dict__.get("stop") : slice.stop,
+                        slice.step == null ? this.__dict__.get("step") : slice.step
                 );
             } else {
                 long len = ((org.python.types.Int) (this.__len__())).value;
-                long idx = ((org.python.types.Int)index).value;
+                long idx = ((org.python.types.Int) index).value;
 
                 if (idx < 0) {
                     idx = len + idx;
@@ -117,23 +115,23 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
                 throw new org.python.exceptions.TypeError("range indices must be integers");
             } else {
                 throw new org.python.exceptions.TypeError(
-                    "range indices must be integers or slices, not " + index.typeName()
+                        "range indices must be integers or slices, not " + index.typeName()
                 );
             }
         }
     }
 
     @org.python.Method(
-        __doc__ = "Implement __len__(self)."
+            __doc__ = "Implement __len__(self)."
     )
     public org.python.Object __len__() {
         if (this.step > 0 && this.start < this.stop) {
             return new org.python.types.Int(
-                1 + (this.stop - 1 - this.start) / this.step
+                    1 + (this.stop - 1 - this.start) / this.step
             );
         } else if (this.step < 0 && this.start > this.stop) {
             return new org.python.types.Int(
-                1 + (this.start - 1 - this.stop) / (-this.step)
+                    1 + (this.start - 1 - this.stop) / (-this.step)
             );
         } else {
             return new org.python.types.Int(0);
@@ -141,70 +139,70 @@ public class Range extends org.python.types.Object implements org.python.Iterabl
     }
 
     @org.python.Method(
-        __doc__ = "Implement __bool__(self)."
+            __doc__ = "Implement __bool__(self)."
     )
     public org.python.Object __bool__() {
         return new org.python.types.Bool(
-            ((org.python.types.Int) this.__len__()).value > 0
+                ((org.python.types.Int) this.__len__()).value > 0
         );
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __invert__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'range'");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __neg__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary -: 'range'");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __pos__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary +: 'range'");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;

@@ -9,7 +9,7 @@ public class KeyboardInterrupt extends org.python.exceptions.BaseException {
         super(msg);
     }
 
-    public KeyboardInterrupt(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public KeyboardInterrupt(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

@@ -9,7 +9,7 @@ public class ValueError extends org.python.exceptions.Exception {
         super(msg);
     }
 
-    public ValueError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public ValueError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

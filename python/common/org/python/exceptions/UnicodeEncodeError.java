@@ -9,7 +9,7 @@ public class UnicodeEncodeError extends org.python.exceptions.UnicodeError {
         super(msg);
     }
 
-    public UnicodeEncodeError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public UnicodeEncodeError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

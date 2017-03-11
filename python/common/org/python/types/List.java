@@ -42,26 +42,26 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "list() -> new empty list" +
-            "list(iterable) -> new list initialized from iterable's items\n",
-        default_args = {"iterable"}
+            __doc__ = "list() -> new empty list" +
+                    "list(iterable) -> new list initialized from iterable's items\n",
+            default_args = {"iterable"}
     )
-    public List(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public List(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super();
         if (args[0] == null) {
             this.value = new java.util.ArrayList<org.python.Object>();
         } else {
             if (args[0] instanceof org.python.types.List) {
                 this.value = new java.util.ArrayList<org.python.Object>(
-                    ((org.python.types.List) args[0]).value
+                        ((org.python.types.List) args[0]).value
                 );
             } else if (args[0] instanceof org.python.types.Set) {
                 this.value = new java.util.ArrayList<org.python.Object>(
-                    ((org.python.types.Set) args[0]).value
+                        ((org.python.types.Set) args[0]).value
                 );
             } else if (args[0] instanceof org.python.types.Tuple) {
                 this.value = new java.util.ArrayList<org.python.Object>(
-                    ((org.python.types.Tuple) args[0]).value
+                        ((org.python.types.Tuple) args[0]).value
                 );
             } else {
                 org.python.Iterable iterator = org.Python.iter(args[0]);
@@ -87,52 +87,51 @@ public class List extends org.python.types.Object {
     // }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __pos__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary +: 'list'");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __neg__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary -: 'list'");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __iadd__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
             this.value.addAll(((org.python.types.List) other).value);
             return this;
         } else if (other instanceof org.python.types.Tuple) {
-	    this.value.addAll(((org.python.types.Tuple) other).value);
-	    return this;
-	} else {
+            this.value.addAll(((org.python.types.Tuple) other).value);
+            return this;
+        } else {
             throw new org.python.exceptions.TypeError(
-                String.format("'%s' object is not iterable", Python.typeName(other.getClass())));
+                    String.format("'%s' object is not iterable", Python.typeName(other.getClass())));
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __invert__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'list'");
     }
 
-
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __bool__() {
         return new org.python.types.Bool(!this.value.isEmpty());
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("[");
@@ -150,15 +149,15 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Str __format__() {
         throw new org.python.exceptions.NotImplementedError("list.__format__() has not been implemented.");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -191,8 +190,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -225,8 +224,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -237,8 +236,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -271,8 +270,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -310,14 +309,14 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
@@ -354,7 +353,6 @@ public class List extends org.python.types.Object {
                     }
                 }
                 return new org.python.types.List(sliced);
-
             } else {
                 int idx = (int) ((org.python.types.Int) index).value;
                 if (idx < 0) {
@@ -374,18 +372,18 @@ public class List extends org.python.types.Object {
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + index.typeName()
+                        "list indices must be integers, not " + index.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers or slices, not " + index.typeName()
+                        "list indices must be integers or slices, not " + index.typeName()
                 );
             }
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
         try {
@@ -406,18 +404,18 @@ public class List extends org.python.types.Object {
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + index.typeName()
+                        "list indices must be integers, not " + index.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers or slices, not " + index.typeName()
+                        "list indices must be integers or slices, not " + index.typeName()
                 );
             }
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public void __delitem__(org.python.Object index) {
         try {
@@ -438,33 +436,33 @@ public class List extends org.python.types.Object {
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + index.typeName()
+                        "list indices must be integers, not " + index.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers or slices, not " + index.typeName()
+                        "list indices must be integers or slices, not " + index.typeName()
                 );
             }
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Iterable __iter__() {
         return new org.python.types.Iterator(this);
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Iterable __reversed__() {
         throw new org.python.exceptions.NotImplementedError("list.__reversed__() has not been implemented.");
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"item"}
+            __doc__ = "",
+            args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
         boolean found = false;
@@ -479,7 +477,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -489,12 +487,12 @@ public class List extends org.python.types.Object {
             return result;
         } else {
             throw new org.python.exceptions.TypeError(
-                String.format("can only concatenate list (not \"%s\") to list", Python.typeName(other.getClass())));
+                    String.format("can only concatenate list (not \"%s\") to list", Python.typeName(other.getClass())));
         }
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -530,12 +528,10 @@ public class List extends org.python.types.Object {
             boolean bool = ((org.python.types.Bool) other).value;
             if (bool) {
                 return this;
-            }
-            else {
+            } else {
                 return new org.python.types.List();
             }
-        }
-        else {
+        } else {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
         }
     }
@@ -548,8 +544,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"item"}
+            __doc__ = "",
+            args = {"item"}
     )
     public org.python.Object append(org.python.Object item) {
         this.value.add(item);
@@ -557,7 +553,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object clear() {
         this.value.clear();
@@ -565,15 +561,15 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "L.copy() -> list -- a shallow copy of L"
+            __doc__ = "L.copy() -> list -- a shallow copy of L"
     )
     public org.python.Object copy() {
         return new org.python.types.List(new java.util.ArrayList<org.python.Object>(this.value));
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"other"}
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object count(org.python.Object other) {
         int count = 0;
@@ -587,7 +583,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object extend(org.python.Object other) {
         return org.python.types.NoneType.NONE;
@@ -601,30 +597,30 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "L.index(value, [start, [stop]]) -> integer -- return first index of value.\nRaises ValueError if the value is not present.",
-        args = {"item"},
-        default_args = {"start", "end"}
+            __doc__ = "L.index(value, [start, [stop]]) -> integer -- return first index of value.\nRaises ValueError if the value is not present.",
+            args = {"item"},
+            default_args = {"start", "end"}
     )
     public org.python.Object index(org.python.Object item, org.python.Object start, org.python.Object end) {
         if (start != null && !(start instanceof org.python.types.Int)) {
             if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + start.typeName()
+                        "list indices must be integers, not " + start.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers or slices, not " + start.typeName()
+                        "list indices must be integers or slices, not " + start.typeName()
                 );
             }
         }
         if (end != null && !(end instanceof org.python.types.Int)) {
             if (org.Python.VERSION < 0x03050000) {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers, not " + end.typeName()
+                        "list indices must be integers, not " + end.typeName()
                 );
             } else {
                 throw new org.python.exceptions.TypeError(
-                    "list indices must be integers or slices, not " + end.typeName()
+                        "list indices must be integers or slices, not " + end.typeName()
                 );
             }
         }
@@ -643,12 +639,12 @@ public class List extends org.python.types.Object {
                 return new org.python.types.Int(i);
             }
         }
-        throw new org.python.exceptions.ValueError(String.format("%d is not in list",  ((org.python.types.Int)item).value));
+        throw new org.python.exceptions.ValueError(String.format("%d is not in list", ((org.python.types.Int) item).value));
     }
 
     @org.python.Method(
-        __doc__ = "L.pop([index]) -> item -- remove and return item at index (default last).",
-        default_args = {"item"}
+            __doc__ = "L.pop([index]) -> item -- remove and return item at index (default last).",
+            default_args = {"item"}
     )
     public org.python.Object pop(org.python.Object item) {
         int index = this.value.size() - 1;
@@ -667,11 +663,11 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"item"}
+            __doc__ = "",
+            args = {"item"}
     )
     public org.python.Object remove(org.python.Object item) {
-        for(int i = 0; i < this.value.size(); i++) {
+        for (int i = 0; i < this.value.size(); i++) {
             if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
                     item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
                 this.value.remove(i);
@@ -682,9 +678,9 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*",
-        args = {},
-        default_args = {"key", "reverse"}
+            __doc__ = "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*",
+            args = {},
+            default_args = {"key", "reverse"}
     )
     public org.python.Object sort(final org.python.Object key, org.python.Object reverse) {
         if (key == null && reverse == null) {
@@ -692,7 +688,7 @@ public class List extends org.python.types.Object {
         } else {
             // needs to be final in order to use inside the comparator
             final boolean shouldReverse = reverse == null ? false :
-                ((org.python.types.Bool) reverse.__bool__()).value;
+                    ((org.python.types.Bool) reverse.__bool__()).value;
 
             Collections.sort(this.value, new Comparator<org.python.Object>() {
                 @Override
@@ -711,7 +707,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         throw new org.python.exceptions.TypeError("type list doesn't define __round__ method");

@@ -1,6 +1,5 @@
 package org.python.types;
 
-
 class PlaceholderType extends org.python.types.Type {
     private java.util.ArrayList<org.python.Object> instances = new java.util.ArrayList<org.python.Object>();
 
@@ -13,7 +12,7 @@ class PlaceholderType extends org.python.types.Type {
     }
 
     public void resolve(org.python.types.Type python_type) {
-        for (org.python.Object obj: this.instances) {
+        for (org.python.Object obj : this.instances) {
             obj.__new__(python_type);
         }
     }

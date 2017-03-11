@@ -9,7 +9,7 @@ public class SyntaxWarning extends org.python.exceptions.Warning {
         super(msg);
     }
 
-    public SyntaxWarning(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public SyntaxWarning(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }
