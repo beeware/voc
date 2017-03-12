@@ -107,6 +107,28 @@ class StrTests(TranspileTestCase):
             print(s.startswith(suffix,3))
             """)
 
+    def test_split(self) :
+        self.assertCodeExecution("""
+            s = "this is just a test to test."
+            print(s.split())
+            print(s.split("i"))
+            print(s.split(maxsplit=1))
+            print(s.split("i",maxsplit=2))
+            print(s.split("k"))
+            print("".split())
+            try:
+                print("test test test".split(5))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_swapcase(self) :
+        self.assertCodeExecution("""
+            s = "This is A test. Thanks."
+            print(s.swapcase())
+            print("".swapcase())
+            """)
+
     def test_getattr(self):
         self.assertCodeExecution("""
             x = "Hello, world"

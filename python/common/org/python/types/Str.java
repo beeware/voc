@@ -973,7 +973,62 @@ public class Str extends org.python.types.Object {
             default_args = {"sep", "maxsplit"}
     )
     public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
-        throw new org.python.exceptions.NotImplementedError("split() has not been implemented.");
+        if (this.value.isEmpty()) {
+            if (sep == null) {
+                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
+                    return new org.python.types.List();
+                }
+                throw new org.python.exceptions.TypeError("'" + maxsplit.typeName()+ "' cannot be interpreted as an integer");
+            }
+            else if (sep instanceof Str) {
+                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
+                    return new org.python.types.List();
+                }
+                throw new org.python.exceptions.TypeError("'" + maxsplit.typeName()+ "' cannot be interpreted as an integer");
+            }
+            throw new org.python.exceptions.TypeError("Can't convert '" + sep.typeName()+ "' object to str implicitly");
+        }
+        if (sep == null) {
+            if (maxsplit == null) {
+                String[] result = this.value.toString().split(" ");
+                org.python.types.List result_list = new org.python.types.List();
+                for (String w:result) {
+                    result_list.append(new Str(w));
+                }
+                return result_list;
+            }
+            else if (maxsplit instanceof org.python.types.Int) {
+                int number = Integer.parseInt(maxsplit.toString());
+                String[] result = this.value.toString().split(" ",number+1);
+                org.python.types.List result_list = new org.python.types.List();
+                for (String w:result) {
+                    result_list.append(new Str(w));
+                }
+                return result_list;
+            }
+            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName()+ "' cannot be interpreted as an integer");
+        }
+        else if (sep instanceof Str) {
+            if (maxsplit == null) {
+                String[] result = this.value.toString().split(((Str) sep).toString());
+                org.python.types.List result_list = new org.python.types.List();
+                for (String w:result) {
+                    result_list.append(new Str(w));
+                }
+                return result_list;
+            }
+            else if (maxsplit instanceof org.python.types.Int) {
+                int number = Integer.parseInt(maxsplit.toString());
+                String[] result = this.value.toString().split(((Str) sep).toString(),number+1);
+                org.python.types.List result_list = new org.python.types.List();
+                for (String w:result) {
+                    result_list.append(new Str(w));
+                }
+                return result_list;
+            }
+            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName()+ "' cannot be interpreted as an integer");
+        }
+        throw new org.python.exceptions.TypeError("Can't convert '" + sep.typeName()+ "' object to str implicitly");
     }
 
     @org.python.Method(
@@ -1011,10 +1066,24 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.swapcase() -> Swap the case of all characters in the given string."
     )
     public org.python.Object swapcase() {
-        throw new org.python.exceptions.NotImplementedError("swapcase() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new Str(this.value);
+        }
+        String swapcase = "";
+        int c = 0;
+        while (c < this.value.length()) {
+            if (Character.isUpperCase(this.value.charAt(c))) {
+                swapcase += Character.toString(Character.toLowerCase(this.value.charAt(c)));
+            }
+            else {
+                swapcase += Character.toString(Character.toUpperCase(this.value.charAt(c)));
+            }
+            c++;
+        }
+        return new Str(swapcase);
     }
 
     @org.python.Method(
