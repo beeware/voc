@@ -913,8 +913,13 @@ public class Str extends org.python.types.Object {
         String[] split = this.value.split(sepStr, 2);
         java.util.List<org.python.Object> tuple = new java.util.ArrayList<org.python.Object>();
         tuple.add(new org.python.types.Str(split[0]));
-        tuple.add(sep);
-        tuple.add(new org.python.types.Str(split[1]));
+        if (split.length != 1) {
+            tuple.add(sep);
+            tuple.add(new org.python.types.Str(split[1]));
+        } else {
+            tuple.add(new org.python.types.Str(""));
+            tuple.add(new org.python.types.Str(""));
+        }
         return new org.python.types.Tuple(tuple);
     }
 

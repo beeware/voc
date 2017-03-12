@@ -363,6 +363,7 @@ class StrTests(TranspileTestCase):
             print(s.partition("o"))
             print(s.partition("f"))
             print(s.partition("r"))
+            print(s.partition("x"))
             try:
                 print(s.partition(""))
             except ValueError as err:
