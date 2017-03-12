@@ -336,10 +336,10 @@ public class List extends org.python.types.Object {
 
                     if (step < 0) {
                         long start;
-                        if (slice.start != null){
+                        if (slice.start != null) {
                             start = Math.min(slice.start.value, this.value.size());
                         } else {
-                            start =this.value.size()-1;
+                            start = this.value.size() - 1;
                         }
 
                         long stop;
