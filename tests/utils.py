@@ -672,7 +672,7 @@ SAMPLE_DATA = {
         ],
     'set': [
             'set()',
-            '{1, 2.3456, "another"}',
+            'set({1, 2.3456, "another"})',
         ],
     'slice': [
             'slice(0)',
