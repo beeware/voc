@@ -107,7 +107,7 @@ class StrTests(TranspileTestCase):
             print(s.startswith(suffix,3))
             """)
 
-    def test_split(self) :
+    def test_split(self):
         self.assertCodeExecution("""
             s = "this is just a test to test."
             print(s.split())
@@ -122,7 +122,7 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
-    def test_swapcase(self) :
+    def test_swapcase(self):
         self.assertCodeExecution("""
             s = "This is A test. Thanks."
             print(s.swapcase())
