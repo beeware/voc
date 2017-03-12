@@ -308,7 +308,8 @@ public class Dict extends org.python.types.Object {
     )
     public org.python.Iterable __iter__() {
         // FIXME: Once this is implemented, update org.Python.addToKwargs()
-        return new org.python.types.Iterator(new org.python.types.List(new java.util.ArrayList<org.python.Object>(this.value.keySet())));
+        // FIXME: it should return dict_iter not only iter
+        return new org.python.types.List(new java.util.ArrayList<org.python.Object>(this.value.keySet())).__iter__();
     }
 
     @org.python.Method(
@@ -355,7 +356,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
             args = {"iterable"},
             default_args = {"value"}
     )
@@ -363,7 +364,7 @@ public class Dict extends org.python.types.Object {
         org.python.types.Dict result = new org.python.types.Dict();
         try {
             org.python.Iterable iter  = iterable.__iter__();
-            if (value == null){
+            if (value == null) {
                 value = org.python.types.NoneType.NONE;
             }
             while (true) {
@@ -371,7 +372,7 @@ public class Dict extends org.python.types.Object {
             }
         } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
-        } catch (org.python.exceptions.StopIteration e) {}
+        } catch (org.python.exceptions.StopIteration e) { }
 
         return result;
     }
