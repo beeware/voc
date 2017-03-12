@@ -581,7 +581,6 @@ public class Str extends org.python.types.Object {
             end = new Int(this.value.length());
         }
         String original = this.__getitem__(new Slice(start, end)).toString();
-
         return new Int((original.length() - original.replace(sub_str, "").length()) / sub_str.length());
     }
 
@@ -594,10 +593,22 @@ public class Str extends org.python.types.Object {
 
     @org.python.Method(
             __doc__ = "S.endswith(suffix[, start[, end]]) -> bool",
-            args = {"item"}
+            args = {"suffix"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object endswith(org.python.Object suffix) {
-        return new org.python.types.Bool(this.value.endsWith(suffix.toString()));
+    public org.python.Object endswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
+        if (suffix instanceof org.python.types.Str) {
+            if (start == null) {
+                start = new Int(0);
+            }
+            if (end == null) {
+                end = new Int(this.value.length());
+            }
+            String original = this.__getitem__(new Slice(start, end)).toString();
+            boolean result = original.endsWith(((Str) suffix).toString());
+            return new org.python.types.Bool(result);
+        }
+        throw new org.python.exceptions.TypeError("endswith first arg must be str, not " + suffix.typeName());
     }
 
     @org.python.Method(
@@ -973,10 +984,23 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.startsswith(suffix[, start[, end]]) -> bool",
+            args = {"suffix"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object startswith() {
-        throw new org.python.exceptions.NotImplementedError("startswith() has not been implemented.");
+    public org.python.Object startswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
+        if (suffix instanceof org.python.types.Str) {
+            if (start == null) {
+                start = new Int(0);
+            }
+            if (end == null) {
+                end = new Int(this.value.length());
+            }
+            String original = this.__getitem__(new Slice(start, end)).toString();
+            boolean result = original.startsWith(((Str) suffix).toString());
+            return new org.python.types.Bool(result);
+        }
+        throw new org.python.exceptions.TypeError("startswith first arg must be str, not " + suffix.typeName());
     }
 
     @org.python.Method(

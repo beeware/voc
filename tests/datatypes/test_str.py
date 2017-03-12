@@ -69,13 +69,42 @@ class StrTests(TranspileTestCase):
             """)
 
         self.assertCodeExecution("""
-            print('abracadabra'.endswith('abra'))
+            print('abracadabra'.endswith('abra',0,5))
             """)
 
         self.assertCodeExecution("""
             s = "ABRACADABRA"
             suffix = ""
-            print(s.endswith(suffix))
+            print(s.endswith(suffix,3))
+            """)
+
+    def test_startswith(self):
+        self.assertCodeExecution("""
+            s = "abracadabra"
+            suffix = "abra"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            s = "abracadabra"
+            suffix = "ABRA"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            s = "ABRACADABRA"
+            suffix = "abra"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            print('abracadabra'.startswith('abra',0,5))
+            """)
+
+        self.assertCodeExecution("""
+            s = "ABRACADABRA"
+            suffix = ""
+            print(s.startswith(suffix,3))
             """)
 
     def test_getattr(self):
