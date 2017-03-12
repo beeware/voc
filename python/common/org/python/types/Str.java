@@ -913,10 +913,25 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.partition(sep) -> tuple",
+            args = {"sep"}
     )
-    public org.python.Object partition() {
-        throw new org.python.exceptions.NotImplementedError("partition() has not been implemented.");
+    public org.python.Object partition(org.python.Object sep) {
+        String sepStr = ((org.python.types.Str) sep).value;
+        if (sepStr.equals("")) {
+            throw new org.python.exceptions.ValueError("empty separator");
+        }
+        String[] split = this.value.split(sepStr, 2);
+        java.util.List<org.python.Object> tuple = new java.util.ArrayList<org.python.Object>();
+        tuple.add(new org.python.types.Str(split[0]));
+        if (split.length != 1) {
+            tuple.add(sep);
+            tuple.add(new org.python.types.Str(split[1]));
+        } else {
+            tuple.add(new org.python.types.Str(""));
+            tuple.add(new org.python.types.Str(""));
+        }
+        return new org.python.types.Tuple(tuple);
     }
 
     @org.python.Method(
