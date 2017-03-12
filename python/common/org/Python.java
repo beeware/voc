@@ -602,11 +602,44 @@ public class Python {
                     "iteration.  The enumerate object yields pairs containing a count (from\n" +
                     "start, which defaults to zero) and a value yielded by the iterable argument.\n" +
                     "enumerate is useful for obtaining an indexed list:\n" +
-                    "       (0, seq[0]), (1, seq[1]), (2, seq[2]), ...\n"
+                    "       (0, seq[0]), (1, seq[1]), (2, seq[2]), ...\n",
+           args = {"items"},
+           default_args = {"start"}
     )
-    public static org.python.Iterable enumerate() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'enumerate' not implemented");
+    //public static org.python.Iterable enumerate(org.python.Iterable items, org.python.types.Int start) {
+   public static org.python.Iterable enumerate(org.python.Object items,/*org.python.types.List items,*/ org.python.Object start) {
+    	try{
+    		if(start==null)
+    			start=new org.python.types.Int(0);
+    		else {
+    			if(!(start instanceof org.python.types.Int))
+    				throw new org.python.exceptions.TypeError("integer argument expected as 'start' , got " + start.typeName() + "");
+    				
+    			}
+    		org.python.Object increment= new org.python.types.Int(1);
+    		org.python.Iterable iter = org.Python.iter(items);
+    		java.util.List enumList= new java.util.ArrayList();
+    		while(true){
+    			try{
+    				java.util.List tuple= new java.util.ArrayList();
+    				tuple.add(start);
+    				tuple.add(iter.__next__());
+    				org.python.types.Tuple pythonTuple= new org.python.types.Tuple(tuple);
+    				enumList.add(pythonTuple);
+    				start=start.__add__(increment);
+    			}
+    			catch(org.python.exceptions.StopIteration e){
+    				break;
+    			}
+    		}
+    	
+    		return org.Python.iter(new org.python.types.List(enumList));
+    	    }
+		catch(org.python.exceptions.AttributeError e){
+			 throw new org.python.exceptions.TypeError("'" + items.typeName() + "' object is not iterable");
+		}
     }
+
 
     @org.python.Method(
             __doc__ = "eval(source[, globals[, locals]]) -> value" +

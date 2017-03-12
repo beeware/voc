@@ -2,7 +2,28 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class EnumerateTests(TranspileTestCase):
-    pass
+      def test_enumerate(self):
+        self.assertCodeExecution("""
+            lst=['a','b','c','d','e']
+            print(list(enumerate(lst)))
+            """)
+
+        self.assertCodeExecution("""
+            lst=['a','b','c','d','e']
+            print(list(enumerate(lst,start=-40)))
+            """)
+
+        self.assertCodeExecution("""
+            lst=['a','b','c','d','e']
+            print(list(enumerate(lst,start=46)))
+            """)
+
+        self.assertCodeExecution("""
+            lst=[('a',4),'b','c',10,'e']
+            print(list(enumerate(lst)))
+            """)
+            
+    #pass
 
 
 class BuiltinEnumerateFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
