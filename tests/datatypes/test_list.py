@@ -1,5 +1,4 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
-from unittest import expectedFailure
 
 
 class ListTests(TranspileTestCase):
@@ -192,7 +191,6 @@ class ListTests(TranspileTestCase):
                 print(err)
             """)
 
-    @expectedFailure
     def test_slice_in_reverse(self):
         # Full slice with a negative step
         self.assertCodeExecution("""
