@@ -985,7 +985,7 @@ public class Str extends org.python.types.Object {
                 }
                 throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' cannot be interpreted as an integer");
             }
-            throw new org.python.exceptions.TypeError("Can't convert '" + sep.typeName() + "' object to str implicitly");
+            throw new org.python.exceptions.TypeError("must be str or None, not " + sep.typeName());
         }
         if (sep == null) {
             if (maxsplit == null) {
@@ -1024,7 +1024,7 @@ public class Str extends org.python.types.Object {
             }
             throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' cannot be interpreted as an integer");
         }
-        throw new org.python.exceptions.TypeError("Can't convert '" + sep.typeName() + "' object to str implicitly");
+        throw new org.python.exceptions.TypeError("must be str or None, not " + sep.typeName());
     }
 
     @org.python.Method(
