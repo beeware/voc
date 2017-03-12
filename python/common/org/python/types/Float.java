@@ -267,6 +267,8 @@ public class Float extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             double other_val = ((org.python.types.Float) other).value;
             return new org.python.types.Float(this.value + other_val);
+        } else if (other instanceof org.python.types.Complex) {
+            return ((org.python.types.Complex) other).__add__(this);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'float' and '" + other.typeName() + "'");
     }
