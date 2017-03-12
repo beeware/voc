@@ -343,6 +343,13 @@ class StrTests(TranspileTestCase):
             print(s.title())
         """)
 
+    def test_swapcase(self):
+        self.assertCodeExecution("""
+            words = ['PyBee', 'Voc', 'fOo', 'Bar', 'BaZ', 'ABRACADABRA']
+            for word in words:
+                print(word.swapcase())
+        """)
+                
     def test_len(self):
         self.assertCodeExecution("""
             s = ' foo  bar    baz '
