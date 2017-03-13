@@ -1,5 +1,7 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
+from unittest import expectedFailure
+
 
 class DictTests(TranspileTestCase):
     def test_setattr(self):
@@ -233,32 +235,22 @@ class DictTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = {42: 'Babel'}
             y = x.copy()
+
             print(y)
-            """)
-
-        self.assertCodeExecution("""
-            x = {42: 'Babel'}
-            y = x.copy()
             print(x == y)
-            """)
-
-        self.assertCodeExecution("""
-            x = {42: 'Babel'}
-            y = x.copy()
             print(x is not y)
             """)
 
         self.assertCodeExecution("""
-            x = {42: 'Babel'}
+            x = {'42': 'Babel'}
             y = x.copy()
-            y['42'] = 'Babel'
-            print(x == y)
-            """)
 
-        self.assertCodeExecution("""
-            x = {'key': {42: 'Babel'}, 42: 'Babel'}
-            y = x.copy()
-            print(x['key'] is y['key'])
+            print(x['42'] is y['42'])
+
+            x['42'] = 'somevalue'
+            print(x['42'] == y['42'])
+
+            print(x == y)
             """)
 
     def test_fromkeys(self):
@@ -269,15 +261,21 @@ class DictTests(TranspileTestCase):
 
         # non-iterable error test
         self.assertCodeExecution("""
-            keys = [1, 2]
+            keys = 1
             value = 2
-            print({}.fromkeys(keys, value))
+            try:
+                print({}.fromkeys(keys, value))
+            except TypeError as err:
+                print(err)
             """)
 
+        # empty iterable and orginal dict test
         self.assertCodeExecution("""
-            keys = (1, 2)
+            keys = ()
             value = 5
-            print({}.fromkeys(keys, 5))
+            dt = {}
+            print(dt.fromkeys(keys, value))
+            print(dt)
             """)
 
         # non-hashable error on key test
@@ -285,6 +283,15 @@ class DictTests(TranspileTestCase):
             keys = [[1], 2]
             try:
                 print({}.fromkeys(keys))
+            except TypeError as err:
+                print(err)
+            """)
+
+    @expectedFailure
+    def test_fromkeys_missing_iterable(self):
+        self.assertCodeExecution("""
+            try:
+                print({}.fromkeys())
             except TypeError as err:
                 print(err)
             """)
