@@ -718,7 +718,18 @@ public class Str extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object isalpha() {
-        return new org.python.types.Bool(this.value.matches("[a-zA-Z]+"));
+        int c = 0;
+        java.lang.String checkString = this.value.toUpperCase();
+        char currentCharacter;
+        while (c < (checkString.length()-1)) {
+            currentCharacter = checkString.charAt(c);
+            int ascii = (int) currentCharacter;
+            if (ascii<65 || ascii>90) {
+                return new org.python.types.Bool(false);
+            }
+            c++;
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
