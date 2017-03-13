@@ -189,7 +189,7 @@ class StrTests(TranspileTestCase):
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
                 print(s.capitalize())
                 print(s.lower())
-                # print(s.swap())
+                print(s.swapcase())
                 print(s.title())
                 print(s.upper())
             """)
