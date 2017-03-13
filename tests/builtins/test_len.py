@@ -8,6 +8,4 @@ class LenTests(TranspileTestCase):
 class BuiltinLenFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["len"]
 
-    not_implemented = [
-        'test_frozenset',
-    ]
+    not_implemented = []

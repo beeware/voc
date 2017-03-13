@@ -647,6 +647,9 @@ SAMPLE_DATA = {
     'frozenset': [
             'frozenset()',
             'frozenset({1, 2.3456, "another"})',
+            'frozenset([1, 2.3456, "another"])',
+            'frozenset((1, 2.3456, "another"))',
+            'frozenset(iter([1, 2.3456, "another"]))',
         ],
     'int': [
             '3',
