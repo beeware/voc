@@ -718,7 +718,7 @@ public class Str extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object isalpha() {
-        throw new org.python.exceptions.NotImplementedError("isalpha() has not been implemented.");
+        return new org.python.types.Bool(this.value.matches("[a-zA-Z]+"));
     }
 
     @org.python.Method(
