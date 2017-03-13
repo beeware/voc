@@ -719,12 +719,11 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isalpha() {
         int c = 0;
-        java.lang.String checkString = this.value.toUpperCase();
+        java.lang.String checkString = this.value;
         char currentCharacter;
         while (c < (checkString.length()-1)) {
             currentCharacter = checkString.charAt(c);
-            int ascii = (int) currentCharacter;
-            if (ascii<65 || ascii>90) {
+            if (!Character.isLetter(currentCharacter)) {
                 return new org.python.types.Bool(false);
             }
             c++;
