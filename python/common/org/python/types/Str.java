@@ -1026,10 +1026,23 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.swapcase() -> str\n\nSwap the case of all characters in the given string."
     )
     public org.python.Object swapcase() {
-        throw new org.python.exceptions.NotImplementedError("swapcase() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new Str(this.value);
+        }
+        String swapcase = "";
+        int c = 0;
+        while (c < this.value.length()) {
+            if (Character.isUpperCase(this.value.charAt(c))) {
+                swapcase += Character.toString(Character.toLowerCase(this.value.charAt(c)));
+            } else {
+                swapcase += Character.toString(Character.toUpperCase(this.value.charAt(c)));
+            }
+            c++;
+        }
+        return new Str(swapcase);
     }
 
     @org.python.Method(
