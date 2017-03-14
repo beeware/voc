@@ -935,11 +935,60 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+        __doc__ = "replace",
+        args = {"oldString","replacedBy"},
+        default_args={"howManyTimes"}
     )
-    public org.python.Object replace() {
-        throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
+    public org.python.Object replace(org.python.Object oldString,org.python.Object replacedBy,org.python.Object howManyTimes) {
+        String from = ((org.python.types.Str) oldString).value;
+        String to = ((org.python.types.Str) replacedBy).value;
+        int num=0,flag;
+        if ((this.value == null) || (this.value.length() == 0) || (from == null) || (from.length() == 0))
+        {
+            return new org.python.types.Str(this.value);
+        }
+
+        if (to == null)
+        {
+            to = "";
+        }
+        if(howManyTimes!=null)
+        {
+           num = (int)((org.python.types.Int) howManyTimes).value;
+           flag=1;
+        }
+        else
+        {
+            flag=0;
+        }
+
+
+        String result = value;
+        int lastIndex = 0;
+        int index = value.indexOf(from);
+        int counter=0;
+
+        if (index != -1)
+        {
+            StringBuffer buffer = new StringBuffer();
+
+            while (index != -1)
+            {
+                if(counter==num && flag==1)
+                    break;
+                buffer.append(value.substring(lastIndex, index)).append(to);
+                counter++;
+                lastIndex = index + from.length();
+                index = value.indexOf(from, lastIndex);
+            }
+
+            buffer.append(value.substring(lastIndex));
+            result = buffer.toString();
+        }
+
+       return new org.python.types.Str(result);
     }
+
 
     @org.python.Method(
             __doc__ = ""
