@@ -9,7 +9,7 @@ public class TypeError extends org.python.exceptions.Exception {
         super(msg);
     }
 
-    public TypeError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public TypeError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

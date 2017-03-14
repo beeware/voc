@@ -1,8 +1,7 @@
 package python.types;
 
-
 @org.python.Module(
-    __doc__ = "\nDefine names for built-in types that aren't directly accessible as a builtin.\n"
+        __doc__ = "\nDefine names for built-in types that aren't directly accessible as a builtin.\n"
 )
 public class __init__ extends org.python.types.Module {
     static {
@@ -30,7 +29,6 @@ public class __init__ extends org.python.types.Module {
 
     // @org.python.Attribute
     // public static org.python.Object BuiltinMethodType;
-
     @org.python.Attribute
     public static org.python.Object CodeType;
 
@@ -39,10 +37,8 @@ public class __init__ extends org.python.types.Module {
 
     // @org.python.Attribute
     // public static org.python.Object FrameType;
-
     @org.python.Attribute
     public static org.python.Object FunctionType;
-
     @org.python.Attribute
     public static org.python.Object GeneratorType;
 
@@ -57,10 +53,8 @@ public class __init__ extends org.python.types.Module {
 
     // @org.python.Attribute
     // public static org.python.Object MemberDescriptorType;
-
     @org.python.Attribute
     public static org.python.Object MethodType;
-
     @org.python.Attribute
     public static org.python.Object ModuleType;
 
@@ -72,44 +66,37 @@ public class __init__ extends org.python.types.Module {
 
     // @org.python.Attribute
     // public static org.python.Object __builtins__;
-
     @org.python.Attribute
     public static org.python.Object __cached__ = org.python.types.NoneType.NONE;  // TODO
-
     @org.python.Attribute
     public static org.python.Object __file__ = new org.python.types.Str("python/common/python/types/__init__.java");
-
     @org.python.Attribute
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
-
     @org.python.Attribute
     public static org.python.Object __name__ = new org.python.types.Str("types");
-
     @org.python.Attribute
     public static org.python.Object __package__ = new org.python.types.Str("");
-
     @org.python.Attribute
     public static org.python.Object __spec__ = org.python.types.NoneType.NONE;  // TODO
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public static org.python.Object _calculate_meta() {
         throw new org.python.exceptions.NotImplementedError("types._calculate_meta() has not been implemented.");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public static org.python.Object new_class() {
         throw new org.python.exceptions.NotImplementedError("types.new_class() has not been implemented.");
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public static org.python.Object prepare_class() {
         throw new org.python.exceptions.NotImplementedError("types.prepare_class() has not been implemented.");
     }
-
 }

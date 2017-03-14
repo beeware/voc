@@ -9,7 +9,7 @@ public class IndentationError extends org.python.exceptions.SyntaxError {
         super(msg);
     }
 
-    public IndentationError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public IndentationError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

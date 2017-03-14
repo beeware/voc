@@ -1,6 +1,5 @@
 package org.python.types;
 
-
 public class Slice extends org.python.types.Object {
     org.python.types.Int start;
     org.python.types.Int stop;
@@ -35,13 +34,56 @@ public class Slice extends org.python.types.Object {
         }
 
         if (step instanceof org.python.types.Int) {
-            this.__dict__.put("step", step);
             this.step = (org.python.types.Int) step;
+            if (this.step.value == 0) {
+                throw new org.python.exceptions.ValueError("slice step cannot be zero");
+            } else {
+                this.__dict__.put("step", step);
+            }
         } else if (step instanceof org.python.types.NoneType) {
             this.__dict__.put("step", step);
         } else {
             throw new org.python.exceptions.TypeError("'" + step.typeName() + "' object cannot be interpreted as an integer");
         }
+    }
 
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __ge__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __gt__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __eq__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __lt__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __le__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 }

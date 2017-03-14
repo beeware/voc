@@ -11,6 +11,31 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_iscase(self):
+        self.assertCodeExecution("""
+            for s in ['hello, World!', 'HELLO, WORLD.', 'ello? world', '']:
+                print(s.islower())
+                print(s.isupper())
+            """)
+
+    def test_isdigit(self):
+        self.assertCodeExecution("""
+            for s in ['112358132134', '3.14159', '12312344df', '']:
+                print(s.isdigit())
+            """)
+
+    def test_isspace(self):
+        self.assertCodeExecution("""
+            for s in ['''  \t \r''', ' ', '\t\tnope\t\t', '']:
+                print(s.isspace())
+            """)
+
+    def test_istitle(self):
+        self.assertCodeExecution("""
+            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '']:
+                print(s.istitle())
+            """)
+
     def test_join(self):
         self.assertCodeExecution("""
             print(','.join(None))
@@ -44,13 +69,42 @@ class StrTests(TranspileTestCase):
             """)
 
         self.assertCodeExecution("""
-            print('abracadabra'.endswith('abra'))
+            print('abracadabra'.endswith('abra',0,5))
             """)
 
         self.assertCodeExecution("""
             s = "ABRACADABRA"
             suffix = ""
-            print(s.endswith(suffix))
+            print(s.endswith(suffix,3))
+            """)
+
+    def test_startswith(self):
+        self.assertCodeExecution("""
+            s = "abracadabra"
+            suffix = "abra"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            s = "abracadabra"
+            suffix = "ABRA"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            s = "ABRACADABRA"
+            suffix = "abra"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            print('abracadabra'.startswith('abra',0,5))
+            """)
+
+        self.assertCodeExecution("""
+            s = "ABRACADABRA"
+            suffix = ""
+            print(s.startswith(suffix,3))
             """)
 
     def test_getattr(self):
@@ -135,7 +189,7 @@ class StrTests(TranspileTestCase):
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
                 print(s.capitalize())
                 print(s.lower())
-                # print(s.swap())
+                print(s.swapcase())
                 print(s.title())
                 print(s.upper())
             """)
@@ -314,6 +368,37 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_ljust(self):
+        self.assertCodeExecution("""
+            s = "abc"
+            print(s.ljust(5, "P"))
+            print(s.ljust(2))
+            print(s.ljust(15, "0"))
+            print(s.ljust(20, "ã"))
+            try:
+                print(s.ljust(5, b'_'))
+            except TypeError as err:
+                print(TypeError)
+            try:
+                print(s.ljust(5.0, "P"))
+            except TypeError as err:
+                print(err)
+                """)
+
+    def test_partition(self):
+        self.assertCodeExecution("""
+            s = "foobar"
+            print(s.partition("ob"))
+            print(s.partition("o"))
+            print(s.partition("f"))
+            print(s.partition("r"))
+            print(s.partition("x"))
+            try:
+                print(s.partition(""))
+            except ValueError as err:
+                print(err)
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
@@ -331,6 +416,20 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_and_class',
         'test_and_frozenset',
+
+        'test_direct_eq_bytes',
+        'test_direct_ge_bytes',
+        'test_direct_gt_bytes',
+        'test_direct_le_bytes',
+        'test_direct_lt_bytes',
+        'test_direct_ne_bytes',
+
+        'test_direct_eq_frozenset',
+        'test_direct_ge_frozenset',
+        'test_direct_gt_frozenset',
+        'test_direct_le_frozenset',
+        'test_direct_lt_frozenset',
+        'test_direct_ne_frozenset',
 
         'test_eq_class',
         'test_eq_frozenset',

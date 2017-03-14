@@ -1,16 +1,16 @@
 package python.platform;
 
 @org.python.Module(
-    __doc__ =
-        " This module tries to retrieve as much platform-identifying data as\n" +
-        "    possible. It makes this information available via function APIs.\n" +
-        "\n" +
-        "    If called from the command line, it prints the platform\n" +
-        "    information concatenated as single string to stdout. The output\n" +
-        "    format is useable as part of a filename.\n" +
-        "\n" +
-        "\n" +
-        "\n"
+        __doc__ =
+                " This module tries to retrieve as much platform-identifying data as\n" +
+                        "    possible. It makes this information available via function APIs.\n" +
+                        "\n" +
+                        "    If called from the command line, it prints the platform\n" +
+                        "    information concatenated as single string to stdout. The output\n" +
+                        "    format is useable as part of a filename.\n" +
+                        "\n" +
+                        "\n" +
+                        "\n"
 )
 public class __init__ extends org.python.types.Module {
     public static python.Platform impl;
@@ -48,24 +48,18 @@ public class __init__ extends org.python.types.Module {
     // DEV_NULL',
     // _UNIXCONFDIR',
     // __builtins__',
-
     @org.python.Attribute()
     public static org.python.Object __cached__ = org.python.types.NoneType.NONE;  // TODO;
 
     // __copyright__',
-
     @org.python.Attribute()
     public static org.python.Object __file__ = new org.python.types.Str("python/common/python/platform/__init__.java");
-
     @org.python.Attribute()
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
-
     @org.python.Attribute()
     public static org.python.Object __name__ = new org.python.types.Str("sys");
-
     @org.python.Attribute()
     public static org.python.Object __package__ = new org.python.types.Str("");
-
     @org.python.Attribute()
     public static org.python.Object __spec__ = org.python.types.NoneType.NONE;  // TODO
 

@@ -1,6 +1,5 @@
 package org.python.java;
 
-
 public class Field extends org.python.types.Object {
     java.lang.reflect.Field field;
 
@@ -11,9 +10,9 @@ public class Field extends org.python.types.Object {
 
     public org.python.types.Str __repr__() {
         return new org.python.types.Str(
-            String.format("<unbound native field %s>",
-                this.field
-            )
+                String.format("<unbound native field %s>",
+                        this.field
+                )
         );
     }
 

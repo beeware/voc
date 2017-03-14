@@ -9,7 +9,7 @@ public class BlockingIOError extends org.python.exceptions.OSError {
         super(msg);
     }
 
-    public BlockingIOError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public BlockingIOError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

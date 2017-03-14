@@ -9,7 +9,7 @@ public class FloatingPointError extends org.python.exceptions.ArithmeticError {
         super(msg);
     }
 
-    public FloatingPointError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public FloatingPointError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

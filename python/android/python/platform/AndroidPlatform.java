@@ -2,7 +2,6 @@ package python.platform;
 
 import android.os.Debug;
 
-
 public class AndroidPlatform implements python.Platform {
     private org.python.stdlib._io.TextIOWrapper _stderr;
     private org.python.stdlib._io.TextIOWrapper _stdout;

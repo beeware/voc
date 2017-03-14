@@ -9,7 +9,7 @@ public class IsADirectoryError extends org.python.exceptions.OSError {
         super(msg);
     }
 
-    public IsADirectoryError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public IsADirectoryError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

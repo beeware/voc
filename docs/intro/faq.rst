@@ -5,10 +5,15 @@ Is VOC a source code converter?
 -------------------------------
 
 No. VOC operates *at the bytecode level*, rather than the source code level.
-It takes the CPython bytecode format (the `.pyc` files generated at runtime
-by CPython when the code is imported for the first time), and converts that
-bytecode directly into Java bytecode in a `.class` file. No intermediate Java
-source file is generated.
+In the initial versions, VOC would take CPython bytecode format (the `.pyc` files
+generated at runtime by CPython when the code is imported for the first time),
+and convert that
+bytecode directly into Java bytecode in a `.class` file.
+
+Currently, VOC uses the Python ``ast`` module to parse the Python code,
+and generates the Java bytecode from that.
+
+No intermediate Java source file is generated.
 
 Isn't this the same thing as Jython?
 ------------------------------------
@@ -77,7 +82,7 @@ that caused the problem.
 What version of Python does VOC require?
 ----------------------------------------
 
-VOC runs under Python 3.4, and compiles Python 3.4 compatible bytecode.
+VOC runs under Python 3.4+.
 
 What version of Java does VOC require?
 --------------------------------------

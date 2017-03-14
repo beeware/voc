@@ -21,29 +21,29 @@ public class Function extends org.python.types.Object implements org.python.Call
             return "0";
         } else if (klass.getName().startsWith("[")) {
             return klass.getName();
-        } else if (   klass == java.lang.Boolean.TYPE
-                   || klass == java.lang.Boolean.class) {
+        } else if (klass == java.lang.Boolean.TYPE
+                || klass == java.lang.Boolean.class) {
             return "Z";
-        } else if (   klass == java.lang.Byte.TYPE
-                   || klass == java.lang.Byte.class) {
+        } else if (klass == java.lang.Byte.TYPE
+                || klass == java.lang.Byte.class) {
             return "B";
-        } else if (   klass == java.lang.Character.TYPE
-                   || klass == java.lang.Character.class) {
+        } else if (klass == java.lang.Character.TYPE
+                || klass == java.lang.Character.class) {
             return "C";
-        } else if (   klass == java.lang.Short.TYPE
-                   || klass == java.lang.Short.class) {
+        } else if (klass == java.lang.Short.TYPE
+                || klass == java.lang.Short.class) {
             return "S";
-        } else if (   klass == java.lang.Integer.TYPE
-                   || klass == java.lang.Integer.class) {
+        } else if (klass == java.lang.Integer.TYPE
+                || klass == java.lang.Integer.class) {
             return "I";
-        } else if (   klass == java.lang.Long.TYPE
-                   || klass == java.lang.Long.class) {
+        } else if (klass == java.lang.Long.TYPE
+                || klass == java.lang.Long.class) {
             return "J";
-        } else if (   klass == java.lang.Float.TYPE
-                   || klass == java.lang.Float.class) {
+        } else if (klass == java.lang.Float.TYPE
+                || klass == java.lang.Float.class) {
             return "F";
-        } else if (   klass == java.lang.Double.TYPE
-                   || klass == java.lang.Double.class) {
+        } else if (klass == java.lang.Double.TYPE
+                || klass == java.lang.Double.class) {
             return "D";
         } else {
             return "L" + klass.getName().replace('.', '/') + ";";
@@ -110,7 +110,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         // org.Python.debug("               To", to_type);
 
         if (from_type == null) {
-            if (       to_type == java.lang.Double.TYPE
+            if (to_type == java.lang.Double.TYPE
                     || to_type == java.lang.Float.TYPE
                     || to_type == java.lang.Long.TYPE
                     || to_type == java.lang.Integer.TYPE
@@ -247,8 +247,8 @@ public class Function extends org.python.types.Object implements org.python.Call
                 // org.Python.debug("Got a long/int/short/char");
                 return MatchType.CAST_RANGE_MATCH;
             }
-        // } else {
-        //     org.Python.debug("Don't know what to do with to-type", to_type);
+            // } else {
+            //     org.Python.debug("Don't know what to do with to-type", to_type);
         }
 
         // org.Python.debug("Can't be assigned");
@@ -264,12 +264,12 @@ public class Function extends org.python.types.Object implements org.python.Call
      *
      * If multiple matches exist return the most specific match.
      */
-    public java.lang.reflect.Method selectMethod(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public java.lang.reflect.Method selectMethod(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         // org.Python.debug("Method options: ", this.methods);
 
         java.lang.reflect.Method method = null;
         java.lang.StringBuilder signature = new java.lang.StringBuilder();
-        java.lang.Class<?> [] arg_types = new java.lang.Class<?> [args.length];
+        java.lang.Class<?>[] arg_types = new java.lang.Class<?>[args.length];
         int n_args = args.length;
         for (int i = 0; i < n_args; i++) {
             if (args[i] == null) {
@@ -287,10 +287,10 @@ public class Function extends org.python.types.Object implements org.python.Call
         // No pre-cached match - need to try alternatives for signature.
         if (method == null) {
             java.util.List<java.lang.reflect.Method> candidates = new java.util.ArrayList<java.lang.reflect.Method>();
-            java.lang.Class<?> [] param_types = null;
+            java.lang.Class<?>[] param_types = null;
             Function.MatchType param_match = Function.MatchType.EXACT_MATCH;
 
-            for (java.lang.reflect.Method candidate: this.methods.values()) {
+            for (java.lang.reflect.Method candidate : this.methods.values()) {
                 param_types = candidate.getParameterTypes();
 
                 // Candidate must have the same number of parameters as
@@ -309,19 +309,19 @@ public class Function extends org.python.types.Object implements org.python.Call
                     if (match) {
                         // org.Python.debug("New candidate", candidate);
                         candidates.add(candidate);
-                    // } else {
-                    //     org.Python.debug("Ignore candidate; non-matching signature", candidate);
+                        // } else {
+                        //     org.Python.debug("Ignore candidate; non-matching signature", candidate);
                     }
-                // } else {
-                //     org.Python.debug("Ignore candidate; wrong number of parameters", candidate);
+                    // } else {
+                    //     org.Python.debug("Ignore candidate; wrong number of parameters", candidate);
                 }
             }
 
             // Now work out *which* candidate is the most specific match.
-            java.lang.Class<?> [] candidate_types;
+            java.lang.Class<?>[] candidate_types;
             Function.MatchType candidate_match;
             // org.Python.debug("Choose best candidate...", candidates);
-            for (java.lang.reflect.Method candidate: candidates) {
+            for (java.lang.reflect.Method candidate : candidates) {
                 // org.Python.debug("Evaluate candidate", candidate);
                 if (method == null) {
                     // org.Python.debug("New best (default) candidate", candidate);
@@ -360,12 +360,12 @@ public class Function extends org.python.types.Object implements org.python.Call
             // If there is still no match, raise an error.
             if (method == null) {
                 throw new org.python.exceptions.RuntimeError(
-                    java.lang.String.format(
-                        "No candidate method found for signature %s(%s); tried %s",
-                        this.name,
-                        signature.toString(),
-                        candidates
-                    )
+                        java.lang.String.format(
+                                "No candidate method found for signature %s(%s); tried %s",
+                                this.name,
+                                signature.toString(),
+                                candidates
+                        )
                 );
             }
 
@@ -377,9 +377,9 @@ public class Function extends org.python.types.Object implements org.python.Call
         return method;
     }
 
-    public java.lang.Object [] adjustArguments(java.lang.reflect.Method method, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        java.lang.Object [] adjusted = new java.lang.Object [args.length];
-        java.lang.Class<?> [] param_types = method.getParameterTypes();
+    public java.lang.Object[] adjustArguments(java.lang.reflect.Method method, org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        java.lang.Object[] adjusted = new java.lang.Object[args.length];
+        java.lang.Class<?>[] param_types = method.getParameterTypes();
         for (int i = 0; i < args.length; i++) {
             adjusted[i] = org.python.types.Type.toJava(param_types[i], args[i]);
         }
@@ -402,12 +402,12 @@ public class Function extends org.python.types.Object implements org.python.Call
         java.lang.Class<?> clazz = klass;
         while (clazz != null) {
             // org.Python.debug("CLAZZ:", clazz);
-            for (java.lang.reflect.Method method: clazz.getDeclaredMethods()) {
+            for (java.lang.reflect.Method method : clazz.getDeclaredMethods()) {
                 // org.Python.debug("METHOD:", method.getName());
                 if (method.getName().equals(name)) {
                     java.lang.StringBuilder signature = new java.lang.StringBuilder();
 
-                    for (java.lang.Class c: method.getParameterTypes()) {
+                    for (java.lang.Class c : method.getParameterTypes()) {
                         signature.append(org.python.java.Function.descriptor(c));
                     }
 
@@ -437,18 +437,18 @@ public class Function extends org.python.types.Object implements org.python.Call
     }
 
     @org.python.Method(
-        __doc__ = "Implement repr(self)."
+            __doc__ = "Implement repr(self)."
     )
     public org.python.types.Str __repr__() {
         return new org.python.types.Str(
-            java.lang.String.format("<native function %s.%s>",
-                this.klass.getName(),
-                this.name)
-            );
+                java.lang.String.format("<native function %s.%s>",
+                        this.klass.getName(),
+                        this.name)
+        );
     }
 
     @org.python.Method(
-        __doc__ = "Implement __get__(self)."
+            __doc__ = "Implement __get__(self)."
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
         if (instance == klass) {
@@ -459,17 +459,17 @@ public class Function extends org.python.types.Object implements org.python.Call
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __bool__() {
         return new org.python.types.Bool(true);
     }
 
-    public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         return this.invoke(null, args, kwargs);
     }
 
-    public org.python.Object invoke(org.python.Object instance, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object instance, org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             java.lang.Object target = null;
             // org.Python.debug("Native Function:", this.name);
@@ -495,7 +495,7 @@ public class Function extends org.python.types.Object implements org.python.Call
 
             // org.Python.debug("  Native method: ", method);
 
-            java.lang.Object [] adjusted_args = this.adjustArguments(method, args, kwargs);
+            java.lang.Object[] adjusted_args = this.adjustArguments(method, args, kwargs);
 
             // if (adjusted_args != null) {
             //     for (java.lang.Object arg: adjusted_args) {
@@ -535,16 +535,16 @@ public class Function extends org.python.types.Object implements org.python.Call
                 java.lang.String message = e.getCause().getMessage();
                 if (message == null) {
                     throw new org.python.exceptions.RuntimeError(
-                        e.getCause().getClass().getName()
+                            e.getCause().getClass().getName()
                     );
                 } else {
                     throw new org.python.exceptions.RuntimeError(
-                        e.getCause().getClass().getName() + ": " + message
+                            e.getCause().getClass().getName() + ": " + message
                     );
                 }
             }
         } finally {
-        //     org.Python.debug("INVOKE METHOD DONE");
+            //     org.Python.debug("INVOKE METHOD DONE");
         }
     }
 }

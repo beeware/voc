@@ -2,12 +2,17 @@ Contributing to VOC
 =======================
 
 
-If you experience problems with VOC, `log them on GitHub`_. If you want to contribute code, please `fork the code`_ and `submit a pull request`_.
+If you experience problems with VOC, `log them on GitHub`_.
+
+If you want to contribute code, please `fork the code`_ and `submit a pull request`_.
+
+If you're a newcomer to the project looking for how to start contributing,
+you may find useful the `First Timers Guide`_.
 
 .. _log them on Github: https://github.com/pybee/voc/issues
 .. _fork the code: https://github.com/pybee/voc
 .. _submit a pull request: https://github.com/pybee/voc/pulls
-
+.. _First Timers Guide: http://pybee.org/contributing/how/first-time/what/voc/
 
 Setting up your development environment
 ---------------------------------------
@@ -93,6 +98,25 @@ Or, to run all the datatypes tests:
 .. code-block:: bash
 
     $ python setup.py test -s tests.datatypes
+
+
+Running the code style checks
+-----------------------------
+
+Before sending your pull request for review, you may want to run the style checks locally.
+
+These checks also run automatically in Travis, but you will avoid unnecessary
+waiting time if you do this beforehand and fix your code to follow the style
+rules.
+
+In order to do that, first you need to install flake8::
+
+    pip install flake8
+
+Then, whenever you want to run the checks, run the following command inside the
+project's directory::
+
+    flake8 && ant checkstyle
 
 
 Working with code for Java bytecode

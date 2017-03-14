@@ -1,8 +1,5 @@
 package org.python.java;
 
-import org.python.java.Function;
-
-
 public class Type extends org.python.types.Type {
     java.util.Map<java.lang.String, java.lang.reflect.Constructor> constructors;
 
@@ -14,17 +11,17 @@ public class Type extends org.python.types.Type {
         super(origin, klass);
 
         this.constructors = new java.util.HashMap<java.lang.String, java.lang.reflect.Constructor>();
-        for (java.lang.reflect.Constructor constructor: klass.getConstructors()) {
+        for (java.lang.reflect.Constructor constructor : klass.getConstructors()) {
             // System.out.println("Found constructor " + constructor);
             java.lang.StringBuilder signature = new java.lang.StringBuilder();
 
-            for (java.lang.Class c: constructor.getParameterTypes()) {
+            for (java.lang.Class c : constructor.getParameterTypes()) {
                 signature.append(Function.descriptor(c));
             }
 
             this.constructors.put(
-                signature.toString(),
-                constructor
+                    signature.toString(),
+                    constructor
             );
         }
         // System.out.println("Constructors: " + this.constructors);
@@ -39,12 +36,12 @@ public class Type extends org.python.types.Type {
      *
      * If multiple matches exist return the most specific match.
      */
-    public java.lang.reflect.Constructor selectConstructor(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public java.lang.reflect.Constructor selectConstructor(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         // org.Python.debug("Constructor options: ", this.constructors);
 
         java.lang.reflect.Constructor constructor = null;
         java.lang.StringBuilder signature = new java.lang.StringBuilder();
-        java.lang.Class<?> [] arg_types = new java.lang.Class<?> [args.length];
+        java.lang.Class<?>[] arg_types = new java.lang.Class<?>[args.length];
         int n_args = args.length;
         for (int i = 0; i < n_args; i++) {
             if (args[i] == null) {
@@ -62,10 +59,10 @@ public class Type extends org.python.types.Type {
         // No pre-cached match - need to try alternatives for signature.
         if (constructor == null) {
             java.util.List<java.lang.reflect.Constructor> candidates = new java.util.ArrayList<java.lang.reflect.Constructor>();
-            java.lang.Class<?> [] param_types = null;
+            java.lang.Class<?>[] param_types = null;
             Function.MatchType param_match = Function.MatchType.EXACT_MATCH;
 
-            for (java.lang.reflect.Constructor candidate: this.constructors.values()) {
+            for (java.lang.reflect.Constructor candidate : this.constructors.values()) {
                 param_types = candidate.getParameterTypes();
 
                 // Candidate must have the same number of parameters as
@@ -84,19 +81,19 @@ public class Type extends org.python.types.Type {
                     if (match) {
                         // org.Python.debug("New candidate", candidate);
                         candidates.add(candidate);
-                    // } else {
-                    //     org.Python.debug("Ignore candidate; non-matching signature", candidate);
+                        // } else {
+                        //     org.Python.debug("Ignore candidate; non-matching signature", candidate);
                     }
-                // } else {
-                //     org.Python.debug("Ignore candidate; wrong number of parameters", candidate);
+                    // } else {
+                    //     org.Python.debug("Ignore candidate; wrong number of parameters", candidate);
                 }
             }
 
             // Now work out *which* candidate is the most specific match.
-            java.lang.Class<?> [] candidate_types;
+            java.lang.Class<?>[] candidate_types;
             Function.MatchType candidate_match = Function.MatchType.EXACT_MATCH;
             // org.Python.debug("Choose best candidate...", candidates);
-            for (java.lang.reflect.Constructor candidate: candidates) {
+            for (java.lang.reflect.Constructor candidate : candidates) {
                 // org.Python.debug("Evaluate candidate", candidate);
                 if (constructor == null) {
                     // org.Python.debug("New best (default) candidate", candidate);
@@ -135,11 +132,11 @@ public class Type extends org.python.types.Type {
             // If there is still no match, raise an error.
             if (constructor == null) {
                 throw new org.python.exceptions.RuntimeError(
-                    java.lang.String.format(
-                        "No candidate constructor found for signature (%s); tried %s",
-                        signature.toString(),
-                        candidates
-                    )
+                        java.lang.String.format(
+                                "No candidate constructor found for signature (%s); tried %s",
+                                signature.toString(),
+                                candidates
+                        )
                 );
             }
 
@@ -151,9 +148,9 @@ public class Type extends org.python.types.Type {
         return constructor;
     }
 
-    public java.lang.Object [] adjustArguments(java.lang.reflect.Constructor constructor, org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        java.lang.Object [] adjusted = new java.lang.Object [args.length];
-        java.lang.Class<?> [] param_types = constructor.getParameterTypes();
+    public java.lang.Object[] adjustArguments(java.lang.reflect.Constructor constructor, org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        java.lang.Object[] adjusted = new java.lang.Object[args.length];
+        java.lang.Class<?>[] param_types = constructor.getParameterTypes();
         for (int i = 0; i < args.length; i++) {
             adjusted[i] = org.python.types.Type.toJava(param_types[i], args[i]);
         }
@@ -238,7 +235,7 @@ public class Type extends org.python.types.Type {
         return true;
     }
 
-    public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // org.Python.debug("Native Constructor:", this.constructor);
             // org.Python.debug("            Origin:", this.origin);
@@ -261,7 +258,7 @@ public class Type extends org.python.types.Type {
                 }
             } else {
                 constructor = this.selectConstructor(args, kwargs);
-                java.lang.Object [] adjusted_args = this.adjustArguments(constructor, args, kwargs);
+                java.lang.Object[] adjusted_args = this.adjustArguments(constructor, args, kwargs);
 
                 return new org.python.java.Object(constructor.newInstance(adjusted_args));
             }
@@ -280,7 +277,7 @@ public class Type extends org.python.types.Type {
         } catch (java.lang.InstantiationException e) {
             throw new org.python.exceptions.RuntimeError(e.getCause().toString());
         } finally {
-        //     System.out.println("CONSTRUCTOR DONE");
+            //     System.out.println("CONSTRUCTOR DONE");
         }
     }
 }

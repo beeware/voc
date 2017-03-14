@@ -7,10 +7,10 @@ public class Type extends org.python.types.Object implements org.python.Callable
         PYTHON,       // A type defined in Python code
         JAVA,         // A type defined in Java
         EXTENSION     // A type defined in Python, extending a Java base class
-    };
+    }
+
     public java.lang.String PYTHON_TYPE_NAME;
     private static java.util.Map<java.lang.Class, org.python.types.Type> known_types = new java.util.HashMap<java.lang.Class, org.python.types.Type>();
-
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
@@ -49,44 +49,44 @@ public class Type extends org.python.types.Object implements org.python.Callable
     }
 
     public static org.python.types.Type declarePythonType(
-                org.python.Object name,
-                org.python.Object bases,
-                org.python.Object dict
-            ) {
+            org.python.Object name,
+            org.python.Object bases,
+            org.python.Object dict
+    ) {
         java.util.Map<org.python.Object, org.python.Object> from_dict = ((org.python.types.Dict) dict).value;
         java.util.Map<java.lang.String, org.python.Object> to_dict = new java.util.HashMap<java.lang.String, org.python.Object>();
-        for (org.python.Object k: from_dict.keySet()) {
+        for (org.python.Object k : from_dict.keySet()) {
             to_dict.put(k.toString(), from_dict.get(k));
         }
 
         return org.python.types.Type.declarePythonType(
-            org.python.types.Object.class,
-            ((org.python.types.Str) name).value,
-            ((org.python.types.Tuple) bases).value,
-            to_dict
+                org.python.types.Object.class,
+                ((org.python.types.Str) name).value,
+                ((org.python.types.Tuple) bases).value,
+                to_dict
         );
     }
 
     public static org.python.types.Type declarePythonType(
-                java.lang.String name,
-                java.util.List<org.python.Object> bases,
-                java.util.Map<java.lang.String, org.python.Object> dict
-            ) {
+            java.lang.String name,
+            java.util.List<org.python.Object> bases,
+            java.util.Map<java.lang.String, org.python.Object> dict
+    ) {
         return org.python.types.Type.declarePythonType(org.python.types.Object.class, name, bases, dict);
     }
 
     public static org.python.types.Type declarePythonType(
-                java.lang.Class java_class
-            ) {
+            java.lang.Class java_class
+    ) {
         return org.python.types.Type.declarePythonType(java_class, null, null, null);
     }
 
     public static org.python.types.Type declarePythonType(
-                java.lang.Class java_class,
-                java.lang.String name,
-                java.util.List<org.python.Object> bases,
-                java.util.Map<java.lang.String, org.python.Object> dict
-            ) {
+            java.lang.Class java_class,
+            java.lang.String name,
+            java.util.List<org.python.Object> bases,
+            java.util.Map<java.lang.String, org.python.Object> dict
+    ) {
         org.python.types.Type python_type;
         // System.out.println("DECLARE " + java_class + " as " + name + " with bases " + bases + " and dict " + dict);
 
@@ -150,29 +150,29 @@ public class Type extends org.python.types.Object implements org.python.Callable
         if (value == null) {
             return org.python.types.NoneType.NONE;
         } else {
-            if (   value.getClass() == java.lang.Boolean.TYPE
-                || value.getClass() == java.lang.Boolean.class) {
+            if (value.getClass() == java.lang.Boolean.TYPE
+                    || value.getClass() == java.lang.Boolean.class) {
                 return new org.python.types.Bool((java.lang.Boolean) value);
-            } else if (   value.getClass() == java.lang.Byte.TYPE
-                       || value.getClass() == java.lang.Byte.class) {
+            } else if (value.getClass() == java.lang.Byte.TYPE
+                    || value.getClass() == java.lang.Byte.class) {
                 return new org.python.types.Int((java.lang.Byte) value);
-            } else if (   value.getClass() == java.lang.Character.TYPE
-                       || value.getClass() == java.lang.Character.class) {
+            } else if (value.getClass() == java.lang.Character.TYPE
+                    || value.getClass() == java.lang.Character.class) {
                 return new org.python.types.Str((java.lang.Character) value);
-            } else if (   value.getClass() == java.lang.Short.TYPE
-                       || value.getClass() == java.lang.Short.class) {
+            } else if (value.getClass() == java.lang.Short.TYPE
+                    || value.getClass() == java.lang.Short.class) {
                 return new org.python.types.Int((java.lang.Short) value);
-            } else if (   value.getClass() == java.lang.Integer.TYPE
-                       || value.getClass() == java.lang.Integer.class) {
+            } else if (value.getClass() == java.lang.Integer.TYPE
+                    || value.getClass() == java.lang.Integer.class) {
                 return new org.python.types.Int((java.lang.Integer) value);
-            } else if (   value.getClass() == java.lang.Long.TYPE
-                       || value.getClass() == java.lang.Long.class) {
+            } else if (value.getClass() == java.lang.Long.TYPE
+                    || value.getClass() == java.lang.Long.class) {
                 return new org.python.types.Int((java.lang.Long) value);
-            } else if (   value.getClass() == java.lang.Float.TYPE
-                       || value.getClass() == java.lang.Float.class) {
+            } else if (value.getClass() == java.lang.Float.TYPE
+                    || value.getClass() == java.lang.Float.class) {
                 return new org.python.types.Float((java.lang.Float) value);
-            } else if (   value.getClass() == java.lang.Double.TYPE
-                       || value.getClass() == java.lang.Double.class) {
+            } else if (value.getClass() == java.lang.Double.TYPE
+                    || value.getClass() == java.lang.Double.class) {
                 return new org.python.types.Float((java.lang.Double) value);
             } else if (value.getClass() == java.lang.String.class) {
                 return new org.python.types.Str((java.lang.String) value);
@@ -256,22 +256,22 @@ public class Type extends org.python.types.Object implements org.python.Callable
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Str __repr__() {
         if (this.klass == null) {
             return new org.python.types.Str(
-                String.format("<...type 0x%x (%s) is being initialized...>",
-                    this.hashCode(),
-                    this.origin
-                )
+                    String.format("<...type 0x%x (%s) is being initialized...>",
+                            this.hashCode(),
+                            this.origin
+                    )
             );
         }
         return new org.python.types.Str(
-            String.format("<class '%s'%s>",
-                org.Python.typeName(this.klass),
-                this.origin == Origin.PLACEHOLDER ? " (placeholder)" : ""
-            )
+                String.format("<class '%s'%s>",
+                        org.Python.typeName(this.klass),
+                        this.origin == Origin.PLACEHOLDER ? " (placeholder)" : ""
+                )
         );
     }
 
@@ -293,7 +293,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                     // A field exists. Check that the attribute
                     // should be exposed to the Python namespace.
                     org.python.Attribute annotation =
-                        (org.python.Attribute) field.getAnnotation(org.python.Attribute.class);
+                            (org.python.Attribute) field.getAnnotation(org.python.Attribute.class);
                     if (annotation != null) {
                         value = new org.python.java.Field(field);
                     } else {
@@ -310,7 +310,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
         // no local field; so defer to the base type chain.
         if (value == null) {
             if (this.__dict__.get("__bases__") != null) {
-                for (org.python.Object base: ((org.python.types.Tuple) this.__dict__.get("__bases__")).value) {
+                for (org.python.Object base : ((org.python.types.Tuple) this.__dict__.get("__bases__")).value) {
                     value = base.__getattribute_null(name);
                     if (value != null) {
                         break;
@@ -360,7 +360,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
         return true;
     }
 
-    public org.python.Object invoke(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public org.python.Object invoke(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // org.Python.debug("Constructor:", this.constructor);
             // org.Python.debug("     Origin:", this.origin);
@@ -372,18 +372,18 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
             if (this.constructor != null) {
                 org.python.Method annotation = (org.python.Method) this.constructor.getAnnotation(org.python.Method.class);
-                org.python.Object [] adjusted_args;
+                org.python.Object[] adjusted_args;
 
                 if (annotation != null && origin == Origin.BUILTIN) {
-                    java.lang.String [] arg_names = annotation.args();
-                    java.lang.String [] default_arg_names = annotation.default_args();
+                    java.lang.String[] arg_names = annotation.args();
+                    java.lang.String[] default_arg_names = annotation.default_args();
                     boolean has_varargs = annotation.varargs().equals("");
                     int a;
                     java.lang.String arg_name;
                     org.python.Object arg;
                     int n_args = arg_names.length + default_arg_names.length;
 
-                    adjusted_args = new org.python.Object [arg_names.length + default_arg_names.length];
+                    adjusted_args = new org.python.Object[arg_names.length + default_arg_names.length];
 
                     if (args.length < n_args) {
                         // Take as many positional arguments as have been literally provided
@@ -402,8 +402,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
                             arg = kwargs.remove(arg_name);
                             if (arg == null && a < arg_names.length) {
                                 throw new org.python.exceptions.TypeError(
-                                    this.PYTHON_TYPE_NAME + " constructor missing positional argument '" +
-                                    arg_name + "'"
+                                        this.PYTHON_TYPE_NAME + " constructor missing positional argument '" +
+                                                arg_name + "'"
                                 );
                             }
                             adjusted_args[a] = arg;
@@ -450,7 +450,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
         } catch (java.lang.InstantiationException e) {
             throw new org.python.exceptions.RuntimeError(e.getCause().toString());
         } finally {
-        //     System.out.println("CONSTRUCTOR DONE");
+            //     System.out.println("CONSTRUCTOR DONE");
         }
     }
 }

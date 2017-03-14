@@ -9,7 +9,7 @@ public class GeneratorExit extends org.python.exceptions.BaseException {
         super(msg);
     }
 
-    public GeneratorExit(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public GeneratorExit(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

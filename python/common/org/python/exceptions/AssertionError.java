@@ -13,7 +13,7 @@ public class AssertionError extends org.python.exceptions.Exception {
         super(msg.toString());
     }
 
-    public AssertionError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public AssertionError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

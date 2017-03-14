@@ -9,7 +9,7 @@ public class UnicodeError extends org.python.exceptions.ValueError {
         super(msg);
     }
 
-    public UnicodeError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public UnicodeError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

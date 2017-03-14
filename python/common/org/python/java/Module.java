@@ -1,7 +1,6 @@
 package org.python.java;
 
 public class Module extends org.python.types.Module {
-
     public java.lang.String java_namespace;
 
     public int hashCode() {

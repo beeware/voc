@@ -13,7 +13,7 @@ public class RuntimeError extends org.python.exceptions.Exception {
         this(msg.toString());
     }
 
-    public RuntimeError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public RuntimeError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from .. utils import TranspileTestCase
 
 
@@ -55,8 +53,7 @@ class IsinstanceTests(TranspileTestCase):
             print(isinstance(obj, (MyClass1, MyClass2)))
             """, run_in_function=False)
 
-    @expectedFailure
-    def test_subclass(self):
+    def test_parent(self):
         self.assertCodeExecution("""
             class MyClass1:
                 pass
@@ -68,6 +65,24 @@ class IsinstanceTests(TranspileTestCase):
 
             print(isinstance(obj, MyClass1))
             print(isinstance(obj, MyClass2))
+            """, run_in_function=False)
+
+    def test_grandparent(self):
+        self.assertCodeExecution("""
+            class MyClass1:
+                pass
+
+            class MyClass2(MyClass1):
+                pass
+
+            class MyClass3(MyClass2):
+                pass
+
+            obj = MyClass3()
+
+            print(isinstance(obj, MyClass1))
+            print(isinstance(obj, MyClass2))
+            print(isinstance(obj, MyClass3))
             """, run_in_function=False)
 
     def test_types(self):

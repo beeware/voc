@@ -1,8 +1,6 @@
 package org.python.java;
 
-
 public class Object extends org.python.types.Object {
-
     public java.lang.Object object;
 
     public int hashCode() {
@@ -36,17 +34,16 @@ public class Object extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Str __repr__() {
         return new org.python.types.Str(String.format("<Native %s object at 0x%x>", this.object.getClass().getName(), this.object.hashCode()));
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Str __str__() {
         return new org.python.types.Str(this.object.toString());
     }
-
 }

@@ -1,6 +1,5 @@
 package org.python.internals;
 
-
 public class Scope implements java.util.Map<org.python.Object, org.python.Object> {
     java.util.Map<java.lang.String, org.python.Object> value;
 
@@ -61,14 +60,14 @@ public class Scope implements java.util.Map<org.python.Object, org.python.Object
      */
     public java.util.Set<java.util.Map.Entry<org.python.Object, org.python.Object>> entrySet() {
         java.util.Set<java.util.Map.Entry<org.python.Object, org.python.Object>> entries =
-            new java.util.HashSet<java.util.Map.Entry<org.python.Object, org.python.Object>>();
+                new java.util.HashSet<java.util.Map.Entry<org.python.Object, org.python.Object>>();
 
-        for (java.util.Map.Entry<java.lang.String, org.python.Object> entry: this.value.entrySet()) {
+        for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : this.value.entrySet()) {
             entries.add(
-                new ScopeEntry(
-                    new org.python.types.Str(entry.getKey()),
-                    entry.getValue()
-                )
+                    new ScopeEntry(
+                            new org.python.types.Str(entry.getKey()),
+                            entry.getValue()
+                    )
             );
         }
         return null;
@@ -108,7 +107,7 @@ public class Scope implements java.util.Map<org.python.Object, org.python.Object
     public java.util.Set<org.python.Object> keySet() {
         java.util.Set<org.python.Object> keys = new java.util.HashSet<org.python.Object>();
 
-        for (java.lang.String key: this.value.keySet()) {
+        for (java.lang.String key : this.value.keySet()) {
             keys.add(new org.python.types.Str(key));
         }
         return keys;
@@ -124,11 +123,11 @@ public class Scope implements java.util.Map<org.python.Object, org.python.Object
     /**
      * Copies all of the mappings from the specified map to this map (optional operation).
      */
-    public void putAll(java.util.Map<? extends org.python.Object,? extends org.python.Object> map) {
-        for (java.util.Map.Entry<? extends org.python.Object, ? extends org.python.Object> entry: map.entrySet()) {
+    public void putAll(java.util.Map<? extends org.python.Object, ? extends org.python.Object> map) {
+        for (java.util.Map.Entry<? extends org.python.Object, ? extends org.python.Object> entry : map.entrySet()) {
             this.value.put(
-                ((org.python.types.Str) entry.getKey()).value,
-                entry.getValue()
+                    ((org.python.types.Str) entry.getKey()).value,
+                    entry.getValue()
             );
         }
     }

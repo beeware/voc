@@ -60,7 +60,7 @@ def setUpSuite():
     )
 
     try:
-        out, err = proc.communicate(timeout=15)
+        out, err = proc.communicate(timeout=30)
     except subprocess.TimeoutExpired:
         proc.kill()
         out, err = proc.communicate()
@@ -672,7 +672,7 @@ SAMPLE_DATA = {
         ],
     'set': [
             'set()',
-            '{1, 2.3456, "another"}',
+            'set({1, 2.3456, "another"})',
         ],
     'slice': [
             'slice(0)',
@@ -850,6 +850,13 @@ class BinaryOperationTestCase(NotImplementedToExpectedFailure):
         vars()['test_ge_%s' % datatype] = _binary_test('test_ge_%s' % datatype, 'x >= y', examples)
         vars()['test_eq_%s' % datatype] = _binary_test('test_eq_%s' % datatype, 'x == y', examples)
         vars()['test_ne_%s' % datatype] = _binary_test('test_ne_%s' % datatype, 'x != y', examples)
+
+        vars()['test_direct_lt_%s' % datatype] = _binary_test('test_lt_%s' % datatype, 'x.__lt__(y)', examples)
+        vars()['test_direct_le_%s' % datatype] = _binary_test('test_le_%s' % datatype, 'x.__le__(y)', examples)
+        vars()['test_direct_gt_%s' % datatype] = _binary_test('test_gt_%s' % datatype, 'x.__gt__(y)', examples)
+        vars()['test_direct_ge_%s' % datatype] = _binary_test('test_ge_%s' % datatype, 'x.__ge__(y)', examples)
+        vars()['test_direct_eq_%s' % datatype] = _binary_test('test_eq_%s' % datatype, 'x.__eq__(y)', examples)
+        vars()['test_direct_ne_%s' % datatype] = _binary_test('test_ne_%s' % datatype, 'x.__ne__(y)', examples)
 
 
 def _inplace_test(test_name, operation, examples):

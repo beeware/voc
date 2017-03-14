@@ -9,7 +9,7 @@ public class ConnectionRefusedError extends org.python.exceptions.ConnectionErro
         super(msg);
     }
 
-    public ConnectionRefusedError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public ConnectionRefusedError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

@@ -1,3 +1,4 @@
+import voc
 import argparse
 
 from .transpiler import transpile
@@ -28,6 +29,11 @@ def main():
         '-v', '--verbosity',
         action='count',
         default=0
+    )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version='voc %s' % voc.__version__,
     )
     parser.add_argument(
         'input',

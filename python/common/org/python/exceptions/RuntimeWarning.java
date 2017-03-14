@@ -9,7 +9,7 @@ public class RuntimeWarning extends org.python.exceptions.Warning {
         super(msg);
     }
 
-    public RuntimeWarning(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public RuntimeWarning(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

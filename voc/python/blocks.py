@@ -300,7 +300,7 @@ class Block(Accumulator):
 
                 # Get a Java Method representing the new function
                 JavaOpcodes.LDC_W(Classref(function.class_descriptor)),
-                JavaOpcodes.LDC_W(function.java_name),
+                JavaOpcodes.LDC_W(function.pyimpl_name),
 
                 java.Array(len(function.parameters), classname='java/lang/Class'),
         )

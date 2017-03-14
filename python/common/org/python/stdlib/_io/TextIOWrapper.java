@@ -2,7 +2,6 @@ package org.python.stdlib._io;
 
 public class TextIOWrapper extends org.python.types.Object {
     public org.python.Object __VOC__;
-
     java.io.InputStream input;
     java.io.OutputStream output;
 
@@ -25,51 +24,51 @@ public class TextIOWrapper extends org.python.types.Object {
     //     return cls;
     // }
 
- // '_CHUNK_SIZE',
- // '__class__',
- // '__del__',
- // '__delattr__',
- // '__dict__',
- // '__dir__',
- // '__doc__',
- // '__enter__',
- // '__eq__',
- // '__exit__',
- // '__format__',
- // '__ge__',
- // '__getattribute__',
- // '__getstate__',
- // '__gt__',
- // '__hash__',
- // '__init__',
- // '__iter__',
- // '__le__',
- // '__lt__',
- // '__ne__',
- // '__new__',
- // '__next__',
- // '__reduce__',
- // '__reduce_ex__',
- // '__repr__',
- // '__setattr__',
- // '__sizeof__',
- // '__str__',
- // '__subclasshook__',
- // '_checkClosed',
- // '_checkReadable',
- // '_checkSeekable',
- // '_checkWritable',
- // '_finalizing',
- // 'buffer',
- // 'close',
- // 'closed',
- // 'detach',
- // 'encoding',
- // 'errors',
- // 'fileno',
+    // '_CHUNK_SIZE',
+    // '__class__',
+    // '__del__',
+    // '__delattr__',
+    // '__dict__',
+    // '__dir__',
+    // '__doc__',
+    // '__enter__',
+    // '__eq__',
+    // '__exit__',
+    // '__format__',
+    // '__ge__',
+    // '__getattribute__',
+    // '__getstate__',
+    // '__gt__',
+    // '__hash__',
+    // '__init__',
+    // '__iter__',
+    // '__le__',
+    // '__lt__',
+    // '__ne__',
+    // '__new__',
+    // '__next__',
+    // '__reduce__',
+    // '__reduce_ex__',
+    // '__repr__',
+    // '__setattr__',
+    // '__sizeof__',
+    // '__str__',
+    // '__subclasshook__',
+    // '_checkClosed',
+    // '_checkReadable',
+    // '_checkSeekable',
+    // '_checkWritable',
+    // '_finalizing',
+    // 'buffer',
+    // 'close',
+    // 'closed',
+    // 'detach',
+    // 'encoding',
+    // 'errors',
+    // 'fileno',
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object flush() {
         try {
@@ -80,23 +79,23 @@ public class TextIOWrapper extends org.python.types.Object {
         return org.python.types.NoneType.NONE;
     }
 
- // 'isatty',
- // 'line_buffering',
- // 'name',
- // 'newlines',
- // 'read',
- // 'readable',
- // 'readline',
- // 'readlines',
- // 'seek',
- // 'seekable',
- // 'tell',
- // 'truncate',
- // 'writable',
+    // 'isatty',
+    // 'line_buffering',
+    // 'name',
+    // 'newlines',
+    // 'read',
+    // 'readable',
+    // 'readline',
+    // 'readlines',
+    // 'seek',
+    // 'seekable',
+    // 'tell',
+    // 'truncate',
+    // 'writable',
 
     @org.python.Method(
-        __doc__ = "",
-        args = {"content"}
+            __doc__ = "",
+            args = {"content"}
     )
     public org.python.Object write(org.python.Object content) {
         try {
@@ -107,6 +106,5 @@ public class TextIOWrapper extends org.python.types.Object {
         return org.python.types.NoneType.NONE;
     }
 
- // 'writelines'
-
+    // 'writelines'
 };

@@ -9,7 +9,7 @@ public class BrokenPipeError extends org.python.exceptions.ConnectionError {
         super(msg);
     }
 
-    public BrokenPipeError(org.python.Object [] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+    public BrokenPipeError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }
 }

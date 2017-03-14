@@ -1414,7 +1414,7 @@ class InnerClasses(Attribute):
 
         for i in range(0, n_classes):
             c1 = reader.read_u2()
-            inner_class = reader.constant_pool[c1].name.string
+            inner_class = reader.constant_pool[c1].name.value
             if dump is not None:
                 reader.debug("    " * (dump + 2), 'Inner Class: %s' % inner_class)
 
@@ -1424,7 +1424,7 @@ class InnerClasses(Attribute):
                 if dump is not None:
                     reader.debug("    " * (dump + 3), 'Outer Class: (Anonymous)')
             else:
-                outer_class = reader.constant_pool[c2].name.string
+                outer_class = reader.constant_pool[c2].name.value
                 if dump is not None:
                     reader.debug("    " * (dump + 3), 'Outer Class: %s' % outer_class)
 
@@ -1432,7 +1432,7 @@ class InnerClasses(Attribute):
             if c3 == 0:
                 inner_name = None
             else:
-                inner_name = reader.constant_pool[c3].string
+                inner_name = reader.constant_pool[c3].value
                 if dump is not None:
                     reader.debug("    " * (dump + 3), 'Inner Name: %s' % inner_name)
 
@@ -1460,9 +1460,9 @@ class InnerClasses(Attribute):
 
             classes.append(
                 InnerClass(
-                    inner_class,
-                    outer_class,
                     inner_name,
+                    outer_class,
+                    inner_class,
                     public=bool(flags & InnerClass.ACC_PUBLIC),
                     private=bool(flags & InnerClass.ACC_PRIVATE),
                     protected=bool(flags & InnerClass.ACC_PROTECTED),

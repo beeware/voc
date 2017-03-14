@@ -20,15 +20,15 @@ public class Module extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.types.Str __repr__() {
         return new org.python.types.Str(
-            String.format(
-                "<module '%s' from '%s.class'>",
-                this.getClass().getPackage().getName(),
-                this.getClass()
-            )
+                String.format(
+                        "<module '%s' from '%s.class'>",
+                        this.getClass().getPackage().getName(),
+                        this.getClass()
+                )
         );
     }
 
@@ -41,11 +41,11 @@ public class Module extends org.python.types.Object {
     }
 
     public org.python.Object __getattribute_null(java.lang.String name) {
-    //     System.out.println("GETATTRIBUTE MODULE " + this + " " + name);
-    //     // System.out.println("MODULE ATTRS " + this.__dict__);
-    //     org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
-    //     // System.out.println("MODULE CLS = " + cls);
-    //     // System.out.println("MODULE CLS ATTRS = " + cls.__dict__);
+        //     System.out.println("GETATTRIBUTE MODULE " + this + " " + name);
+        //     // System.out.println("MODULE ATTRS " + this.__dict__);
+        //     org.python.types.Type cls = org.python.types.Type.pythonType(this.klass);
+        //     // System.out.println("MODULE CLS = " + cls);
+        //     // System.out.println("MODULE CLS ATTRS = " + cls.__dict__);
 
         org.python.Object value = super.__getattribute_null(name);
 
