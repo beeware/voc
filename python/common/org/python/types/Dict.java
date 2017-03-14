@@ -308,7 +308,8 @@ public class Dict extends org.python.types.Object {
     )
     public org.python.Iterable __iter__() {
         // FIXME: Once this is implemented, update org.Python.addToKwargs()
-        throw new org.python.exceptions.NotImplementedError("dict.__iter__() has not been implemented.");
+        // FIXME: it should return dict_iter not only iter
+        return new org.python.types.List(new java.util.ArrayList<org.python.Object>(this.value.keySet())).__iter__();
     }
 
     @org.python.Method(
@@ -348,17 +349,32 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "D.copy() -> dict -- a shallow copy of D"
     )
     public org.python.Object copy() {
-        throw new org.python.exceptions.NotImplementedError("dict.copy() has not been implemented.");
+        return new org.python.types.Dict(new java.util.HashMap<org.python.Object, org.python.Object>(this.value));
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"iterable"},
+            default_args = {"value"}
     )
-    public org.python.Object fromkeys(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.fromkeys() has not been implemented.");
+    public org.python.Object fromkeys(org.python.Object iterable, org.python.Object value) {
+        org.python.types.Dict result = new org.python.types.Dict();
+        try {
+            org.python.Iterable iter  = iterable.__iter__();
+            if (value == null) {
+                value = org.python.types.NoneType.NONE;
+            }
+            while (true) {
+                result.__setitem__(iter.__next__(), value);
+            }
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + iterable.typeName() + "' object is not iterable");
+        } catch (org.python.exceptions.StopIteration e) { }
+
+        return result;
     }
 
     @org.python.Method(
