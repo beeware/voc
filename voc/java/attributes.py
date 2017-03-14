@@ -1837,6 +1837,8 @@ class LineNumberTable(Attribute):
     def write_info(self, writer):
         writer.write_u2(self.line_number_table_length)
         for start_pc, line_number in self.line_number_table:
+            if start_pc > 65535:
+                raise Exception("Code too large")
             writer.write_u2(start_pc)
             writer.write_u2(line_number)
 
