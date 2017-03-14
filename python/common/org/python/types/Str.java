@@ -2,6 +2,7 @@ package org.python.types;
 import org.Python;
 
 import java.util.ArrayList;
+import java.lang.String;
 
 public class Str extends org.python.types.Object {
     public java.lang.String value;
@@ -232,7 +233,7 @@ public class Str extends org.python.types.Object {
         __doc__ = "len(object)\n\nReturn the number of items of a sequence or collection."
     )
     public org.python.types.Int __len__() {
-	return new org.python.types.Int(this.value.length());
+    return new org.python.types.Int(this.value.length());
     }
 
     @org.python.Method(
@@ -770,7 +771,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object islower() {
         if (!this.value.isEmpty() && this.value.toLowerCase().equals(this.value)) {
-        	return new org.python.types.Bool(true);
+            return new org.python.types.Bool(true);
         }
         return new org.python.types.Bool(false);
     }
@@ -834,7 +835,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isupper() {
         if (!this.value.isEmpty() && this.value.toUpperCase().equals(this.value)) {
-        	return new org.python.types.Bool(true);
+            return new org.python.types.Bool(true);
         }
         return new org.python.types.Bool(false);
     }
@@ -880,27 +881,27 @@ public class Str extends org.python.types.Object {
     public org.python.Object ljust(org.python.Object width, org.python.Object fillChar) {
         java.lang.String ch = new java.lang.String();
         if (fillChar instanceof org.python.types.Str) {
-        	if(((org.python.types.Str) fillChar).value.length() != 1) {
-        		throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
-        	}
-        	ch = ((org.python.types.Str) fillChar).value;
+            if(((org.python.types.Str) fillChar).value.length() != 1) {
+                throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
+            }
+            ch = ((org.python.types.Str) fillChar).value;
         } else if (fillChar == null) {
-        	ch = " ";
+            ch = " ";
         } else {
-        	throw new org.python.exceptions.TypeError("The fill character cannot be converted to Unicode");
+            throw new org.python.exceptions.TypeError("The fill character cannot be converted to Unicode");
         }
         if (width instanceof org.python.types.Int) {
-        	int w = (int)((org.python.types.Int) width).value;
-        	if (w < this.value.length()) {
-        		return new org.python.types.Str(this.value);
-        	}
-        	java.lang.StringBuffer str = new java.lang.StringBuffer(w);
-        	str.append(this.value);
-        	int balance = w - this.value.length();
-        	for (int i = 0; i < balance; i++) {
-        		str.append(ch); 
-        	}
-        	return new org.python.types.Str(str.toString());
+            int w = (int)((org.python.types.Int) width).value;
+            if (w < this.value.length()) {
+                return new org.python.types.Str(this.value);
+            }
+            java.lang.StringBuffer str = new java.lang.StringBuffer(w);
+            str.append(this.value);
+            int balance = w - this.value.length();
+            for (int i = 0; i < balance; i++) {
+                str.append(ch); 
+            }
+            return new org.python.types.Str(str.toString());
         }
         return new org.python.exceptions.TypeError("integer argument expected, got " + Python.typeName(width.getClass()));
     }
@@ -933,11 +934,59 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("partition() has not been implemented.");
     }
 
-    @org.python.Method(
-        __doc__ = ""
+   @org.python.Method(
+        __doc__ = "replace",
+        args = {"oldString","replacedBy"},
+        default_args={"howManyTimes"}
     )
-    public org.python.Object replace() {
-        throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
+    public org.python.Object replace(org.python.Object oldString,org.python.Object replacedBy,org.python.Object howManyTimes) {
+        String from = ((org.python.types.Str) oldString).value;
+        String to = ((org.python.types.Str) replacedBy).value;
+        int num=0,flag;
+        if ((this.value == null) || (this.value.length() == 0) || (from == null) || (from.length() == 0))
+        {
+            return new org.python.types.Str(this.value);
+        }
+
+        if (to == null)
+        {
+            to = "";
+        }
+        if(howManyTimes!=null)
+        {
+           num = (int)((org.python.types.Int) howManyTimes).value;
+           flag=1;
+        }
+        else
+        {
+            flag=0;
+        }
+
+
+        String result = value;
+        int lastIndex = 0;
+        int index = value.indexOf(from);
+        int counter=0;
+
+        if (index != -1)
+        {
+            StringBuffer buffer = new StringBuffer();
+
+            while (index != -1)
+            {
+                if(counter==num && flag==1)
+                    break;
+                buffer.append(value.substring(lastIndex, index)).append(to);
+                counter++;
+                lastIndex = index + from.length();
+                index = value.indexOf(from, lastIndex);
+            }
+
+            buffer.append(value.substring(lastIndex));
+            result = buffer.toString();
+        }
+
+       return new org.python.types.Str(result);
     }
 
     @org.python.Method(
