@@ -41,11 +41,11 @@ public class FrozenSet extends org.python.types.Object {
                 this.value = java.util.Collections.unmodifiableSet(generated);
             }
             else {
-            	java.lang.StringBuilder buffer = new java.lang.StringBuilder("'");
-            	buffer.append(args[0].typeName());
-            	buffer.append("' object is not iterable");
+                java.lang.StringBuilder buffer = new java.lang.StringBuilder("'");
+                buffer.append(args[0].typeName());
+                buffer.append("' object is not iterable");
 
-            	throw new org.python.exceptions.TypeError(buffer.toString());
+                throw new org.python.exceptions.TypeError(buffer.toString());
             }
         }
     }
