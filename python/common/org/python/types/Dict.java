@@ -308,7 +308,7 @@ public class Dict extends org.python.types.Object {
     )
     public org.python.Iterable __iter__() {
         // FIXME: Once this is implemented, update org.Python.addToKwargs()
-        throw new org.python.exceptions.NotImplementedError("dict.__iter__() has not been implemented.");
+        return new org.python.types.Dict_KeyIterator(this);
     }
 
     @org.python.Method(
