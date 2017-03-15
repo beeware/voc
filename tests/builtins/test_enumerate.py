@@ -22,7 +22,7 @@ class EnumerateTests(TranspileTestCase):
             lst=[('a',4),'b','c',10,'e']
             print(list(enumerate(lst)))
             """)
-            
+
     def test_enumerate_invalid_start_args(self):
         self.assertCodeExecution("""
             print(list(enumerate(['a','b','c'], start=None)))
@@ -33,8 +33,7 @@ class EnumerateTests(TranspileTestCase):
         self.assertCodeExecution("""
             print(list(enumerate(['a','b','c'], start="start_string")))
             """, exits_early=True)
-            
-     def test_enumerate_invalid_iterable(self):
+    def test_enumerate_invalid_iterable(self):
          self.assertCodeExecution("""
             num=10
             print(list(enumerate(num, start=10)))
