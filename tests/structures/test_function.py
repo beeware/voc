@@ -1,5 +1,12 @@
 from ..utils import TranspileTestCase
 
+class LambdaTests(TranspileTestCase):
+    def test_lambda(self):
+        self.assertCodeExecution("""
+            f = lambda : 42
+            print(f())
+            """)
+
 
 class FunctionTests(TranspileTestCase):
     def test_function(self):
