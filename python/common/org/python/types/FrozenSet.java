@@ -9,7 +9,7 @@ public class FrozenSet extends org.python.types.Object {
                     "\n" +
                     "Build an immutable unordered collection of unique elements.\n",
             default_args = {"iterable"}
-            )
+    )
     public FrozenSet(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
             this.value = java.util.Collections.emptySet();
@@ -28,7 +28,7 @@ public class FrozenSet extends org.python.types.Object {
                         new java.util.HashSet<org.python.Object>(
                         ((org.python.types.Tuple) args[0]).value)
                 );
-            } else if (org.Python.iter(args[0]) instanceof org.python.Iterable) {
+            } else {
                 org.python.Iterable iterator = org.Python.iter(args[0]);
                 java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
                 try {
@@ -39,12 +39,6 @@ public class FrozenSet extends org.python.types.Object {
                 } catch (org.python.exceptions.StopIteration si) {
                 }
                 this.value = java.util.Collections.unmodifiableSet(generated);
-            } else {
-                java.lang.StringBuilder buffer = new java.lang.StringBuilder("'");
-                buffer.append(args[0].typeName());
-                buffer.append("' object is not iterable");
-
-                throw new org.python.exceptions.TypeError(buffer.toString());
             }
         }
     }

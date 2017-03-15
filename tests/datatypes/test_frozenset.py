@@ -7,29 +7,35 @@ class FrozensetTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = frozenset()
             print(x)
-            """)
 
-        # Set constant
-        self.assertCodeExecution("""
-            x = {'a'}
+            x = frozenset({'a'})
             print(x)
-            """)
 
-        self.assertCodeExecution("""
-            x = frozenset(['a'])
+            y = {1,2}
+            x = frozenset(y)
             print(x)
-            """)
-
-        self.assertCodeExecution("""
-            x = frozenset((1, 2))
+            y = {3}
             print(x)
-            """)
 
-        self.assertCodeExecution("""
-            x = frozenset('a')
+            y = ['c']
+            x = frozenset(y)
             print(x)
-            """)
+            y.append('d')
+            print(x)
 
+            y = (1,2)
+            x = frozenset(y)
+            print(x)
+            y = ()
+            print(x)
+
+            y ='a'
+            x = frozenset(y)
+            print(x)
+            y = y + 'b'
+            print(x)
+            
+            """)
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
