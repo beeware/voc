@@ -1,10 +1,23 @@
 from ..utils import TranspileTestCase
 
+
 class LambdaTests(TranspileTestCase):
     def test_lambda(self):
         self.assertCodeExecution("""
             f = lambda : 42
             print(f())
+
+            g = lambda x : x
+            print(g(10))
+
+            print((lambda x: x + '!!!')('hello'))
+
+            print((lambda x='something': x + '!!!')('hello'))
+
+            #print((lambda *,x='something': x + '!!!')())
+
+            print((lambda x: x + '!!!')(x='hello'))
+
             """)
 
 

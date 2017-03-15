@@ -1099,10 +1099,10 @@ class Visitor(ast.NodeVisitor):
         self.visit(node.body)
         self.context.add_opcodes(JavaOpcodes.ARETURN())
         self.context.opcodes[-1].depth = len(self.context.blocks)
-        
+
         self.pop_context()
 
-        self.context.load_name(lambda_name)        
+        self.context.load_name(lambda_name)
 
     @node_visitor
     def visit_IfExp(self, node):
