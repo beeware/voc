@@ -189,7 +189,7 @@ class StrTests(TranspileTestCase):
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
                 print(s.capitalize())
                 print(s.lower())
-                # print(s.swap())
+                print(s.swapcase())
                 print(s.title())
                 print(s.upper())
             """)
@@ -384,6 +384,20 @@ class StrTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
                 """)
+
+    def test_partition(self):
+        self.assertCodeExecution("""
+            s = "foobar"
+            print(s.partition("ob"))
+            print(s.partition("o"))
+            print(s.partition("f"))
+            print(s.partition("r"))
+            print(s.partition("x"))
+            try:
+                print(s.partition(""))
+            except ValueError as err:
+                print(err)
+            """)
 
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
