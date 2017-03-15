@@ -717,16 +717,16 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "S.isalpha() -> bool\n\n returns false when the string has atleast non letter or if it is empty."
     )
-
     public org.python.Object isalpha() {
         if (!this.value.isEmpty()) {
             for (char ch : this.value.toCharArray()) {
                 if (!(Character.isLetter(ch))) {
                     return new org.python.types.Bool(false);
+                }
+                return new org.python.types.Bool(true);
             }
-            return new org.python.types.Bool(true);
+            return new org.python.types.Bool(false);
         }
-        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
