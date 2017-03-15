@@ -43,6 +43,8 @@ class EnumerateTests(TranspileTestCase):
             st="IterateMe"
             print(list(enumerate(st)))
             """, exits_early=True)
+            
+            
 
 class BuiltinEnumerateFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["enumerate"]
