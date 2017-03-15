@@ -714,14 +714,14 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("isalnum() has not been implemented.");
     }
 
-   @org.python.Method(
-        __doc__ = "S.isalpha() -> bool\n\n returns false when the string has atleast non letter or if it is empty."
+    @org.python.Method(
+            __doc__ = "S.isalpha() -> bool\n\n returns false when the string has atleast non letter or if it is empty."
     )
 
     public org.python.Object isalpha() {
-    if (!this.value.isEmpty()) {
+        if (!this.value.isEmpty()) {
             for (char ch : this.value.toCharArray()) {
-                if (!(Character.isLetter(ch)))
+                if (!(Character.isLetter(ch))) {
                     return new org.python.types.Bool(false);
             }
             return new org.python.types.Bool(true);
