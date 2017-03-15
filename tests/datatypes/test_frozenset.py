@@ -34,8 +34,9 @@ class FrozensetTests(TranspileTestCase):
             print(x)
             y = y + 'b'
             print(x)
-            
+
             """)
+
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
