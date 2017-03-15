@@ -441,27 +441,25 @@ public class Set extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object issubset(org.python.Object other) {
-       if (other instanceof org.python.types.Set) {
+        if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(otherSet.value.containsAll(this.value));
-        }
-        else if(other instanceof org.python.types.Int){
-        	 throw new org.python.exceptions.TypeError("'int' object is not iterable");
+        } else if (other instanceof org.python.types.Int) {
+            throw new org.python.exceptions.TypeError("'int' object is not iterable");
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-           __doc__ = "state whether other set is a superset",
+            __doc__ = "state whether other set is a superset",
             args = {"other"}
     )
     public org.python.Object issuperset(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(this.value.containsAll(otherSet.value));
-        }
-        else if(other instanceof org.python.types.Int){
-        	 throw new org.python.exceptions.TypeError("'int' object is not iterable");
+        } else if (other instanceof org.python.types.Int) {
+            throw new org.python.exceptions.TypeError("'int' object is not iterable");
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
