@@ -46,6 +46,34 @@ public class FrozenSet extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'frozenset'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'frozenset'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'frozenset'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.types.Bool __bool__() {
+        return new org.python.types.Bool(this.value.size() > 0);
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
     public org.python.types.Str __repr__() {
         // Representation of an empty set is different
         if (this.value.size() == 0) {
