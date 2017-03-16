@@ -11,6 +11,12 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_isalpha(self):
+        self.assertCodeExecution("""
+            for s in ['hai', 'bye hai?', '12312344df', '']:
+                print(s.isalpha())
+            """)
+
     def test_iscase(self):
         self.assertCodeExecution("""
             for s in ['hello, World!', 'HELLO, WORLD.', 'ello? world', '']:
