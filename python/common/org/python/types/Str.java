@@ -723,10 +723,10 @@ public class Str extends org.python.types.Object {
                 if (!(Character.isLetter(ch))) {
                     return new org.python.types.Bool(false);
                 }
-                return new org.python.types.Bool(true);
             }
-            return new org.python.types.Bool(false);
+            return new org.python.types.Bool(true);
         }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
