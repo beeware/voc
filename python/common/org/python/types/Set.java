@@ -430,7 +430,8 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "check whether the given two sets have no elements in common"
+            args = {"other"}
     )
     public org.python.Object isdisjoint(org.python.Object other) {
         java.util.Set set = ((Set) this.copy()).value;
