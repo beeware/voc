@@ -171,6 +171,13 @@ class SetTests(TranspileTestCase):
             print(x.issubset(y));
             """)
 
+    def test_isdisjoint(self):
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = {3, 4}
+            print(x.isdisjoint(y));
+            """)
+
     def test_update(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}
