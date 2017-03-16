@@ -899,12 +899,20 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "lstrip",
+            default_args = {"charsToBeRm"}
     )
-    public org.python.Object lstrip() {
-        throw new org.python.exceptions.NotImplementedError("lstrip() has not been implemented.");
+    public org.python.Object lstrip(org.python.Object charsToBeRm) {
+        String chars, ltrim;
+        if (charsToBeRm == null) {
+            ltrim = this.value.replaceAll("^\\s+", "");
+            return new org.python.types.Str(ltrim);
+        } else {
+            chars = ((org.python.types.Str) charsToBeRm).value;
+            ltrim = this.value.replaceAll("^[" + chars + "]" + "+", "");
+            return new org.python.types.Str(ltrim);
+        }
     }
-
     @org.python.Method(
             __doc__ = ""
     )
@@ -942,23 +950,39 @@ public class Str extends org.python.types.Object {
     public org.python.Object replace(org.python.Object oldString, org.python.Object replacedBy, org.python.Object howManyTimes) {
         String from = ((org.python.types.Str) oldString).value;
         String to = ((org.python.types.Str) replacedBy).value;
-        int num = 0, flag;
-        if ((this.value == null) || (this.value.length() == 0) || (from == null) || (from.length() == 0)) {
-            return new org.python.types.Str(this.value);
-        }
-
-        if (to == null) {
-            to = "";
-        }
+        String result = "";
+        int num = 0, j, flag = 0;
         if (howManyTimes != null) {
             num = (int) ((org.python.types.Int) howManyTimes).value;
+            if (num == 0) {
+                return new org.python.types.Str(this.value);
+            }
             flag = 1;
         } else {
             flag = 0;
         }
-
-
-        String result = value;
+        if (from.length() == 0) {
+            if (num > this.value.length() + 1) {
+                num = this.value.length() + 1;
+            }
+            if (howManyTimes != null) {
+                if (this.value.length() == 0) {
+                    return new org.python.types.Str("");
+                }
+                for (j = 0; j < num - 1; j++) {
+                    result += Character.toString(this.value.charAt(j)) + to;
+                }
+                result = to + result + this.value.substring(num - 1);
+                return new org.python.types.Str(result);
+            } else {
+                for (j = 0; j < this.value.length(); j++) {
+                    result += Character.toString(this.value.charAt(j)) + to;
+                }
+                result = to + result;
+                return new org.python.types.Str(result);
+            }
+        }
+        result = value;
         int lastIndex = 0;
         int index = value.indexOf(from);
         int counter = 0;
@@ -981,7 +1005,6 @@ public class Str extends org.python.types.Object {
 
         return new org.python.types.Str(result);
     }
-
 
     @org.python.Method(
             __doc__ = ""
@@ -1019,11 +1042,21 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "rstrip",
+            default_args = {"charsToBeRm"}
     )
-    public org.python.Object rstrip() {
-        throw new org.python.exceptions.NotImplementedError("rstrip() has not been implemented.");
+    public org.python.Object rstrip(org.python.Object charsToBeRm) {
+        String chars, rtrim;
+        if (charsToBeRm == null) {
+            rtrim = this.value.replaceAll("\\s+$", "");
+            return new org.python.types.Str(rtrim);
+        } else {
+            chars = ((org.python.types.Str) charsToBeRm).value;
+            rtrim = this.value.replaceAll("[" + chars + "]" + "+" + "$", "");
+            return new org.python.types.Str(rtrim);
+        }
     }
+
 
     @org.python.Method(
             __doc__ = "S.split(sep=None, maxsplit=-1) -> list of strings\n\nReturn a list of the words in S, using sep as the\ndelimiter string.  If maxsplit is given, at most maxsplit\nsplits are done. If sep is not specified or is None, any\nwhitespace string is a separator and empty strings are\nremoved from the result.\n",
@@ -1061,10 +1094,19 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "strip",
+            default_args = {"charsToBeRm"}
     )
-    public org.python.Object strip() {
-        throw new org.python.exceptions.NotImplementedError("strip() has not been implemented.");
+    public org.python.Object strip(org.python.Object charsToBeRm) {
+        String chars, strim;
+        if (charsToBeRm == null) {
+            strim = this.value.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
+            return new org.python.types.Str(strim);
+        } else {
+            chars = ((org.python.types.Str) charsToBeRm).value;
+            strim = this.value.replaceAll("[" + chars + "]" + "+" + "$", "").replaceAll("^[" + chars + "]" + "+", "");
+            return new org.python.types.Str(strim);
+        }
     }
 
     @org.python.Method(
