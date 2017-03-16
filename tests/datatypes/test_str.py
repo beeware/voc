@@ -32,7 +32,7 @@ class StrTests(TranspileTestCase):
 
     def test_isalpha(self):
         self.assertCodeExecution("""
-            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '', 'hello1'
+            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '', 'hello1',
             'this', 'this is string example....wow!!!', 'átomo', 'CasesLikeTheseWithoutSpaces']:
                 print(s.isalpha())
             """)
