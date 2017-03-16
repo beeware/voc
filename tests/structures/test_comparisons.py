@@ -493,9 +493,9 @@ class ComparisonTests(TranspileTestCase):
                     return NotImplemented
             print(Base() != Derived())
             """)
-
-    # lambda not implemented yet
+    
     @expectedFailure
+    # failing because class C not recreated on each loop
     def test_other_delegation(self):
         self.assertCodeExecution("""
             # No default delegation between operations except __ne__()
@@ -523,8 +523,6 @@ class ComparisonTests(TranspileTestCase):
                         print(err)
             """)
 
-    # lambda not implemented yet
-    @expectedFailure
     def test_issue_1393(self):
         self.assertCodeExecution("""
             class Anything:
