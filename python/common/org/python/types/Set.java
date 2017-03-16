@@ -433,7 +433,9 @@ public class Set extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object isdisjoint(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("isdisjoint() has not been implemented.");
+        java.util.Set set = ((Set) this.copy()).value;
+        set.retainAll(((Set) other).value);
+        return new org.python.types.Bool(set.isEmpty());
     }
 
     @org.python.Method(
