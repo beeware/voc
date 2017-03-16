@@ -721,12 +721,17 @@ public class Str extends org.python.types.Object {
         int c = 0;
         java.lang.String checkString = this.value;
         char currentCharacter;
-        while (c < (checkString.length())) {
-            currentCharacter = checkString.charAt(c);
-            if (!Character.isLetter(currentCharacter)) {
-                return new org.python.types.Bool(false);
+
+        if (checkString.length() == 0) {
+            return new org.python.types.Bool(false);
+        } else {
+            while (c < (checkString.length())) {
+                currentCharacter = checkString.charAt(c);
+                if (!Character.isLetter(currentCharacter)) {
+                    return new org.python.types.Bool(false);
+                }
+                c++;
             }
-            c++;
         }
         return new org.python.types.Bool(true);
     }
