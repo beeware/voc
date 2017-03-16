@@ -327,20 +327,6 @@ public class List extends org.python.types.Object {
                 if (slice.start == null && slice.stop == null && slice.step == null) {
                     sliced.addAll(this.value);
                 } else {
-                    long start;
-                    if (slice.start != null) {
-                        start = Math.min(slice.start.value, this.value.size());
-                    } else {
-                        start = 0;
-                    }
-
-                    long stop;
-                    if (slice.stop != null) {
-                        stop = Math.min(slice.stop.value, this.value.size());
-                    } else {
-                        stop = this.value.size();
-                    }
-
                     long step;
                     if (slice.step != null) {
                         step = slice.step.value;
@@ -348,8 +334,42 @@ public class List extends org.python.types.Object {
                         step = 1;
                     }
 
-                    for (long i = start; i < stop; i += step) {
-                        sliced.add(this.value.get((int) i));
+                    if (step < 0) {
+                        long start;
+                        if (slice.start != null) {
+                            start = Math.min(slice.start.value, this.value.size());
+                        } else {
+                            start = this.value.size() - 1;
+                        }
+
+                        long stop;
+                        if (slice.stop != null) {
+                            stop = Math.min(slice.stop.value, start);
+                        } else {
+                            stop = -1;
+                        }
+
+                        for (long i = start; i > stop; i += step) {
+                            sliced.add(this.value.get((int) i));
+                        }
+                    } else {
+                        long start;
+                        if (slice.start != null) {
+                            start = Math.min(slice.start.value, this.value.size());
+                        } else {
+                            start = 0;
+                        }
+
+                        long stop;
+                        if (slice.stop != null) {
+                            stop = Math.min(slice.stop.value, this.value.size());
+                        } else {
+                            stop = this.value.size();
+                        }
+
+                        for (long i = start; i < stop; i += step) {
+                            sliced.add(this.value.get((int) i));
+                        }
                     }
                 }
                 return new org.python.types.List(sliced);
