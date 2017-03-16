@@ -493,7 +493,7 @@ class ComparisonTests(TranspileTestCase):
                     return NotImplemented
             print(Base() != Derived())
             """)
-    
+
     @expectedFailure
     # failing because class C not recreated on each loop
     def test_other_delegation(self):
