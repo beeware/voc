@@ -33,7 +33,7 @@ class EnumerateTests(TranspileTestCase):
         self.assertCodeExecution("""
             print(list(enumerate(['a','b','c'], start="start_string")))
             """, exits_early=True)
-            
+
     def test_enumerate_invalid_iterable(self):
         self.assertCodeExecution("""
             num=10
@@ -43,7 +43,7 @@ class EnumerateTests(TranspileTestCase):
             st="IterateMe"
             print(list(enumerate(st)))
             """, exits_early=True)
-            
+
 
 class BuiltinEnumerateFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["enumerate"]
