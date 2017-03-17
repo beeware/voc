@@ -406,6 +406,34 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_lstrip(self):
+        self.assertCodeExecution("""
+            str = "gggfoo"
+            print(str.lstrip('g'))
+            print(str.lstrip('h'))
+            str = "   foo"
+            print(str.lstrip())
+            print("foot".lstrip("foobar"))
+            try:
+                print("kk".lstrip(6))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rstrip(self):
+        self.assertCodeExecution("""
+            str = "fooggg"
+            print(str.rstrip('g'))
+            print(str.rstrip('h'))
+            str = "foo   "
+            print(str.rstrip())
+            print("boo".rstrip("foo"))
+            try:
+                print("kk".lstrip(6))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
