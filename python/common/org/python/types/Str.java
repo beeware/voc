@@ -715,25 +715,18 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isalpha() -> bool\n\n returns false when the string has atleast ONE non letter or if it is empty."
     )
     public org.python.Object isalpha() {
-        int c = 0;
-        java.lang.String checkString = this.value;
-        char currentCharacter;
-
-        if (checkString.length() == 0) {
-            return new org.python.types.Bool(false);
-        } else {
-            while (c < (checkString.length())) {
-                currentCharacter = checkString.charAt(c);
-                if (!Character.isLetter(currentCharacter)) {
+        if (!this.value.isEmpty()) {
+            for (char ch : this.value.toCharArray()) {
+                if (!(Character.isLetter(ch))) {
                     return new org.python.types.Bool(false);
                 }
-                c++;
             }
+            return new org.python.types.Bool(true);
         }
-        return new org.python.types.Bool(true);
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
