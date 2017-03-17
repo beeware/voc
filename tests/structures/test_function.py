@@ -1,5 +1,7 @@
 from ..utils import TranspileTestCase
 
+from unittest import expectedFailure
+
 
 class LambdaTests(TranspileTestCase):
     def test_lambda(self):
@@ -14,10 +16,15 @@ class LambdaTests(TranspileTestCase):
 
             print((lambda x='something': x + '!!!')('hello'))
 
-            #print((lambda *,x='something': x + '!!!')())
-
             print((lambda x: x + '!!!')(x='hello'))
 
+            """)
+
+    @expectedFailure
+    # keyword only args not handled
+    def test_lambda_kwonly(self):
+        self.assertCodeExecution("""
+            print((lambda *,x='something': x + '!!!')())
             """)
 
 
@@ -300,3 +307,13 @@ class FunctionTests(TranspileTestCase):
             i = MyClass()
             print(i.a_method())
             """, exits_early=True)
+
+    @expectedFailure
+    # keyword only args not handled
+    def test_function_kwonly(self):
+        self.assertCodeExecution("""
+            def myfunc(*,x=100):
+                return x
+
+            print (myfunc())
+            """)
