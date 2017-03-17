@@ -194,6 +194,19 @@ class StrTests(TranspileTestCase):
                 print(s.upper())
             """)
 
+    def test_split(self):
+        self.assertCodeExecution("""
+            for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
+                print(s.split())
+                print(s.split("o"))
+                print(s.split(maxsplit=2))
+                print(s.split("l",maxsplit=0))
+                try:
+                    print(s.split(5))
+                except TypeError as err:
+                    print(err)
+            """)
+
     def test_index(self):
         self.assertCodeExecution("""
             s = 'hello hell'
