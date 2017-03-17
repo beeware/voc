@@ -399,6 +399,41 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_replace(self):
+        self.assertCodeExecution("""
+            print('aaa'.replace('a', ''))
+            print('aaa'.replace('a', 's'))
+            print('aaa'.replace('a', 's',2))
+            print('aaa'.replace('a', 's',0))
+            print('abc'.replace('', 'M',5)) 
+            print('abc'.replace('', 'M',3)) 
+            print(''.replace('', 'M',10))
+            print(''.replace('', 'M',0))
+            print(''.replace('', 'M'))
+            """)
+
+    def test_strip(self):
+        self.assertCodeExecution("""
+            print("50342=Data,231".strip("0123456789=, "))
+            """)
+
+    def test_lstrip(self):
+        self.assertCodeExecution("""
+            print('[io]'.lstrip('['))
+            print('***io]'.lstrip('**'))
+            print('^^^io]'.lstrip('^^'))
+            print('ABCBBAA'.lstrip('AB'))
+            """)
+
+    def test_rstrip(self):
+        self.assertCodeExecution("""
+            print('[io]'.rstrip('['))
+            print('***io]'.rstrip('**'))
+            print('^^^io]'.rstrip('^^'))
+            print('ABCBBAA'.rstrip('AB'))
+            """)
+
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

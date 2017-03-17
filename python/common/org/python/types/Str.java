@@ -1,4 +1,6 @@
 package org.python.types;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import org.Python;
 
@@ -909,7 +911,7 @@ public class Str extends org.python.types.Object {
             return new org.python.types.Str(ltrim);
         } else {
             chars = ((org.python.types.Str) charsToBeRm).value;
-            ltrim = this.value.replaceAll("^[" + chars + "]" + "+", "");
+            ltrim = this.value.replaceAll("^[" + Pattern.quote(chars) + "]" + "+", "");
             return new org.python.types.Str(ltrim);
         }
     }
@@ -951,15 +953,12 @@ public class Str extends org.python.types.Object {
         String from = ((org.python.types.Str) oldString).value;
         String to = ((org.python.types.Str) replacedBy).value;
         String result = "";
-        int num = 0, j, flag = 0;
+        Pattern p = Pattern.compile(Pattern.quote(from));
+        Matcher m = p.matcher(this.value);
+        int num = 0, j;
+
         if (howManyTimes != null) {
             num = (int) ((org.python.types.Int) howManyTimes).value;
-            if (num == 0) {
-                return new org.python.types.Str(this.value);
-            }
-            flag = 1;
-        } else {
-            flag = 0;
         }
         if (from.length() == 0) {
             if (num > this.value.length() + 1) {
@@ -982,29 +981,22 @@ public class Str extends org.python.types.Object {
                 return new org.python.types.Str(result);
             }
         }
-        result = value;
-        int lastIndex = 0;
-        int index = value.indexOf(from);
-        int counter = 0;
-
-        if (index != -1) {
-            StringBuffer buffer = new StringBuffer();
-            while (index != -1) {
-                if (counter == num && flag == 1) {
-                    break;
-                }
-                buffer.append(value.substring(lastIndex, index)).append(to);
-                counter++;
-                lastIndex = index + from.length();
-                index = value.indexOf(from, lastIndex);
+        result = this.value;
+        if (howManyTimes == null) {
+            while (m.find()) {
+                result = result.replaceFirst(Pattern.quote(from), to);
             }
+            return new org.python.types.Str(result);
 
-            buffer.append(value.substring(lastIndex));
-            result = buffer.toString();
+        } else {
+            for (int i = 0; i < num; i++) {
+                result = result.replaceFirst(Pattern.quote(from), to);
+            }
+            return new org.python.types.Str(result);
+
         }
-
-        return new org.python.types.Str(result);
     }
+
 
     @org.python.Method(
             __doc__ = ""
@@ -1052,7 +1044,7 @@ public class Str extends org.python.types.Object {
             return new org.python.types.Str(rtrim);
         } else {
             chars = ((org.python.types.Str) charsToBeRm).value;
-            rtrim = this.value.replaceAll("[" + chars + "]" + "+" + "$", "");
+            rtrim = this.value.replaceAll("[" + Pattern.quote(chars) + "]" + "+" + "$", "");
             return new org.python.types.Str(rtrim);
         }
     }
@@ -1104,7 +1096,7 @@ public class Str extends org.python.types.Object {
             return new org.python.types.Str(strim);
         } else {
             chars = ((org.python.types.Str) charsToBeRm).value;
-            strim = this.value.replaceAll("[" + chars + "]" + "+" + "$", "").replaceAll("^[" + chars + "]" + "+", "");
+            strim = this.value.replaceAll("[" + Pattern.quote(chars) + "]" + "+" + "$", "").replaceAll("^[" + Pattern.quote(chars) + "]" + "+", "");
             return new org.python.types.Str(strim);
         }
     }
