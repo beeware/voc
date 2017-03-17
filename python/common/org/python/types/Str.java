@@ -718,7 +718,22 @@ public class Str extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object isalpha() {
-        throw new org.python.exceptions.NotImplementedError("isalpha() has not been implemented.");
+        int c = 0;
+        java.lang.String checkString = this.value;
+        char currentCharacter;
+
+        if (checkString.length() == 0) {
+            return new org.python.types.Bool(false);
+        } else {
+            while (c < (checkString.length())) {
+                currentCharacter = checkString.charAt(c);
+                if (!Character.isLetter(currentCharacter)) {
+                    return new org.python.types.Bool(false);
+                }
+                c++;
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
