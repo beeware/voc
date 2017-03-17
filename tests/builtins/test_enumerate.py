@@ -25,24 +25,32 @@ class EnumerateTests(TranspileTestCase):
 
     def test_enumerate_invalid_start_args(self):
         self.assertCodeExecution("""
-            print(list(enumerate(['a','b','c'], start=None)))
-            """, exits_early=True)
+            try:
+                print(list(enumerate(['a','b','c'], start=None)))
+            except TypeError as err:
+                print(err)
+            """)
         self.assertCodeExecution("""
-            print(list(enumerate(['a','b','c'], start=1.5)))
-            """, exits_early=True)
+            try:
+                print(list(enumerate(['a','b','c'], start=1.5)))
+            except TypeError as err:
+                print(err)
+            """)
         self.assertCodeExecution("""
-            print(list(enumerate(['a','b','c'], start="start_string")))
-            """, exits_early=True)
+            try:
+                print(list(enumerate(['a','b','c'], start="start_string")))
+            except TypeError as err:
+                print(err)
+            """)
 
     def test_enumerate_invalid_iterable(self):
         self.assertCodeExecution("""
-            num=10
-            print(list(enumerate(num, start=10)))
-            """, exits_early=True)
-        self.assertCodeExecution("""
-            st="IterateMe"
-            print(list(enumerate(st)))
-            """, exits_early=True)
+            try:
+                num=10
+                print(list(enumerate(num, start=10)))
+            except TypeError as err:
+                print(err)
+            """)
 
 
 class BuiltinEnumerateFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

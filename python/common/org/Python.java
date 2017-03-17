@@ -615,7 +615,7 @@ public class Python {
                 try {
                     index = (org.python.types.Int) start; // will throw error if start can't be converted to Int
                 } catch (ClassCastException te) {
-                    throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer ");
+                    throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
                 }
             }
             org.python.Object increment = new org.python.types.Int(1);
