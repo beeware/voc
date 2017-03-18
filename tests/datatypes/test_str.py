@@ -447,6 +447,48 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_rfind(self):
+        # test cases to generate outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rfind('cook'))
+            print(st.rfind('cook',10))
+            print(st.rfind('cook',1,10))
+            """)
+
+        # test cases with indices more than the string length
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rfind('cook',100,200))
+            print(st.rfind('cook',1000))
+            print(st.rfind('cook',-1))
+            """)
+
+        # test cases with invalid find string
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rfind(5,100,200))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rfind(2.3,1000))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rfind())
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rfind(['cook'],1000,10))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rfind(['cook'],-1))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
