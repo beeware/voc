@@ -715,10 +715,18 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isalpha() -> bool\n\n returns false when the string has atleast ONE non letter or if it is empty."
     )
     public org.python.Object isalpha() {
-        throw new org.python.exceptions.NotImplementedError("isalpha() has not been implemented.");
+        if (!this.value.isEmpty()) {
+            for (char ch : this.value.toCharArray()) {
+                if (!(Character.isLetter(ch))) {
+                    return new org.python.types.Bool(false);
+                }
+            }
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -899,10 +907,38 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.lstrip([chars]) -> str\nreturns a copy of the string in which all chars have been stripped from the beginning of the string (default whitespace characters).",
+            default_args = {"chars"}
     )
-    public org.python.Object lstrip() {
-        throw new org.python.exceptions.NotImplementedError("lstrip() has not been implemented.");
+    public org.python.Object lstrip(org.python.Object chars) {
+        int l, i;
+        java.lang.String strip = "";
+        java.lang.String modified = this.value;
+        boolean checker = true;
+        if (chars == null) {
+            strip = " ";
+        } else if (chars instanceof org.python.types.Str) {
+            strip = ((org.python.types.Str) chars).value;
+        }
+        if (!strip.equals("")) {
+            l = strip.length();
+            while (checker) {
+                for (i = 0; i < strip.length(); i++) {
+                    if (strip.charAt(i) != modified.charAt(i)) {
+                        checker = false;
+                        break;
+                    }
+                }
+                if (!checker) {
+                    modified = modified.substring(i);
+                } else {
+                    modified = modified.substring(l);
+                }
+            }
+            return new org.python.types.Str(modified);
+        } else {
+            return new org.python.exceptions.TypeError("lstrip arg must be None or str");
+        }
     }
 
     @org.python.Method(
@@ -1002,10 +1038,36 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.rstrip([chars]) -> str\nreturns a copy of the string in which all chars have been stripped from the end of the string (default whitespace characters).",
+            default_args = "chars"
     )
-    public org.python.Object rstrip() {
-        throw new org.python.exceptions.NotImplementedError("rstrip() has not been implemented.");
+    public org.python.Object rstrip(org.python.Object chars) {
+        int l;
+        int i;
+        java.lang.String strip = "";
+        java.lang.String modified = this.value;
+        int tracker = this.value.length();
+        boolean checker = true;
+        if (chars == null) {
+            strip = " ";
+        } else if (chars instanceof org.python.types.Str) {
+            strip = ((org.python.types.Str) chars).value;
+        }
+        if (!strip.equals("")) {
+            l = strip.length();
+            while (checker) {
+                for (i = l - 1; i >= 0; i--) {
+                    if (strip.charAt(i) != modified.charAt(tracker - 1)) {
+                        checker = false;
+                        break;
+                    }
+                    tracker--;
+                }
+                modified = modified.substring(0, tracker);
+            }
+            return new org.python.types.Str(modified);
+        }
+        return new org.python.exceptions.TypeError("rstrip arg must be None or str");
     }
 
     @org.python.Method(
@@ -1013,7 +1075,74 @@ public class Str extends org.python.types.Object {
             default_args = {"sep", "maxsplit"}
     )
     public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
-        throw new org.python.exceptions.NotImplementedError("split() has not been implemented.");
+        if (this.value.isEmpty()) {
+            if (sep == null) {
+                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
+                    return new org.python.types.List();
+                }
+                throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' cannot be interpreted as an integer");
+            } else if (sep instanceof Str) {
+                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
+                    org.python.types.List result_list = new org.python.types.List();
+                    result_list.append(new Str(""));
+                    return result_list;
+                }
+                throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' cannot be interpreted as an integer");
+            }
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + sep.typeName() + "' object to str implicitly");
+            } else {
+                throw new org.python.exceptions.TypeError("must be str or None, not " + sep.typeName());
+            }
+        }
+        if (sep == null) {
+            if (maxsplit == null) {
+                String[] result = this.value.toString().split(" ");
+                org.python.types.List result_list = new org.python.types.List();
+                for (String w:result) {
+                    result_list.append(new Str(w));
+                }
+                return result_list;
+            } else if (maxsplit instanceof org.python.types.Int) {
+                int number = Integer.parseInt(maxsplit.toString());
+                String[] result = this.value.toString().split(" ", number + 1);
+                org.python.types.List result_list = new org.python.types.List();
+                for (String w:result) {
+                    result_list.append(new Str(w));
+                }
+                return result_list;
+            }
+            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' cannot be interpreted as an integer");
+        } else if (sep instanceof Str) {
+            if (maxsplit == null) {
+                String[] result = this.value.toString().split(((Str) sep).toString());
+                org.python.types.List result_list = new org.python.types.List();
+                for (String w:result) {
+                    result_list.append(new Str(w));
+                }
+                if (this.value.endsWith(sep.toString())) {
+                    result_list.append(new Str(""));
+                }
+                return result_list;
+            } else if (maxsplit instanceof org.python.types.Int) {
+                int number = Integer.parseInt(maxsplit.toString());
+                String[] result = this.value.toString().split(((Str) sep).toString(), number + 1);
+                org.python.types.List result_list = new org.python.types.List();
+                for (String w:result) {
+                    result_list.append(new Str(w));
+                }
+                if (this.value.endsWith(sep.toString())) {
+                    result_list.append(new Str(""));
+                }
+                return result_list;
+            }
+            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' cannot be interpreted as an integer");
+        }
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + sep.typeName() + "' object to str implicitly");
+        } else {
+            throw new org.python.exceptions.TypeError("must be str or None, not " + sep.typeName());
+        }
     }
 
     @org.python.Method(

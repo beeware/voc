@@ -2,18 +2,46 @@ from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationT
 
 
 class FrozensetTests(TranspileTestCase):
-    pass
+    def test_creation(self):
+        # Empty dict
+        self.assertCodeExecution("""
+            x = frozenset()
+            print(x)
+
+            x = frozenset({'a'})
+            print(x)
+
+            y = {1,2}
+            x = frozenset(y)
+            print(x)
+            y = {3}
+            print(x)
+
+            y = ['c']
+            x = frozenset(y)
+            print(x)
+            y.append('d')
+            print(x)
+
+            y = (1,2)
+            x = frozenset(y)
+            print(x)
+            y = ()
+            print(x)
+
+            y ='a'
+            x = frozenset(y)
+            print(x)
+            y = y + 'b'
+            print(x)
+
+            """)
 
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
 
-    not_implemented = [
-        'test_unary_invert',
-        'test_unary_negative',
-        'test_unary_not',
-        'test_unary_positive',
-    ]
+    not_implemented = []
 
 
 class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
