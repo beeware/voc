@@ -30,6 +30,13 @@ class StrTests(TranspileTestCase):
                 print(s.isspace())
             """)
 
+    def test_isalpha(self):
+        self.assertCodeExecution("""
+            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '', 'hello1',
+            'this', 'this is string example....wow!!!', 'átomo', 'CasesLikeTheseWithoutSpaces']:
+                print(s.isalpha())
+            """)
+
     def test_istitle(self):
         self.assertCodeExecution("""
             for s in ['Hello World', 'hello wORLd.', 'Hello world.', '']:
@@ -69,13 +76,42 @@ class StrTests(TranspileTestCase):
             """)
 
         self.assertCodeExecution("""
-            print('abracadabra'.endswith('abra'))
+            print('abracadabra'.endswith('abra',0,5))
             """)
 
         self.assertCodeExecution("""
             s = "ABRACADABRA"
             suffix = ""
-            print(s.endswith(suffix))
+            print(s.endswith(suffix,3))
+            """)
+
+    def test_startswith(self):
+        self.assertCodeExecution("""
+            s = "abracadabra"
+            suffix = "abra"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            s = "abracadabra"
+            suffix = "ABRA"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            s = "ABRACADABRA"
+            suffix = "abra"
+            print(s.startswith(suffix))
+            """)
+
+        self.assertCodeExecution("""
+            print('abracadabra'.startswith('abra',0,5))
+            """)
+
+        self.assertCodeExecution("""
+            s = "ABRACADABRA"
+            suffix = ""
+            print(s.startswith(suffix,3))
             """)
 
     def test_getattr(self):
@@ -160,9 +196,22 @@ class StrTests(TranspileTestCase):
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
                 print(s.capitalize())
                 print(s.lower())
-                # print(s.swap())
+                print(s.swapcase())
                 print(s.title())
                 print(s.upper())
+            """)
+
+    def test_split(self):
+        self.assertCodeExecution("""
+            for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
+                print(s.split())
+                print(s.split("o"))
+                print(s.split(maxsplit=2))
+                print(s.split("l",maxsplit=0))
+                try:
+                    print(s.split(5))
+                except TypeError as err:
+                    print(err)
             """)
 
     def test_index(self):
@@ -355,6 +404,48 @@ class StrTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
                 """)
+
+    def test_partition(self):
+        self.assertCodeExecution("""
+            s = "foobar"
+            print(s.partition("ob"))
+            print(s.partition("o"))
+            print(s.partition("f"))
+            print(s.partition("r"))
+            print(s.partition("x"))
+            try:
+                print(s.partition(""))
+            except ValueError as err:
+                print(err)
+            """)
+
+    def test_lstrip(self):
+        self.assertCodeExecution("""
+            str = "gggfoo"
+            print(str.lstrip('g'))
+            print(str.lstrip('h'))
+            str = "   foo"
+            print(str.lstrip())
+            print("foot".lstrip("foobar"))
+            try:
+                print("kk".lstrip(6))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rstrip(self):
+        self.assertCodeExecution("""
+            str = "fooggg"
+            print(str.rstrip('g'))
+            print(str.rstrip('h'))
+            str = "foo   "
+            print(str.rstrip())
+            print("boo".rstrip("foo"))
+            try:
+                print("kk".lstrip(6))
+            except TypeError as err:
+                print(err)
+            """)
 
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):

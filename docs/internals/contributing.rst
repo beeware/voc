@@ -100,6 +100,25 @@ Or, to run all the datatypes tests:
     $ python setup.py test -s tests.datatypes
 
 
+Running the code style checks
+-----------------------------
+
+Before sending your pull request for review, you may want to run the style checks locally.
+
+These checks also run automatically in Travis, but you will avoid unnecessary
+waiting time if you do this beforehand and fix your code to follow the style
+rules.
+
+In order to do that, first you need to install flake8::
+
+    pip install flake8
+
+Then, whenever you want to run the checks, run the following command inside the
+project's directory::
+
+    flake8 && ant checkstyle
+
+
 Working with code for Java bytecode
 -----------------------------------
 

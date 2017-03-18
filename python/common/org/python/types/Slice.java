@@ -34,8 +34,12 @@ public class Slice extends org.python.types.Object {
         }
 
         if (step instanceof org.python.types.Int) {
-            this.__dict__.put("step", step);
             this.step = (org.python.types.Int) step;
+            if (this.step.value == 0) {
+                throw new org.python.exceptions.ValueError("slice step cannot be zero");
+            } else {
+                this.__dict__.put("step", step);
+            }
         } else if (step instanceof org.python.types.NoneType) {
             this.__dict__.put("step", step);
         } else {
