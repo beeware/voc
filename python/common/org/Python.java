@@ -603,24 +603,24 @@ public class Python {
                     "start, which defaults to zero) and a value yielded by the iterable argument.\n" +
                     "enumerate is useful for obtaining an indexed list:\n" +
                     "(0, seq[0]), (1, seq[1]), (2, seq[2]), ...\n",
-            args = {"items"},
-            default_args = {"start"}
+            default_args = {"items", "start"}
     )
     public static org.python.Iterable enumerate(org.python.Object items, org.python.Object start) {
-        try {
-            org.python.Object index = new org.python.types.Int(0);
-            if (start == null) {
-                start = new org.python.types.Int(0);
-            } else {
-                try {
-                    index = (org.python.types.Int) start; // will throw error if start can't be converted to Int
-                } catch (ClassCastException te) {
-                    throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
-                }
+        if (items == null) {
+            throw new org.python.exceptions.TypeError("Required argument 'iterable' (pos 1) not found");
+        }
+        org.python.Object index = new org.python.types.Int(0);
+        if (start != null) {
+            try {
+                index = (org.python.types.Int) start; // will throw error if start can't be converted to Int
+            } catch (ClassCastException te) {
+                throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
             }
-            org.python.Object increment = new org.python.types.Int(1);
+        }
+        org.python.Object increment = new org.python.types.Int(1);
+        java.util.List enumList = new java.util.ArrayList();
+        try {
             org.python.Iterable iter = org.Python.iter(items);
-            java.util.List enumList = new java.util.ArrayList();
             while (true) {
                 try {
                     java.util.List tuple = new java.util.ArrayList();
@@ -638,7 +638,6 @@ public class Python {
             throw new org.python.exceptions.TypeError("'" + items.typeName() + "' object is not iterable");
         }
     }
-
 
     @org.python.Method(
             __doc__ = "eval(source[, globals[, locals]]) -> value" +

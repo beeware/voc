@@ -6,19 +6,10 @@ class EnumerateTests(TranspileTestCase):
         self.assertCodeExecution("""
             lst=['a','b','c','d','e']
             print(list(enumerate(lst)))
-            """)
-
-        self.assertCodeExecution("""
             lst=['a','b','c','d','e']
             print(list(enumerate(lst,start=-40)))
-            """)
-
-        self.assertCodeExecution("""
             lst=['a','b','c','d','e']
             print(list(enumerate(lst,start=46)))
-            """)
-
-        self.assertCodeExecution("""
             lst=[('a',4),'b','c',10,'e']
             print(list(enumerate(lst)))
             """)
@@ -29,14 +20,10 @@ class EnumerateTests(TranspileTestCase):
                 print(list(enumerate(['a','b','c'], start=None)))
             except TypeError as err:
                 print(err)
-            """)
-        self.assertCodeExecution("""
             try:
                 print(list(enumerate(['a','b','c'], start=1.5)))
             except TypeError as err:
                 print(err)
-            """)
-        self.assertCodeExecution("""
             try:
                 print(list(enumerate(['a','b','c'], start="start_string")))
             except TypeError as err:
@@ -48,6 +35,10 @@ class EnumerateTests(TranspileTestCase):
             try:
                 num=10
                 print(list(enumerate(num, start=10)))
+            except TypeError as err:
+                print(err)
+            try:
+                print(list(enumerate()))
             except TypeError as err:
                 print(err)
             """)
