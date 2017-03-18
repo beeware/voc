@@ -57,7 +57,7 @@ For Windows the use of cmd under Administrator permission is suggested instead o
 
 .. code-block:: bash
 
-    > virtualenv -p "C:\Python35\python.exe" env
+    > virtualenv -p "C:\Python34\python.exe" env
     > env\Scripts\activate.bat
     > cd voc
     > pip install -e .
