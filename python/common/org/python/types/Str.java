@@ -1,7 +1,7 @@
 package org.python.types;
 
 import org.Python;
-import java.util.regex.Pattern;
+
 
 public class Str extends org.python.types.Object {
     public java.lang.String value;
@@ -982,7 +982,7 @@ public class Str extends org.python.types.Object {
             from = ((org.python.types.Str) oldString).value;
             to = ((org.python.types.Str) replacedBy).value;
         } else {
-            return new org.python.exceptions.TypeError("args must be Str Type or None");
+            return new org.python.exceptions.TypeError("args must be Str Type");
         }
         String result = "";
         int lastIndex = 0, counter = 0, num = 0, flag = 0, j;
@@ -1208,21 +1208,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "strip",
-            default_args = {"charsToBeRm"}
+            __doc__ = ""
     )
-    public org.python.Object strip(org.python.Object charsToBeRm) {
-        String strim = "";
-        if (charsToBeRm == null) {
-            strim = this.value.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
-            return new org.python.types.Str(strim);
-        } else if (charsToBeRm instanceof org.python.types.Str) {
-            String chars = Pattern.quote(((org.python.types.Str) charsToBeRm).value);
-            strim = this.value.replaceAll("[" + chars + "]" + "+" + "$", "").replaceAll("^[" + chars + "]" + "+", "");
-            return new org.python.types.Str(strim);
-        } else {
-            return new org.python.exceptions.TypeError("strip arg must be Str Type or None");
-        }
+    public org.python.Object strip() {
+        throw new org.python.exceptions.NotImplementedError("strip() has not been implemented.");
     }
 
     @org.python.Method(
