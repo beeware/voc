@@ -215,98 +215,7 @@ class Visitor(ast.NodeVisitor):
     # Statements
     @node_visitor
     def visit_FunctionDef(self, node):
-        # Build the definition of the function
-        name_visitor = NameVisitor()
-        default_vars = []
-        parameter_signatures = []
-        for i, arg in enumerate(node.args.args):
-            index = len(node.args.defaults) - len(node.args.args) + i
-            if index >= 0:
-                default = '#%s-default-%s-%x' % (node.name, i, id(node))
-                self.visit(node.args.defaults[index])
-                self.context.add_opcodes(
-                    ASTORE_name(default)
-                )
-                default_vars.append(default)
-            else:
-                default = None
-
-            parameter_signatures.append({
-                'name': arg.arg,
-                'annotation': name_visitor.evaluate(arg.annotation).annotation,
-                'kind': ArgType.POSITIONAL_OR_KEYWORD,
-                'default': default
-            })
-
-        if node.args.vararg:
-            parameter_signatures.append({
-                'name': node.args.vararg.arg,
-                'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
-                'kind': ArgType.VAR_POSITIONAL,
-            })
-
-        for i, arg in enumerate(node.args.kwonlyargs):
-            index = len(node.args.kw_defaults) - len(node.args.kwonlyargs) + i
-            if index >= 0:
-                default = '#%s-kw_default-%s-%x' % (node.name, i, id(node))
-                self.visit(node.args.kw_defaults[index])
-                self.context.add_opcodes(
-                    ASTORE_name(default)
-                )
-                default_vars.append(default)
-            else:
-                default = None
-
-            parameter_signatures.append({
-                'name': arg.arg,
-                'annotation': name_visitor.evaluate(arg.annotation).annotation,
-                'kind': ArgType.KEYWORD_ONLY,
-                'default': default
-            })
-
-        if node.args.kwarg:
-            parameter_signatures.append({
-                'name': node.args.kwarg.arg,
-                'annotation': name_visitor.evaluate(node.args.kwarg.annotation).annotation,
-                'kind': ArgType.VAR_KEYWORD,
-            })
-
-        return_signature = {
-            'annotation': name_visitor.evaluate(node.returns).annotation
-        }
-
-        # Now actually define the function.
-        for decorator in node.decorator_list:
-            self.visit(decorator)
-            self.context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/Callable'),
-                java.Array(1),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.ICONST_0(),
-            )
-
-        function = self.context.add_function(
-            name=node.name,
-            code=self.code_objects[(node.lineno, node.name)],
-            parameter_signatures=parameter_signatures,
-            return_signature=return_signature
-        )
-
-        for decorator in node.decorator_list[::-1]:
-            self.context.add_opcodes(
-                JavaOpcodes.AASTORE(),
-                JavaOpcodes.ACONST_NULL(),
-                python.Callable.invoke(),
-            )
-
-        # Store the callable object as an accessible symbol.
-        self.context.store_name(node.name)
-
-        # Free all the variables used for default storage.
-        for default in default_vars:
-            self.context.add_opcodes(
-                free_name(default)
-            )
+        function = self._create_function(node, node.name, node.decorator_list)
 
         self.push_context(function)
 
@@ -1014,10 +923,118 @@ class Visitor(ast.NodeVisitor):
             )
         )
 
+    def _create_function(self, node, func_name, decorator_list):
+        name_visitor = NameVisitor()
+        default_vars = []
+        parameter_signatures = []
+        for i, arg in enumerate(node.args.args):
+            index = len(node.args.defaults) - len(node.args.args) + i
+            if index >= 0:
+                default = '#%s-default-%s-%x' % (func_name, i, id(node))
+                self.visit(node.args.defaults[index])
+                self.context.add_opcodes(
+                    ASTORE_name(default)
+                )
+                default_vars.append(default)
+            else:
+                default = None
+
+            parameter_signatures.append({
+                'name': arg.arg,
+                'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                'kind': ArgType.POSITIONAL_OR_KEYWORD,
+                'default': default
+            })
+
+        if node.args.vararg:
+            parameter_signatures.append({
+                'name': node.args.vararg.arg,
+                'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
+                'kind': ArgType.VAR_POSITIONAL,
+            })
+
+        for i, arg in enumerate(node.args.kwonlyargs):
+            index = len(node.args.kw_defaults) - len(node.args.kwonlyargs) + i
+            if index >= 0:
+                default = '#%s-kw_default-%s-%x' % (func_name, i, id(node))
+                self.visit(node.args.kw_defaults[index])
+                self.context.add_opcodes(
+                    ASTORE_name(default)
+                )
+                default_vars.append(default)
+            else:
+                default = None
+
+            parameter_signatures.append({
+                'name': arg.arg,
+                'annotation': name_visitor.evaluate(arg.annotation).annotation,
+                'kind': ArgType.KEYWORD_ONLY,
+                'default': default
+            })
+
+        if node.args.kwarg:
+            parameter_signatures.append({
+                'name': node.args.kwarg.arg,
+                'annotation': name_visitor.evaluate(node.args.kwarg.annotation).annotation,
+                'kind': ArgType.VAR_KEYWORD,
+            })
+
+        returns = getattr(node, 'returns', None)
+        return_signature = {
+            'annotation': name_visitor.evaluate(returns).annotation
+        }
+
+        # Now actually define the function.
+        for decorator in decorator_list:
+            self.visit(decorator)
+            self.context.add_opcodes(
+                JavaOpcodes.CHECKCAST('org/python/Callable'),
+                java.Array(1),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.ICONST_0(),
+            )
+
+        function = self.context.add_function(
+            name=func_name,
+            code=self.code_objects[(node.lineno, getattr(node, 'name', '<lambda>'))],
+            parameter_signatures=parameter_signatures,
+            return_signature=return_signature
+        )
+
+        for decorator in decorator_list[::-1]:
+            self.context.add_opcodes(
+                JavaOpcodes.AASTORE(),
+                JavaOpcodes.ACONST_NULL(),
+                python.Callable.invoke(),
+            )
+
+        # Store the callable object as an accessible symbol.
+        self.context.store_name(func_name)
+
+        # Free all the variables used for default storage.
+        for default in default_vars:
+            self.context.add_opcodes(
+                free_name(default)
+            )
+
+        return function
+
     @node_visitor
     def visit_Lambda(self, node):
-        # arguments args, expr body):
-        raise NotImplementedError('No handler for Lambda')
+        lambda_name = 'lambda-%x' % id(node)
+        function = self._create_function(node, lambda_name, [])
+
+        self.push_context(function)
+
+        LocalsVisitor(function).visit(node)
+
+        self.visit(node.body)
+        self.context.add_opcodes(JavaOpcodes.ARETURN())
+        self.context.opcodes[-1].depth = len(self.context.blocks)
+
+        self.pop_context()
+
+        self.context.load_name(lambda_name)
 
     @node_visitor
     def visit_IfExp(self, node):
