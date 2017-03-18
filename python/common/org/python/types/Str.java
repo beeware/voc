@@ -914,10 +914,38 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.lstrip([chars]) -> str\nreturns a copy of the string in which all chars have been stripped from the beginning of the string (default whitespace characters).",
+            default_args = {"chars"}
     )
-    public org.python.Object lstrip() {
-        throw new org.python.exceptions.NotImplementedError("lstrip() has not been implemented.");
+    public org.python.Object lstrip(org.python.Object chars) {
+        int l, i;
+        java.lang.String strip = "";
+        java.lang.String modified = this.value;
+        boolean checker = true;
+        if (chars == null) {
+            strip = " ";
+        } else if (chars instanceof org.python.types.Str) {
+            strip = ((org.python.types.Str) chars).value;
+        }
+        if (!strip.equals("")) {
+            l = strip.length();
+            while (checker) {
+                for (i = 0; i < strip.length(); i++) {
+                    if (strip.charAt(i) != modified.charAt(i)) {
+                        checker = false;
+                        break;
+                    }
+                }
+                if (!checker) {
+                    modified = modified.substring(i);
+                } else {
+                    modified = modified.substring(l);
+                }
+            }
+            return new org.python.types.Str(modified);
+        } else {
+            return new org.python.exceptions.TypeError("lstrip arg must be None or str");
+        }
     }
 
     @org.python.Method(
@@ -992,10 +1020,36 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.rstrip([chars]) -> str\nreturns a copy of the string in which all chars have been stripped from the end of the string (default whitespace characters).",
+            default_args = "chars"
     )
-    public org.python.Object rstrip() {
-        throw new org.python.exceptions.NotImplementedError("rstrip() has not been implemented.");
+    public org.python.Object rstrip(org.python.Object chars) {
+        int l;
+        int i;
+        java.lang.String strip = "";
+        java.lang.String modified = this.value;
+        int tracker = this.value.length();
+        boolean checker = true;
+        if (chars == null) {
+            strip = " ";
+        } else if (chars instanceof org.python.types.Str) {
+            strip = ((org.python.types.Str) chars).value;
+        }
+        if (!strip.equals("")) {
+            l = strip.length();
+            while (checker) {
+                for (i = l - 1; i >= 0; i--) {
+                    if (strip.charAt(i) != modified.charAt(tracker - 1)) {
+                        checker = false;
+                        break;
+                    }
+                    tracker--;
+                }
+                modified = modified.substring(0, tracker);
+            }
+            return new org.python.types.Str(modified);
+        }
+        return new org.python.exceptions.TypeError("rstrip arg must be None or str");
     }
 
     @org.python.Method(
