@@ -947,13 +947,13 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object rfind(org.python.Object item, org.python.Object start, org.python.Object end) {
         if (item == null) {
-    	    throw new org.python.exceptions.TypeError("rfind() takes at least 1 argument (0 given)");
-    	}
+            throw new org.python.exceptions.TypeError("rfind() takes at least 1 argument (0 given)");
+        }
         try {
-    	    org.python.Object st = (org.python.types.Str) item;
-    	} catch (ClassCastException te) {
-    	    throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
-    	}
+            org.python.Object st = (org.python.types.Str) item;
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
+        }
         if (start == null) {
             start = new Int(0);
         }

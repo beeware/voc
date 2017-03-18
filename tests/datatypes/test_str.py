@@ -435,6 +435,10 @@ class StrTests(TranspileTestCase):
                 print(st.rfind(['cook'],1000,10))
             except TypeError as err:
                 print(err)
+            try:
+                print(st.rfind(['cook'],-1))
+            except TypeError as err:
+                print(err)
             """)
 
 
