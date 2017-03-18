@@ -434,9 +434,27 @@ public class Set extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object isdisjoint(org.python.Object other) {
-        java.util.Set set = ((Set) this.copy()).value;
-        set.retainAll(((Set) other).value);
-        return new org.python.types.Bool(set.isEmpty());
+        if (other instanceof org.python.types.Set) {
+            java.util.Set set = ((Set) this.copy()).value;
+            set.retainAll(((Set) other).value);
+            return new org.python.types.Bool(set.isEmpty());
+        } else {
+            org.python.Iterable iterator = org.Python.iter(other);
+            java.util.Set set = ((Set) this.copy()).value;
+            try {
+                while (true) {
+                    org.python.Object next = iterator.__next__();
+                    boolean check;
+                    check = set.remove(next);
+                    if (check) {
+                        return new org.python.types.Bool(false);
+                    }
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(true);
+
+        }
     }
 
     @org.python.Method(
@@ -447,10 +465,19 @@ public class Set extends org.python.types.Object {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(otherSet.value.containsAll(this.value));
-        } else if (other instanceof org.python.types.Int) {
-            throw new org.python.exceptions.TypeError("'int' object is not iterable");
+        } else {
+            org.python.Iterable iterator = org.Python.iter(other);
+            java.util.Set set = ((Set) this.copy()).value;
+            try {
+                while (true) {
+                    org.python.Object next = iterator.__next__();
+                    set.remove(next);
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(set.isEmpty());
+
         }
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -460,11 +487,24 @@ public class Set extends org.python.types.Object {
     public org.python.Object issuperset(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
-            return new org.python.types.Bool(this.value.containsAll(otherSet.value));
-        } else if (other instanceof org.python.types.Int) {
-            throw new org.python.exceptions.TypeError("'int' object is not iterable");
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value));
+        } else {
+            org.python.Iterable iterator = org.Python.iter(other);
+            java.util.Set set = ((Set) this.copy()).value;
+            try {
+                while (true) {
+                    org.python.Object next = iterator.__next__();
+                    boolean check;
+                    check = set.remove(next);
+                    if (!check) {
+                        return new org.python.types.Bool(false);
+                    }
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(true);
+
         }
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
