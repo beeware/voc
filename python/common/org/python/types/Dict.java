@@ -308,8 +308,7 @@ public class Dict extends org.python.types.Object {
     )
     public org.python.Iterable __iter__() {
         // FIXME: Once this is implemented, update org.Python.addToKwargs()
-        // FIXME: it should return dict_iter not only iter
-        return new org.python.types.List(new java.util.ArrayList<org.python.Object>(this.value.keySet())).__iter__();
+        return new org.python.types.Dict_KeyIterator(this);
     }
 
     @org.python.Method(

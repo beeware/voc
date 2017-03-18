@@ -30,6 +30,13 @@ class StrTests(TranspileTestCase):
                 print(s.isspace())
             """)
 
+    def test_isalpha(self):
+        self.assertCodeExecution("""
+            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '', 'hello1',
+            'this', 'this is string example....wow!!!', 'átomo', 'CasesLikeTheseWithoutSpaces']:
+                print(s.isalpha())
+            """)
+
     def test_istitle(self):
         self.assertCodeExecution("""
             for s in ['Hello World', 'hello wORLd.', 'Hello world.', '']:
@@ -192,6 +199,19 @@ class StrTests(TranspileTestCase):
                 print(s.swapcase())
                 print(s.title())
                 print(s.upper())
+            """)
+
+    def test_split(self):
+        self.assertCodeExecution("""
+            for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
+                print(s.split())
+                print(s.split("o"))
+                print(s.split(maxsplit=2))
+                print(s.split("l",maxsplit=0))
+                try:
+                    print(s.split(5))
+                except TypeError as err:
+                    print(err)
             """)
 
     def test_index(self):
@@ -432,7 +452,32 @@ class StrTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             try:
-                print(st.rfind(['cook'],1000,10))
+                print(st.rfind(['cook'],1000,10)
+
+    def test_lstrip(self):
+        self.assertCodeExecution("""
+            str = "gggfoo"
+            print(str.lstrip('g'))
+            print(str.lstrip('h'))
+            str = "   foo"
+            print(str.lstrip())
+            print("foot".lstrip("foobar"))
+            try:
+                print("kk".lstrip(6))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rstrip(self):
+        self.assertCodeExecution("""
+            str = "fooggg"
+            print(str.rstrip('g'))
+            print(str.rstrip('h'))
+            str = "foo   "
+            print(str.rstrip())
+            print("boo".rstrip("foo"))
+            try:
+                print("kk".lstrip(6))
             except TypeError as err:
                 print(err)
             """)
