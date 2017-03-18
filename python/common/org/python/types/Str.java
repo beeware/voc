@@ -1010,10 +1010,19 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.index(sub[, start[, end]]) -> int\n\nLike S.find() but raise ValueError when the substring is not found.",
+            default_args = {"items", "start", "end"}
     )
-    public org.python.Object rindex() {
-        throw new org.python.exceptions.NotImplementedError("rindex() has not been implemented.");
+    public org.python.Object rindex(org.python.Object item, org.python.Object start, org.python.Object end) {
+        if (item == null) {
+            throw new org.python.exceptions.TypeError("rindex() takes at least 1 argument (0 given)");
+        }
+        org.python.Object index = this.rfind(item, start, end);
+        if (((Int) index).value < 0) {
+            throw new org.python.exceptions.ValueError("substring not found");
+        } else {
+            return index;
+        }
     }
 
     @org.python.Method(
