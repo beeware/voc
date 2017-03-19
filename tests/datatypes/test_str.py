@@ -446,14 +446,15 @@ class StrTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
     def test_replace(self):
         self.assertCodeExecution("""
              print('aaa'.replace('a', ''))
              print('aaa'.replace('a', 's'))
              print('aaa'.replace('a', 's',2))
              print('aaa'.replace('a', 's',0))
-             print('abc'.replace('', 'M',5)) 
-             print('abc'.replace('', 'M',3)) 
+             print('abc'.replace('', 'M',5))
+             print('abc'.replace('', 'M',3))
              print(''.replace('', 'M',10))
              print(''.replace('', 'M',0))
              print(''.replace('', 'M'))
@@ -463,7 +464,6 @@ class StrTests(TranspileTestCase):
              except TypeError as err:
                 print(err)
             """)
-
 
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
