@@ -1,6 +1,7 @@
 package org.python.types;
 
 import org.Python;
+import java.util.regex.Pattern;
 
 public class Str extends org.python.types.Object {
     public java.lang.String value;
@@ -1193,10 +1194,21 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "strip",
+            default_args = {"charsToBeRm"}
     )
-    public org.python.Object strip() {
-        throw new org.python.exceptions.NotImplementedError("strip() has not been implemented.");
+    public org.python.Object strip(org.python.Object charsToBeRm) {
+        String strim = "";
+        if (charsToBeRm == null) {
+            strim = this.value.replaceAll("^\\s+", "").replaceAll("\\s+$", "");
+            return new org.python.types.Str(strim);
+        } else if (charsToBeRm instanceof org.python.types.Str) {
+            String chars = Pattern.quote(((org.python.types.Str) charsToBeRm).value);
+            strim = this.value.replaceAll("[" + chars + "]" + "+" + "$", "").replaceAll("^[" + chars + "]" + "+", "");
+            return new org.python.types.Str(strim);
+        } else {
+            return new org.python.exceptions.TypeError("strip arg must be Str Type or None");
+        }
     }
 
     @org.python.Method(
