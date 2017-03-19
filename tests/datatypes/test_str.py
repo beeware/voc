@@ -459,6 +459,23 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_strip(self):
+        self.assertCodeExecution("""
+            s = "\t\t   hello "
+            try:
+                print(s.strip(6))
+            except TypeError as e:
+                print(e)
+            print(s.strip())
+            print(s.strip(None))
+            print(s.strip(''))
+            print(s.strip('a'))
+            print(s.strip(' '))
+            print(s.strip('\t '))
+            print(s.strip('\t ho'))
+            print(s.strip('\t hello '))
+            """)
+
     def test_rfind(self):
         # test cases to generate outout
         self.assertCodeExecution("""
