@@ -1026,10 +1026,40 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.ljust(width, fillChar=' ') -> str\nReturns the string left justified in a string of length width." +
+                    "\nPadding is done using the specified fillchar (default is a space)." +
+                    "\nThe original string is returned if width is less than len(s)",
+            default_args = {"width", "fillChar"}
     )
-    public org.python.Object rjust() {
-        throw new org.python.exceptions.NotImplementedError("rjust() has not been implemented.");
+    public org.python.Object rjust(org.python.Object width, org.python.Object fillChar) {
+        if (width == null) {
+            throw new org.python.exceptions.TypeError("rjust() takes at least 1 argument (0 given)");
+        }
+        java.lang.String ch = new java.lang.String();
+        if (fillChar instanceof org.python.types.Str) {
+            if (((org.python.types.Str) fillChar).value.length() != 1) {
+                throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
+            }
+            ch = ((org.python.types.Str) fillChar).value;
+        } else if (fillChar == null) {
+            ch = " ";
+        } else {
+            throw new org.python.exceptions.TypeError("The fill character cannot be converted to Unicode");
+        }
+        if (width instanceof org.python.types.Int) {
+            int w = (int) ((org.python.types.Int) width).value;
+            if (w < this.value.length()) {
+                return new org.python.types.Str(this.value);
+            }
+            java.lang.StringBuffer str = new java.lang.StringBuffer(w);
+            int balance = w - this.value.length();
+            for (int i = 0; i < balance; i++) {
+                str.append(ch);
+            }
+            str.append(this.value);
+            return new org.python.types.Str(str.toString());
+        }
+        return new org.python.exceptions.TypeError("integer argument expected, got " + Python.typeName(width.getClass()));
     }
 
     @org.python.Method(
