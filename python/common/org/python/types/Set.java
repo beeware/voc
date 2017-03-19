@@ -235,9 +235,7 @@ public class Set extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Iterable __iter__() {
-        java.util.List return_list = new java.util.ArrayList<org.python.Object>();
-        return_list.addAll(this.value);
-        return new org.python.types.List(return_list).__iter__();
+        return new org.python.types.Set_Iterator(this);
     }
 
     @org.python.Method(
