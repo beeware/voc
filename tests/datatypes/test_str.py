@@ -191,6 +191,18 @@ class StrTests(TranspileTestCase):
             print(x[6:7])
             """)
 
+        # Slice bound in both directions with start larger than end
+        self.assertCodeExecution("""
+            x = "12345"
+            print(x[4:1])
+            """)
+
+        # Slice bound in both directions with start and end out of bounds
+        self.assertCodeExecution("""
+            x = "12345"
+            print(x[-10:10])
+            """)
+
     def test_case_changes(self):
         self.assertCodeExecution("""
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
@@ -447,21 +459,91 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_rfind(self):
+        # test cases to generate outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rfind('cook'))
+            print(st.rfind('cook',10))
+            print(st.rfind('book',1,10))
+            """)
+
+        # test cases with indices more than the string length
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rfind('cook',100,200))
+            print(st.rfind('cook',1000))
+            print(st.rfind('cook',-1))
+            """)
+
+        # test cases with empty find string
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rfind())
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rindex(self):
+        # test cases to generate outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex('cook'))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',10))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',1,10))
+            except ValueError as err:
+                print(err)
+            """)
+
+        # test cases with indices more than the string length
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex('cook',100,200))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',1000))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',-1))
+            except ValueError as err:
+                print(err)
+            """)
+
+        # test cases with empty find string
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex())
+            except TypeError as err:
+                print(err)
+            """)
+
     def test_replace(self):
         self.assertCodeExecution("""
-             print('aaa'.replace('a', ''))
-             print('aaa'.replace('a', 's'))
-             print('aaa'.replace('a', 's',2))
-             print('aaa'.replace('a', 's',0))
-             print('abc'.replace('', 'M',5))
-             print('abc'.replace('', 'M',3))
-             print(''.replace('', 'M',10))
-             print(''.replace('', 'M',0))
-             print(''.replace('', 'M'))
-             print('abccabccabcc'.replace('abc', 'ab', 2))
-             try:
+            print('aaa'.replace('a', ''))
+            print('aaa'.replace('a', 's'))
+            print('aaa'.replace('a', 's',2))
+            print('aaa'.replace('a', 's',0))
+            print('abc'.replace('', 'M',5))
+            print('abc'.replace('', 'M',3))
+            print(''.replace('', 'M',10))
+            print(''.replace('', 'M',0))
+            print(''.replace('', 'M'))
+            print('abccabccabcc'.replace('abc', 'ab', 2))
+            try:
                 print("kk".replace(6,"l"))
-             except TypeError as err:
+            except TypeError as err:
                 print(err)
             """)
 
