@@ -967,10 +967,69 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "replace",
+            args = {"oldString", "replacedBy"},
+            default_args = {"howManyTimes"}
     )
-    public org.python.Object replace() {
-        throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
+    public org.python.Object replace(org.python.Object oldString, org.python.Object replacedBy, org.python.Object howManyTimes) {
+        String from, to;
+        if (oldString instanceof org.python.types.Str && replacedBy instanceof org.python.types.Str) {
+            from = ((org.python.types.Str) oldString).value;
+            to = ((org.python.types.Str) replacedBy).value;
+        } else {
+            return new org.python.exceptions.TypeError("args must be Str Type");
+        }
+        String result = "";
+        int lastIndex = 0, counter = 0, num = 0, flag = 0, j;
+        int index = this.value.indexOf(from);
+
+        if (howManyTimes != null) {
+            num = (int) ((org.python.types.Int) howManyTimes).value;
+            if (num == 0) {
+                return new org.python.types.Str(this.value);
+            }
+            flag = 1;
+        } else {
+            flag = 0;
+        }
+        if (from.length() == 0) {
+            if (num > this.value.length() + 1) {
+                num = this.value.length() + 1;
+            }
+            if (howManyTimes != null) {
+                if (this.value.length() == 0) {
+                    return new org.python.types.Str("");
+                }
+                for (j = 0; j < num - 1; j++) {
+                    result += Character.toString(this.value.charAt(j)) + to;
+                }
+                result = to + result + this.value.substring(num - 1);
+                return new org.python.types.Str(result);
+            } else {
+                for (j = 0; j < this.value.length(); j++) {
+                    result += Character.toString(this.value.charAt(j)) + to;
+                }
+                result = to + result;
+                return new org.python.types.Str(result);
+            }
+        }
+        result = value;
+        if (index != -1) {
+            StringBuffer buffer = new StringBuffer();
+            while (index != -1) {
+                if (counter == num && flag == 1) {
+                    break;
+                }
+                buffer.append(value.substring(lastIndex, index)).append(to);
+                counter++;
+                lastIndex = index + from.length();
+                index = value.indexOf(from, lastIndex);
+            }
+
+            buffer.append(value.substring(lastIndex));
+            result = buffer.toString();
+        }
+        return new org.python.types.Str(result);
     }
 
     @org.python.Method(
