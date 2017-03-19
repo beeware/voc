@@ -602,10 +602,41 @@ public class Python {
                     "iteration.  The enumerate object yields pairs containing a count (from\n" +
                     "start, which defaults to zero) and a value yielded by the iterable argument.\n" +
                     "enumerate is useful for obtaining an indexed list:\n" +
-                    "       (0, seq[0]), (1, seq[1]), (2, seq[2]), ...\n"
+                    "(0, seq[0]), (1, seq[1]), (2, seq[2]), ...\n",
+            default_args = {"items", "start"}
     )
-    public static org.python.Iterable enumerate() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'enumerate' not implemented");
+    public static org.python.Iterable enumerate(org.python.Object items, org.python.Object start) {
+        if (items == null) {
+            throw new org.python.exceptions.TypeError("Required argument 'iterable' (pos 1) not found");
+        }
+        org.python.Object index = new org.python.types.Int(0);
+        if (start != null) {
+            try {
+                index = (org.python.types.Int) start; // will throw error if start can't be converted to Int
+            } catch (ClassCastException te) {
+                throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
+            }
+        }
+        org.python.Object increment = new org.python.types.Int(1);
+        java.util.List enumList = new java.util.ArrayList();
+        try {
+            org.python.Iterable iter = org.Python.iter(items);
+            while (true) {
+                try {
+                    java.util.List tuple = new java.util.ArrayList();
+                    tuple.add(index);
+                    tuple.add(iter.__next__());
+                    org.python.types.Tuple pythonTuple = new org.python.types.Tuple(tuple);
+                    enumList.add(pythonTuple);
+                    index = index.__add__(increment);
+                } catch (org.python.exceptions.StopIteration e) {
+                    break;
+                }
+            }
+            return org.Python.iter(new org.python.types.List(enumList));
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + items.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
