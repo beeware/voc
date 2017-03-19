@@ -362,7 +362,7 @@ public class Dict extends org.python.types.Object {
     public org.python.Object fromkeys(org.python.Object iterable, org.python.Object value) {
         org.python.types.Dict result = new org.python.types.Dict();
         try {
-            org.python.Iterable iter  = iterable.__iter__();
+            org.python.Iterable iter = iterable.__iter__();
             if (value == null) {
                 value = org.python.types.NoneType.NONE;
             }
