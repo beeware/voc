@@ -235,7 +235,9 @@ public class Set extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Iterable __iter__() {
-        throw new org.python.exceptions.NotImplementedError("__iter__() has not been implemented");
+        java.util.List return_list = new java.util.ArrayList<org.python.Object>();
+        return_list.addAll(this.value);
+        return new org.python.types.List(return_list).__iter__();
     }
 
     @org.python.Method(
