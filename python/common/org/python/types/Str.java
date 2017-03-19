@@ -225,17 +225,18 @@ public class Str extends org.python.types.Object {
                 } else {
                     long start;
                     if (slice.start != null) {
-                        start = toPositiveIndex(Math.min(slice.start.value, this.value.length()));
+                        start = toPositiveIndex(slice.start.value);
                     } else {
                         start = 0;
                     }
 
                     long stop;
                     if (slice.stop != null) {
-                        stop = toPositiveIndex(Math.min(slice.stop.value, this.value.length()));
+                        stop = toPositiveIndex(slice.stop.value);
                     } else {
                         stop = this.value.length();
                     }
+                    stop = Math.max(start, stop);
 
                     long step;
                     if (slice.step != null) {
@@ -686,11 +687,21 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("format_map() has not been implemented.");
     }
 
+    /** Normalize index into an index in the range [0, this.value.length()] */
     private long toPositiveIndex(long index) {
         if (index < 0) {
-            return this.value.length() + index;
+            if (-index > this.value.length()) {
+                return 0;
+            } else {
+                return index + this.value.length();
+            }
+        } else {
+            if (index > this.value.length()) {
+                return this.value.length();
+            } else {
+                return index;
+            }
         }
-        return index;
     }
 
     @org.python.Method(
