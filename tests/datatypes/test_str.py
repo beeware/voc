@@ -433,28 +433,32 @@ class StrTests(TranspileTestCase):
 
     def test_lstrip(self):
         self.assertCodeExecution("""
-            str = "gggfoo"
-            print(str.lstrip('g'))
+            str = "\t\t   gggfoo "
             print(str.lstrip('h'))
-            str = "   foo"
             print(str.lstrip())
-            print("foot".lstrip("foobar"))
+            print(str.lstrip(None))
+            print(str.lstrip(''))
+            print(str.lstrip(\t ))
+            print(str.lstrip('\t gf'))
+            print(str.lstrip('\t\t   gggfoo '))
             try:
-                print("kk".lstrip(6))
+                print(str.lstrip(6))
             except TypeError as err:
                 print(err)
             """)
 
     def test_rstrip(self):
         self.assertCodeExecution("""
-            str = "fooggg"
-            print(str.rstrip('g'))
+            str = " fooggg\t\t   "
             print(str.rstrip('h'))
-            str = "foo   "
             print(str.rstrip())
-            print("boo".rstrip("foo"))
+            print(str.rstrip(None))
+            print(str.rstrip(''))
+            print(str.rstrip('\t '))
+            print(str.rstrip('\t og'))
+            print(str.rstrip(' fooggg\t\t   '))
             try:
-                print("kk".lstrip(6))
+                print(str.rstrip(6))
             except TypeError as err:
                 print(err)
             """)

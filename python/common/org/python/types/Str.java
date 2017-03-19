@@ -918,38 +918,29 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.lstrip([chars]) -> str\nreturns a copy of the string in which all chars have been stripped from the beginning of the string (default whitespace characters).",
+            __doc__ = "S.lstrip([chars]) -> str\n\n" +
+                    "Return a copy of the string with leading characters removed.\n" +
+                    "The chars argument is a string specifying the set of characters to be removed.\n" +
+                    "If omitted or None, the chars argument defaults to removing whitespace.\n" +
+                    "The chars argument is not a prefix; rather, all combinations of its values are stripped.",
             default_args = {"chars"}
     )
     public org.python.Object lstrip(org.python.Object chars) {
-        int l, i;
-        java.lang.String strip = "";
-        java.lang.String modified = this.value;
-        boolean checker = true;
-        if (chars == null) {
-            strip = " ";
-        } else if (chars instanceof org.python.types.Str) {
-            strip = ((org.python.types.Str) chars).value;
-        }
-        if (!strip.equals("")) {
-            l = strip.length();
-            while (checker) {
-                for (i = 0; i < strip.length(); i++) {
-                    if (strip.charAt(i) != modified.charAt(i)) {
-                        checker = false;
-                        break;
-                    }
-                }
-                if (!checker) {
-                    modified = modified.substring(i);
-                } else {
-                    modified = modified.substring(l);
-                }
+        int start = 0;
+        int end = this.value.length();
+        if (chars == null || chars instanceof org.python.types.NoneType) {
+            while (start < end && java.lang.Character.isWhitespace(this.value.charAt(start))) {
+                start++;
             }
-            return new org.python.types.Str(modified);
+        } else if (chars instanceof org.python.types.Str) {
+            org.python.types.Str chars_str = (org.python.types.Str) chars;
+            while (start < end && chars_str.value.indexOf(this.value.charAt(start)) != -1) {
+                start++;
+            }
         } else {
-            return new org.python.exceptions.TypeError("lstrip arg must be None or str");
+            throw new org.python.exceptions.TypeError("lstrip arg must be None or str");
         }
+        return new org.python.types.Str(this.value.substring(start, end));
     }
 
     @org.python.Method(
@@ -1058,36 +1049,29 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.rstrip([chars]) -> str\nreturns a copy of the string in which all chars have been stripped from the end of the string (default whitespace characters).",
+            __doc__ = "S.rstrip([chars]) -> str\n\n" +
+                    "Return a copy of the string with trailing characters removed.\n" +
+                    "The chars argument is a string specifying the set of characters to be removed.\n" +
+                    "If omitted or None, the chars argument defaults to removing whitespace.\n" +
+                    "The chars argument is not a suffix; rather, all combinations of its values are stripped.",
             default_args = "chars"
     )
     public org.python.Object rstrip(org.python.Object chars) {
-        int l;
-        int i;
-        java.lang.String strip = "";
-        java.lang.String modified = this.value;
-        int tracker = this.value.length();
-        boolean checker = true;
-        if (chars == null) {
-            strip = " ";
-        } else if (chars instanceof org.python.types.Str) {
-            strip = ((org.python.types.Str) chars).value;
-        }
-        if (!strip.equals("")) {
-            l = strip.length();
-            while (checker) {
-                for (i = l - 1; i >= 0; i--) {
-                    if (strip.charAt(i) != modified.charAt(tracker - 1)) {
-                        checker = false;
-                        break;
-                    }
-                    tracker--;
-                }
-                modified = modified.substring(0, tracker);
+        int start = 0;
+        int end = this.value.length();
+        if (chars == null || chars instanceof org.python.types.NoneType) {
+            while (end > start && java.lang.Character.isWhitespace(this.value.charAt(end - 1))) {
+                end--;
             }
-            return new org.python.types.Str(modified);
+        } else if (chars instanceof org.python.types.Str) {
+            org.python.types.Str chars_str = (org.python.types.Str) chars;
+            while (end > start && chars_str.value.indexOf(this.value.charAt(end - 1)) != -1) {
+                end--;
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("rstrip arg must be None or str");
         }
-        return new org.python.exceptions.TypeError("rstrip arg must be None or str");
+        return new org.python.types.Str(this.value.substring(start, end));
     }
 
     @org.python.Method(
