@@ -942,7 +942,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+             __doc__ = ""
     )
     public org.python.Object maketrans() {
         throw new org.python.exceptions.NotImplementedError("maketrans() has not been implemented.");
@@ -978,17 +978,51 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.rfind(sub[, start[, end]]) -> int",
+            default_args = {"item", "start", "end"}
     )
-    public org.python.Object rfind() {
-        throw new org.python.exceptions.NotImplementedError("rfind() has not been implemented.");
+    public org.python.Object rfind(org.python.Object item, org.python.Object start, org.python.Object end) {
+        if (item == null) {
+            throw new org.python.exceptions.TypeError("rfind() takes at least 1 argument (0 given)");
+        }
+        try {
+            org.python.Object st = (org.python.types.Str) item;
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
+        }
+        if (start == null) {
+            start = new Int(0);
+        }
+        if (end == null) {
+            end = new Int(this.value.length());
+        }
+        org.python.Object index = new Int(-1);
+        org.python.Object temp = (Int) index;
+        while (((Bool) (temp.__lt__(end))).value) {
+            temp = this.find(item, start, end);
+            if (((Int) temp).value < 0) {
+                break;
+            }
+            index = temp;
+            start = temp.__add__(new Int(1));
+        }
+        return index;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.index(sub[, start[, end]]) -> int\n\nLike S.find() but raise ValueError when the substring is not found.",
+            default_args = {"items", "start", "end"}
     )
-    public org.python.Object rindex() {
-        throw new org.python.exceptions.NotImplementedError("rindex() has not been implemented.");
+    public org.python.Object rindex(org.python.Object item, org.python.Object start, org.python.Object end) {
+        if (item == null) {
+            throw new org.python.exceptions.TypeError("rindex() takes at least 1 argument (0 given)");
+        }
+        org.python.Object index = this.rfind(item, start, end);
+        if (((Int) index).value < 0) {
+            throw new org.python.exceptions.ValueError("substring not found");
+        } else {
+            return index;
+        }
     }
 
     @org.python.Method(

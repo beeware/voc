@@ -447,6 +447,76 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_rfind(self):
+        # test cases to generate outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rfind('cook'))
+            print(st.rfind('cook',10))
+            print(st.rfind('book',1,10))
+            """)
+
+        # test cases with indices more than the string length
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rfind('cook',100,200))
+            print(st.rfind('cook',1000))
+            print(st.rfind('cook',-1))
+            """)
+
+        # test cases with empty find string
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rfind())
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rindex(self):
+        # test cases to generate outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex('cook'))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',10))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',1,10))
+            except ValueError as err:
+                print(err)
+            """)
+
+        # test cases with indices more than the string length
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex('cook',100,200))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',1000))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',-1))
+            except ValueError as err:
+                print(err)
+            """)
+
+        # test cases with empty find string
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex())
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
