@@ -191,6 +191,18 @@ class StrTests(TranspileTestCase):
             print(x[6:7])
             """)
 
+        # Slice bound in both directions with start larger than end
+        self.assertCodeExecution("""
+            x = "12345"
+            print(x[4:1])
+            """)
+
+        # Slice bound in both directions with start and end out of bounds
+        self.assertCodeExecution("""
+            x = "12345"
+            print(x[-10:10])
+            """)
+
     def test_case_changes(self):
         self.assertCodeExecution("""
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:

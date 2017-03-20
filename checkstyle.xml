@@ -130,6 +130,7 @@
         <module name="Indentation">
             <property name="lineWrappingIndentation" value="8"/>
         </module>
+        <module name="SingleSpaceSeparator"/>
 
         <!-- Modifier Checks                                    -->
         <!-- See http://checkstyle.sf.net/config_modifiers.html -->
@@ -139,7 +140,7 @@
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
         <module name="AvoidNestedBlocks"/>
-        <!--<module name="EmptyBlock"/>-->
+        <module name="EmptyBlock"/>
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
         <module name="RightCurly"/>

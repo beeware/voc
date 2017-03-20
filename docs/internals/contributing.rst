@@ -47,6 +47,15 @@ Then create a virtual environment and install VOC into it:
     $ cd voc
     $ pip install -e .
 
+For Windows the use of cmd under Administrator permission is suggested instead of PowerShell.
+
+.. code-block:: batch
+
+    > virtualenv -p "C:\Python34\python.exe" env
+    > env\Scripts\activate.bat
+    > cd voc
+    > pip install -e .
+
 You're now ready to run the test suite!
 
 Running the test suite
