@@ -204,8 +204,9 @@ def return_statement(accumulator, annotation):
             JavaOpcodes.ARETURN()
         )
 
-class CodeTooLarge(Exception):
+class MethodCodeTooLarge(Exception):
     pass
+
 
 class Function(Block):
     def __init__(self, module, name, code, parameters, returns, static=False):
@@ -541,7 +542,8 @@ class Function(Block):
                 )
             ]
         except BlockCodeTooLarge as e:
-            raise CodeTooLarge("Code is too large for method %s: %d > 65534", self.name, e.code_length)
+            raise MethodCodeTooLarge("Code is too large for method %s: %d > 65534"
+                                     % (self.name, e.code_length))
 
     def transpile_wrapper(self):
         return []

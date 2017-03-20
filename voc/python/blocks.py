@@ -21,10 +21,12 @@ class IgnoreBlock(Exception):
     """An escape hatch; enable a block to be flagged as ignorable"""
     pass
 
+
 class BlockCodeTooLarge(Exception):
     """Enable a block to be flagged too large to transpile."""
     def __init__(self, code_length):
         self.code_length = code_length
+
 
 class Accumulator:
     def __init__(self, local_vars=None):
