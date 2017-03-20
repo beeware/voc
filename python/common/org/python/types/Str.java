@@ -1026,7 +1026,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.ljust(width, fillChar=' ') -> str\nReturns the string left justified in a string of length width." +
+            __doc__ = "S.rjust(width, fillChar=' ') -> str\nReturns the string left justified in a string of length width." +
                     "\nPadding is done using the specified fillchar (default is a space)." +
                     "\nThe original string is returned if width is less than len(s)",
             default_args = {"width", "fillChar"}
@@ -1035,7 +1035,7 @@ public class Str extends org.python.types.Object {
         if (width == null) {
             throw new org.python.exceptions.TypeError("rjust() takes at least 1 argument (0 given)");
         } else if (!(width instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("integer argument expected, got " + Python.typeName(width.getClass()));
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + width.typeName());
         } else {
             java.lang.String ch = new java.lang.String();
             if (fillChar instanceof org.python.types.Str) {
