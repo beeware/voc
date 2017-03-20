@@ -3,7 +3,7 @@ from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
     RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref as JavaClassref
 )
-from .blocks import Block, Accumulator
+from .blocks import Block, Accumulator, BlockCodeTooLarge
 from .structures import (
     TRY, CATCH, END_TRY,
     ArgType,
@@ -204,6 +204,8 @@ def return_statement(accumulator, annotation):
             JavaOpcodes.ARETURN()
         )
 
+class CodeTooLarge(Exception):
+    pass
 
 class Function(Block):
     def __init__(self, module, name, code, parameters, returns, static=False):
@@ -529,14 +531,17 @@ class Function(Block):
         ]
 
     def transpile_method(self):
-        return [
-            JavaMethod(
-                self.pyimpl_name,
-                self.signature,
-                static=self.static,
-                attributes=[self.transpile_code()] + self.method_attributes()
-            )
-        ]
+        try:
+            return [
+                JavaMethod(
+                    self.pyimpl_name,
+                    self.signature,
+                    static=self.static,
+                    attributes=[self.transpile_code()] + self.method_attributes()
+                )
+            ]
+        except BlockCodeTooLarge as e:
+            raise CodeTooLarge("Code is too large for method %s: %d > 65534", self.name, e.code_length)
 
     def transpile_wrapper(self):
         return []
