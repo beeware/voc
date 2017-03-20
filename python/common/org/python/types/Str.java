@@ -710,19 +710,19 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "string.isalnum() -> bool\n" +
                     "\n" +
-                    "Returns false when the string has atleast ONE character which is\n" +
-                    "not an alphanumeric or if the string is empty.\n"
+                    "Return true if all characters in the string are alphanumeric\n" +
+                    "and there is at least one character, false otherwise.\n"
     )
     public org.python.Object isalnum() {
-        if (!this.value.isEmpty()) {
-            for (char c : this.value.toCharArray()) {
-                if (!java.lang.Character.isLetter(c) && !java.lang.Character.isDigit(c)) {
-                    return new org.python.types.Bool(false);
-                }
-            }
-            return new org.python.types.Bool(true);
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
         }
-        return new org.python.types.Bool(false);
+        for (char c : this.value.toCharArray()) {
+            if (!java.lang.Character.isLetter(c) && !java.lang.Character.isDigit(c)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -743,19 +743,19 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "string.isdecimal() -> bool\n" +
                     "\n" +
-                    "Returns false when the string has atleast ONE character which is\n" +
-                    "not a decimal or if the string is empty.\n"
+                    "Return true if all characters in the string are decimal\n" +
+                    "characters and there is at least one character, false otherwise.\n"
     )
     public org.python.Object isdecimal() {
-        if (!this.value.isEmpty()) {
-            for (char c : this.value.toCharArray()) {
-                if (!java.lang.Character.isDigit(c)) {
-                    return new org.python.types.Bool(false);
-                }
-            }
-            return new org.python.types.Bool(true);
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
         }
-        return new org.python.types.Bool(false);
+        for (char c : this.value.toCharArray()) {
+            if (!java.lang.Character.isDigit(c)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
