@@ -204,6 +204,7 @@ def return_statement(accumulator, annotation):
             JavaOpcodes.ARETURN()
         )
 
+
 class MethodCodeTooLarge(Exception):
     pass
 
