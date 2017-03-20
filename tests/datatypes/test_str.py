@@ -543,7 +543,7 @@ class StrTests(TranspileTestCase):
             print('abccabccabcc'.replace('abc', 'ab', 2))
             try:
                 print("kk".replace(6,"l"))
-             except TypeError as err:
+            except TypeError as err:
                 print(err)
             """)
 
