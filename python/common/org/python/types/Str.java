@@ -384,7 +384,7 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object __floordiv__ (org.python.Object other){
+    public org.python.Object __floordiv__(org.python.Object other) {
         if (other instanceof org.python.types.Complex) {
             throw new org.python.exceptions.TypeError("can't take floor of complex number.");
         } else {
@@ -394,7 +394,7 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object __ifloordiv__ (org.python.Object other){
+    public org.python.Object __ifloordiv__(org.python.Object other) {
         if (other instanceof org.python.types.Complex) {
             throw new org.python.exceptions.TypeError("can't take floor of complex number.");
         } else {
