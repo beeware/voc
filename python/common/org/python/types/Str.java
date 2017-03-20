@@ -1034,19 +1034,20 @@ public class Str extends org.python.types.Object {
     public org.python.Object rjust(org.python.Object width, org.python.Object fillChar) {
         if (width == null) {
             throw new org.python.exceptions.TypeError("rjust() takes at least 1 argument (0 given)");
-        }
-        java.lang.String ch = new java.lang.String();
-        if (fillChar instanceof org.python.types.Str) {
-            if (((org.python.types.Str) fillChar).value.length() != 1) {
-                throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
-            }
-            ch = ((org.python.types.Str) fillChar).value;
-        } else if (fillChar == null) {
-            ch = " ";
+        } else if (!(width instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + Python.typeName(width.getClass()));
         } else {
-            throw new org.python.exceptions.TypeError("The fill character cannot be converted to Unicode");
-        }
-        if (width instanceof org.python.types.Int) {
+            java.lang.String ch = new java.lang.String();
+            if (fillChar instanceof org.python.types.Str) {
+                if (((org.python.types.Str) fillChar).value.length() != 1) {
+                    throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
+                }
+                ch = ((org.python.types.Str) fillChar).value;
+            } else if (fillChar == null) {
+                ch = " ";
+            } else {
+                throw new org.python.exceptions.TypeError("The fill character cannot be converted to Unicode");
+            }
             int w = (int) ((org.python.types.Int) width).value;
             if (w < this.value.length()) {
                 return new org.python.types.Str(this.value);
@@ -1059,7 +1060,6 @@ public class Str extends org.python.types.Object {
             str.append(this.value);
             return new org.python.types.Str(str.toString());
         }
-        return new org.python.exceptions.TypeError("integer argument expected, got " + Python.typeName(width.getClass()));
     }
 
     @org.python.Method(

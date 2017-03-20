@@ -531,7 +531,11 @@ class StrTests(TranspileTestCase):
         self.assertCodeExecution("""
             st="a good cook could cook good"
             try:
-                print(st.rjust(-20, 'cook'))
+                print(st.rjust(-20, 'X'))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rjust(100, 'cook'))
             except TypeError as err:
                 print(err)
             try:
