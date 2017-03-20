@@ -916,6 +916,7 @@ public class Str extends org.python.types.Object {
             default_args = {"chars"}
     )
     public org.python.Object lstrip(org.python.Object chars) {
+<<<<<<< HEAD
         int start = 0;
         int end = this.value.length();
         if (chars == null || chars instanceof org.python.types.NoneType) {
@@ -931,6 +932,31 @@ public class Str extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("lstrip arg must be None or str");
         }
         return new org.python.types.Str(this.value.substring(start, end));
+=======
+        java.lang.String strip = null;
+        if (chars == null) {
+            strip = " ";
+        } else if (chars instanceof org.python.types.Str) {
+            strip = ((org.python.types.Str) chars).value;
+        } else {
+            throw new org.python.exceptions.TypeError("lstrip arg must be None or str");
+        }
+        java.lang.String modified = this.value;
+        boolean checker = true;
+        while (checker) {
+            for (int i = 0; i < strip.length(); i++) {
+                if (strip.charAt(i) != modified.charAt(i)) {
+                    checker = false;
+                    modified = modified.substring(i);
+                    break;
+                }
+            }
+            if (checker) {
+                modified = modified.substring(strip.length());
+            }
+        }
+        return new org.python.types.Str(modified);
+>>>>>>> upstream/master
     }
 
     @org.python.Method(
@@ -1047,6 +1073,7 @@ public class Str extends org.python.types.Object {
             default_args = "chars"
     )
     public org.python.Object rstrip(org.python.Object chars) {
+<<<<<<< HEAD
         int start = 0;
         int end = this.value.length();
         if (chars == null || chars instanceof org.python.types.NoneType) {
@@ -1062,6 +1089,30 @@ public class Str extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("rstrip arg must be None or str");
         }
         return new org.python.types.Str(this.value.substring(start, end));
+=======
+        java.lang.String strip = null;
+        if (chars == null) {
+            strip = " ";
+        } else if (chars instanceof org.python.types.Str) {
+            strip = ((org.python.types.Str) chars).value;
+        } else {
+            throw new org.python.exceptions.TypeError("rstrip arg must be None or str");
+        }
+        java.lang.String modified = this.value;
+        int tracker = this.value.length();
+        boolean checker = true;
+        while (checker) {
+            for (int i = strip.length() - 1; i >= 0; i--) {
+                if (strip.charAt(i) != modified.charAt(tracker - 1)) {
+                    checker = false;
+                    break;
+                }
+                tracker--;
+            }
+            modified = modified.substring(0, tracker);
+        }
+        return new org.python.types.Str(modified);
+>>>>>>> upstream/master
     }
 
     @org.python.Method(

@@ -449,7 +449,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
             }
         } catch (java.lang.InstantiationException e) {
             throw new org.python.exceptions.RuntimeError(e.getCause().toString());
-        } finally {
+        // } finally {
             //     System.out.println("CONSTRUCTOR DONE");
         }
     }

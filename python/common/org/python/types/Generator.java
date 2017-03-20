@@ -75,7 +75,7 @@ public class Generator extends org.python.types.Object implements org.python.Ite
                 }
                 throw new org.python.exceptions.RuntimeError(message);
             }
-        } finally {
+        // } finally {
             //     System.out.println("INVOKE METHOD DONE");
         }
     }

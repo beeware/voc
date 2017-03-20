@@ -411,7 +411,7 @@ public class Function extends org.python.types.Object implements org.python.Call
                 }
                 throw new org.python.exceptions.RuntimeError(message);
             }
-        } finally {
+        // } finally {
             //     System.out.println("INVOKE METHOD DONE");
         }
     }
