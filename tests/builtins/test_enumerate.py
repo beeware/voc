@@ -12,6 +12,8 @@ class EnumerateTests(TranspileTestCase):
             print(list(enumerate(lst,start=46)))
             lst=[('a',4),'b','c',10,'e']
             print(list(enumerate(lst)))
+            print(list(enumerate([])))
+            print(list(enumerate([], start=10)))
             """)
 
     def test_enumerate_invalid_start_args(self):
