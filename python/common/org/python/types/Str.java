@@ -973,11 +973,18 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object replace(org.python.Object oldString, org.python.Object replacedBy, org.python.Object howManyTimes) {
         String from, to;
-        if (oldString instanceof org.python.types.Str && replacedBy instanceof org.python.types.Str) {
+        if (oldString == null || replacedBy == null) {
+            throw new org.python.exceptions.TypeError("replace takes at least 2 argument");
+        }
+        try {
             from = ((org.python.types.Str) oldString).value;
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + oldString.typeName() + "' object to str implicitly");
+        }
+        try {
             to = ((org.python.types.Str) replacedBy).value;
-        } else {
-            return new org.python.exceptions.TypeError("args must be Str Type");
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("Can't convert '" + replacedBy.typeName() + "' object to str implicitly");
         }
         String result = "";
         int lastIndex = 0, counter = 0, num = 0, flag = 0, j;
