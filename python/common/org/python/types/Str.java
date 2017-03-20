@@ -974,24 +974,28 @@ public class Str extends org.python.types.Object {
     public org.python.Object replace(org.python.Object oldString, org.python.Object replacedBy, org.python.Object howManyTimes) {
         String from, to;
         if (oldString == null || replacedBy == null) {
-            throw new org.python.exceptions.TypeError("replace takes at least 2 argument");
+            throw new org.python.exceptions.TypeError("replace() takes at least 2 argument");
         }
         try {
             from = ((org.python.types.Str) oldString).value;
         } catch (ClassCastException te) {
-            throw new org.python.exceptions.TypeError("Can't convert '" + oldString.typeName() + "' object to str implicitly");
+            throw new org.python.exceptions.TypeError("replace() argument 1 must be str, not " + oldString.typeName());
         }
         try {
             to = ((org.python.types.Str) replacedBy).value;
         } catch (ClassCastException te) {
-            throw new org.python.exceptions.TypeError("Can't convert '" + replacedBy.typeName() + "' object to str implicitly");
+            throw new org.python.exceptions.TypeError("replace() argument 2 must be str, not " + replacedBy.typeName());
         }
         String result = "";
         int lastIndex = 0, counter = 0, num = 0, flag = 0, j;
         int index = this.value.indexOf(from);
 
         if (howManyTimes != null) {
-            num = (int) ((org.python.types.Int) howManyTimes).value;
+            if (howManyTimes instanceof org.python.types.Int) {
+                num = (int) ((org.python.types.Int) howManyTimes).value;
+            } else {
+                throw new org.python.exceptions.TypeError("replace() argument 3 must be int, not " + howManyTimes.typeName());
+            }
             if (num == 0) {
                 return new org.python.types.Str(this.value);
             }
