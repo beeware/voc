@@ -23,11 +23,11 @@ instead of using the official PyBee repository, you'll be using your own
 Github fork.
 
 As with the getting started guide, these instructions will assume that you
-have Python3, a Java 7 or Java 8 JDK, and Apache ANT installed, and have virtualenv available for use.
+have Python 3.4+, a Java 7 or Java 8 JDK, and Apache ANT installed, and have virtualenv available for use.
 
 **Note:** If you are on Linux, you will need to install an extra package to be able to run the test suite. 
 * **Ubuntu** 12.04 and 14.04: ``libpython3.4-testsuite`` This can be done by running ``apt-get install libpython3.4-testsuite``.
-* **Ubuntu** 16.04: The default version apt-get provides on Ubuntu 16.04 is 3.5+. voc does not build on Python3.5+. A seperate Python3.4 is required.
+* **Ubuntu** 16.04 and 16.10: ``libpython3.5-testsuite`` This can be done by running ``apt-get install libpython3.5-testsuite``.
 
 Start by forking VOC into your own Github repository; then
 check out your fork to your own computer into a development directory:
@@ -46,6 +46,15 @@ Then create a virtual environment and install VOC into it:
     $ . env/bin/activate
     $ cd voc
     $ pip install -e .
+
+For Windows the use of cmd under Administrator permission is suggested instead of PowerShell.
+
+.. code-block:: batch
+
+    > virtualenv -p "C:\Python34\python.exe" env
+    > env\Scripts\activate.bat
+    > cd voc
+    > pip install -e .
 
 You're now ready to run the test suite!
 
@@ -98,6 +107,25 @@ Or, to run all the datatypes tests:
 .. code-block:: bash
 
     $ python setup.py test -s tests.datatypes
+
+
+Running the code style checks
+-----------------------------
+
+Before sending your pull request for review, you may want to run the style checks locally.
+
+These checks also run automatically in Travis, but you will avoid unnecessary
+waiting time if you do this beforehand and fix your code to follow the style
+rules.
+
+In order to do that, first you need to install flake8::
+
+    pip install flake8
+
+Then, whenever you want to run the checks, run the following command inside the
+project's directory::
+
+    flake8 && ant checkstyle
 
 
 Working with code for Java bytecode

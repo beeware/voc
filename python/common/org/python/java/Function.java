@@ -543,7 +543,7 @@ public class Function extends org.python.types.Object implements org.python.Call
                     );
                 }
             }
-        } finally {
+        // } finally {
             //     org.Python.debug("INVOKE METHOD DONE");
         }
     }

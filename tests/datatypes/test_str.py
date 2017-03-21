@@ -30,6 +30,13 @@ class StrTests(TranspileTestCase):
                 print(s.isspace())
             """)
 
+    def test_isalpha(self):
+        self.assertCodeExecution("""
+            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '', 'hello1',
+            'this', 'this is string example....wow!!!', 'átomo', 'CasesLikeTheseWithoutSpaces']:
+                print(s.isalpha())
+            """)
+
     def test_istitle(self):
         self.assertCodeExecution("""
             for s in ['Hello World', 'hello wORLd.', 'Hello world.', '']:
@@ -184,14 +191,39 @@ class StrTests(TranspileTestCase):
             print(x[6:7])
             """)
 
+        # Slice bound in both directions with start larger than end
+        self.assertCodeExecution("""
+            x = "12345"
+            print(x[4:1])
+            """)
+
+        # Slice bound in both directions with start and end out of bounds
+        self.assertCodeExecution("""
+            x = "12345"
+            print(x[-10:10])
+            """)
+
     def test_case_changes(self):
         self.assertCodeExecution("""
             for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
                 print(s.capitalize())
                 print(s.lower())
-                # print(s.swap())
+                print(s.swapcase())
                 print(s.title())
                 print(s.upper())
+            """)
+
+    def test_split(self):
+        self.assertCodeExecution("""
+            for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
+                print(s.split())
+                print(s.split("o"))
+                print(s.split(maxsplit=2))
+                print(s.split("l",maxsplit=0))
+                try:
+                    print(s.split(5))
+                except TypeError as err:
+                    print(err)
             """)
 
     def test_index(self):
@@ -396,6 +428,104 @@ class StrTests(TranspileTestCase):
             try:
                 print(s.partition(""))
             except ValueError as err:
+                print(err)
+            """)
+
+    def test_lstrip(self):
+        self.assertCodeExecution("""
+            str = "gggfoo"
+            print(str.lstrip('g'))
+            print(str.lstrip('h'))
+            str = "   foo"
+            print(str.lstrip())
+            print("foot".lstrip("foobar"))
+            try:
+                print("kk".lstrip(6))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rstrip(self):
+        self.assertCodeExecution("""
+            str = "fooggg"
+            print(str.rstrip('g'))
+            print(str.rstrip('h'))
+            str = "foo   "
+            print(str.rstrip())
+            print("boo".rstrip("foo"))
+            try:
+                print("kk".lstrip(6))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rfind(self):
+        # test cases to generate outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rfind('cook'))
+            print(st.rfind('cook',10))
+            print(st.rfind('book',1,10))
+            """)
+
+        # test cases with indices more than the string length
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rfind('cook',100,200))
+            print(st.rfind('cook',1000))
+            print(st.rfind('cook',-1))
+            """)
+
+        # test cases with empty find string
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rfind())
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rindex(self):
+        # test cases to generate outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex('cook'))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',10))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',1,10))
+            except ValueError as err:
+                print(err)
+            """)
+
+        # test cases with indices more than the string length
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex('cook',100,200))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',1000))
+            except ValueError as err:
+                print(err)
+            try:
+                print(st.rindex('cook',-1))
+            except ValueError as err:
+                print(err)
+            """)
+
+        # test cases with empty find string
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rindex())
+            except TypeError as err:
                 print(err)
             """)
 

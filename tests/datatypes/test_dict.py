@@ -1,5 +1,7 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
+from unittest import expectedFailure
+
 
 class DictTests(TranspileTestCase):
     def test_setattr(self):
@@ -225,6 +227,71 @@ class DictTests(TranspileTestCase):
                 print(err)
             try:
                 print(x.get([], 1))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_copy(self):
+        self.assertCodeExecution("""
+            x = {42: 'Babel'}
+            y = x.copy()
+
+            print(y)
+            print(x == y)
+            print(x is not y)
+            """)
+
+        self.assertCodeExecution("""
+            x = {'42': 'Babel'}
+            y = x.copy()
+
+            print(x['42'] is y['42'])
+
+            x['42'] = 'somevalue'
+            print(x['42'] == y['42'])
+
+            print(x == y)
+            """)
+
+    def test_fromkeys(self):
+        self.assertCodeExecution("""
+            keys = [1, 2]
+            print({}.fromkeys(keys))
+            """)
+
+        # non-iterable error test
+        self.assertCodeExecution("""
+            keys = 1
+            value = 2
+            try:
+                print({}.fromkeys(keys, value))
+            except TypeError as err:
+                print(err)
+            """)
+
+        # empty iterable and orginal dict test
+        self.assertCodeExecution("""
+            keys = ()
+            value = 5
+            dt = {}
+            print(dt.fromkeys(keys, value))
+            print(dt)
+            """)
+
+        # non-hashable error on key test
+        self.assertCodeExecution("""
+            keys = [[1], 2]
+            try:
+                print({}.fromkeys(keys))
+            except TypeError as err:
+                print(err)
+            """)
+
+    @expectedFailure
+    def test_fromkeys_missing_iterable(self):
+        self.assertCodeExecution("""
+            try:
+                print({}.fromkeys())
             except TypeError as err:
                 print(err)
             """)

@@ -4,9 +4,6 @@ package python.importlib;
         __doc__ = "A pure Python implementation of import."
 )
 public class __init__ extends org.python.types.Module {
-    static {
-    }
-
     @org.python.Method(
             __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
