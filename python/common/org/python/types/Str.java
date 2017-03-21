@@ -989,10 +989,80 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "replace",
+            args = {"oldString", "replacedBy"},
+            default_args = {"howManyTimes"}
     )
-    public org.python.Object replace() {
-        throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
+    public org.python.Object replace(org.python.Object oldString, org.python.Object replacedBy, org.python.Object howManyTimes) {
+        String from, to;
+        if (oldString == null || replacedBy == null) {
+            throw new org.python.exceptions.TypeError("replace() takes at least 2 argument");
+        }
+        try {
+            from = ((org.python.types.Str) oldString).value;
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("replace() argument 1 must be str, not " + oldString.typeName());
+        }
+        try {
+            to = ((org.python.types.Str) replacedBy).value;
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("replace() argument 2 must be str, not " + replacedBy.typeName());
+        }
+        String result = "";
+        int lastIndex = 0, counter = 0, num = 0, flag = 0, j;
+        int index = this.value.indexOf(from);
+
+        if (howManyTimes != null) {
+            if (howManyTimes instanceof org.python.types.Int) {
+                num = (int) ((org.python.types.Int) howManyTimes).value;
+            } else {
+                throw new org.python.exceptions.TypeError("replace() argument 3 must be int, not " + howManyTimes.typeName());
+            }
+            if (num == 0) {
+                return new org.python.types.Str(this.value);
+            }
+            flag = 1;
+        } else {
+            flag = 0;
+        }
+        if (from.length() == 0) {
+            if (num > this.value.length() + 1) {
+                num = this.value.length() + 1;
+            }
+            if (howManyTimes != null) {
+                if (this.value.length() == 0) {
+                    return new org.python.types.Str("");
+                }
+                for (j = 0; j < num - 1; j++) {
+                    result += Character.toString(this.value.charAt(j)) + to;
+                }
+                result = to + result + this.value.substring(num - 1);
+                return new org.python.types.Str(result);
+            } else {
+                for (j = 0; j < this.value.length(); j++) {
+                    result += Character.toString(this.value.charAt(j)) + to;
+                }
+                result = to + result;
+                return new org.python.types.Str(result);
+            }
+        }
+        result = value;
+        if (index != -1) {
+            StringBuffer buffer = new StringBuffer();
+            while (index != -1) {
+                if (counter == num && flag == 1) {
+                    break;
+                }
+                buffer.append(value.substring(lastIndex, index)).append(to);
+                counter++;
+                lastIndex = index + from.length();
+                index = value.indexOf(from, lastIndex);
+            }
+
+            buffer.append(value.substring(lastIndex));
+            result = buffer.toString();
+        }
+        return new org.python.types.Str(result);
     }
 
     @org.python.Method(
