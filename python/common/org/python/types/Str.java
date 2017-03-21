@@ -717,10 +717,21 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isalnum() -> bool\n" +
+                    "\n" +
+                    "Return True if all characters in S are alphanumeric\n" +
+                    "and there is at least one character in S, False otherwise.\n"
     )
     public org.python.Object isalnum() {
-        throw new org.python.exceptions.NotImplementedError("isalnum() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+        }
+        for (char c : this.value.toCharArray()) {
+            if (!java.lang.Character.isLetter(c) && !java.lang.Character.isDigit(c)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -739,10 +750,21 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isdecimal() -> bool\n" +
+                    "\n" +
+                    "Return True if there are only decimal characters in S,\n" +
+                    "False otherwise.\n"
     )
     public org.python.Object isdecimal() {
-        throw new org.python.exceptions.NotImplementedError("isdecimal() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+        }
+        for (char c : this.value.toCharArray()) {
+            if (!java.lang.Character.isDigit(c)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
