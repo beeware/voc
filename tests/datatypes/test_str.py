@@ -33,7 +33,7 @@ class StrTests(TranspileTestCase):
     def test_isalnum(self):
         self.assertCodeExecution("""
             for word in ["", "12", "abc", "abc12", "\u00c4", "\x41", "a@g", "äÆ",
-            "12.2", "'hi'", "hello!!"]:
+            "12.2", "'Hi'", "Hello!!", "HELLO", "V0c", "A A"]:
                 print(word.isalnum())
             """)
 

@@ -708,10 +708,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "string.isalnum() -> bool\n" +
+            __doc__ = "S.isalnum() -> bool\n" +
                     "\n" +
-                    "Return true if all characters in the string are alphanumeric\n" +
-                    "and there is at least one character, false otherwise.\n"
+                    "Return True if all characters in S are alphanumeric\n" +
+                    "and there is at least one character in S, False otherwise.\n"
     )
     public org.python.Object isalnum() {
         if (this.value.isEmpty()) {
@@ -741,10 +741,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "string.isdecimal() -> bool\n" +
+            __doc__ = "S.isdecimal() -> bool\n" +
                     "\n" +
-                    "Return true if all characters in the string are decimal\n" +
-                    "characters and there is at least one character, false otherwise.\n"
+                    "Return True if there are only decimal characters in S,\n" +
+                    "False otherwise.\n"
     )
     public org.python.Object isdecimal() {
         if (this.value.isEmpty()) {
