@@ -1151,7 +1151,8 @@ public class Str extends org.python.types.Object {
             __doc__ = "S.rjust(width[, fillchar]) -> str\n" +
                     "\n" +
                     "Return S right-justified in a string of length width. Padding is\n" +
-                    "done using the specified fill character (default is a space).\n"
+                    "done using the specified fill character (default is a space).\n",
+            default_args = {"width", "fillChar"}
     )
     public org.python.Object rjust(org.python.Object width, org.python.Object fillChar) {
         if (width == null) {
