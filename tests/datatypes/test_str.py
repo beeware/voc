@@ -395,6 +395,20 @@ class StrTests(TranspileTestCase):
             print(len(s))
         """)
 
+    def test_casefold(self):
+        self.assertCodeExecution("""
+            s = 'İ'
+            print(s.casefold())
+            s = 'I'
+            print(s.casefold())
+            s = 'ß'
+            print(s.casefold())
+            s = 'Ŋ'
+            print(s.casefold())
+            s = 'ı'
+            print(s.casefold())
+        """)
+
     def test_center(self):
         # test ok
         self.assertCodeExecution("""

@@ -512,10 +512,46 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.casefold() -> Str\nReturn a version of S suitable for caseless comparisons.\n"
     )
     public org.python.Object casefold() {
-        throw new org.python.exceptions.NotImplementedError("casefold() has not been implemented.");
+        if (!this.value.isEmpty()) {
+            //import the mapping here or import it from initiation
+            java.io.File f = new java.io.File("../../python/common/org/python/types/CaseFolding.txt");
+            java.util.Scanner scan = new java.util.Scanner(System.in);
+            try {
+                scan = new java.util.Scanner(f);
+            } catch (java.io.FileNotFoundException ex) {
+                System.out.println(ex);
+            }
+            java.util.Map<Character, String> casefoldMap = new java.util.HashMap<Character, String>();
+            java.lang.String casefoldMode = "F";
+            while (scan.hasNextLine()) {
+                java.lang.String ln = scan.nextLine();
+                java.lang.String[] parts = ln.split(";");
+                if (casefoldMode.equals(parts[1].trim())) {
+                    int from = Integer.decode("0x" + parts[0].trim());
+                    java.lang.String[] cs = (parts[2].trim()).split(" ");
+                    java.lang.String to = "";
+                    for (int j = 0; j < cs.length; j++) {
+                        to += java.lang.String.valueOf(Character.toChars(Integer.decode("0x" + cs[j])));
+                    }
+                    casefoldMap.put((Character.toChars(from))[0], to);
+                }
+            }
+            //for each char, map it based on the map table
+            java.lang.String ret = "";
+            for (int i = 0; i < this.value.length(); i++) {
+                if (casefoldMap.containsKey(this.value.charAt(i))) {
+                    ret += casefoldMap.get(this.value.charAt(i));
+                } else {
+                    ret += this.value.charAt(i);
+                }
+            }
+            return new org.python.types.Str(ret.toLowerCase());
+        } else {
+            throw new org.python.exceptions.NotImplementedError("casefold() has not been implemented.");
+        }
     }
 
     @org.python.Method(
