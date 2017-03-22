@@ -1151,18 +1151,7 @@ public class Str extends org.python.types.Object {
         if (chars == null || chars instanceof org.python.types.NoneType) {
             return new org.python.types.Str(this.value.trim());
         } else if (chars instanceof org.python.types.Str) {
-            org.python.types.Str chars_str = (org.python.types.Str) chars;
-            int start = 0;
-            int end = this.value.length();
-            // lstrip
-            while (start < end && chars_str.value.indexOf(this.value.charAt(start)) != -1) {
-                start++;
-            }
-            // rstrip
-            while (end > start && chars_str.value.indexOf(this.value.charAt(end - 1)) != -1) {
-                end--;
-            }
-            return new org.python.types.Str(this.value.substring(start, end));
+            return ((org.python.types.Str) this.lstrip(chars)).rstrip(chars);
         } else {
             throw new org.python.exceptions.TypeError("strip arg must be None or str");
         }
