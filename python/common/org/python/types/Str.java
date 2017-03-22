@@ -762,7 +762,15 @@ public class Str extends org.python.types.Object {
                     "and there is at least one character in S, False otherwise.\n"
     )
     public org.python.Object isalnum() {
-        throw new org.python.exceptions.NotImplementedError("isalnum() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+        }
+        for (char c : this.value.toCharArray()) {
+            if (!java.lang.Character.isLetter(c) && !java.lang.Character.isDigit(c)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -790,7 +798,15 @@ public class Str extends org.python.types.Object {
                     "False otherwise.\n"
     )
     public org.python.Object isdecimal() {
-        throw new org.python.exceptions.NotImplementedError("isdecimal() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+        }
+        for (char c : this.value.toCharArray()) {
+            if (!java.lang.Character.isDigit(c)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -1137,8 +1153,35 @@ public class Str extends org.python.types.Object {
                     "Return S right-justified in a string of length width. Padding is\n" +
                     "done using the specified fill character (default is a space).\n"
     )
-    public org.python.Object rjust() {
-        throw new org.python.exceptions.NotImplementedError("rjust() has not been implemented.");
+    public org.python.Object rjust(org.python.Object width, org.python.Object fillChar) {
+        if (width == null) {
+            throw new org.python.exceptions.TypeError("rjust() takes at least 1 argument (0 given)");
+        } else if (!(width instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + width.typeName());
+        } else {
+            java.lang.String ch = new java.lang.String();
+            if (fillChar instanceof org.python.types.Str) {
+                if (((org.python.types.Str) fillChar).value.length() != 1) {
+                    throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
+                }
+                ch = ((org.python.types.Str) fillChar).value;
+            } else if (fillChar == null) {
+                ch = " ";
+            } else {
+                throw new org.python.exceptions.TypeError("The fill character cannot be converted to Unicode");
+            }
+            int w = (int) ((org.python.types.Int) width).value;
+            if (w < this.value.length()) {
+                return new org.python.types.Str(this.value);
+            }
+            java.lang.StringBuffer str = new java.lang.StringBuffer(w);
+            int balance = w - this.value.length();
+            for (int i = 0; i < balance; i++) {
+                str.append(ch);
+            }
+            str.append(this.value);
+            return new org.python.types.Str(str.toString());
+        }
     }
 
     @org.python.Method(
