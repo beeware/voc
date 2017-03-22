@@ -1320,7 +1320,8 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Return a copy of the string S with leading and trailing\n" +
                     "whitespace removed.\n" +
-                    "If chars is given and not None, remove characters in chars instead.\n"
+                    "If chars is given and not None, remove characters in chars instead.\n",
+            default_args = {"chars"}
     )
     public org.python.Object strip(org.python.Object chars) {
         if (chars == null || chars instanceof org.python.types.NoneType) {
