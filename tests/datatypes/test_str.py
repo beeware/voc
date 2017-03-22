@@ -543,6 +543,37 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_rjust(self):
+        # test cases to generate valid outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rjust(100))
+            print(st.rjust(100, 'X'))
+            print(st.rjust(10, 'X'))
+
+            """)
+
+        # test cases to generate exception
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rjust(-20, 'X'))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rjust(100, 'cook'))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rjust())
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rjust(20.5, 'X'))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
