@@ -30,11 +30,25 @@ class StrTests(TranspileTestCase):
                 print(s.isspace())
             """)
 
+    def test_isalnum(self):
+        self.assertCodeExecution("""
+            for word in ["", "12", "abc", "abc12", "\u00c4", "\x41", "a@g", "äÆ",
+            "12.2", "'Hi'", "Hello!!", "HELLO", "V0c", "A A"]:
+                print(word.isalnum())
+            """)
+
     def test_isalpha(self):
         self.assertCodeExecution("""
             for s in ['Hello World', 'hello wORLd.', 'Hello world.', '', 'hello1',
             'this', 'this is string example....wow!!!', 'átomo', 'CasesLikeTheseWithoutSpaces']:
                 print(s.isalpha())
+            """)
+
+    def test_isdecimal(self):
+        self.assertCodeExecution("""
+            for word in ["", "12", "abc", "abc12", "\u0037", "\x31", "0101b",
+            "-13", "12.2", "'7'"]:
+                print(word.isdecimal())
             """)
 
     def test_istitle(self):
@@ -546,6 +560,37 @@ class StrTests(TranspileTestCase):
             st="a good cook could cook good"
             try:
                 print(st.rindex())
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_rjust(self):
+        # test cases to generate valid outout
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            print(st.rjust(100))
+            print(st.rjust(100, 'X'))
+            print(st.rjust(10, 'X'))
+
+            """)
+
+        # test cases to generate exception
+        self.assertCodeExecution("""
+            st="a good cook could cook good"
+            try:
+                print(st.rjust(-20, 'X'))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rjust(100, 'cook'))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rjust())
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.rjust(20.5, 'X'))
             except TypeError as err:
                 print(err)
             """)
