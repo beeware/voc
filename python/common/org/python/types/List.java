@@ -645,7 +645,8 @@ public class List extends org.python.types.Object {
             }
         }
 
-        int iStart = 0, iEnd = this.value.size();
+        int iStart = 0;
+        int iEnd = this.value.size();
         if (end != null) {
             iEnd = toPositiveIndex(((Long) end.toJava()).intValue());
         }

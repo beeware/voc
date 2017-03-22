@@ -556,12 +556,13 @@ public class ByteArray extends org.python.types.Object {
             if (other instanceof org.python.types.List
                     || other instanceof org.python.types.Range
                     || other instanceof org.python.types.Dict) {
-                int i, size;
+                int i;
                 for (i = 0; i < this.value.length; i++) {
                     if (this.value[0] == 0) {
                         break;
                     }
                 }
+                int size;
                 if (org.Python.VERSION < 0x03060000) {
                     size = i;
                 } else {
