@@ -671,10 +671,35 @@ public class __init__ extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Get an environment variable, return None if it doesn't exist.\n" +
+                      "The optional second argument can specify an alternate default.\n" +
+                      "key, default and the result are str.",
+            args = {"key"},
+            default_args = {"default"}
     )
-    public static org.python.Object getenv() {
-        throw new org.python.exceptions.NotImplementedError("'getenv' has not been implemented");
+    public static org.python.Object getenv(org.python.Object key, org.python.Object defaultVal) {
+        //check type of key
+        if (!(key instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("str expected, not " + key.typeName());
+        }
+
+        //if default is null assign none
+        if (defaultVal == null) {
+            defaultVal = org.python.types.NoneType.NONE;
+        }
+
+        //get java getenv
+        String value = System.getenv(((org.python.types.Str) key).value);
+
+        //return if it isnt null
+        if (value != null) {
+            return new org.python.types.Str(value);
+        }
+
+        //if it is null return the default
+        return defaultVal;
+
+
     }
 
     @org.python.Method(
