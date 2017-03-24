@@ -410,41 +410,40 @@ public class Str extends org.python.types.Object {
     }
 
     void castArgs(java.lang.String format, java.util.List<java.lang.Object> args) {
-      String[] parsedOp = parse(format);
-      int args_index = 0;
-      for(int i =0; i < parsedOp.length; i++)
-      {
+        String[] parsedOp = parse(format);
+        int args_index = 0;
+        for (int i = 0; i < parsedOp.length; i++) {
 
-          java.lang.Object other = args.get(args_index);
+            java.lang.Object other = args.get(args_index);
 
-          if(other instanceof Float || other instanceof Double)
-          {
-              // Since this is called after convertSpecifiers, no need to worry about Python only(s) like F, r, a, u, i
-              switch(parsedOp[i].charAt(0))
-              {
-                  case 'c': // %c implicitly converts int to char
-                  case 'd': // decimal int
-                  case 'i': // decimal int
-                  case 'u': // decimal int
-                  case 'o': // %o implicitly converts decimal int to octal int
-                  case 'x': // %x implicitly converts decimal int to hex int
-                  case 'X': // %X implicitly converts decimal int to hex int
-                      // Convert to int, hex should happen auto due to flag
-                      args.remove(args_index);
-                      args.add(args_index,(int)((double)other));
-                      break;
-                  default:
-                      // f, F, e, E, g, G, s, r, a
-                      // floating point representation and thus no conversion
-                      break;
-              }
-          }
+            if (other instanceof Float || other instanceof Double) {
+                // Since this is called after convertSpecifiers, no need to worry about Python only(s) like F, r, a, u, i
+                switch (parsedOp[i].charAt(0)) {
+                    case 'c': // %c implicitly converts int to char
+                    case 'd': // decimal int
+                    case 'i': // decimal int
+                    case 'u': // decimal int
+                    case 'o': // %o implicitly converts decimal int to octal int
+                    case 'x': // %x implicitly converts decimal int to hex int
+                    case 'X': // %X implicitly converts decimal int to hex int
+                        // Convert to int, hex should happen auto due to flag
+                        args.remove(args_index);
+                        args.add(args_index, (int) ((double) other));
+                        break;
+                    default:
+                        // f, F, e, E, g, G, s, r, a
+                        // floating point representation and thus no conversion
+                        break;
+                }
+            }
 
-          if(!other.equals("%")) args_index++;
-      }
+            if (!other.equals("%")) {
+                args_index++;
+            }
+        }
     }
 
-    private java.lang.String convertToPythonFormatSpecifiers(java.lang.String format){
+    private java.lang.String convertToPythonFormatSpecifiers(java.lang.String format) {
 
         java.lang.String output = format;
         java.lang.String[] parsedOp = parse(format);
@@ -492,7 +491,7 @@ public class Str extends org.python.types.Object {
         java.util.ArrayList<java.lang.String> al = new java.util.ArrayList<>();
         java.util.regex.Matcher m = fsPattern.matcher(s);
 
-        for (int i = 0, len = s.length(); i < len; ) {
+        for (int i = 0, len = s.length(); i < len;) {
             if (m.find(i)) {
                 // Anything between the start of the string and the beginning
                 // of the format specifier is either fixed text or contains
