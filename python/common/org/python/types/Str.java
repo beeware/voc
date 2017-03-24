@@ -1182,10 +1182,34 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Search for the separator sep in S, starting at the end of S, and return\n" +
                     "the part before it, the separator itself, and the part after it.  If the\n" +
-                    "separator is not found, return two empty strings and S.\n"
+                    "separator is not found, return two empty strings and S.\n",
+            args = {"sep"}
     )
-    public org.python.Object rpartition() {
-        throw new org.python.exceptions.NotImplementedError("rpartition() has not been implemented.");
+    public org.python.Object rpartition(org.python.types.Object sep) {
+        java.lang.String sepStr = ((org.python.types.Str) sep).value;
+        java.lang.String str_one = new java.lang.String();
+        java.util.List<org.python.Object> tuple = new java.util.ArrayList<org.python.Object>();
+        if (sepStr.equals("")) {
+            throw new org.python.exceptions.ValueError("empty separator");
+        }
+        java.lang.String[] split = this.value.split(sepStr);
+        if (split.length == 1) {
+            tuple.add(new org.python.types.Str(""));
+            tuple.add(new org.python.types.Str(""));
+            tuple.add(new org.python.types.Str(this.value));
+            return new org.python.types.Tuple(tuple);
+        }
+        for (int i = 0; i < split.length - 1; i++) {
+            if (i == split.length - 2) {
+                str_one += split[i];
+                break;
+            }
+            str_one += split[i] + sepStr;
+        }
+        tuple.add(new org.python.types.Str(str_one));
+        tuple.add(new org.python.types.Str(sepStr));
+        tuple.add(new org.python.types.Str(split[split.length - 1]));
+        return new org.python.types.Tuple(tuple);
     }
 
     @org.python.Method(

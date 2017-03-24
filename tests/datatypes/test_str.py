@@ -594,6 +594,7 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+<<<<<<< bd6c9ab5d32ee1376333216cd2a6c471de7d17d5
     def test_strip(self):
         self.assertCodeExecution("""
             s = "\t\t   hello "
@@ -625,6 +626,18 @@ class StrTests(TranspileTestCase):
             print("ÅAÆΣß".casefold())
             print("ß.nfG".casefold())
             print("HeLlo_worldʃ!".casefold())
+=======
+    def test_rpartition(self):
+        self.assertCodeExecution("""
+            Stri = "Hello World!"
+            print(Stri.rpartition("H"))
+            print(Stri.rpartition(" "))
+            print(Stri.rpartition("l"))
+            try:
+                print(Stri.rpartition(""))
+            except ValueError as err:
+                print(err)
+>>>>>>> added rpartition
             """)
 
 
