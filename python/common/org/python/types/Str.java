@@ -383,27 +383,6 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object __floordiv__(org.python.Object other) {
-        if (other instanceof org.python.types.Complex) {
-            throw new org.python.exceptions.TypeError("can't take floor of complex number.");
-        } else {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
-        }
-    }
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __ifloordiv__(org.python.Object other) {
-        if (other instanceof org.python.types.Complex) {
-            throw new org.python.exceptions.TypeError("can't take floor of complex number.");
-        } else {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //=: '" + this.typeName() + "' and '" + other.typeName() + "'");
-        }
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
     public org.python.Object __mod__(org.python.Object other) {
         java.util.List<java.lang.Object> format_args = new java.util.ArrayList<java.lang.Object>();
         if (other instanceof org.python.types.List) {
