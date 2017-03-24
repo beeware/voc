@@ -522,7 +522,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.capitalize() -> str\n" +
+                    "\n" +
+                    "Return a capitalized version of S, i.e. make the first character\n" +
+                    "have upper case and the rest lower case.\n"
     )
     public org.python.Object capitalize() {
         if (this.value.length() > 0) {
@@ -533,14 +536,19 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.casefold() -> str\n" +
+                    "\n" +
+                    "Return a version of S suitable for caseless comparisons.\n"
     )
     public org.python.Object casefold() {
         throw new org.python.exceptions.NotImplementedError("casefold() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "S.center(width[, fillchar]) -> str\n" +
+                    "\n" +
+                    "Return S centered in a string of length width. Padding is\n" +
+                    "done using the specified fill character (default is a space)\n",
             args = {"width"},
             default_args = {"charToFill"}
     )
@@ -588,7 +596,11 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "S.count(sub[, start[, end]]) -> int\n" +
+                    "\n" +
+                    "Return the number of non-overlapping occurrences of substring sub in\n" +
+                    "string S[start:end].  Optional arguments start and end are\n" +
+                    "interpreted as in slice notation.\n",
             args = {"item"},
             default_args = {"start", "end"}
     )
@@ -605,14 +617,26 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.encode(encoding='utf-8', errors='strict') -> bytes\n" +
+                    "\n" +
+                    "Encode S using the codec registered for encoding. Default encoding\n" +
+                    "is 'utf-8'. errors may be given to set a different error\n" +
+                    "handling scheme. Default is 'strict' meaning that encoding errors raise\n" +
+                    "a UnicodeEncodeError. Other possible values are 'ignore', 'replace' and\n" +
+                    "'xmlcharrefreplace' as well as any other name registered with\n" +
+                    "codecs.register_error that can handle UnicodeEncodeErrors.\n"
     )
     public org.python.Object encode() {
         throw new org.python.exceptions.NotImplementedError("encode() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "S.endswith(suffix[, start[, end]]) -> bool",
+            __doc__ = "S.endswith(suffix[, start[, end]]) -> bool\n" +
+                    "\n" +
+                    "Return True if S ends with the specified suffix, False otherwise.\n" +
+                    "With optional start, test S beginning at that position.\n" +
+                    "With optional end, stop comparing S at that position.\n" +
+                    "suffix can also be a tuple of strings to try.\n",
             args = {"suffix"},
             default_args = {"start", "end"}
     )
@@ -632,7 +656,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.expandtabs([tabsize]) -> string",
+            __doc__ = "S.expandtabs(tabsize=8) -> str\n" +
+                    "\n" +
+                    "Return a copy of S where all tab characters are expanded using spaces.\n" +
+                    "If tabsize is not given, a tab size of 8 characters is assumed.\n",
             default_args = {"tabsize"}
     )
     public org.python.Object expandtabs(org.python.Object tabsize) {
@@ -674,7 +701,11 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.find(sub[, start[, end]]) -> int",
+            __doc__ = "S.find(sub[, start[, end]]) -> int\n" +
+                    "\n" +
+                    "Return the lowest index in S where substring sub is found,\n" +
+                    "such that sub is contained within S[start:end].  Optional\n" +
+                    "arguments start and end are interpreted as in slice notation.\n",
             args = {"item"},
             default_args = {"start", "end"}
     )
@@ -693,14 +724,20 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.format(*args, **kwargs) -> str\n" +
+                    "\n" +
+                    "Return a formatted version of S, using substitutions from args and kwargs.\n" +
+                    "The substitutions are identified by braces ('{' and '}').\n"
     )
     public org.python.Object format() {
         throw new org.python.exceptions.NotImplementedError("format() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.format_map(mapping) -> str\n" +
+                    "\n" +
+                    "Return a formatted version of S, using substitutions from mapping.\n" +
+                    "The substitutions are identified by braces ('{' and '}').\n"
     )
     public org.python.Object format_map() {
         throw new org.python.exceptions.NotImplementedError("format_map() has not been implemented.");
@@ -724,7 +761,9 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.index(sub[, start[, end]]) -> int\n\nLike S.find() but raise ValueError when the substring is not found.",
+            __doc__ = "S.index(sub[, start[, end]]) -> int\n" +
+                    "\n" +
+                    "Like S.find() but raise ValueError when the substring is not found.\n",
             args = {"item"},
             default_args = {"start", "end"}
     )
@@ -756,7 +795,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.isalpha() -> bool\n\n returns false when the string has atleast ONE non letter or if it is empty."
+            __doc__ = "S.isalpha() -> bool\n" +
+                    "\n" +
+                    "Return True if all characters in S are alphabetic\n" +
+                    "and there is at least one character in S, False otherwise.\n"
     )
     public org.python.Object isalpha() {
         if (this.value.isEmpty()) {
@@ -789,7 +831,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isdigit() -> bool\n" +
+                    "\n" +
+                    "Return True if all characters in S are digits\n" +
+                    "and there is at least one character in S, False otherwise.\n"
     )
     public org.python.Object isdigit() {
         if (this.value.isEmpty()) {
@@ -804,14 +849,23 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isidentifier() -> bool\n" +
+                    "\n" +
+                    "Return True if S is a valid identifier according\n" +
+                    "to the language definition.\n" +
+                    "\n" +
+                    "Use keyword.iskeyword() to test for reserved identifiers\n" +
+                    "such as \"def\" and \"class\".\n"
     )
     public org.python.Object isidentifier() {
         throw new org.python.exceptions.NotImplementedError("isidentifier() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.islower() -> bool\n" +
+                    "\n" +
+                    "Return True if all cased characters in S are lowercase and there is\n" +
+                    "at least one cased character in S, False otherwise.\n"
     )
     public org.python.Object islower() {
         if (!this.value.isEmpty() && this.value.toLowerCase().equals(this.value)) {
@@ -821,21 +875,30 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isnumeric() -> bool\n" +
+                    "\n" +
+                    "Return True if there are only numeric characters in S,\n" +
+                    "False otherwise.\n"
     )
     public org.python.Object isnumeric() {
         throw new org.python.exceptions.NotImplementedError("isnumeric() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isprintable() -> bool\n" +
+                    "\n" +
+                    "Return True if all characters in S are considered\n" +
+                    "printable in repr() or S is empty, False otherwise.\n"
     )
     public org.python.Object isprintable() {
         throw new org.python.exceptions.NotImplementedError("isprintable() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isspace() -> bool\n" +
+                    "\n" +
+                    "Return True if all characters in S are whitespace\n" +
+                    "and there is at least one character in S, False otherwise.\n"
     )
     public org.python.Object isspace() {
         if (this.value.isEmpty()) {
@@ -850,7 +913,12 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.istitle() -> bool\n" +
+                    "\n" +
+                    "Return True if S is a titlecased string and there is at least one\n" +
+                    "character in S, i.e. upper- and titlecase characters may only\n" +
+                    "follow uncased characters and lowercase characters only cased ones.\n" +
+                    "Return False otherwise.\n"
     )
     public org.python.Object istitle() {
         if (this.value.isEmpty()) {
@@ -865,7 +933,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.isupper() -> bool\n" +
+                    "\n" +
+                    "Return True if all cased characters in S are uppercase and there is\n" +
+                    "at least one cased character in S, False otherwise.\n"
     )
     public org.python.Object isupper() {
         if (!this.value.isEmpty() && this.value.toUpperCase().equals(this.value)) {
@@ -875,7 +946,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.join(iterable) -> str",
+            __doc__ = "S.join(iterable) -> str\n" +
+                    "\n" +
+                    "Return a string which is the concatenation of the strings in the\n" +
+                    "iterable.  The separator between elements is S.\n",
             args = {"iterable"}
     )
     public org.python.Object join(org.python.Object iterable) {
@@ -907,9 +981,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.ljust(width, fillChar=' ') -> str\nReturns the string left justified in a string of length width." +
-                    "\nPadding is done using the specified fillchar (default is a space)." +
-                    "\nThe original string is returned if width is less than len(s)",
+            __doc__ = "S.ljust(width[, fillchar]) -> str\n" +
+                    "\n" +
+                    "Return S left-justified in a Unicode string of length width. Padding is\n" +
+                    "done using the specified fill character (default is a space).\n",
             args = {"width"},
             default_args = {"fillChar"}
     )
@@ -944,14 +1019,19 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.lower() -> str\n" +
+                    "\n" +
+                    "Return a copy of the string S converted to lowercase.\n"
     )
     public org.python.Object lower() {
         return new org.python.types.Str(this.value.toLowerCase());
     }
 
     @org.python.Method(
-            __doc__ = "S.lstrip([chars]) -> str\nreturns a copy of the string in which all chars have been stripped from the beginning of the string (default whitespace characters).",
+            __doc__ = "S.lstrip([chars]) -> str\n" +
+                    "\n" +
+                    "Return a copy of the string S with leading whitespace removed.\n" +
+                    "If chars is given and not None, remove characters in chars instead.\n",
             default_args = {"chars"}
     )
     public org.python.Object lstrip(org.python.Object chars) {
@@ -981,14 +1061,26 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-             __doc__ = ""
+             __doc__ = "Return a translation table usable for str.translate().\n" +
+                    "\n" +
+                    "If there is only one argument, it must be a dictionary mapping Unicode\n" +
+                    "ordinals (integers) or characters to Unicode ordinals, strings or None.\n" +
+                    "Character keys will be then converted to ordinals.\n" +
+                    "If there are two arguments, they must be strings of equal length, and\n" +
+                    "in the resulting dictionary, each character in x will be mapped to the\n" +
+                    "character at the same position in y. If there is a third argument, it\n" +
+                    "must be a string, whose characters will be mapped to None in the result.\n"
     )
     public org.python.Object maketrans() {
         throw new org.python.exceptions.NotImplementedError("maketrans() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "S.partition(sep) -> tuple",
+            __doc__ = "S.partition(sep) -> (head, sep, tail)\n" +
+                    "\n" +
+                    "Search for the separator sep in S, and return the part before it,\n" +
+                    "the separator itself, and the part after it.  If the separator is not\n" +
+                    "found, return S and two empty strings.\n",
             args = {"sep"}
     )
     public org.python.Object partition(org.python.Object sep) {
@@ -1010,14 +1102,24 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.replace(old, new[, count]) -> str\n" +
+                    "\n" +
+                    "Return a copy of S with all occurrences of substring\n" +
+                    "old replaced by new.  If the optional argument count is\n" +
+                    "given, only the first count occurrences are replaced.\n"
     )
     public org.python.Object replace() {
         throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "S.rfind(sub[, start[, end]]) -> int",
+            __doc__ = "S.rfind(sub[, start[, end]]) -> int\n" +
+                    "\n" +
+                    "Return the highest index in S where substring sub is found,\n" +
+                    "such that sub is contained within S[start:end].  Optional\n" +
+                    "arguments start and end are interpreted as in slice notation.\n" +
+                    "\n" +
+                    "Return -1 on failure.\n",
             default_args = {"item", "start", "end"}
     )
     public org.python.Object rfind(org.python.Object item, org.python.Object start, org.python.Object end) {
@@ -1049,7 +1151,9 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.index(sub[, start[, end]]) -> int\n\nLike S.find() but raise ValueError when the substring is not found.",
+            __doc__ = "S.rindex(sub[, start[, end]]) -> int\n" +
+                    "\n" +
+                    "Like S.rfind() but raise ValueError when the substring is not found.\n",
             default_args = {"items", "start", "end"}
     )
     public org.python.Object rindex(org.python.Object item, org.python.Object start, org.python.Object end) {
@@ -1065,28 +1169,72 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.rjust(width[, fillchar]) -> str\n" +
+                    "\n" +
+                    "Return S right-justified in a string of length width. Padding is\n" +
+                    "done using the specified fill character (default is a space).\n",
+            default_args = {"width", "fillChar"}
     )
-    public org.python.Object rjust() {
-        throw new org.python.exceptions.NotImplementedError("rjust() has not been implemented.");
+    public org.python.Object rjust(org.python.Object width, org.python.Object fillChar) {
+        if (width == null) {
+            throw new org.python.exceptions.TypeError("rjust() takes at least 1 argument (0 given)");
+        } else if (!(width instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + width.typeName());
+        } else {
+            java.lang.String ch = new java.lang.String();
+            if (fillChar instanceof org.python.types.Str) {
+                if (((org.python.types.Str) fillChar).value.length() != 1) {
+                    throw new org.python.exceptions.TypeError("The fill character must be exactly one character long");
+                }
+                ch = ((org.python.types.Str) fillChar).value;
+            } else if (fillChar == null) {
+                ch = " ";
+            } else {
+                throw new org.python.exceptions.TypeError("The fill character cannot be converted to Unicode");
+            }
+            int w = (int) ((org.python.types.Int) width).value;
+            if (w < this.value.length()) {
+                return new org.python.types.Str(this.value);
+            }
+            java.lang.StringBuffer str = new java.lang.StringBuffer(w);
+            int balance = w - this.value.length();
+            for (int i = 0; i < balance; i++) {
+                str.append(ch);
+            }
+            str.append(this.value);
+            return new org.python.types.Str(str.toString());
+        }
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.rpartition(sep) -> (head, sep, tail)\n" +
+                    "\n" +
+                    "Search for the separator sep in S, starting at the end of S, and return\n" +
+                    "the part before it, the separator itself, and the part after it.  If the\n" +
+                    "separator is not found, return two empty strings and S.\n"
     )
     public org.python.Object rpartition() {
         throw new org.python.exceptions.NotImplementedError("rpartition() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.rsplit(sep=None, maxsplit=-1) -> list of strings\n" +
+                    "\n" +
+                    "Return a list of the words in S, using sep as the\n" +
+                    "delimiter string, starting at the end of the string and\n" +
+                    "working to the front.  If maxsplit is given, at most maxsplit\n" +
+                    "splits are done. If sep is not specified, any whitespace string\n" +
+                    "is a separator.\n"
     )
     public org.python.Object rsplit() {
         throw new org.python.exceptions.NotImplementedError("rsplit() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "S.rstrip([chars]) -> str\nreturns a copy of the string in which all chars have been stripped from the end of the string (default whitespace characters).",
+            __doc__ = "S.rstrip([chars]) -> str\n" +
+                    "\n" +
+                    "Return a copy of the string S with trailing whitespace removed.\n" +
+                    "If chars is given and not None, remove characters in chars instead.\n",
             default_args = "chars"
     )
     public org.python.Object rstrip(org.python.Object chars) {
@@ -1115,7 +1263,13 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.split(sep=None, maxsplit=-1) -> list of strings\n\nReturn a list of the words in S, using sep as the\ndelimiter string.  If maxsplit is given, at most maxsplit\nsplits are done. If sep is not specified or is None, any\nwhitespace string is a separator and empty strings are\nremoved from the result.\n",
+            __doc__ = "S.split(sep=None, maxsplit=-1) -> list of strings\n" +
+                    "\n" +
+                    "Return a list of the words in S, using sep as the\n" +
+                    "delimiter string.  If maxsplit is given, at most maxsplit\n" +
+                    "splits are done. If sep is not specified or is None, any\n" +
+                    "whitespace string is a separator and empty strings are\n" +
+                    "removed from the result.\n",
             default_args = {"sep", "maxsplit"}
     )
     public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
@@ -1163,14 +1317,23 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.splitlines([keepends]) -> list of strings\n" +
+                    "\n" +
+                    "Return a list of the lines in S, breaking at line boundaries.\n" +
+                    "Line breaks are not included in the resulting list unless keepends\n" +
+                    "is given and true.\n"
     )
     public org.python.Object splitlines() {
         throw new org.python.exceptions.NotImplementedError("splitlines() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "S.startsswith(suffix[, start[, end]]) -> bool",
+            __doc__ = "S.startswith(prefix[, start[, end]]) -> bool\n" +
+                    "\n" +
+                    "Return True if S starts with the specified prefix, False otherwise.\n" +
+                    "With optional start, test S beginning at that position.\n" +
+                    "With optional end, stop comparing S at that position.\n" +
+                    "prefix can also be a tuple of strings to try.\n",
             args = {"suffix"},
             default_args = {"start", "end"}
     )
@@ -1190,14 +1353,21 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.strip([chars]) -> str\n" +
+                    "\n" +
+                    "Return a copy of the string S with leading and trailing\n" +
+                    "whitespace removed.\n" +
+                    "If chars is given and not None, remove characters in chars instead.\n"
     )
     public org.python.Object strip() {
         throw new org.python.exceptions.NotImplementedError("strip() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "S.swapcase() -> str\n\nSwap the case of all characters in the given string."
+            __doc__ = "S.swapcase() -> str\n" +
+                    "\n" +
+                    "Return a copy of S with uppercase characters converted to lowercase\n" +
+                    "and vice versa.\n"
     )
     public org.python.Object swapcase() {
         if (this.value.isEmpty()) {
@@ -1215,7 +1385,10 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.title() -> str\n\nReturn a titlecased version of S, i.e. words start with title case\ncharacters, all remaining cased characters have lower case."
+            __doc__ = "S.title() -> str\n" +
+                    "\n" +
+                    "Return a titlecased version of S, i.e. words start with title case\n" +
+                    "characters, all remaining cased characters have lower case.\n"
     )
     public org.python.Object title() {
         if (this.value.isEmpty()) {
@@ -1236,14 +1409,23 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.translate(table) -> str\n" +
+                    "\n" +
+                    "Return a copy of the string S in which each character has been mapped\n" +
+                    "through the given translation table. The table must implement\n" +
+                    "lookup/indexing via __getitem__, for instance a dictionary or list,\n" +
+                    "mapping Unicode ordinals to Unicode ordinals, strings, or None. If\n" +
+                    "this operation raises LookupError, the character is left untouched.\n" +
+                    "Characters mapped to None are deleted.\n"
     )
     public org.python.Object translate() {
         throw new org.python.exceptions.NotImplementedError("translate() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.upper() -> str\n" +
+                    "\n" +
+                    "Return a copy of S converted to uppercase.\n"
     )
     public org.python.Object upper() {
         return new org.python.types.Str(this.value.toUpperCase());
