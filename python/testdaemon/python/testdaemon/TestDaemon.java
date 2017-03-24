@@ -65,21 +65,17 @@ public class TestDaemon {
                 method.invoke(null, (Object) inputArgs);
             } catch (ReflectiveOperationException e) {
                 // InvocationTargetException may contain an ExitException
-                if (e instanceof InvocationTargetException && e.getCause() != null
-                        && e.getCause() instanceof ExitException) {
-                    // System.exit() was invoked somewhere, and caught due to
-                    // the custom SecurityManager
-                    // Do nothing, there should be no output
-                } else {
+                if (!(e instanceof InvocationTargetException) || e.getCause() == null
+                        || !(e.getCause() instanceof ExitException)) {
                     // ClassNotFound, NoSuchMethod, IllegalAccess Exceptions
+                    // This was _not_ a case of System.exit() being invoked somewhere
+                    // and being caught due to the custom SecurityManager.
                     e.printStackTrace();
                 }
             } catch (ExceptionInInitializerError e) {
-                if (e.getCause() != null && e.getCause() instanceof ExitException) {
-                    // System.exit() was invoked somewhere, and caught due to
-                    // the custom SecurityManager
-                    // Do nothing, there should be no output
-                } else {
+                if (e.getCause() == null || !(e.getCause() instanceof ExitException)) {
+                    // This was _not_ a case of System.exit() being invoked somewhere
+                    // and being caught due to the custom SecurityManager.
                     e.printStackTrace();
                 }
             } catch (Throwable e) {

@@ -205,7 +205,7 @@ public class ImportLib {
         } catch (java.lang.ClassNotFoundException e) {
             python_module = new org.python.java.Module(import_name);
             python.sys.__init__.modules.__setitem__(new org.python.types.Str(import_name), python_module);
-        } finally {
+        // } finally {
             // org.Python.debug("CONSTRUCTOR DONE");
         }
         return python_module;
@@ -251,7 +251,7 @@ public class ImportLib {
         } catch (java.lang.InstantiationException e) {
             // e.printStackTrace();
             throw new org.python.exceptions.RuntimeError(e.getCause().toString());
-        } finally {
+        // } finally {
             // org.Python.debug("CONSTRUCTOR DONE");
         }
         return python_module;
