@@ -385,6 +385,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object __mod__(org.python.Object other) {
         java.util.List<java.lang.Object> format_args = new java.util.ArrayList<java.lang.Object>();
+
         if (other instanceof org.python.types.List) {
             org.python.types.List oth = (org.python.types.List) other;
             for (org.python.Object obj : oth.value) {
@@ -401,7 +402,126 @@ public class Str extends org.python.types.Object {
             format_args.add(other.toJava());
         }
 
+        java.lang.String format_string = this.value;
+        format_string = convertToPythonFormatSpecifiers(format_string);
+        castArgs(format_string, format_args);
+
         return new org.python.types.Str(java.lang.String.format(this.value, format_args.toArray()));
+    }
+
+    void castArgs(java.lang.String format, java.util.List<java.lang.Object> args) {
+      String[] parsedOp = parse(format);
+      int args_index = 0;
+      for(int i =0; i < parsedOp.length; i++)
+      {
+
+          java.lang.Object other = args.get(args_index);
+
+          if(other instanceof Float || other instanceof Double)
+          {
+              // Since this is called after convertSpecifiers, no need to worry about Python only(s) like F, r, a, u, i
+              switch(parsedOp[i].charAt(0))
+              {
+                  case 'c': // %c implicitly converts int to char
+                  case 'd': // decimal int
+                  case 'i': // decimal int
+                  case 'u': // decimal int
+                  case 'o': // %o implicitly converts decimal int to octal int
+                  case 'x': // %x implicitly converts decimal int to hex int
+                  case 'X': // %X implicitly converts decimal int to hex int
+                      // Convert to int, hex should happen auto due to flag
+                      args.remove(args_index);
+                      args.add(args_index,(int)((double)other));
+                      break;
+                  default:
+                      // f, F, e, E, g, G, s, r, a
+                      // floating point representation and thus no conversion
+                      break;
+              }
+          }
+
+          if(!other.equals("%")) args_index++;
+      }
+    }
+
+    private java.lang.String convertToPythonFormatSpecifiers(java.lang.String format){
+
+        java.lang.String output = format;
+        java.lang.String[] parsedOp = parse(format);
+        for (java.lang.String s : parsedOp) {
+            /*
+                Specifiers that need a custom implementation:
+                * r -> repr() ; currently using %s
+                * a -> ascii() ; currently using %s
+
+                Specifiers that need to be tested a bit before determining the path to take:
+                * F ; currently using %f
+                * i ; currently using %d
+                * u ; currently using %d
+            */
+            switch (s.charAt(0)) {
+                case 'r':
+                    output = output.replaceAll("%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?r", "%$1$2$3$4s");
+                    break;
+                case 'a':
+                    output = output.replaceAll("%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?a", "%$1$2$3$4s");
+                    break;
+                case 'F':
+                    output = output.replaceAll("%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?F", "%$1$2$3$4f");
+                    break;
+                case 'i':
+                    output = output.replaceAll("%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?i", "%$1$2$3$4d");
+                    break;
+                case 'u':
+                    output = output.replaceAll("%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?u", "%$1$2$3$4d");
+                    break;
+                default:
+                    break;
+            }
+
+        }
+        return output;
+    }
+
+    private java.lang.String[] parse(java.lang.String s) {
+        // %[argument_index$][flags][width][.precision][t]conversion
+        java.lang.String formatSpecifier = "%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?([a-zA-Z%])";
+
+        java.util.regex.Pattern fsPattern = java.util.regex.Pattern.compile(formatSpecifier);
+
+        java.util.ArrayList<java.lang.String> al = new java.util.ArrayList<>();
+        java.util.regex.Matcher m = fsPattern.matcher(s);
+
+        for (int i = 0, len = s.length(); i < len; ) {
+            if (m.find(i)) {
+                // Anything between the start of the string and the beginning
+                // of the format specifier is either fixed text or contains
+                // an invalid format string.
+                if (m.start() != i) {
+                    // Make sure we didn't miss any invalid format specifiers
+                    checkText(s, i, m.start());
+                }
+
+                al.add(m.group(5)); // 5 because it is the 5th group in the regex expression formatSpecifier
+                i = m.end();
+            } else {
+                // No more valid format specifiers.  Check for possible invalid
+                // format specifiers.
+                checkText(s, i, len);
+            }
+        }
+        return al.toArray(new java.lang.String[al.size()]);
+    }
+
+    // Checks for invalid format specifier syntax, rather than the specifiers themselves
+    private void checkText(java.lang.String s, int start, int end) {
+        for (int i = start; i < end; i++) {
+            // Any '%' found in the region starts an invalid format specifier.
+            if (s.charAt(i) == '%') {
+                char c = (i == end - 1) ? '%' : s.charAt(i + 1);
+                throw new java.util.UnknownFormatConversionException(java.lang.String.valueOf(c));
+            }
+        }
     }
 
     @org.python.Method(
