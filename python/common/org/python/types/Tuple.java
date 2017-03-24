@@ -359,7 +359,7 @@ public class Tuple extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Iterable __iter__() {
-        return new org.python.types.Iterator(this);
+        return new org.python.types.Tuple_Iterator(this);
     }
 
     @org.python.Method(
