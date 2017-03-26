@@ -1023,20 +1023,23 @@ public class Str extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("lstrip arg must be None or str");
         }
         java.lang.String modified = this.value;
-        boolean checker = true;
-        while (checker) {
-            for (int i = 0; i < strip.length(); i++) {
-                if (strip.charAt(i) != modified.charAt(i)) {
-                    checker = false;
-                    modified = modified.substring(i);
+        int j;
+        for (int i=0;i<modified.length();i++)
+        {
+            for(j=0;j<strip.length();j++)
+            {
+                if(modified.charAt(i)!=strip.charAt(j))
+                    continue;
+                else
                     break;
-                }
             }
-            if (checker) {
-                modified = modified.substring(strip.length());
+
+            if(j==strip.length())
+            {
+                return new org.python.types.Str(modified.substring(i));
             }
         }
-        return new org.python.types.Str(modified);
+        return new org.python.types.Str("");
     }
 
     @org.python.Method(
@@ -1226,19 +1229,24 @@ public class Str extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("rstrip arg must be None or str");
         }
         java.lang.String modified = this.value;
-        int tracker = this.value.length();
-        boolean checker = true;
-        while (checker) {
-            for (int i = strip.length() - 1; i >= 0; i--) {
-                if (strip.charAt(i) != modified.charAt(tracker - 1)) {
-                    checker = false;
+        int j;
+        for (int i=modified.length()-1;i>-1;i--)
+        {
+            for(j=0;j<strip.length();j++)
+            {
+                if(modified.charAt(i)!=strip.charAt(j))
+                    continue;
+                else
                     break;
-                }
-                tracker--;
             }
-            modified = modified.substring(0, tracker);
+
+            if(j==strip.length())
+            {
+                System.out.println("entered return inner");
+                return new org.python.types.Str(modified.substring(0,i+1));
+            }
         }
-        return new org.python.types.Str(modified);
+        return new org.python.types.Str("");
     }
 
     @org.python.Method(
@@ -1331,15 +1339,22 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("startswith first arg must be str, not " + suffix.typeName());
     }
 
-    @org.python.Method(
+  @org.python.Method(
             __doc__ = "S.strip([chars]) -> str\n" +
                     "\n" +
                     "Return a copy of the string S with leading and trailing\n" +
                     "whitespace removed.\n" +
-                    "If chars is given and not None, remove characters in chars instead.\n"
+                    "If chars is given and not None, remove characters in chars instead.\n",
+            default_args = {"chars"}
+
     )
-    public org.python.Object strip() {
-        throw new org.python.exceptions.NotImplementedError("strip() has not been implemented.");
+    public org.python.Object strip(org.python.Object chars) {   
+        if ((chars != null) && (!(chars instanceof org.python.types.Str))) {
+            throw new org.python.exceptions.TypeError("strip arg must be None or str");
+        }
+        else{
+            return ((Str)this.rstrip(chars)).lstrip(chars);
+        }
     }
 
     @org.python.Method(
