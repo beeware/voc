@@ -219,6 +219,16 @@ class TupleTests(TranspileTestCase):
             print((y,) == (x,)) # False, y is not x, y.__eq__(x)
             """)
 
+    def test_iteration(self):
+        self.assertCodeExecution("""
+            a = (1, 2, 3, 4, 5)
+            b = ()
+            for x in a:
+                print(x)
+            for x in b:
+                print(x)
+            """)
+
 
 class UnaryTupleOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
