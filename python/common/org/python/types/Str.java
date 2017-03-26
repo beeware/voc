@@ -1193,14 +1193,14 @@ public class Str extends org.python.types.Object {
             throw new org.python.exceptions.ValueError("empty separator");
         }
         java.lang.String[] split = this.value.split(sepStr);
-        if(this.value.length() < sepStr.length()) {
+        if (this.value.length() < sepStr.length()) {
             tuple.add(new org.python.types.Str(""));
             tuple.add(new org.python.types.Str(""));
             tuple.add(new org.python.types.Str(this.value));
             return new org.python.types.Tuple(tuple);
         }
         if (split.length == 1) {
-            if((this.value.substring(this.value.length() - sepStr.length())).equals(sepStr)) {
+            if ((this.value.substring(this.value.length() - sepStr.length())).equals(sepStr)) {
                 tuple.add(new org.python.types.Str(this.value.substring(0, this.value.length() - sepStr.length())));
                 tuple.add(new org.python.types.Str(sepStr));
                 tuple.add(new org.python.types.Str(""));
