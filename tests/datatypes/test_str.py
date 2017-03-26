@@ -629,12 +629,17 @@ class StrTests(TranspileTestCase):
 =======
     def test_rpartition(self):
         self.assertCodeExecution("""
-            Stri = "Hello World!"
-            print(Stri.rpartition("H"))
-            print(Stri.rpartition(" "))
-            print(Stri.rpartition("l"))
+            st = "Hello World!"
+            print(st.rpartition("H"))
+            print(st.rpartition(" "))
+            print(st.rpartition("l"))
+            print(st.rpartition("q"))
+            print(st.rpartition("lo"))
+            print(st.rpartition("!"))
+            print(st.rpartition("ld!"))
+            print("voc".rpartition("foobar"))
             try:
-                print(Stri.rpartition(""))
+                print(st.rpartition(""))
             except ValueError as err:
                 print(err)
 >>>>>>> added rpartition
