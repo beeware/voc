@@ -574,6 +574,13 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_casefold(self):
+        self.assertCodeExecution("""
+            print("ÅAÆΣß".casefold())
+            print("ß.nfG".casefold())
+            print("HeLlo_worldʃ!".casefold())
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
