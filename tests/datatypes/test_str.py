@@ -586,7 +586,6 @@ class StrTests(TranspileTestCase):
 
     def test_strip(self):
         self.assertCodeExecution("""
-
             try:
                 print("kk".strip(2))
             except TypeError as err:
@@ -597,9 +596,7 @@ class StrTests(TranspileTestCase):
             str=""
             print(str.strip())
             print(str.strip('ab'))
-
             """)
-
 
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):

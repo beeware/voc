@@ -1024,18 +1024,15 @@ public class Str extends org.python.types.Object {
         }
         java.lang.String modified = this.value;
         int j;
-        for (int i=0;i<modified.length();i++)
-        {
-            for(j=0;j<strip.length();j++)
-            {
-                if(modified.charAt(i)!=strip.charAt(j))
+        for (int i = 0; i < modified.length(); i++) {
+            for (j = 0; j < strip.length(); j++) {
+                if (modified.charAt(i) != strip.charAt(j)) {
                     continue;
-                else
+                } else {
                     break;
+                }
             }
-
-            if(j==strip.length())
-            {
+            if (j == strip.length()) {
                 return new org.python.types.Str(modified.substring(i));
             }
         }
@@ -1230,20 +1227,17 @@ public class Str extends org.python.types.Object {
         }
         java.lang.String modified = this.value;
         int j;
-        for (int i=modified.length()-1;i>-1;i--)
-        {
-            for(j=0;j<strip.length();j++)
-            {
-                if(modified.charAt(i)!=strip.charAt(j))
+        for (int i = modified.length() - 1; i > -1; i--) {
+            for (j = 0; j < strip.length(); j++) {
+                if (modified.charAt(i) != strip.charAt(j)) {
                     continue;
-                else
+                } else {
                     break;
+                }
             }
+            if (j == strip.length()) {
 
-            if(j==strip.length())
-            {
-                System.out.println("entered return inner");
-                return new org.python.types.Str(modified.substring(0,i+1));
+                return new org.python.types.Str(modified.substring(0, i + 1));
             }
         }
         return new org.python.types.Str("");
@@ -1339,7 +1333,7 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("startswith first arg must be str, not " + suffix.typeName());
     }
 
-  @org.python.Method(
+    @org.python.Method(
             __doc__ = "S.strip([chars]) -> str\n" +
                     "\n" +
                     "Return a copy of the string S with leading and trailing\n" +
@@ -1348,12 +1342,11 @@ public class Str extends org.python.types.Object {
             default_args = {"chars"}
 
     )
-    public org.python.Object strip(org.python.Object chars) {   
+    public org.python.Object strip(org.python.Object chars) {
         if ((chars != null) && (!(chars instanceof org.python.types.Str))) {
             throw new org.python.exceptions.TypeError("strip arg must be None or str");
-        }
-        else{
-            return ((Str)this.rstrip(chars)).lstrip(chars);
+        } else {
+            return ((Str) this.rstrip(chars)).lstrip(chars);
         }
     }
 
