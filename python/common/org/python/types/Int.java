@@ -320,8 +320,10 @@ public class Int extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
             }
+        } else if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't take floor of complex number.");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'int' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(

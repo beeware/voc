@@ -368,8 +368,10 @@ public class Float extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("float divmod()");
             }
+        } else if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't take floor of complex number.");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'float' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(

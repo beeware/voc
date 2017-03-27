@@ -98,10 +98,6 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_frozenset',
         'test_eq_slice',
 
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
-
         'test_ge_bool',
         'test_ge_bytearray',
         'test_ge_bytes',
@@ -240,10 +236,6 @@ class InplaceSliceOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
         'test_and_class',
         'test_and_frozenset',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',

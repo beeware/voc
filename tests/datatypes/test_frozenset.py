@@ -214,7 +214,6 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_floor_divide_bytearray',
         'test_floor_divide_bytes',
         'test_floor_divide_class',
-        'test_floor_divide_complex',
         'test_floor_divide_dict',
         'test_floor_divide_float',
         'test_floor_divide_frozenset',

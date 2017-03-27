@@ -93,10 +93,6 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_frozenset',
         'test_eq_range',
 
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
-
         'test_ge_bool',
         'test_ge_bytearray',
         'test_ge_bytes',
