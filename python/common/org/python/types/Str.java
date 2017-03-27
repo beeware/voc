@@ -1040,7 +1040,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-             __doc__ = "Return a translation table usable for str.translate().\n" +
+            __doc__ = "Return a translation table usable for str.translate().\n" +
                     "\n" +
                     "If there is only one argument, it must be a dictionary mapping Unicode\n" +
                     "ordinals (integers) or characters to Unicode ordinals, strings or None.\n" +
@@ -1085,10 +1085,67 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Return a copy of S with all occurrences of substring\n" +
                     "old replaced by new.  If the optional argument count is\n" +
-                    "given, only the first count occurrences are replaced.\n"
+                    "given, only the first count occurrences are replaced.\n",
+            args = {"old", "replaced"},
+            default_args = {"count"}
     )
-    public org.python.Object replace() {
-        throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
+    public org.python.Object replace(org.python.Object old, org.python.Object replaced, org.python.Object count) {
+        int times = 0;
+        if (old == null && replaced != null) {
+            throw new org.python.exceptions.ValueError("replace() takes at least 2 arguments (1 given)");
+        }
+        if (old != null && replaced == null) {
+            throw new org.python.exceptions.ValueError("replace() takes at least 2 arguments (1 given)");
+        }
+        if (old == null && replaced == null) {
+            throw new org.python.exceptions.ValueError("replace() takes at least 2 arguments (0 given)");
+        }
+        if (count == null) {
+            times = 0;
+        }
+
+        if (count != null) {
+            times = (int) ((org.python.types.Int) count).value;
+            if ((int) ((org.python.types.Int) count).value < 0) {
+                count = null;
+            }
+        }
+        boolean replaceEverything = false;
+        boolean optionalParameter = false;
+        java.lang.String originalString = this.value;
+        java.lang.String output = new String();
+        java.lang.String toBeReplaced = ((org.python.types.Str) old).value;
+        java.lang.String replacement = ((org.python.types.Str) replaced).value;
+        int size = originalString.length();
+        if (count != null) {
+            optionalParameter = true;
+        }
+        if (toBeReplaced.length() == 0) {
+            replaceEverything = true;
+        }
+        if (optionalParameter && replaceEverything) {
+            int i;
+            for (i = 0; i < originalString.length(); i++) {
+                if (i < times) {
+                    output = output + replacement + originalString.charAt(i);
+                } else {
+                    output = output + originalString.charAt(i);
+                }
+            }
+        } else if (!optionalParameter && replaceEverything) {
+            for (int i = 0; i < originalString.length(); i++) {
+                output = output + replacement + originalString.charAt(i);
+            }
+            output = output + replacement;
+        } else if (optionalParameter && !replaceEverything) {
+            output = originalString;
+            for (int i = 0; i < times; i++) {
+                output = output.replaceFirst(toBeReplaced, replacement);
+            }
+        } else if (!optionalParameter && !replaceEverything) {
+            output = originalString.replaceAll(toBeReplaced, replacement);
+        }
+        return new org.python.types.Str(output);
     }
 
     @org.python.Method(

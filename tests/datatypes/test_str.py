@@ -574,6 +574,17 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_replace(self):
+        # test cases with valid outputs
+        self.assertCodeExecution("""
+            string = "hello\\nsomething else \\n \\n, test\\t.\hello"
+            print(string.replace("h", "1", 200))
+            print(string.replace("\\n", "23"))
+            string = "hello world el el el el"
+            print(string.replace("el", "as"))
+            print(string.replace("el", "as", 2))
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
