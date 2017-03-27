@@ -574,6 +574,27 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_splitlines(self):
+        self.assertCodeExecution("""
+            st="Today\\n\\n has been a \\n good \\n day. \\n\\n"
+            try:
+                print(st.splitlines(0))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.splitlines(-1))
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.splitlines())
+            except TypeError as err:
+                print(err)
+            try:
+                print(st.splitlines(10))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
