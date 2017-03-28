@@ -605,6 +605,7 @@ class StrTests(TranspileTestCase):
             print("HeLlo_worldʃ!".casefold())
             """)
 
+
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
