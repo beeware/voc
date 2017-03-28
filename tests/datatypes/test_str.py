@@ -461,6 +461,14 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+        self.assertCodeExecution("""
+            str="abbaccdcbbs"
+            print(str.lstrip('ab'))
+            str=""
+            print(str.lstrip())
+            print(str.lstrip('ab'))
+            """)
+
     def test_rstrip(self):
         self.assertCodeExecution("""
             str = " fooggg\t\t   "
@@ -477,21 +485,12 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
-    def test_strip(self):
         self.assertCodeExecution("""
-            s = "\t\t   hello "
-            try:
-                print(s.strip(6))
-            except TypeError as e:
-                print(e)
-            print(s.strip())
-            print(s.strip(None))
-            print(s.strip(''))
-            print(s.strip('a'))
-            print(s.strip(' '))
-            print(s.strip('\t '))
-            print(s.strip('\t ho'))
-            print(s.strip('\t hello '))
+            str="abbaccdcbbsabba"
+            print(str.rstrip('ab'))
+            str=""
+            print(str.rstrip())
+            print(str.rstrip('ab'))
             """)
 
     def test_rfind(self):
@@ -595,6 +594,39 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_strip(self):
+        self.assertCodeExecution("""
+            s = "\t\t   hello "
+            try:
+                print(s.strip(6))
+            except TypeError as e:
+                print(e)
+            print(s.strip())
+            print(s.strip(None))
+            print(s.strip(''))
+            print(s.strip('a'))
+            print(s.strip(' '))
+            print(s.strip('\t '))
+            print(s.strip('\t ho'))
+            print(s.strip('\t hello '))
+            """)
+
+        self.assertCodeExecution("""
+            str="abbaccdcbbsabba"
+            print(str.strip('abs'))
+            print(str.strip())
+            str=""
+            print(str.strip())
+            print(str.strip('ab'))
+            """)
+
+    def test_casefold(self):
+        self.assertCodeExecution("""
+            print("ÅAÆΣß".casefold())
+            print("ß.nfG".casefold())
+            print("HeLlo_worldʃ!".casefold())
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
@@ -629,10 +661,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_eq_class',
         'test_eq_frozenset',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
 
         'test_ge_class',
         'test_ge_frozenset',
@@ -707,10 +735,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
         'test_and_class',
         'test_and_frozenset',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',

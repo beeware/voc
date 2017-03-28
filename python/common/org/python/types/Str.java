@@ -520,7 +520,7 @@ public class Str extends org.python.types.Object {
                     "Return a version of S suitable for caseless comparisons.\n"
     )
     public org.python.Object casefold() {
-        throw new org.python.exceptions.NotImplementedError("casefold() has not been implemented.");
+        return new org.python.types.Str(this.value.toUpperCase().toLowerCase());
     }
 
     @org.python.Method(
