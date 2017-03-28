@@ -412,10 +412,15 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "D.keys() -> a set-like object providing a view on D's keys"
     )
     public org.python.Object keys() {
-        throw new org.python.exceptions.NotImplementedError("dict.keys() has not been implemented.");
+        // FIXME: This should return a dict_view object, not compose a new list.
+        org.python.types.List result = new org.python.types.List();
+        for (org.python.Object key : this.value.keySet()) {
+            result.append(key);
+        }
+        return result;
     }
 
     @org.python.Method(
@@ -476,9 +481,15 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "D.values() -> a set-like object providing a view on D's values"
     )
     public org.python.Object values() {
-        throw new org.python.exceptions.NotImplementedError("dict.values() has not been implemented.");
+        // FIXME: This should return a dict_view object, not compose a new list.
+        java.util.List<org.python.Object> list_val = new java.util.ArrayList<org.python.Object>(this.value.values());
+        org.python.types.List result = new org.python.types.List();
+        for (org.python.Object value : list_val) {
+            result.append(value);
+        }
+        return result;
     }
 }
