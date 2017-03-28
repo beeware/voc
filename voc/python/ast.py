@@ -1020,7 +1020,6 @@ class Visitor(ast.NodeVisitor):
                         name_visitor.evaluate(arg_type).ref_name
                         for arg_type in decorator.args[0].values
                     ]
-                    print(arg_index)
                     init = InitMethod(
                         klass=self.context,
                         args=arg_index,
