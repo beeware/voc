@@ -457,6 +457,11 @@ class StrTests(TranspileTestCase):
                 print("kk".lstrip(6))
             except TypeError as err:
                 print(err)
+            str="abbaccdcbbs"
+            print(str.lstrip('ab'))
+            str=""
+            print(str.lstrip())
+            print(str.lstrip('ab'))
             """)
 
     def test_rstrip(self):
@@ -468,9 +473,14 @@ class StrTests(TranspileTestCase):
             print(str.rstrip())
             print("boo".rstrip("foo"))
             try:
-                print("kk".lstrip(6))
+                print("kk".rstrip(6))
             except TypeError as err:
                 print(err)
+            str="abbaccdcbbsabba"
+            print(str.rstrip('ab'))
+            str=""
+            print(str.rstrip())
+            print(str.rstrip('ab'))
             """)
 
     def test_rfind(self):
@@ -574,12 +584,25 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_strip(self):
+        self.assertCodeExecution("""
+            try:
+                print("kk".strip(2))
+            except TypeError as err:
+                print(err)
+            str="abbaccdcbbsabba"
+            print(str.strip('abs'))
+            print(str.strip())
+            str=""
+            print(str.strip())
+            print(str.strip('ab'))
+            """)
+
     def test_casefold(self):
         self.assertCodeExecution("""
             print("ÅAÆΣß".casefold())
             print("ß.nfG".casefold())
             print("HeLlo_worldʃ!".casefold())
-            """)
 
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
