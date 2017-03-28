@@ -72,3 +72,40 @@ class ExtendsTests(TranspileTestCase):
             PEEK: 126
             """,
             run_in_function=False)
+
+    def test_protected_access(self):
+        self.assertJavaExecution(
+            """
+            class MyClass(extends=com.example.BaseClass):
+                @super({v: int})
+                def __init__(self, v):
+                    pass
+
+                def peek(self):
+                    return self.poke()
+
+
+            obj = MyClass(42)
+            print("PEEK:", obj.peek())
+            """,
+            java={
+                'com/example/BaseClass': """
+                package com.example;
+
+                public class BaseClass {
+                    public int base_value;
+
+                    public BaseClass(int v) {
+                        base_value = v;
+                    }
+
+                    protected int poke() {
+                        return 2 * base_value;
+                    }
+                }
+                """
+            },
+            out="""
+            PEEK: 84
+            """,
+            run_in_function=False)
