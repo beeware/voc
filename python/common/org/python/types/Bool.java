@@ -404,7 +404,6 @@ public class Bool extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __radd__(org.python.Object other) {
-        System.out.println("radd was called");
         if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) + (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Int) {
@@ -419,7 +418,6 @@ public class Bool extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __rsub__(org.python.Object other) {
-        System.out.println("rsub was called");
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Int(((org.python.types.Int) other).value - (((org.python.types.Bool) this).value ? 1 : 0));
         } else if (other instanceof org.python.types.Bool) {
