@@ -404,14 +404,30 @@ public class Bool extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __radd__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__radd__() has not been implemented.");
+        System.out.println("radd was called");
+        if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) + (((org.python.types.Bool) other).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Int) {
+            return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Int) other).value);
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Float) other).value);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __rsub__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__rsub__() has not been implemented.");
+        System.out.println("rsub was called");
+        if (other instanceof org.python.types.Int) {
+            return new org.python.types.Int(((org.python.types.Int) other).value - (((org.python.types.Bool) this).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Int((((org.python.types.Bool) other).value ? 1 : 0) - (((org.python.types.Bool) this).value ? 1 : 0));
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float((((org.python.types.Float) other).value) - (((org.python.types.Bool) this).value ? 1.0 : 0.0));
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for rsub: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
