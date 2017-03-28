@@ -4,7 +4,7 @@ import traceback
 
 from ..java import opcodes as JavaOpcodes
 from .modules import Module
-from .methods import MainFunction
+from .methods import MainFunction, InitMethod, to_java
 from .structures import (
     IF, ELSE, END_IF,
     TRY, CATCH, FINALLY, END_TRY,
@@ -927,8 +927,14 @@ class Visitor(ast.NodeVisitor):
         name_visitor = NameVisitor()
         default_vars = []
         parameter_signatures = []
+        arg_index = {}
         for i, arg in enumerate(node.args.args):
             index = len(node.args.defaults) - len(node.args.args) + i
+            if index != 0:
+                # Store the index of the arguments; this is only used by
+                # the @super decorator on the constructors.
+                # self can be ignored.
+                arg_index[arg.arg] = i - 1
             if index >= 0:
                 default = '#%s-default-%s-%x' % (func_name, i, id(node))
                 self.visit(node.args.defaults[index])
@@ -947,6 +953,7 @@ class Visitor(ast.NodeVisitor):
             })
 
         if node.args.vararg:
+            arg_index[node.args.vararg] = len(node.args.args)
             parameter_signatures.append({
                 'name': node.args.vararg.arg,
                 'annotation': name_visitor.evaluate(node.args.vararg.annotation).annotation,
@@ -955,6 +962,7 @@ class Visitor(ast.NodeVisitor):
 
         for i, arg in enumerate(node.args.kwonlyargs):
             index = len(node.args.kw_defaults) - len(node.args.kwonlyargs) + i
+            arg_index[arg.arg] = None
             if index >= 0:
                 default = '#%s-kw_default-%s-%x' % (func_name, i, id(node))
                 self.visit(node.args.kw_defaults[index])
@@ -973,6 +981,7 @@ class Visitor(ast.NodeVisitor):
             })
 
         if node.args.kwarg:
+            arg_index[node.args.kwarg] = None
             parameter_signatures.append({
                 'name': node.args.kwarg.arg,
                 'annotation': name_visitor.evaluate(node.args.kwarg.annotation).annotation,
@@ -986,27 +995,72 @@ class Visitor(ast.NodeVisitor):
 
         # Now actually define the function.
         for decorator in decorator_list:
-            self.visit(decorator)
-            self.context.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/Callable'),
-                java.Array(1),
-                JavaOpcodes.DUP(),
-                JavaOpcodes.ICONST_0(),
-            )
+            # The @super decorator on __init__() is a special case. It tells us how
+            # we want to invoke super() in the Java construction process.
+            # It should have a single argument; a dictionary that has the
+            # expressions to be passed in as arguments as keys, and the type
+            # annotation for the argument as the value. For example:
+            #
+            #   class MyClass(BaseClass):
+            #       @super({value: int, value*2: float, "Hello": java.lang.String})
+            #       def __init__(self, value):
+            #           ...
+            #
+            # would map to the rough equivalent of:
+            #
+            #   public MyClass(value) {
+            #       super(value, value * 2, "Hello");
+            #           ...
+            #   }
+            #
+            if func_name == '__init__' and is_call(decorator, 'super'):
+                if len(decorator.args) == 1 and isinstance(decorator.args[0], ast.Dict):
+
+                    super_args = [
+                        name_visitor.evaluate(arg_type).ref_name
+                        for arg_type in decorator.args[0].values
+                    ]
+                    print(arg_index)
+                    init = InitMethod(
+                        klass=self.context,
+                        args=arg_index,
+                        super_args=super_args,
+                    )
+                    self.push_context(init)
+
+                    for arg, annotation in zip(decorator.args[0].keys, super_args):
+                        self.visit(arg)
+                        to_java(self.context, annotation)
+
+                    self.pop_context()
+                    self.context.constructor = init
+                else:
+                    raise Exception("Invalid super() decorator")
+            else:
+                self.visit(decorator)
+                self.context.add_opcodes(
+                    JavaOpcodes.CHECKCAST('org/python/Callable'),
+                    java.Array(1),
+                    JavaOpcodes.DUP(),
+                    JavaOpcodes.ICONST_0(),
+                )
 
         function = self.context.add_function(
             name=func_name,
             code=self.code_objects[(node.lineno, getattr(node, 'name', '<lambda>'))],
             parameter_signatures=parameter_signatures,
-            return_signature=return_signature
+            return_signature=return_signature,
         )
 
         for decorator in decorator_list[::-1]:
-            self.context.add_opcodes(
-                JavaOpcodes.AASTORE(),
-                JavaOpcodes.ACONST_NULL(),
-                python.Callable.invoke(),
-            )
+            if func_name == '__init__' and is_call(decorator, 'super'):
+                pass
+            else:
+                self.context.add_opcodes(
+                    JavaOpcodes.AASTORE(),
+                    JavaOpcodes.ACONST_NULL(),
+                    python.Callable.invoke(),
+                )
 
         # Store the callable object as an accessible symbol.
         self.context.store_name(func_name)

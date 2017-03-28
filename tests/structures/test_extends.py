@@ -33,3 +33,42 @@ class ExtendsTests(TranspileTestCase):
             The machine goes Bing!
             Done.
             """, run_in_function=False)
+
+    def test_no_default_constructor(self):
+        self.assertJavaExecution(
+            """
+            class MyClass(extends=com.example.BaseClass):
+                @super({v * 3: int})
+                def __init__(self, v):
+                    pass
+
+                def peek(self):
+                    return self.base_value
+
+
+            obj = MyClass(42)
+            print("POKE:", obj.poke())
+            print("PEEK:", obj.peek())
+            """,
+            java={
+                'com/example/BaseClass': """
+                package com.example;
+
+                public class BaseClass {
+                    public int base_value;
+
+                    public BaseClass(int v) {
+                        base_value = v;
+                    }
+
+                    public int poke() {
+                        return 2 * base_value;
+                    }
+                }
+                """
+            },
+            out="""
+            POKE: 252
+            PEEK: 126
+            """,
+            run_in_function=False)
