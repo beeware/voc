@@ -452,7 +452,7 @@ class StrTests(TranspileTestCase):
             print(str.lstrip())
             print(str.lstrip(None))
             print(str.lstrip(''))
-            print(str.lstrip(\t ))
+            print(str.lstrip('\t '))
             print(str.lstrip('\t gf'))
             print(str.lstrip('\t\t   gggfoo '))
             try:
