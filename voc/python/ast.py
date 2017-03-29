@@ -1013,28 +1013,30 @@ class Visitor(ast.NodeVisitor):
             #           ...
             #   }
             #
-            if func_name == '__init__' and is_call(decorator, 'super'):
-                if len(decorator.args) == 1 and isinstance(decorator.args[0], ast.Dict):
+            if is_call(decorator, 'super'):
+                if func_name == '__init__':
+                    if len(decorator.args) == 1 and isinstance(decorator.args[0], ast.Dict):
+                        super_args = [
+                            name_visitor.evaluate(arg_type).ref_name
+                            for arg_type in decorator.args[0].values
+                        ]
+                        init = InitMethod(
+                            klass=self.context,
+                            args=arg_index,
+                            super_args=super_args,
+                        )
+                        self.push_context(init)
 
-                    super_args = [
-                        name_visitor.evaluate(arg_type).ref_name
-                        for arg_type in decorator.args[0].values
-                    ]
-                    init = InitMethod(
-                        klass=self.context,
-                        args=arg_index,
-                        super_args=super_args,
-                    )
-                    self.push_context(init)
+                        for arg, annotation in zip(decorator.args[0].keys, super_args):
+                            self.visit(arg)
+                            to_java(self.context, annotation)
 
-                    for arg, annotation in zip(decorator.args[0].keys, super_args):
-                        self.visit(arg)
-                        to_java(self.context, annotation)
-
-                    self.pop_context()
-                    self.context.constructor = init
+                        self.pop_context()
+                        self.context.constructor = init
+                    else:
+                        raise Exception("super() (as __init__ decorator) expects a single dictionary as an argument")
                 else:
-                    raise Exception("Invalid super() decorator")
+                    raise Exception("super() can only be used as a decorator on __init__()")
             else:
                 self.visit(decorator)
                 self.context.add_opcodes(
@@ -1053,6 +1055,7 @@ class Visitor(ast.NodeVisitor):
 
         for decorator in decorator_list[::-1]:
             if func_name == '__init__' and is_call(decorator, 'super'):
+                # We can ignore the @super decorator on __init__ methods.
                 pass
             else:
                 self.context.add_opcodes(
