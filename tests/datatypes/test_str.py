@@ -598,6 +598,15 @@ class StrTests(TranspileTestCase):
             print(str.strip('ab'))
             """)
 
+    def test_replace(self):
+        self.assertCodeExecution("""
+            s="abc abc abc abc abc abcd mm       "
+            print(s.replace('','k'))
+            print(s.replace(' ','k'))
+            print(s.replace(' ','f'))
+            print(s.replace('ab','bc'))
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
