@@ -250,7 +250,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        throw new org.python.exceptions.AttributeError(this, "__bool__");
+        return org.python.types.Bool.TRUE;
     }
 
     /**
