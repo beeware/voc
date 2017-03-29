@@ -246,7 +246,11 @@ public class Bool extends org.python.types.Object {
         try {
             return new org.python.types.Int(this.value ? 1 : 0).__floordiv__(other);
         } catch (org.python.exceptions.TypeError ae) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'bool' and '" + other.typeName() + "'");
+            if (other instanceof org.python.types.Complex) {
+                throw new org.python.exceptions.TypeError("can't take floor of complex number.");
+            } else {
+                throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            }
         }
     }
 

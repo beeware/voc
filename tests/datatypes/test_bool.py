@@ -57,10 +57,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_class',
         'test_eq_frozenset',
 
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
-
         'test_ge_class',
         'test_ge_frozenset',
 

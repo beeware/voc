@@ -227,10 +227,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_class',
         'test_eq_frozenset',
 
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
-
         'test_ge_class',
         'test_ge_frozenset',
 
@@ -294,10 +290,6 @@ class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_and_class',
         'test_and_frozenset',
         'test_and_set',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',
