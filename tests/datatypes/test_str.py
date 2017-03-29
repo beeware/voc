@@ -598,11 +598,13 @@ class StrTests(TranspileTestCase):
             print(str.strip('ab'))
             """)
 
-    def test_casefold(self):
+    def test_replace(self):
         self.assertCodeExecution("""
-            print("ÅAÆΣß".casefold())
-            print("ß.nfG".casefold())
-            print("HeLlo_worldʃ!".casefold())
+            s="abc abc abc abc abc abcd mm       "
+            print(s.replace('','k'))
+            print(s.replace(' ','k'))
+            print(s.replace(' ','f'))
+            print(s.replace('ab','bc'))
             """)
 
 
