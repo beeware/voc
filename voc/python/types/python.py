@@ -188,12 +188,10 @@ class Object:
             context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE(
                     'org/python/Object',
-                    '__bool__',
+                    'toBoolean',
                     args=[],
-                    returns='Lorg/python/Object;'
+                    returns='Z'
                 ),
-                JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-                JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
             )
 
 

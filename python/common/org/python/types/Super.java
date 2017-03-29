@@ -23,6 +23,10 @@ public class Super implements org.python.Object {
         return this.instance;
     }
 
+    public boolean toBoolean() {
+        return true;
+    }
+
     public org.python.Object byValue() {
         return this;
     }

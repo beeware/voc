@@ -24,6 +24,18 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return this;
     }
 
+    public boolean toBoolean() {
+        try {
+            return ((org.python.types.Bool) this.__bool__()).value;
+        } catch (org.python.exceptions.AttributeError ae) {
+            try {
+                return ((org.python.types.Int) this.__len__()).value != 0;
+            } catch (org.python.exceptions.AttributeError ae2) {
+                return true;
+            }
+        }
+    }
+
     public org.python.Object byValue() {
         return this;
     }
@@ -250,7 +262,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return org.python.types.Bool.TRUE;
+        throw new org.python.exceptions.AttributeError(this, "__bool__");
     }
 
     /**
