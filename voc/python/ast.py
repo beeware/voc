@@ -1037,6 +1037,12 @@ class Visitor(ast.NodeVisitor):
                         raise Exception("super() (as __init__ decorator) expects a single dictionary as an argument")
                 else:
                     raise Exception("super() can only be used as a decorator on __init__()")
+            elif isinstance(decorator, ast.Name) and decorator.id == "classmethod":
+                # print("FIXME: Ignoring classmethod")
+                pass
+            elif isinstance(decorator, ast.Name) and decorator.id == "staticmethod":
+                # print("FIXME: Ignoring staticmethod")
+                pass
             else:
                 self.visit(decorator)
                 self.context.add_opcodes(
@@ -1056,6 +1062,10 @@ class Visitor(ast.NodeVisitor):
         for decorator in decorator_list[::-1]:
             if func_name == '__init__' and is_call(decorator, 'super'):
                 # We can ignore the @super decorator on __init__ methods.
+                pass
+            elif isinstance(decorator, ast.Name) and decorator.id == "classmethod":
+                pass
+            elif isinstance(decorator, ast.Name) and decorator.id == "staticmethod":
                 pass
             else:
                 self.context.add_opcodes(

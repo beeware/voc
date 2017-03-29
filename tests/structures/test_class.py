@@ -158,3 +158,34 @@ class ClassTests(TranspileTestCase):
             inst2.x = 5
             print(inst2.x)
             """, run_in_function=False)
+
+
+class ClassMethodTests(TranspileTestCase):
+    @expectedFailure
+    def test_classmethod(self):
+        self.assertCodeExecution("""
+            class MyClass:
+                @classmethod
+                def foo(cls, arg1, arg2):
+                    print("This is a classmethod on ", cls, arg1, arg2)
+
+            obj = MyClass()
+            obj.foo(1, 2)
+            MyClass.foo(3, 4)
+            """, run_in_function=False)
+
+
+
+class StaticMethodTests(TranspileTestCase):
+    @expectedFailure
+    def test_staticmethod(self):
+        self.assertCodeExecution("""
+            class MyClass:
+                @staticmethod
+                def foo(arg1, arg2):
+                    print("This is a staticmethod ", arg1, arg2)
+
+            obj = MyClass()
+            obj.foo(1, 2)
+            MyClass.foo(3, 4)
+            """, run_in_function=False)
