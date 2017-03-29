@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -173,7 +175,6 @@ class ClassMethodTests(TranspileTestCase):
             obj.foo(1, 2)
             MyClass.foo(3, 4)
             """, run_in_function=False)
-
 
 
 class StaticMethodTests(TranspileTestCase):
