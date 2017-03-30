@@ -184,6 +184,23 @@ class SetTests(TranspileTestCase):
                 print(y.__conatins__(s))
             """)
 
+    def test_issubset(self):
+        self.assertCodeExecution("""
+            a = set('abc')
+            b = set('abcde')
+            print(a.issubset(b)
+            print(a.issubset('ab'))
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            a = set([1, 2, 3])
+            try:
+                print(a.issubset(1))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
