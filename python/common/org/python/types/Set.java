@@ -453,10 +453,18 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object issuperset(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("issuperset() has not been implemented.");
+        try {
+            org.python.Object[] arrObject = new org.python.Object[1];
+            arrObject[0] = other;
+            org.python.types.Set otherSet = new org.python.types.Set(arrObject, null);
+            return this.__ge__(otherSet);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(

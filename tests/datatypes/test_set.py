@@ -201,6 +201,23 @@ class SetTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_issuperset(self):
+        self.assertCodeExecution("""
+            a = set('abcd')
+            b = set('ab')
+            print(a.issuperset(b)
+            print(a.issuperset('ab1'))
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            a = set([1, 2, 3])
+            try:
+                print(a.issuperset(1))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
