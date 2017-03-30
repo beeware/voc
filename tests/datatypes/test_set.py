@@ -114,9 +114,11 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.intersection(y)
+            w = x.intersection([3,4,5])
             print(x)
             print(y)
             print(z)
+            print(w)
             """)
 
         self.assertCodeExecution("""
@@ -126,6 +128,15 @@ class SetTests(TranspileTestCase):
             print(x)
             print(y)
             print(z)
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                print(x.intersection(1))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_remove(self):
@@ -188,7 +199,7 @@ class SetTests(TranspileTestCase):
         self.assertCodeExecution("""
             a = set('abc')
             b = set('abcde')
-            print(a.issubset(b)
+            print(a.issubset(b))
             print(a.issubset('ab'))
             """)
 
@@ -205,7 +216,7 @@ class SetTests(TranspileTestCase):
         self.assertCodeExecution("""
             a = set('abcd')
             b = set('ab')
-            print(a.issuperset(b)
+            print(a.issuperset(b))
             print(a.issuperset('ab1'))
             """)
 
