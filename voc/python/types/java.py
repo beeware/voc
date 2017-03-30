@@ -76,6 +76,16 @@ class Array:
                     JavaOpcodes.AASTORE(),
                 )
 
+    class get:
+        def __init__(self, index):
+            self.index = index
+
+        def process(self, context):
+            context.add_opcodes(
+                ICONST_val(self.index),
+                JavaOpcodes.AALOAD(),
+            )
+
 
 class List:
     def __init__(self, size=None):

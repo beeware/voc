@@ -18,6 +18,12 @@ public interface Object extends Comparable {
     public java.lang.Object toObject();
 
     /**
+     * Return the Python boolean interpretation of the object. This is
+     * used when the object is the subject of a logical comparison.
+     */
+    public boolean toBoolean();
+
+    /**
      * Return the Python type for this object.
      */
     public org.python.types.Type type();

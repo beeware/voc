@@ -4,8 +4,7 @@ Release History
 0.1.2
 -----
 
-Tons of new features and bugs fixed.
-
+Progress release. VOC is able to compile the Toga and Colosseum libraries.
 
 0.1.1
 -----
@@ -14,7 +13,6 @@ Switched approach to parse Python code with ``ast`` instead of transpiling
 CPython bytecode.
 
 Many bugs fixed.
-
 
 0.1.0
 -----

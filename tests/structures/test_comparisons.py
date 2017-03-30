@@ -4,6 +4,31 @@ from unittest import expectedFailure
 
 
 class ComparisonTests(TranspileTestCase):
+    def test_bool(self):
+        self.assertCodeExecution("""
+            x = 1234
+            if x:
+                print('True')
+            else:
+                print('False')
+            """)
+
+        self.assertCodeExecution("""
+            x = object()
+            if x:
+                print('True')
+            else:
+                print('False')
+            """)
+
+        self.assertCodeExecution("""
+            x = None
+            if x:
+                print('True')
+            else:
+                print('False')
+            """)
+
     def test_is(self):
         self.assertCodeExecution("""
             x = 1234

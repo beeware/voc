@@ -7,6 +7,7 @@ Development
 
    contributing
    releases
+   release_process
    roadmap
    signatures
    typesystem

@@ -49,15 +49,7 @@ public class Bool extends org.python.types.Object {
         if (args[0] == null) {
             this.value = false;
         } else {
-            try {
-                this.value = ((org.python.types.Bool) args[0].__bool__()).value;
-            } catch (org.python.exceptions.AttributeError ae) {
-                try {
-                    this.value = ((org.python.types.Int) args[0].__len__()).value != 0;
-                } catch (org.python.exceptions.AttributeError ae2) {
-                    this.value = true;
-                }
-            }
+            this.value = args[0].toBoolean();
         }
     }
     // public org.python.Object __new__() {

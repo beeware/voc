@@ -374,6 +374,9 @@ public class Function extends org.python.types.Object implements org.python.Call
             this.methods.put(signature.toString(), method);
         }
 
+        // If the method is protected/private, it won't be invokable.
+        // Set the method to be accessible;
+        method.setAccessible(true);
         return method;
     }
 
@@ -521,12 +524,14 @@ public class Function extends org.python.types.Object implements org.python.Call
             //     }
             // }
             return pyresult;
-        } catch (java.lang.IllegalAccessException e) {
-            // e.printStackTrace();
-            throw new org.python.exceptions.RuntimeError("Illegal access to Java function");
+        } catch (java.lang.IllegalAccessException iae) {
+            throw new org.python.exceptions.RuntimeError(iae.toString());
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
-                // e.getTargetException().printStackTrace();
+                // org.Python.debug("Exception:", e.getTargetException());
+                // for (java.lang.StackTraceElement ste: e.getTargetException().getStackTrace()) {
+                //     org.Python.debug("     ", ste);
+                // }
                 // If the Java method raised an Python exception, re-raise that
                 // exception as-is. If it wasn"t a Python exception, wrap it
                 // as one and continue.
