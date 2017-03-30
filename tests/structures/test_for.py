@@ -1,3 +1,4 @@
+from unittest import
 from ..utils import TranspileTestCase
 
 
@@ -121,4 +122,36 @@ class ForLoopTests(TranspileTestCase):
             print('And once again...')
             for item in sorted(values.items()):
                 print(item[0], item[1])
+            """)
+
+    def test_recursive(self):
+        self.assertCodeExecution("""
+            def process(data):
+                print('process: ', data)
+                for datum in data:
+                    process(datum)
+                print('data processed: ', data)
+
+            data = [[], [[], [], []], [[]]]
+
+            process(data)
+            """, run_in_function=False)
+
+    # FIXME: this is the same as the previous test, but the in-function
+    # version fails because recursive functions defined *in* a function
+    # don't work. Once they *do* work, the previous test can be used
+    # without the run_in_function=False qualifier, and this test can be
+    # deleted.
+    @expectedFailure
+    def test_recursive_in_function(self):
+        self.assertCodeExecution("""
+            def process(data):
+                print('process: ', data)
+                for datum in data:
+                    process(datum)
+                print('data processed: ', data)
+
+            data = [[], [[], [], []], [[]]]
+
+            process(data)
             """)

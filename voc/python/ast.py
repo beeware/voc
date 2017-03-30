@@ -375,10 +375,10 @@ class Visitor(ast.NodeVisitor):
 
         self.context.add_opcodes(
             JavaOpcodes.ICONST_1(),
-            ISTORE_name('#loop-orelse-%x' % id(loop))
+            ISTORE_name('#loop-orelse-%x' % id(loop)),
+            ASTORE_name('#for-iter-%x' % id(node))
         )
 
-        self.context.store_name('#for-iter-%x' % id(node))
         self.context.add_opcodes(
             loop,
         )
