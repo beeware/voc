@@ -169,4 +169,34 @@ public class FrozenSet extends org.python.types.Object {
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __gt__(org.python.Object other) {
+        if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
+            return new org.python.types.Bool(this.value.containsAll(otherSet.value) && !this.value.equals(otherSet.value));
+        } else if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(this.value.containsAll(otherSet.value) && !this.value.equals(otherSet.value));
+        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __ge__(org.python.Object other) {
+        if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
+            return new org.python.types.Bool(this.value.containsAll(otherSet.value));
+        } else if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(this.value.containsAll(otherSet.value));
+        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
 }
