@@ -231,8 +231,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_add_frozenset',
 
         'test_and_class',
-        'test_and_frozenset',
-        'test_and_set',
 
         'test_direct_eq_bytes',
         'test_direct_eq_set',
