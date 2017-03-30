@@ -124,4 +124,49 @@ public class FrozenSet extends org.python.types.Object {
     public org.python.Object __not_contains__(org.python.Object other) {
         return new org.python.types.Bool(!this.value.contains(other));
     }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __lt__(org.python.Object other) {
+        if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value) && !this.value.equals(otherSet.value));
+        } else if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value) && !this.value.equals(otherSet.value));
+        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __le__(org.python.Object other) {
+        if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value));
+        } else if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value));
+        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __eq__(org.python.Object other) {
+        if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
+            return new org.python.types.Bool(this.value.equals(otherSet.value));
+        } else if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(this.value.equals(otherSet.value));
+        }
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
 }
