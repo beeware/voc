@@ -199,13 +199,16 @@ class SetTests(TranspileTestCase):
         self.assertCodeExecution("""
             a = set('abc')
             b = set('abcde')
+            c = set()
             print(a.issubset(b))
             print(a.issubset('ab'))
+            print(a.issubset(a))
+            print(a.issubset(c))
             """)
 
         # not iterable test
         self.assertCodeExecution("""
-            a = set([1, 2, 3])
+            a = {1, 2, 3}
             try:
                 print(a.issubset(1))
             except TypeError as err:
@@ -216,13 +219,16 @@ class SetTests(TranspileTestCase):
         self.assertCodeExecution("""
             a = set('abcd')
             b = set('ab')
+            c = set()
             print(a.issuperset(b))
             print(a.issuperset('ab1'))
+            print(a.issuperset(a))
+            print(a.issuperset(c))
             """)
 
         # not iterable test
         self.assertCodeExecution("""
-            a = set([1, 2, 3])
+            a = {1, 2, 3}
             try:
                 print(a.issuperset(1))
             except TypeError as err:
