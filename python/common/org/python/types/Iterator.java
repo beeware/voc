@@ -19,6 +19,10 @@ class Iterator extends org.python.types.Object implements org.python.Iterable {
         this.iterator = dict.value.keySet().iterator();
     }
 
+    public Iterator(org.python.types.Set set) {
+        this.iterator = set.value.iterator();
+    }
+
     @org.python.Method(
             __doc__ = "Implement iter(self)."
     )

@@ -131,6 +131,13 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Iterable __iter__() {
+        throw new org.python.exceptions.TypeError("'float' object is not iterable");
+    }
+
+    @org.python.Method(
             __doc__ = "",
             args = {"other"}
     )

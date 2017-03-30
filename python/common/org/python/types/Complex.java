@@ -192,6 +192,13 @@ public class Complex extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
+    public org.python.Iterable __iter__() {
+        throw new org.python.exceptions.TypeError("'complex' object is not iterable");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
     public org.python.Object __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("complex.__format__ has not been implemented.");
     }
