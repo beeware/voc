@@ -309,8 +309,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_frozenset',
 
         'test_or_class',
-        'test_or_frozenset',
-        'test_or_set',
 
         'test_power_class',
         'test_power_frozenset',
@@ -319,8 +317,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_rshift_frozenset',
 
         'test_subtract_class',
-        'test_subtract_frozenset',
-        'test_subtract_set',
 
         'test_subscr_class',
         'test_subscr_frozenset',

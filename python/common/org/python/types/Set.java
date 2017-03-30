@@ -268,12 +268,20 @@ public class Set extends org.python.types.Object {
         return super.__mul__(other);
     }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public org.python.Object __sub__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__sub__() has not been implemented");
-    // }
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __sub__(org.python.Object other) {
+        java.util.Set set = ((org.python.types.Set) this.copy()).value;
+        if (other instanceof org.python.types.Set) {
+            set.removeAll(((org.python.types.Set) other).value);
+            return new org.python.types.Set(set);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            set.removeAll(((org.python.types.FrozenSet) other).value);
+            return new org.python.types.Set(set);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 
     @org.python.Method(
             __doc__ = ""
@@ -297,12 +305,20 @@ public class Set extends org.python.types.Object {
     //     throw new org.python.exceptions.NotImplementedError("__xor__() has not been implemented");
     // }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public org.python.Object __or__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__or__() has not been implemented");
-    // }
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __or__(org.python.Object other) {
+        java.util.Set set = ((org.python.types.Set) this.copy()).value;
+        if (other instanceof org.python.types.Set) {
+            set.addAll(((org.python.types.Set) other).value);
+            return new org.python.types.Set(set);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            set.addAll(((org.python.types.FrozenSet) other).value);
+            return new org.python.types.Set(set);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 
     // @org.python.Method(
     //     __doc__ = ""
