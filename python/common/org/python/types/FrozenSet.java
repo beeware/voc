@@ -102,7 +102,7 @@ public class FrozenSet extends org.python.types.Object {
         return new org.python.types.Int(this.value.size());
     }
 
-        @org.python.Method(
+    @org.python.Method(
             __doc__ = "",
             args = {"item"}
     )
