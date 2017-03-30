@@ -37,6 +37,60 @@ class FrozensetTests(TranspileTestCase):
 
             """)
 
+    def test_contains(self):
+        # Normal Contains
+        self.assertCodeExecution("""
+            x = frozenset()
+            print(x)
+
+            x = frozenset({'a'})
+            print('a' in x)
+
+            y = {1,2}
+            x = frozenset(y)
+            print(2 in x)
+
+            y = ['c']
+            x = frozenset(y)
+            print('c' in x)
+
+            y = (1,2)
+            x = frozenset(y)
+            print(3 in x)
+
+            y ='a'
+            x = frozenset(y)
+            print('e' in x)
+
+            """)
+
+    def test_not_contains(self):
+        # Normal Not Contains
+        self.assertCodeExecution("""
+            x = frozenset()
+            print(x)
+
+            x = frozenset({'a'})
+            print('b' not in x)
+
+            y = {1,2}
+            x = frozenset(y)
+            print(4 not in x)
+
+            y = ['c']
+            x = frozenset(y)
+            print('d' not in x)
+
+            y = (1,2)
+            x = frozenset(y)
+            print(1 not in x)
+
+            y ='a'
+            x = frozenset(y)
+            print('a' not in x)
+
+            """)
+
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
