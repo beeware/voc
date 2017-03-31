@@ -1090,13 +1090,13 @@ public class Str extends org.python.types.Object {
             if (org.Python.VERSION < 0x03060000) {
                 throw new org.python.exceptions.TypeError("Can't convert '" + repChars.typeName() + "' object to str implicitly");
             } else {
-                throw new org.python.exceptions.TypeError("must be str or None, not " + repChars.typeName());
+                throw new org.python.exceptions.TypeError("replace() argument 1 must be str, not " + repChars.typeName());
             }
         } else if (!(repWith instanceof org.python.types.Str)) {
             if (org.Python.VERSION < 0x03060000) {
                 throw new org.python.exceptions.TypeError("Can't convert '" + repWith.typeName() + "' object to str implicitly");
             } else {
-                throw new org.python.exceptions.TypeError("must be str or None, not " + repWith.typeName());
+                throw new org.python.exceptions.TypeError("replace() argument 2 must be str, not " + repWith.typeName());
             }
         }
         int no;
