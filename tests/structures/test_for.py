@@ -1,4 +1,5 @@
-from unittest import
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 

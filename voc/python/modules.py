@@ -68,7 +68,7 @@ class Module(Block):
     def class_descriptor(self):
         return '/'.join(self.namespace.split('.') + [self.name, '__init__'])
 
-    def store_name(self, name):
+    def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
 

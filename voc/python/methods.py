@@ -247,8 +247,8 @@ class Function(Block):
     def add_self(self):
         pass
 
-    def store_name(self, name):
-        if name in self.local_vars:
+    def store_name(self, name, declare=False):
+        if declare or name in self.local_vars:
             self.add_opcodes(
                 # Store in a local variable
                 ASTORE_name(name),
@@ -844,7 +844,7 @@ class MainFunction(Function):
     def can_ignore_empty(self):
         return True
 
-    def store_name(self, name):
+    def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
