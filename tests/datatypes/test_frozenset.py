@@ -99,6 +99,8 @@ class FrozensetTests(TranspileTestCase):
             print('a' not in x)
             print('d' not in x)
 
+            """)
+
     def test_iteration(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}
