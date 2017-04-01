@@ -1027,14 +1027,13 @@ public class Python {
                 throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
             }
 
-            for (int i = 0; i < args.value.size(); i++) {
+            for (int i = 1; i < args.value.size(); i++) {
                 value = args.value.get(i);
                 if (key == null) {
                     key_value = value;
                 } else {
                     throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
                 }
-
                 if (key_value.__gt__(max_key_value).toBoolean()) {
                     max_value = value;
                     max_key_value = key_value;
@@ -1109,7 +1108,7 @@ public class Python {
                 throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
             }
 
-            for (int i = 0; i < args.value.size(); i++) {
+            for (int i = 1; i < args.value.size(); i++) {
                 value = args.value.get(i);
                 if (key == null) {
                     key_value = value;
