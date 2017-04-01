@@ -37,6 +37,70 @@ class FrozensetTests(TranspileTestCase):
 
             """)
 
+    def test_contains(self):
+        # Normal Contains
+        self.assertCodeExecution("""
+            x = frozenset()
+            print(1 in x)
+
+            x = frozenset({'a'})
+            print('a' in x)
+            print('b' in x)
+
+            y = {1,2}
+            x = frozenset(y)
+            print(2 in x)
+            print(3 in x)
+
+            y = ['c']
+            x = frozenset(y)
+            print('c' in x)
+            print('a' in x)
+
+            y = (1,2)
+            x = frozenset(y)
+            print(3 in x)
+            print(1 in x)
+
+            y = 'a'
+            x = frozenset(y)
+            print('e' in x)
+            print('a' in x)
+
+            """)
+
+    def test_not_contains(self):
+        # Normal Not Contains
+        self.assertCodeExecution("""
+            x = frozenset()
+            print(1 in x)
+
+            x = frozenset({'a'})
+            print('b' not in x)
+            print('a' not in x)
+
+            y = {1,2}
+            x = frozenset(y)
+            print(4 not in x)
+            print(1 not in x)
+
+            y = ['c']
+            x = frozenset(y)
+            print('d' not in x)
+            print('c' not in x)
+
+            y = (1,2)
+            x = frozenset(y)
+            print(1 not in x)
+            print(3 not in x)
+
+            y = 'a'
+            x = frozenset(y)
+            print('a' not in x)
+            print('d' not in x)
+
+            """)
+
     def test_iteration(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}
@@ -46,6 +110,7 @@ class FrozensetTests(TranspileTestCase):
                 print(x.__contains__(s))
             for s in y:
                 print(y.__conatins__(s))
+
             """)
 
 
