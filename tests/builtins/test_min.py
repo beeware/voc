@@ -20,6 +20,11 @@ class MinTests(TranspileTestCase):
             # Multiple integers
             print(min(1, 5, 2, 4))
 
+            # Mixed types
+            print(min(2, 5.0, True))
+            print(min(5.0, 2, True))
+            print(min(True, 5.0, 2))
+
             # String (an iterable)
             print(min("Hello World"))
 

@@ -20,6 +20,11 @@ class MaxTests(TranspileTestCase):
             # Multiple integers
             print(max(1, 5, 2, 4))
 
+            # Mixed types
+            print(max(2, 5.0, True))
+            print(max(5.0, 2, True))
+            print(max(True, 5.0, 2))
+
             # String (an iterable)
             print(max("Hello World"))
 

@@ -999,7 +999,11 @@ public class Python {
                         throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
                     }
 
-                    if (key_value.__gt__(max_key_value).toBoolean()) {
+                    if (org.python.types.Object.__cmp__(
+                                key_value,
+                                max_key_value,
+                                org.python.types.Object.CMP_OP.GT
+                            ).toBoolean()) {
                         max_value = value;
                         max_key_value = key_value;
                     }
@@ -1034,7 +1038,11 @@ public class Python {
                 } else {
                     throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
                 }
-                if (key_value.__gt__(max_key_value).toBoolean()) {
+                if (org.python.types.Object.__cmp__(
+                            key_value,
+                            max_key_value,
+                            org.python.types.Object.CMP_OP.GT
+                        ).toBoolean()) {
                     max_value = value;
                     max_key_value = key_value;
                 }
@@ -1080,7 +1088,11 @@ public class Python {
                         throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
                     }
 
-                    if (key_value.__lt__(min_key_value).toBoolean()) {
+                    if (org.python.types.Object.__cmp__(
+                                key_value,
+                                min_key_value,
+                                org.python.types.Object.CMP_OP.LT
+                            ).toBoolean()) {
                         min_value = value;
                         min_key_value = key_value;
                     }
@@ -1116,7 +1128,11 @@ public class Python {
                     throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
                 }
 
-                if (key_value.__lt__(min_key_value).toBoolean()) {
+                if (org.python.types.Object.__cmp__(
+                            key_value,
+                            min_key_value,
+                            org.python.types.Object.CMP_OP.LT
+                        ).toBoolean()) {
                     min_value = value;
                     min_key_value = key_value;
                 }
