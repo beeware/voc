@@ -368,8 +368,10 @@ public class Float extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("float divmod()");
             }
+        } else if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't take floor of complex number.");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'float' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -639,6 +641,18 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object __invert__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'float'");
+    }
+
+    @org.python.Method(
+            __doc__ = "F.is_integer() -> bool\n" +
+                    "\n" +
+                    "Return True if the float instance is finite with integral value, and False otherwise.\n"
+    )
+    public org.python.Object is_integer() {
+        if (this.value == Math.floor(this.value) && !Double.isInfinite(this.value)) {
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(

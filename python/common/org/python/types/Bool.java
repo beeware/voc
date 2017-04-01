@@ -49,15 +49,7 @@ public class Bool extends org.python.types.Object {
         if (args[0] == null) {
             this.value = false;
         } else {
-            try {
-                this.value = ((org.python.types.Bool) args[0].__bool__()).value;
-            } catch (org.python.exceptions.AttributeError ae) {
-                try {
-                    this.value = ((org.python.types.Int) args[0].__len__()).value != 0;
-                } catch (org.python.exceptions.AttributeError ae2) {
-                    this.value = true;
-                }
-            }
+            this.value = args[0].toBoolean();
         }
     }
     // public org.python.Object __new__() {
@@ -246,7 +238,11 @@ public class Bool extends org.python.types.Object {
         try {
             return new org.python.types.Int(this.value ? 1 : 0).__floordiv__(other);
         } catch (org.python.exceptions.TypeError ae) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'bool' and '" + other.typeName() + "'");
+            if (other instanceof org.python.types.Complex) {
+                throw new org.python.exceptions.TypeError("can't take floor of complex number.");
+            } else {
+                throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            }
         }
     }
 

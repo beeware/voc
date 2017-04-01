@@ -173,6 +173,17 @@ class SetTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_iteration(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = set()
+            #We are not printing each element because python and voc store the items in different ways.
+            for s in x:
+                print(x.__contains__(s))
+            for s in y:
+                print(y.__conatins__(s))
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
@@ -226,10 +237,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_eq_class',
         'test_eq_frozenset',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
 
         'test_ge_class',
         'test_ge_frozenset',
@@ -294,10 +301,6 @@ class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_and_class',
         'test_and_frozenset',
         'test_and_set',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',

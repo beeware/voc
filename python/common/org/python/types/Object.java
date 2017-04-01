@@ -24,6 +24,18 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return this;
     }
 
+    public boolean toBoolean() {
+        try {
+            return ((org.python.types.Bool) this.__bool__()).value;
+        } catch (org.python.exceptions.AttributeError ae) {
+            try {
+                return ((org.python.types.Int) this.__len__()).value != 0;
+            } catch (org.python.exceptions.AttributeError ae2) {
+                return true;
+            }
+        }
+    }
+
     public org.python.Object byValue() {
         return this;
     }
@@ -140,9 +152,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return this.__class__;
     }
 
-    // public void __init__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-    //     throw new org.python.exceptions.AttributeError(this, "__init__");
-    // }
+    @org.python.Method(
+            __doc__ = "Initialize self.  See help(type(self)) for accurate signature."
+    )
+    public void __init__() {
+    }
 
     @org.python.Method(
             __doc__ = "Destroy an existing object. See help(type) for accurate signature."
@@ -579,7 +593,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __floordiv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't take floor of complex number.");
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -811,7 +829,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             this.setValue(this.__floordiv__(other));
             return this;
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //=: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            if (other instanceof org.python.types.Complex) {
+                throw new org.python.exceptions.TypeError("can't take floor of complex number.");
+            } else {
+                throw new org.python.exceptions.TypeError("unsupported operand type(s) for //=: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            }
         }
     }
 

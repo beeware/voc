@@ -64,6 +64,24 @@ class FloatTests(TranspileTestCase):
             print(x, y)
             """)
 
+    def test_is_integer(self):
+        self.assertCodeExecution("""
+            x = 0.0
+            print(x.is_integer())
+            x = 3.14
+            print(x.is_integer())
+            x = -1.0
+            print(x.is_integer())
+            x = -62.5
+            print(x.is_integer())
+            x = float('nan')
+            print(x.is_integer())
+            x = float('inf')
+            print(x.is_integer())
+            x = float('-inf')
+            print(x.is_integer())
+            """)
+
     def test_hex(self):
         numbers = [
             0e0, -0e0, 10000152587890625e-16, -566e85,
@@ -112,10 +130,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_eq_class',
         'test_eq_frozenset',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
 
         'test_ge_class',
         'test_ge_frozenset',

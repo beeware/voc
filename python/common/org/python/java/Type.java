@@ -276,7 +276,7 @@ public class Type extends org.python.types.Type {
             }
         } catch (java.lang.InstantiationException e) {
             throw new org.python.exceptions.RuntimeError(e.getCause().toString());
-        } finally {
+        // } finally {
             //     System.out.println("CONSTRUCTOR DONE");
         }
     }

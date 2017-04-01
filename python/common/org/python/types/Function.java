@@ -391,8 +391,8 @@ public class Function extends org.python.types.Object implements org.python.Call
             } else {
                 return org.python.types.Type.toPython(this.method.invoke(instance, adjusted_args));
             }
-        } catch (java.lang.IllegalAccessException e) {
-            throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.method);
+        } catch (java.lang.IllegalAccessException iae) {
+            throw new org.python.exceptions.RuntimeError(iae.toString());
         } catch (java.lang.reflect.InvocationTargetException e) {
             try {
                 // org.Python.debug("Exception:", e.getTargetException());
@@ -411,7 +411,7 @@ public class Function extends org.python.types.Object implements org.python.Call
                 }
                 throw new org.python.exceptions.RuntimeError(message);
             }
-        } finally {
+        // } finally {
             //     System.out.println("INVOKE METHOD DONE");
         }
     }

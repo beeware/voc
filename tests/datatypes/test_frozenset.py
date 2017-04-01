@@ -99,6 +99,16 @@ class FrozensetTests(TranspileTestCase):
             print('a' not in x)
             print('d' not in x)
 
+    def test_iteration(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = frozenset()
+            #We are not printing each element because python and voc store the items in different ways.
+            for s in x:
+                print(x.__contains__(s))
+            for s in y:
+                print(y.__conatins__(s))
+
             """)
 
 
@@ -278,7 +288,6 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_floor_divide_bytearray',
         'test_floor_divide_bytes',
         'test_floor_divide_class',
-        'test_floor_divide_complex',
         'test_floor_divide_dict',
         'test_floor_divide_float',
         'test_floor_divide_frozenset',
