@@ -971,7 +971,7 @@ public class Python {
                     "the provided iterable is empty.\n" +
                     "With two or more arguments, return the largest argument.\n",
             varargs = "args",
-            kwonlyargs={"default", "key"}
+            kwonlyargs = {"default", "key"}
     )
     public static org.python.Object max(org.python.types.Tuple args, org.python.Object default_, org.python.Object key) {
         org.python.Object max_value = null;
@@ -1052,7 +1052,7 @@ public class Python {
                     "the provided iterable is empty.\n" +
                     "With two or more arguments, return the smallest argument.\n",
             varargs = "args",
-            kwonlyargs={"default", "key"}
+            kwonlyargs = {"default", "key"}
     )
     public static org.python.Object min(org.python.types.Tuple args, org.python.Object default_, org.python.Object key) {
         org.python.Object min_value = null;

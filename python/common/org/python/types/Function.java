@@ -19,7 +19,7 @@ public class Function extends org.python.types.Object implements org.python.Call
     java.util.Map<java.lang.String, org.python.Object> default_kwargs;
     org.python.types.Closure closure;
 
-    static public java.lang.String protect_reserved_words(java.lang.String arg) {
+    public static java.lang.String protect_reserved_words(java.lang.String arg) {
         if (arg.equals("default")) {
             return arg + "_";
         }
