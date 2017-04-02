@@ -24,6 +24,18 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return this;
     }
 
+    public boolean toBoolean() {
+        try {
+            return ((org.python.types.Bool) this.__bool__()).value;
+        } catch (org.python.exceptions.AttributeError ae) {
+            try {
+                return ((org.python.types.Int) this.__len__()).value != 0;
+            } catch (org.python.exceptions.AttributeError ae2) {
+                return true;
+            }
+        }
+    }
+
     public org.python.Object byValue() {
         return this;
     }
@@ -140,9 +152,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return this.__class__;
     }
 
-    // public void __init__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-    //     throw new org.python.exceptions.AttributeError(this, "__init__");
-    // }
+    @org.python.Method(
+            __doc__ = "Initialize self.  See help(type(self)) for accurate signature."
+    )
+    public void __init__() {
+    }
 
     @org.python.Method(
             __doc__ = "Destroy an existing object. See help(type) for accurate signature."

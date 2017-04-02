@@ -173,6 +173,17 @@ class SetTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_iteration(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = set()
+            #We are not printing each element because python and voc store the items in different ways.
+            for s in x:
+                print(x.__contains__(s))
+            for s in y:
+                print(y.__conatins__(s))
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'

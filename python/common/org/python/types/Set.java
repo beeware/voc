@@ -235,7 +235,7 @@ public class Set extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Iterable __iter__() {
-        throw new org.python.exceptions.NotImplementedError("__iter__() has not been implemented");
+        return new org.python.types.Set_Iterator(this);
     }
 
     @org.python.Method(
@@ -353,7 +353,8 @@ public class Set extends org.python.types.Object {
     // }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object add(org.python.Object other) {
         this.value.add(other);

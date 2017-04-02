@@ -23,6 +23,10 @@ public class Super implements org.python.Object {
         return this.instance;
     }
 
+    public boolean toBoolean() {
+        return true;
+    }
+
     public org.python.Object byValue() {
         return this;
     }
@@ -256,7 +260,7 @@ public class Super implements org.python.Object {
 
     public org.python.Object __getattribute_null(java.lang.String name) {
         // Look for local instance attributes first
-        // org.Python.debug("SUPER " + this.klass + "GETATTRIBUTE ", name);
+        // org.Python.debug("SUPER " + this.klass + " GETATTRIBUTE ", name);
         org.python.Object value = null;
         java.util.List<org.python.Object> bases = ((org.python.types.Tuple) this.klass.__dict__.get("__bases__")).value;
 
