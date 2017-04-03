@@ -20,4 +20,8 @@ class OsModuleTests(TranspileTestCase):
                 print(os.getenv(1))
             except Exception as e:
                 print(type(e), e)
+            try:
+                print(os.getenv())
+            except Exception as e:
+                print(type(e), e)
             """)
