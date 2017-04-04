@@ -113,6 +113,38 @@ class FrozensetTests(TranspileTestCase):
 
             """)
 
+    def test_copy(self):
+        self.assertCodeExecution("""
+            x = frozenset()
+            y = x.copy()
+            print(x is y)
+
+            x = frozenset({'a'})
+            y = x.copy()
+            print(x is y)
+
+            y = {1,2}
+            x = frozenset(y)
+            z = x.copy()
+            print(x is z)
+
+            y = ['c']
+            x = frozenset(y)
+            z = x.copy()
+            print(x is z)
+
+            y = (1,2)
+            x = frozenset(y)
+            z = x.copy()
+            print(x is z)
+
+            y = 'a'
+            x = frozenset(y)
+            z = x.copy()
+            print(x is z)
+
+            """)
+
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'

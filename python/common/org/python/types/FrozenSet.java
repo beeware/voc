@@ -124,4 +124,11 @@ public class FrozenSet extends org.python.types.Object {
     public org.python.Object __not_contains__(org.python.Object other) {
         return new org.python.types.Bool(!this.value.contains(other));
     }
+
+    @org.python.Method(
+            __doc__ = "Return a shallow copy of a FrozenSet."
+    )
+    public org.python.Object copy() {
+        return this;
+    }
 }
