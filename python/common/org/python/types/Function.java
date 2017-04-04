@@ -19,14 +19,6 @@ public class Function extends org.python.types.Object implements org.python.Call
     java.util.Map<java.lang.String, org.python.Object> default_kwargs;
     org.python.types.Closure closure;
 
-    public static java.lang.String protect_reserved_words(java.lang.String arg) {
-        if (arg.equals("default")) {
-            return arg + "_";
-        }
-
-        return arg;
-    }
-
     private void populateAttrs() {
         org.python.types.Str name = new org.python.types.Str(method.getName());
         this.__dict__.put("__name__", this.name);
