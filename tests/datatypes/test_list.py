@@ -573,18 +573,18 @@ class ListTests(TranspileTestCase):
             print([x] == [y]) # True, x is not y, x.__eq__(y)
             print([y] == [x]) # False, y is not x, y.__eq__(x)
             """)
-    
+        
     def test_reversed(self):
         self.assertCodeExecution("""
-			list = [123, 'xyz', 'abc']
-			reversedList = ['abc', 'xyz', 123] # to check equality
-			l = []
-			reverse = list.__reversed__()
-			try:
-				while(True):
-					l.append(next(reverse))
-			except StopIteration:
-				print(l == reversedList)
+            list = [123, 'xyz', 'abc']
+            reversedList = ['abc', 'xyz', 123] # to check equality
+            l = []
+            reverse = list.__reversed__()
+            try:
+                while(True):
+                    l.append(next(reverse))
+            except StopIteration:
+            print(l == reversedList)
         """)
 
 
