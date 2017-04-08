@@ -483,9 +483,9 @@ public class List extends org.python.types.Object {
         org.python.types.List list = new org.python.types.List();
         for (int i = this.value.size() - 1; i >= 0; i--) {
             list.append(this.value.get(i));
-	}
-	org.python.Iterable iter = new org.python.types.List_Iterator(list);
-	return iter;
+        }
+        org.python.Iterable iter = new org.python.types.List_Iterator(list);
+        return iter;
     }
 
     @org.python.Method(
