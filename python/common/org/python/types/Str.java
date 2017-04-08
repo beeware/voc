@@ -1194,7 +1194,7 @@ public class Str extends org.python.types.Object {
             if (org.Python.VERSION < 0x03060000) {
                 throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.typeName(sep.getClass()) + "' object to str implicitly");
             }
-            return new org.python.exceptions.TypeError("must be str or None, not " + org.Python.typeName(sep.getClass())) ;
+            return new org.python.exceptions.TypeError("must be str or None, not " + org.Python.typeName(sep.getClass()));
         }
         java.lang.String sepStr = ((org.python.types.Str) sep).value;
         if (sepStr.equals("")) {
