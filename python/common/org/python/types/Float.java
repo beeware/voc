@@ -644,6 +644,18 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "F.is_integer() -> bool\n" +
+                    "\n" +
+                    "Return True if the float instance is finite with integral value, and False otherwise.\n"
+    )
+    public org.python.Object is_integer() {
+        if (this.value == Math.floor(this.value) && !Double.isInfinite(this.value)) {
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
+    }
+
+    @org.python.Method(
             __doc__ = ""
     )
     public org.python.types.Str hex() {

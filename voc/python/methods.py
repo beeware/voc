@@ -3,7 +3,7 @@ from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
     RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref as JavaClassref
 )
-from .blocks import Block, Accumulator
+from .blocks import Block, Accumulator, BlockCodeTooLarge
 from .structures import (
     TRY, CATCH, END_TRY,
     ArgType,
@@ -43,6 +43,170 @@ def descriptor(annotation):
         return 'V'
     else:
         return 'L%s;' % annotation.replace('.', '/')
+
+
+def to_python(accumulator, annotation, var_name):
+    if annotation == "bool":
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
+            java.New('org/python/types/Bool'),
+            ILOAD_name(var_name),
+            java.Init('org/python/types/Bool', 'Z'),
+        )
+    elif annotation == "byte":
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
+            java.New('org/python/types/Int'),
+            ILOAD_name(var_name),
+            java.Init('org/python/types/Int', 'B'),
+        )
+    elif annotation == 'char':
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
+            java.New('org/python/types/Str'),
+            ILOAD_name(var_name),
+            java.Init('org/python/types/Str', 'C'),
+        )
+    elif annotation == "short":
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
+            java.New('org/python/types/Int'),
+            ILOAD_name(var_name),
+            java.Init('org/python/types/Int', 'S'),
+        )
+    elif annotation == "int":
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
+            java.New('org/python/types/Int'),
+            ILOAD_name(var_name),
+            java.Init('org/python/types/Int', 'I'),
+        )
+    elif annotation == "long":
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
+            java.New('org/python/types/Int'),
+            ILOAD_name(var_name),
+            java.Init('org/python/types/Int', 'J'),
+        )
+    elif annotation == "float":
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
+            java.New('org/python/types/Float'),
+            FLOAD_name(var_name),
+            java.Init('org/python/types/Float', 'F'),
+        )
+    elif annotation == "double":
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
+            java.New('org/python/types/Float'),
+            DLOAD_name(var_name),
+            java.Init('org/python/types/Float', 'D'),
+        )
+    else:
+        accumulator.add_opcodes(
+            # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+            ALOAD_name(var_name),
+            python.Type.to_python(),
+        )
+
+
+def to_java(accumulator, annotation):
+    if annotation == 'void':
+        accumulator.add_opcodes(
+            JavaOpcodes.POP(),
+        )
+    elif annotation == 'bool':
+        accumulator.add_opcodes(
+            JavaOpcodes.CHECKCAST('org/python/types/Bool'),
+            JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
+        )
+    elif annotation == 'byte':
+        accumulator.add_opcodes(
+            JavaOpcodes.CHECKCAST('org/python/types/Int'),
+            JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+            JavaOpcodes.L2I(),
+            JavaOpcodes.I2B(),
+        )
+    elif annotation == 'char':
+        accumulator.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', args=[], returns='Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST('java/lang/String'),
+            ICONST_val(0),
+            JavaOpcodes.INVOKEVIRTUAL('java/lang/String', 'charAt', args=['I'], returns='C'),
+        )
+    elif annotation == 'short':
+        accumulator.add_opcodes(
+            JavaOpcodes.CHECKCAST('org/python/types/Int'),
+            JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+            JavaOpcodes.L2I(),
+            JavaOpcodes.I2S(),
+        )
+    elif annotation == 'int':
+        accumulator.add_opcodes(
+            JavaOpcodes.CHECKCAST('org/python/types/Int'),
+            JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+            JavaOpcodes.L2I(),
+        )
+    elif annotation == 'long':
+        accumulator.add_opcodes(
+            JavaOpcodes.CHECKCAST('org/python/types/Int'),
+            JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
+        )
+    elif annotation == 'float':
+        accumulator.add_opcodes(
+            JavaOpcodes.CHECKCAST('org/python/types/Float'),
+            JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
+            JavaOpcodes.DTOF(),
+        )
+    elif annotation == 'double':
+        accumulator.add_opcodes(
+            JavaOpcodes.CHECKCAST('org/python/types/Float'),
+            JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
+        )
+    elif annotation != 'org/python/Object':
+        accumulator.add_opcodes(
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', args=[], returns='Ljava/lang/Object;'),
+            JavaOpcodes.CHECKCAST(annotation.replace('.', '/')),
+        )
+
+
+def return_statement(accumulator, annotation):
+    if annotation == 'void':
+        accumulator.add_opcodes(
+            JavaOpcodes.RETURN()
+        )
+    elif annotation in ['bool', 'byte', 'char', 'short', 'int']:
+        accumulator.add_opcodes(
+            JavaOpcodes.IRETURN(),
+        )
+    elif annotation == 'long':
+        accumulator.add_opcodes(
+            JavaOpcodes.LRETURN(),
+        )
+    elif annotation == 'float':
+        accumulator.add_opcodes(
+            JavaOpcodes.FRETURN(),
+        )
+    elif annotation == 'double':
+        accumulator.add_opcodes(
+            JavaOpcodes.DRETURN(),
+        )
+    else:
+        accumulator.add_opcodes(
+            JavaOpcodes.ARETURN()
+        )
+
+
+class MethodCodeTooLarge(Exception):
+    pass
 
 
 class Function(Block):
@@ -369,14 +533,18 @@ class Function(Block):
         ]
 
     def transpile_method(self):
-        return [
-            JavaMethod(
-                self.pyimpl_name,
-                self.signature,
-                static=self.static,
-                attributes=[self.transpile_code()] + self.method_attributes()
-            )
-        ]
+        try:
+            return [
+                JavaMethod(
+                    self.pyimpl_name,
+                    self.signature,
+                    static=self.static,
+                    attributes=[self.transpile_code()] + self.method_attributes()
+                )
+            ]
+        except BlockCodeTooLarge as e:
+            raise MethodCodeTooLarge("Code is too large for method %s: %d > 65534"
+                                     % (self.name, e.code_length))
 
     def transpile_wrapper(self):
         return []
@@ -386,7 +554,7 @@ class Function(Block):
 
 
 class InitMethod(Function):
-    def __init__(self, klass, parameters=None):
+    def __init__(self, klass, args=None, super_args=None, parameters=None):
         super().__init__(
             klass,
             name='<init>',
@@ -410,7 +578,8 @@ class InitMethod(Function):
             ],
             returns={'annotation': None},
         )
-        self.build()
+        self.args = args if args else {}
+        self.super_args = super_args if super_args else []
 
     def __repr__(self):
         return '<Constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
@@ -439,15 +608,42 @@ class InitMethod(Function):
     def signature(self):
         return '([Lorg/python/Object;Ljava/util/Map;)V'
 
-    def build(self):
+    def load_name(self, name):
+        if name in self.args:
+            index = self.args[name]
+            if index is None:
+                self.add_opcodes(
+                    JavaOpcodes.ALOAD_2(),
+                    java.Map.get(name)
+                )
+            else:
+                self.add_opcodes(
+                    JavaOpcodes.ALOAD_1(),
+                    java.Array.get(index),
+                )
+        else:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                python.Object.get_attribute(name),
+            )
+
+    def visitor_setup(self):
         # Construct the contents of the constructor method...
         self.add_opcodes(
             # Create the instance
             JavaOpcodes.ALOAD_0(),
             JavaOpcodes.DUP(),
-            # TODO - this only allows using the default constructor
-            # for extended Java classes.
-            java.Init(self.klass.extends_descriptor),
+        )
+
+    def visitor_teardown(self):
+        self.add_opcodes(
+            java.Init(self.klass.extends_descriptor, *[descriptor(arg) for arg in self.super_args]),
             python.Type.to_python(),
 
             python.Object.get_attribute('__init__', use_null=True),
@@ -528,81 +724,10 @@ class Method(Function):
 
         # Then extract each argument, converting to Python types as required.
         for i, param in enumerate(self.parameters[1:]):
-            annotation = param['annotation']
-
-            if annotation is None:
+            if param['annotation'] is None:
                 raise Exception("Parameters can't be void")
-            elif annotation == "bool":
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-                    java.New('org/python/types/Bool'),
-                    ILOAD_name(param['name']),
-                    java.Init('org/python/types/Bool', 'Z'),
-                )
-            elif annotation == "byte":
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-                    java.New('org/python/types/Int'),
-                    ILOAD_name(param['name']),
-                    java.Init('org/python/types/Int', 'B'),
-                )
-            elif annotation == 'char':
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-                    java.New('org/python/types/Str'),
-                    ILOAD_name(param['name']),
-                    java.Init('org/python/types/Str', 'C'),
-                )
-            elif annotation == "short":
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-                    java.New('org/python/types/Int'),
-                    ILOAD_name(param['name']),
-                    java.Init('org/python/types/Int', 'S'),
-                )
-            elif annotation == "int":
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-                    java.New('org/python/types/Int'),
-                    ILOAD_name(param['name']),
-                    java.Init('org/python/types/Int', 'I'),
-                )
-            elif annotation == "long":
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-                    java.New('org/python/types/Int'),
-                    ILOAD_name(param['name']),
-                    java.Init('org/python/types/Int', 'J'),
-                )
-            elif annotation == "float":
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-                    java.New('org/python/types/Float'),
-                    FLOAD_name(param['name']),
-                    java.Init('org/python/types/Float', 'F'),
-                )
-            elif annotation == "double":
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-                    java.New('org/python/types/Float'),
-                    DLOAD_name(param['name']),
-                    java.Init('org/python/types/Float', 'D'),
-                )
             else:
-                binding.add_opcodes(
-                    # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-                    ALOAD_name(param['name']),
-                    python.Type.to_python(),
-                )
-
+                to_python(binding, param['annotation'], param['name'])
             # binding.add_opcodes(
             #     DEBUG("INPUT %s TRANSFORMED" % (i)),
             # )
@@ -615,80 +740,8 @@ class Method(Function):
             JavaOpcodes.INVOKESTATIC(self.klass.descriptor, self.pyimpl_name, self.signature),
         )
 
-        # Now convert the return type to a native type.
-        return_type = self.returns['annotation']
-
-        if return_type == 'void':
-            binding.add_opcodes(
-                JavaOpcodes.POP(),
-                JavaOpcodes.RETURN()
-            )
-        elif return_type == 'bool':
-            binding.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Bool'),
-                JavaOpcodes.GETFIELD('org/python/types/Bool', 'value', 'Z'),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'byte':
-            binding.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
-                JavaOpcodes.L2I(),
-                JavaOpcodes.I2B(),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'char':
-            binding.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', args=[], returns='Ljava/lang/Object;'),
-                JavaOpcodes.CHECKCAST('java/lang/String'),
-                ICONST_val(0),
-                JavaOpcodes.INVOKEVIRTUAL('java/lang/String', 'charAt', args=['I'], returns='C'),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'short':
-            binding.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
-                JavaOpcodes.L2I(),
-                JavaOpcodes.I2S(),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'int':
-            binding.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
-                JavaOpcodes.L2I(),
-                JavaOpcodes.IRETURN(),
-            )
-        elif return_type == 'long':
-            binding.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                JavaOpcodes.GETFIELD('org/python/types/Int', 'value', 'J'),
-                JavaOpcodes.LRETURN(),
-            )
-        elif return_type == 'float':
-            binding.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Float'),
-                JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
-                JavaOpcodes.DTOF(),
-                JavaOpcodes.FRETURN(),
-            )
-        elif return_type == 'double':
-            binding.add_opcodes(
-                JavaOpcodes.CHECKCAST('org/python/types/Float'),
-                JavaOpcodes.GETFIELD('org/python/types/Float', 'value', 'D'),
-                JavaOpcodes.DRETURN(),
-            )
-        elif return_type != 'org/python/Object':
-            binding.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'toJava', args=[], returns='Ljava/lang/Object;'),
-                JavaOpcodes.CHECKCAST(return_type.replace('.', '/')),
-                JavaOpcodes.ARETURN(),
-            )
-        else:
-            binding.add_opcodes(
-                JavaOpcodes.ARETURN()
-            )
+        to_java(binding, self.returns['annotation'])
+        return_statement(binding, self.returns['annotation'])
 
         # binding.add_opcodes(
         #     DEBUG("BINDING OUTPUT to type %s" % self.returns['annotation']),
@@ -988,14 +1041,8 @@ class ClosureInitMethod(InitMethod):
     def signature(self):
         return '(Ljava/util/Map;)V'
 
-    def build(self):
-        # Get the __init__ method for the class...
+    def visitor_teardown(self):
         self.add_opcodes(
-            # Create the instance
-            JavaOpcodes.ALOAD_0(),
-            JavaOpcodes.DUP(),
-            # TODO - this only allows using the default constructor
-            # for extended Java classes.
             JavaOpcodes.ALOAD_1(),
             java.Init(self.klass.extends_descriptor, 'Ljava/util/Map;'),
 

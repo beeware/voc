@@ -17,6 +17,8 @@ from .types.primitives import (
 
 
 class Class(Block):
+    CONSTRUCTOR = InitMethod
+
     def __init__(
             self, module, name,
             namespace=None, extends=None, implements=None,
@@ -46,7 +48,7 @@ class Class(Block):
         # Mark this class as being a VOC generated class.
         self.fields["__VOC__"] = "Lorg/python/Object;"
 
-        self.methods.append(self.constructor())
+        self._constructor = None
 
     @property
     def descriptor(self):
@@ -153,9 +155,19 @@ class Class(Block):
             python.Object.del_attr(name),
         )
 
+    @property
     def constructor(self):
         # Make sure there is a Java constructor
-        return InitMethod(self)
+        if self._constructor is None:
+            init = self.CONSTRUCTOR(self)
+            init.visitor_setup()
+            init.visitor_teardown()
+            return init
+        return self._constructor
+
+    @constructor.setter
+    def constructor(self, value):
+        self._constructor = value
 
     def add_function(self, name, code, parameter_signatures, return_signature):
         if False:  # FIXME code.co_flags & CO_GENERATOR:
@@ -240,6 +252,9 @@ class Class(Block):
         for method in self.methods:
             classfile.methods.extend(method.transpile())
 
+        # Add the constructor
+        classfile.methods.extend(self.constructor.transpile())
+
         # Ensure the class has a class protected, no-args init() so that
         # instances can be instantiated.
         if self.include_default_constructor:
@@ -267,6 +282,8 @@ class Class(Block):
 
 
 class ClosureClass(Class):
+    CONSTRUCTOR = ClosureInitMethod
+
     def __init__(self, module, name, closure_var_names, verbosity=0):
         super().__init__(
             module=module,
@@ -277,7 +294,3 @@ class ClosureClass(Class):
             include_default_constructor=False,
         )
         self.closure_var_names = closure_var_names
-
-    def constructor(self):
-        # Make sure there is a default constructor
-        return ClosureInitMethod(self)
