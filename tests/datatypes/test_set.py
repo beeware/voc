@@ -96,9 +96,20 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.difference(y)
+            w = x.difference([3,4,5])
             print(x)
             print(y)
             print(z)
+            print(w)
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                print(x.difference(1))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_discard(self):

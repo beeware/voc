@@ -420,9 +420,17 @@ public class Set extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object difference(org.python.Object other) {
-        java.util.Set set = ((Set) this.copy()).value;
-        set.removeAll(((Set) other).value);
-        return new Set(set);
+        try {
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
+            return this.__sub__(otherSet);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
