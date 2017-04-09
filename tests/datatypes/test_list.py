@@ -584,7 +584,7 @@ class ListTests(TranspileTestCase):
                 while(True):
                     l.append(next(reverse))
             except StopIteration:
-            print(l == reversedList)
+                print(l == reversedList)
         """)
 
 
