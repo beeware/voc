@@ -267,4 +267,20 @@ public class FrozenSet extends org.python.types.Object {
         }
         return super.__mul__(other);
     }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __and__(org.python.Object other) {
+        java.util.Set frozenSet = new java.util.HashSet<org.python.Object>(this.value);
+        if (other instanceof org.python.types.FrozenSet) {
+            frozenSet.retainAll(((org.python.types.FrozenSet) other).value);
+            return new org.python.types.FrozenSet(frozenSet);
+        } else if (other instanceof org.python.types.Set) {
+            frozenSet.retainAll(((org.python.types.Set) other).value);
+            return new org.python.types.FrozenSet(frozenSet);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 }
