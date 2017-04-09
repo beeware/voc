@@ -3,6 +3,24 @@ package org.python.types;
 public class FrozenSet extends org.python.types.Object {
     public java.util.Set<org.python.Object> value;
 
+    /**
+     * A utility method to update the internal value of this object.
+     *
+     * Used by __i*__ operations to do an in-place operation.
+     * obj must be of type org.python.types.Set
+     */
+    void setValue(org.python.Object obj) {
+        this.value = ((org.python.types.FrozenSet) obj).value;
+    }
+
+    public java.lang.Object toJava() {
+        return this.value;
+    }
+
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
     @org.python.Method(
             __doc__ = "frozenset() -> empty frozenset object" +
                     "frozenset(iterable) -> frozenset object\n" +
