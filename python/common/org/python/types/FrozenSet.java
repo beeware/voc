@@ -130,6 +130,7 @@ public class FrozenSet extends org.python.types.Object {
     )
     public org.python.Object copy() {
         return this;
+    }
 
     @org.python.Method(
             __doc__ = "",
