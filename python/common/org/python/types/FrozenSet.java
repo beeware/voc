@@ -251,4 +251,20 @@ public class FrozenSet extends org.python.types.Object {
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __mul__(org.python.Object other) {
+        if (other instanceof org.python.types.List ||
+                other instanceof org.python.types.Tuple ||
+                other instanceof org.python.types.Str ||
+                other instanceof org.python.types.Bytes ||
+                other instanceof org.python.types.ByteArray
+            ) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        }
+        return super.__mul__(other);
+    }
 }
