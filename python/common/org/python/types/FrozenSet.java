@@ -7,7 +7,7 @@ public class FrozenSet extends org.python.types.Object {
      * A utility method to update the internal value of this object.
      *
      * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Set
+     * obj must be of type org.python.types.FrozenSet
      */
     void setValue(org.python.Object obj) {
         this.value = ((org.python.types.FrozenSet) obj).value;
@@ -265,7 +265,7 @@ public class FrozenSet extends org.python.types.Object {
             ) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -298,5 +298,29 @@ public class FrozenSet extends org.python.types.Object {
             return new org.python.types.FrozenSet(frozenSet);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __xor__(org.python.Object other) {
+        java.util.Set frozenSet = new java.util.HashSet<org.python.Object>(this.value);
+        if (other instanceof org.python.types.FrozenSet) {
+            java.util.Set otherFrozenSet = ((org.python.types.FrozenSet) other).value;
+            frozenSet.addAll(otherFrozenSet);
+            java.util.Set temp = new java.util.HashSet<org.python.Object>(this.value);
+            temp.retainAll(otherFrozenSet);
+            frozenSet.removeAll(temp);
+            return new org.python.types.FrozenSet(frozenSet);
+        } else if (other instanceof org.python.types.Set) {
+            java.util.Set otherFrozenSet = ((org.python.types.Set) other).value;
+            frozenSet.addAll(otherFrozenSet);
+            java.util.Set temp = new java.util.HashSet<org.python.Object>(this.value);
+            temp.retainAll(otherFrozenSet);
+            frozenSet.removeAll(temp);
+            return new org.python.types.FrozenSet(frozenSet);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 }
