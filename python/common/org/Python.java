@@ -964,15 +964,56 @@ public class Python {
 
     @org.python.Method(
             __doc__ = "max(iterable, *[, default=obj, key=func]) -> value" +
-                    "max(arg1, arg2, *args, *[, key=func]) -> value\n" +
-                    "\n" +
-                    "With a single iterable argument, return its biggest item. The\n" +
-                    "default keyword-only argument specifies an object to return if\n" +
-                    "the provided iterable is empty.\n" +
-                    "With two or more arguments, return the largest argument.\n"
+                "max(arg1, arg2, *args, *[, key=func]) -> value\n" +
+                "\n" +
+                "With a single iterable argument, return its biggest item. The\n" +
+                "default keyword-only argument specifies an object to return if\n" +
+                "the provided iterable is empty.\n" +
+                "With two or more arguments, return the largest argument.\n",
+            args = {"first"},
+            varargs = "others",
+            kwargs = "kwargs"
     )
-    public static org.python.Object max() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'max' not implemented");
+    public static org.python.Object max(org.python.Object first, org.python.types.Tuple rest, org.python.types.Dict kwargs) {
+        org.python.Object val = null;
+        java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
+        org.python.Iterable iter;
+        try {
+            iter = org.Python.iter(first);
+            try {
+                while (true) {
+                    org.python.Object next = iter.__next__();
+                    generated.add(next);
+                }
+            } catch (Exception e) {
+                throw new org.python.exceptions.ValueError("max() arg is an empty sequence");
+            }
+        } catch (org.python.exceptions.AttributeError e) {
+            val = first;
+        } finally {
+            try {
+                iter = org.Python.iter(rest);
+                try {
+                    while (true) {
+                        org.python.Object next = iter.__next__();
+                        generated.add(next);
+                    }
+                } catch (org.python.exceptions.StopIteration si) { }
+            } catch (org.python.exceptions.AttributeError e) {
+                generated = rest.value;
+                generated.add(first);
+            } finally {
+                val = java.util.Collections.max(generated, null);
+                if (kwargs != null) {
+                    for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : ((org.python.types.Dict) kwargs).value.entrySet()) {
+                        if (val.compareTo(entry.getValue()) < 0) {
+                            val = entry.getValue();
+                        }
+                    }
+                }
+                return val;
+            }
+        }
     }
 
     @org.python.Method(
