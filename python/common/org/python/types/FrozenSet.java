@@ -265,7 +265,7 @@ public class FrozenSet extends org.python.types.Object {
             ) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
         }
-        return super.__mul__(other);
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -282,5 +282,21 @@ public class FrozenSet extends org.python.types.Object {
             return new org.python.types.FrozenSet(frozenSet);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __or__(org.python.Object other) {
+        java.util.Set frozenSet = new java.util.HashSet<org.python.Object>(this.value);
+        if (other instanceof org.python.types.FrozenSet) {
+            frozenSet.addAll(((org.python.types.FrozenSet) other).value);
+            return new org.python.types.FrozenSet(frozenSet);
+        } else if (other instanceof org.python.types.Set) {
+            frozenSet.addAll(((org.python.types.Set) other).value);
+            return new org.python.types.FrozenSet(frozenSet);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 }
