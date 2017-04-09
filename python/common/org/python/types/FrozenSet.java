@@ -21,6 +21,16 @@ public class FrozenSet extends org.python.types.Object {
         return this.value.hashCode();
     }
 
+    public FrozenSet() {
+        super();
+        this.value = java.util.Collections.emptySet();
+    }
+
+    public FrozenSet(java.util.Set<org.python.Object> frozenSet) {
+        super();
+        this.value = java.util.Collections.unmodifiableSet(frozenSet);
+    }
+
     @org.python.Method(
             __doc__ = "frozenset() -> empty frozenset object" +
                     "frozenset(iterable) -> frozenset object\n" +
