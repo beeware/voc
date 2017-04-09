@@ -456,7 +456,12 @@ public class Set extends org.python.types.Object {
     )
     public org.python.Object intersection(org.python.Object other) {
         try {
-            org.python.types.Set otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
             return this.__and__(otherSet);
         } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
@@ -485,7 +490,12 @@ public class Set extends org.python.types.Object {
     )
     public org.python.Object issubset(org.python.Object other) {
         try {
-            org.python.types.Set otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
             return this.__le__(otherSet);
         } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
@@ -498,7 +508,12 @@ public class Set extends org.python.types.Object {
     )
     public org.python.Object issuperset(org.python.Object other) {
         try {
-            org.python.types.Set otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
             return this.__ge__(otherSet);
         } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
