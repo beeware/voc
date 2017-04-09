@@ -234,4 +234,21 @@ public class FrozenSet extends org.python.types.Object {
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
+
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __sub__(org.python.Object other) {
+        java.util.Set frozenSet = new java.util.HashSet<org.python.Object>(this.value);
+        if (other instanceof org.python.types.FrozenSet) {
+            frozenSet.removeAll(((org.python.types.FrozenSet) other).value);
+            return new org.python.types.FrozenSet(frozenSet);
+        } else if (other instanceof org.python.types.Set) {
+            frozenSet.removeAll(((org.python.types.Set) other).value);
+            return new org.python.types.FrozenSet(frozenSet);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 }
