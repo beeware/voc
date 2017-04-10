@@ -115,7 +115,7 @@ class Block(Accumulator):
             'annotation': None
         }
 
-    def store_name(self, name):
+    def store_name(self, name, declare=False):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
     def store_dynamic(self):

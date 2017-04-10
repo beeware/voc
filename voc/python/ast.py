@@ -375,10 +375,9 @@ class Visitor(ast.NodeVisitor):
 
         self.context.add_opcodes(
             JavaOpcodes.ICONST_1(),
-            ISTORE_name('#loop-orelse-%x' % id(loop))
+            ISTORE_name('#loop-orelse-%x' % id(loop)),
         )
-
-        self.context.store_name('#for-iter-%x' % id(node))
+        self.context.store_name('#for-iter-%x' % id(node), declare=True)
         self.context.add_opcodes(
             loop,
         )
@@ -1190,7 +1189,7 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
             python.List(),
         )
-        self.context.store_name('#listcomp-result-%x' % id(node))
+        self.context.store_name('#listcomp-result-%x' % id(node), declare=True)
 
         if len(node.generators) != 1:
             raise NotImplementedError("Don't know how to handle multiple generators")
@@ -1206,7 +1205,7 @@ class Visitor(ast.NodeVisitor):
 
         loop = START_LOOP()
 
-        self.context.store_name('#listcomp-iter-%x' % id(node))
+        self.context.store_name('#listcomp-iter-%x' % id(node), declare=True)
         self.context.add_opcodes(
             loop,
         )
@@ -1331,7 +1330,7 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
             python.Set(),
         )
-        self.context.store_name('#setcomp-result-%x' % id(node)),
+        self.context.store_name('#setcomp-result-%x' % id(node), declare=True)
 
         if len(node.generators) != 1:
             raise NotImplementedError("Don't know how to handle multiple generators")
@@ -1345,7 +1344,7 @@ class Visitor(ast.NodeVisitor):
             else:
                 raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
 
-        self.context.store_name('#setcomp-iter-%x' % id(node))
+        self.context.store_name('#setcomp-iter-%x' % id(node), declare=True)
 
         loop = START_LOOP()
         self.context.add_opcodes(
@@ -1454,7 +1453,7 @@ class Visitor(ast.NodeVisitor):
             java.New('org/python/types/Dict'),
             java.Init('org/python/types/Dict'),
         )
-        self.context.store_name('#dictcomp-result-%x' % id(node))
+        self.context.store_name('#dictcomp-result-%x' % id(node), declare=True)
 
         if len(node.generators) != 1:
             raise NotImplementedError("Don't know how to handle multiple generators")
@@ -1468,7 +1467,7 @@ class Visitor(ast.NodeVisitor):
             else:
                 raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
 
-        self.context.store_name('#dictcomp-iter-%x' % id(node))
+        self.context.store_name('#dictcomp-iter-%x' % id(node), declare=True)
 
         loop = START_LOOP()
         self.context.add_opcodes(
@@ -1596,7 +1595,7 @@ class Visitor(ast.NodeVisitor):
             else:
                 raise NotImplementedError("Don't know how to handle generator of type %s" % type(generator))
 
-        self.context.store_name('#genexp-iter-%x' % id(node)),
+        self.context.store_name('#genexp-iter-%x' % id(node), declare=True)
         loop = START_LOOP()
         self.context.add_opcodes(
             loop,
@@ -1604,7 +1603,7 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
                 TRY(),
         )
-        self.context.load_name('#genexp-iter-%x' % id(node)),
+        self.context.load_name('#genexp-iter-%x' % id(node))
         self.context.add_opcodes(
                     JavaOpcodes.CHECKCAST('org/python/Iterable'),
                     python.Iterable.next(),
