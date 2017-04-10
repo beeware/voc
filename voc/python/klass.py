@@ -102,7 +102,7 @@ class Class(Block):
         #     DEBUG("DEFINITION BLOCK OF " + self.descriptor + " DONE"),
         # )
 
-    def store_name(self, name):
+    def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
             python.Type.for_class(self.descriptor),
