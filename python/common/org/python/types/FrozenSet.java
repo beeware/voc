@@ -126,6 +126,13 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "Return a shallow copy of a FrozenSet."
+    )
+    public org.python.Object copy() {
+        return this;
+    }
+
+    @org.python.Method(
             __doc__ = "",
             args = {"other"}
     )
