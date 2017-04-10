@@ -995,6 +995,7 @@ public class Python {
                     value = iter.__next__();
                     if (key == null) {
                         key_value = value;
+
                     } else {
                         throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
                     }
@@ -1707,9 +1708,62 @@ public class Python {
                     "Return a zip object whose .__next__() method returns a tuple where\n" +
                     "the i-th element comes from the i-th iterable argument.  The .__next__()\n" +
                     "method continues until the shortest iterable in the argument sequence\n" +
-                    "is exhausted and then it raises StopIteration.\n"
+                    "is exhausted and then it raises StopIteration.\n",
+
+            args = {"item"},
+            varargs = "moreItems"
     )
-    public static org.python.Object zip() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'zip' not implemented");
+    public static org.python.Object zip(org.python.Object item, org.python.types.Tuple moreItems) {
+        java.util.List result = new java.util.ArrayList();
+        int count = 0;
+        if (item != null) {
+            count = 1;
+            org.python.Iterable iter;
+            try {
+                iter = org.Python.iter(item);
+            } catch (org.python.exceptions.TypeError e) {
+                throw new org.python.exceptions.TypeError("zip argument #" + count + " must support iteration");
+            }
+            java.util.List<org.python.Iterable> iters = new java.util.ArrayList<org.python.Iterable>();
+            iters.add(iter);
+            if (moreItems != null) {
+                org.python.Iterable tupIter = org.Python.iter(moreItems);
+                while (true) {
+                    count++;
+                    org.python.Iterable it;
+                    org.python.Object obj;
+                    try {
+                        obj = tupIter.__next__();
+                    } catch (org.python.exceptions.StopIteration e) {
+                        break;
+                    }
+                    try {
+                        it = org.Python.iter(obj);
+                    } catch (org.python.exceptions.TypeError e) {
+                        throw new org.python.exceptions.TypeError("zip argument #" + count + " must support iteration");
+                    }
+                    iters.add(it);
+                }
+            }
+            boolean flag = false;
+            while (true) {
+                java.util.List tuple = new java.util.ArrayList();
+                for (int i = 0; i < count - 1; i++) {
+                    try {
+                        org.python.Iterable it = iters.get(i);
+                        tuple.add(it.__next__());
+                    } catch (IndexOutOfBoundsException | org.python.exceptions.StopIteration e) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag) {
+                    break;
+                }
+                org.python.types.Tuple pythonTuple = new org.python.types.Tuple(tuple);
+                result.add(pythonTuple);
+            }
+        }
+        return new org.python.types.List(result);
     }
 }
