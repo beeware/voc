@@ -585,6 +585,9 @@ class ListTests(TranspileTestCase):
                     l.append(next(reverse))
             except StopIteration:
                 print(l == reversedList)
+
+            origList = [123, 'xyz', 'abc'] # to check if original list was modified
+            print(list == origList)
         """)
 
 
