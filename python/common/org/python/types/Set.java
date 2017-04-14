@@ -426,7 +426,11 @@ public class Set extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object intersection_update(org.python.Object other) {
-        this.value.retainAll(((Set) other).value);
+        try {
+            this.value.retainAll(((Set) other).value);
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
         return org.python.types.NoneType.NONE;
     }
 
@@ -518,17 +522,31 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return a new set with elements in either the set or other but not both.",
+            default_args = {"other"}
     )
     public org.python.Object symmetric_difference(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("symmetric_difference() has not been implemented.");
+        if (other == null) {
+            throw new org.python.exceptions.TypeError("symmetric_difference() takes exactly one argument (0 given)");
+        }
+        Set union = (Set) (this.union(other));
+        Set intersection = (Set) (this.intersection(other));
+        return union.difference(intersection);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Update the set, keeping only elements found in either set, but not in both.",
+            default_args = {"other"}
     )
     public org.python.Object symmetric_difference_update(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("symmetric_difference_update() has not been implemented.");
+        if (other == null) {
+            throw new org.python.exceptions.TypeError("symmetric_difference_update() takes exactly one argument (0 given)");
+        }
+        Set union = (Set) (this.union(other));
+        Set intersection = (Set) (this.intersection(other));
+        union = (Set) union.difference(intersection);
+        this.value = union.value;
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -537,7 +555,11 @@ public class Set extends org.python.types.Object {
     )
     public org.python.Object union(org.python.Object other) {
         java.util.Set set = ((Set) this.copy()).value;
-        set.addAll(((Set) other).value);
+        try {
+            set.addAll(((Set) other).value);
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
         return new Set(set);
     }
 

@@ -283,6 +283,76 @@ class SetTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_symmetric_difference(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            print(sorted(x.symmetric_difference(y)))
+            print(sorted(x.symmetric_difference(z)))
+            print(sorted(t.symmetric_difference(z)))
+            print(sorted(t.symmetric_difference(y)))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.symmetric_difference(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference())
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_symmetric_difference_update(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            x.symmetric_difference_update(y)
+            print(sorted(x))
+            #x.test_symmetric_difference_update(z)
+            print(sorted(x))
+            t.symmetric_difference_update(z)
+            print(sorted(t))
+            t.symmetric_difference_update(y)
+            print(sorted(t))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.symmetric_difference_update(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference_update(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference_update())
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
