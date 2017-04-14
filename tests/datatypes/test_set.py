@@ -165,6 +165,99 @@ class SetTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_issuperset(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {1, 2}
+            print(x.issuperset(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = [1, 2]
+            print(x.issuperset(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = 'set'
+            print(x.issuperset(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = {1, 4}
+            print(x.issuperset(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = 1
+            print(x.issuperset(y))
+            """)
+
+    def test_issubset(self):
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = {1, 2, 3}
+            print(x.issubset(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = [1, 2, 3]
+            print(x.issubset(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = 'set'
+            print(x.issubset(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = {4, 5, 6}
+            print(x.issubset(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = 1
+            print(x.issubset(y))
+            """)
+
+    def test_isdisjoint(self):
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = {3, 4}
+            print(x.isdisjoint(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = [3, 4]
+            print(x.isdisjoint(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = [1, 2]
+            print(x.isdisjoint(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = 'set'
+            print(x.isdisjoint(y))
+            """)
+
+        self.assertCodeExecution("""
+            x = {1, 2}
+            y = 1
+            print(x.isdisjoint(y))
+            """)
+
     def test_update(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}

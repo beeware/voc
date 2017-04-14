@@ -431,24 +431,81 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "check whether the given two sets have no elements in common",
+            args = {"other"}
     )
     public org.python.Object isdisjoint(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("isdisjoint() has not been implemented.");
+        if (other instanceof org.python.types.Set) {
+            java.util.Set set = ((Set) this.copy()).value;
+            set.retainAll(((Set) other).value);
+            return new org.python.types.Bool(set.isEmpty());
+        } else {
+            org.python.Iterable iterator = org.Python.iter(other);
+            java.util.Set set = ((Set) this.copy()).value;
+            try {
+                while (true) {
+                    org.python.Object next = iterator.__next__();
+                    boolean check;
+                    check = set.remove(next);
+                    if (check) {
+                        return new org.python.types.Bool(false);
+                    }
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(true);
+
+        }
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "state whether other set is a subset",
+            args = {"other"}
     )
     public org.python.Object issubset(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("issubset() has not been implemented.");
+        if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value));
+        } else {
+            org.python.Iterable iterator = org.Python.iter(other);
+            java.util.Set set = ((Set) this.copy()).value;
+            try {
+                while (true) {
+                    org.python.Object next = iterator.__next__();
+                    set.remove(next);
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(set.isEmpty());
+
+        }
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "state whether other set is a superset",
+            args = {"other"}
     )
     public org.python.Object issuperset(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("issuperset() has not been implemented.");
+        if (other instanceof org.python.types.Set) {
+            org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value));
+        } else {
+            org.python.Iterable iterator = org.Python.iter(other);
+            java.util.Set set = ((Set) this.copy()).value;
+            try {
+                while (true) {
+                    org.python.Object next = iterator.__next__();
+                    boolean check;
+                    check = set.remove(next);
+                    if (!check) {
+                        return new org.python.types.Bool(false);
+                    }
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+            return new org.python.types.Bool(true);
+
+        }
     }
 
     @org.python.Method(
