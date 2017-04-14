@@ -184,6 +184,43 @@ class SetTests(TranspileTestCase):
                 print(y.__conatins__(s))
             """)
 
+    def test_isdisjoint(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            print(x.isdisjoint(y))
+            print(x.isdisjoint(z))
+            print(t.isdisjoint(z))
+            print(t.isdisjoint(y))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.isdisjoint(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.isdisjoint(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(m.isdisjoint(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(m.isdisjoint(y))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'

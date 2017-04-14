@@ -431,10 +431,23 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "returns True if the intersection of a set with other set is empty, False otherwise",
+            default_args = {"other"}
     )
     public org.python.Object isdisjoint(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("isdisjoint() has not been implemented.");
+        if (other == null) {
+            throw new org.python.exceptions.TypeError("isdisjoint() takes exactly one argument (0 given)");
+        }
+        java.util.Set<org.python.Object> intersection = new java.util.HashSet<org.python.Object>(this.value);
+        try {
+            intersection.retainAll(((org.python.types.Set) other).value);
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
+        if (intersection.size() == 0) {
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
