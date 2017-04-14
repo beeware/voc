@@ -574,6 +574,22 @@ class ListTests(TranspileTestCase):
             print([y] == [x]) # False, y is not x, y.__eq__(x)
             """)
 
+    def test_reversed(self):
+        self.assertCodeExecution("""
+            list = [123, 'xyz', 'abc']
+            reversedList = ['abc', 'xyz', 123] # to check equality
+            l = []
+            reverse = list.__reversed__()
+            try:
+                while(True):
+                    l.append(next(reverse))
+            except StopIteration:
+                print(l == reversedList)
+
+            origList = [123, 'xyz', 'abc'] # to check if original list was modified
+            print(list == origList)
+        """)
+
 
 class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'list'
