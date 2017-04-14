@@ -212,11 +212,73 @@ class SetTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             try:
-                print(m.isdisjoint(x))
+                print(l.isdisjoint(x))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_issubset(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            print(x.issubset(y))
+            print(x.issubset(z))
+            print(t.issubset(z))
+            print(t.issubset(y))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.issubset(y))
             except TypeError as err:
                 print(err)
             try:
-                print(m.isdisjoint(y))
+                print(l.issubset(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.issubset())
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_issuperset(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            print(x.issuperset(y))
+            print(x.issuperset(z))
+            print(t.issuperset(z))
+            print(t.issuperset(y))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.issuperset(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.issuperset(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.issuperset())
             except TypeError as err:
                 print(err)
             """)

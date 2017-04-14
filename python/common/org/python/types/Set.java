@@ -431,7 +431,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "returns True if the intersection of a set with other set is empty, False otherwise",
+            __doc__ = "Return True if the set has no elements in common with other. Sets are disjoint if and only if their intersection is the empty set.",
             default_args = {"other"}
     )
     public org.python.Object isdisjoint(org.python.Object other) {
@@ -451,17 +451,43 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Test whether every element in the set is in other.",
+            default_args = {"other"}
     )
     public org.python.Object issubset(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("issubset() has not been implemented.");
+        if (other == null) {
+            throw new org.python.exceptions.TypeError("issubset() takes exactly one argument (0 given)");
+        }
+        java.util.Set<org.python.Object> intersection = new java.util.HashSet<org.python.Object>(this.value);
+        try {
+            intersection.retainAll(((org.python.types.Set) other).value);
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
+        if (intersection.size() == this.value.size()) {
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Test whether every element in other is in the set.",
+            default_args = {"other"}
     )
     public org.python.Object issuperset(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("issuperset() has not been implemented.");
+        if (other == null) {
+            throw new org.python.exceptions.TypeError("issuperset() takes exactly one argument (0 given)");
+        }
+        java.util.Set<org.python.Object> intersection = new java.util.HashSet<org.python.Object>(this.value);
+        try {
+            intersection.retainAll(((org.python.types.Set) other).value);
+        } catch (ClassCastException te) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
+        if (intersection.size() == ((org.python.types.Set) other).value.size()) {
+            return new org.python.types.Bool(true);
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
