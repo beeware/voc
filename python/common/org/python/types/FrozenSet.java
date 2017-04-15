@@ -323,4 +323,37 @@ public class FrozenSet extends org.python.types.Object {
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
+
+    private org.python.types.FrozenSet iterToFrozenSet(org.python.Object iterable) {
+        org.python.Iterable iterator = iterable.__iter__();
+        java.util.Set<org.python.Object> temp = new java.util.HashSet<org.python.Object>();
+        try {
+            while (true) {
+                temp.add(iterator.__next__());
+            }
+        } catch (org.python.exceptions.StopIteration si) {
+        }
+        return new org.python.types.FrozenSet(temp);
+    }
+
+    @org.python.Method(
+            __doc__ = "Return True if the set has no elements in common with other. Sets are\n"+
+            "disjoint if and only if their intersection is the empty set.",
+            args = {"other"}
+    )
+    public org.python.Object isdisjoint(org.python.Object other) {
+        try {
+            if (!(other instanceof org.python.types.Set || other instanceof org.python.types.FrozenSet)) {
+                other = iterToFrozenSet(other);
+            }
+            org.python.types.FrozenSet temp = (org.python.types.FrozenSet) this.__and__(other);
+            if (temp.__len__().value > 0) {
+                return new org.python.types.Bool(false);
+            } else {
+                return new org.python.types.Bool(true);
+            }
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
+    }
 }

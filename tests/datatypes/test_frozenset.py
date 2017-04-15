@@ -145,6 +145,25 @@ class FrozensetTests(TranspileTestCase):
 
             """)
 
+    def test_isdisjoint(self):
+        self.assertCodeExecution("""
+            x = frozenset("hello world")
+            y = set("hello")
+            z = frozenset()
+            t = "hello"
+            w = 2.0
+
+            print(x.isdisjoint(y))
+            print(x.isdisjoint(z))
+            print(x.isdisjoint(t))
+
+            # not-iterable test
+            try:
+                print(x.isdisjoint(w))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
