@@ -132,6 +132,9 @@ public class Set extends org.python.types.Object {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(otherSet.value.containsAll(this.value) && !this.value.equals(otherSet.value));
+        } else if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value) && !this.value.equals(otherSet.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -143,6 +146,9 @@ public class Set extends org.python.types.Object {
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(otherSet.value.containsAll(this.value));
+        } else if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
             return new org.python.types.Bool(otherSet.value.containsAll(this.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
@@ -156,6 +162,9 @@ public class Set extends org.python.types.Object {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(this.value.equals(otherSet.value));
+        } else if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
+            return new org.python.types.Bool(this.value.equals(otherSet.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -168,6 +177,9 @@ public class Set extends org.python.types.Object {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
             return new org.python.types.Bool(this.value.containsAll(otherSet.value) && !this.value.equals(otherSet.value));
+        } else if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
+            return new org.python.types.Bool(this.value.containsAll(otherSet.value) && !this.value.equals(otherSet.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -179,6 +191,9 @@ public class Set extends org.python.types.Object {
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Set) {
             org.python.types.Set otherSet = (org.python.types.Set) other;
+            return new org.python.types.Bool(this.value.containsAll(otherSet.value));
+        } else if (other instanceof org.python.types.FrozenSet) {
+            org.python.types.FrozenSet otherSet = (org.python.types.FrozenSet) other;
             return new org.python.types.Bool(this.value.containsAll(otherSet.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
@@ -268,19 +283,35 @@ public class Set extends org.python.types.Object {
         return super.__mul__(other);
     }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public org.python.Object __sub__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__sub__() has not been implemented");
-    // }
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __sub__(org.python.Object other) {
+        java.util.Set set = ((org.python.types.Set) this.copy()).value;
+        if (other instanceof org.python.types.Set) {
+            set.removeAll(((org.python.types.Set) other).value);
+            return new org.python.types.Set(set);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            set.removeAll(((org.python.types.FrozenSet) other).value);
+            return new org.python.types.Set(set);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public org.python.Object __and__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__and__() has not been implemented");
-    // }
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __and__(org.python.Object other) {
+        java.util.Set set = ((org.python.types.Set) this.copy()).value;
+        if (other instanceof org.python.types.Set) {
+            set.retainAll(((org.python.types.Set) other).value);
+            return new org.python.types.Set(set);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            set.retainAll(((org.python.types.FrozenSet) other).value);
+            return new org.python.types.Set(set);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 
     // @org.python.Method(
     //     __doc__ = ""
@@ -289,12 +320,20 @@ public class Set extends org.python.types.Object {
     //     throw new org.python.exceptions.NotImplementedError("__xor__() has not been implemented");
     // }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public org.python.Object __or__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__or__() has not been implemented");
-    // }
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __or__(org.python.Object other) {
+        java.util.Set set = ((org.python.types.Set) this.copy()).value;
+        if (other instanceof org.python.types.Set) {
+            set.addAll(((org.python.types.Set) other).value);
+            return new org.python.types.Set(set);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            set.addAll(((org.python.types.FrozenSet) other).value);
+            return new org.python.types.Set(set);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 
     // @org.python.Method(
     //     __doc__ = ""
@@ -381,9 +420,17 @@ public class Set extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object difference(org.python.Object other) {
-        java.util.Set set = ((Set) this.copy()).value;
-        set.removeAll(((Set) other).value);
-        return new Set(set);
+        try {
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
+            return this.__sub__(otherSet);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
@@ -416,9 +463,17 @@ public class Set extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object intersection(org.python.Object other) {
-        java.util.Set set = ((Set) this.copy()).value;
-        set.retainAll(((Set) other).value);
-        return new Set(set);
+        try {
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
+            return this.__and__(otherSet);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
@@ -438,17 +493,39 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object issubset(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("issubset() has not been implemented.");
+        try {
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
+            return this.__le__(otherSet);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object issuperset(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("issuperset() has not been implemented.");
+        try {
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
+            return this.__ge__(otherSet);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
     }
 
     @org.python.Method(
