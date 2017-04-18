@@ -96,16 +96,20 @@ public class Type extends org.python.types.Object implements org.python.Callable
         if (org.python.Object.class.isAssignableFrom(java_class)) {
             if (java_class.getName().startsWith("org.python.types")
                     || java_class.getName().startsWith("org.python.stdlib")) {
+                // System.out.println("    BUILTIN");
                 python_type = new org.python.types.Type(Origin.BUILTIN, java_class);
                 org.Python.initializeModule(java_class, python_type.__dict__);
             } else {
+                // System.out.println("    PYTHON");
                 python_type = new org.python.types.Type(Origin.PYTHON, java_class);
             }
         } else {
             try {
+                // System.out.println("    EXTENSION");
                 java_class.getDeclaredField("__VOC__");
                 python_type = new org.python.java.Type(Origin.EXTENSION, java_class);
             } catch (NoSuchFieldException e) {
+                // System.out.println("    JAVA");
                 python_type = new org.python.java.Type(Origin.JAVA, java_class);
             }
         }

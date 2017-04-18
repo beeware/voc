@@ -18,11 +18,11 @@ public class AndroidPlatform implements python.Platform {
     }
 
     public void debug(java.lang.String msg) {
-        android.util.Log.d("Python", msg);
+        android.util.Log.i("Python", msg);
     }
 
     public void debug(java.lang.String msg, java.lang.Object obj) {
-        android.util.Log.d("Python", msg + " " + obj);
+        android.util.Log.i("Python", msg + " " + obj);
     }
 
     public org.python.Object getPlatform() {
