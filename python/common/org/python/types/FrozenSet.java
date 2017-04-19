@@ -306,15 +306,13 @@ public class FrozenSet extends org.python.types.Object {
     )
     public org.python.Object __xor__(org.python.Object other) {
         java.util.Set frozenSet = new java.util.HashSet<org.python.Object>(this.value);
+        java.util.Set otherFrozenSet = null;
         if (other instanceof org.python.types.FrozenSet) {
-            java.util.Set otherFrozenSet = ((org.python.types.FrozenSet) other).value;
-            frozenSet.addAll(otherFrozenSet);
-            java.util.Set temp = new java.util.HashSet<org.python.Object>(this.value);
-            temp.retainAll(otherFrozenSet);
-            frozenSet.removeAll(temp);
-            return new org.python.types.FrozenSet(frozenSet);
+            otherFrozenSet = ((org.python.types.FrozenSet) other).value;
         } else if (other instanceof org.python.types.Set) {
-            java.util.Set otherFrozenSet = ((org.python.types.Set) other).value;
+            otherFrozenSet = ((org.python.types.Set) other).value;
+        }
+        if (otherFrozenSet != null) {
             frozenSet.addAll(otherFrozenSet);
             java.util.Set temp = new java.util.HashSet<org.python.Object>(this.value);
             temp.retainAll(otherFrozenSet);
