@@ -229,6 +229,38 @@ class TupleTests(TranspileTestCase):
                 print(x)
             """)
 
+    def test_index(self):
+        # success
+        self.assertCodeExecution("""
+            a = (1, 2, 3, 4, 3)
+            print(a.index(2))
+            print(a.index(2,1))
+            print(a.index(2,1,5))
+            print(a.index(2,0,1000))
+            print(a.index(2,-300))
+            """)
+
+        # raise exceptions
+        self.assertCodeExecution("""
+            a = (1, 2, 3, 4, 3)
+            try:
+                print(a.index('2'))
+            except ValueError as err:
+                print(err)
+            try:
+                print(a.index(2,0,-50))
+            except ValueError as err:
+                print(err)
+            try:
+                print(a.index(7,0,5))
+            except ValueError as err:
+                print(err)
+            try:
+                print(a.index())
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryTupleOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
