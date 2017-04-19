@@ -1077,10 +1077,51 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Return a copy of S with all occurrences of substring\n" +
                     "old replaced by new.  If the optional argument count is\n" +
-                    "given, only the first count occurrences are replaced.\n"
+                    "given, only the first count occurrences are replaced.\n",
+            default_args = {"repChars", "repWith", "num"}
     )
-    public org.python.Object replace() {
-        throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
+    public org.python.Object replace(org.python.Object repChars, org.python.Object repWith, org.python.Object num) {
+
+        if (repWith == null && repChars == null) {
+            throw new org.python.exceptions.TypeError("replace() takes at least 2 arguments (0 given)");
+        } else if (repWith == null || repChars == null) {
+            throw new org.python.exceptions.TypeError("replace() takes at least 2 arguments (1 given)");
+        } else if (!(repChars instanceof org.python.types.Str)) {
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + repChars.typeName() + "' object to str implicitly");
+            } else {
+                throw new org.python.exceptions.TypeError("replace() argument 1 must be str, not " + repChars.typeName());
+            }
+        } else if (!(repWith instanceof org.python.types.Str)) {
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + repWith.typeName() + "' object to str implicitly");
+            } else {
+                throw new org.python.exceptions.TypeError("replace() argument 2 must be str, not " + repWith.typeName());
+            }
+        }
+        int no;
+        if (num == null) {
+            no = this.value.length();
+        } else {
+            no = Integer.parseInt(num.toString());
+        }
+        java.lang.String replace = ((org.python.types.Str) repChars).value;
+        java.lang.String replaceWith = ((org.python.types.Str) repWith).value;
+        java.lang.String str = this.value;
+        java.lang.String ret_str = str;
+        if (replace == "") {
+            ret_str = replaceWith;
+            for (int i = 0; i < str.length(); i++) {
+                char c = str.charAt(i);
+                ret_str += c;
+                ret_str += replaceWith;
+            } //  ^^^^  to cover the border case of replacing an empty string with something
+        } else {
+            for (int i = 0; i < no && i < str.length(); i++) {
+                ret_str = ret_str.replaceFirst(replace, replaceWith);
+            }
+        }
+        return new org.python.types.Str(ret_str);
     }
 
     @org.python.Method(
