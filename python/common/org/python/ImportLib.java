@@ -11,7 +11,7 @@ public class ImportLib {
             java.lang.String[] from_list,
             int level) {
         // Create an array containing the module path.
-        org.Python.debug("Import from " + python_name + " level " + level);
+        // org.Python.debug("Import from " + python_name + " level " + level);
         // org.Python.debug("from_list");
         // if (from_list != null) {
         //     for (java.lang.String s: from_list) {
@@ -162,17 +162,17 @@ public class ImportLib {
             return_module = python_module;
             import_name.append(".");
             for (java.lang.String name : from_list) {
-                org.Python.debug("IMPORT NAME", name);
+                // org.Python.debug("IMPORT NAME", name);
                 if (!name.equals("*")) {
                     java.lang.String mod_name = import_name.toString() + name;
                     // org.Python.debug("mod_name", name);
                     try {
                         if (native_import) {
-                            org.Python.debug("native import");
+                            // org.Python.debug("native import");
                             java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass(mod_name);
                             parent_module.__setattr__(name, org.python.java.Type.pythonType(java_class));
                         } else {
-                            org.Python.debug("python import");
+                            // org.Python.debug("python import");
                             python_module = importPythonModule(mod_name);
                             parent_module.__setattr__(name, python_module);
                         }
@@ -180,10 +180,10 @@ public class ImportLib {
                         // `name` doesn't exist as a submodule; it might be
                         // an exportable symbol in the parent module.
                         try {
-                            org.Python.debug("not a submodule");
+                            // org.Python.debug("not a submodule");
                             parent_module.__getattribute__(name);
                         } catch (org.python.exceptions.NameError ne) {
-                            org.Python.debug("must be a java module");
+                            // org.Python.debug("must be a java module");
                             python_module = new org.python.java.Module(mod_name);
                             parent_module.__setattr__(name, python_module);
                             python.sys.__init__.modules.__setitem__(new org.python.types.Str(mod_name), python_module);
@@ -222,8 +222,14 @@ public class ImportLib {
             } catch (ClassNotFoundException cnfe) {
                 java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass("python." + import_name);
             }
-            java.lang.reflect.Constructor constructor = java_class.getConstructor();
-            python_module = (org.python.types.Module) constructor.newInstance();
+
+            // Create an instance of the class; if it isn't a module, we haven't been able to import.
+            try {
+                java.lang.reflect.Constructor constructor = java_class.getConstructor();
+                python_module = (org.python.types.Module) constructor.newInstance();
+            } catch (ClassCastException cce) {
+                throw new java.lang.ClassNotFoundException("Found " + import_name + " class, but class is not a module");
+            }
 
             // Store module instance at imported name
             java.lang.String python_name = import_name;
