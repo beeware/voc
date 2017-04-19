@@ -191,6 +191,31 @@ class FrozensetTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_issuperset(self):
+        self.assertCodeExecution("""
+            a = frozenset('abcd')
+            b = frozenset('ab')
+            c = set()
+            d = 'ab'
+
+            print(a.issuperset(b))
+            print(a.issuperset(a))
+            print(a.issuperset(c))
+
+            # iterable test
+            print(a.issuperset(d))
+            """)
+
+        # not-iterable test
+        self.assertCodeExecution("""
+            a = frozenset({1, 2, 3})
+            b = 1
+            try:
+                print(a.issuperset(b))
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'

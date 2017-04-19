@@ -371,4 +371,19 @@ public class FrozenSet extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
         }
     }
+
+    @org.python.Method(
+            __doc__ = "Whether every element in other is in the set",
+            args = {"other"}
+    )
+    public org.python.Object issuperset(org.python.Object other) {
+        try {
+            if (!(other instanceof org.python.types.Set || other instanceof org.python.types.FrozenSet)) {
+                other = iterToFrozenSet(other);
+            }
+            return this.__ge__(other);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
+    }
 }
