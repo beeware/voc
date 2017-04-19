@@ -627,6 +627,23 @@ class StrTests(TranspileTestCase):
             print("HeLlo_worldʃ!".casefold())
             """)
 
+    def test_replace(self):
+        self.assertCodeExecution("""
+            s="abc abc abc abc abc abcd mm       "
+            print(s.replace('','k'))
+            print(s.replace(' ','k'))
+            print(s.replace(' ','fm'))
+            print(s.replace('ab','bc'))
+            try:
+                print(s.replace(45,'bc'))
+            except TypeError as err:
+                print(err)
+            try:
+                print(s.replace('kk',45))
+            except TypeError as err:
+                print(err)
+            """)
+
     def test_rpartition(self):
         self.assertCodeExecution("""
             st = "Hello World!"
@@ -667,9 +684,6 @@ class StrTests(TranspileTestCase):
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
-
-    not_implemented = [
-    ]
 
 
 class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
