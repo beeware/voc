@@ -459,19 +459,17 @@ public class Set extends org.python.types.Object {
             default_args = {"other"}
     )
     public org.python.Object issubset(org.python.Object other) {
-        if (other == null) {
-            throw new org.python.exceptions.TypeError("issubset() takes exactly one argument (0 given)");
-        }
-        java.util.Set<org.python.Object> intersection = new java.util.HashSet<org.python.Object>(this.value);
         try {
-            intersection.retainAll(((org.python.types.Set) other).value);
-        } catch (ClassCastException te) {
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
+            return this.__le__(otherSet);
+        } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
         }
-        if (intersection.size() == this.value.size()) {
-            return new org.python.types.Bool(true);
-        }
-        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -479,19 +477,17 @@ public class Set extends org.python.types.Object {
             default_args = {"other"}
     )
     public org.python.Object issuperset(org.python.Object other) {
-        if (other == null) {
-            throw new org.python.exceptions.TypeError("issuperset() takes exactly one argument (0 given)");
-        }
-        java.util.Set<org.python.Object> intersection = new java.util.HashSet<org.python.Object>(this.value);
         try {
-            intersection.retainAll(((org.python.types.Set) other).value);
-        } catch (ClassCastException te) {
+            org.python.types.Set otherSet = null;
+            if (other instanceof org.python.types.Set) {
+                otherSet = (org.python.types.Set) other;
+            } else {
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+            }
+            return this.__ge__(otherSet);
+        } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
         }
-        if (intersection.size() == ((org.python.types.Set) other).value.size()) {
-            return new org.python.types.Bool(true);
-        }
-        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(

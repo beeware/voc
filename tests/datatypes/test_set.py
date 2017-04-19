@@ -218,67 +218,41 @@ class SetTests(TranspileTestCase):
             """)
 
     def test_issubset(self):
-        # successful
         self.assertCodeExecution("""
-            x = set("hello World !")
-            y = set("hello")
-            z = set()
-            t = set()
-            print(x.issubset(y))
-            print(x.issubset(z))
-            print(t.issubset(z))
-            print(t.issubset(y))
+            a = set('abc')
+            b = set('abcde')
+            c = set()
+            print(a.issubset(b))
+            print(a.issubset('ab'))
+            print(a.issubset(a))
+            print(a.issubset(c))
             """)
 
-        # unsuccessful
+        # not iterable test
         self.assertCodeExecution("""
-            x = 9.3
-            y = 5
-            l = set("hello World !")
-            m = set("hello")
+            a = {1, 2, 3}
             try:
-                print(l.issubset(y))
-            except TypeError as err:
-                print(err)
-            try:
-                print(l.issubset(x))
-            except TypeError as err:
-                print(err)
-            try:
-                print(l.issubset())
+                print(a.issubset(1))
             except TypeError as err:
                 print(err)
             """)
 
     def test_issuperset(self):
-        # successful
         self.assertCodeExecution("""
-            x = set("hello World !")
-            y = set("hello")
-            z = set()
-            t = set()
-            print(x.issuperset(y))
-            print(x.issuperset(z))
-            print(t.issuperset(z))
-            print(t.issuperset(y))
+            a = set('abcd')
+            b = set('ab')
+            c = set()
+            print(a.issuperset(b))
+            print(a.issuperset('ab1'))
+            print(a.issuperset(a))
+            print(a.issuperset(c))
             """)
 
-        # unsuccessful
+        # not iterable test
         self.assertCodeExecution("""
-            x = 9.3
-            y = 5
-            l = set("hello World !")
-            m = set("hello")
+            a = {1, 2, 3}
             try:
-                print(l.issuperset(y))
-            except TypeError as err:
-                print(err)
-            try:
-                print(l.issuperset(x))
-            except TypeError as err:
-                print(err)
-            try:
-                print(l.issuperset())
+                print(a.issuperset(1))
             except TypeError as err:
                 print(err)
             """)
