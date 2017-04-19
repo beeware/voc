@@ -216,6 +216,27 @@ class FrozensetTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_union(self):
+        self.assertCodeExecution("""
+            x = frozenset({1, 2, 3})
+            y = frozenset({3, 4, 5})
+            z = [5, 6, 7]
+            w = 1
+
+            print(x.union(y))
+
+            # multiple args test
+            print(x.union(y, z))
+
+            # iterable test
+            print(x.union(z))
+
+            # not-iterable test
+            try:
+                print(x.union(w))
+            except TypeError as err:
+                print(err)
+            """)
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
