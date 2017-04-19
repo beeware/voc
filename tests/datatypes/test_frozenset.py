@@ -155,11 +155,38 @@ class FrozensetTests(TranspileTestCase):
 
             print(x.isdisjoint(y))
             print(x.isdisjoint(z))
+
+            # iterable test
             print(x.isdisjoint(t))
 
             # not-iterable test
             try:
                 print(x.isdisjoint(w))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_issubset(self):
+        self.assertCodeExecution("""
+            a = frozenset('abc')
+            b = frozenset('abcde')
+            c = set()
+            d = 'wxyz'
+
+            print(a.issubset(b))
+            print(a.issubset(a))
+            print(a.issubset(c))
+
+            # iterable test
+            print(a.issubset(d))
+            """)
+
+        # not-iterable test
+        self.assertCodeExecution("""
+            a = frozenset({1, 2, 3})
+            b = 1
+            try:
+                print(a.issubset(b))
             except TypeError as err:
                 print(err)
             """)

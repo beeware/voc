@@ -337,8 +337,8 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return True if the set has no elements in common with other. Sets are\n"+
-            "disjoint if and only if their intersection is the empty set.",
+            __doc__ = "Return True if the set has no elements in common with other. Sets are\n" +
+                      "disjoint if and only if their intersection is the empty set.",
             args = {"other"}
     )
     public org.python.Object isdisjoint(org.python.Object other) {
@@ -352,6 +352,21 @@ public class FrozenSet extends org.python.types.Object {
             } else {
                 return new org.python.types.Bool(true);
             }
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
+    }
+
+    @org.python.Method(
+            __doc__ = "Whether every element in the set is in other.",
+            args = {"other"}
+    )
+    public org.python.Object issubset(org.python.Object other) {
+        try {
+            if (!(other instanceof org.python.types.Set || other instanceof org.python.types.FrozenSet)) {
+                other = iterToFrozenSet(other);
+            }
+            return this.__le__(other);
         } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
         }
