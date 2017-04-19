@@ -456,4 +456,19 @@ public class FrozenSet extends org.python.types.Object {
         }
         return new org.python.types.FrozenSet(set);
     }
+
+    @org.python.Method(
+            __doc__ = "Return a new set with elements in either the set or other but not both.",
+            args = {"other"}
+    )
+    public org.python.Object symmetric_difference(org.python.Object other) {
+        try {
+            if (!(other instanceof org.python.types.Set || other instanceof org.python.types.FrozenSet)) {
+                other = new org.python.types.FrozenSet(iterToSet(other));
+            }
+            return this.__xor__(other);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
+    }
 }

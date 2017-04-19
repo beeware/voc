@@ -294,6 +294,30 @@ class FrozensetTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_symmetric_difference(self):
+        self.assertCodeExecution("""
+            x = frozenset({1, 2, 3})
+            y = frozenset({2, 3, 4})
+            z = [1, 6, 7]
+            w = 1
+            t = frozenset()
+
+            print(x.symmetric_difference(y))
+
+            # empty set test
+            print(x.symmetric_difference(t))
+
+            # iterable test
+            print(x.symmetric_difference(z))
+
+            # not-iterable test
+            try:
+                print(x.symmetric_difference(w))
+            except TypeError as err:
+                print(err)
+
+            """)
+
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
