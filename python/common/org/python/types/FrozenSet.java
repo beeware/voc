@@ -434,4 +434,28 @@ public class FrozenSet extends org.python.types.Object {
         }
         return new org.python.types.FrozenSet(set);
     }
+
+    @org.python.Method(
+            __doc__ = "Return the difference of two or more sets as a new set.\n\n(i.e. all elements that are in this set but not the others.)",
+            varargs = "others"
+    )
+    public org.python.Object difference(org.python.types.Tuple others) {
+        java.util.Set set = new java.util.HashSet<org.python.Object>(this.value);
+        for (org.python.Object other: others.value) {
+            try {
+                java.util.Set otherSet = null;
+                if (other instanceof org.python.types.Set) {
+                    otherSet = ((org.python.types.Set) other).value;
+                } else if (other instanceof org.python.types.FrozenSet) {
+                    otherSet = ((org.python.types.FrozenSet) other).value;
+                } else {
+                    otherSet = iterToSet(other);
+                }
+                set.removeAll(otherSet);
+            } catch (org.python.exceptions.AttributeError e) {
+                throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+            }
+        }
+        return new org.python.types.FrozenSet(set);
+    }
 }
