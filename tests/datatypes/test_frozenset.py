@@ -222,8 +222,12 @@ class FrozensetTests(TranspileTestCase):
             y = frozenset({3, 4, 5})
             z = [5, 6, 7]
             w = 1
+            t = frozenset()
 
             print(x.union(y))
+
+            # empty set test
+            print(x.union(t))
 
             # multiple args test
             print(x.union(y, z))
@@ -234,6 +238,32 @@ class FrozensetTests(TranspileTestCase):
             # not-iterable test
             try:
                 print(x.union(w))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_intersection(self):
+        self.assertCodeExecution("""
+            x = frozenset({1, 2, 3})
+            y = frozenset({2, 3, 4})
+            z = [3, 6, 7]
+            w = 1
+            t = frozenset()
+
+            print(x.intersection(y))
+
+            # empty set test
+            print(x.intersection(t))
+
+            # multiple args test
+            print(x.intersection(y, z))
+
+            # iterable test
+            print(x.intersection(z))
+
+            # not-iterable test
+            try:
+                print(x.intersection(w))
             except TypeError as err:
                 print(err)
             """)
