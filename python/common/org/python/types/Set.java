@@ -499,8 +499,14 @@ public class Set extends org.python.types.Object {
         }
         java.util.Set<org.python.Object> intersection = new java.util.HashSet<org.python.Object>(this.value);
         try {
-            intersection.retainAll(((org.python.types.Set) other).value);
-        } catch (ClassCastException te) {
+            if (other instanceof org.python.types.Set) {
+                intersection.retainAll(((org.python.types.Set) other).value);
+            } else {
+                org.python.types.Set otherSet = null;
+                otherSet = new org.python.types.Set(new org.python.Object[] {other}, null);
+                intersection.retainAll(((org.python.types.Set) otherSet).value);
+            }
+        } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
         }
         if (intersection.size() == 0) {

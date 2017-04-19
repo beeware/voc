@@ -214,6 +214,7 @@ class SetTests(TranspileTestCase):
             z = set()
             t = set()
             print(x.isdisjoint(y))
+            print(x.isdisjoint("hell"))
             print(x.isdisjoint(z))
             print(t.isdisjoint(z))
             print(t.isdisjoint(y))
