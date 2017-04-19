@@ -1,4 +1,4 @@
-package python.time;
+package python;
 
 @org.python.Module(
         __doc__ =
@@ -46,16 +46,17 @@ package python.time;
                         "strptime() -- parse string to time tuple according to format specification\n" +
                         "tzset() -- change the local timezone"
 )
-public class __init__ extends org.python.types.Module {
-    public __init__() {
+public class time extends org.python.types.Module {
+    public time() {
         super();
-        vm_start_time = python.platform.__init__.impl.clock();
+        vm_start_time = python.platform.impl.clock();
     }
 
     private static long vm_start_time;
     public static org.python.Object _STRUCT_TM_ITEMS;
+
     @org.python.Attribute
-    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/time/__init__.java");
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/time.java");
     @org.python.Attribute
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
     @org.python.Attribute
@@ -81,7 +82,7 @@ public class __init__ extends org.python.types.Module {
                     "records.\n"
     )
     public static org.python.Object clock() {
-        long current_time = python.platform.__init__.impl.clock() - vm_start_time;
+        long current_time = python.platform.impl.clock() - vm_start_time;
 
         // thread time is in nanoseconds; convert to seconds.
         return new org.python.types.Float(current_time / 1000000000.0);

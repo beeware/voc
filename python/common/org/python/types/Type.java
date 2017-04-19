@@ -330,7 +330,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
             // System.out.println("__dict__ " + this.__dict__);
             org.python.Object module_name = this.__dict__.get("__module__");
             if (module_name != null) {
-                org.python.Object module = python.sys.__init__.modules.__getitem__(module_name);
+                org.python.Object module = python.sys.modules.__getitem__(module_name);
                 value = module.__getattribute_null(name);
             }
         }

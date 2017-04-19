@@ -1,4 +1,4 @@
-package python.sys;
+package python;
 
 @org.python.Module(
         __doc__ =
@@ -71,17 +71,17 @@ package python.sys;
                         "setrecursionlimit() -- set the max recursion depth for the interpreter\n" +
                         "settrace() -- set the global debug tracing function\n"
 )
-public class __init__ extends org.python.types.Module {
+public class sys extends org.python.types.Module {
     static {
-        stdout = python.platform.__init__.impl.stdout();
-        stderr = python.platform.__init__.impl.stderr();
-        stdin = python.platform.__init__.impl.stdin();
+        stdout = python.platform.impl.stdout();
+        stderr = python.platform.impl.stderr();
+        stdin = python.platform.impl.stdin();
 
-        __stdout__ = python.platform.__init__.impl.stdout();
-        __stderr__ = python.platform.__init__.impl.stderr();
-        __stdin__ = python.platform.__init__.impl.stdin();
+        __stdout__ = python.platform.impl.stdout();
+        __stderr__ = python.platform.impl.stderr();
+        __stdin__ = python.platform.impl.stdin();
 
-        platform = python.platform.__init__.impl.getPlatform();
+        platform = python.platform.impl.getPlatform();
 
         hexversion = new org.python.types.Int(org.Python.VERSION);
 
@@ -109,7 +109,7 @@ public class __init__ extends org.python.types.Module {
         // cls.__dict__.put("__spec__", new org.python.types...);
         // cls.__dict__.put("__loader__", new org.python.types...);
 
-        cls.__dict__.put("argv", python.platform.__init__.impl.args());
+        cls.__dict__.put("argv", python.platform.impl.args());
         return cls;
     }
 
@@ -133,11 +133,15 @@ public class __init__ extends org.python.types.Module {
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
     @org.python.Attribute()
     public static org.python.Object __name__ = new org.python.types.Str("sys");
+    @org.python.Attribute
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/sys.java");
     @org.python.Attribute()
     public static org.python.Object __package__ = new org.python.types.Str("");
     @org.python.Attribute()
     public static org.python.Object __spec__ = org.python.types.NoneType.NONE;  // TODO
+
     public static org.python.types.Int __plen;
+
     @org.python.Attribute()
     public static org.python.Object __stderr__;
     @org.python.Attribute()

@@ -1,8 +1,8 @@
-package python.platform;
+package python._platform;
 
 import android.os.Debug;
 
-public class AndroidPlatform implements python.Platform {
+public class AndroidPlatform implements python.PlatformInterface {
     private org.python.stdlib._io.TextIOWrapper _stderr;
     private org.python.stdlib._io.TextIOWrapper _stdout;
     private org.python.stdlib._io.TextIOWrapper _stdin;

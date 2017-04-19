@@ -1,4 +1,4 @@
-package python.platform;
+package python._platform;
 
 public class LogStream extends java.io.OutputStream {
     protected java.lang.String tag;

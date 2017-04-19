@@ -77,7 +77,7 @@ public class ImportLib {
 
                 java.lang.Class java_class = java.lang.Thread.currentThread().getContextClassLoader().loadClass("org.Python");
                 python_module = new org.python.types.Module(java_class);
-                python.sys.__init__.modules.__setitem__(new org.python.types.Str("builtins"), python_module);
+                python.sys.modules.__setitem__(new org.python.types.Str("builtins"), python_module);
 
                 parent_module = python_module;
                 return_module = python_module;
@@ -111,7 +111,7 @@ public class ImportLib {
 
                 try {
                     // org.Python.debug("IMPORT", mod_name);
-                    python_module = (org.python.types.Module) python.sys.__init__.modules.__getitem__(new org.python.types.Str(mod_name));
+                    python_module = (org.python.types.Module) python.sys.modules.__getitem__(new org.python.types.Str(mod_name));
                     // org.Python.debug("Already imported", mod_name);
                 } catch (org.python.exceptions.KeyError ke) {
                     try {
@@ -149,7 +149,7 @@ public class ImportLib {
                     return_module = python_module;
                 }
 
-                // org.Python.debug("MODULES", python.sys.__init__.modules);
+                // org.Python.debug("MODULES", python.sys.modules);
                 // The module just imported will be the parent of the next import
                 // in the chain.
                 parent_module = python_module;
@@ -186,7 +186,7 @@ public class ImportLib {
                             // org.Python.debug("must be a java module");
                             python_module = new org.python.java.Module(mod_name);
                             parent_module.__setattr__(name, python_module);
-                            python.sys.__init__.modules.__setitem__(new org.python.types.Str(mod_name), python_module);
+                            python.sys.modules.__setitem__(new org.python.types.Str(mod_name), python_module);
                         }
                     }
                 }
@@ -204,7 +204,7 @@ public class ImportLib {
             python_module = null;
         } catch (java.lang.ClassNotFoundException e) {
             python_module = new org.python.java.Module(import_name);
-            python.sys.__init__.modules.__setitem__(new org.python.types.Str(import_name), python_module);
+            python.sys.modules.__setitem__(new org.python.types.Str(import_name), python_module);
         // } finally {
             // org.Python.debug("CONSTRUCTOR DONE");
         }
@@ -236,7 +236,7 @@ public class ImportLib {
             if (import_name.startsWith("python.")) {
                 python_name = import_name.substring(7);
             }
-            python.sys.__init__.modules.__setitem__(new org.python.types.Str(python_name), python_module);
+            python.sys.modules.__setitem__(new org.python.types.Str(python_name), python_module);
 
             // Initialize module
             java.lang.reflect.Method init = java_class.getMethod("module$import");

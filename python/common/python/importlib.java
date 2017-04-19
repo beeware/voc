@@ -1,9 +1,9 @@
-package python.importlib;
+package python;
 
 @org.python.Module(
         __doc__ = "A pure Python implementation of import."
 )
-public class __init__ extends org.python.types.Module {
+public class importlib extends org.python.types.Module {
     @org.python.Method(
             __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
@@ -22,8 +22,6 @@ public class __init__ extends org.python.types.Module {
     // public static org.python.Object __builtins__;
     @org.python.Attribute()
     public static org.python.Object __cached__;
-    @org.python.Attribute
-    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/importlib/__init__.java");
 
     @org.python.Method(
             __doc__ = "",
@@ -39,6 +37,8 @@ public class __init__ extends org.python.types.Module {
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
     @org.python.Attribute
     public static org.python.Object __name__ = new org.python.types.Str("importlib");
+    @org.python.Attribute()
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/importlib.java");
     @org.python.Attribute
     public static org.python.Object __package__ = new org.python.types.Str("");
     @org.python.Attribute()

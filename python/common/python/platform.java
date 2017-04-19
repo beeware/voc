@@ -1,4 +1,4 @@
-package python.platform;
+package python;
 
 @org.python.Module(
         __doc__ =
@@ -12,8 +12,8 @@ package python.platform;
                         "\n" +
                         "\n"
 )
-public class __init__ extends org.python.types.Module {
-    public static python.Platform impl;
+public class platform extends org.python.types.Module {
+    public static python.PlatformInterface impl;
 
     static {
         java.util.Properties prop = System.getProperties();
@@ -22,16 +22,16 @@ public class __init__ extends org.python.types.Module {
         java.lang.Class platform_class;
 
         if (vendor.equals("Oracle Corporation")) {
-            platform_class_name = "python.platform.JavaPlatform";
+            platform_class_name = "python._platform.JavaPlatform";
         } else if (vendor.equals("The Android Project")) {
-            platform_class_name = "python.platform.AndroidPlatform";
+            platform_class_name = "python._platform.AndroidPlatform";
         } else {
             throw new org.python.exceptions.RuntimeError("Unknown platform vendor '" + vendor + "'");
         }
 
         try {
             platform_class = java.lang.Class.forName(platform_class_name);
-            impl = (python.Platform) platform_class.getConstructor().newInstance();
+            impl = (python.PlatformInterface) platform_class.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             throw new org.python.exceptions.RuntimeError("Unable to find platform '" + platform_class_name + "'");
         } catch (NoSuchMethodException e) {
@@ -53,7 +53,7 @@ public class __init__ extends org.python.types.Module {
 
     // __copyright__',
     @org.python.Attribute()
-    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/platform/__init__.java");
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/platform.java");
     @org.python.Attribute()
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
     @org.python.Attribute()

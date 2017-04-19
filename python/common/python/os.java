@@ -1,4 +1,4 @@
-package python.os;
+package python;
 
 @org.python.Module(
         __doc__ =
@@ -25,7 +25,7 @@ package python.os;
                         "(e.g., split and join).\n" +
                         "\n"
 )
-public class __init__ extends org.python.types.Module {
+public class os extends org.python.types.Module {
     static {
         environ = new org.python.types.Dict();
         environb = new org.python.types.Dict();
@@ -279,7 +279,7 @@ public class __init__ extends org.python.types.Module {
     @org.python.Attribute()
     public static org.python.Object __cached__ = org.python.types.NoneType.NONE;  // TODO;
     @org.python.Attribute()
-    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/os/__init__.java");
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/os.java");
     @org.python.Attribute()
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
     @org.python.Attribute()
