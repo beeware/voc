@@ -27,6 +27,10 @@ _suite_configured = False
 # Set during setUpSuite()
 _output_dir = ''
 
+# The target JVM instance we'll run code against.
+# Set during setUpSuite()
+_jvm = None
+
 
 def setUpSuite():
     """Configure the entire test suite.
@@ -35,6 +39,7 @@ def setUpSuite():
     """
     global _output_dir
     global _suite_configured
+    global _jvm
     if _suite_configured:
         return
 
@@ -69,6 +74,18 @@ def setUpSuite():
     if proc.returncode != 0:
         raise Exception("Error compiling java sources: " + out.decode('ascii'))
 
+    classpath = os.pathsep.join([
+        os.path.join('dist', 'python-java-testdaemon.jar'),
+        os.path.join('dist', 'python-java-support.jar'),
+    ])
+    if _jvm is None:
+        _jvm = subprocess.Popen(
+            ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            cwd=_output_dir,
+        )
     _suite_configured = True
 
 
@@ -308,23 +325,6 @@ class TranspileTestCase(TestCase):
         global _output_dir
         setUpSuite()
         cls.temp_dir = os.path.join(_output_dir, 'temp')
-        classpath = os.pathsep.join([
-            os.path.join('dist', 'python-java-testdaemon.jar'),
-            os.path.join('dist', 'python-java-support.jar'),
-        ])
-        cls.jvm = subprocess.Popen(
-            ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            cwd=_output_dir,
-        )
-
-    @classmethod
-    def tearDownClass(cls):
-        if cls.jvm is not None:
-            # use communicate here to wait for process to exit
-            cls.jvm.communicate("exit".encode("utf-8"))
 
     def assertBlock(self, python, java):
         self.maxDiff = None
@@ -536,6 +536,7 @@ class TranspileTestCase(TestCase):
     def runAsJava(self, main_code, extra_code=None, args=None):
         """Run a block of Python code as a Java program."""
         # Output source code into test directory
+        global _jvm
         transpiler = Transpiler(verbosity=0)
 
         # Don't redirect stderr; we want to see any errors from the transpiler
@@ -554,13 +555,13 @@ class TranspileTestCase(TestCase):
 
         if len(args) == 0:
             # encode to turn str into bytes-like object
-            self.jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
-            self.jvm.stdin.flush()
+            _jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
+            _jvm.stdin.flush()
 
             out = ""
             while True:
                 try:
-                    line = self.jvm.stdout.readline().decode("utf-8")
+                    line = _jvm.stdout.readline().decode("utf-8")
                     if line == ".{0}".format(os.linesep):
                         break
                     else:
