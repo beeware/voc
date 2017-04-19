@@ -182,6 +182,7 @@ class ImportTests(TranspileTestCase):
 
                     """
             })
+
     def test_full_deep_dotted_path(self):
         self.assertCodeExecution(
             """
