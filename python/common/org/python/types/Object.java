@@ -1111,7 +1111,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         org.python.Object[] args = new org.python.Object[1];
         args[0] = y;
-        java.util.Map<java.lang.String, org.python.Object> kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
-        return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, kwargs);
+        return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, null);
     }
 }

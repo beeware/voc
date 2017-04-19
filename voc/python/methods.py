@@ -3,7 +3,7 @@ from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
     RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref as JavaClassref
 )
-from .blocks import Block, Accumulator
+from .blocks import Block, Accumulator, BlockCodeTooLarge
 from .structures import (
     TRY, CATCH, END_TRY,
     ArgType,
@@ -205,6 +205,10 @@ def return_statement(accumulator, annotation):
         )
 
 
+class MethodCodeTooLarge(Exception):
+    pass
+
+
 class Function(Block):
     def __init__(self, module, name, code, parameters, returns, static=False):
         super().__init__(parent=module)
@@ -247,8 +251,8 @@ class Function(Block):
     def add_self(self):
         pass
 
-    def store_name(self, name):
-        if name in self.local_vars:
+    def store_name(self, name, declare=False):
+        if declare or name in self.local_vars:
             self.add_opcodes(
                 # Store in a local variable
                 ASTORE_name(name),
@@ -529,14 +533,18 @@ class Function(Block):
         ]
 
     def transpile_method(self):
-        return [
-            JavaMethod(
-                self.pyimpl_name,
-                self.signature,
-                static=self.static,
-                attributes=[self.transpile_code()] + self.method_attributes()
-            )
-        ]
+        try:
+            return [
+                JavaMethod(
+                    self.pyimpl_name,
+                    self.signature,
+                    static=self.static,
+                    attributes=[self.transpile_code()] + self.method_attributes()
+                )
+            ]
+        except BlockCodeTooLarge as e:
+            raise MethodCodeTooLarge("Code is too large for method %s: %d > 65534"
+                                     % (self.name, e.code_length))
 
     def transpile_wrapper(self):
         return []
@@ -844,7 +852,7 @@ class MainFunction(Function):
     def can_ignore_empty(self):
         return True
 
-    def store_name(self, name):
+    def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),

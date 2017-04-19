@@ -358,7 +358,7 @@ public class Python {
         try {
             while (true) {
                 org.python.Object next = iter.__next__();
-                if (!((org.python.types.Bool) next.__bool__()).value) {
+                if (!next.toBoolean()) {
                     return new org.python.types.Bool(false);
                 }
             }
@@ -379,7 +379,7 @@ public class Python {
         try {
             while (true) {
                 org.python.Object next = iter.__next__();
-                if (((org.python.types.Bool) next.__bool__()).value) {
+                if (next.toBoolean()) {
                     return new org.python.types.Bool(true);
                 }
             }
@@ -701,7 +701,7 @@ public class Python {
                     "When a default argument is given, it is returned when the attribute doesn't\n" +
                     "exist; without it, an exception is raised in that case.\n",
             args = {"object", "name"},
-            default_args = {"default_"}
+            default_args = {"default"}
     )
     public static org.python.Object getattr(org.python.Object object, org.python.Object name, org.python.Object default_) {
         org.python.Object result;
@@ -870,7 +870,7 @@ public class Python {
         } else if (classinfo_or_tuple instanceof org.python.types.Tuple) {
             java.util.List<org.python.Object> target_classes = ((org.python.types.Tuple) classinfo_or_tuple).value;
             for (org.python.Object target_klass: target_classes) {
-                if (((org.python.types.Bool) org.Python.issubclass(klass, target_klass).__bool__()).value) {
+                if (org.Python.issubclass(klass, target_klass).toBoolean()) {
                     return new org.python.types.Bool(true);
                 }
             }
@@ -969,10 +969,87 @@ public class Python {
                     "With a single iterable argument, return its biggest item. The\n" +
                     "default keyword-only argument specifies an object to return if\n" +
                     "the provided iterable is empty.\n" +
-                    "With two or more arguments, return the largest argument.\n"
+                    "With two or more arguments, return the largest argument.\n",
+            varargs = "args",
+            kwonlyargs = {"default", "key"}
     )
-    public static org.python.Object max() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'max' not implemented");
+    public static org.python.Object max(org.python.types.Tuple args, org.python.Object default_, org.python.Object key) {
+        org.python.Object max_value = null;
+        org.python.Object max_key_value = null;
+        org.python.Object value;
+        org.python.Object key_value;
+
+        if (args.value.size() == 0) {
+            throw new org.python.exceptions.TypeError("max expected 1 arguments, got 0");
+        } else if (args.value.size() == 1) {
+            try {
+                org.python.Iterable iter = args.value.get(0).__iter__();
+                max_value = iter.__next__();
+                if (key == null) {
+                    max_key_value = max_value;
+                } else {
+                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
+                }
+
+                while (true) {
+                    value = iter.__next__();
+                    if (key == null) {
+                        key_value = value;
+
+                    } else {
+                        throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
+                    }
+
+                    if (org.python.types.Object.__cmp__(
+                                key_value,
+                                max_key_value,
+                                org.python.types.Object.CMP_OP.GT
+                            ).toBoolean()) {
+                        max_value = value;
+                        max_key_value = key_value;
+                    }
+                }
+            } catch (org.python.exceptions.AttributeError ae) {
+                throw new org.python.exceptions.TypeError("'" + args.value.get(0).typeName() + "' object is not iterable");
+            } catch (org.python.exceptions.StopIteration si) {
+                if (max_value == null) {
+                    if (default_ == null) {
+                        throw new org.python.exceptions.ValueError("max() arg is an empty sequence");
+                    } else {
+                        max_value = default_;
+                    }
+                }
+            }
+        } else {
+            if (default_ != null) {
+                throw new org.python.exceptions.TypeError("Cannot specify a default for max() with multiple positional arguments");
+            }
+
+            max_value = args.value.get(0);
+            if (key == null) {
+                max_key_value = max_value;
+            } else {
+                throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
+            }
+
+            for (int i = 1; i < args.value.size(); i++) {
+                value = args.value.get(i);
+                if (key == null) {
+                    key_value = value;
+                } else {
+                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
+                }
+                if (org.python.types.Object.__cmp__(
+                            key_value,
+                            max_key_value,
+                            org.python.types.Object.CMP_OP.GT
+                        ).toBoolean()) {
+                    max_value = value;
+                    max_key_value = key_value;
+                }
+            }
+        }
+        return max_value;
     }
 
     @org.python.Method(
@@ -982,10 +1059,87 @@ public class Python {
                     "With a single iterable argument, return its smallest item. The\n" +
                     "default keyword-only argument specifies an object to return if\n" +
                     "the provided iterable is empty.\n" +
-                    "With two or more arguments, return the smallest argument.\n"
+                    "With two or more arguments, return the smallest argument.\n",
+            varargs = "args",
+            kwonlyargs = {"default", "key"}
     )
-    public static org.python.Object min() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'min' not implemented");
+    public static org.python.Object min(org.python.types.Tuple args, org.python.Object default_, org.python.Object key) {
+        org.python.Object min_value = null;
+        org.python.Object min_key_value = null;
+        org.python.Object value;
+        org.python.Object key_value;
+
+        if (args.value.size() == 0) {
+            throw new org.python.exceptions.TypeError("min expected 1 arguments, got 0");
+        } else if (args.value.size() == 1) {
+            try {
+                org.python.Iterable iter = args.value.get(0).__iter__();
+                min_value = iter.__next__();
+                if (key == null) {
+                    min_key_value = min_value;
+                } else {
+                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
+                }
+
+                while (true) {
+                    value = iter.__next__();
+                    if (key == null) {
+                        key_value = value;
+                    } else {
+                        throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
+                    }
+
+                    if (org.python.types.Object.__cmp__(
+                                key_value,
+                                min_key_value,
+                                org.python.types.Object.CMP_OP.LT
+                            ).toBoolean()) {
+                        min_value = value;
+                        min_key_value = key_value;
+                    }
+                }
+            } catch (org.python.exceptions.AttributeError ae) {
+                throw new org.python.exceptions.TypeError("'" + args.value.get(0).typeName() + "' object is not iterable");
+            } catch (org.python.exceptions.StopIteration si) {
+                if (min_value == null) {
+                    if (default_ == null) {
+                        throw new org.python.exceptions.ValueError("min() arg is an empty sequence");
+                    } else {
+                        min_value = default_;
+                    }
+                }
+            }
+        } else {
+            if (default_ != null) {
+                throw new org.python.exceptions.TypeError("Cannot specify a default for min() with multiple positional arguments");
+            }
+
+            min_value = args.value.get(0);
+            if (key == null) {
+                min_key_value = min_value;
+            } else {
+                throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
+            }
+
+            for (int i = 1; i < args.value.size(); i++) {
+                value = args.value.get(i);
+                if (key == null) {
+                    key_value = value;
+                } else {
+                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
+                }
+
+                if (org.python.types.Object.__cmp__(
+                            key_value,
+                            min_key_value,
+                            org.python.types.Object.CMP_OP.LT
+                        ).toBoolean()) {
+                    min_value = value;
+                    min_key_value = key_value;
+                }
+            }
+        }
+        return min_value;
     }
 
     @org.python.Method(
@@ -994,15 +1148,15 @@ public class Python {
                     "Return the next item from the iterator. If default is given and the iterator\n" +
                     "is exhausted, it is returned instead of raising StopIteration.\n",
             args = {"iterator"},
-            default_args = {"_default"}
+            default_args = {"default"}
     )
-    public static org.python.Object next(org.python.Object iterator, org.python.Object _default) {
+    public static org.python.Object next(org.python.Object iterator, org.python.Object default_) {
         if (iterator instanceof org.python.Iterable) {
             try {
                 return ((org.python.Iterable) iterator).__next__();
             } catch (org.python.exceptions.StopIteration si) {
-                if (_default != null) {
-                    return _default;
+                if (default_ != null) {
+                    return default_;
                 } else {
                     throw si;
                 }
@@ -1262,7 +1416,7 @@ public class Python {
             throw new org.python.exceptions.TypeError("'" + write_method.typeName() + "' object is not callable");
         }
 
-        if (flush != null && ((org.python.types.Bool) flush.__bool__()).value) {
+        if (flush != null && flush.toBoolean()) {
             org.python.Object flush_method = file.__getattribute__("flush");
             try {
                 ((org.python.Callable) flush_method).invoke(null, null);
@@ -1425,11 +1579,11 @@ public class Python {
                 }
             }
             org.python.Object result = org.python.types.Object.__cmp_bool__(o1, o2, org.python.types.Object.CMP_OP.LT);
-            if (((org.python.types.Bool) result.__bool__()).value) {
+            if (result.toBoolean()) {
                 return reverse ? 1 : -1;
             }
             result = org.python.types.Object.__cmp_bool__(o2, o1, org.python.types.Object.CMP_OP.LT);
-            if (((org.python.types.Bool) result.__bool__()).value) {
+            if (result.toBoolean()) {
                 return reverse ? -1 : 1;
             }
             return 0;
@@ -1554,9 +1708,62 @@ public class Python {
                     "Return a zip object whose .__next__() method returns a tuple where\n" +
                     "the i-th element comes from the i-th iterable argument.  The .__next__()\n" +
                     "method continues until the shortest iterable in the argument sequence\n" +
-                    "is exhausted and then it raises StopIteration.\n"
+                    "is exhausted and then it raises StopIteration.\n",
+
+            args = {"item"},
+            varargs = "moreItems"
     )
-    public static org.python.Object zip() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'zip' not implemented");
+    public static org.python.Object zip(org.python.Object item, org.python.types.Tuple moreItems) {
+        java.util.List result = new java.util.ArrayList();
+        int count = 0;
+        if (item != null) {
+            count = 1;
+            org.python.Iterable iter;
+            try {
+                iter = org.Python.iter(item);
+            } catch (org.python.exceptions.TypeError e) {
+                throw new org.python.exceptions.TypeError("zip argument #" + count + " must support iteration");
+            }
+            java.util.List<org.python.Iterable> iters = new java.util.ArrayList<org.python.Iterable>();
+            iters.add(iter);
+            if (moreItems != null) {
+                org.python.Iterable tupIter = org.Python.iter(moreItems);
+                while (true) {
+                    count++;
+                    org.python.Iterable it;
+                    org.python.Object obj;
+                    try {
+                        obj = tupIter.__next__();
+                    } catch (org.python.exceptions.StopIteration e) {
+                        break;
+                    }
+                    try {
+                        it = org.Python.iter(obj);
+                    } catch (org.python.exceptions.TypeError e) {
+                        throw new org.python.exceptions.TypeError("zip argument #" + count + " must support iteration");
+                    }
+                    iters.add(it);
+                }
+            }
+            boolean flag = false;
+            while (true) {
+                java.util.List tuple = new java.util.ArrayList();
+                for (int i = 0; i < count - 1; i++) {
+                    try {
+                        org.python.Iterable it = iters.get(i);
+                        tuple.add(it.__next__());
+                    } catch (IndexOutOfBoundsException | org.python.exceptions.StopIteration e) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag) {
+                    break;
+                }
+                org.python.types.Tuple pythonTuple = new org.python.types.Tuple(tuple);
+                result.add(pythonTuple);
+            }
+        }
+        return new org.python.types.List(result);
     }
 }

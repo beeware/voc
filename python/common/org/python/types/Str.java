@@ -1223,10 +1223,41 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Search for the separator sep in S, starting at the end of S, and return\n" +
                     "the part before it, the separator itself, and the part after it.  If the\n" +
-                    "separator is not found, return two empty strings and S.\n"
+                    "separator is not found, return two empty strings and S.\n",
+            default_args = {"sep"}
     )
-    public org.python.Object rpartition() {
-        throw new org.python.exceptions.NotImplementedError("rpartition() has not been implemented.");
+    public org.python.Object rpartition(org.python.types.Object sep) {
+        java.util.List<org.python.Object> tuple = new java.util.ArrayList<org.python.Object>();
+        if (sep == null) {
+            throw new org.python.exceptions.TypeError("rpartition() takes exactly one argument (0 given)");
+        }
+        if (!(sep instanceof org.python.types.Str)) {
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.typeName(sep.getClass()) + "' object to str implicitly");
+            }
+            return new org.python.exceptions.TypeError("must be str, not " + org.Python.typeName(sep.getClass()));
+        }
+        java.lang.String sepStr = ((org.python.types.Str) sep).value;
+        if (sepStr.equals("")) {
+            throw new org.python.exceptions.ValueError("empty separator");
+        }
+        if (this.value.equals("")) {
+            tuple.add(new org.python.types.Str(""));
+            tuple.add(new org.python.types.Str(""));
+            tuple.add(new org.python.types.Str(""));
+            return new org.python.types.Tuple(tuple);
+        }
+        int i = this.value.lastIndexOf(sepStr);
+        if (i != -1) {
+            tuple.add(new org.python.types.Str(this.value.substring(0, i)));
+            tuple.add(new org.python.types.Str(sepStr));
+            tuple.add(new org.python.types.Str(this.value.substring(i + sepStr.length())));
+            return new org.python.types.Tuple(tuple);
+        }
+        tuple.add(new org.python.types.Str(""));
+        tuple.add(new org.python.types.Str(""));
+        tuple.add(new org.python.types.Str(this.value));
+        return new org.python.types.Tuple(tuple);
     }
 
     @org.python.Method(

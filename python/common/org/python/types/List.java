@@ -474,10 +474,18 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Reverse the list in place and returns\n" +
+                      "an iterator that iterates over all the objects\n" +
+                      "in the list in reverse order. Does not\n" +
+                      "modify the original list."
     )
     public org.python.Iterable __reversed__() {
-        throw new org.python.exceptions.NotImplementedError("list.__reversed__() has not been implemented.");
+        org.python.types.List list = new org.python.types.List();
+        for (int i = this.value.size() - 1; i >= 0; i--) {
+            list.append(this.value.get(i));
+        }
+        org.python.Iterable iter = new org.python.types.List_Iterator(list);
+        return iter;
     }
 
     @org.python.Method(
