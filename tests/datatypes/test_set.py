@@ -96,9 +96,20 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.difference(y)
+            w = x.difference([3,4,5])
             print(x)
             print(y)
             print(z)
+            print(w)
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                print(x.difference(1))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_discard(self):
@@ -114,9 +125,11 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.intersection(y)
+            w = x.intersection([3,4,5])
             print(x)
             print(y)
             print(z)
+            print(w)
             """)
 
         self.assertCodeExecution("""
@@ -126,6 +139,15 @@ class SetTests(TranspileTestCase):
             print(x)
             print(y)
             print(z)
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                print(x.intersection(1))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_remove(self):
@@ -340,8 +362,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_add_frozenset',
 
         'test_and_class',
-        'test_and_frozenset',
-        'test_and_set',
 
         'test_direct_eq_bytes',
         'test_direct_eq_set',
@@ -379,22 +399,17 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_le_tuple',
 
         'test_eq_class',
-        'test_eq_frozenset',
 
         'test_ge_class',
-        'test_ge_frozenset',
 
         'test_gt_class',
-        'test_gt_frozenset',
 
         'test_le_class',
-        'test_le_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',
 
         'test_lt_class',
-        'test_lt_frozenset',
 
         'test_modulo_class',
         'test_modulo_complex',
@@ -409,8 +424,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_frozenset',
 
         'test_or_class',
-        'test_or_frozenset',
-        'test_or_set',
 
         'test_power_class',
         'test_power_frozenset',
@@ -419,8 +432,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_rshift_frozenset',
 
         'test_subtract_class',
-        'test_subtract_frozenset',
-        'test_subtract_set',
 
         'test_subscr_class',
         'test_subscr_frozenset',
