@@ -206,6 +206,40 @@ class SetTests(TranspileTestCase):
                 print(y.__conatins__(s))
             """)
 
+    def test_isdisjoint(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            print(x.isdisjoint(y))
+            print(x.isdisjoint("hell"))
+            print(x.isdisjoint(z))
+            print(t.isdisjoint(z))
+            print(t.isdisjoint(y))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.isdisjoint(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.isdisjoint(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.isdisjoint(x))
+            except TypeError as err:
+                print(err)
+            """)
+
     def test_issubset(self):
         self.assertCodeExecution("""
             a = set('abc')
@@ -242,6 +276,76 @@ class SetTests(TranspileTestCase):
             a = {1, 2, 3}
             try:
                 print(a.issuperset(1))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_symmetric_difference(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            print(sorted(x.symmetric_difference(y)))
+            print(sorted(x.symmetric_difference(z)))
+            print(sorted(t.symmetric_difference(z)))
+            print(sorted(t.symmetric_difference(y)))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.symmetric_difference(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference())
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_symmetric_difference_update(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            x.symmetric_difference_update(y)
+            print(sorted(x))
+            #x.test_symmetric_difference_update(z)
+            print(sorted(x))
+            t.symmetric_difference_update(z)
+            print(sorted(t))
+            t.symmetric_difference_update(y)
+            print(sorted(t))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.symmetric_difference_update(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference_update(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference_update())
             except TypeError as err:
                 print(err)
             """)
