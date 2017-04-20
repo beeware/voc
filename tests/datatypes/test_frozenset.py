@@ -145,6 +145,179 @@ class FrozensetTests(TranspileTestCase):
 
             """)
 
+    def test_isdisjoint(self):
+        self.assertCodeExecution("""
+            x = frozenset("hello world")
+            y = set("hello")
+            z = frozenset()
+            t = "hello"
+            w = 2.0
+
+            print(x.isdisjoint(y))
+            print(x.isdisjoint(z))
+
+            # iterable test
+            print(x.isdisjoint(t))
+
+            # not-iterable test
+            try:
+                print(x.isdisjoint(w))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_issubset(self):
+        self.assertCodeExecution("""
+            a = frozenset('abc')
+            b = frozenset('abcde')
+            c = set()
+            d = 'wxyz'
+
+            print(a.issubset(b))
+            print(a.issubset(a))
+            print(a.issubset(c))
+
+            # iterable test
+            print(a.issubset(d))
+            """)
+
+        # not-iterable test
+        self.assertCodeExecution("""
+            a = frozenset({1, 2, 3})
+            b = 1
+            try:
+                print(a.issubset(b))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_issuperset(self):
+        self.assertCodeExecution("""
+            a = frozenset('abcd')
+            b = frozenset('ab')
+            c = set()
+            d = 'ab'
+
+            print(a.issuperset(b))
+            print(a.issuperset(a))
+            print(a.issuperset(c))
+
+            # iterable test
+            print(a.issuperset(d))
+            """)
+
+        # not-iterable test
+        self.assertCodeExecution("""
+            a = frozenset({1, 2, 3})
+            b = 1
+            try:
+                print(a.issuperset(b))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_union(self):
+        self.assertCodeExecution("""
+            x = frozenset({1, 2, 3})
+            y = frozenset({3, 4, 5})
+            z = [5, 6, 7]
+            w = 1
+            t = frozenset()
+
+            print(x.union(y))
+
+            # empty set test
+            print(x.union(t))
+
+            # multiple args test
+            print(x.union(y, z))
+
+            # iterable test
+            print(x.union(z))
+
+            # not-iterable test
+            try:
+                print(x.union(w))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_intersection(self):
+        self.assertCodeExecution("""
+            x = frozenset({1, 2, 3})
+            y = frozenset({2, 3, 4})
+            z = [3, 6, 7]
+            w = 1
+            t = frozenset()
+
+            print(x.intersection(y))
+
+            # empty set test
+            print(x.intersection(t))
+
+            # multiple args test
+            print(x.intersection(y, z))
+
+            # iterable test
+            print(x.intersection(z))
+
+            # not-iterable test
+            try:
+                print(x.intersection(w))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_difference(self):
+        self.assertCodeExecution("""
+            x = frozenset({1, 2, 3})
+            y = frozenset({2, 3, 4})
+            z = [1, 6]
+            w = 1
+            t = frozenset()
+
+            print(x.difference(y))
+
+            # empty set test
+            print(x.difference(t))
+
+            # multiple args test
+            print(x.difference(y, z))
+
+            # iterable test
+            print(x.difference(z))
+
+            # not-iterable test
+            try:
+                print(x.difference(w))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_symmetric_difference(self):
+        self.assertCodeExecution("""
+            x = frozenset({1, 2, 3})
+            y = frozenset({2, 3, 4})
+            z = [1, 6, 7]
+            w = 1
+            t = frozenset()
+
+            print(x.symmetric_difference(y))
+
+            # empty set test
+            print(x.symmetric_difference(t))
+
+            # iterable test
+            print(x.symmetric_difference(z))
+
+            # not-iterable test
+            try:
+                print(x.symmetric_difference(w))
+            except TypeError as err:
+                print(err)
+
+            """)
+
 
 class UnaryFrozensetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
