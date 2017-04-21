@@ -17,6 +17,7 @@
         destdir="${build}/java">
       <src path="${src}/common" />
       <src path="${src}/java" />
+      <compilerarg value="-Xdiags:verbose"/>
     </javac>
   </target>
 
