@@ -28,6 +28,9 @@ class Module(Block):
         parts = os.path.splitext(sourcefile)[0].split(os.path.sep)
         if parts[-1] == '__init__':
             parts.pop()
+            self.has_init_file = True
+        else:
+            self.has_init_file = False
 
         # If the sourcefile started with a /, the first part will
         # be an empty string; replace that with the namespace.
@@ -36,6 +39,7 @@ class Module(Block):
             parts[0] = namespace
         else:
             parts = [namespace] + parts
+
         self.namespace = '.'.join(parts[:-1])
         self.name = parts[-1]
 
@@ -62,17 +66,17 @@ class Module(Block):
 
     @property
     def class_name(self):
-        return '.'.join(self.namespace.split('.') + [self.name, '__init__'])
+        return '.'.join(self.namespace.split('.') + ([self.name, '__init__'] if self.has_init_file else [self.name]))
 
     @property
     def class_descriptor(self):
-        return '/'.join(self.namespace.split('.') + [self.name, '__init__'])
+        return '/'.join(self.namespace.split('.') + ([self.name, '__init__'] if self.has_init_file else [self.name]))
 
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
 
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -86,7 +90,7 @@ class Module(Block):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name('#value'),
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -104,7 +108,7 @@ class Module(Block):
 
     def load_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -114,7 +118,7 @@ class Module(Block):
 
     def load_globals(self):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -130,7 +134,7 @@ class Module(Block):
 
     def delete_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -370,7 +374,7 @@ class Module(Block):
         # at least one entry - the class for the module itself.
         classfiles = [(
             self.namespace,
-            '%s/__init__' % self.name,
+            self.name + ('/__init__' if self.has_init_file else ''),
             classfile
         )]
         # Also output any classes defined in this module.

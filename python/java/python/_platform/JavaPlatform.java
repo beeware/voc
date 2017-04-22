@@ -1,9 +1,9 @@
-package python.platform;
+package python._platform;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
-public class JavaPlatform implements python.Platform {
+public class JavaPlatform implements python.PlatformInterface {
     private org.python.stdlib._io.TextIOWrapper _stderr;
     private org.python.stdlib._io.TextIOWrapper _stdout;
     private org.python.stdlib._io.TextIOWrapper _stdin;

@@ -327,7 +327,7 @@ class Block(Accumulator):
                 ),
 
                 # globals
-                # JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                # JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
                 JavaOpcodes.ACONST_NULL(),  # globals
 
                 # Default args

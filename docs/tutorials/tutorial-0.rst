@@ -56,23 +56,23 @@ You will see output like the following:
 
     Compiling example.py ...
     Adding default main method...
-    Writing python/example/__init__.class ...
+    Writing python/example.class ...
 
-This will produce an ``__init__.class`` in the ``python/example`` namespace.
+This will produce an ``example.class`` in the ``python`` namespace.
 This classfile can run on any Java 6 (or higher) VM. To run the project, type:
 
 * On Linux / OS X
 
 .. code-block:: bash
 
-    $ java -classpath ../voc/dist/python-java-support.jar:. python.example.__init__
+    $ java -classpath ../voc/dist/python-java-support.jar:. python.example
     Hello World!
 
 * On Windows
 
 .. code-block:: bash
 
-    > java -classpath ../voc/dist/python-java-support.jar;. python.example.__init__
+    > java -classpath ../voc/dist/python-java-support.jar;. python.example
     Hello World!
 
 

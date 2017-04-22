@@ -158,6 +158,31 @@ class ImportTests(TranspileTestCase):
                     """
             })
 
+    def test_ambiguous_symbol_from_dotted_path(self):
+        self.assertCodeExecution(
+            """
+            from example.thing import Thing
+
+            Thing()
+
+            print("Done.")
+            """,
+            extra_code={
+                'example.__init__':
+                    """
+                    print("Initializing the example module")
+                    """,
+                'example.thing':
+                    """
+                    print("Now we're in example.thing")
+
+                    class Thing:
+                        def __init__(self):
+                            print("Now we're creating a Thing")
+
+                    """
+            })
+
     def test_full_deep_dotted_path(self):
         self.assertCodeExecution(
             """

@@ -136,14 +136,14 @@ public class Python {
     }
 
     public static void debug(java.lang.String msg) {
-        python.platform.__init__.impl.debug(msg);
+        python.platform.impl.debug(msg);
     }
 
     public static void debug(java.lang.String msg, java.lang.Object obj) {
         if (obj == null) {
-            python.platform.__init__.impl.debug(msg, "NULL");
+            python.platform.impl.debug(msg, "NULL");
         } else {
-            python.platform.__init__.impl.debug(msg, obj);
+            python.platform.impl.debug(msg, obj);
         }
     }
 
@@ -1405,7 +1405,7 @@ public class Python {
         }
 
         if (file == null) {
-            file = python.sys.__init__.stdout;
+            file = python.sys.stdout;
         }
 
         org.python.Object content = new org.python.types.Str(buffer.toString());

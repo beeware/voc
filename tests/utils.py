@@ -252,7 +252,7 @@ def cleanse_java(raw, substitutions):
 
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
     out = out.replace(
-        "'python.test.__init__'", '***EXECUTABLE***').replace(
+        "'python.test'", '***EXECUTABLE***').replace(
         "'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
 
     # Replace references to the test script with something generic
@@ -554,7 +554,7 @@ class TranspileTestCase(TestCase):
 
         if len(args) == 0:
             # encode to turn str into bytes-like object
-            self.jvm.stdin.write(("python.test.__init__\n").encode("utf-8"))
+            self.jvm.stdin.write(("python.test\n").encode("utf-8"))
             self.jvm.stdin.flush()
 
             out = ""
@@ -574,7 +574,7 @@ class TranspileTestCase(TestCase):
                 os.curdir,
             ])
             proc = subprocess.Popen(
-                ["java", "-classpath", classpath, "python.test.__init__"] + args,
+                ["java", "-classpath", classpath, "python.test"] + args,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
