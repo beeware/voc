@@ -1,6 +1,11 @@
 Release History
 ===============
 
+0.1.3
+-----
+
+Progress release. VOC is able to run Toga tutorials on Android.
+
 0.1.2
 -----
 
