@@ -1752,7 +1752,10 @@ public class Python {
                     try {
                         org.python.Iterable it = iters.get(i);
                         tuple.add(it.__next__());
-                    } catch (IndexOutOfBoundsException | org.python.exceptions.StopIteration e) {
+                    } catch (IndexOutOfBoundsException e) {
+                        flag = true;
+                        break;
+                    } catch (org.python.exceptions.StopIteration e) {
                         flag = true;
                         break;
                     }
