@@ -985,26 +985,13 @@ public class Python {
             try {
                 org.python.Iterable iter = args.value.get(0).__iter__();
                 max_value = iter.__next__();
-                if (key == null) {
-                    max_key_value = max_value;
-                } else {
-                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
-                }
+                max_key_value = applyKey(max_value, key);
 
                 while (true) {
                     value = iter.__next__();
-                    if (key == null) {
-                        key_value = value;
+                    key_value = applyKey(value, key);
 
-                    } else {
-                        throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
-                    }
-
-                    if (org.python.types.Object.__cmp__(
-                                key_value,
-                                max_key_value,
-                                org.python.types.Object.CMP_OP.GT
-                            ).toBoolean()) {
+                    if (compareKeys(key_value, max_key_value)) {
                         max_value = value;
                         max_key_value = key_value;
                     }
@@ -1026,30 +1013,26 @@ public class Python {
             }
 
             max_value = args.value.get(0);
-            if (key == null) {
-                max_key_value = max_value;
-            } else {
-                throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
-            }
+            max_key_value = applyKey(max_value, key);
 
             for (int i = 1; i < args.value.size(); i++) {
                 value = args.value.get(i);
-                if (key == null) {
-                    key_value = value;
-                } else {
-                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'max' not implemented");
-                }
-                if (org.python.types.Object.__cmp__(
-                            key_value,
-                            max_key_value,
-                            org.python.types.Object.CMP_OP.GT
-                        ).toBoolean()) {
+                key_value = applyKey(value, key);
+                if (compareKeys(key_value, max_key_value)) {
                     max_value = value;
                     max_key_value = key_value;
                 }
             }
         }
         return max_value;
+    }
+
+    private static boolean compareKeys(org.python.Object first, org.python.Object second) {
+        return org.python.types.Object.__cmp__(
+                    first,
+                    second,
+                    org.python.types.Object.CMP_OP.GT
+                ).toBoolean();
     }
 
     @org.python.Method(
@@ -1075,25 +1058,13 @@ public class Python {
             try {
                 org.python.Iterable iter = args.value.get(0).__iter__();
                 min_value = iter.__next__();
-                if (key == null) {
-                    min_key_value = min_value;
-                } else {
-                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
-                }
+                min_key_value = applyKey(min_value, key);
 
                 while (true) {
                     value = iter.__next__();
-                    if (key == null) {
-                        key_value = value;
-                    } else {
-                        throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
-                    }
+                    key_value = applyKey(value, key);
 
-                    if (org.python.types.Object.__cmp__(
-                                key_value,
-                                min_key_value,
-                                org.python.types.Object.CMP_OP.LT
-                            ).toBoolean()) {
+                    if (compareKeys(min_key_value, key_value)) {
                         min_value = value;
                         min_key_value = key_value;
                     }
@@ -1115,25 +1086,13 @@ public class Python {
             }
 
             min_value = args.value.get(0);
-            if (key == null) {
-                min_key_value = min_value;
-            } else {
-                throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
-            }
+            min_key_value = applyKey(min_value, key);
 
             for (int i = 1; i < args.value.size(); i++) {
                 value = args.value.get(i);
-                if (key == null) {
-                    key_value = value;
-                } else {
-                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
-                }
+                key_value = applyKey(value, key);
 
-                if (org.python.types.Object.__cmp__(
-                            key_value,
-                            min_key_value,
-                            org.python.types.Object.CMP_OP.LT
-                        ).toBoolean()) {
+                if (compareKeys(min_key_value, key_value)) {
                     min_value = value;
                     min_key_value = key_value;
                 }
@@ -1569,15 +1528,8 @@ public class Python {
         }
 
         public int compare(org.python.Object o1, org.python.Object o2) {
-            if (key != null) {
-                try {
-                    // Replace the two objects by their keys for comparison
-                    o1 = ((org.python.Callable) key).invoke(new org.python.Object[]{o1}, null);
-                    o2 = ((org.python.Callable) key).invoke(new org.python.Object[]{o2}, null);
-                } catch (java.lang.ClassCastException e) {
-                    throw new org.python.exceptions.TypeError("'" + key.typeName() + "' object is not callable");
-                }
-            }
+            o1 = applyKey(o1, key);
+            o2 = applyKey(o2, key);
             org.python.Object result = org.python.types.Object.__cmp_bool__(o1, o2, org.python.types.Object.CMP_OP.LT);
             if (result.toBoolean()) {
                 return reverse ? 1 : -1;
@@ -1588,6 +1540,17 @@ public class Python {
             }
             return 0;
         }
+    }
+
+    private static org.python.Object applyKey(org.python.Object obj, org.python.Object key) {
+        if (key != null) {
+            try {
+                return ((org.python.Callable) key).invoke(new org.python.Object[]{obj}, null);
+            } catch (java.lang.ClassCastException e) {
+                throw new org.python.exceptions.TypeError("'" + key.typeName() + "' object is not callable");
+            }
+        }
+        return obj;
     }
 
     @org.python.Method(

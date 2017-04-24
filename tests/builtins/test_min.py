@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
@@ -62,7 +60,6 @@ class MinTests(TranspileTestCase):
                 print("Threw an error as expected")
             """)
 
-    @expectedFailure
     def test_key(self):
         self.assertCodeExecution("""
             # key applied over args
@@ -70,6 +67,8 @@ class MinTests(TranspileTestCase):
 
             # key applied over iterable
             print(min([51, 42, 33, 24], key=lambda v: v % 10))
+
+            print(min([(2, 4), (5, 0), (4, 0), (9, 3)], key=lambda t: t[1]))
             """)
 
 
