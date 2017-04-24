@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
@@ -62,7 +60,6 @@ class MaxTests(TranspileTestCase):
                 print("Threw an error as expected")
             """)
 
-    @expectedFailure
     def test_key(self):
         self.assertCodeExecution("""
             # key applied over args
