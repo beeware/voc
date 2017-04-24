@@ -1058,25 +1058,13 @@ public class Python {
             try {
                 org.python.Iterable iter = args.value.get(0).__iter__();
                 min_value = iter.__next__();
-                if (key == null) {
-                    min_key_value = min_value;
-                } else {
-                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
-                }
+                min_key_value = applyKey(min_value, key);
 
                 while (true) {
                     value = iter.__next__();
-                    if (key == null) {
-                        key_value = value;
-                    } else {
-                        throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
-                    }
+                    key_value = applyKey(value, key);
 
-                    if (org.python.types.Object.__cmp__(
-                                key_value,
-                                min_key_value,
-                                org.python.types.Object.CMP_OP.LT
-                            ).toBoolean()) {
+                    if (compareKeys(min_key_value, key_value)) {
                         min_value = value;
                         min_key_value = key_value;
                     }
@@ -1098,25 +1086,13 @@ public class Python {
             }
 
             min_value = args.value.get(0);
-            if (key == null) {
-                min_key_value = min_value;
-            } else {
-                throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
-            }
+            min_key_value = applyKey(min_value, key);
 
             for (int i = 1; i < args.value.size(); i++) {
                 value = args.value.get(i);
-                if (key == null) {
-                    key_value = value;
-                } else {
-                    throw new org.python.exceptions.NotImplementedError("Keyword argument 'key' for builtin function 'min' not implemented");
-                }
+                key_value = applyKey(value, key);
 
-                if (org.python.types.Object.__cmp__(
-                            key_value,
-                            min_key_value,
-                            org.python.types.Object.CMP_OP.LT
-                        ).toBoolean()) {
+                if (compareKeys(min_key_value, key_value)) {
                     min_value = value;
                     min_key_value = key_value;
                 }
