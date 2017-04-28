@@ -430,7 +430,6 @@ public class Complex extends org.python.types.Object {
 
     private org.python.Object calCPow(org.python.types.Complex b) {
         org.python.types.Complex r = new org.python.types.Complex(0, 0);
-        double vabs, len, at, phase;
         if (b.real.value == 0.0 && b.imag.value == 0) {
             r.real.value = 1.0;
             r.imag.value = 0.0;
@@ -441,10 +440,10 @@ public class Complex extends org.python.types.Object {
             r.real.value = 1.0;
             r.imag.value = 0.0;
         } else {
-            vabs = Math.hypot(this.real.value, this.imag.value);
-            len = Math.pow(vabs, b.real.value);
-            at = Math.atan2(this.imag.value, this.real.value);
-            phase = at * b.real.value;
+            double vabs = Math.hypot(this.real.value, this.imag.value);
+            double len = Math.pow(vabs, b.real.value);
+            double at = Math.atan2(this.imag.value, this.real.value);
+            double phase = at * b.real.value;
             if (b.imag.value != 0.0) {
                 len /= Math.exp(at * b.imag.value);
                 phase += b.imag.value * Math.log(vabs);
@@ -456,10 +455,9 @@ public class Complex extends org.python.types.Object {
     }
 
     private org.python.Object calUPow(long n) {
-        org.python.types.Complex r, p;
         long mask = 1;
-        r = new org.python.types.Complex(1, 0);
-        p = this;
+        org.python.types.Complex r = new org.python.types.Complex(1, 0);
+        org.python.types.Complex p = this;
         while (mask > 0 && n >= mask) {
             if ((n & mask) != 0) {
                 r = (org.python.types.Complex) r.__mul__(p);
