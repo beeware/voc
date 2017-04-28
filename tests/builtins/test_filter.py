@@ -13,10 +13,10 @@ class FilterTests(TranspileTestCase):
         self.assertCodeExecution('print(list(filter(None, [])))')
 
     def test_lambda(self):
-        self.assertCodeExecution('print(list(filter(lambda x: x>1, [3,4,56,1, -11])))')
+        self.assertCodeExecution('print(list(filter(lambda x: x > 1, [3, 4, 56, 1, -11])))')
 
     def test_wrong_argument(self):
-        self.assertCodeExecution('print(list(  filter(None, None)  ))', exits_early=True)
+        self.assertCodeExecution('print(list(filter(None, None)))', exits_early=True)
 
 
 class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
