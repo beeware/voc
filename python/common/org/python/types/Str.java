@@ -860,8 +860,17 @@ public class Str extends org.python.types.Object {
                     "False otherwise.\n"
     )
     public org.python.Object isnumeric() {
-        throw new org.python.exceptions.NotImplementedError("isnumeric() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+        }
+        for (char ch : this.value.toCharArray()) {
+            if (!(Character.isDigit(ch))) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
+
 
     @org.python.Method(
             __doc__ = "S.isprintable() -> bool\n" +
