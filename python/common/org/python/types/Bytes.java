@@ -472,8 +472,12 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__iter__ has not been implemented.");
+    public org.python.Iterable __iter__() {
+        java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
+        for (byte b: this.value) {
+            listOfBytes.add(new org.python.types.Int(b));
+        }
+        return new org.python.types.List(listOfBytes).__iter__();
     }
 
     @org.python.Method(
@@ -555,8 +559,23 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object capitalize(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.capitalize has not been implemented.");
+    public org.python.Object capitalize() {
+        byte[] value = new byte[this.value.length];
+        for (int i = 0; i < this.value.length; i++) {
+            byte b = this.value[i];
+            if (b < 128) { // TODO: double check if this is sufficient safeguard for ascii
+                char c = (char) b;
+                if (i == 0) {
+                    c = Character.toUpperCase(c);
+                } else {
+                    c = Character.toLowerCase(c);
+                }
+                value[i] = (byte) c;
+            } else {
+                value[i] = b;
+            }
+        }
+        return new Bytes(value);
     }
 
     @org.python.Method(

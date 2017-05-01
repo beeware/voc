@@ -20,6 +20,20 @@ class BytesTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_capitalize(self):
+        self.assertCodeExecution("""
+            print(b'hello, world'.capitalize())
+            print(b'helloWORLD'.capitalize())
+            print(b'HELLO WORLD'.capitalize())
+            print(b'2015638687'.capitalize())
+        """)
+
+    def test_iter(self):
+        self.assertCodeExecution("""
+            print([b for b in b''])
+            print([b for b in b'hello world'])
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
