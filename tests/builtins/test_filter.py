@@ -1,53 +1,22 @@
 from .. utils import TranspileTestCase, BuiltinTwoargFunctionTestCase
 
-from unittest import expectedFailure
-
 
 class FilterTests(TranspileTestCase):
-    base_code = """
-            #placeholder while list()s etc aren't fully implemented
-            class ListLike:
-                x = %s
-                index = 0
 
-                def __iter__(self):
-                    return self
-
-                def __next__(self):
-                    self.index = self.index + 1
-                    if self.index > len(self.x):
-                        raise StopIteration
-                    return self.x[self.index]
-
-            def testish(x):
-                return %s
-
-            print(filter(testish, ListLike()))
-            mylist = ListLike()
-            print(filter(testish, mylist).__next__())
-            print(filter(testish, mylist).__next__())
-            print(filter(testish, mylist).__next__())
-            try:
-                print(filter(testish, mylist).__next__())
-            except StopIteration:
-                pass
-    """
-
-    @expectedFailure
     def test_bool(self):
-        self.assertCodeExecution(self.base_code % ("[True, False, True]", "bool(x)"))
+        self.assertCodeExecution('print(list(filter(bool, [True, False, True])))')
+        self.assertCodeExecution('print(list(filter(bool, [1, 0, 3, -1])))')
+        self.assertCodeExecution('print(list(filter(bool, [])))')
 
-    @expectedFailure
-    def test_bytearray(self):
-        self.assertCodeExecution(self.base_code % ("b'123'", "x"))
+    def test_none(self):
+        self.assertCodeExecution('print(list(filter(None, [True, False, True])))')
+        self.assertCodeExecution('print(list(filter(None, [])))')
 
-    @expectedFailure
-    def test_float(self):
-        self.assertCodeExecution(self.base_code % ("[3.14, 2.17, 1.0]", "x > 1"))
+    def test_lambda(self):
+        self.assertCodeExecution('print(list(filter(lambda x: x > 1, [3, 4, 56, 1, -11])))')
 
-    @expectedFailure
-    def test_int(self):
-        self.assertCodeExecution(self.base_code % ("[1, 2, 3]", "x * 2"))
+    def test_wrong_argument(self):
+        self.assertCodeExecution('print(list(filter(None, None)))', exits_early=True)
 
 
 class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):

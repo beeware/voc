@@ -674,8 +674,7 @@ public class Python {
             args = {"function", "iterable"}
     )
     public static org.python.Object filter(org.python.Object function, org.python.Object iterable) {
-        org.python.Iterable iterator = org.Python.iter(iterable);
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'filter' not implemented");
+        return new org.python.types.Filter(function, org.Python.iter(iterable));
     }
 
     @org.python.Method(
