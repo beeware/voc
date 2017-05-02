@@ -11,6 +11,11 @@ class TupleTests(TranspileTestCase):
             print(tuple([1,2,3]))
             """)
 
+        self.assertCodeExecution("""
+            #more than one arg throws exception
+            print(tuple(1,2))
+            """, exits_early=True)
+
 
 class BuiltinTupleFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["tuple"]

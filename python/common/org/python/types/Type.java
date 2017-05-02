@@ -364,6 +364,13 @@ public class Type extends org.python.types.Object implements org.python.Callable
         return true;
     }
 
+    private void throwUnexpectedPositionalArgumentsError(int numExpected, int numGot) {
+        String posArgs = numExpected + " argument" + (numExpected == 1 ? "" : "s");
+        String givenArgs = " (" + numGot + " given)";
+        String mesg = this.PYTHON_TYPE_NAME + "() takes at most " + posArgs + givenArgs;
+        throw new org.python.exceptions.TypeError(mesg);
+    }
+
     public org.python.Object invoke(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         try {
             // org.Python.debug("Constructor:", this.constructor);
@@ -417,13 +424,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
                             adjusted_args[a] = args[a];
                         }
 
-                        for (a = n_args; a < args.length; a++) {
-                            if (a < arg_names.length) {
-                                arg_name = arg_names[a];
-                            } else {
-                                arg_name = default_arg_names[a - arg_names.length];
-                            }
-                            kwargs.put(arg_name, args[a]);
+                        if (args.length > n_args) {
+                            throwUnexpectedPositionalArgumentsError( n_args, args.length);
                         }
                     }
                 } else {
