@@ -563,7 +563,7 @@ public class Bytes extends org.python.types.Object {
         byte[] value = new byte[this.value.length];
         for (int i = 0; i < this.value.length; i++) {
             byte b = this.value[i];
-            if (b < 128) { // TODO: double check if this is sufficient safeguard for ascii
+            if (b < 127 && b > 32) {
                 char c = (char) b;
                 if (i == 0) {
                     c = Character.toUpperCase(c);

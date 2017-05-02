@@ -1,5 +1,7 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
+import unittest
+
 
 class BytesTests(TranspileTestCase):
     def test_setattr(self):
@@ -26,6 +28,12 @@ class BytesTests(TranspileTestCase):
             print(b'helloWORLD'.capitalize())
             print(b'HELLO WORLD'.capitalize())
             print(b'2015638687'.capitalize())
+        """)
+
+    @unittest.skip("Move this to test_capitalize upon resolution of #530")
+    def test_capitalize_with_nonascii(self):
+        self.assertCodeExecution("""
+            print(b'\xc8'.capitalize())
         """)
 
     def test_iter(self):
