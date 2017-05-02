@@ -2,7 +2,14 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class TupleTests(TranspileTestCase):
-    pass
+    def test_tuple_constructor(self):
+        self.assertCodeExecution("""
+            #No args
+            print(tuple())
+
+            #List arg
+            print(tuple([1,2,3]))
+            """)
 
 
 class BuiltinTupleFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

@@ -2,7 +2,14 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class ListTests(TranspileTestCase):
-    pass
+    def test_list_constructor(self):
+        self.assertCodeExecution("""
+            #No args
+            print(list())
+
+            #List arg
+            print(list([1,2,3]))
+            """)
 
 
 class BuiltinListFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

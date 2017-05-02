@@ -35,10 +35,22 @@ public class Tuple extends org.python.types.Object {
             __doc__ = "tuple() -> empty tuple" +
                     "tuple(iterable) -> tuple initialized from iterable's items\n" +
                     "\n" +
-                    "If the argument is a tuple, the return value is the same object.\n"
+                    "If the argument is a tuple, the return value is the same object.\n",
+            args = {},
+            default_args = {"iterable"}
     )
     public Tuple(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
+        super();
+        this.value = new java.util.ArrayList<org.python.Object>();
+        if (args[0] != null) {
+            org.python.Iterable iter = org.Python.iter(args[0]);
+            try {
+                while (true) {
+                    this.value.add(iter.__next__());
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+        }
     }
 
     // public org.python.Object __new__() {
