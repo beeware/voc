@@ -1,7 +1,5 @@
 from .. utils import TranspileTestCase, BuiltinTwoargFunctionTestCase
 
-from unittest import expectedFailure
-
 
 class MapTests(TranspileTestCase):
     base_code = """
@@ -22,7 +20,6 @@ class MapTests(TranspileTestCase):
     def test_bool(self):
         self.assertCodeExecution(self.base_code % ("[True, False, True]", "bool(x)"))
 
-    @expectedFailure
     def test_bytearray(self):
         self.assertCodeExecution(self.base_code % ("b'123'", "x"))
 

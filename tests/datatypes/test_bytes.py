@@ -1,5 +1,7 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
+from unittest import expectedFailure
+
 
 class BytesTests(TranspileTestCase):
     def test_setattr(self):
@@ -19,6 +21,27 @@ class BytesTests(TranspileTestCase):
             except AttributeError as err:
                 print(err)
             """)
+
+    def test_capitalize(self):
+        self.assertCodeExecution("""
+            print(b'hello, world'.capitalize())
+            print(b'helloWORLD'.capitalize())
+            print(b'HELLO WORLD'.capitalize())
+            print(b'2015638687'.capitalize())
+        """)
+
+    @expectedFailure
+    def test_capitalize_with_nonascii(self):
+        # Move this to test_capitalize upon resolution of #530
+        self.assertCodeExecution("""
+            print(b'\xc8'.capitalize())
+        """)
+
+    def test_iter(self):
+        self.assertCodeExecution("""
+            print([b for b in b''])
+            print([b for b in b'hello world'])
+        """)
 
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
