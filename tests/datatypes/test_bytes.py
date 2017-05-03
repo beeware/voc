@@ -1,6 +1,6 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
-import unittest
+from unittest import expectedFailure
 
 
 class BytesTests(TranspileTestCase):
@@ -30,8 +30,9 @@ class BytesTests(TranspileTestCase):
             print(b'2015638687'.capitalize())
         """)
 
-    @unittest.skip("Move this to test_capitalize upon resolution of #530")
+    @expectedFailure
     def test_capitalize_with_nonascii(self):
+        # Move this to test_capitalize upon resolution of #530
         self.assertCodeExecution("""
             print(b'\xc8'.capitalize())
         """)
