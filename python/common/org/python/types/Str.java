@@ -871,7 +871,6 @@ public class Str extends org.python.types.Object {
         return new org.python.types.Bool(true);
     }
 
-
     @org.python.Method(
             __doc__ = "S.isprintable() -> bool\n" +
                     "\n" +
