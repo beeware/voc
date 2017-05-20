@@ -61,7 +61,7 @@ Documentation for VOC can be found on `Read The Docs`_.
 Why "VOC"?
 ----------
 
-The `Vereenigde Oostindische Compagnie (VOC)`_, or Dutch East India Company,
+The `Vereenigde Oostindische Compagnie (VOC)`_, or Dutch East India Company (also known as the United East Indies Company, United East India Company or the United East Indian Company),
 is often considered to be the world's first multinational corporation. It was
 also the first company to issue shares, and facilitate the trading of those
 shares. It was granted a 21 year monopoly to carry out trade activities in
