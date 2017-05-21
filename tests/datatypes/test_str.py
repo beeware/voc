@@ -24,6 +24,12 @@ class StrTests(TranspileTestCase):
                 print(s.isdigit())
             """)
 
+    def test_isnumeric(self):
+        self.assertCodeExecution("""
+            for s in [u'112358132134', u'3.14159', u'12312344df', '', 'this2009', '23443434', '3.14', '314.', '3.14M']:
+                print(s.isnumeric())
+            """)
+
     def test_isspace(self):
         self.assertCodeExecution("""
             for s in ['''  \t \r''', ' ', '\t\tnope\t\t', '']:
