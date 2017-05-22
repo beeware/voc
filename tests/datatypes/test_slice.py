@@ -76,8 +76,6 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
     not_implemented = [
 
 
-        'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
 
         'test_direct_eq_slice',
         'test_direct_ge_slice',
@@ -87,35 +85,22 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_ne_slice',
 
         'test_eq_class',
-        'test_eq_frozenset',
         'test_eq_slice',
 
-        'test_ge_bytearray',
         'test_ge_class',
-        'test_ge_complex',
-        'test_ge_dict',
         'test_ge_slice',
 
-        'test_gt_bytearray',
         'test_gt_class',
-        'test_gt_dict',
-        'test_gt_float',
-        'test_gt_frozenset',
         'test_gt_slice',
 
         'test_le_class',
-        'test_le_NotImplemented',
         'test_le_slice',
 
-        'test_lshift_class',
 
         'test_lt_class',
-        'test_lt_int',
         'test_lt_slice',
 
-        'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
@@ -163,18 +148,13 @@ class InplaceSliceOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
-        'test_multiply_class',
         'test_multiply_list',
         'test_multiply_str',
         'test_multiply_tuple',
 
 
-        'test_power_frozenset',
-
-        'test_rshift_class',
 
 
-        'test_true_divide_class',
 
-        'test_xor_frozenset',
+
     ]

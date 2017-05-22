@@ -93,9 +93,4 @@ class BuiltinIssubclassFunctionTests(BuiltinFunctionTestCase, TranspileTestCase)
     functions = ["issubclass"]
 
     not_implemented = [
-        'test_bytes',
-        'test_dict',
-        'test_set',
-        'test_str',
-        'test_tuple',
     ]

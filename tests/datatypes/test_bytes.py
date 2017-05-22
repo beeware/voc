@@ -55,48 +55,27 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 
     not_implemented = [
-        'test_add_frozenset',
 
-        'test_and_class',
-        'test_and_frozenset',
 
         'test_direct_eq_bytearray',
-        'test_direct_eq_bytes',
-        'test_direct_eq_int',
         'test_direct_eq_none',
-        'test_direct_eq_set',
 
         'test_direct_ge_bytearray',
-        'test_direct_ge_frozenset',
         'test_direct_ge_none',
 
         'test_direct_gt_bytearray',
-        'test_direct_gt_int',
         'test_direct_gt_none',
-        'test_direct_gt_set',
-        'test_direct_gt_str',
 
         'test_direct_le_bytearray',
-        'test_direct_le_class',
-        'test_direct_le_complex',
         'test_direct_le_none',
 
         'test_direct_lt_bytearray',
-        'test_direct_lt_complex',
         'test_direct_lt_none',
 
         'test_direct_ne_bytearray',
-        'test_direct_ne_bytes',
-        'test_direct_ne_complex',
-        'test_direct_ne_frozenset',
-        'test_direct_ne_list',
         'test_direct_ne_none',
-        'test_direct_ne_tuple',
 
-        'test_direct_ge_frozenset',
-        'test_direct_ne_frozenset',
 
-        'test_eq_bytearray',
         'test_eq_class',
 
         'test_ne_class',
@@ -109,17 +88,13 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_lt_class',
 
-        'test_lshift_class',
 
         'test_modulo_complex',
         'test_modulo_dict',
-        'test_modulo_int',
 
 
-        'test_or_class',
 
 
-        'test_rshift_frozenset',
 
 
 
@@ -132,23 +107,14 @@ class InplaceBytesOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     not_implemented = [
 
-        'test_and_class',
-        'test_and_frozenset',
 
-        'test_floor_divide_class',
 
-        'test_lshift_class',
 
-        'test_modulo_None',
         'test_modulo_complex',
-        'test_modulo_dict',
-        'test_modulo_list',
-        'test_modulo_range',
 
 
 
 
-        'test_rshift_frozenset',
 
 
 

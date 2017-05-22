@@ -89,10 +89,8 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
 
     not_implemented = [
-        'test_add_frozenset',
 
 
-        'test_direct_eq_frozenset',
 
         'test_direct_eq_range',
         'test_direct_ne_range',
@@ -101,26 +99,15 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_range',
 
         'test_ge_class',
-        'test_ge_tuple',
 
-        'test_gt_bool',
         'test_gt_class',
-        'test_gt_float',
-        'test_gt_frozenset',
-        'test_gt_tuple',
 
-        'test_le_bool',
         'test_le_class',
 
-        'test_lshift_class',
 
-        'test_lt_bool',
         'test_lt_class',
-        'test_lt_dict',
-        'test_lt_tuple',
 
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
@@ -131,7 +118,6 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_class',
         'test_ne_range',
 
-        'test_or_class',
 
 
 
@@ -154,8 +140,6 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 
-        'test_xor_class',
-        'test_xor_frozenset',
     ]
 
 
@@ -164,20 +148,15 @@ class InplaceRangeOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     not_implemented = [
 
-        'test_and_class',
 
 
-        'test_lshift_class',
-        'test_lshift_frozenset',
 
         'test_modulo_complex',
 
-        'test_multiply_frozenset',
 
 
 
 
 
 
-        'test_xor_frozenset',
     ]

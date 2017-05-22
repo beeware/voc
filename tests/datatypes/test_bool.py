@@ -35,32 +35,23 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_add_complex',
 
-        'test_and_class',
 
-        'test_direct_lt_bytes',
-        'test_direct_ne_bytes',
 
 
         'test_eq_class',
-        'test_eq_frozenset',
 
         'test_ge_class',
-        'test_ge_frozenset',
 
         'test_gt_class',
-        'test_gt_frozenset',
 
         'test_le_class',
-        'test_le_frozenset',
 
 
         'test_lt_class',
 
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_complex',
-        'test_multiply_frozenset',
 
         'test_ne_class',
 
@@ -86,7 +77,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_str',
         'test_subscr_tuple',
 
-        'test_subtract_class',
         'test_subtract_complex',
 
         'test_true_divide_bytearray',
@@ -119,7 +109,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
         'test_floor_divide_bool',
         'test_floor_divide_float',
-        'test_floor_divide_frozenset',
         'test_floor_divide_int',
 
 
@@ -131,7 +120,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_bool',
         'test_multiply_bytearray',
         'test_multiply_bytes',
-        'test_multiply_class',
         'test_multiply_complex',
         'test_multiply_float',
         'test_multiply_int',

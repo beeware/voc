@@ -58,32 +58,21 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
     functions = ["delattr"]
 
     not_implemented = [
-        'test_bool_frozenset',
 
 
-        'test_bytes_frozenset',
 
-        'test_class_slice',
         'test_class_str',
 
-        'test_complex_frozenset',
-
-
-        'test_float_class',
-
-        'test_frozenset_complex',
-        'test_frozenset_None',
-
-
-        'test_list_frozenset',
-
-
-        'test_NotImplemented_frozenset',
-
-        'test_range_class',
 
 
 
-        'test_str_class',
+
+
+
+
+
+
+
+
 
     ]

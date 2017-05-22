@@ -35,43 +35,19 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
     not_implemented = [
 
-        'test_bytearray_frozenset',
-
-        'test_bytes_class',
-
-        'test_class_bytes',
-        'test_class_complex',
-        'test_class_list',
-        'test_class_None',
-        'test_class_range',
-        'test_class_set',
-        'test_class_str',
-        'test_class_tuple',
 
 
 
-        'test_float_frozenset',
-
-        'test_frozenset_bytearray',
-        'test_frozenset_bytes',
-        'test_frozenset_class',
-        'test_frozenset_dict',
-        'test_frozenset_float',
-        'test_frozenset_frozenset',
-        'test_frozenset_None',
-        'test_frozenset_slice',
-        'test_frozenset_tuple',
-
-
-        'test_list_frozenset',
-
-
-        'test_NotImplemented_class',
 
 
 
-        'test_slice_frozenset',
 
-        'test_str_class',
+
+
+
+
+
+
+
 
     ]

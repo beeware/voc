@@ -43,36 +43,20 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
     functions = ["getattr"]
 
     not_implemented = [
-        'test_bool_class',
 
 
 
-        'test_class_complex',
-        'test_class_float',
-        'test_class_list',
-        'test_class_range',
         'test_class_str',
 
 
-        'test_dict_frozenset',
-
-        'test_float_frozenset',
-
-        'test_frozenset_bytearray',
-        'test_frozenset_bytes',
-        'test_frozenset_float',
-        'test_frozenset_int',
-        'test_frozenset_list',
-        'test_frozenset_NotImplemented',
-
-
-        'test_list_frozenset',
-
-        'test_None_frozenset',
 
 
 
-        'test_set_class',
+
+
+
+
+
 
 
 

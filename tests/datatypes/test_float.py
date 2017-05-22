@@ -107,14 +107,9 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
     not_implemented = [
-        'test_add_frozenset',
 
 
-        'test_direct_eq_bytes',
-        'test_direct_gt_bytes',
-        'test_direct_ne_bytes',
 
-        'test_direct_ge_frozenset',
 
         'test_eq_class',
 
@@ -126,10 +121,8 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
         'test_lt_class',
-        'test_lt_frozenset',
 
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
@@ -166,9 +159,7 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_subtract_complex',
 
-        'test_true_divide_class',
         'test_true_divide_complex',
-        'test_true_divide_frozenset',
 
     ]
 
@@ -177,7 +168,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
     not_implemented = [
-        'test_add_class',
         'test_add_complex',
 
 
@@ -197,12 +187,9 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_tuple',
 
 
-        'test_power_class',
         'test_power_complex',
         'test_power_float',
-        'test_power_frozenset',
 
-        'test_rshift_frozenset',
 
         'test_subtract_complex',
 

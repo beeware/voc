@@ -25,7 +25,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
     not_implemented = [
         'test_bool_bytearray',
         'test_bool_bytes',
-        'test_bool_class',
         'test_bool_dict',
         'test_bool_frozenset',
         'test_bool_list',
@@ -55,9 +54,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_bytes_tuple',
 
         'test_class_bytearray',
-        'test_class_int',
-        'test_class_list',
-        'test_class_tuple',
 
         'test_complex_bytearray',
         'test_complex_bytes',
@@ -93,7 +89,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_frozenset_bytes',
         'test_frozenset_dict',
         'test_frozenset_frozenset',
-        'test_frozenset_int',
         'test_frozenset_list',
         'test_frozenset_range',
         'test_frozenset_set',
@@ -121,7 +116,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_list_tuple',
 
         'test_None_bytearray',
-        'test_None_class',
 
         'test_NotImplemented_bytearray',
         'test_NotImplemented_bytes',
@@ -145,7 +139,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
 
         'test_set_bytearray',
         'test_set_bytes',
-        'test_set_class',
         'test_set_dict',
         'test_set_frozenset',
         'test_set_list',
@@ -176,7 +169,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
 
         'test_tuple_bytearray',
         'test_tuple_bytes',
-        'test_tuple_class',
         'test_tuple_dict',
         'test_tuple_frozenset',
         'test_tuple_list',

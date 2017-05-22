@@ -10,5 +10,4 @@ class BuiltinRangeFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_bool',
-        'test_frozenset',
     ]

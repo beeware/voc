@@ -272,48 +272,33 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
     not_implemented = [
 
 
-        'test_direct_ge_bytes',
-        'test_direct_gt_bytes',
-        'test_direct_lt_bytes',
-        'test_direct_ne_bytes',
 
-        'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
 
-        'test_direct_ge_tuple',
-        'test_direct_gt_tuple',
 
         'test_eq_class',
 
         'test_ge_class',
 
         'test_gt_class',
-        'test_gt_frozenset',
 
         'test_le_class',
 
 
         'test_lt_class',
-        'test_lt_tuple',
 
-        'test_modulo_class',
         'test_modulo_complex',
 
 
         'test_ne_class',
 
-        'test_or_frozenset',
 
 
 
         'test_subscr_bool',
-        'test_subscr_class',
         'test_subscr_slice',
 
 
-        'test_true_divide_class',
 
-        'test_xor_class',
     ]
 
 
@@ -342,13 +327,9 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
 
-        'test_or_class',
 
 
-        'test_rshift_frozenset',
 
 
-        'test_true_divide_class',
 
-        'test_xor_class',
     ]
