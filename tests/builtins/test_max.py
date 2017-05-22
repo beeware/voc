@@ -77,6 +77,5 @@ class BuiltinMaxFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_bytearray',
         'test_bytes',
         'test_frozenset',
-        'test_set',
         'test_tuple',
     ]

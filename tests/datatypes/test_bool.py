@@ -40,14 +40,12 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_and_class',
         'test_and_frozenset',
 
-        'test_direct_eq_bytes',
         'test_direct_ge_bytes',
         'test_direct_gt_bytes',
         'test_direct_le_bytes',
         'test_direct_lt_bytes',
         'test_direct_ne_bytes',
 
-        'test_direct_eq_frozenset',
         'test_direct_ge_frozenset',
         'test_direct_gt_frozenset',
         'test_direct_le_frozenset',
@@ -72,7 +70,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_lt_class',
         'test_lt_frozenset',
 
-        'test_modulo_class',
         'test_modulo_complex',
         'test_modulo_frozenset',
 
@@ -88,7 +85,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_power_class',
         'test_power_complex',
-        'test_power_frozenset',
 
         'test_rshift_class',
         'test_rshift_frozenset',
@@ -150,7 +146,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_and_int',
 
         'test_floor_divide_bool',
-        'test_floor_divide_class',
         'test_floor_divide_complex',
         'test_floor_divide_float',
         'test_floor_divide_frozenset',
@@ -207,6 +202,5 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_true_divide_int',
 
         'test_xor_class',
-        'test_xor_frozenset',
         'test_xor_int',
     ]

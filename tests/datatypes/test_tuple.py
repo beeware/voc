@@ -271,10 +271,8 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_add_class',
-        'test_add_frozenset',
 
         'test_and_class',
-        'test_and_frozenset',
 
         'test_direct_eq_bytes',
         'test_direct_ge_bytes',
@@ -293,13 +291,11 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_ge_tuple',
         'test_direct_gt_tuple',
         'test_direct_le_tuple',
-        'test_direct_lt_tuple',
 
         'test_eq_class',
         'test_eq_frozenset',
 
         'test_ge_class',
-        'test_ge_frozenset',
         'test_ge_tuple',
 
         'test_gt_class',
@@ -311,18 +307,14 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_le_tuple',
 
         'test_lshift_class',
-        'test_lshift_frozenset',
 
         'test_lt_class',
-        'test_lt_frozenset',
         'test_lt_tuple',
 
         'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_class',
-        'test_multiply_frozenset',
 
         'test_ne_class',
         'test_ne_frozenset',
@@ -363,9 +355,7 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_and_frozenset',
 
         'test_lshift_class',
-        'test_lshift_frozenset',
 
-        'test_modulo_class',
         'test_modulo_complex',
         'test_modulo_frozenset',
 
@@ -391,11 +381,9 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_class',
         'test_power_frozenset',
 
-        'test_rshift_class',
         'test_rshift_frozenset',
 
         'test_subtract_class',
-        'test_subtract_frozenset',
 
         'test_true_divide_class',
         'test_true_divide_frozenset',

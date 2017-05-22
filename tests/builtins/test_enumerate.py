@@ -50,7 +50,6 @@ class BuiltinEnumerateFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["enumerate"]
 
     not_implemented = [
-        'test_bool',
         'test_bytearray',
         'test_bytes',
         'test_class',
@@ -60,7 +59,6 @@ class BuiltinEnumerateFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_frozenset',
         'test_int',
         'test_list',
-        'test_None',
         'test_NotImplemented',
         'test_range',
         'test_set',

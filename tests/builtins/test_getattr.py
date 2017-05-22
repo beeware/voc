@@ -52,8 +52,6 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_bytes_class',
         'test_bytes_frozenset',
 
-        'test_class_bool',
-        'test_class_bytearray',
         'test_class_bytes',
         'test_class_class',
         'test_class_complex',
@@ -68,7 +66,6 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_class_set',
         'test_class_slice',
         'test_class_str',
-        'test_class_tuple',
 
         'test_complex_class',
         'test_complex_frozenset',
@@ -82,7 +79,6 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_frozenset_bool',
         'test_frozenset_bytearray',
         'test_frozenset_bytes',
-        'test_frozenset_class',
         'test_frozenset_complex',
         'test_frozenset_dict',
         'test_frozenset_float',
@@ -91,13 +87,10 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_frozenset_list',
         'test_frozenset_None',
         'test_frozenset_NotImplemented',
-        'test_frozenset_range',
-        'test_frozenset_set',
         'test_frozenset_slice',
         'test_frozenset_str',
         'test_frozenset_tuple',
 
-        'test_int_class',
         'test_int_frozenset',
 
         'test_list_class',
@@ -119,7 +112,6 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_slice_frozenset',
 
         'test_str_class',
-        'test_str_frozenset',
 
         'test_tuple_class',
         'test_tuple_frozenset',

@@ -14,6 +14,5 @@ class BuiltinAllFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_class',
         'test_dict',
         'test_frozenset',
-        'test_set',
         'test_str',
     ]

@@ -35,7 +35,6 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
     not_implemented = [
         'test_bool_class',
         'test_bool_complex',
-        'test_bool_frozenset',
 
         'test_bytearray_class',
         'test_bytearray_complex',
@@ -60,17 +59,13 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
         'test_class_range',
         'test_class_set',
         'test_class_slice',
-        'test_class_str',
         'test_class_tuple',
 
-        'test_complex_bool',
         'test_complex_bytearray',
         'test_complex_bytes',
-        'test_complex_class',
         'test_complex_complex',
         'test_complex_dict',
         'test_complex_float',
-        'test_complex_frozenset',
         'test_complex_int',
         'test_complex_list',
         'test_complex_None',
@@ -94,14 +89,11 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
         'test_frozenset_bytes',
         'test_frozenset_class',
         'test_frozenset_complex',
-        'test_frozenset_dict',
         'test_frozenset_float',
-        'test_frozenset_frozenset',
         'test_frozenset_int',
         'test_frozenset_list',
         'test_frozenset_None',
         'test_frozenset_NotImplemented',
-        'test_frozenset_range',
         'test_frozenset_set',
         'test_frozenset_slice',
         'test_frozenset_str',
@@ -113,11 +105,9 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
 
         'test_list_class',
         'test_list_complex',
-        'test_list_frozenset',
 
         'test_None_class',
         'test_None_complex',
-        'test_None_frozenset',
 
         'test_NotImplemented_class',
         'test_NotImplemented_complex',
@@ -141,5 +131,4 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
 
         'test_tuple_class',
         'test_tuple_complex',
-        'test_tuple_frozenset',
     ]
