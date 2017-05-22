@@ -20,15 +20,12 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_add_class',
         'test_add_frozenset',
 
-        'test_and_class',
-        'test_and_frozenset',
 
         'test_direct_eq_bytes',
         'test_direct_ne_bytes',
 
         'test_direct_eq_frozenset',
         'test_direct_ge_frozenset',
-        'test_direct_le_frozenset',
         'test_direct_lt_frozenset',
         'test_direct_ne_frozenset',
 
@@ -46,11 +43,8 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_lshift_frozenset',
 
         'test_lt_class',
-        'test_lt_frozenset',
 
-        'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_bytes',
         'test_multiply_bytearray',
@@ -69,7 +63,6 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
 
         'test_true_divide_class',
 
-        'test_xor_frozenset',
     ]
 
 
@@ -80,7 +73,6 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_add_frozenset',
 
         'test_and_class',
-        'test_and_frozenset',
 
         'test_eq_bytearray',
         'test_eq_class',
@@ -111,9 +103,7 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_lt_complex',
         'test_lt_frozenset',
 
-        'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_bytes',
         'test_multiply_bytearray',
@@ -128,14 +118,11 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_ne_complex',
         'test_ne_frozenset',
 
-        'test_or_class',
-        'test_or_frozenset',
 
         'test_power_class',
         'test_power_frozenset',
 
         'test_rshift_class',
-        'test_rshift_frozenset',
 
         'test_subscr_bytearray',
         'test_subscr_bytes',

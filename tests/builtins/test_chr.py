@@ -10,5 +10,4 @@ class BuiltinChrFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_complex',
-        'test_frozenset',
     ]

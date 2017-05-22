@@ -110,7 +110,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_add_frozenset',
 
-        'test_and_class',
         'test_and_frozenset',
 
         'test_direct_eq_bytes',
@@ -118,7 +117,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_lt_bytes',
         'test_direct_ne_bytes',
 
-        'test_direct_eq_frozenset',
         'test_direct_ge_frozenset',
         'test_direct_le_frozenset',
         'test_direct_lt_frozenset',
@@ -126,20 +124,17 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_class',
 
         'test_ge_class',
-        'test_ge_frozenset',
 
         'test_gt_class',
 
         'test_le_class',
         'test_le_frozenset',
 
-        'test_lshift_class',
         'test_lshift_frozenset',
 
         'test_lt_class',
         'test_lt_frozenset',
 
-        'test_modulo_class',
         'test_modulo_complex',
         'test_modulo_frozenset',
 
@@ -160,7 +155,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_power_float',
         'test_power_frozenset',
 
-        'test_rshift_frozenset',
 
         'test_subscr_bool',
         'test_subscr_bytearray',
@@ -181,7 +175,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_tuple',
 
         'test_subtract_complex',
-        'test_subtract_frozenset',
 
         'test_true_divide_class',
         'test_true_divide_complex',
@@ -202,11 +195,8 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
         'test_floor_divide_class',
 
-        'test_lshift_class',
-        'test_lshift_frozenset',
 
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
@@ -225,7 +215,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_float',
         'test_power_frozenset',
 
-        'test_rshift_class',
         'test_rshift_frozenset',
 
         'test_subtract_class',

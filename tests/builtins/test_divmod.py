@@ -33,7 +33,6 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
     functions = ["divmod"]
 
     not_implemented = [
-        'test_bool_class',
         'test_bool_complex',
 
         'test_bytearray_class',
@@ -46,50 +45,35 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
 
         'test_class_bool',
         'test_class_bytes',
-        'test_class_class',
         'test_class_complex',
         'test_class_float',
-        'test_class_int',
         'test_class_list',
         'test_class_None',
         'test_class_NotImplemented',
         'test_class_range',
-        'test_class_slice',
 
         'test_complex_bytearray',
         'test_complex_bytes',
-        'test_complex_dict',
         'test_complex_float',
-        'test_complex_int',
-        'test_complex_NotImplemented',
         'test_complex_range',
-        'test_complex_str',
-        'test_complex_tuple',
 
         'test_dict_class',
         'test_dict_complex',
         'test_dict_frozenset',
 
-        'test_float_class',
         'test_float_complex',
         'test_float_frozenset',
 
-        'test_frozenset_bool',
-        'test_frozenset_bytearray',
         'test_frozenset_class',
         'test_frozenset_complex',
-        'test_frozenset_list',
-        'test_frozenset_None',
         'test_frozenset_NotImplemented',
         'test_frozenset_set',
         'test_frozenset_str',
         'test_frozenset_tuple',
 
-        'test_int_class',
         'test_int_complex',
         'test_int_frozenset',
 
-        'test_list_class',
         'test_list_complex',
 
         'test_None_class',
@@ -99,7 +83,6 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
         'test_NotImplemented_complex',
         'test_NotImplemented_frozenset',
 
-        'test_range_class',
         'test_range_complex',
         'test_range_frozenset',
 
@@ -108,11 +91,9 @@ class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileT
 
         'test_slice_class',
         'test_slice_complex',
-        'test_slice_frozenset',
 
         'test_str_class',
         'test_str_complex',
 
-        'test_tuple_class',
         'test_tuple_complex',
     ]

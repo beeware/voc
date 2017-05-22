@@ -9,5 +9,4 @@ class BuiltinPropertyFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["property"]
 
     not_implemented = [
-        'test_frozenset',
     ]

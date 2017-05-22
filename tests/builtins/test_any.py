@@ -10,9 +10,6 @@ class BuiltinAnyFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_bytearray',
-        'test_class',
         'test_dict',
-        'test_frozenset',
-        'test_set',
         'test_str',
     ]

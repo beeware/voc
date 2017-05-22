@@ -44,30 +44,20 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
     not_implemented = [
         'test_bool_class',
-        'test_bool_frozenset',
 
         'test_bytearray_class',
         'test_bytearray_frozenset',
 
         'test_bytes_class',
-        'test_bytes_frozenset',
 
-        'test_class_bytes',
         'test_class_complex',
         'test_class_float',
-        'test_class_frozenset',
         'test_class_list',
-        'test_class_None',
-        'test_class_NotImplemented',
         'test_class_range',
-        'test_class_set',
-        'test_class_slice',
         'test_class_str',
 
         'test_complex_class',
-        'test_complex_frozenset',
 
-        'test_dict_class',
         'test_dict_frozenset',
 
         'test_float_frozenset',
@@ -75,8 +65,6 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_frozenset_bool',
         'test_frozenset_bytearray',
         'test_frozenset_bytes',
-        'test_frozenset_complex',
-        'test_frozenset_dict',
         'test_frozenset_float',
         'test_frozenset_int',
         'test_frozenset_list',
@@ -85,7 +73,6 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_frozenset_slice',
         'test_frozenset_tuple',
 
-        'test_int_frozenset',
 
         'test_list_frozenset',
 

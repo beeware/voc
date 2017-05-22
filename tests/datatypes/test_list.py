@@ -603,31 +603,24 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_add_frozenset',
 
 
-        'test_direct_gt_bytes',
         'test_direct_le_bytes',
         'test_direct_ne_bytes',
 
-        'test_direct_gt_list',
         'test_direct_le_list',
 
         'test_direct_eq_frozenset',
         'test_direct_ge_frozenset',
         'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_ne_frozenset',
 
         'test_eq_class',
 
         'test_ge_class',
-        'test_ge_frozenset',
-        'test_ge_list',
 
         'test_gt_class',
 
         'test_le_class',
         'test_le_list',
 
-        'test_lshift_frozenset',
 
         'test_lt_class',
         'test_lt_frozenset',
@@ -636,17 +629,14 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_class',
         'test_modulo_complex',
 
-        'test_multiply_class',
         'test_multiply_frozenset',
 
         'test_ne_class',
         'test_ne_frozenset',
 
-        'test_or_class',
 
         'test_power_class',
 
-        'test_rshift_class',
         'test_rshift_frozenset',
 
         'test_subscr_bool',
@@ -673,7 +663,6 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_set',
         'test_add_str',
 
-        'test_and_class',
 
         'test_floor_divide_class',
         'test_floor_divide_complex',
@@ -682,11 +671,9 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_lshift_class',
         'test_lshift_frozenset',
 
-        'test_modulo_class',
         'test_modulo_complex',
         'test_modulo_frozenset',
 
-        'test_multiply_frozenset',
 
 
         'test_power_class',
@@ -694,9 +681,7 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_rshift_class',
         'test_rshift_frozenset',
 
-        'test_subtract_frozenset',
 
-        'test_true_divide_class',
 
         'test_xor_frozenset',
     ]
