@@ -602,15 +602,11 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_add_class',
         'test_add_frozenset',
 
-        'test_and_class',
 
-        'test_direct_eq_bytes',
-        'test_direct_ge_bytes',
         'test_direct_gt_bytes',
         'test_direct_le_bytes',
         'test_direct_ne_bytes',
 
-        'test_direct_ge_list',
         'test_direct_gt_list',
         'test_direct_le_list',
 
@@ -629,10 +625,8 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_gt_class',
 
         'test_le_class',
-        'test_le_frozenset',
         'test_le_list',
 
-        'test_lshift_class',
         'test_lshift_frozenset',
 
         'test_lt_class',
@@ -641,7 +635,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_class',
         'test_multiply_frozenset',
@@ -650,7 +643,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_frozenset',
 
         'test_or_class',
-        'test_or_frozenset',
 
         'test_power_class',
 
@@ -658,7 +650,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_rshift_frozenset',
 
         'test_subscr_bool',
-        'test_subscr_class',
         'test_subscr_frozenset',
         'test_subscr_slice',
 
@@ -699,12 +690,10 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
 
         'test_power_class',
-        'test_power_frozenset',
 
         'test_rshift_class',
         'test_rshift_frozenset',
 
-        'test_subtract_class',
         'test_subtract_frozenset',
 
         'test_true_divide_class',

@@ -33,7 +33,6 @@ class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
         'test_direct_ne_bool',
-        'test_direct_ne_bytearray',
         'test_direct_ne_class',
         'test_direct_ne_complex',
         'test_direct_ne_dict',
@@ -45,25 +44,20 @@ class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_ne_set',
         'test_direct_ne_slice',
         'test_direct_ne_str',
-        'test_direct_ne_tuple',
 
         'test_direct_le_bytes',
         'test_direct_lt_bytes',
 
-        'test_direct_eq_frozenset',
         'test_direct_ge_frozenset',
         'test_direct_gt_frozenset',
         'test_direct_le_frozenset',
         'test_direct_lt_frozenset',
 
         'test_eq_class',
-        'test_eq_frozenset',
 
         'test_ge_class',
-        'test_ge_frozenset',
 
         'test_gt_class',
-        'test_gt_frozenset',
 
         'test_le_class',
         'test_le_frozenset',
@@ -80,7 +74,6 @@ class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_bytes',
         'test_multiply_bytearray',
         'test_multiply_class',
-        'test_multiply_frozenset',
 
         'test_ne_class',
         'test_ne_frozenset',
@@ -111,20 +104,17 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
     data_type = 'None'
 
     not_implemented = [
-        'test_add_class',
         'test_add_frozenset',
 
         'test_and_class',
 
         'test_floor_divide_class',
         'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',
 
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
         'test_multiply_bytes',
         'test_multiply_bytearray',
@@ -134,7 +124,6 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
         'test_multiply_str',
         'test_multiply_tuple',
 
-        'test_or_frozenset',
 
         'test_power_class',
         'test_power_frozenset',
@@ -143,7 +132,6 @@ class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase)
         'test_rshift_frozenset',
 
         'test_subtract_class',
-        'test_subtract_frozenset',
 
         'test_true_divide_class',
 

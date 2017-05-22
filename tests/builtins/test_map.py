@@ -35,13 +35,10 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_bool_bytearray',
-        'test_bool_dict',
-        'test_bool_set',
         'test_bool_str',
 
         'test_bytearray_bytearray',
         'test_bytearray_bytes',
-        'test_bytearray_class',
         'test_bytearray_dict',
         'test_bytearray_frozenset',
         'test_bytearray_set',
@@ -49,9 +46,7 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
 
         'test_bytes_bytearray',
         'test_bytes_dict',
-        'test_bytes_frozenset',
         'test_bytes_set',
-        'test_bytes_str',
 
         'test_class_bytearray',
         'test_class_class',
@@ -61,9 +56,7 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
         'test_class_int',
         'test_class_None',
         'test_class_range',
-        'test_class_set',
         'test_class_slice',
-        'test_class_str',
         'test_class_tuple',
 
         'test_complex_bytearray',
@@ -74,10 +67,7 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
         'test_complex_str',
 
         'test_dict_bytearray',
-        'test_dict_bytes',
         'test_dict_class',
-        'test_dict_dict',
-        'test_dict_frozenset',
         'test_dict_str',
 
         'test_float_bytearray',
@@ -90,23 +80,15 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
         'test_frozenset_bool',
         'test_frozenset_bytearray',
         'test_frozenset_class',
-        'test_frozenset_float',
-        'test_frozenset_frozenset',
         'test_frozenset_int',
         'test_frozenset_list',
         'test_frozenset_None',
         'test_frozenset_NotImplemented',
-        'test_frozenset_range',
         'test_frozenset_set',
-        'test_frozenset_str',
         'test_frozenset_tuple',
 
         'test_int_bytearray',
-        'test_int_bytes',
         'test_int_class',
-        'test_int_dict',
-        'test_int_frozenset',
-        'test_int_set',
         'test_int_str',
 
         'test_list_bytearray',
@@ -114,7 +96,6 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
         'test_list_class',
         'test_list_dict',
         'test_list_frozenset',
-        'test_list_str',
 
         'test_None_bytearray',
         'test_None_bytes',
@@ -125,19 +106,14 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
 
         'test_NotImplemented_bytearray',
         'test_NotImplemented_class',
-        'test_NotImplemented_frozenset',
         'test_NotImplemented_str',
 
         'test_range_bytearray',
-        'test_range_bytes',
-        'test_range_class',
         'test_range_dict',
-        'test_range_str',
 
         'test_set_bytearray',
         'test_set_bytes',
         'test_set_class',
-        'test_set_dict',
         'test_set_set',
 
         'test_slice_bytearray',
@@ -149,8 +125,6 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
         'test_slice_str',
 
         'test_str_bytearray',
-        'test_str_bytes',
-        'test_str_class',
         'test_str_dict',
         'test_str_frozenset',
         'test_str_set',

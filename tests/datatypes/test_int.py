@@ -38,7 +38,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
 
-        'test_and_class',
         'test_and_frozenset',
 
         'test_direct_eq_bytes',
@@ -49,20 +48,14 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_ne_bytes',
 
         'test_direct_eq_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_lt_frozenset',
-        'test_direct_ne_frozenset',
 
         'test_eq_class',
 
         'test_ge_class',
-        'test_ge_frozenset',
 
         'test_gt_class',
-        'test_gt_frozenset',
 
         'test_le_class',
-        'test_le_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',
@@ -81,7 +74,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_frozenset',
 
         'test_or_class',
-        'test_or_frozenset',
 
         'test_power_class',
         'test_power_complex',
@@ -91,7 +83,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_rshift_class',
         'test_rshift_frozenset',
 
-        'test_subscr_class',
         'test_subscr_frozenset',
 
         'test_subtract_frozenset',
@@ -101,7 +92,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_true_divide_frozenset',
 
         'test_xor_class',
-        'test_xor_frozenset',
     ]
 
 
@@ -118,18 +108,15 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_float',
 
         'test_lshift_class',
-        'test_lshift_frozenset',
 
         'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_frozenset',
         'test_modulo_float',
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_complex',
         'test_multiply_float',
-        'test_multiply_frozenset',
         'test_multiply_list',
         'test_multiply_str',
         'test_multiply_tuple',

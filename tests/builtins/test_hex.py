@@ -9,5 +9,4 @@ class BuiltinHexFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["hex"]
 
     not_implemented = [
-        'test_frozenset',
     ]

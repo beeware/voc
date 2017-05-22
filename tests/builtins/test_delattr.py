@@ -58,28 +58,22 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
     functions = ["delattr"]
 
     not_implemented = [
-        'test_bool_class',
         'test_bool_frozenset',
 
-        'test_bytearray_frozenset',
 
         'test_bytes_class',
         'test_bytes_frozenset',
 
         'test_class_bool',
         'test_class_bytearray',
-        'test_class_bytes',
         'test_class_complex',
         'test_class_dict',
         'test_class_float',
         'test_class_frozenset',
         'test_class_list',
         'test_class_None',
-        'test_class_NotImplemented',
-        'test_class_range',
         'test_class_slice',
         'test_class_str',
-        'test_class_tuple',
 
         'test_complex_class',
         'test_complex_frozenset',
@@ -100,7 +94,6 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_frozenset_str',
         'test_frozenset_tuple',
 
-        'test_int_class',
         'test_int_frozenset',
 
         'test_list_class',
@@ -108,7 +101,6 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
         'test_None_frozenset',
 
-        'test_NotImplemented_class',
         'test_NotImplemented_frozenset',
 
         'test_range_class',
@@ -117,10 +109,8 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_set_frozenset',
 
         'test_slice_class',
-        'test_slice_frozenset',
 
         'test_str_class',
-        'test_str_frozenset',
 
         'test_tuple_class',
         'test_tuple_frozenset',

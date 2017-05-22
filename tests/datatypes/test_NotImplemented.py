@@ -24,12 +24,10 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_and_frozenset',
 
         'test_direct_eq_bytes',
-        'test_direct_gt_bytes',
         'test_direct_ne_bytes',
 
         'test_direct_eq_frozenset',
         'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
         'test_direct_le_frozenset',
         'test_direct_lt_frozenset',
         'test_direct_ne_frozenset',
@@ -65,9 +63,7 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_or_frozenset',
 
 
-        'test_rshift_class',
 
-        'test_subscr_frozenset',
 
         'test_subtract_frozenset',
 
@@ -81,7 +77,6 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
     data_type = 'NotImplemented'
 
     not_implemented = [
-        'test_add_class',
         'test_add_frozenset',
 
         'test_and_class',
@@ -151,8 +146,6 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_subtract_class',
         'test_subtract_frozenset',
 
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
 
         'test_xor_frozenset',
     ]

@@ -34,16 +34,13 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
     functions = ["hasattr"]
 
     not_implemented = [
-        'test_bool_frozenset',
 
-        'test_bytearray_class',
         'test_bytearray_frozenset',
 
         'test_bytes_class',
 
         'test_class_bytearray',
         'test_class_bytes',
-        'test_class_class',
         'test_class_complex',
         'test_class_dict',
         'test_class_float',
@@ -58,7 +55,6 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_complex_class',
 
         'test_dict_class',
-        'test_dict_frozenset',
 
         'test_float_frozenset',
 
@@ -72,14 +68,11 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_frozenset_int',
         'test_frozenset_list',
         'test_frozenset_None',
-        'test_frozenset_NotImplemented',
-        'test_frozenset_range',
         'test_frozenset_set',
         'test_frozenset_slice',
         'test_frozenset_str',
         'test_frozenset_tuple',
 
-        'test_int_frozenset',
 
         'test_list_class',
         'test_list_frozenset',
@@ -89,7 +82,6 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
         'test_NotImplemented_class',
 
-        'test_range_class',
         'test_range_frozenset',
 
         'test_set_class',
@@ -101,5 +93,4 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_str_frozenset',
 
         'test_tuple_class',
-        'test_tuple_frozenset',
     ]

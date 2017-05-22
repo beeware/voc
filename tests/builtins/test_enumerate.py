@@ -59,7 +59,6 @@ class BuiltinEnumerateFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_frozenset',
         'test_int',
         'test_list',
-        'test_NotImplemented',
         'test_range',
         'test_set',
         'test_slice',

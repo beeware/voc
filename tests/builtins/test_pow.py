@@ -123,16 +123,11 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_class_bytearray',
         'test_class_bytes',
         'test_class_class',
-        'test_class_dict',
         'test_class_float',
         'test_class_frozenset',
-        'test_class_range',
-        'test_class_slice',
         'test_class_int',
-        'test_class_list',
         'test_class_NotImplemented',
         'test_class_set',
-        'test_class_str',
         'test_class_tuple',
 
         'test_complex_bool',
@@ -142,10 +137,7 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_complex_float',
         'test_complex_frozenset',
         'test_complex_range',
-        'test_complex_slice',
         'test_complex_int',
-        'test_complex_list',
-        'test_complex_None',
         'test_complex_NotImplemented',
         'test_complex_set',
         'test_complex_tuple',
@@ -155,27 +147,19 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_float_complex',
         'test_float_float',
 
-        'test_frozenset_bool',
-        'test_frozenset_bytearray',
         'test_frozenset_bytes',
         'test_frozenset_class',
-        'test_frozenset_complex',
-        'test_frozenset_dict',
         'test_frozenset_float',
         'test_frozenset_frozenset',
         'test_frozenset_range',
         'test_frozenset_int',
         'test_frozenset_list',
         'test_frozenset_None',
-        'test_frozenset_NotImplemented',
-        'test_frozenset_set',
         'test_frozenset_str',
         'test_frozenset_tuple',
 
-        'test_int_class',
         'test_int_complex',
         'test_int_float',
-        'test_int_frozenset',
 
         'test_list_frozenset',
 
@@ -183,7 +167,6 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_None_frozenset',
 
 
-        'test_range_class',
         'test_range_frozenset',
 
         'test_set_class',
@@ -194,5 +177,4 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
 
         'test_str_frozenset',
 
-        'test_tuple_class',
     ]

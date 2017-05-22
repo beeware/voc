@@ -80,8 +80,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_class',
         'test_ne_frozenset',
 
-        'test_or_class',
-        'test_or_frozenset',
 
         'test_power_class',
         'test_power_complex',
@@ -142,7 +140,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_frozenset',
 
         'test_and_class',
-        'test_and_frozenset',
         'test_and_int',
 
         'test_floor_divide_bool',
@@ -152,7 +149,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_int',
 
         'test_lshift_class',
-        'test_lshift_frozenset',
 
         'test_modulo_bool',
         'test_modulo_class',
@@ -173,7 +169,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
 
-        'test_or_class',
         'test_or_frozenset',
         'test_or_int',
 
@@ -181,21 +176,16 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_class',
         'test_power_complex',
         'test_power_float',
-        'test_power_frozenset',
         'test_power_int',
 
-        'test_rshift_class',
-        'test_rshift_frozenset',
 
         'test_subtract_bool',
-        'test_subtract_class',
         'test_subtract_complex',
         'test_subtract_float',
         'test_subtract_frozenset',
         'test_subtract_int',
 
         'test_true_divide_bool',
-        'test_true_divide_class',
         'test_true_divide_complex',
         'test_true_divide_float',
         'test_true_divide_frozenset',
