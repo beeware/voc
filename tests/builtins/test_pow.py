@@ -111,26 +111,15 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
 
     not_implemented = [
 
-        'test_bool_class',
         'test_bool_complex',
         'test_bool_frozenset',
 
 
-        'test_bytes_class',
         'test_bytes_frozenset',
 
-        'test_class_bool',
-        'test_class_bytearray',
-        'test_class_float',
-        'test_class_frozenset',
-        'test_class_int',
-        'test_class_set',
-        'test_class_tuple',
 
         'test_complex_bool',
-        'test_complex_class',
         'test_complex_complex',
-        'test_complex_int',
         'test_complex_set',
         'test_complex_tuple',
 
@@ -138,28 +127,18 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_float_complex',
         'test_float_float',
 
-        'test_frozenset_bytes',
-        'test_frozenset_float',
-        'test_frozenset_range',
         'test_frozenset_int',
-        'test_frozenset_None',
-        'test_frozenset_str',
         'test_frozenset_tuple',
 
         'test_int_complex',
         'test_int_float',
 
-        'test_list_frozenset',
 
-        'test_None_class',
-        'test_None_frozenset',
 
 
 
         'test_set_frozenset',
 
-        'test_slice_class',
 
-        'test_str_frozenset',
 
     ]

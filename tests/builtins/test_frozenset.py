@@ -9,10 +9,8 @@ class BuiltinFrozensetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["frozenset"]
 
     not_implemented = [
-        'test_bool',
         'test_bytearray',
         'test_bytes',
-        'test_complex',
         'test_dict',
         'test_frozenset',
         'test_slice',

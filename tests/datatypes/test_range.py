@@ -89,14 +89,10 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
 
     not_implemented = [
-        'test_add_class',
         'test_add_frozenset',
 
-        'test_and_class',
 
         'test_direct_eq_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_lt_frozenset',
 
         'test_direct_eq_range',
         'test_direct_ne_range',
@@ -104,31 +100,23 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_class',
         'test_eq_range',
 
-        'test_ge_bytearray',
         'test_ge_class',
-        'test_ge_range',
         'test_ge_tuple',
 
         'test_gt_bool',
         'test_gt_class',
         'test_gt_float',
         'test_gt_frozenset',
-        'test_gt_set',
         'test_gt_tuple',
 
         'test_le_bool',
         'test_le_class',
-        'test_le_range',
 
         'test_lshift_class',
 
         'test_lt_bool',
         'test_lt_class',
         'test_lt_dict',
-        'test_lt_frozenset',
-        'test_lt_list',
-        'test_lt_range',
-        'test_lt_set',
         'test_lt_tuple',
 
         'test_modulo_complex',
@@ -136,13 +124,11 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
-        'test_multiply_frozenset',
         'test_multiply_list',
         'test_multiply_str',
         'test_multiply_tuple',
 
         'test_ne_class',
-        'test_ne_frozenset',
         'test_ne_range',
 
         'test_or_class',
@@ -177,29 +163,21 @@ class InplaceRangeOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'range'
 
     not_implemented = [
-        'test_add_class',
 
         'test_and_class',
 
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
 
         'test_lshift_class',
         'test_lshift_frozenset',
 
-        'test_modulo_class',
         'test_modulo_complex',
 
         'test_multiply_frozenset',
 
-        'test_or_frozenset',
 
 
 
-        'test_subtract_class',
 
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
 
         'test_xor_frozenset',
     ]

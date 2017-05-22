@@ -62,8 +62,6 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_direct_eq_bytearray',
         'test_direct_eq_bytes',
-        'test_direct_eq_dict',
-        'test_direct_eq_frozenset',
         'test_direct_eq_int',
         'test_direct_eq_none',
         'test_direct_eq_set',
@@ -71,10 +69,8 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_ge_bytearray',
         'test_direct_ge_frozenset',
         'test_direct_ge_none',
-        'test_direct_ge_tuple',
 
         'test_direct_gt_bytearray',
-        'test_direct_gt_frozenset',
         'test_direct_gt_int',
         'test_direct_gt_none',
         'test_direct_gt_set',
@@ -83,34 +79,21 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_le_bytearray',
         'test_direct_le_class',
         'test_direct_le_complex',
-        'test_direct_le_frozenset',
-        'test_direct_le_int',
-        'test_direct_le_list',
         'test_direct_le_none',
-        'test_direct_le_set',
 
         'test_direct_lt_bytearray',
-        'test_direct_lt_class',
         'test_direct_lt_complex',
-        'test_direct_lt_int',
-        'test_direct_lt_list',
         'test_direct_lt_none',
 
-        'test_direct_ne_bool',
         'test_direct_ne_bytearray',
         'test_direct_ne_bytes',
         'test_direct_ne_complex',
         'test_direct_ne_frozenset',
         'test_direct_ne_list',
         'test_direct_ne_none',
-        'test_direct_ne_set',
-        'test_direct_ne_str',
         'test_direct_ne_tuple',
 
-        'test_direct_eq_frozenset',
         'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
         'test_direct_ne_frozenset',
 
         'test_eq_bytearray',
@@ -128,28 +111,18 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_lshift_class',
 
-        'test_modulo_None',
-        'test_modulo_bytes',
         'test_modulo_complex',
         'test_modulo_dict',
         'test_modulo_int',
-        'test_modulo_list',
-        'test_modulo_set',
-        'test_modulo_str',
-        'test_modulo_tuple',
 
-        'test_multiply_class',
 
         'test_or_class',
 
-        'test_power_frozenset',
 
         'test_rshift_frozenset',
 
 
-        'test_subtract_frozenset',
 
-        'test_true_divide_frozenset',
 
     ]
 
@@ -167,25 +140,16 @@ class InplaceBytesOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_lshift_class',
 
         'test_modulo_None',
-        'test_modulo_bool',
-        'test_modulo_bytearray',
-        'test_modulo_bytes',
         'test_modulo_complex',
         'test_modulo_dict',
-        'test_modulo_frozenset',
         'test_modulo_list',
         'test_modulo_range',
-        'test_modulo_set',
-        'test_modulo_tuple',
 
 
-        'test_or_class',
 
 
-        'test_rshift_class',
         'test_rshift_frozenset',
 
-        'test_subtract_class',
 
 
     ]

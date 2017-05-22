@@ -32,9 +32,7 @@ class BinaryBytearrayOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 
     not_implemented = [
-        'test_add_class',
 
-        'test_and_class',
 
         'test_direct_eq_frozenset',
         'test_direct_ne_frozenset',
@@ -42,25 +40,20 @@ class BinaryBytearrayOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_eq_class',
 
         'test_ge_class',
-        'test_ge_frozenset',
 
         'test_gt_class',
-        'test_gt_frozenset',
 
         'test_le_class',
         'test_le_frozenset',
 
-        'test_lshift_class',
 
         'test_lt_class',
 
         'test_modulo_class',
         'test_modulo_complex',
-        'test_modulo_frozenset',
 
 
         'test_ne_class',
-        'test_ne_frozenset',
 
         'test_or_frozenset',
 
@@ -69,7 +62,6 @@ class BinaryBytearrayOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 
-        'test_subtract_frozenset',
 
         'test_true_divide_frozenset',
 
@@ -87,14 +79,10 @@ class InplaceBytearrayOperationTests(InplaceOperationTestCase, TranspileTestCase
         'test_and_frozenset',
 
         'test_floor_divide_class',
-        'test_floor_divide_complex',
 
-        'test_lshift_class',
 
-        'test_modulo_class',
         'test_modulo_complex',
 
-        'test_multiply_class',
 
 
         'test_power_class',
@@ -102,7 +90,6 @@ class InplaceBytearrayOperationTests(InplaceOperationTestCase, TranspileTestCase
 
         'test_subtract_class',
 
-        'test_true_divide_class',
         'test_true_divide_frozenset',
 
     ]

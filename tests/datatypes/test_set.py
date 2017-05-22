@@ -359,22 +359,14 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
 
     not_implemented = [
-        'test_add_class',
         'test_add_frozenset',
 
         'test_and_class',
 
         'test_direct_eq_bytes',
-        'test_direct_ge_bytearray',
-        'test_direct_ge_bytes',
         'test_direct_gt_bytearray',
         'test_direct_gt_bytes',
-        'test_direct_gt_set',
-        'test_direct_le_bytes',
-        'test_direct_lt_bytearray',
-        'test_direct_lt_set',
 
-        'test_direct_ne_frozenset',
 
 
         'test_direct_le_slice',
@@ -393,7 +385,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_lt_class',
 
-        'test_modulo_class',
         'test_modulo_complex',
 
         'test_multiply_bytearray',
@@ -402,17 +393,12 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_class',
 
 
-        'test_power_frozenset',
-
-        'test_rshift_class',
 
 
-        'test_subscr_class',
-        'test_subscr_frozenset',
+
 
         'test_true_divide_class',
 
-        'test_xor_class',
         'test_xor_frozenset',
         'test_xor_set',
     ]
@@ -422,10 +408,7 @@ class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'set'
 
     not_implemented = [
-        'test_add_frozenset',
 
-        'test_and_class',
-        'test_and_set',
 
 
         'test_modulo_complex',
@@ -434,11 +417,9 @@ class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_or_class',
         'test_or_frozenset',
 
-        'test_power_class',
 
 
 
-        'test_true_divide_class',
         'test_true_divide_frozenset',
 
         'test_xor_class',

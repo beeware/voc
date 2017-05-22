@@ -63,29 +63,16 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
         'test_bytes_frozenset',
 
-        'test_class_bool',
-        'test_class_complex',
-        'test_class_dict',
-        'test_class_list',
-        'test_class_None',
         'test_class_slice',
         'test_class_str',
 
-        'test_complex_class',
         'test_complex_frozenset',
 
-        'test_dict_frozenset',
 
         'test_float_class',
 
-        'test_frozenset_bytes',
         'test_frozenset_complex',
-        'test_frozenset_list',
         'test_frozenset_None',
-        'test_frozenset_NotImplemented',
-        'test_frozenset_range',
-        'test_frozenset_slice',
-        'test_frozenset_str',
 
 
         'test_list_frozenset',
@@ -96,7 +83,6 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_range_class',
 
 
-        'test_slice_class',
 
         'test_str_class',
 

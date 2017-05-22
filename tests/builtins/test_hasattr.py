@@ -41,7 +41,6 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
         'test_class_bytes',
         'test_class_complex',
-        'test_class_float',
         'test_class_list',
         'test_class_None',
         'test_class_range',
@@ -49,9 +48,7 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_class_str',
         'test_class_tuple',
 
-        'test_complex_class',
 
-        'test_dict_class',
 
         'test_float_frozenset',
 
@@ -61,27 +58,20 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
         'test_frozenset_dict',
         'test_frozenset_float',
         'test_frozenset_frozenset',
-        'test_frozenset_int',
-        'test_frozenset_list',
         'test_frozenset_None',
         'test_frozenset_slice',
-        'test_frozenset_str',
         'test_frozenset_tuple',
 
 
-        'test_list_class',
         'test_list_frozenset',
 
-        'test_None_frozenset',
 
         'test_NotImplemented_class',
 
 
-        'test_set_class',
 
         'test_slice_frozenset',
 
         'test_str_class',
-        'test_str_frozenset',
 
     ]

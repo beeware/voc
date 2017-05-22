@@ -18,26 +18,18 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
 
     not_implemented = [
         'test_add_class',
-        'test_add_frozenset',
 
 
-        'test_direct_eq_bytes',
-        'test_direct_ne_bytes',
 
         'test_direct_eq_frozenset',
-        'test_direct_ge_frozenset',
-        'test_direct_lt_frozenset',
-        'test_direct_ne_frozenset',
 
         'test_eq_class',
 
         'test_ge_class',
-        'test_ge_frozenset',
 
         'test_gt_class',
 
         'test_le_class',
-        'test_le_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',
@@ -51,7 +43,6 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_multiply_frozenset',
 
         'test_ne_class',
-        'test_ne_frozenset',
 
         'test_or_class',
         'test_or_frozenset',
@@ -61,7 +52,6 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
 
         'test_subtract_frozenset',
 
-        'test_true_divide_class',
 
     ]
 
@@ -70,16 +60,13 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
     data_type = 'NotImplemented'
 
     not_implemented = [
-        'test_add_frozenset',
 
-        'test_and_class',
 
         'test_eq_bytearray',
         'test_eq_class',
         'test_eq_complex',
         'test_eq_frozenset',
 
-        'test_floor_divide_frozenset',
 
         'test_ge_bytearray',
         'test_ge_class',
@@ -96,7 +83,6 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_le_complex',
         'test_le_frozenset',
 
-        'test_lshift_class',
 
         'test_lt_bytearray',
         'test_lt_class',
@@ -108,7 +94,6 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_multiply_bytes',
         'test_multiply_bytearray',
         'test_multiply_class',
-        'test_multiply_frozenset',
         'test_multiply_list',
         'test_multiply_str',
         'test_multiply_tuple',
@@ -120,9 +105,7 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
 
 
         'test_power_class',
-        'test_power_frozenset',
 
-        'test_rshift_class',
 
         'test_subscr_bytearray',
         'test_subscr_bytes',
@@ -134,5 +117,4 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_subtract_frozenset',
 
 
-        'test_xor_frozenset',
     ]
