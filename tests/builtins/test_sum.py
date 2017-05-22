@@ -30,4 +30,5 @@ class BuiltinSumFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_bytearray',
+        'test_frozenzet',
     ]
