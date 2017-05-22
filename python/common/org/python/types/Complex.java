@@ -72,7 +72,7 @@ public class Complex extends org.python.types.Object {
                     this.real = ((org.python.types.Float) args[0].__float__());
                 }
             } catch (org.python.exceptions.AttributeError e) {
-                if (org.Python.VERSION < 0x03060000) {
+                if (org.Python.VERSION < 0x03050300) {
                     throw new org.python.exceptions.TypeError(
                             "complex() argument must be a string or a number, not '" + args[0].typeName() + "'"
                     );
