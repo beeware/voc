@@ -108,6 +108,14 @@ Or, to run all the datatypes tests:
 
     $ python setup.py test -s tests.datatypes
 
+Or you can use Cricket, a GUI tool for running test suites. To start cricket in the background:
+
+.. code-block:: bash
+
+    $ pip install -r requirements/tests.txt
+    $ cricket-unittest &
+
+This should open a GUI window that lists all the tests. From there you can "Run all" or select specific tests and "Run selected."
 
 Running the code style checks
 -----------------------------
