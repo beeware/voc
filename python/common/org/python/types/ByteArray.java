@@ -562,7 +562,7 @@ public class ByteArray extends org.python.types.Object {
                         break;
                     }
                 }
-                if (org.Python.VERSION < 0x03060000) {
+                if (org.Python.VERSION < 0x03050300) {
                     size = i;
                 } else {
                     size = this.value.length;
