@@ -107,10 +107,10 @@ def adjust(text, run_in_function=False):
 
     if run_in_function:
         final_lines = [
-                          "def test_function():",
-                      ] + final_lines + [
-                          "test_function()",
-                      ]
+            "def test_function():",
+        ] + final_lines + [
+            "test_function()",
+        ]
 
     return '\n'.join(final_lines)
 
@@ -302,6 +302,7 @@ def cleanse_python(raw, substitutions):
 
 
 class TranspileTestCase(TestCase):
+
     @classmethod
     def setUpClass(cls):
         global _output_dir
@@ -397,7 +398,7 @@ class TranspileTestCase(TestCase):
             self.assertEqual(java_out, py_out, context)
 
             # Confirm that both output strings end with the canary statement
-            substring_start = - (len(END_OF_CODE_STRING) + 1)
+            substring_start = - (len(END_OF_CODE_STRING)+1)
             if exits_early:
                 self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
                 self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
@@ -436,7 +437,7 @@ class TranspileTestCase(TestCase):
             self.assertEqual(java_out, py_out, context)
 
             # Confirm that both output strings end with the canary statement
-            substring_start = - (len(END_OF_CODE_STRING) + 1)
+            substring_start = - (len(END_OF_CODE_STRING)+1)
             if exits_early:
                 self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
                 self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
@@ -445,10 +446,10 @@ class TranspileTestCase(TestCase):
                 self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
 
     def assertJavaExecution(
-            self, code, out,
-            extra_code=None, java=None,
-            run_in_global=True, run_in_function=True,
-            args=None, substitutions=None):
+                self, code, out,
+                extra_code=None, java=None,
+                run_in_global=True, run_in_function=True,
+                args=None, substitutions=None):
         """Run code under Java and check the output is as expected"""
         global _output_dir
         self.maxDiff = None
@@ -606,107 +607,108 @@ class NotImplementedToExpectedFailure:
 
 SAMPLE_DATA = {
     'bool': [
-        'True',
-        'False',
-    ],
+            'True',
+            'False',
+        ],
     'bytearray': [
-        'bytearray()',
-        'bytearray(1)',
-        'bytearray([1, 2, 3])',
-        # 'bytearray(b"hello world")',
-    ],
+            'bytearray()',
+            'bytearray(1)',
+            'bytearray([1, 2, 3])',
+            # 'bytearray(b"hello world")',
+        ],
     'bytes': [
-        'b""',
-        'b"This is another string of bytes"',
-        'b"One arg: %s"',
-        'b"Three args: %s | %s | %s"',
-    ],
+            'b""',
+            'b"This is another string of bytes"',
+            'b"One arg: %s"',
+            'b"Three args: %s | %s | %s"',
+        ],
     'class': [
-        'type(1)',
-        'type("a")',
-        'type(object())',
-        'type("MyClass", (object,), {})',
-    ],
+            'type(1)',
+            'type("a")',
+            'type(object())',
+            'type("MyClass", (object,), {})',
+        ],
     'complex': [
-        '1j',
-        '3.14159265j',
-        '1+2j',
-        '3-4j',
-        '-5j',
-    ],
+            '1j',
+            '3.14159265j',
+            '1+2j',
+            '3-4j',
+            '-5j',
+        ],
     'dict': [
-        '{}',
-        '{"a": 1, "c": 2.3456, "d": "another"}',
-    ],
+            '{}',
+            '{"a": 1, "c": 2.3456, "d": "another"}',
+        ],
     'float': [
-        '2.3456',
-        '0.0',
-        '-3.14159',
-        '-4.81756',
-        '5.5',
-        '-3.5',
-        '4.5',
-        '-4.5',
-    ],
+            '2.3456',
+            '0.0',
+            '-3.14159',
+            '-4.81756',
+            '5.5',
+            '-3.5',
+            '4.5',
+            '-4.5',
+        ],
     'frozenset': [
-        'frozenset()',
-        'frozenset({1, 2.3456, "another"})',
-    ],
+            'frozenset()',
+            'frozenset({1, 2.3456, "another"})',
+        ],
     'int': [
-        '0',
-        '-5',
-        '-3',
-        '3',
-        '1',
-    ],
+            '0',
+            '-5',
+            '-3',
+            '3',
+            '1',
+        ],
     'list': [
-        '[]',
-        '[3, 4, 5]',
-        '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]',
-        '["a","b","c"]',
-    ],
+            '[]',
+            '[3, 4, 5]',
+            '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]',
+            '["a","b","c"]',
+        ],
     'range': [
-        'range(0)',
-        'range(5)',
-        'range(2, 7)',
-        'range(2, 7, 2)',
-        'range(7, 2, -1)',
-        'range(7, 2, -2)',
-    ],
+            'range(0)',
+            'range(5)',
+            'range(2, 7)',
+            'range(2, 7, 2)',
+            'range(7, 2, -1)',
+            'range(7, 2, -2)',
+        ],
     'set': [
-        'set()',
-        'set({1, 2.3456, "another"})',
-    ],
+            'set()',
+            'set({1, 2.3456, "another"})',
+        ],
     'slice': [
-        'slice(0)',
-        'slice(5)',
-        'slice(2, 7)',
-        'slice(2, 7, 2)',
-        'slice(7, 2, -1)',
-        'slice(7, 2, -2)',
-    ],
+            'slice(0)',
+            'slice(5)',
+            'slice(2, 7)',
+            'slice(2, 7, 2)',
+            'slice(7, 2, -1)',
+            'slice(7, 2, -2)',
+        ],
     'str': [
-        '""',
-        '"3"',
-        '"This is another string"',
-        '"Mÿ hôvèrçràft îß fûłl öf éêlś"',
-        '"One arg: %s"',
-        '"Three args: %s | %s | %s"',
-    ],
+            '""',
+            '"3"',
+            '"This is another string"',
+            '"Mÿ hôvèrçràft îß fûłl öf éêlś"',
+            '"One arg: %s"',
+            '"Three args: %s | %s | %s"',
+        ],
     'tuple': [
-        '(1,)',
-        '(1, 2)',
-        '(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)',
-        '(3, 1.2, True, )',
-        '(1, 2.3456, "another")',
-    ],
+            '(1,)',
+            '(1, 2)',
+            '(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)',
+            '(3, 1.2, True, )',
+            '(1, 2.3456, "another")',
+        ],
     'None': [
-        'None',
-    ],
+            'None',
+        ],
     'NotImplemented': [
-        'NotImplemented',
-    ],
+            'NotImplemented',
+        ],
 }
+
 
 SAMPLE_SUBSTITUTIONS = {
     # Normalize set ordering
@@ -745,7 +747,6 @@ def _unary_test(test_name, operation):
             format=self.format,
             substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
-
     return func
 
 
@@ -765,11 +766,11 @@ class UnaryOperationTestCase(NotImplementedToExpectedFailure):
                         print(type(e), ':', e)
                     print()
                     """ % {
-                    'x': x,
-                    'operation': operation,
-                    'format': format,
-                }
-                       )
+                        'x': x,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
                 for x in x_values
             ),
             "Error running %s" % operation,
@@ -792,7 +793,6 @@ def _binary_test(test_name, operation, examples):
             format=self.format,
             substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
-
     return func
 
 
@@ -820,12 +820,12 @@ class BinaryOperationTestCase(NotImplementedToExpectedFailure):
                         print(type(e), ':', e)
                     print()
                     """ % {
-                    'x': x,
-                    'y': y,
-                    'operation': operation,
-                    'format': format,
-                }
-                       )
+                        'x': x,
+                        'y': y,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
                 for x, y in data
             ),
             "Error running %s" % operation,
@@ -872,7 +872,6 @@ def _inplace_test(test_name, operation, examples):
             format=self.format,
             substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
-
     return func
 
 
@@ -902,12 +901,12 @@ class InplaceOperationTestCase(NotImplementedToExpectedFailure):
                         print(type(e), ':', e)
                     print()
                     """ % {
-                    'x': x,
-                    'y': y,
-                    'operation': operation,
-                    'format': format,
-                }
-                       )
+                        'x': x,
+                        'y': y,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
                 for x, y in data
             ),
             "Error running %s" % operation,
@@ -987,7 +986,6 @@ def _builtin_test(test_name, operation, examples):
             format=self.format,
             substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
-
     return func
 
 
@@ -1014,12 +1012,12 @@ class BuiltinFunctionTestCase(NotImplementedToExpectedFailure):
                         print(type(e), ':', e)
                     print()
                     """ % {
-                    'f': f,
-                    'x': x,
-                    'operation': operation,
-                    'format': format,
-                }
-                       )
+                        'f': f,
+                        'x': x,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
                 for f, x in data
             ),
             "Error running %s" % operation,
@@ -1041,7 +1039,6 @@ def _builtin_twoarg_test(test_name, operation, examples1, examples2):
             format=self.format,
             substitutions=getattr(self, 'substitutions', SAMPLE_SUBSTITUTIONS)
         )
-
     return func
 
 
@@ -1071,13 +1068,13 @@ class BuiltinTwoargFunctionTestCase(NotImplementedToExpectedFailure):
                         print(type(e), ':', e)
                     print()
                     """ % {
-                    'f': f,
-                    'x': x,
-                    'y': y,
-                    'operation': operation,
-                    'format': format,
-                }
-                       )
+                        'f': f,
+                        'x': x,
+                        'y': y,
+                        'operation': operation,
+                        'format': format,
+                    }
+                )
                 for f, x, y in data
             ),
             "Error running %s" % operation,
