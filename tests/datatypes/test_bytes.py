@@ -43,6 +43,34 @@ class BytesTests(TranspileTestCase):
             print([b for b in b'hello world'])
         """)
 
+    def test_count(self):
+        self.assertCodeExecution("""
+            print(b'abcabca'.count(97))
+            print(b'abcabca'.count(b'abc'))
+            print(b'qqq'.count(b'q'))
+            print(b'qqq'.count(b'qq'))
+            print(b'qqq'.count(b'qqq'))
+            print(b'qqq'.count(b'qqqq'))
+            print(b'abcdefgh'.count(b'bc',-7, -5))
+            print(b'abcdefgh'.count(b'bc',1, -5))
+            print(b'abcdefgh'.count(b'bc',0, 3))
+            print(b'abcdefgh'.count(b'bc',-7, 500))
+            print(b'qqaqqbqqqcqqqdqqqqeqqqqf'.count(b'qq'),1)
+            print(b''.count(b'q'),0)
+        """)
+        self.assertCodeExecution("""
+            b'abcabc'.count([]) #Test TypeError invalid byte array
+        """, exits_early=True)
+        self.assertCodeExecution("""
+            b'abcabc'.count(256) #Test ValueError invalid integer range
+        """, exits_early=True)
+        self.assertCodeExecution("""
+            print(b'abcabca'.count(97, [], 3)) #Test Slicing Error on Start
+        """, exits_early=True)
+        self.assertCodeExecution("""
+            print(b'abcabca'.count(97, 3, [])) #Test Slicing Error on End
+        """, exits_early=True)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'

@@ -586,10 +586,89 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.count(sub[, start[, end]]) -> int\n" +
+                "\n" +
+                "Return the number of non-overlapping occurrences of " +
+                "subsequence sub in the range [start, end]. Optional " +
+                "arguments start and end are interpreted as in slice" +
+                "notation.\n" +
+                "The subsequence to search for may be any bytes-like object" +
+                "or an integer in the range 0 to 255.\n",
+            args = {"sub"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object count(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.count has not been implemented.");
+    public org.python.Object count(org.python.Object sub, org.python.Object start, org.python.Object end) {
+        byte[] sub_array;
+        if (sub instanceof org.python.types.Int) {
+            int isub = (int) (((org.python.types.Int) sub).value);
+            if (isub < 0 || isub > 255) {
+                throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
+            }
+            sub_array = new byte[1];
+            sub_array[0] = (byte) isub;
+        } else if (sub instanceof org.python.types.Bytes) {
+            sub_array = ((org.python.types.Bytes) sub).value;
+        } else {
+            throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sub.typeName() + "'\n");
+        }
+        //If the sub string is longer than the value string a match cannot exist
+        if (sub_array.length > this.value.length) {
+            return new org.python.types.Int(0);
+        }
+        int istart = 0;
+        int iend = this.value.length;
+        //todo: Error if end is not slice type
+        if (start != null) {
+            if (start instanceof org.python.types.Int) {
+                istart = (int) (((org.python.types.Int) start).value);
+                //Clamp value to negative positive range of indices
+                int length = this.value.length;
+                istart = Math.max(-length, Math.min(length, istart));
+                //Compute wrapped index for negative values(Python modulo operation)
+                if (istart < 0) {
+                    istart = ((istart % length) + length) % length;
+                }
+            } else {
+                //todo: how is this suppose to be handled? slice doesn't even provide this?
+                throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
+            }
+        }
+        //todo: Error if end is not slice type
+        if (end != null) {
+            if (end instanceof org.python.types.Int) {
+                iend = (int) (((org.python.types.Int) end).value);
+                //Clamp value to negative positive range of indices
+                int length = this.value.length;
+                iend = Math.max(-length, Math.min(length, iend));
+                //Compute wrapped index for negative values(Python modulo operation)
+                if (iend < 0) {
+                    iend = ((iend % length) + length) % length;
+                }
+            } else {
+                //todo: how is this suppose to be handled? slice doesn't even provide this?
+                throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
+            }
+        }
+        int count = 0;
+        boolean found_match = true;
+        //iend-sub_array.length+1 accounts for the inner loop comparison to
+        //  end comparisons at (i+j)==iend
+        for (int i = istart; i < iend - sub_array.length + 1; i++) {
+            found_match = true;
+            for (int j = 0; j < sub_array.length; j++) {
+                if (this.value[i + j] != sub_array[j]) {
+                    found_match = false;
+                    break;
+                }
+            }
+            if (found_match) {
+                count++;
+                //skip ahead by the length of the sub_array (-1 to account for i++ in outer loop)
+                //this consumes the match from the value array
+                i += sub_array.length - 1;
+            }
+        }
+        return new org.python.types.Int(count);
     }
 
     @org.python.Method(
