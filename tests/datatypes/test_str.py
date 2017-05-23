@@ -688,6 +688,13 @@ class StrTests(TranspileTestCase):
             print(str_.isnumeric())
             """)
 
+    def test_isidentifier(self):
+        self.assertCodeExecution("""
+        for str_ in ['_sjkd', 'abc', 'ABC', 'b13s', 'foo_bar', 'eÃⱣỉ', 'ÃⱣỉ', "22222", " ", "", "/",
+        "4a2a", "*", "ab cd", "!z", "&a", "@", "%"]:
+            print(str_, str_.isidentifier())
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
