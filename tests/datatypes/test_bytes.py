@@ -66,11 +66,15 @@ class BytesTests(TranspileTestCase):
             print(b'abcd'.index(b'ab'))
             print(b'abcd'.index(b'bc'))
             print(b'abcd'.index(b'cd'))
+            print(b'abcd'.find(b'cd', 2))
+            print(b'abcd'.find(b'cd', 2, 3))
         """)
         self.assertCodeExecution("""
             print(b''.index(b'a'))
             print(b'abcd'.index(b''))
             print(b'abcd'.index(b'...'))
+            print(b'abcd'.find(b'ab', 3))
+            print(b'abcd'.find(b'ab', 3, 4))
         """, exits_early=True)
 
 
