@@ -160,22 +160,16 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_eq_bytearray',
         'test_eq_bytes',
-        'test_eq_class',
         'test_eq_frozenset',
 
-        'test_ne_class',
         'test_ne_frozenset',
 
-        'test_ge_class',
         'test_ge_frozenset',
 
-        'test_gt_class',
         'test_gt_frozenset',
 
-        'test_le_class',
         'test_le_frozenset',
 
-        'test_lt_class',
         'test_lt_frozenset',
 
         'test_lshift_class',

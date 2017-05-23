@@ -37,22 +37,17 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_direct_lt_frozenset',
         'test_direct_ne_frozenset',
 
-        'test_eq_class',
         'test_eq_frozenset',
 
-        'test_ge_class',
         'test_ge_frozenset',
 
-        'test_gt_class',
         'test_gt_frozenset',
 
-        'test_le_class',
         'test_le_frozenset',
 
         'test_lshift_class',
         'test_lshift_frozenset',
 
-        'test_lt_class',
         'test_lt_frozenset',
 
         'test_modulo_class',
@@ -64,7 +59,6 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
         'test_multiply_class',
         'test_multiply_frozenset',
 
-        'test_ne_class',
         'test_ne_frozenset',
 
         'test_or_class',
