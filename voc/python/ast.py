@@ -1733,17 +1733,9 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Compare(self, node):
-        self.visit(node.left)
-        const_comparison = isinstance(node.left, ast.Num)
 
-        if len(node.comparators) == 1:
-            self.visit(node.comparators[0])
-            const_comparison |= isinstance(node.comparators[0], ast.Num)
-        else:
-            raise NotImplementedError("Don't know how to resolve multiple comparators")
-
-        if len(node.ops) == 1:
-            if isinstance(node.ops[0], ast.Is) and not const_comparison:
+        def compare_to(arg):
+            if isinstance(arg, ast.Is) and not const_comparison:
                 self.context.add_opcodes(
                     IF([], JavaOpcodes.IF_ACMPNE),
                 )
@@ -1764,7 +1756,7 @@ class Visitor(ast.NodeVisitor):
                     END_IF(),
                 )
 
-            elif isinstance(node.ops[0], ast.IsNot) and not const_comparison:
+            elif isinstance(arg, ast.IsNot) and not const_comparison:
                 self.context.add_opcodes(
                     IF([], JavaOpcodes.IF_ACMPEQ),
                 )
@@ -1786,7 +1778,7 @@ class Visitor(ast.NodeVisitor):
                 )
 
             else:
-                if isinstance(node.ops[0], (ast.In, ast.NotIn)):
+                if isinstance(arg, (ast.In, ast.NotIn)):
                     self.context.add_opcodes(
                         JavaOpcodes.SWAP()
                     )
@@ -1814,7 +1806,7 @@ class Visitor(ast.NodeVisitor):
                         ast.IsNot: 'is not',
                         ast.NotEq: '!=',
                         ast.NotIn: 'not in',
-                }[type(node.ops[0])]
+                }[type(arg)]
                 reflect_oper = {
                         ast.Eq: '__eq__',
                         ast.Gt: '__lt__',
@@ -1826,7 +1818,7 @@ class Visitor(ast.NodeVisitor):
                         ast.IsNot: '__ne__',
                         ast.NotEq: '__ne__',
                         ast.NotIn: '__not_contains__',
-                }[type(node.ops[0])]
+                }[type(arg)]
 
                 self.context.add_opcodes(
                     JavaOpcodes.LDC_W(oper_symbol),
@@ -1845,8 +1837,62 @@ class Visitor(ast.NodeVisitor):
                         returns='Lorg/python/Object;',
                     ),
                 )
+
+        self.visit(node.left)
+        const_comparison = isinstance(node.left, ast.Num)
+
+        if len(node.comparators) == 1:
+            self.visit(node.comparators[0])
+            const_comparison |= isinstance(node.comparators[0], ast.Num)
+            compare_to(node.ops[0])
         else:
-            raise NotImplementedError("Don't know how to resolve multiple operators")
+            for operation, argument in zip(node.ops, node.comparators):
+                self.visit(argument)
+                self.context.add_opcodes(
+                        JavaOpcodes.DUP_X1()
+                        )
+                compare_to(operation)
+                self.context.add_opcodes(
+                        JavaOpcodes.DUP()
+                        )
+                self.context.add_opcodes(
+                    IF([python.Object.as_boolean()], JavaOpcodes.IFEQ)
+                )
+                self.context.add_opcodes(
+                    JavaOpcodes.POP()
+                    )
+                self.context.add_opcodes(
+                    ELSE()
+                    )
+                self.context.add_opcodes(
+                    JavaOpcodes.SWAP()
+                    )
+                self.context.add_opcodes(
+                    JavaOpcodes.POP()
+                    )
+            for _ in node.ops:
+                self.context.add_opcodes(
+                    END_IF()
+                    )
+            self.context.add_opcodes(
+                    IF([python.Object.as_boolean()], JavaOpcodes.IFEQ)
+                )
+            self.context.add_opcodes(
+                    java.New('org/python/types/Bool'),
+                    JavaOpcodes.ICONST_1(),
+                    java.Init('org/python/types/Bool', 'Z'),
+            )
+            self.context.add_opcodes(
+                    ELSE()
+                )
+            self.context.add_opcodes(
+                    java.New('org/python/types/Bool'),
+                    JavaOpcodes.ICONST_0(),
+                    java.Init('org/python/types/Bool', 'Z'),
+            )
+            self.context.add_opcodes(
+                END_IF()
+                )
 
     @node_visitor
     def visit_Call(self, node):

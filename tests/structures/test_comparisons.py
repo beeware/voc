@@ -564,3 +564,15 @@ class ComparisonTests(TranspileTestCase):
             print(y == Anything())
             print(Anything() == y)
             """)
+
+    def test_multiple_comparisons(self):
+        self.assertCodeExecution("""
+            print(1 == 1 == 1 == 1)
+            print(1 > 2 > 3)
+            print(1 == 1 == 2)
+            print(1 == 1 != 2)
+            print(1 == 1 < 2)
+            print(3 == 3 < 2)
+            print(1 < 2 < 3 > 2)
+            """)
+
