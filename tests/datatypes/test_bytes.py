@@ -43,6 +43,32 @@ class BytesTests(TranspileTestCase):
             print([b for b in b'hello world'])
         """)
 
+    def test_find(self):
+        self.assertCodeExecution("""
+            print(b''.find(b'a'))
+            print(b'abcd'.find(b''))
+            print(b'abcd'.find(b'...'))
+            print(b'abcd'.find(b'ab'))
+            print(b'abcd'.find(b'bc'))
+            print(b'abcd'.find(b'cd'))
+            print(b'abcd'.find(b'cd', 2))
+            print(b'abcd'.find(b'ab', 3))
+            print(b'abcd'.find(b'cd', 2, 3))
+            print(b'abcd'.find(b'ab', 3, 4))
+        """)
+
+    def test_index(self):
+        self.assertCodeExecution("""
+            print(b'abcd'.index(b'ab'))
+            print(b'abcd'.index(b'bc'))
+            print(b'abcd'.index(b'cd'))
+        """)
+        self.assertCodeExecution("""
+            print(b''.index(b'a'))
+            print(b'abcd'.index(b''))
+            print(b'abcd'.index(b'...'))
+        """, exits_early=True)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
