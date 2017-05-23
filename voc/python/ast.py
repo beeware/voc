@@ -1794,7 +1794,7 @@ class Visitor(ast.NodeVisitor):
                         ast.IsNot: '__ne__',
                         ast.NotEq: '__ne__',
                         ast.NotIn: '__not_contains__',
-                }[type(node.ops[0])]
+                }[type(arg)]
                 oper_symbol = {
                         ast.Eq: '==',
                         ast.Gt: '>',
@@ -1848,59 +1848,35 @@ class Visitor(ast.NodeVisitor):
         else:
             for i, (operation, argument) in enumerate(zip(node.ops, node.comparators)):
                 self.visit(argument)
-                #don't dup if i < len(node.ops) return result of eval
-                if i < len(node.ops) - 1 :
+                if i < len(node.ops) - 1:
                     self.context.add_opcodes(
                             JavaOpcodes.DUP_X1()
                             )
                     compare_to(operation)
                     self.context.add_opcodes(
-                            JavaOpcodes.DUP()
-                            )
+                        JavaOpcodes.DUP()
+                    )
                     self.context.add_opcodes(
                         IF([python.Object.as_boolean()], JavaOpcodes.IFNE)
                     )
-                    #if i < len(node.ops) - 1:
                     self.context.add_opcodes(
-                        JavaOpcodes.SWAP()
-                        )
-                    self.context.add_opcodes(
-                        JavaOpcodes.POP()
-                         )
+                            JavaOpcodes.SWAP(),
+                            JavaOpcodes.POP()
+                    )
                     self.context.add_opcodes(
                         ELSE()
-                        )
-
+                    )
                     self.context.add_opcodes(
-                        JavaOpcodes.POP()
-                        )
+                            JavaOpcodes.POP()
+                    )
                 else: 
                     compare_to(operation)
+
             for _ in range(len(node.ops) - 1):
                 self.context.add_opcodes(
                     END_IF()
-                    )
-            '''
-            self.context.add_opcodes(
-                    IF([python.Object.as_boolean()], JavaOpcodes.IFEQ)
                 )
-            self.context.add_opcodes(
-                    java.New('org/python/types/Bool'),
-                    JavaOpcodes.ICONST_1(),
-                    java.Init('org/python/types/Bool', 'Z'),
-            )
-            self.context.add_opcodes(
-                    ELSE()
-                )
-            self.context.add_opcodes(
-                    java.New('org/python/types/Bool'),
-                    JavaOpcodes.ICONST_0(),
-                    java.Init('org/python/types/Bool', 'Z'),
-            )
-            self.context.add_opcodes(
-                END_IF()
-                )
-            '''
+
     @node_visitor
     def visit_Call(self, node):
         if is_call(node, ('locals', 'globals', 'vars')):
