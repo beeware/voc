@@ -66,6 +66,12 @@ public class Dict extends org.python.types.Object {
                             data = ((org.python.types.Tuple) next).value;
                         } else if (next instanceof org.python.types.List) {
                             data = ((org.python.types.List) next).value;
+                        } else if (next instanceof org.python.types.Str) {
+                            org.python.types.Str str = ((org.python.types.Str) next);
+                            data = new java.util.ArrayList<org.python.Object>();
+                            for (int i = 0; i < ((org.python.types.Int) str.__len__()).value; i++) {
+                                data.add(str.__getitem__(new org.python.types.Int(i)));
+                            }
                         } else {
                             throw new org.python.exceptions.TypeError(
                                     "cannot convert dictionary update sequence element #" + generated.size() +
