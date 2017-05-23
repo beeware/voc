@@ -837,7 +837,27 @@ public class Str extends org.python.types.Object {
                     "such as \"def\" and \"class\".\n"
     )
     public org.python.Object isidentifier() {
-        throw new org.python.exceptions.NotImplementedError("isidentifier() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+        }
+        boolean firstCheck = true;
+        for (char ch : this.value.toCharArray()) {
+            // Beginning with underscores seems to blow up on isUnicodeIdentifierStart
+            if (ch == '_') {
+                continue;
+            }
+            if (firstCheck) {
+                if (!(Character.isUnicodeIdentifierStart(ch))) {
+                    return new org.python.types.Bool(false);
+                }
+                firstCheck = false;
+            } else {
+                if (!(Character.isUnicodeIdentifierPart(ch))) {
+                    return new org.python.types.Bool(false);
+                }
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(

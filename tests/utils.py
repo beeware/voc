@@ -9,6 +9,7 @@ import sys
 import tempfile
 import traceback
 from unittest import TestCase
+from itertools import permutations
 
 from voc.python.blocks import Block as PyBlock
 from voc.python.modules import Module as PyModule
@@ -651,7 +652,9 @@ SAMPLE_DATA = {
         ],
     'frozenset': [
             'frozenset()',
-            'frozenset({1, 2.3456, "another"})',
+            'frozenset({"on","to","an"})',
+            'frozenset({"one","two","six"})',
+            'frozenset({1, 2.3456, 7})',
         ],
     'int': [
             '0',
@@ -676,7 +679,9 @@ SAMPLE_DATA = {
         ],
     'set': [
             'set()',
-            'set({1, 2.3456, "another"})',
+            'set({"on","to","an"})',
+            'set({"one","two","six"})',
+            'set({1, 2.3456, 7})',
         ],
     'slice': [
             'slice(0)',
@@ -710,30 +715,44 @@ SAMPLE_DATA = {
 }
 
 
+def _string_substitutions(string):
+    delims = (string[0], string[-1])
+    string = string[1:-1]
+    elems = [elem for elem in string.split(", ")]
+    perms = permutations(elems)
+    return [(delims[0] + ", ".join(list(perm)) + delims[1]) for perm in perms]
+
+
 SAMPLE_SUBSTITUTIONS = {
     # Normalize set ordering
-    "{1, 2.3456, 'another'}": [
-        "{1, 'another', 2.3456}",
-        "{2.3456, 1, 'another'}",
-        "{2.3456, 'another', 1}",
-        "{'another', 1, 2.3456}",
-        "{'another', 2.3456, 1}",
-    ],
-    "{'a', 'b', 'c'}": [
-        "{'a', 'c', 'b'}",
-        "{'b', 'a', 'c'}",
-        "{'b', 'c', 'a'}",
-        "{'c', 'a', 'b'}",
-        "{'c', 'b', 'a'}",
-    ],
+    "{1, 2.3456, 7}": _string_substitutions("{1, 2.3456, 7}"),
+    "{1, 2.3456, 'another'}": _string_substitutions("{1, 2.3456, 'another'}"),
+    "{'an', 'to', 'on'}": _string_substitutions("{'an', 'to', 'on'}"),
+    "{'one', 'two', 'six'}": _string_substitutions("{'one', 'two', 'six'}"),
+    "{'a', 'b', 'c'}": _string_substitutions("{'a', 'b', 'c'}"),
+
+    # Normalize list ordering
+    "[1, 2.3456, 7]": _string_substitutions("[1, 2.3456, 7]"),
+    "[1, 2.3456, 'another']": _string_substitutions("[1, 2.3456, 'another']"),
+    "['a', 'b', 'c']": _string_substitutions("['a', 'b', 'c']"),
+    "['an', 'to', 'on']": _string_substitutions("['an', 'to', 'on']"),
+
+    "['one', 'two', 'six']": _string_substitutions("['one', 'two', 'six']"),
     # Normalize dictionary ordering
-    "{'a': 1, 'c': 2.3456, 'd': 'another'}": [
-        "{'a': 1, 'd': 'another', 'c': 2.3456}",
-        "{'c': 2.3456, 'd': 'another', 'a': 1}",
-        "{'c': 2.3456, 'a': 1, 'd': 'another'}",
-        "{'d': 'another', 'a': 1, 'c': 2.3456}",
-        "{'d': 'another', 'c': 2.3456, 'a': 1}",
-    ],
+    "{'a': 1, 'c': 2.3456, 'd': 7}": _string_substitutions(
+                                              "{'a': 1, 'c': 2.3456, 'd': 7}"),
+    "{'a': 1, 'c': 2.3456, 'd': 'another'}": _string_substitutions(
+                                      "{'a': 1, 'c': 2.3456, 'd': 'another'}"),
+    "{'a': 'n', 't': 'o', 'o': 'n'}": _string_substitutions(
+                                             "{'a': 'n', 't': 'o', 'o': 'n'}"),
+    "{'to', 'two', 'one', 'an', 'on', 'six'}": _string_substitutions(
+                                    "{'to', 'two', 'one', 'an', 'on', 'six'}"),
+    "{1, 2.3456, 7, 'one', 'six', 'two'}": _string_substitutions(
+                                        "{1, 2.3456, 7, 'one', 'six', 'two'}"),
+    "{1, 2.3456, 7, 'on', 'an', 'to'}": _string_substitutions(
+                                        "{1, 2.3456, 7, 'on', 'an', 'to'}"),
+    "{1, 2.3456, 7, 1, 2.3456, 7}": _string_substitutions(
+                                        "{1, 2.3456, 7, 1, 2.3456, 7}"),
     # Normalize precision error
     "-3.14159": ["-3.1415900000000008"],
 }

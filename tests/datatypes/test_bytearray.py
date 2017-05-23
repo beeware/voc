@@ -32,31 +32,15 @@ class BinaryBytearrayOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 
     not_implemented = [
-
-
-
         'test_eq_class',
-
         'test_ge_class',
-
         'test_gt_class',
-
         'test_le_class',
-
-
         'test_lt_class',
 
         'test_modulo_complex',
 
-
         'test_ne_class',
-
-
-
-
-
-
-
     ]
 
 
@@ -64,16 +48,5 @@ class InplaceBytearrayOperationTests(InplaceOperationTestCase, TranspileTestCase
     data_type = 'bytearray'
 
     not_implemented = [
-
-
-
-
         'test_modulo_complex',
-
-
-
-
-
-
-
     ]

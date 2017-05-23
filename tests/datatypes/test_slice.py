@@ -84,7 +84,6 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_lt_slice',
         'test_direct_ne_slice',
 
-        'test_eq_class',
         'test_eq_slice',
 
         'test_ge_class',
@@ -108,7 +107,6 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
 
-        'test_ne_class',
         'test_ne_slice',
 
 

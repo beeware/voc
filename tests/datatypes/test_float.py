@@ -111,16 +111,11 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 
 
-        'test_eq_class',
-
-        'test_ge_class',
-
-        'test_gt_class',
-
-        'test_le_class',
 
 
-        'test_lt_class',
+
+
+
 
         'test_modulo_complex',
 
@@ -132,7 +127,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_NotImplemented',
         'test_multiply_range',
 
-        'test_ne_class',
 
 
         'test_power_complex',

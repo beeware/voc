@@ -39,14 +39,14 @@ def is_call(node, name):
 
 
 def node_visitor(fn):
-    def dec(self, node):
+    def dec(self, node, *args, **kwargs):
         try:
             if node.lineno != self._current_line:
                 self._current_line = self.context.next_opcode_starts_line = node.lineno
         except AttributeError:
             pass
         self.context.next_resolve_list.append((node, OpcodePosition.START))
-        fn(self, node)
+        fn(self, node, *args, **kwargs)
         self.context.next_resolve_list.append((node, OpcodePosition.END))
         self.context.next_resolve_list.append((node, OpcodePosition.NEXT))
     return dec
@@ -337,8 +337,16 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_AugAssign(self, node):
         # expr target, operator op, expr value):
+
+        # Evaluate the target
+        if isinstance(node.target, ast.Subscript):
+            self.visit_Subscript(node.target, ctx=ast.Load())
+        elif isinstance(node.target, ast.Attribute):
+            self.visit_Attribute(node.target, ctx=ast.Load())
+        else:
+            self.context.load_name(node.target.id)
+
         # Evaluate the value
-        self.context.load_name(node.target.id)
         self.visit(node.value)
         self.context.add_opcodes(
             JavaOpcodes.INVOKEINTERFACE(
@@ -2083,34 +2091,36 @@ class Visitor(ast.NodeVisitor):
         raise NotImplementedError('No handler for Ellipsis')
 
     @node_visitor
-    def visit_Attribute(self, node):
+    def visit_Attribute(self, node, ctx=None):
+        ctx = ctx or node.ctx
         self.visit(node.value)
 
-        if type(node.ctx) == ast.Load:
+        if type(ctx) == ast.Load:
             self.context.add_opcodes(
                 python.Object.get_attribute(node.attr),
             )
-        elif type(node.ctx) == ast.Store:
+        elif type(ctx) == ast.Store:
             self.context.add_opcodes(
                 JavaOpcodes.SWAP(),
                 python.Object.set_attr(node.attr),
             )
-        elif type(node.ctx) == ast.Del:
+        elif type(ctx) == ast.Del:
             self.context.add_opcodes(
                 JavaOpcodes.LDC_W(node.attr),
             )
         else:
-            raise NotImplementedError("Unknown context %s" % node.ctx)
+            raise NotImplementedError("Unknown context %s" % ctx)
 
     @node_visitor
-    def visit_Subscript(self, node):
-        if type(node.ctx) == ast.Load:
+    def visit_Subscript(self, node, ctx=None):
+        ctx = ctx or node.ctx
+        if type(ctx) == ast.Load:
             self.visit(node.value)
             self.visit(node.slice)
             self.context.add_opcodes(
                 python.Object.get_item()
             )
-        elif type(node.ctx) == ast.Store:
+        elif type(ctx) == ast.Store:
             self.context.add_opcodes(
                 ASTORE_name('#value'),
             )
@@ -2121,7 +2131,7 @@ class Visitor(ast.NodeVisitor):
                 python.Object.set_item(),
                 free_name('#value'),
             )
-        elif type(node.ctx) == ast.Del:
+        elif type(ctx) == ast.Del:
             self.visit(node.value)
             self.visit(node.slice)
         else:
