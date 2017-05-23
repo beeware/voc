@@ -636,19 +636,25 @@ public class Bytes extends org.python.types.Object {
         if (_sub.value.length <= 0) {
             return new Int(0);
         }
-        while (_sub.value.length > 0 && _start < _end) {
-            for (int i = 0; i < _sub.value.length && _start < _end; _start++) {
-                byte b1 = this.value[_start];
-                byte b2 = _sub.value[i];
-                if (b1 == b2) {
-                    i++;
-                }
-                if (i == _sub.value.length - 1) {
-                    return new Int(_start);
+        int pos = -1;
+        for (int i = 0; _start < _end; _start++) {
+            byte b1 = this.value[_start];
+            byte b2 = _sub.value[i];
+            if (b1 == b2) {
+                i++;
+                if (pos == -1) {
+                    pos = _start;
                 }
             }
+            if (i == _sub.value.length) {
+                break;
+            }
+            if (b1 != b2) {
+                i = 0;
+                pos = -1;
+            }
         }
-        return new Int(-1);
+        return new Int(pos);
     }
 
     @org.python.Method(
