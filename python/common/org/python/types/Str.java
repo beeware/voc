@@ -159,7 +159,11 @@ public class Str extends org.python.types.Object {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
             return new org.python.types.Bool(this.value.equals(value));
-        } else {
+        }
+         else if (other instanceof org.python.types.Type) {
+            return new org.python.types.Bool(false);
+            }
+        else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
