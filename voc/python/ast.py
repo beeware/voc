@@ -1839,43 +1839,40 @@ class Visitor(ast.NodeVisitor):
                 )
 
         self.visit(node.left)
-        const_comparison = isinstance(node.left, ast.Num)
+        left = node.left
 
-        if len(node.comparators) == 1:
-            self.visit(node.comparators[0])
-            const_comparison |= isinstance(node.comparators[0], ast.Num)
-            compare_to(node.ops[0])
-        else:
-            for i, (operation, argument) in enumerate(zip(node.ops, node.comparators)):
-                self.visit(argument)
-                if i < len(node.ops) - 1:
-                    self.context.add_opcodes(
-                            JavaOpcodes.DUP_X1()
-                            )
-                    compare_to(operation)
-                    self.context.add_opcodes(
-                        JavaOpcodes.DUP()
-                    )
-                    self.context.add_opcodes(
-                        IF([python.Object.as_boolean()], JavaOpcodes.IFNE)
-                    )
-                    self.context.add_opcodes(
-                            JavaOpcodes.SWAP(),
-                            JavaOpcodes.POP()
-                    )
-                    self.context.add_opcodes(
-                        ELSE()
-                    )
-                    self.context.add_opcodes(
-                            JavaOpcodes.POP()
-                    )
-                else: 
-                    compare_to(operation)
-
-            for _ in range(len(node.ops) - 1):
+        for i, (operation, right) in enumerate(zip(node.ops, node.comparators)):
+            self.visit(right)
+            const_comparison = isinstance(left, ast.Num) | isinstance(right, ast.Num)
+            if i < len(node.ops) - 1:
                 self.context.add_opcodes(
-                    END_IF()
+                        JavaOpcodes.DUP_X1()
+                        )
+                compare_to(operation)
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP()
                 )
+                self.context.add_opcodes(
+                    IF([python.Object.as_boolean()], JavaOpcodes.IFNE)
+                )
+                self.context.add_opcodes(
+                        JavaOpcodes.SWAP(),
+                        JavaOpcodes.POP()
+                )
+                self.context.add_opcodes(
+                    ELSE()
+                )
+                self.context.add_opcodes(
+                        JavaOpcodes.POP()
+                )
+            else:
+                compare_to(operation)
+            left = right
+
+        for _ in range(len(node.ops) - 1):
+            self.context.add_opcodes(
+                END_IF()
+            )
 
     @node_visitor
     def visit_Call(self, node):

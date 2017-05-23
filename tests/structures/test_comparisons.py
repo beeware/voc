@@ -567,13 +567,19 @@ class ComparisonTests(TranspileTestCase):
 
     def test_multiple_comparisons(self):
         self.assertCodeExecution("""
-            print('1 == 1 == 1 == 1', 1 == 1 == 1 == 1)
-            print('1 > 2 > 3', 1 > 2 > 3)
-            print('1 == 1 == 2', 1 == 1 == 2)
-            print('1 == 1 != 2', 1 == 1 != 2)
-            print('1 == 1 < 2', 1 == 1 < 2)
-            print('3 == 3 < 2', 3 == 3 < 2)
-            print('1 < 2 < 3 > 2', 1 < 2 < 3 > 2)
-            print('0 == 0 == 0 == 0', 0 == 0 == 0 == 0)
-            
+            print(1 == 1 == 1 == 1)
+            print(1 > 2 > 3)
+            print(1 == 1 == 2)
+            print(1 == 1 != 2)
+            print(1 == 1 < 2)
+            print(3 == 3 < 2)
+            print(1 < 2 < 3 > 2)
+            print(0 == 0 == 0 == 0)
+            print('abc' == '123' != '123')
+            print('abc' == '123' == '123')
+            print('abc' != '123' == '123')
+            print(len('abcd') == 4 == len('1234'))
+            x = 100
+            print(x == (50 + 50) < 2000)
+            print(x == (50 + 50) > 2000)
             """)
