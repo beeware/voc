@@ -61,6 +61,18 @@ class BytesTests(TranspileTestCase):
             print(b'abcd'.find(b'ab', 3, 4))
         """)
 
+    def test_index(self):
+        self.assertCodeExecution("""
+            print(b'abcd'.index(b'ab'))
+            print(b'abcd'.index(b'bc'))
+            print(b'abcd'.index(b'cd'))
+        """)
+        self.assertCodeExecution("""
+            print(b''.index(b'a'))
+            print(b'abcd'.index(b''))
+            print(b'abcd'.index(b'...'))
+        """, exits_early=True)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
