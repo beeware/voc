@@ -1846,34 +1846,41 @@ class Visitor(ast.NodeVisitor):
             const_comparison |= isinstance(node.comparators[0], ast.Num)
             compare_to(node.ops[0])
         else:
-            for operation, argument in zip(node.ops, node.comparators):
+            for i, (operation, argument) in enumerate(zip(node.ops, node.comparators)):
                 self.visit(argument)
-                self.context.add_opcodes(
-                        JavaOpcodes.DUP_X1()
+                #don't dup if i < len(node.ops) return result of eval
+                if i < len(node.ops) - 1 :
+                    self.context.add_opcodes(
+                            JavaOpcodes.DUP_X1()
+                            )
+                    compare_to(operation)
+                    self.context.add_opcodes(
+                            JavaOpcodes.DUP()
+                            )
+                    self.context.add_opcodes(
+                        IF([python.Object.as_boolean()], JavaOpcodes.IFNE)
+                    )
+                    #if i < len(node.ops) - 1:
+                    self.context.add_opcodes(
+                        JavaOpcodes.SWAP()
                         )
-                compare_to(operation)
-                self.context.add_opcodes(
-                        JavaOpcodes.DUP()
+                    self.context.add_opcodes(
+                        JavaOpcodes.POP()
+                         )
+                    self.context.add_opcodes(
+                        ELSE()
                         )
-                self.context.add_opcodes(
-                    IF([python.Object.as_boolean()], JavaOpcodes.IFEQ)
-                )
-                self.context.add_opcodes(
-                    JavaOpcodes.POP()
-                    )
-                self.context.add_opcodes(
-                    ELSE()
-                    )
-                self.context.add_opcodes(
-                    JavaOpcodes.SWAP()
-                    )
-                self.context.add_opcodes(
-                    JavaOpcodes.POP()
-                    )
-            for _ in node.ops:
+
+                    self.context.add_opcodes(
+                        JavaOpcodes.POP()
+                        )
+                else: 
+                    compare_to(operation)
+            for _ in range(len(node.ops) - 1):
                 self.context.add_opcodes(
                     END_IF()
                     )
+            '''
             self.context.add_opcodes(
                     IF([python.Object.as_boolean()], JavaOpcodes.IFEQ)
                 )
@@ -1893,7 +1900,7 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 END_IF()
                 )
-
+            '''
     @node_visitor
     def visit_Call(self, node):
         if is_call(node, ('locals', 'globals', 'vars')):
