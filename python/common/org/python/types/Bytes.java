@@ -698,10 +698,42 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"sub"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object find(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.find has not been implemented.");
+    public org.python.types.Int find(org.python.Object sub, org.python.Object start, org.python.Object end) {
+        int _start = 0;
+        int _end = 0;
+        if (start != null && !(start instanceof org.python.types.NoneType)) {
+            _start = (int) ((Int) start).value;
+        }
+        if (end == null || end instanceof org.python.types.NoneType) {
+            _end = this.value.length;
+        }
+        Bytes _sub = (Bytes) sub;
+        if (_sub.value.length <= 0) {
+            return new Int(0);
+        }
+        int pos = -1;
+        for (int i = 0; _start < _end; _start++) {
+            byte b1 = this.value[_start];
+            byte b2 = _sub.value[i];
+            if (b1 == b2) {
+                i++;
+                if (pos == -1) {
+                    pos = _start;
+                }
+            }
+            if (i == _sub.value.length) {
+                break;
+            }
+            if (b1 != b2) {
+                i = 0;
+                pos = -1;
+            }
+        }
+        return new Int(pos);
     }
 
     @org.python.Method(

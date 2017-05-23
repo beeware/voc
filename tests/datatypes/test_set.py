@@ -399,18 +399,8 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_gt_tuple',
         'test_direct_le_tuple',
 
-        'test_eq_class',
-
-        'test_ge_class',
-
-        'test_gt_class',
-
-        'test_le_class',
-
         'test_lshift_class',
         'test_lshift_frozenset',
-
-        'test_lt_class',
 
         'test_modulo_class',
         'test_modulo_complex',
@@ -421,7 +411,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_class',
         'test_multiply_frozenset',
 
-        'test_ne_class',
         'test_ne_frozenset',
 
         'test_or_class',

@@ -71,6 +71,24 @@ class BytesTests(TranspileTestCase):
             print(b'abcabca'.count(97, 3, [])) #Test Slicing Error on End
         """, exits_early=True)
 
+    def test_find(self):
+        self.assertCodeExecution("""
+            print(b''.find(b'a'))
+            print(b'abcd'.find(b''))
+            print(b'abcd'.find(b'...'))
+            print(b'abcd'.find(b'a'))
+            print(b'abcd'.find(b'b'))
+            print(b'abcd'.find(b'c'))
+            print(b'abcd'.find(b'd'))
+            print(b'abcd'.find(b'ab'))
+            print(b'abcd'.find(b'bc'))
+            print(b'abcd'.find(b'cd'))
+            print(b'abcd'.find(b'cd', 2))
+            print(b'abcd'.find(b'ab', 3))
+            print(b'abcd'.find(b'cd', 2, 3))
+            print(b'abcd'.find(b'ab', 3, 4))
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
@@ -188,22 +206,16 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_eq_bytearray',
         'test_eq_bytes',
-        'test_eq_class',
         'test_eq_frozenset',
 
-        'test_ne_class',
         'test_ne_frozenset',
 
-        'test_ge_class',
         'test_ge_frozenset',
 
-        'test_gt_class',
         'test_gt_frozenset',
 
-        'test_le_class',
         'test_le_frozenset',
 
-        'test_lt_class',
         'test_lt_frozenset',
 
         'test_lshift_class',

@@ -441,8 +441,6 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_gt_str',
         'test_direct_gt_tuple',
 
-        'test_eq_class',
-
         'test_floor_divide_bool',
         'test_floor_divide_bytearray',
         'test_floor_divide_bytes',
@@ -459,12 +457,6 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_floor_divide_slice',
         'test_floor_divide_str',
         'test_floor_divide_tuple',
-
-        'test_ge_class',
-
-        'test_gt_class',
-
-        'test_le_class',
 
         'test_lshift_bool',
         'test_lshift_bytearray',
@@ -483,8 +475,6 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_lshift_slice',
         'test_lshift_str',
         'test_lshift_tuple',
-
-        'test_lt_class',
 
         'test_modulo_bool',
         'test_modulo_bytearray',
@@ -509,7 +499,6 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_ne_bool',
         'test_ne_bytearray',
         'test_ne_bytes',
-        'test_ne_class',
         'test_ne_complex',
         'test_ne_dict',
         'test_ne_float',

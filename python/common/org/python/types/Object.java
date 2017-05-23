@@ -1105,7 +1105,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         org.python.Object comparator = x.__getattribute_null(methodName);
-        if (comparator == null) {
+        if (comparator == null || !(comparator instanceof org.python.types.Method)) {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
 
