@@ -127,6 +127,9 @@ public class Bool extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) > (((org.python.types.Bool) other).value ? 1 : 0));
         }
+        else if (other instanceof org.python.types.Type) {
+            throw new org.python.exceptions.TypeError("unorderable types: bool() > type()");
+        }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
