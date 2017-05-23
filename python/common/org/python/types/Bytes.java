@@ -626,8 +626,7 @@ public class Bytes extends org.python.types.Object {
     public org.python.types.Int find(org.python.Object sub, org.python.Object start, org.python.Object end) {
         int _start = 0;
         int _end = 0;
-        if (start == null || start instanceof org.python.types.NoneType) {
-        } else {
+        if (start != null && !(start instanceof org.python.types.NoneType)) {
             _start = (int) ((Int) start).value;
         }
         if (end == null || end instanceof org.python.types.NoneType) {
