@@ -313,6 +313,9 @@ class Visitor(ast.NodeVisitor):
                 self.context.add_opcodes(
                     python.Object.del_item()
                 )
+            elif isinstance(target, ast.Name):
+                # delete is performed by visit(target) with context Del
+                pass
             else:
                 raise NotImplementedError('No handler for Delete of type %s' % target)
 
@@ -2177,6 +2180,8 @@ class Visitor(ast.NodeVisitor):
                 )
         elif type(node.ctx) == ast.Store:
             self.context.store_name(node.id)
+        elif type(node.ctx) == ast.Del:
+            self.context.delete_name(node.id)
         else:
             raise NotImplementedError("Unknown context %s" % node.ctx)
 
