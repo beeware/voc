@@ -1407,7 +1407,7 @@ public class Str extends org.python.types.Object {
         int start_extra;
         boolean skip = false;
 
-        for(int i = 0; i < this.value.length(); i++) {
+        for (int i = 0; i < this.value.length(); i++) {
             current = this.value.charAt(i);
             char next = current;
 
