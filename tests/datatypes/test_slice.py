@@ -57,7 +57,7 @@ class SliceTests(TranspileTestCase):
             print("x[:5:2] = ", x[:5:2])
             print("x[2:8:2] = ", x[2:8:2])
             """)
-    
+
     def test_slice_index(self):
         self.assertCodeExecution("""
             class C(object):
@@ -65,7 +65,6 @@ class SliceTests(TranspileTestCase):
                     self._value = value
                 def __index__(self):
                     return self._value
-                    
             x = range(0, 10)
             print("x[:] = ", x[:])
             print("x[C(5):] = ", x[C(5):])
@@ -76,6 +75,7 @@ class SliceTests(TranspileTestCase):
             print("x[:C(5):C(2] = ", x[:C(5):C(2)])
             print("x[C(2):C(8):C(2)] = ", x[C(2):C(8):C(2)])
             """)
+
 
 class UnarySliceOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'slice'
