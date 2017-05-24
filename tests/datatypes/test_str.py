@@ -707,6 +707,14 @@ class StrTests(TranspileTestCase):
         print(repr(str_))
         """)
 
+    def test_splitlines(self):
+        self.assertCodeExecution("""
+        str_ = "aaa\\nbbb\\rccc\\r\\nddd\\n\\reee"
+
+        print(str_.splitlines())
+        print(str_.splitlines(True))
+        """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
