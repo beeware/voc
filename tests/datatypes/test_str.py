@@ -695,6 +695,12 @@ class StrTests(TranspileTestCase):
             print(str_, str_.isidentifier())
             """)
 
+    def test_isprintable(self):
+        self.assertCodeExecution("""
+        for str_ in [chr(i) for i in range(33)] + ['AAA', 'bcd', '1234', 'eÃⱣỉ', 'ÃⱣỉ', '', '\x07' + 'foo']:
+            print(str_.isprintable())
+            """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

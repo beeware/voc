@@ -898,7 +898,12 @@ public class Str extends org.python.types.Object {
                     "printable in repr() or S is empty, False otherwise.\n"
     )
     public org.python.Object isprintable() {
-        throw new org.python.exceptions.NotImplementedError("isprintable() has not been implemented.");
+        for (char ch : this.value.toCharArray()) {
+            if (Character.isISOControl(ch)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
