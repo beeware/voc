@@ -70,7 +70,8 @@ public class Str extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __repr__() {
-        return new org.python.types.Str("'" + this.value + "'");
+        String repr = this.value.replaceAll("\\n", "\\\\n").replaceAll("\\r", "\\\\r");
+        return new org.python.types.Str("'" + repr + "'");
     }
 
     @org.python.Method(
