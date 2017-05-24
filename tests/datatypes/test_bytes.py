@@ -23,18 +23,20 @@ class BytesTests(TranspileTestCase):
             """)
 
     def test_capitalize(self):
-        self.assertCodeExecution("""
+        self.assertCodeExecution(r"""
             print(b'hello, world'.capitalize())
             print(b'helloWORLD'.capitalize())
             print(b'HELLO WORLD'.capitalize())
             print(b'2015638687'.capitalize())
+            print(b'\xc8'.capitalize())
         """)
 
-    @expectedFailure
-    def test_capitalize_with_nonascii(self):
-        # Move this to test_capitalize upon resolution of #530
-        self.assertCodeExecution("""
-            print(b'\xc8'.capitalize())
+    def test_repr(self):
+        self.assertCodeExecution(r"""
+            print(repr(b'\xc8'))
+            print(repr(b'abcdef \xc8 abcdef'))
+            print(repr(b'abcdef \xc8 abcdef\n\r\t'))
+            print(b'abcdef \xc8 abcdef\n\r\t')
         """)
 
     def test_iter(self):

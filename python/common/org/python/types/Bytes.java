@@ -70,11 +70,17 @@ public class Bytes extends org.python.types.Object {
     public org.python.types.Str __str__() {
         StringBuilder sb = new StringBuilder();
         sb.append("b'");
-        for (int c : this.value) {
-            if (c >= 32 && c < 128) {
+        for (byte c : this.value) {
+            if (c == '\n') {
+                sb.append("\\n");
+            } else if (c == '\t') {
+                sb.append("\\t");
+            } else if (c == '\r') {
+                sb.append("\\r");
+            } else if (c >= 32 && c < 127) {
                 sb.append((char) c);
             } else {
-                sb.append(String.format("\\x%02d", c));
+                sb.append(String.format("\\x%02x", c));
             }
         }
         sb.append("'");
