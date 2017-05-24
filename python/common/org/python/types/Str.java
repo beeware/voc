@@ -70,7 +70,8 @@ public class Str extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __repr__() {
-        return new org.python.types.Str("'" + this.value + "'");
+        String repr = this.value.replaceAll("\\n", "\\\\n").replaceAll("\\r", "\\\\r");
+        return new org.python.types.Str("'" + repr + "'");
     }
 
     @org.python.Method(
@@ -1390,10 +1391,58 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Return a list of the lines in S, breaking at line boundaries.\n" +
                     "Line breaks are not included in the resulting list unless keepends\n" +
-                    "is given and true.\n"
+                    "is given and true.\n",
+            default_args = {"keepends"}
     )
-    public org.python.Object splitlines() {
-        throw new org.python.exceptions.NotImplementedError("splitlines() has not been implemented.");
+    public org.python.Object splitlines(org.python.Object keepends) {
+        if (keepends == null) {
+            keepends = new org.python.types.Bool(false);
+        }
+
+        org.python.types.List result = new org.python.types.List();
+        char current;
+
+        int start = 0;
+        int end;
+        int start_extra;
+        boolean skip = false;
+
+        for (int i = 0; i < this.value.length(); i++) {
+            current = this.value.charAt(i);
+            char next = current;
+
+            if (i < this.value.length() - 1) {
+                next = this.value.charAt(i + 1);
+            }
+
+            if (current == '\n' || current == '\r') {
+                end = i;
+                if (current == '\r' && next == '\n') {
+                    skip = true;
+                    start_extra = 1;
+                    if (keepends.toBoolean()) {
+                        end++;
+                    }
+                } else {
+                    start_extra = 0;
+                }
+                if (keepends.toBoolean()) {
+                    end++;
+                }
+                result.append(this.__getitem__(new org.python.types.Slice(new org.python.types.Int(start), new org.python.types.Int(end))));
+                start = i + 1 + start_extra;
+                if (skip) {
+                    skip = false;
+                    i++;
+                }
+            }
+        }
+        org.python.types.Str last = (org.python.types.Str) this.__getitem__(new org.python.types.Slice(new org.python.types.Int(start), org.python.types.NoneType.NONE));
+        if (last.value.length() > 0) {
+            result.append(last);
+        }
+        return result;
+
     }
 
     @org.python.Method(
