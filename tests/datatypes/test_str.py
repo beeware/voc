@@ -701,6 +701,12 @@ class StrTests(TranspileTestCase):
             print(str_.isprintable())
             """)
 
+    def test_repr(self):
+        self.assertCodeExecution("""
+        str_ = "\\r\\n"
+        print(repr(str_))
+        """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
