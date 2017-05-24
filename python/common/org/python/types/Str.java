@@ -70,7 +70,31 @@ public class Str extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __repr__() {
-        return new org.python.types.Str("'" + this.value + "'");
+        String result = "";
+        char[] charArray = this.value.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            if (isLineBreak(charArray[i])) {
+                String lineBreak = "\\";
+                String hexString = Integer.toHexString(charArray[i]);
+                if (charArray[i] == '\n') {
+                    lineBreak += "n";
+                } else if (charArray[i] == '\r') {
+                    lineBreak += "r";
+                } else if (hexString.length() == 1) {
+                    lineBreak += "x0" + hexString;
+                } else if (hexString.length() == 2) {
+                    lineBreak += "x" + hexString;
+                } else if (hexString.length() == 3) {
+                    lineBreak += "u0" + hexString;
+                } else if (hexString.length() == 4) {
+                    lineBreak += "u" + hexString;
+                }
+                result += lineBreak;
+            } else {
+                result += charArray[i];
+            }
+        }
+        return new org.python.types.Str("'" + result + "'");
     }
 
     @org.python.Method(
@@ -1386,14 +1410,74 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.splitlines([keepends]) -> list of strings\n" +
-                    "\n" +
-                    "Return a list of the lines in S, breaking at line boundaries.\n" +
-                    "Line breaks are not included in the resulting list unless keepends\n" +
-                    "is given and true.\n"
+            __doc__ = "S.splitlines([keepends]) -> list of strings\n\nReturn a list of the lines in the string, breaking at line boundaries. Line breaks are not included in the resulting list unless keepends is given and true.",
+            default_args = "keepends"
     )
-    public org.python.Object splitlines() {
-        throw new org.python.exceptions.NotImplementedError("splitlines() has not been implemented.");
+    public org.python.Object splitlines(org.python.Object keepends) {
+
+        boolean hasKeepEnds;
+        if (keepends == null) {
+            hasKeepEnds = false;
+        } else if (keepends instanceof org.python.types.Bool || keepends instanceof org.python.types.Int || keepends instanceof org.python.types.Complex) {
+            hasKeepEnds = ((org.python.types.Int) keepends.__int__()).value != 0;
+        } else if (keepends instanceof org.python.types.Float) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got " + keepends.typeName());
+        } else {
+            throw new org.python.exceptions.TypeError("an integer is required (got type " + keepends.typeName() + ")");
+        }
+        org.python.types.List result_list = new org.python.types.List();
+        if (this.value.isEmpty()) {
+            return result_list;
+        }
+        char[] charArray = this.value.toCharArray();
+        int i = 0;
+        int j = 0;
+        int eol;
+        while (i < charArray.length) {
+            String linebreak = "";
+            while (i < charArray.length && !isLineBreak(charArray[i])) {
+                i++;
+            }
+            eol = i;
+            if (i < charArray.length) {
+                if (charArray[i] == '\r' && i + 1 < charArray.length && charArray[i + 1] == '\n') {
+                    linebreak = "\r\n";
+                    i += 2;
+                } else {
+                    i++;
+                }
+                if (hasKeepEnds) {
+                    eol = i;
+                }
+            }
+            if (j == 0 && eol == charArray.length) {
+                result_list.append(new org.python.types.Str(this.value));
+                break;
+            }
+            String result = new java.lang.String(charArray, j, eol - j);
+            result_list.append(new org.python.types.Str(result));
+            j = i;
+        }
+        return result_list;
+    }
+
+    private static boolean isLineBreak(char character) {
+        // List of line boundaries from https://docs.python.org/3.4/library/stdtypes.html#str.splitlines
+        switch (character) {
+            case '\n':
+            case '\r':
+            case '\u000B':
+            case '\u000C':
+            case '\u001C':
+            case '\u001D':
+            case '\u001E':
+            case '\u0085':
+            case '\u2028':
+            case '\u2029':
+                return true;
+            default:
+                return false;
+        }
     }
 
     @org.python.Method(
