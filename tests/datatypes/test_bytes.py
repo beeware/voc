@@ -1,7 +1,5 @@
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
-from unittest import expectedFailure
-
 
 class BytesTests(TranspileTestCase):
     def test_setattr(self):
