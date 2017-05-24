@@ -1437,9 +1437,12 @@ public class Str extends org.python.types.Object {
                 }
             }
         }
-
-        result.append(this.__getitem__(new org.python.types.Slice(new org.python.types.Int(start), org.python.types.NoneType.NONE)));
+        org.python.types.Str last = (org.python.types.Str) this.__getitem__(new org.python.types.Slice(new org.python.types.Int(start), org.python.types.NoneType.NONE));
+        if (last.value.length() > 0) {
+            result.append(last);
+        }
         return result;
+
     }
 
     @org.python.Method(

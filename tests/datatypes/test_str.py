@@ -713,6 +713,9 @@ class StrTests(TranspileTestCase):
 
         print(str_.splitlines())
         print(str_.splitlines(True))
+        print('Dont Panic\\n'.splitlines())
+        print('\\n'.splitlines())
+        print(''.splitlines())
         """)
 
 
