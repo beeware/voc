@@ -484,17 +484,21 @@ public class Bytes extends org.python.types.Object {
         } else if (index instanceof org.python.types.Bool || index instanceof org.python.types.Int) {
             return this.__getitem__index(index);
         } else {
-            org.python.Object index_object;
+            org.python.Object index_object = null;
+            boolean error_caught = false;
             try {
                 index_object = index.__index__();
-            } catch (org.python.exceptions.TypeError | org.python.exceptions.AttributeError error) {
+            } catch (org.python.exceptions.TypeError error) {
+                error_caught = true;
+            } catch (org.python.exceptions.AttributeError error) {
+                error_caught = true;
+            }
+            if (error_caught) {
+                String message = "byte indices must be integers or slices, not " + index.typeName();
                 if (org.Python.VERSION < 0x03050000) {
                     throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
-                } else {
-                    throw new org.python.exceptions.TypeError(
-                            "byte indices must be integers or slices, not " + index.typeName()
-                    );
                 }
+                throw new org.python.exceptions.TypeError(message);
             }
             if (index_object instanceof org.python.types.Int) {
                 return this.__getitem__index(index);
