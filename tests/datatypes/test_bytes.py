@@ -89,6 +89,47 @@ class BytesTests(TranspileTestCase):
             print(b'abcd'.find(b'ab', 3, 4))
         """)
 
+    def test_isdigit(self):
+        self.assertCodeExecution("""
+            for byt in [b'123', b'678', b'99999', b'abc', b'2s3x', 'a2b3', b'2S3X', 'A2b3', b'6',
+                    b'k', b'GHI', b'Jkl', b'!234', b'.', b'?/']:
+                print(byt.isdigit())
+        """)
+
+    def test_islower(self):
+        self.assertCodeExecution("""
+            for byt in [b'123', b'678', b'99999', b'abc', b'2s3x', 'a2b3', b'2S3X', 'A2b3', b'6',
+                    b'k', b'GHI', b'Jkl', b'!234', b'.', b'?/']:
+                print(byt, byt.islower())
+        """)
+
+    def test_isupper(self):
+        self.assertCodeExecution("""
+            for byt in [b'123', b'678', b'99999', b'abc', b'2s3x', 'a2b3', b'2S3X', 'A2b3', b'6',
+                    b'k', b'GHI', b'Jkl', b'!234', b'.', b'?/']:
+                print(byt, byt.islower())
+        """)
+
+    def test_isalpha(self):
+        self.assertCodeExecution("""
+            for byt in [b'123', b'678', b'99999', b'abc', b'2s3x', 'a2b3', b'2S3X', 'A2b3', b'6',
+                    b'k', b'GHI', b'Jkl', b'!234', b'.', b'?/']:
+                print(byt, byt.isalpha())
+        """)
+
+    def test_isalnum(self):
+        self.assertCodeExecution("""
+            for byt in [b'123', b'678', b'99999', b'abc', b'2s3x', 'a2b3', b'2S3X', 'A2b3', b'6',
+                    b'k', b'GHI', b'Jkl', b'!234', b'.', b'?/']:
+                print(byt, byt.isalnum())
+        """)
+
+    def test_isspace(self):
+        self.assertCodeExecution(r"""
+            for byt in [b'\t', b'\n', b'   ', b'\t ', b'\r\n', b' 4t', b'adc', b'5 6', b'TF  ']:
+                print(byt.isspace())
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
