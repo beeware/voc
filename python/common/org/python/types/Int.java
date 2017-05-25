@@ -754,43 +754,47 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         if (ndigits instanceof org.python.types.Int) {
-            long dividend,divisor=1,remainder,digits=0,result,i=0;
-            ndigits_val=((org.python.types.Int) ndigits).value;
-            this_val=((org.python.types.Int)this).value;
-            if(ndigits_val==0)
+            long dividend, divisor = 1, remainder, digits = 0, result, i = 0;
+            ndigits_val = ((org.python.types.Int) ndigits).value;
+            this_val = ((org.python.types.Int) this).value;
+            if (ndigits_val == 0) {
                 return new org.python.types.Int(this_val);
-            if(ndigits_val<0) {
-                dividend=this_val;
-                while(dividend>0) {
-                    dividend=dividend/10;
+            }
+            if (ndigits_val < 0) {
+                dividend = this_val;
+                while (dividend > 0) {
+                    dividend = dividend/10;
                     digits++;
                 }
-                if(digits<-ndigits_val)
+                if (digits < -ndigits_val) {
                     return new org.python.types.Int(0); 
-                while(i>ndigits_val) {
-                    divisor=divisor*10;
+                }
+                while (i > ndigits_val) {
+                    divisor = divisor * 10;
                     i--;
                 }
-                remainder=this_val%divisor;
-                dividend=this_val/divisor;
-                if(remainder>5*(divisor/10)) 
-                    result=dividend+1;
-                if(remainder<5*(divisor/10))
-                    result=dividend;
-                if(remainder==5*(divisor/10)) {
-                    if(dividend%2==0)
-                        result=dividend;
-                    else
-                        result=dividend+1;
+                remainder = this_val % divisor;
+                dividend = this_val / divisor;
+                if (remainder > 5 * (divisor / 10)) 
+                    result = dividend + 1;
+                if (remainder < 5 * (divisor / 10))
+                    result = dividend;
+                if (remainder == 5 * (divisor / 10)) {
+                    if (dividend % 2 == 0) {
+                        result = dividend;
+                    } else {
+                        result = dividend + 1; 
+                    }
                 }
-                result=result*divisor;
+                result = result * divisor;
                 return new org.python.types.Int(result);
-            }
-            else
+            } else {
                 throw new org.python.exceptions.ValueError("ndigits can not be positive for integers");
+            }
                 
         }
-        else
+        else {
             throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
+        }
     }
 }
