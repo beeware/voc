@@ -65,7 +65,7 @@ class SliceTests(TranspileTestCase):
                     self._value = value
                 def __index__(self):
                     return self._value
-            x = range(0, 10)
+            x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             print("x[:] = ", x[:])
             print("x[C(5):] = ", x[C(5):])
             print("x[:C(5)] = ", x[:C(5)])
@@ -74,6 +74,65 @@ class SliceTests(TranspileTestCase):
             print("x[C(5)::C(2)] = ", x[C(5)::C(2)])
             print("x[:C(5):C(2] = ", x[:C(5):C(2)])
             print("x[C(2):C(8):C(2)] = ", x[C(2):C(8):C(2)])
+            """)
+        self.assertCodeExecution("""
+            class D(object):
+                def __init__(self, value):
+                    self._value = value
+            x = b"0123456789"
+            print("x[D(1)::1] = ", x[D(1)::1])
+        """, exits_early=True)
+        self.assertCodeExecution("""
+            class D(object):
+                def __init__(self, value):
+                    self._value = value
+            x = b"0123456789"
+            print("x[:D(10):1] = ", x[:D(10):1])
+        """, exits_early=True)
+        self.assertCodeExecution("""
+            class D(object):
+                def __init__(self, value):
+                    self._value = value
+            x = b"0123456789"
+            print("x[::D(1)] = ", x[::D(1)])
+        """, exits_early=True)
+
+    def test_slice_bytes(self):
+        self.assertCodeExecution("""
+            x = b"0123456789"
+            print("x[:] = ", x[:])
+            print("x[5:] = ", x[5:])
+            print("x[:5] = ", x[:5])
+            print("x[2:8] = ", x[2:8])
+
+            print("x[::2] = ", x[::2])
+            print("x[5::2] = ", x[5::2])
+            print("x[:5:2] = ", x[:5:2])
+            print("x[2:8:2] = ", x[2:8:2])
+
+            print("x[:] = ", x[:])
+            print("x[-5:] = ", x[-5:])
+            print("x[:-5] = ", x[:-5])
+            print("x[-2:-8] = ", x[-2:-8])
+
+            print("x[::-2] = ", x[::-2])
+            print("x[-5::-2] = ", x[-5::-2])
+            print("x[:-5:-2] = ", x[:-5:-2])
+            print("x[-2:-8:-2] = ", x[-2:-8:-2])
+            """)
+
+    def test_negative_indexing(self):
+        self.assertCodeExecution("""
+            x = b"0123456789"
+            print("x[:] = ", x[:])
+            print("x[-5:] = ", x[-5:])
+            print("x[:-5] = ", x[:-5])
+            print("x[-2:-8] = ", x[-2:-8])
+
+            print("x[::-2] = ", x[::-2])
+            print("x[-5::-2] = ", x[-5::-2])
+            print("x[:-5:-2] = ", x[:-5:-2])
+            print("x[-2:-8:-2] = ", x[-2:-8:-2])
             """)
 
 

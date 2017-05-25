@@ -363,102 +363,147 @@ public class Bytes extends org.python.types.Object {
         }
     }
 
+    private org.python.Object __getitem__slice(org.python.Object index) {
+        org.python.types.Slice slice = (org.python.types.Slice) index;
+        byte[] sliced;
+        if (slice.start == null && slice.stop == null && slice.step == null) {
+            sliced = this.value;
+        } else {
+            int step;
+            if (slice.step != null) {
+                step = (int) slice.step.value;
+            } else {
+                step = 1;
+            }
+            int start;
+            if (slice.start == null) {
+                if (step > 0) {
+                    start = 0;
+                } else {
+                    start = this.value.length - 1;
+                }
+            } else {
+                start = (int) slice.start.value;
+                //Clamp value to negative positive range of indices
+                int length = this.value.length;
+                start = Math.max(-length, Math.min(length, start));
+                //Compute wrapped index for negative values
+                if (start < 0) {
+                    start = start + length;
+                }
+                //Modify the start location for stepping backwaards
+                if ((int) slice.start.value >= this.value.length && step < 0) {
+                    start = this.value.length - 1;
+                }
+                //If stepping backwards modify start location to be outside the range
+                if ((int) slice.start.value < -this.value.length && step < 0) {
+                    start = -1;
+                }
+            }
+            int stop;
+            if (slice.stop == null) {
+                if (step > 0) {
+                    stop = this.value.length;
+                } else {
+                    stop = -1;
+                }
+            } else {
+                stop = (int) slice.stop.value;
+                //Clamp value to negative positive range of indices
+                int length = this.value.length;
+                stop = Math.max(-length, Math.min(length, stop));
+                //Compute wrapped index for negative values
+                if (stop < 0) {
+                    stop = stop + length;
+                }
+                //Check for the case where stop was clipped and needs to be inclusive
+                if ((int) slice.stop.value < -this.value.length && step < 0) {
+                    stop = -1;
+                }
+            }
+            if (step > 0) {
+                int sliced_length = (int) Math.ceil((stop - start) / (float) step);
+                if (sliced_length <= 0) {
+                    return new Bytes(new byte[0]);
+                }
+                sliced = new byte[sliced_length];
+                for (int i = 0, j = start; j < stop; i++, j += step) {
+                    sliced[i] = this.value[j];
+                }
+            } else {
+                int sliced_length = (int) Math.ceil((start - stop) / (float) -step);
+                if (sliced_length <= 0) {
+                    return new Bytes(new byte[0]);
+                }
+                sliced = new byte[sliced_length];
+                for (int i = 0, j = start; j > stop; i++, j += step) {
+                    sliced[i] = this.value[j];
+                }
+            }
+        }
+        return new Bytes(sliced);
+    }
+
+    private org.python.Object __getitem__index(org.python.Object index) {
+        int idx;
+        if (index instanceof org.python.types.Bool) {
+            boolean index_bool = ((org.python.types.Bool) index).value;
+            if (index_bool) {
+                idx = 1;
+            } else {
+                idx = 0;
+            }
+        } else {
+            idx = (int) ((org.python.types.Int) index).value;
+        }
+
+        if (idx < 0) {
+            if (-idx > this.value.length) {
+                throw new org.python.exceptions.IndexError("index out of range");
+            } else {
+                idx = this.value.length + idx;
+                // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
+                return new org.python.types.Int(this.value[idx]);
+            }
+        } else {
+            if (idx >= this.value.length) {
+                throw new org.python.exceptions.IndexError("index out of range");
+            } else {
+                // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
+                return new org.python.types.Int(this.value[idx]);
+            }
+        }
+    }
+
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Slice) {
-            org.python.types.Slice slice = (org.python.types.Slice) index;
-            byte[] sliced;
-
-            if (slice.start == null && slice.stop == null && slice.step == null) {
-                sliced = this.value;
-            } else {
-                int start;
-                if (slice.start != null) {
-                    start = (int) slice.start.value;
-                } else {
-                    start = 0;
-                }
-
-                int stop;
-                if (slice.stop != null) {
-                    stop = (int) slice.stop.value;
-                } else {
-                    stop = this.value.length;
-                }
-
-                int step;
-                if (slice.step != null) {
-                    step = (int) slice.step.value;
-                } else {
-                    step = 1;
-                }
-
-                // System.err.format("start:%d, stop:%d, step:%d\n", start, stop, step);
-                if (step > 0) {
-                    if (start >= this.value.length || stop >= this.value.length || start > stop) {
-                        return new Bytes(new byte[0]);
-                    }
-
-                    int len = (int) Math.ceil((float) (stop - start) / step);
-                    sliced = new byte[len];
-
-                    for (int i = 0, j = start; j < stop; i++, j += step) {
-                        // System.err.format("this.value[%d] -> sliced[%d]\n", j, i);
-                        sliced[i] = this.value[j];
-                    }
-                } else { // step < 0
-                    if (Math.abs(start) >= this.value.length || Math.abs(stop) >= this.value.length || stop > start) {
-                        return new Bytes(new byte[0]);
-                    }
-
-                    int len = (int) Math.ceil((float) (stop - start) / step);
-                    sliced = new byte[len];
-
-                    for (int i = 0, j = start; j > stop; i++, j += step) {
-                        // System.err.format("this.value[%d] -> sliced[%d]\n", j, i);
-                        sliced[i] = this.value[j];
-                    }
-                }
-            }
-            return new Bytes(sliced);
+            return this.__getitem__slice(index);
         } else if (index instanceof org.python.types.Bool || index instanceof org.python.types.Int) {
-            int idx;
-            if (index instanceof org.python.types.Bool) {
-                boolean index_bool = ((org.python.types.Bool) index).value;
-                if (index_bool) {
-                    idx = 1;
-                } else {
-                    idx = 0;
-                }
-            } else {
-                idx = (int) ((org.python.types.Int) index).value;
-            }
-
-            if (idx < 0) {
-                if (-idx > this.value.length) {
-                    throw new org.python.exceptions.IndexError("index out of range");
-                } else {
-                    idx = this.value.length + idx;
-                    // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int(this.value[idx]);
-                }
-            } else {
-                if (idx >= this.value.length) {
-                    throw new org.python.exceptions.IndexError("index out of range");
-                } else {
-                    // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int(this.value[idx]);
-                }
-            }
+            return this.__getitem__index(index);
         } else {
-            if (org.Python.VERSION < 0x03050000) {
-                throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
+            org.python.Object index_object = null;
+            boolean error_caught = false;
+            try {
+                index_object = index.__index__();
+            } catch (org.python.exceptions.TypeError error) {
+                error_caught = true;
+            } catch (org.python.exceptions.AttributeError error) {
+                error_caught = true;
+            }
+            if (error_caught) {
+                String message = "byte indices must be integers or slices, not " + index.typeName();
+                if (org.Python.VERSION < 0x03050000) {
+                    throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
+                }
+                throw new org.python.exceptions.TypeError(message);
+            }
+            if (index_object instanceof org.python.types.Int) {
+                return this.__getitem__index(index);
             } else {
-                throw new org.python.exceptions.TypeError(
-                        "byte indices must be integers or slices, not " + index.typeName()
-                );
+                throw new org.python.exceptions.TypeError("TypeError: __index__ returned non-int (type " + index_object.typeName() + ")");
             }
         }
     }
