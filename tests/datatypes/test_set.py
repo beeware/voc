@@ -443,9 +443,6 @@ class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_frozenset',
 
         'test_and_class',
-        'test_and_frozenset',
-        'test_and_set',
-
         'test_lshift_class',
         'test_lshift_frozenset',
 
@@ -457,8 +454,6 @@ class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_frozenset',
 
         'test_or_class',
-        'test_or_frozenset',
-        'test_or_set',
 
         'test_power_class',
         'test_power_frozenset',
@@ -467,13 +462,9 @@ class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_rshift_frozenset',
 
         'test_subtract_class',
-        'test_subtract_frozenset',
-        'test_subtract_set',
 
         'test_true_divide_class',
         'test_true_divide_frozenset',
 
         'test_xor_class',
-        'test_xor_frozenset',
-        'test_xor_set',
     ]
