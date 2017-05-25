@@ -764,14 +764,14 @@ public class Int extends org.python.types.Object {
                 dividend = this_val;
                 while (dividend > 0) {
                     dividend = dividend/10;
-                    digits++;
+                    digits += 1;
                 }
                 if (digits < -ndigits_val) {
                     return new org.python.types.Int(0); 
                 }
                 while (i > ndigits_val) {
                     divisor = divisor * 10;
-                    i--;
+                    i -= 1;
                 }
                 remainder = this_val % divisor;
                 dividend = this_val / divisor;
