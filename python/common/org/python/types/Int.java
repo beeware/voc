@@ -793,8 +793,7 @@ public class Int extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ValueError("ndigits can not be positive for integers");
             }
-        }
-        else {
+        } else {
             throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
         }
     }
