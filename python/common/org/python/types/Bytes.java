@@ -672,7 +672,11 @@ public class Bytes extends org.python.types.Object {
     public org.python.types.Int index(org.python.Object sub, org.python.Object start, org.python.Object end) {
         Int pos = this.find(sub, start, end);
         if (pos.equals(new Int(-1))) {
-            throw new org.python.exceptions.ValueError("subsection not found");
+            String message = "subsection not found";
+            if (org.Python.VERSION < 0x03060000) {
+                message = "substring not found";
+            }
+            throw new org.python.exceptions.ValueError(message);
         }
         return pos;
     }
