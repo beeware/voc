@@ -106,3 +106,28 @@ class DeleteTests(TranspileTestCase):
 
             print("Done.")
             """)
+
+    def test_delete_local(self):
+        self.assertCodeExecution("""
+            x = 123
+            print('x = ', x)
+
+            print('Deleting x...')
+            del x
+            try:
+                print('x = ', x)
+            except NameError:
+                print('x was successfully deleted')
+
+            def foo():
+                y = 456
+                print('y =', y)
+                print('Deleting y...')
+                del y
+                try:
+                    print('y =', y)
+                except UnboundLocalError:
+                    print('y was successfully deleted')
+
+            foo()
+            """)
