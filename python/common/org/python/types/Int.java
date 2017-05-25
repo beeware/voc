@@ -763,11 +763,11 @@ public class Int extends org.python.types.Object {
             if (ndigits_val < 0) {
                 dividend = this_val;
                 while (dividend > 0) {
-                    dividend = dividend/10;
+                    dividend = dividend / 10;
                     digits += 1;
                 }
                 if (digits < -ndigits_val) {
-                    return new org.python.types.Int(0); 
+                    return new org.python.types.Int(0);
                 }
                 while (i > ndigits_val) {
                     divisor = divisor * 10;
@@ -775,15 +775,17 @@ public class Int extends org.python.types.Object {
                 }
                 remainder = this_val % divisor;
                 dividend = this_val / divisor;
-                if (remainder > 5 * (divisor / 10)) 
+                if (remainder > 5 * (divisor / 10)) {
                     result = dividend + 1;
-                if (remainder < 5 * (divisor / 10))
+                }
+                if (remainder < 5 * (divisor / 10)) {
                     result = dividend;
+                }
                 if (remainder == 5 * (divisor / 10)) {
                     if (dividend % 2 == 0) {
                         result = dividend;
                     } else {
-                        result = dividend + 1; 
+                        result = dividend + 1;
                     }
                 }
                 result = result * divisor;
@@ -791,7 +793,6 @@ public class Int extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ValueError("ndigits can not be positive for integers");
             }
-                
         }
         else {
             throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
