@@ -487,7 +487,7 @@ public class Bytes extends org.python.types.Object {
             org.python.Object index_object;
             try {
                 index_object = index.__index__();
-            } catch (org.python.exceptions.TypeError error) {
+            } catch (org.python.exceptions.TypeError | org.python.exceptions.AttributeError error) {
                 if (org.Python.VERSION < 0x03050000) {
                     throw new org.python.exceptions.TypeError("byte indices must be integers, not " + index.typeName());
                 } else {

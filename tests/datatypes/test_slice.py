@@ -75,6 +75,27 @@ class SliceTests(TranspileTestCase):
             print("x[:C(5):C(2] = ", x[:C(5):C(2)])
             print("x[C(2):C(8):C(2)] = ", x[C(2):C(8):C(2)])
             """)
+        self.assertCodeExecution("""
+            class D(object):
+                def __init__(self, value):
+                    self._value = value
+            x = b"0123456789"
+            print("x[D(1)::1] = ", x[D(1)::1])
+        """, exits_early=True)
+        self.assertCodeExecution("""
+            class D(object):
+                def __init__(self, value):
+                    self._value = value
+            x = b"0123456789"
+            print("x[:D(10):1] = ", x[:D(10):1])
+        """, exits_early=True)
+        self.assertCodeExecution("""
+            class D(object):
+                def __init__(self, value):
+                    self._value = value
+            x = b"0123456789"
+            print("x[::D(1)] = ", x[::D(1)])
+        """, exits_early=True)
 
     def test_slice_bytes(self):
         self.assertCodeExecution("""
