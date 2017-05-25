@@ -25,11 +25,7 @@ public class Slice extends org.python.types.Object {
             try {
                 index_object = start.__index__();
             } catch (org.python.exceptions.TypeError | org.python.exceptions.AttributeError error) {
-                if (org.Python.VERSION < 0x03050000) {
-                    throw new org.python.exceptions.TypeError("byte indices must be integers, not " + start.typeName());
-                } else {
-                    throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
-                }
+                throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
             }
             if (index_object instanceof org.python.types.Int) {
                 this.__dict__.put("start", start);
@@ -49,11 +45,7 @@ public class Slice extends org.python.types.Object {
             try {
                 index_object = stop.__index__();
             } catch (org.python.exceptions.TypeError | org.python.exceptions.AttributeError error) {
-                if (org.Python.VERSION < 0x03050000) {
-                    throw new org.python.exceptions.TypeError("byte indices must be integers, not " + stop.typeName());
-                } else {
-                    throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
-                }
+                throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
             }
             if (index_object instanceof org.python.types.Int) {
                 this.__dict__.put("stop", stop);
@@ -77,11 +69,7 @@ public class Slice extends org.python.types.Object {
             try {
                 index_object = step.__index__();
             } catch (org.python.exceptions.TypeError | org.python.exceptions.AttributeError error) {
-                if (org.Python.VERSION < 0x03050000) {
-                    throw new org.python.exceptions.TypeError("byte indices must be integers, not " + step.typeName());
-                } else {
-                    throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
-                }
+                throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
             }
             if (index_object instanceof org.python.types.Int) {
                 this.__dict__.put("step", step);
