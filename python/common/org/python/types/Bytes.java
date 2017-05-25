@@ -795,10 +795,20 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "get an index of any byte from bytes",
+            args = {"sub"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object index(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.index has not been implemented.");
+    public org.python.types.Int index(org.python.Object sub, org.python.Object start, org.python.Object end) {
+        Int pos = this.find(sub, start, end);
+        if (pos.equals(new Int(-1))) {
+            String message = "subsection not found";
+            if (org.Python.VERSION < 0x03060000) {
+                message = "substring not found";
+            }
+            throw new org.python.exceptions.ValueError(message);
+        }
+        return pos;
     }
 
     @org.python.Method(
