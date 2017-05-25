@@ -357,9 +357,6 @@ public class Bytes extends org.python.types.Object {
         }
     }
 
-    @org.python.Method(
-            __doc__ = ""
-    )
     private org.python.Object __getitem__slice(org.python.Object index) {
         org.python.types.Slice slice = (org.python.types.Slice) index;
         byte[] sliced;
@@ -377,17 +374,24 @@ public class Bytes extends org.python.types.Object {
                 if (step > 0) {
                     start = 0;
                 } else {
-                    start = this.value.length-1;
+                    start = this.value.length - 1;
                 }
-            }
-            else {
+            } else {
                 start = (int) slice.start.value;
                 //Clamp value to negative positive range of indices
                 int length = this.value.length;
-                start = Math.max(-length, Math.min(length-1, start));
+                start = Math.max(-length, Math.min(length, start));
                 //Compute wrapped index for negative values
                 if (start < 0) {
                     start = start + length;
+                }
+                //Modify the start location for stepping backwaards
+                if ((int) slice.start.value >= this.value.length && step < 0) {
+                    start = this.value.length - 1;
+                }
+                //If stepping backwards modify start location to be outside the range
+                if ((int) slice.start.value < -this.value.length && step < 0) {
+                    start = -1;
                 }
             }
             int stop;
@@ -397,36 +401,31 @@ public class Bytes extends org.python.types.Object {
                 } else {
                     stop = -1;
                 }
-            }
-            else {
+            } else {
                 stop = (int) slice.stop.value;
                 //Clamp value to negative positive range of indices
                 int length = this.value.length;
-                
                 stop = Math.max(-length, Math.min(length, stop));
                 //Compute wrapped index for negative values
                 if (stop < 0) {
                     stop = stop + length;
                 }
                 //Check for the case where stop was clipped and needs to be inclusive
-                if ((int)slice.stop.value < -this.value.length && step < 0) {
+                if ((int) slice.stop.value < -this.value.length && step < 0) {
                     stop = -1;
                 }
-                
             }
-            
             if (step > 0) {
-                int sliced_length = (int)Math.ceil((stop-start)/(float)step);
+                int sliced_length = (int) Math.ceil((stop - start) / (float) step);
                 if (sliced_length <= 0) {
                     return new Bytes(new byte[0]);
                 }
-                
                 sliced = new byte[sliced_length];
                 for (int i = 0, j = start; j < stop; i++, j += step) {
                     sliced[i] = this.value[j];
                 }
-            } else {                              
-                int sliced_length = (int)Math.ceil((start-stop)/(float)-step);
+            } else {
+                int sliced_length = (int) Math.ceil((start - stop) / (float) -step);
                 if (sliced_length <= 0) {
                     return new Bytes(new byte[0]);
                 }
@@ -438,98 +437,7 @@ public class Bytes extends org.python.types.Object {
         }
         return new Bytes(sliced);
     }
-   /*  private org.python.Object __getitem__slice(org.python.Object index) {
-        org.python.types.Slice slice = (org.python.types.Slice) index;
-        byte[] sliced;
-        //Rewrite this from scratch tomorrow. 
-        //Empty indexes need special treatment to represent one past the end and one before the beginning but are not wrapped the same way as specified indices.
-        //If i process all valid inputthen handle the default values second instead of first I think it will work out ok.
-        if (slice.start == null && slice.stop == null && slice.step == null) {
-            sliced = this.value;
-        } else {
-        
-            int step;
-            if (slice.step != null) {
-                step = (int) slice.step.value;
-            } else {
-                step = 1;
-            }
-            
-            int start;
-            if (slice.start != null) {
-                start = (int) slice.start.value;
-            } else {
-                if (step > 0) {
-                    start = 0;
-                } else {
-                    start = this.value.length;
-                }
-            }
 
-            int stop;
-            if (slice.stop != null) {
-                stop = (int) slice.stop.value;
-            } else {
-                if (step > 0) {
-                    
-                    stop = this.value.length;
-                    
-                } else {
-                    stop = 0;
-                    //throw new org.python.exceptions.TypeError(">>>"+ start + " " + stop + " " + step);
-                }
-            }
-
-        
-            
-            //Clamp value to negative positive range of indices
-            int length = this.value.length;
-            start = Math.max(-length, Math.min(length, start));
-            //Compute wrapped index for negative values(Python modulo operation)
-            if (start < 0) {
-                start = start + length;
-               
-            }
-            stop = Math.max(-length, Math.min(length, stop));
-            //Compute wrapped index for negative values(Python modulo operation)
-            if (stop < 0) {
-                stop = stop + length;
-              
-            }
-       
-            if (step > 0) {
-                int sliced_length = (int)Math.ceil((stop-start)/(float)step);
-                if (sliced_length <= 0) {
-                    return new Bytes(new byte[0]);
-                }
-                
-                sliced = new byte[sliced_length];
-                for (int i = 0, j = start; j < stop; i++, j += step) {
-                    sliced[i] = this.value[j];
-                }
-            } else {
-                int temp = 0;
-                if (start >= this.value.length)
-                {
-                    start = start -1;
-                    if (slice.stop == null){
-                        stop =   -1;
-                        }
-                }
-                int sliced_length = (int)Math.ceil((start-stop)/(float)-step);
-                if (sliced_length <= 0) {
-                    return new Bytes(new byte[0]);
-                }
-               
-                sliced = new byte[sliced_length];
-                
-                for (int i = 0, j = start; j > stop; i++, j += step) {
-                    sliced[i] = this.value[j];
-                }
-            }
-        }
-        return new Bytes(sliced);
-    } */
     private org.python.Object __getitem__index(org.python.Object index) {
         int idx;
         if (index instanceof org.python.types.Bool) {
@@ -560,9 +468,11 @@ public class Bytes extends org.python.types.Object {
             }
         }
     }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
     public org.python.Object __getitem__(org.python.Object index) {
-        //org.python.Object ox = org.python.types.Slice.__getitem__(this.value, index);
-    
         if (index instanceof org.python.types.Slice) {
             return this.__getitem__slice(index);
         } else if (index instanceof org.python.types.Bool || index instanceof org.python.types.Int) {
