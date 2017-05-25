@@ -754,7 +754,7 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         if (ndigits instanceof org.python.types.Int) {
-            long dividend, divisor = 1, remainder, digits = 0, result, i = 0;
+            long dividend, divisor = 1, remainder, digits = 0, this_val, ndigits_val, result, i = 0;
             ndigits_val = ((org.python.types.Int) ndigits).value;
             this_val = ((org.python.types.Int) this).value;
             if (ndigits_val == 0) {
