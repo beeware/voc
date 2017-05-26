@@ -253,7 +253,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -267,14 +268,13 @@ public class Float extends org.python.types.Object {
         } else if (other instanceof org.python.types.Float) {
             double other_val = ((org.python.types.Float) other).value;
             return new org.python.types.Float(this.value + other_val);
-        } else if (other instanceof org.python.types.Complex) {
-            return ((org.python.types.Complex) other).__add__(this);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'float' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __sub__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -289,41 +289,27 @@ public class Float extends org.python.types.Object {
             }
             return new org.python.types.Float(this.value);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'float' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
-
-        if (other instanceof org.python.types.Str) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + "float" + "'");
-        } else if (other instanceof org.python.types.Int) {
+        if (other instanceof org.python.types.Int) {
             return new org.python.types.Float(this.value * ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) * ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Float(this.value * (((org.python.types.Bool) other).value ? 1 : 0));
-        } else if (other instanceof org.python.types.Dict) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.NoneType) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.Set) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
-        } else if (other instanceof org.python.types.Slice) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and 'slice'");
         }
-
-        throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __truediv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -345,11 +331,12 @@ public class Float extends org.python.types.Object {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __floordiv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -368,14 +355,13 @@ public class Float extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("float divmod()");
             }
-        } else if (other instanceof org.python.types.Complex) {
-            throw new org.python.exceptions.TypeError("can't take floor of complex number.");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         try {
@@ -412,9 +398,9 @@ public class Float extends org.python.types.Object {
                 }
             }
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -427,12 +413,14 @@ public class Float extends org.python.types.Object {
             data.add(this.__mod__(other));
             return new org.python.types.Tuple(data);
         } catch (org.python.exceptions.TypeError ae) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'");
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"},
+            default_args = {"modulo"}
     )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
         if (modulo != null) {
@@ -469,46 +457,52 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Float(1);
             }
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'float' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __radd__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__radd__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rsub__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rsub__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rtruediv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rtruediv__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rfloordiv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rfloordiv__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rmod__() has not been implemented.");
@@ -522,7 +516,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rpow__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rpow__() has not been implemented.");

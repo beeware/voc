@@ -249,23 +249,7 @@ public class FrozenSet extends org.python.types.Object {
             frozenSet.removeAll(((org.python.types.Set) other).value);
             return new org.python.types.FrozenSet(frozenSet);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
-    }
-
-    @org.python.Method(
-            __doc__ = "",
-            args = {"other"}
-    )
-    public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.List ||
-                other instanceof org.python.types.Tuple ||
-                other instanceof org.python.types.Str ||
-                other instanceof org.python.types.Bytes ||
-                other instanceof org.python.types.ByteArray
-            ) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -281,7 +265,7 @@ public class FrozenSet extends org.python.types.Object {
             frozenSet.retainAll(((org.python.types.Set) other).value);
             return new org.python.types.FrozenSet(frozenSet);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -297,7 +281,7 @@ public class FrozenSet extends org.python.types.Object {
             frozenSet.addAll(((org.python.types.Set) other).value);
             return new org.python.types.FrozenSet(frozenSet);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -319,7 +303,7 @@ public class FrozenSet extends org.python.types.Object {
             frozenSet.removeAll(temp);
             return new org.python.types.FrozenSet(frozenSet);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     private java.util.Set iterToSet(org.python.Object iterable) {

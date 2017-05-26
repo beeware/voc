@@ -1,7 +1,5 @@
 package org.python.types;
 
-import org.Python;
-
 public class NoneType extends org.python.types.Object {
     public static org.python.Object NONE = new org.python.types.NoneType();
     public static final java.lang.String PYTHON_TYPE_NAME = "NoneType";
@@ -99,19 +97,6 @@ public class NoneType extends org.python.types.Object {
     )
     public org.python.Object __le__(org.python.Object other) {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NoneType'");
-        } else {
-            throw new org.python.exceptions.TypeError(
-                    String.format("unsupported operand type(s) for *: 'NoneType' and '%s'",
-                            Python.typeName(other.getClass())));
-        }
     }
 
     @org.python.Method(

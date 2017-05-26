@@ -337,7 +337,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
@@ -357,7 +358,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -378,11 +380,12 @@ public class Str extends org.python.types.Object {
                 return new org.python.types.Str("");
             }
         }
-        throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object cannot be interpreted as an integer");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         java.util.List<java.lang.Object> format_args = new java.util.ArrayList<java.lang.Object>();
@@ -443,14 +446,16 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmod__() has not been implemented.");

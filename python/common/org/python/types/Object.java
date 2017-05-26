@@ -561,7 +561,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__add__");
     }
 
     @org.python.Method(
@@ -569,7 +569,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __sub__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__sub__");
     }
 
     @org.python.Method(
@@ -577,7 +577,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__mul__");
     }
 
     @org.python.Method(
@@ -585,7 +585,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __truediv__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__truediv__");
     }
 
     @org.python.Method(
@@ -593,11 +593,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __floordiv__(org.python.Object other) {
-        if (other instanceof org.python.types.Complex) {
-            throw new org.python.exceptions.TypeError("can't take floor of complex number.");
-        } else {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + this.typeName() + "' and '" + other.typeName() + "'");
-        }
+        throw new org.python.exceptions.AttributeError(this, "__floordiv__");
     }
 
     @org.python.Method(
@@ -605,7 +601,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__mod__");
     }
 
     @org.python.Method(
@@ -618,10 +614,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
     @org.python.Method(
             __doc__ = "",
-            args = {"other", "modulus"}
+            args = {"other"},
+            default_args = {"modulus"}
     )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulus) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__pow__");
     }
 
     @org.python.Method(
@@ -629,7 +626,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __lshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__lshift__");
     }
 
     @org.python.Method(
@@ -637,7 +634,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __rshift__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__rshift__");
     }
 
     @org.python.Method(
@@ -645,7 +642,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__and__");
     }
 
     @org.python.Method(
@@ -653,7 +650,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __xor__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__xor__");
     }
 
     @org.python.Method(
@@ -661,7 +658,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __or__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.AttributeError(this, "__or__");
     }
 
     @org.python.Method(
@@ -1066,19 +1063,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
 
         if (reflectedChecked) {
-            result = invokeComparison(w, v, reflOperMethod);
+            result = invokeMethod(w, v, reflOperMethod);
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
                 return result;
             }
         }
 
-        result = invokeComparison(v, w, operMethod);
+        result = invokeMethod(v, w, operMethod);
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
         }
 
         if (!reflectedChecked) {
-            result = invokeComparison(w, v, reflOperMethod);
+            result = invokeMethod(w, v, reflOperMethod);
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
                 return result;
             }
@@ -1099,18 +1096,62 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
     }
 
-    private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {
+    /* This method is invoked from the AST for BinOp nodes */
+    public static org.python.Object __binop__(org.python.Object v, org.python.Object w, java.lang.String oper,
+            java.lang.String operMethod, java.lang.String reflOperMethod) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        if (reflectedChecked) {
+            result = invokeMethod(w, v, reflOperMethod);
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
+        }
+
+        result = invokeMethod(v, w, operMethod);
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        if (!reflectedChecked) {
+            result = invokeMethod(w, v, reflOperMethod);
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
+        }
+
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unsupported operand type(s) for %s: '%s' and '%s'", oper, v.typeName(), w.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", oper, v.typeName(), w.typeName()));
+        }
+    }
+
+    private static org.python.Object invokeMethod(org.python.Object x, org.python.Object y, String methodName) {
         if (methodName == null) {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
 
-        org.python.Object comparator = x.__getattribute_null(methodName);
-        if (comparator == null || !(comparator instanceof org.python.types.Method)) {
+        org.python.Object attr = x.__getattribute_null(methodName);
+        if (attr == null || !(attr instanceof org.python.types.Method)) {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
 
         org.python.Object[] args = new org.python.Object[1];
         args[0] = y;
-        return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, null);
+
+        // Ugly workaround because this class provides implementations for
+        // all the methods like __radd__(), so attr != null, and those methods
+        // then throw an AttributeError on execute
+        try {
+            org.python.Object result = (org.python.Object) ((org.python.types.Method) attr).invoke(args, null);
+            return result;
+        } catch (org.python.exceptions.AttributeError ae) {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 }

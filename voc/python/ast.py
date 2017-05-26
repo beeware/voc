@@ -893,27 +893,69 @@ class Visitor(ast.NodeVisitor):
         else:
             self.visit(node.left)
             self.visit(node.right)
+
+            oper_symbol = {
+                    ast.Add: '+',
+                    ast.Sub: '-',
+                    ast.Mult: '*',
+                    # ast.MatMult: '@',
+                    ast.Div: '/',
+                    ast.FloorDiv: '//',
+                    ast.Mod: '%',
+                    ast.Pow: '**',
+                    ast.LShift: '<<',
+                    ast.RShift: '>>',
+                    ast.BitAnd: '&',
+                    ast.BitXor: '^',
+                    ast.BitOr: '|',
+            }[type(node.op)]
+            oper = {
+                    ast.Add: '__add__',
+                    ast.Sub: '__sub__',
+                    ast.Mult: '__mul__',
+                    # ast.MatMult:
+                    ast.Div: '__truediv__',
+                    ast.FloorDiv: '__floordiv__',
+                    ast.Mod: '__mod__',
+                    ast.Pow: '__pow__',
+                    ast.LShift: '__lshift__',
+                    ast.RShift: '__rshift__',
+                    ast.BitAnd: '__and__',
+                    ast.BitXor: '__xor__',
+                    ast.BitOr: '__or__',
+            }[type(node.op)]
+            reflect_oper = {
+                    ast.Add: '__radd__',
+                    ast.Sub: '__rsub__',
+                    ast.Mult: '__rmul__',
+                    # ast.MatMult:
+                    ast.Div: '__rtruediv__',
+                    ast.FloorDiv: '__rfloordiv__',
+                    ast.Mod: '__rmod__',
+                    ast.Pow: '__rpow__',
+                    ast.LShift: '__rlshift__',
+                    ast.RShift: '__rrshift__',
+                    ast.BitAnd: '__rand__',
+                    ast.BitXor: '__rxor__',
+                    ast.BitOr: '__ror__',
+            }[type(node.op)]
+
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
-                    {
-                        ast.Add: '__add__',
-                        ast.Sub: '__sub__',
-                        ast.Mult: '__mul__',
-                        ast.Div: '__truediv__',
-                        ast.FloorDiv: '__floordiv__',
-                        ast.Mod: '__mod__',
-                        ast.Pow: '__pow__',
-                        ast.LShift: '__lshift__',
-                        ast.RShift: '__rshift__',
-                        ast.BitOr: '__or__',
-                        ast.BitXor: '__xor__',
-                        ast.BitAnd: '__and__',
-                        # ast.MatMult:
-                    }[type(node.op)],
-                    args=['Lorg/python/Object;'],
-                    returns='Lorg/python/Object;'
-                )
+                JavaOpcodes.LDC_W(oper_symbol),
+                JavaOpcodes.LDC_W(oper),
+                JavaOpcodes.LDC_W(reflect_oper),
+                JavaOpcodes.INVOKESTATIC(
+                    'org/python/types/Object',
+                    '__binop__',
+                    args=[
+                        'Lorg/python/Object;',
+                        'Lorg/python/Object;',
+                        'Ljava/lang/String;',
+                        'Ljava/lang/String;',
+                        'Ljava/lang/String;',
+                    ],
+                    returns='Lorg/python/Object;',
+                ),
             )
 
     @node_visitor

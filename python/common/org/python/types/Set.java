@@ -270,21 +270,8 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        } else if (other instanceof org.python.types.Str) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        }
-        return super.__mul__(other);
-    }
-
-    @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __sub__(org.python.Object other) {
         java.util.Set set = ((org.python.types.Set) this.copy()).value;
@@ -295,11 +282,12 @@ public class Set extends org.python.types.Object {
             set.removeAll(((org.python.types.FrozenSet) other).value);
             return new org.python.types.Set(set);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __and__(org.python.Object other) {
         java.util.Set set = ((org.python.types.Set) this.copy()).value;
@@ -310,18 +298,20 @@ public class Set extends org.python.types.Object {
             set.retainAll(((org.python.types.FrozenSet) other).value);
             return new org.python.types.Set(set);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public org.python.Object __xor__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__xor__() has not been implemented");
-    // }
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __xor__(org.python.Object other) {
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __or__(org.python.Object other) {
         java.util.Set set = ((org.python.types.Set) this.copy()).value;
@@ -332,7 +322,7 @@ public class Set extends org.python.types.Object {
             set.addAll(((org.python.types.FrozenSet) other).value);
             return new org.python.types.Set(set);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     // @org.python.Method(

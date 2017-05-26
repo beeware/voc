@@ -106,7 +106,8 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -133,13 +134,6 @@ public class Bytes extends org.python.types.Object {
     )
     public org.python.Object __iadd__(org.python.Object other) {
         return this.__add__(other);
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: 'bytes' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -345,16 +339,12 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         if (org.Python.VERSION < 0x03050000) {
-            if (other instanceof org.python.types.Dict) {
-                return this;
-            }
-            throw new org.python.exceptions.TypeError(
-                    "unsupported operand type(s) for %: 'bytes' and '" + other.typeName() + "'"
-            );
+            throw new org.python.exceptions.AttributeError(this, "__mod__");
         } else {
             if (other instanceof org.python.types.List || other instanceof org.python.types.Range) {
                 return this;
@@ -539,7 +529,8 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -559,7 +550,7 @@ public class Bytes extends org.python.types.Object {
             }
             return new Bytes(bytes);
         } else {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object cannot be interpreted as an integer");
         }
     }
 

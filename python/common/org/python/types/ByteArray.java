@@ -175,13 +175,6 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object __and__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
     public org.python.Object __pos__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary +: '" + this.typeName() + "'");
     }
@@ -223,7 +216,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -256,7 +250,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -276,7 +271,7 @@ public class ByteArray extends org.python.types.Object {
             }
             return new ByteArray(bytes);
         } else {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object cannot be interpreted as an integer");
         }
     }
 
@@ -545,13 +540,12 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         if (org.Python.VERSION < 0x03050000) {
-            throw new org.python.exceptions.TypeError(
-                    "unsupported operand type(s) for %: 'bytearray' and '" + other.typeName() + "'"
-            );
+            throw new org.python.exceptions.AttributeError(this, "__mod__");
         } else {
             if (other instanceof org.python.types.List
                     || other instanceof org.python.types.Range

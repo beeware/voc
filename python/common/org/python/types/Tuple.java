@@ -370,7 +370,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -385,7 +386,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -403,11 +405,12 @@ public class Tuple extends org.python.types.Object {
             }
             return result;
         }
-        throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object cannot be interpreted as an integer");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");

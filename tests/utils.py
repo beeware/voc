@@ -848,20 +848,23 @@ class BinaryOperationTestCase(NotImplementedToExpectedFailure):
         )
 
     for datatype, examples in SAMPLE_DATA.items():
+        # numeric types
         vars()['test_add_%s' % datatype] = _binary_test('test_add_%s' % datatype, 'x + y', examples)
         vars()['test_subtract_%s' % datatype] = _binary_test('test_subtract_%s' % datatype, 'x - y', examples)
         vars()['test_multiply_%s' % datatype] = _binary_test('test_multiply_%s' % datatype, 'x * y', examples)
-        vars()['test_floor_divide_%s' % datatype] = _binary_test('test_floor_divide_%s' % datatype, 'x // y', examples)
         vars()['test_true_divide_%s' % datatype] = _binary_test('test_true_divide_%s' % datatype, 'x / y', examples)
+        vars()['test_floor_divide_%s' % datatype] = _binary_test('test_floor_divide_%s' % datatype, 'x // y', examples)
         vars()['test_modulo_%s' % datatype] = _binary_test('test_modulo_%s' % datatype, 'x % y', examples)
         vars()['test_power_%s' % datatype] = _binary_test('test_power_%s' % datatype, 'x ** y', examples)
-        vars()['test_subscr_%s' % datatype] = _binary_test('test_subscr_%s' % datatype, 'x[y]', examples)
         vars()['test_lshift_%s' % datatype] = _binary_test('test_lshift_%s' % datatype, 'x << y', examples)
         vars()['test_rshift_%s' % datatype] = _binary_test('test_rshift_%s' % datatype, 'x >> y', examples)
         vars()['test_and_%s' % datatype] = _binary_test('test_and_%s' % datatype, 'x & y', examples)
         vars()['test_xor_%s' % datatype] = _binary_test('test_xor_%s' % datatype, 'x ^ y', examples)
         vars()['test_or_%s' % datatype] = _binary_test('test_or_%s' % datatype, 'x | y', examples)
 
+        vars()['test_subscr_%s' % datatype] = _binary_test('test_subscr_%s' % datatype, 'x[y]', examples)
+
+        # comparisons
         vars()['test_lt_%s' % datatype] = _binary_test('test_lt_%s' % datatype, 'x < y', examples)
         vars()['test_le_%s' % datatype] = _binary_test('test_le_%s' % datatype, 'x <= y', examples)
         vars()['test_gt_%s' % datatype] = _binary_test('test_gt_%s' % datatype, 'x > y', examples)
@@ -869,12 +872,71 @@ class BinaryOperationTestCase(NotImplementedToExpectedFailure):
         vars()['test_eq_%s' % datatype] = _binary_test('test_eq_%s' % datatype, 'x == y', examples)
         vars()['test_ne_%s' % datatype] = _binary_test('test_ne_%s' % datatype, 'x != y', examples)
 
-        vars()['test_direct_lt_%s' % datatype] = _binary_test('test_lt_%s' % datatype, 'x.__lt__(y)', examples)
-        vars()['test_direct_le_%s' % datatype] = _binary_test('test_le_%s' % datatype, 'x.__le__(y)', examples)
-        vars()['test_direct_gt_%s' % datatype] = _binary_test('test_gt_%s' % datatype, 'x.__gt__(y)', examples)
-        vars()['test_direct_ge_%s' % datatype] = _binary_test('test_ge_%s' % datatype, 'x.__ge__(y)', examples)
-        vars()['test_direct_eq_%s' % datatype] = _binary_test('test_eq_%s' % datatype, 'x.__eq__(y)', examples)
-        vars()['test_direct_ne_%s' % datatype] = _binary_test('test_ne_%s' % datatype, 'x.__ne__(y)', examples)
+        # numeric types - arithmetic operations
+        vars()['test_direct_add_%s' % datatype] = _binary_test(
+            'test_direct_add_%s' % datatype, 'x.__add__(y)', examples)
+        vars()['test_direct_subtract_%s' % datatype] = _binary_test(
+            'test_direct_subtract_%s' % datatype, 'x.__sub__(y)', examples)
+        vars()['test_direct_multiply_%s' % datatype] = _binary_test(
+            'test_direct_multiply_%s' % datatype, 'x.__mul__(y)', examples)
+        vars()['test_direct_true_divide_%s' % datatype] = _binary_test(
+            'test_direct_true_divide_%s' % datatype, 'x.__truediv__(y)', examples)
+        vars()['test_direct_floor_divide_%s' % datatype] = _binary_test(
+            'test_direct_floor_divide_%s' % datatype, 'x.__floordiv__(y)', examples)
+        vars()['test_direct_modulo_%s' % datatype] = _binary_test(
+            'test_direct_modulo_%s' % datatype, 'x.__mod__(y)', examples)
+        vars()['test_direct_power_%s' % datatype] = _binary_test(
+            'test_direct_power_%s' % datatype, 'x.__pow__(y)', examples)
+        vars()['test_direct_lshift_%s' % datatype] = _binary_test(
+            'test_direct_lshift_%s' % datatype, 'x.__lshift__(y)', examples)
+        vars()['test_direct_rshift_%s' % datatype] = _binary_test(
+            'test_direct_rshift_%s' % datatype, 'x.__rshift__(y)', examples)
+        vars()['test_direct_and_%s' % datatype] = _binary_test(
+            'test_direct_and_%s' % datatype, 'x.__and__(y)', examples)
+        vars()['test_direct_xor_%s' % datatype] = _binary_test(
+            'test_direct_xor_%s' % datatype, 'x.__xor__(y)', examples)
+        vars()['test_direct_or_%s' % datatype] = _binary_test(
+            'test_direct_or_%s' % datatype, 'x.__or__(y)', examples)
+
+        # numeric types - arithmetic operations (reflected)
+        vars()['test_direct_radd_%s' % datatype] = _binary_test(
+            'test_direct_radd_%s' % datatype, 'x.__radd__(y)', examples)
+        vars()['test_direct_rsubtract_%s' % datatype] = _binary_test(
+            'test_direct_rsubtract_%s' % datatype, 'x.__rsub__(y)', examples)
+        vars()['test_direct_rmultiply_%s' % datatype] = _binary_test(
+            'test_direct_rmultiply_%s' % datatype, 'x.__rmul__(y)', examples)
+        vars()['test_direct_rtrue_divide_%s' % datatype] = _binary_test(
+            'test_direct_rtrue_divide_%s' % datatype, 'x.__rtruediv__(y)', examples)
+        vars()['test_direct_rfloor_divide_%s' % datatype] = _binary_test(
+            'test_direct_rfloor_divide_%s' % datatype, 'x.__rfloordiv__(y)', examples)
+        vars()['test_direct_rmodulo_%s' % datatype] = _binary_test(
+            'test_direct_rmodulo_%s' % datatype, 'x.__rmod__(y)', examples)
+        vars()['test_direct_rpower_%s' % datatype] = _binary_test(
+            'test_direct_rpower_%s' % datatype, 'x.__rpow__(y)', examples)
+        vars()['test_direct_rlshift_%s' % datatype] = _binary_test(
+            'test_direct_rlshift_%s' % datatype, 'x.__rlshift__(y)', examples)
+        vars()['test_direct_rrshift_%s' % datatype] = _binary_test(
+            'test_direct_rrshift_%s' % datatype, 'x.__rrshift__(y)', examples)
+        vars()['test_direct_rand_%s' % datatype] = _binary_test(
+            'test_direct_rand_%s' % datatype, 'x.__rand__(y)', examples)
+        vars()['test_direct_rxor_%s' % datatype] = _binary_test(
+            'test_direct_rxor_%s' % datatype, 'x.__rxor__(y)', examples)
+        vars()['test_direct_ror_%s' % datatype] = _binary_test(
+            'test_direct_ror_%s' % datatype, 'x.__ror__(y)', examples)
+
+        # comparisons
+        vars()['test_direct_lt_%s' % datatype] = _binary_test(
+            'test_lt_%s' % datatype, 'x.__lt__(y)', examples)
+        vars()['test_direct_le_%s' % datatype] = _binary_test(
+            'test_le_%s' % datatype, 'x.__le__(y)', examples)
+        vars()['test_direct_gt_%s' % datatype] = _binary_test(
+            'test_gt_%s' % datatype, 'x.__gt__(y)', examples)
+        vars()['test_direct_ge_%s' % datatype] = _binary_test(
+            'test_ge_%s' % datatype, 'x.__ge__(y)', examples)
+        vars()['test_direct_eq_%s' % datatype] = _binary_test(
+            'test_eq_%s' % datatype, 'x.__eq__(y)', examples)
+        vars()['test_direct_ne_%s' % datatype] = _binary_test(
+            'test_ne_%s' % datatype, 'x.__ne__(y)', examples)
 
 
 def _inplace_test(test_name, operation, examples):

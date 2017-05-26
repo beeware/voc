@@ -399,6 +399,9 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_gt_tuple',
         'test_direct_le_tuple',
 
+        'test_direct_xor_frozenset',
+        'test_direct_xor_set',
+
         'test_lshift_class',
         'test_lshift_frozenset',
 
