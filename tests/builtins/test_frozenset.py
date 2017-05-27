@@ -11,8 +11,11 @@ class BuiltinFrozensetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     not_implemented = [
         'test_bytearray',
         'test_bytes',
-        'test_dict',
         'test_str',
+    ]
+
+    is_flakey = [
+        'test_dict',
     ]
 
     not_implemented_versions = {

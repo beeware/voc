@@ -28,5 +28,4 @@ class BuiltinSortedFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     not_implemented = [
         'test_bytearray',
         'test_fozenset',
-        'test_set',
     ]

@@ -98,7 +98,7 @@ class BuiltinPowFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_list',
         'test_None',
         'test_NotImplemented',
-        '`_range',
+        'test_range',
         'test_set',
         'test_slice',
         'test_str',
@@ -113,6 +113,7 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_bool_complex',
 
         'test_complex_complex',
+        'test_complex_float',
 
         'test_float_complex',
         'test_float_float',
@@ -120,6 +121,3 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_int_complex',
         'test_int_float',
     ]
-    not_implemented_versions = {
-        'test_complex_float': (3.4, 3.5),
-    }

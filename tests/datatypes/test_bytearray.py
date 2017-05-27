@@ -32,13 +32,18 @@ class BinaryBytearrayOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 
     not_implemented = [
-        'test_modulo_complex',
     ]
 
+    not_implemented_versions = {
+        'test_modulo_complex': (3.4, ),
+    }
 
 class InplaceBytearrayOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 
     not_implemented = [
-        'test_modulo_complex',
     ]
+
+    not_implemented_versions = {
+        'test_modulo_complex': (3.4, ),
+    }

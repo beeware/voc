@@ -75,5 +75,4 @@ class BuiltinMaxFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_bytearray',
-        'test_frozenset',
     ]

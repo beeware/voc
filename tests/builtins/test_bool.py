@@ -50,5 +50,4 @@ class BuiltinBoolFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["bool"]
 
     not_implemented = [
-        'test_complex',
     ]
