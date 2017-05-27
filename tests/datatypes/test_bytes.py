@@ -268,6 +268,7 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_tuple': (3.5, 3.6),
     }
 
+
 class InplaceBytesOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 

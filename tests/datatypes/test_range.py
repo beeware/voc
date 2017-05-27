@@ -124,7 +124,7 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_str': (3.4,),
         'test_subscr_tuple': (3.4,),
     }
- 
+
 
 class InplaceRangeOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'range'
