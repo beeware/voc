@@ -13,5 +13,8 @@ class BuiltinFrozensetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_bytes',
         'test_dict',
         'test_str',
-        'test_tuple',
     ]
+
+    not_implemented_versions = {
+        'test_tuple': (3.4,),
+    }

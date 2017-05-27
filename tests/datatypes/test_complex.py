@@ -64,27 +64,8 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
     }
 
     not_implemented = [
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        'test_power_complex',
+        'test_power_float',
     ]
 
 

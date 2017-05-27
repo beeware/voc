@@ -110,27 +110,16 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
     functions = ["pow"]
 
     not_implemented = [
-
         'test_bool_complex',
 
-
-
-
         'test_complex_complex',
-
 
         'test_float_complex',
         'test_float_float',
 
-
         'test_int_complex',
         'test_int_float',
-
-
-
-
-
-
-
-
     ]
+    not_implemented_versions = {
+        'test_complex_float': (3.4, 3.5),
+    }

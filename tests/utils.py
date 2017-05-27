@@ -587,10 +587,22 @@ class TranspileTestCase(TestCase):
 
 
 class NotImplementedToExpectedFailure:
+    def _is_not_implemented(self):
+        method_name = self._testMethodName
+        if method_name in getattr(self, 'not_implemented', []):
+            return True
+        not_implemented_versions = getattr(self, 'not_implemented_versions', {})
+        if method_name not in not_implemented_versions:
+            return False
+        py_version = float("%s.%s" % (sys.version_info.major, sys.version_info.minor))
+        if py_version in not_implemented_versions[method_name]:
+            return True
+        return False
+
     def run(self, result=None):
         # Override the run method to inject the "expectingFailure" marker
         # when the test case runs.
-        if self._testMethodName in getattr(self, 'not_implemented', []):
+        if self._is_not_implemented():
             # Mark 'expecting failure' on class. It will only be applicable
             # for this specific run.
 

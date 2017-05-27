@@ -73,8 +73,6 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 
     not_implemented = [
-
-
         'test_direct_eq_bytearray',
         'test_direct_eq_none',
 
@@ -93,41 +91,50 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_ne_bytearray',
         'test_direct_ne_none',
 
-
-
-
-
-
-
-
-
         'test_modulo_complex',
         'test_modulo_dict',
-
-
-
-
-
-
-
-
     ]
 
+    not_implemented_versions = {
+        'test_modulo_None': (3.5, 3.6),
+        'test_modulo_NotImplemented': (3.5, 3.6),
+        'test_modulo_bool': (3.5, 3.6),
+        'test_modulo_bytearray': (3.5, 3.6),
+        'test_modulo_bytes': (3.5, 3.6),
+        'test_modulo_class': (3.5, 3.6),
+        'test_modulo_float': (3.5, 3.6),
+        'test_modulo_frozenset': (3.5, 3.6),
+        'test_modulo_int': (3.5, 3.6),
+        'test_modulo_list': (3.5, 3.6),
+        'test_modulo_range': (3.5, 3.6),
+        'test_modulo_set': (3.5, 3.6),
+        'test_modulo_slice': (3.5, 3.6),
+        'test_modulo_str': (3.5, 3.6),
+        'test_modulo_tuple': (3.5, 3.6),
+    }
 
 class InplaceBytesOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 
     not_implemented = [
-
-
-
-
         'test_modulo_complex',
-
-
-
-
-
-
-
+        'test_modulo_dict',
     ]
+
+    not_implemented_versions = {
+        'test_modulo_None': (3.5, 3.6),
+        'test_modulo_NotImplemented': (3.5, 3.6),
+        'test_modulo_bool': (3.5, 3.6),
+        'test_modulo_bytearray': (3.5, 3.6),
+        'test_modulo_bytes': (3.5, 3.6),
+        'test_modulo_class': (3.5, 3.6),
+        'test_modulo_float': (3.5, 3.6),
+        'test_modulo_frozenset': (3.5, 3.6),
+        'test_modulo_int': (3.5, 3.6),
+        'test_modulo_list': (3.5, 3.6),
+        'test_modulo_range': (3.5, 3.6),
+        'test_modulo_set': (3.5, 3.6),
+        'test_modulo_slice': (3.5, 3.6),
+        'test_modulo_str': (3.5, 3.6),
+        'test_modulo_tuple': (3.5, 3.6),
+    }
