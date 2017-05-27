@@ -151,9 +151,6 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'slice'
 
     not_implemented = [
-
-
-
         'test_direct_eq_slice',
         'test_direct_ge_slice',
         'test_direct_gt_slice',
@@ -162,18 +159,9 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_direct_ne_slice',
 
         'test_eq_slice',
-
-        'test_ge_class',
         'test_ge_slice',
-
-        'test_gt_class',
         'test_gt_slice',
-
-        'test_le_class',
         'test_le_slice',
-
-
-        'test_lt_class',
         'test_lt_slice',
 
         'test_modulo_complex',
@@ -185,9 +173,6 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_tuple',
 
         'test_ne_slice',
-
-
-
 
         'test_subscr_bool',
         'test_subscr_bytearray',
@@ -206,9 +191,6 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_slice',
         'test_subscr_str',
         'test_subscr_tuple',
-
-
-
     ]
 
 
@@ -216,9 +198,6 @@ class InplaceSliceOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'slice'
 
     not_implemented = [
-
-
-
         'test_modulo_complex',
 
         'test_multiply_bytearray',
@@ -226,10 +205,4 @@ class InplaceSliceOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_list',
         'test_multiply_str',
         'test_multiply_tuple',
-
-
-
-
-
-
     ]

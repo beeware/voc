@@ -34,30 +34,9 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_add_complex',
-
-
-
-
-        'test_eq_class',
-
-        'test_ge_class',
-
-        'test_gt_class',
-
-        'test_le_class',
-
-
-        'test_lt_class',
-
         'test_modulo_complex',
-
         'test_multiply_complex',
-
-        'test_ne_class',
-
-
         'test_power_complex',
-
 
         'test_subscr_bool',
         'test_subscr_bytearray',
@@ -111,7 +90,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_float',
         'test_floor_divide_int',
 
-
         'test_modulo_bool',
         'test_modulo_complex',
         'test_modulo_float',
@@ -133,7 +111,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_complex',
         'test_power_float',
         'test_power_int',
-
 
         'test_subtract_bool',
         'test_subtract_complex',
