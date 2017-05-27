@@ -21,7 +21,24 @@ public class Slice extends org.python.types.Object {
         } else if (start instanceof org.python.types.NoneType) {
             this.__dict__.put("start", start);
         } else {
-            throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
+            org.python.Object index_object = null;
+            boolean error_caught = false;
+            try {
+                index_object = start.__index__();
+            } catch (org.python.exceptions.TypeError error) {
+                error_caught = true;
+            } catch (org.python.exceptions.AttributeError error) {
+                error_caught = true;
+            }
+            if (error_caught) {
+                throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
+            }
+            if (index_object instanceof org.python.types.Int) {
+                this.__dict__.put("start", start);
+                this.start = (org.python.types.Int) index_object;
+            } else {
+                throw new org.python.exceptions.TypeError("TypeError: __index__ returned non-int (type " + index_object.typeName() + ")");
+            }
         }
 
         if (stop instanceof org.python.types.Int) {
@@ -30,7 +47,24 @@ public class Slice extends org.python.types.Object {
         } else if (stop instanceof org.python.types.NoneType) {
             this.__dict__.put("stop", stop);
         } else {
-            throw new org.python.exceptions.TypeError("'" + stop.typeName() + "' object cannot be interpreted as an integer");
+            org.python.Object index_object = null;
+            boolean error_caught = false;
+            try {
+                index_object = stop.__index__();
+            } catch (org.python.exceptions.TypeError error) {
+                error_caught = true;
+            } catch (org.python.exceptions.AttributeError error) {
+                error_caught = true;
+            }
+            if (error_caught) {
+                throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
+            }
+            if (index_object instanceof org.python.types.Int) {
+                this.__dict__.put("stop", stop);
+                this.stop = (org.python.types.Int) index_object;
+            } else {
+                throw new org.python.exceptions.TypeError("TypeError: __index__ returned non-int (type " + index_object.typeName() + ")");
+            }
         }
 
         if (step instanceof org.python.types.Int) {
@@ -43,7 +77,24 @@ public class Slice extends org.python.types.Object {
         } else if (step instanceof org.python.types.NoneType) {
             this.__dict__.put("step", step);
         } else {
-            throw new org.python.exceptions.TypeError("'" + step.typeName() + "' object cannot be interpreted as an integer");
+            org.python.Object index_object = null;
+            boolean error_caught = false;
+            try {
+                index_object = step.__index__();
+            } catch (org.python.exceptions.TypeError error) {
+                error_caught = true;
+            } catch (org.python.exceptions.AttributeError error) {
+                error_caught = true;
+            }
+            if (error_caught) {
+                throw new org.python.exceptions.TypeError("slice indices must be integers or None or have an __index__ method");
+            }
+            if (index_object instanceof org.python.types.Int) {
+                this.__dict__.put("step", step);
+                this.step = (org.python.types.Int) index_object;
+            } else {
+                throw new org.python.exceptions.TypeError("TypeError: __index__ returned non-int (type " + index_object.typeName() + ")");
+            }
         }
     }
 

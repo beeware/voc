@@ -19,7 +19,7 @@ public class Complex extends org.python.types.Object {
     }
 
     public org.python.Object byValue() {
-        throw new org.python.exceptions.NotImplementedError("complex.byValue() has not been implemented.");
+        throw new org.python.exceptions.AttributeError("type object 'complex' has no attribute 'byValue'");
     }
 
     public int hashCode() {
@@ -251,7 +251,8 @@ public class Complex extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.types.Bool __bool__() {
-        throw new org.python.exceptions.NotImplementedError("complex.__bool__ has not been implemented.");
+        // A complex number is "truthy" if either its real component or imaginary component are > 0
+        return new org.python.types.Bool((this.real.value != 0.0) || (this.imag.value != 0.0));
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
