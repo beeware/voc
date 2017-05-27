@@ -38,6 +38,7 @@ class BinaryBytearrayOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_complex': (3.4, ),
     }
 
+
 class InplaceBytearrayOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 
