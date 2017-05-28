@@ -60,6 +60,9 @@ class BinaryComplexOperationTests(BinaryOperationTestCase, TranspileTestCase):
     }
 
     not_implemented = [
+    ]
+
+    is_flakey = [
         'test_power_complex',
         'test_power_float',
     ]

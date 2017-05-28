@@ -113,11 +113,14 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_bool_complex',
 
         'test_complex_complex',
-        'test_complex_float',
 
         'test_float_complex',
         'test_float_float',
 
         'test_int_complex',
         'test_int_float',
+    ]
+
+    is_flakey = [
+        'test_complex_float',
     ]

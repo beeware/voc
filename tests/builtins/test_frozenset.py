@@ -16,8 +16,5 @@ class BuiltinFrozensetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     is_flakey = [
         'test_dict',
+        'test_tuple',
     ]
-
-    not_implemented_versions = {
-        'test_tuple': (3.4,),
-    }

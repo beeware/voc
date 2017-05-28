@@ -274,7 +274,6 @@ class InplaceBytesOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_modulo_complex',
-        'test_modulo_dict',
     ]
 
     not_implemented_versions = {
@@ -294,3 +293,7 @@ class InplaceBytesOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_str': (3.5, 3.6),
         'test_modulo_tuple': (3.5, 3.6),
     }
+
+    is_flakey = [
+        'test_modulo_dict',
+    ]
