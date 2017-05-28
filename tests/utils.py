@@ -604,15 +604,12 @@ class NotImplementedToExpectedFailure:
             return True
 
         not_implemented_versions = getattr(self, 'not_implemented_versions', {})
-        if method_name not in not_implemented_versions:
-            if _debug:
-                print('%s - _is_not_implemented: NOT not_implemented_versions' % method_name)
-            return False
-        py_version = float("%s.%s" % (sys.version_info.major, sys.version_info.minor))
-        if py_version in not_implemented_versions[method_name]:
-            if _debug:
-                print('%s - _is_not_implemented: not_implemented_versions [%s]' % (method_name, py_version))
-            return True
+        if method_name in not_implemented_versions:
+            py_version = float("%s.%s" % (sys.version_info.major, sys.version_info.minor))
+            if py_version in not_implemented_versions[method_name]:
+                if _debug:
+                    print('%s - _is_not_implemented: not_implemented_versions [%s]' % (method_name, py_version))
+                return True
 
         if _debug:
             print('%s - _is_not_implemented: NOPE' % method_name)
