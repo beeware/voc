@@ -594,23 +594,28 @@ class NotImplementedToExpectedFailure:
         _debug = True
         method_name = self._testMethodName
         if method_name in getattr(self, 'not_implemented', []):
-            if _debug: print('%s - _is_not_implemented: not_implemented' % method_name)
+            if _debug:
+                print('%s - _is_not_implemented: not_implemented' % method_name)
             return True
 
         if self._is_flakey():
-            if _debug: print('%s - _is_not_implemented: is_flakey' % method_name)
+            if _debug:
+                print('%s - _is_not_implemented: is_flakey' % method_name)
             return True
 
         not_implemented_versions = getattr(self, 'not_implemented_versions', {})
         if method_name not in not_implemented_versions:
-            if _debug: print('%s - _is_not_implemented: NOT not_implemented_versions' % method_name)
+            if _debug:
+                print('%s - _is_not_implemented: NOT not_implemented_versions' % method_name)
             return False
         py_version = float("%s.%s" % (sys.version_info.major, sys.version_info.minor))
         if py_version in not_implemented_versions[method_name]:
-            if _debug: print('%s - _is_not_implemented: not_implemented_versions [%s]' % (method_name, py_version))
+            if _debug:
+                print('%s - _is_not_implemented: not_implemented_versions [%s]' % (method_name, py_version))
             return True
 
-        if _debug: print('%s - _is_not_implemented: NOPE' % method_name)
+        if _debug:
+            print('%s - _is_not_implemented: NOPE' % method_name)
         return False
 
     def run(self, result=None):
@@ -626,8 +631,6 @@ class NotImplementedToExpectedFailure:
 
             def wrapper(*args, **kwargs):
                 if self._is_flakey():
-                    with open("flakey.txt", 'a') as f:
-                        f.write("%s : IS FLAKEY\n" % self._testMethodName)
                     raise Exception("Flakey test that sometimes passes and sometimes fails")
                 return test_method(*args, **kwargs)
 
