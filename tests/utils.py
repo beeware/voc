@@ -591,28 +591,19 @@ class NotImplementedToExpectedFailure:
         return self._testMethodName in getattr(self, "is_flakey", [])
 
     def _is_not_implemented(self):
-        _debug = True
         method_name = self._testMethodName
         if method_name in getattr(self, 'not_implemented', []):
-            if _debug:
-                print('%s - _is_not_implemented: not_implemented' % method_name)
             return True
 
         if self._is_flakey():
-            if _debug:
-                print('%s - _is_not_implemented: is_flakey' % method_name)
             return True
 
         not_implemented_versions = getattr(self, 'not_implemented_versions', {})
         if method_name in not_implemented_versions:
             py_version = float("%s.%s" % (sys.version_info.major, sys.version_info.minor))
             if py_version in not_implemented_versions[method_name]:
-                if _debug:
-                    print('%s - _is_not_implemented: not_implemented_versions [%s]' % (method_name, py_version))
                 return True
 
-        if _debug:
-            print('%s - _is_not_implemented: NOPE' % method_name)
         return False
 
     def run(self, result=None):
