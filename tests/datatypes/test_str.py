@@ -727,39 +727,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
     not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_direct_eq_bytes',
-        'test_direct_ge_bytes',
-        'test_direct_gt_bytes',
-        'test_direct_le_bytes',
-        'test_direct_lt_bytes',
-        'test_direct_ne_bytes',
-
-        'test_direct_eq_frozenset',
-        'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_lt_frozenset',
-        'test_direct_ne_frozenset',
-
-        'test_eq_frozenset',
-
-        'test_ge_frozenset',
-
-        'test_gt_frozenset',
-
-        'test_le_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_lt_frozenset',
-
         'test_modulo_bool',
         'test_modulo_bytes',
         'test_modulo_bytearray',
@@ -778,33 +745,8 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_str',
         'test_modulo_tuple',
 
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_ne_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
         'test_subscr_bool',
-        'test_subscr_class',
-        'test_subscr_frozenset',
         'test_subscr_slice',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
     ]
 
 
@@ -812,15 +754,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
     not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
         'test_modulo_bool',
         'test_modulo_bytes',
         'test_modulo_bytearray',
@@ -838,25 +771,4 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_set',
         'test_modulo_str',
         'test_modulo_tuple',
-
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
     ]

@@ -35,7 +35,4 @@ class BuiltinNextFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["next"]
 
     not_implemented = [
-        'test_class',
-        'test_frozenset',
-        'test_range',
     ]
