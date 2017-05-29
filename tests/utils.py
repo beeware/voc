@@ -591,11 +591,21 @@ class NotImplementedToExpectedFailure:
         return self._testMethodName in getattr(self, "is_flakey", [])
 
     def _is_not_implemented(self):
+        '''
+        A test is expected to fail if:
+          (a) Its name can be found in the test case's 'not_implemented' list
+          (b) Its name can be found in the test case's 'is_flakey' list
+          (c) Its name can be found in the test case's
+              'not_implemented_versions' dictionary _and_ the current
+              python version is in the dict entry's list
+        :return: True if test is expected to fail
+        '''
         method_name = self._testMethodName
         if method_name in getattr(self, 'not_implemented', []):
             return True
 
         if self._is_flakey():
+            # -- Flakey tests sometimes fail, sometimes pass
             return True
 
         not_implemented_versions = getattr(self, 'not_implemented_versions', {})
@@ -619,7 +629,7 @@ class NotImplementedToExpectedFailure:
 
             def wrapper(*args, **kwargs):
                 if self._is_flakey():
-                    raise Exception("Flakey test that sometimes passes and sometimes fails")
+                    raise Exception("Flakey test that sometimes fails and sometimes passes")
                 return test_method(*args, **kwargs)
 
             wrapper.__unittest_expecting_failure__ = True
