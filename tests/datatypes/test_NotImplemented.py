@@ -17,27 +17,10 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
     data_type = 'NotImplemented'
 
     not_implemented = [
-
-
-
-
-
-
-
-
-
-
         'test_modulo_complex',
 
         'test_multiply_bytes',
         'test_multiply_bytearray',
-
-
-
-
-
-
-
 
     ]
 
@@ -46,13 +29,10 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
     data_type = 'NotImplemented'
 
     not_implemented = [
-
-
         'test_eq_bytearray',
         'test_eq_class',
         'test_eq_complex',
         'test_eq_frozenset',
-
 
         'test_ge_bytearray',
         'test_ge_class',
@@ -68,7 +48,6 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_le_class',
         'test_le_complex',
         'test_le_frozenset',
-
 
         'test_lt_bytearray',
         'test_lt_class',
@@ -88,15 +67,9 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_ne_complex',
         'test_ne_frozenset',
 
-
-
-
         'test_subscr_bytearray',
         'test_subscr_bytes',
         'test_subscr_class',
         'test_subscr_complex',
         'test_subscr_frozenset',
-
-
-
     ]

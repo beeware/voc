@@ -34,20 +34,4 @@ class BuiltinHasattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
     functions = ["hasattr"]
 
     not_implemented = [
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     ]

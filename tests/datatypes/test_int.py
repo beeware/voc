@@ -37,30 +37,14 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'int'
 
     not_implemented = [
-
-
-
-
-
-
-
-
-
-
         'test_modulo_complex',
 
         'test_multiply_complex',
 
-
-
         'test_power_complex',
         'test_power_float',
 
-
-
-
         'test_true_divide_complex',
-
     ]
 
 
@@ -70,9 +54,7 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_add_complex',
 
-
         'test_floor_divide_float',
-
 
         'test_modulo_complex',
         'test_modulo_float',
@@ -85,7 +67,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
 
-
         'test_power_complex',
         'test_power_float',
         'test_power_int',
@@ -95,5 +76,4 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_subtract_float',
 
         'test_true_divide_complex',
-
     ]

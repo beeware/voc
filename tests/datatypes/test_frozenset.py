@@ -329,22 +329,7 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
 
     not_implemented = [
-
-
-
-
-
-
-
-
-
-
         'test_modulo_complex',
-
-
-
-
-
 
         'test_subscr_bool',
         'test_subscr_bytearray',
@@ -363,9 +348,6 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_slice',
         'test_subscr_str',
         'test_subscr_tuple',
-
-
-
     ]
 
 
@@ -373,16 +355,5 @@ class InplaceFrozensetOperationTests(InplaceOperationTestCase, TranspileTestCase
     data_type = 'frozenset'
 
     not_implemented = [
-
-
-
-
         'test_modulo_complex',
-
-
-
-
-
-
-
     ]

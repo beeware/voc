@@ -727,16 +727,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
     not_implemented = [
-
-
-
-
-
-
-
-
-
-
         'test_modulo_bool',
         'test_modulo_bytes',
         'test_modulo_bytearray',
@@ -755,16 +745,8 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_str',
         'test_modulo_tuple',
 
-
-
-
-
-
         'test_subscr_bool',
         'test_subscr_slice',
-
-
-
     ]
 
 
@@ -772,9 +754,6 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
     not_implemented = [
-
-
-
         'test_modulo_bool',
         'test_modulo_bytes',
         'test_modulo_bytearray',
@@ -792,11 +771,4 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_set',
         'test_modulo_str',
         'test_modulo_tuple',
-
-
-
-
-
-
-
     ]

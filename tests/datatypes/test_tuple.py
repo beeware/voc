@@ -270,29 +270,9 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
 
     not_implemented = [
-
-
-
-
-
-
-
-
-
-
-
         'test_modulo_complex',
-
-
-
-
-
-
         'test_subscr_bool',
         'test_subscr_slice',
-
-
-
     ]
 
 
@@ -300,9 +280,6 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
 
     not_implemented = [
-
-
-
         'test_modulo_complex',
 
         'test_multiply_bytearray',
@@ -320,10 +297,4 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_set',
         'test_multiply_str',
         'test_multiply_tuple',
-
-
-
-
-
-
     ]

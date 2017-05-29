@@ -243,7 +243,6 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_ne_str',
         'test_ne_tuple',
 
-
         'test_power_bool',
         'test_power_complex',
         'test_power_float',
@@ -281,5 +280,4 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_true_divide_float',
         'test_true_divide_int',
         'test_true_divide_none',
-
     ]

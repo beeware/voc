@@ -35,36 +35,20 @@ class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_bool_bytearray',
-
         'test_bytearray_bytearray',
-
         'test_bytes_bytearray',
-
         'test_class_bytearray',
-
         'test_complex_bytearray',
-
         'test_dict_bytearray',
-
         'test_float_bytearray',
-
         'test_frozenset_bytearray',
-
         'test_int_bytearray',
-
         'test_list_bytearray',
-
         'test_None_bytearray',
-
         'test_NotImplemented_bytearray',
-
         'test_range_bytearray',
-
         'test_set_bytearray',
-
         'test_slice_bytearray',
-
         'test_str_bytearray',
-
         'test_tuple_bytearray',
     ]

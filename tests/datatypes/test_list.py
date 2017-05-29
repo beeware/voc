@@ -599,29 +599,9 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'list'
 
     not_implemented = [
-
-
-
-
-
-
-
-
-
-
-
         'test_modulo_complex',
-
-
-
-
-
-
         'test_subscr_bool',
         'test_subscr_slice',
-
-
-
     ]
 
 
@@ -637,15 +617,5 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_add_set',
         'test_add_str',
 
-
-
-
         'test_modulo_complex',
-
-
-
-
-
-
-
     ]
