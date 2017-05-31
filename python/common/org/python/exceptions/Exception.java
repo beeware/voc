@@ -9,7 +9,11 @@ public class Exception extends org.python.exceptions.BaseException {
         super(msg);
     }
 
-    public Exception(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        super(args, kwargs);
+    public Exception(org.python.types.Tuple tuple) {
+        super();
+    }    
+
+    public Exception(org.python.Object args) {
+        super(args);
     }
 }

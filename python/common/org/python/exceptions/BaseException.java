@@ -9,6 +9,14 @@ public class BaseException extends org.python.types.Object {
         // System.out.println("EX: " + this);
     }
 
+    public BaseException(org.python.types.Tuple tuple) {
+        super();
+    }
+
+    public BaseException(org.python.Object args) {
+        super(args.toString());
+    }    
+
     public BaseException(String msg) {
         super(msg);
         // System.out.println("EX: " + this);
