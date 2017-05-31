@@ -30,6 +30,7 @@ public class Python {
         builtins.put("int", org.python.types.Type.pythonType(org.python.types.Int.class));
         builtins.put("float", org.python.types.Type.pythonType(org.python.types.Float.class));
         builtins.put("frozenset", org.python.types.Type.pythonType(org.python.types.FrozenSet.class));
+        builtins.put("namedtuple", org.python.types.Type.pythonType(org.python.types.NamedTuple.class));
         builtins.put("list", org.python.types.Type.pythonType(org.python.types.List.class));
         builtins.put("memoryview", org.python.types.Type.pythonType(org.python.types.MemoryView.class));
         builtins.put("set", org.python.types.Type.pythonType(org.python.types.Set.class));
