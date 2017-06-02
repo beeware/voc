@@ -23,7 +23,7 @@ VOC
 .. image:: https://badges.gitter.im/pybee/general.svg
     :target: https://gitter.im/pybee/general
 
-A transpiler that converts Python code into Java bytecode.
+A transpiler that converts Python bytecode into Java bytecode.
 
 This is experimental code. If it breaks, you get to keep all the shiny pieces.
 
