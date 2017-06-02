@@ -6,6 +6,36 @@ from .python.ast import Visitor
 from .python.debug import dump
 
 
+class testing(ast.NodeTransformer):
+    def visit_BinOp(self,node):
+        if isinstance(node.left,ast.Name):
+            attr = {
+                        ast.Add: '__add__',
+                        ast.Sub: '__sub__',
+                        ast.Mult: '__mul__',
+                        ast.Div: '__truediv__',
+                        ast.FloorDiv: '__floordiv__',
+                        ast.Mod: '__mod__',
+                        ast.Pow: '__pow__',
+                        ast.LShift: '__lshift__',
+                        ast.RShift: '__rshift__',
+                        ast.BitOr: '__or__',
+                        ast.BitXor: '__xor__',
+                        ast.BitAnd: '__and__',
+                        # ast.MatMult:
+                    }[type(node.op)]
+            attr2 = ast.Attribute(value=node.left,attr=attr,ctx=ast.Load())
+#             node.func = attr2
+#             node.args = [node.right]
+#             node.keywords = []
+            node2 = ast.Call(func=attr2,args=[node.right],keywords=[])
+            node2 = ast.copy_location(node2,node)
+            node2 = ast.fix_missing_locations(node2)
+            return node2
+        else:
+            return node
+
+
 def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):
     transpiler = Transpiler(namespace=namespace, verbosity=verbosity)
 
@@ -16,6 +46,7 @@ def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):
 
             with open(file_or_dir) as source:
                 ast_module = ast.parse(source.read(), mode='exec')
+                ast_module = testing().visit(ast_module)
                 transpiler.transpile(file_or_dir, ast_module, prefix)
         elif os.path.isdir(file_or_dir):
             for root, dirs, files in os.walk(file_or_dir, followlinks=True):
@@ -26,6 +57,7 @@ def transpile(input, prefix='.', outdir=None, namespace='python', verbosity=0):
                             print("Compiling %s ..." % source_file)
                         with open(source_file) as source:
                             ast_module = ast.parse(source.read(), mode='exec')
+                            ast_module = testing().visit(ast_module)
                             transpiler.transpile(source_file, ast_module, prefix)
         else:
             print("Unknown source file: %s" % file_or_dir, file=sys.stderr)
