@@ -89,14 +89,14 @@ public class Str extends org.python.types.Object {
     * TODO: Need to treat the leading surrogate pair characters
     */
         StringBuilder sb = new StringBuilder();
-        boolean has_double_quote = false;
-        boolean has_single_quote = false;
+        boolean hasDoubleQuote = false;
+        boolean hasSingleQuote = false;
 
         for (char c : this.value.toCharArray()) {
             if (c == '\'') {
-                has_single_quote = true;
+                hasSingleQuote = true;
             } else if (c == '"') {
-                has_double_quote = true;
+                hasDoubleQuote = true;
             }
 
             if (c == '\n') {
@@ -121,15 +121,15 @@ public class Str extends org.python.types.Object {
         String quote;
         String repr = sb.toString();
 
-        if (has_single_quote) {
-            if (has_double_quote) {
-                quote = new String("'");
+        if (hasSingleQuote) {
+            if (hasDoubleQuote) {
+                quote = "'";
                 repr = repr.replaceAll("'", "\\\\'");
             } else {
-                quote = new String("\"");
+                quote = "\"";
             }
         } else {
-            quote = new String("'");
+            quote = "'";
         }
 
         return new org.python.types.Str(quote + repr + quote);
