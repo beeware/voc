@@ -66,13 +66,75 @@ public class Str extends org.python.types.Object {
     //     throw new org.python.exceptions.NotImplementedError("__init__() has not been implemented.");
     // }
 
+    private static boolean isCharPrintable(char c) {
+        // ASCII non-printable
+        if ((int) c <= 0x1f || (int) c >= 0x7f && (int) c <= 0xa0 || (int) c == 0xad) {
+            return false;
+        }
+        if ((int) c == 0x2029) {
+            return false;
+        }
+        if (Character.isISOControl(c)) {
+            return false;
+        }
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __repr__() {
-        String repr = this.value.replaceAll("\\n", "\\\\n").replaceAll("\\r", "\\\\r");
-        return new org.python.types.Str("'" + repr + "'");
+    /*
+    * Reference: https://www.python.org/dev/peps/pep-3138/#id7
+    * TODO: Need to treat the leading surrogate pair characters
+    */
+        StringBuilder sb = new StringBuilder();
+        boolean hasDoubleQuote = false;
+        boolean hasSingleQuote = false;
+
+        for (char c : this.value.toCharArray()) {
+            if (c == '\'') {
+                hasSingleQuote = true;
+            } else if (c == '"') {
+                hasDoubleQuote = true;
+            }
+
+            if (c == '\n') {
+                sb.append("\\n");
+            } else if (c == '\t') {
+                sb.append("\\t");
+            } else if (c == '\r') {
+                sb.append("\\r");
+            } else if (c == '\\') {
+                sb.append("\\\\");
+            // ASCII Non-Printable
+            } else if (c <= 0x1f || c >= 0x7f && c <= 0xa0 || c == 0xad) {
+                sb.append(String.format("\\x%02x", (int) c));
+            } else if (!this.isCharPrintable(c)) {
+                sb.append(String.format("\\u%04x", (int) c));
+            } else {
+                sb.append((char) c);
+            }
+        }
+
+        // Decide if we wanna wrap the result with single or double quotes
+        String quote;
+        String repr = sb.toString();
+
+        if (hasSingleQuote) {
+            if (hasDoubleQuote) {
+                quote = "'";
+                repr = repr.replaceAll("'", "\\\\'");
+            } else {
+                quote = "\"";
+            }
+        } else {
+            quote = "'";
+        }
+
+        return new org.python.types.Str(quote + repr + quote);
     }
+
 
     @org.python.Method(
             __doc__ = ""
@@ -900,7 +962,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isprintable() {
         for (char ch : this.value.toCharArray()) {
-            if (Character.isISOControl(ch)) {
+            if (!this.isCharPrintable(ch)) {
                 return new org.python.types.Bool(false);
             }
         }
@@ -1386,6 +1448,25 @@ public class Str extends org.python.types.Object {
         return result_list;
     }
 
+    private static boolean isLineBreak(char character) {
+        // List of line boundaries from https://docs.python.org/3.4/library/stdtypes.html#str.splitlines
+        switch (character) {
+            case '\n':
+            case '\r':
+            case '\u000B':
+            case '\u000C':
+            case '\u001C':
+            case '\u001D':
+            case '\u001E':
+            case '\u0085':
+            case '\u2028':
+            case '\u2029':
+                return true;
+            default:
+                return false;
+        }
+    }
+
     @org.python.Method(
             __doc__ = "S.splitlines([keepends]) -> list of strings\n" +
                     "\n" +
@@ -1415,7 +1496,7 @@ public class Str extends org.python.types.Object {
                 next = this.value.charAt(i + 1);
             }
 
-            if (current == '\n' || current == '\r') {
+            if (this.isLineBreak(current)) {
                 end = i;
                 if (current == '\r' && next == '\n') {
                     skip = true;

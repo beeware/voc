@@ -1,3 +1,6 @@
+
+from unittest import expectedFailure
+
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
@@ -697,25 +700,38 @@ class StrTests(TranspileTestCase):
 
     def test_isprintable(self):
         self.assertCodeExecution("""
-        for str_ in [chr(i) for i in range(33)] + ['AAA', 'bcd', '1234', 'eÃⱣỉ', 'ÃⱣỉ', '', '\x07' + 'foo']:
+        for str_ in [chr(i) for i in range(33)] + ['AAA', 'bcd', '1234', 'eÃⱣỉ', 'ÃⱣỉ', '', '\x07' + 'foo', '\u2029']:
             print(str_.isprintable())
             """)
 
+    @expectedFailure
+    def test_isprintable_missing_cases(self):
+        self.assertCodeExecution(r"""
+        tests = ['\u2028']:
+        for test in tests:
+            print(test.isprintable())
+        """)
+
     def test_repr(self):
-        self.assertCodeExecution("""
-        str_ = "\\r\\n"
-        print(repr(str_))
+        self.assertCodeExecution(r"""
+        tests = ["\r\n", "áéíóú", "\u000B", "\u2029", "\\", "'", "\"", "\"'"]
+        for test in tests:
+            print(repr(test))
         """)
 
     def test_splitlines(self):
-        self.assertCodeExecution("""
-        str_ = "aaa\\nbbb\\rccc\\r\\nddd\\n\\reee"
+        self.assertCodeExecution(r"""
+        str_ = "aaa\nbbb\rccc\r\nddd\n\reee"
 
         print(str_.splitlines())
         print(str_.splitlines(True))
-        print('Dont Panic\\n'.splitlines())
-        print('\\n'.splitlines())
+        print("Don't Panic\n".splitlines())
+        print('\n'.splitlines())
         print(''.splitlines())
+
+        s1 = '\r\n\r\n\v\f\x0b\x0c\u2029\x1c\x1d\x1e\x85'
+        print(s1.splitlines())
+        print(s1.splitlines(True))
         """)
 
 
