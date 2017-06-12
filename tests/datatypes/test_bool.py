@@ -32,13 +32,6 @@ class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
-    def test_xor_int(self):
-        self.assertCodeExecution("""
-            x = True
-            x ^ 2
-            #expect 3
-            """)
-
     not_implemented = [
         'test_add_complex',
         'test_modulo_complex',
@@ -80,6 +73,7 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_true_divide_str',
         'test_true_divide_tuple',
 
+        'test_xor_int',
     ]
 
 
