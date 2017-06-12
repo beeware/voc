@@ -140,6 +140,12 @@ class Block(Accumulator):
     def can_ignore_empty(self):
         return False
 
+    @property
+    def has_nested_structure(self):
+        """Whether the block has nested structures inside.
+        """
+        return any([self.blocks, self.loops, self.try_catches])
+
     def add_str(self, value):
         self.add_opcodes(
             python.Str(value),
