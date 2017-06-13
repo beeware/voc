@@ -25,7 +25,7 @@ class BuiltinListFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
             "['d', 'c', 'a']",
         ]
     })
-    print(substitutions)
+
     not_implemented = [
         'test_bytearray',
     ]
