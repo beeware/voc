@@ -317,3 +317,36 @@ class FunctionTests(TranspileTestCase):
 
             print (myfunc())
             """)
+
+    def test_function_try_except_return_no_exception(self):
+        self.assertCodeExecution("""
+            def myfunc(x):
+                try:
+                    return x
+                except NameError:
+                    return None
+
+            print(myfunc(10))
+            """)
+
+    def test_function_try_except_return_caught_exception(self):
+        self.assertCodeExecution("""
+            def myfunc(x):
+                try:
+                    return y
+                except NameError:
+                    return x
+
+            print(myfunc(10))
+            """)
+
+    def test_function_try_except_return_uncaught_exception(self):
+        self.assertCodeExecution("""
+            def myfunc(x):
+                try:
+                    return z
+                except IndexError:
+                    return x
+
+            print(myfunc(10))
+            """, exits_early=True)
