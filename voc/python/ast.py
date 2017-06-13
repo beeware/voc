@@ -299,7 +299,8 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(python.NONE())
         self.context.add_opcodes(JavaOpcodes.ARETURN())
         # Record how deep we were when this return was added.
-        self.context.opcodes[-1].depth = len(self.context.blocks)
+        self.context.opcodes[-1].needs_implicit_return = \
+            self.context.has_nested_structure
 
     @node_visitor
     def visit_Delete(self, node):
@@ -1106,7 +1107,8 @@ class Visitor(ast.NodeVisitor):
 
         self.visit(node.body)
         self.context.add_opcodes(JavaOpcodes.ARETURN())
-        self.context.opcodes[-1].depth = len(self.context.blocks)
+        self.context.opcodes[-1].needs_implicit_return = \
+            self.context.has_nested_structure
 
         self.pop_context()
 

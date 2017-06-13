@@ -507,7 +507,7 @@ class Function(Block):
             # return was not added at the root level (i.e., it's not a return
             # as the last statement of an IF statement), add one.
             try:
-                return_required = self.opcodes[-1].depth > 0
+                return_required = self.opcodes[-1].needs_implicit_return
             except AttributeError:
                 return_required = True
         else:
