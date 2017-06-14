@@ -73,7 +73,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_true_divide_str',
         'test_true_divide_tuple',
 
-        'test_xor_int',
     ]
 
 
