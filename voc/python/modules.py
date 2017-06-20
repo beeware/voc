@@ -72,6 +72,9 @@ class Module(Block):
     def class_descriptor(self):
         return '/'.join(self.namespace.split('.') + ([self.name, '__init__'] if self.has_init_file else [self.name]))
 
+    def build_child_class_descriptor(self, child_name):
+        return '/'.join([self.descriptor, child_name])
+
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
