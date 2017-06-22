@@ -206,3 +206,20 @@ class InplaceSliceOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
     ]
+
+
+class SliceMethodTests(TranspileTestCase):
+    def test_slice_repr_stop(self):
+        self.assertCodeExecution("""
+            print(slice(0))
+            """)
+
+    def test_slice_repr_start_stop(self):
+        self.assertCodeExecution("""
+            print(slice(0, 100))
+            """)
+
+    def test_slice_repr_start_stop_step(self):
+        self.assertCodeExecution("""
+            print(slice(0, 100, 2))
+            """)

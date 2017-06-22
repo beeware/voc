@@ -6,11 +6,11 @@ public class Slice extends org.python.types.Object {
     org.python.types.Int step;
 
     public Slice(org.python.Object stop) {
-        this(new org.python.types.Int(0), stop, new org.python.types.Int(1));
+        this(org.python.types.NoneType.NONE, stop, org.python.types.NoneType.NONE);
     }
 
     public Slice(org.python.Object start, org.python.Object stop) {
-        this(start, stop, new org.python.types.Int(1));
+        this(start, stop, org.python.types.NoneType.NONE);
     }
 
     public Slice(org.python.Object start, org.python.Object stop, org.python.Object step) {
@@ -96,6 +96,17 @@ public class Slice extends org.python.types.Object {
                 throw new org.python.exceptions.TypeError("TypeError: __index__ returned non-int (type " + index_object.typeName() + ")");
             }
         }
+    }
+
+    @org.python.Method(
+            __doc__ = "Return repr(self)."
+    )
+    public org.python.Object __repr__() {
+        return new org.python.types.Str(String.format(
+            "slice(%s, %s, %s)",
+            this.start == null ? "None" : this.start.__repr__(),
+            this.stop == null ? "None" : this.stop.__repr__(),
+            this.step == null ? "None" : this.step.__repr__()));
     }
 
     @org.python.Method(

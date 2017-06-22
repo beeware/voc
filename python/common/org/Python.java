@@ -394,10 +394,28 @@ public class Python {
                     "As repr(), return a string containing a printable representation of an\n" +
                     "object, but escape the non-ASCII characters in the string returned by\n" +
                     "repr() using \\x, \\u or \\U escapes.  This generates a string similar\n" +
-                    "to that returned by repr() in Python 2.\n"
+                    "to that returned by repr() in Python 2.\n",
+            args = {"object"}
     )
-    public static org.python.types.Str ascii() {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'ascii' not implemented");
+    public static org.python.types.Object ascii(org.python.Object object) {
+        String string = ((org.python.types.Str) object.__repr__()).value;
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < string.length(); i++) {
+            int cp = string.codePointAt(i);
+            if (cp < 0x80) {
+                sb.append(string.charAt(i));
+            } else if (cp < 0x100) {
+                sb.append(java.lang.String.format("\\x%02x", cp));
+            } else if (java.lang.Character.isHighSurrogate(string.charAt(i))) {
+                cp = java.lang.Character.toCodePoint(string.charAt(i), string.charAt(i + 1));
+                sb.append(java.lang.String.format("\\U%08x", cp));
+                i++;
+            } else {
+                sb.append(java.lang.String.format("\\u%04x", cp));
+            }
+        }
+        return new org.python.types.Str(sb.toString());
     }
 
     @org.python.Method(
