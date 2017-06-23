@@ -63,9 +63,9 @@ public class Slice extends org.python.types.Object {
 
     public ValidatedValue validateValueTypes() {
         ValidatedValue result = new ValidatedValue(
-            this.validateValueType(this.start),
-            this.validateValueType(this.stop),
-            this.validateValueType(this.step));
+                this.validateValueType(this.start),
+                this.validateValueType(this.stop),
+                this.validateValueType(this.step));
         if (result.step != null && result.step.value == 0) {
             throw new org.python.exceptions.ValueError("slice step cannot be zero");
         }
