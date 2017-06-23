@@ -74,6 +74,17 @@ public class Slice extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "Return repr(self)."
+    )
+    public org.python.Object __repr__() {
+        return new org.python.types.Str(String.format(
+            "slice(%s, %s, %s)",
+            this.start.__repr__(),
+            this.stop.__repr__(),
+            this.step.__repr__()));
+    }
+
+    @org.python.Method(
             __doc__ = "",
             args = {"other"}
     )
