@@ -296,7 +296,7 @@ public class ByteArray extends org.python.types.Object {
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Slice) {
-            org.python.types.Slice slice = (org.python.types.Slice) index;
+            org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
             byte[] sliced;
 
             // if (slice.start == null && slice.stop == null && slice.step == null) {

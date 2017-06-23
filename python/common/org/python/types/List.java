@@ -321,7 +321,7 @@ public class List extends org.python.types.Object {
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
-                org.python.types.Slice slice = (org.python.types.Slice) index;
+                org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
                 java.util.List<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
 
                 if (slice.start == null && slice.stop == null && slice.step == null) {
