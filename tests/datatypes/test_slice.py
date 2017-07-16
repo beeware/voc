@@ -14,6 +14,38 @@ class SliceTests(TranspileTestCase):
             print("x[5::2] = ", x[5::2])
             print("x[:5:2] = ", x[:5:2])
             print("x[2:8:2] = ", x[2:8:2])
+
+            print("x[20::2] = ", x[20::2])
+            print("x[:20:2] = ", x[:20:2])
+            print("x[20:25:2] = ", x[20:25:2])
+            """)
+
+    def test_negative_indexing_list(self):
+        self.assertCodeExecution("""
+            x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+            print("x[:] = ", x[:])
+            print("x[-5:] = ", x[-5:])
+            print("x[:-5] = ", x[:-5])
+            print("x[-2:-8] = ", x[-2:-8])
+
+            print("x[::-2] = ", x[::-2])
+            print("x[-5::-2] = ", x[-5::-2])
+            print("x[-5::2] = ", x[-5::2])
+            print("x[-15::2] = ", x[-15::2])
+            print("x[:-5:-2] = ", x[:-5:-2])
+            print("x[:5:-2] = ", x[:5:-2])
+            print("x[:-15:2] = ", x[:-15:2])
+
+            print("x[-2:-8:-2] = ", x[-2:-8:-2])
+            print("x[-20:-8:-2] = ", x[-20:-8:-2])
+            print("x[-20:-15:-2] = ", x[-20:-15:-2])
+            print("x[-20::-2] = ", x[-20::-2])
+            print("x[5:-15:-2] = ", x[5:-15:-2])
+            print("x[-12:0:-2] = ", x[-12:0:-2])
+            print("x[-12::-2] = ", x[-12::-2])
+            print("x[- 5 - len(x): -1] = ", x[- 5 - len(x): -1])
+            print("x[len(x)::-2] = ", x[len(x)::-2])
+            print("x[len(x)+2::-2] = ", x[len(x)+2::-2])
             """)
 
     def test_slice_range(self):

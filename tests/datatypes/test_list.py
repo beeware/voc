@@ -601,7 +601,6 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_modulo_complex',
         'test_subscr_bool',
-        'test_subscr_slice',
     ]
 
 

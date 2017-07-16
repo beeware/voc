@@ -337,36 +337,50 @@ public class List extends org.python.types.Object {
                     if (step < 0) {
                         long start;
                         if (slice.start != null) {
-                            start = Math.min(slice.start.value, this.value.size());
+                            if (slice.start.value < 0) {
+                                start = Math.max((this.value.size() + slice.start.value), -1);
+                            } else {
+                                start = Math.min(slice.start.value, this.value.size() - 1);
+                            }
                         } else {
                             start = this.value.size() - 1;
                         }
 
                         long stop;
                         if (slice.stop != null) {
-                            stop = Math.min(slice.stop.value, start);
+                            if (slice.stop.value < 0) {
+                                stop = Math.max((this.value.size() + slice.stop.value), 0);
+                            } else {
+                                stop = Math.min(slice.stop.value, this.value.size());
+                            }
                         } else {
                             stop = -1;
                         }
-
                         for (long i = start; i > stop; i += step) {
                             sliced.add(this.value.get((int) i));
                         }
                     } else {
                         long start;
                         if (slice.start != null) {
-                            start = Math.min(slice.start.value, this.value.size());
+                            if (slice.start.value < 0) {
+                                start = Math.max((this.value.size() + slice.start.value), 0);
+                            } else {
+                                start = Math.min(slice.start.value, this.value.size());
+                            }
                         } else {
                             start = 0;
                         }
 
                         long stop;
                         if (slice.stop != null) {
-                            stop = Math.min(slice.stop.value, this.value.size());
+                            if (slice.stop.value < 0) {
+                                stop = Math.max((this.value.size() + slice.stop.value), 0);
+                            } else {
+                                stop = Math.min(slice.stop.value, this.value.size());
+                            }
                         } else {
                             stop = this.value.size();
                         }
-
                         for (long i = start; i < stop; i += step) {
                             sliced.add(this.value.get((int) i));
                         }
@@ -401,6 +415,7 @@ public class List extends org.python.types.Object {
             }
         }
     }
+
 
     @org.python.Method(
             __doc__ = ""
