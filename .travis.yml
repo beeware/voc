@@ -9,6 +9,13 @@ env:
   - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=2
   - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=3
   - CIRCLE_NODE_TOTAL=5 CIRCLE_NODE_INDEX=4
+before_install:
+- |
+    TRAVIS_COMMIT_RANGE="FETCH_HEAD...$TRAVIS_BRANCH"
+    git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '(\.md$)|(^(docs|examples))/' || {
+      echo "Only docs were updated, stopping build process."
+      exit
+    }
 install:
   - "pip install ."
   - "pip install pytest"
