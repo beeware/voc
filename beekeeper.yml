@@ -5,9 +5,9 @@ pull_request:
             - pycodestyle:
                 name: Python lint checks
                 task: beefore
-            # - javacodestyle:
-            #     name: Java lint checks
-            #     task: beefore
+            - javacheckstyle:
+                name: Java lint checks
+                task: beefore-java
     - smoke-test:
         task: voc-py34
         name: Smoke build (Python 3.4)
