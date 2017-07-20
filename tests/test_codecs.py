@@ -28,9 +28,9 @@ except ImportError:
             self._buffer += chars
 
         def read(self, size=-1):
-            if size<0:
+            if size < 0:
                 s = self._buffer
-                self._buffer = self._buffer[:0] # make empty
+                self._buffer = self._buffer[:0]  # make empty
                 return s
             else:
                 s = self._buffer[:size]
@@ -69,7 +69,6 @@ except ImportError:
                 d.setstate(state)
                 part2 = d.encode(u[i:], True)
                 self.assertEqual(s, part1+part2)
-
 
     class ReadTest(MixInCheckStateHandling):
         def check_partial(self, input, partialresults):
@@ -180,6 +179,7 @@ except ImportError:
                      "All the king's horses and all the king's men\r",
                      "Couldn't put Humpty together again."]
             data = ''.join(lines)
+
             def getreader():
                 stream = io.BytesIO(data.encode(self.encoding))
                 return codecs.getreader(self.encoding)(stream)
