@@ -398,7 +398,6 @@ class Visitor(ast.NodeVisitor):
         )
         self.context.load_name('#for-iter-%x' % id(node)),
         self.context.add_opcodes(
-                    JavaOpcodes.CHECKCAST('org/python/Iterable'),
                     python.Iterable.next(),
         )
         self.context.add_opcodes(
@@ -1227,7 +1226,6 @@ class Visitor(ast.NodeVisitor):
         )
         self.context.load_name('#listcomp-iter-%x' % id(node))
         self.context.add_opcodes(
-                    JavaOpcodes.CHECKCAST('org/python/Iterable'),
                     python.Iterable.next(),
         )
         self.context.add_opcodes(
@@ -1368,7 +1366,6 @@ class Visitor(ast.NodeVisitor):
         )
         self.context.load_name('#setcomp-iter-%x' % id(node))
         self.context.add_opcodes(
-                    JavaOpcodes.CHECKCAST('org/python/Iterable'),
                     python.Iterable.next(),
         )
         self.context.add_opcodes(
@@ -1491,7 +1488,6 @@ class Visitor(ast.NodeVisitor):
         )
         self.context.load_name('#dictcomp-iter-%x' % id(node)),
         self.context.add_opcodes(
-                    JavaOpcodes.CHECKCAST('org/python/Iterable'),
                     python.Iterable.next(),
         )
         self.context.add_opcodes(
@@ -1618,7 +1614,6 @@ class Visitor(ast.NodeVisitor):
         )
         self.context.load_name('#genexp-iter-%x' % id(node))
         self.context.add_opcodes(
-                    JavaOpcodes.CHECKCAST('org/python/Iterable'),
                     python.Iterable.next(),
         )
         self.context.add_opcodes(

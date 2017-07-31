@@ -1,6 +1,6 @@
 package org.python.types;
 
-public class Generator extends org.python.types.Object implements org.python.Iterable {
+public class Generator extends org.python.types.Object {
     java.lang.String name;
     java.lang.reflect.Method expression;
     public int yield_point;
@@ -45,7 +45,7 @@ public class Generator extends org.python.types.Object implements org.python.Ite
     @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return this;
     }
 

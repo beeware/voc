@@ -523,7 +523,7 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
         for (byte b: this.value) {
             listOfBytes.add(new org.python.types.Int(b));

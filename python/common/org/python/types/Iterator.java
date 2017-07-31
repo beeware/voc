@@ -1,6 +1,6 @@
 package org.python.types;
 
-class Iterator extends org.python.types.Object implements org.python.Iterable {
+class Iterator extends org.python.types.Object implements org.python.Object {
     java.util.Iterator<org.python.Object> iterator;
 
     public int hashCode() {
@@ -26,7 +26,7 @@ class Iterator extends org.python.types.Object implements org.python.Iterable {
     @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         if (kwargs != null && kwargs.size() != 0) {
             throw new org.python.exceptions.TypeError("__iter__ doesn't take keyword arguments");
         }
@@ -36,7 +36,7 @@ class Iterator extends org.python.types.Object implements org.python.Iterable {
         return this;
     }
 
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return this.__iter__(null, null, null, null);
     }
 

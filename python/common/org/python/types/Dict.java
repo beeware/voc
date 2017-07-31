@@ -56,7 +56,7 @@ public class Dict extends org.python.types.Object {
                         ((org.python.types.Dict) args[0]).value
                 );
             } else {
-                org.python.Iterable iterator = org.Python.iter(args[0]);
+                org.python.Object iterator = org.Python.iter(args[0]);
                 java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
                 try {
                     while (true) {
@@ -312,7 +312,7 @@ public class Dict extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         // FIXME: Once this is implemented, update org.Python.addToKwargs()
         return new org.python.types.Dict_KeyIterator(this);
     }
@@ -368,7 +368,7 @@ public class Dict extends org.python.types.Object {
     public org.python.Object fromkeys(org.python.Object iterable, org.python.Object value) {
         org.python.types.Dict result = new org.python.types.Dict();
         try {
-            org.python.Iterable iter = iterable.__iter__();
+            org.python.Object iter = iterable.__iter__();
             if (value == null) {
                 value = org.python.types.NoneType.NONE;
             }

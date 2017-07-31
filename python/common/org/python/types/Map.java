@@ -1,12 +1,12 @@
 package org.python.types;
 
-public class Map extends org.python.types.Object implements org.python.Iterable {
+public class Map extends org.python.types.Object implements org.python.Object {
     private org.python.Object callable;
-    private org.python.Iterable[] iterators;
+    private org.python.Object[] iterators;
 
     public Map(org.python.Object callable, org.python.types.Tuple iterables) {
         this.callable = callable;
-        this.iterators = new org.python.Iterable[iterables.value.size()];
+        this.iterators = new org.python.Object[iterables.value.size()];
         for (int i = 0; i < iterables.value.size(); i++) {
             this.iterators[i] = org.Python.iter(iterables.value.get(i));
         }
@@ -15,7 +15,7 @@ public class Map extends org.python.types.Object implements org.python.Iterable 
     @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return this;
     }
 

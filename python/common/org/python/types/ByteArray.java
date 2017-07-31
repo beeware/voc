@@ -57,7 +57,7 @@ public class ByteArray extends org.python.types.Object {
                     this.value = new byte[(int) ((org.python.types.Int) args[0].__int__()).value];
                 } else {
 
-                    org.python.Iterable iterator = null;
+                    org.python.Object iterator = null;
                     try {
                         iterator = org.Python.iter(args[0]);
                     } catch (org.python.exceptions.TypeError e) {
@@ -617,7 +617,7 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytearray.__iter__ has not been implemented.");
     }
 

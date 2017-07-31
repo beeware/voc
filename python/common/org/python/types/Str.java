@@ -355,7 +355,7 @@ public class Str extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfStrs = new java.util.ArrayList<org.python.Object>();
         for (int i = 0; i < this.value.length(); i++) {
             listOfStrs.add(new org.python.types.Str(this.value.substring(i, i + 1)));
@@ -1029,7 +1029,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object join(org.python.Object iterable) {
         java.util.List<org.python.Object> temp_list = new java.util.ArrayList<org.python.Object>();
-        org.python.Iterable iter = null;
+        org.python.Object iter = null;
         try {
             iter = org.Python.iter(iterable);
         } catch (org.python.exceptions.TypeError e) {
