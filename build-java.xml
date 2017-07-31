@@ -3,11 +3,6 @@
     Build Python support libraries for voc
   </description>
 
-  <!-- set global properties for this build -->
-  <property name="src" location="python"/>
-  <property name="build" location="build"/>
-  <property name="dist" location="dist"/>
-
   <target name="compile" description="Compile the Oracle-specific source">
     <mkdir dir="${build}/java"/>
     <javac
@@ -26,13 +21,15 @@
         debug="true"
         debuglevel="lines,vars,source"
         includeantruntime="false"
+        source="1.7"
+        target="1.7"
         destdir="${build}/java-testdaemon">
       <src path="${src}/testdaemon" />
       <classpath path="${build}/java" />
     </javac>
   </target>
 
-  <target name="dist" depends="compile" description="Generate Oracle jar file">
+  <target name="dist" depends="compile" description="Generate Oracle Java jar file">
     <mkdir dir="${dist}"/>
 
     <jar jarfile="${dist}/Python-${python-version}-Java-support.b${release}.jar" basedir="${build}/java"/>
@@ -52,18 +49,6 @@
         tofile="${dist}/python-java-testdaemon.jar"
         file="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar"
         overwrite="true" />
-  </target>
-
-  <target name="checkstyle" description="Runs checkstyle">
-    <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
-      <classpath>
-        <pathelement location="lib/checkstyle-6.19-all.jar" />
-      </classpath>
-    </taskdef>
-    <checkstyle config="checkstyle.xml" failureProperty="checkstyle.failure.property">
-      <formatter type="plain" />
-      <fileset dir="python" includes="**/*.java" />
-    </checkstyle>
   </target>
 
   <target name="clean" description="Clean up">
