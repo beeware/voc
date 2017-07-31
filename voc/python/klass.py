@@ -7,7 +7,7 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import (
-    InitMethod, ClosureInitMethod, Method
+    InitMethod, ClosureInitMethod, GeneratorMethod, Method, CO_GENERATOR
 )
 from .types import java, python
 from .types.primitives import (
@@ -170,8 +170,17 @@ class Class(Block):
         self._constructor = value
 
     def add_function(self, name, code, parameter_signatures, return_signature):
-        if False:  # FIXME code.co_flags & CO_GENERATOR:
-            raise Exception("Can't handle Generator instance methods (yet)")
+        if code.co_flags & CO_GENERATOR:
+            method = GeneratorMethod(
+                self,
+                name=name,
+                code=code,
+                generator=code.co_name,
+                parameters=parameter_signatures,
+                returns=return_signature,
+                static=True,
+            )
+
         else:
             method = Method(
                 self,

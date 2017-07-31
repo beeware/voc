@@ -1711,10 +1711,11 @@ class Visitor(ast.NodeVisitor):
         yield_point = len(self.context.yield_points) + 1
         self.context.add_opcodes(
             # Convert to a new value for return purposes
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;'),
-
-            # Save the current stack and yield index
-            ALOAD_name('<generator>'),
+            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
+        )
+        # Save the current stack and yield inde
+        self.context.load_name('<generator>')
+        self.context.add_opcodes(
             ALOAD_name('#locals'),
             java.Yield(yield_point),
         )
@@ -1725,8 +1726,8 @@ class Visitor(ast.NodeVisitor):
         self.context.next_resolve_list.append((node, OpcodePosition.YIELD))
 
         #  First thing to do is restore the state of the stack.
+        self.context.load_name('<generator>')
         self.context.add_opcodes(
-            ALOAD_name('<generator>'),
             JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', 'Ljava/util/Map;'),
             ASTORE_name('#locals'),
         )

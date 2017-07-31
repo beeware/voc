@@ -44,3 +44,28 @@ class GeneratorTests(TranspileTestCase):
             for i in somegen():
                 print(i)
             """)
+
+    def test_generator_method(self):
+        self.assertCodeExecution("""
+            class Interview:
+                def __init__(self, start, stop):
+                    self.start = start
+                    self.stop = stop
+
+                def fizz_buzz(self):
+                    for i in range(self.start, self.stop):
+                        found = False
+                        if i % 2 == 0:
+                            yield 'fizz'
+                            found = True
+                        if i % 3 == 0:
+                            yield 'buzz'
+                            found = True
+                        if not found:
+                            yield i
+
+            myinterview = Interview(1, 20)
+
+            for i in myinterview.fizz_buzz():
+                print(i)
+            """)
