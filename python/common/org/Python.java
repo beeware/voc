@@ -1109,18 +1109,16 @@ public class Python {
             default_args = {"default"}
     )
     public static org.python.Object next(org.python.Object iterator, org.python.Object default_) {
-        if (iterator instanceof org.python.Object) {
-            try {
-                return ((org.python.Object) iterator).__next__();
-            } catch (org.python.exceptions.StopIteration si) {
-                if (default_ != null) {
-                    return default_;
-                } else {
-                    throw si;
-                }
-            }
-        } else {
+        try {
+            return ((org.python.Object) iterator).__next__();
+        } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError("'" + iterator.typeName() + "' object is not an iterator");
+        } catch (org.python.exceptions.StopIteration si) {
+            if (default_ != null) {
+                return default_;
+            } else {
+                throw si;
+            }
         }
     }
 
