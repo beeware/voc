@@ -3,11 +3,6 @@
     Build Python support libraries for voc
   </description>
 
-  <!-- set global properties for this build -->
-  <property name="src" location="python"/>
-  <property name="build" location="build"/>
-  <property name="dist" location="dist"/>
-
   <property environment="env"/>
   <property name="release" value="4"/>
   <exec executable="python" outputProperty="python-version">
@@ -21,6 +16,11 @@
   <condition property="dist" value="${env.VOC_DIST_DIR}" else="dist">
     <isset property="env.VOC_DIST_DIR" />
   </condition>
+
+  <!-- set global properties for this build -->
+  <property name="src" location="python"/>
+  <property name="build" location="build"/>
+  <property name="dist" location="dist"/>
 
   <target name="checkstyle" description="Runs checkstyle">
     <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
