@@ -4,7 +4,7 @@
   </description>
 
   <property environment="env"/>
-  <property name="release" value="4"/>
+  <property name="release" value="5"/>
   <exec executable="python" outputProperty="python-version">
     <arg value="-c"/>
     <arg value="import sys; print('.'.join(sys.version.split('.',3)[:2]))"/>
