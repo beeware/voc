@@ -1,10 +1,10 @@
 package org.python.types;
 
-public class Filter extends org.python.types.Object implements org.python.Iterable {
+public class Filter extends org.python.types.Object implements org.python.Object {
     private org.python.Callable callable;
-    private org.python.Iterable iterator;
+    private org.python.Object iterator;
 
-    public Filter(org.python.Object callable, org.python.Iterable iterator) {
+    public Filter(org.python.Object callable, org.python.Object iterator) {
         if (org.python.types.NoneType.NONE == callable) {
             this.callable = null;
         } else {
@@ -16,7 +16,7 @@ public class Filter extends org.python.types.Object implements org.python.Iterab
     @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return this;
     }
 

@@ -126,9 +126,11 @@ public interface Object extends Comparable {
     public org.python.Object __getitem__(org.python.Object item);
     public void __setitem__(org.python.Object item, org.python.Object value);
     public void __delitem__(org.python.Object item);
-    public org.python.Iterable __iter__();
-    public org.python.Iterable __reversed__();
+    public org.python.Object __iter__();
+    public org.python.Object __reversed__();
     public org.python.Object __contains__(org.python.Object item);
+
+    public org.python.Object __next__();
 
     /**
      * Section 3.3.7 - Emulating numeric types

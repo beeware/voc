@@ -260,7 +260,7 @@ public class Python {
     public static org.python.Object[] addToArgs(org.python.Object[] args, org.python.Object varargs) {
         java.util.List<org.python.Object> temp_list = new java.util.ArrayList<org.python.Object>();
         try {
-            org.python.Iterable iter = varargs.__iter__();
+            org.python.Object iter = varargs.__iter__();
             while (true) {
                 org.python.Object item = iter.__next__();
                 temp_list.add(item);
@@ -290,7 +290,7 @@ public class Python {
         // FIXME: Once we have dictionary iterators, we should use an iteration-based
         // rollout, rather than casting to Dict.
         // try {
-        //     org.python.Iterable iter = varkwargs.__iter__();
+        //     org.python.Object iter = varkwargs.__iter__();
         //     while (true) {
         //         org.python.Object key = iter.__next__()
         //         java.lang.String key_string = ((org.python.types.Str) key).value;
@@ -354,7 +354,7 @@ public class Python {
             args = {"iterable"}
     )
     public static org.python.types.Bool all(org.python.Object iterable) {
-        org.python.Iterable iter = org.Python.iter(iterable);
+        org.python.Object iter = org.Python.iter(iterable);
         try {
             while (true) {
                 org.python.Object next = iter.__next__();
@@ -375,7 +375,7 @@ public class Python {
             args = {"iterable"}
     )
     public static org.python.types.Bool any(org.python.Object iterable) {
-        org.python.Iterable iter = org.Python.iter(iterable);
+        org.python.Object iter = org.Python.iter(iterable);
         try {
             while (true) {
                 org.python.Object next = iter.__next__();
@@ -605,7 +605,7 @@ public class Python {
                     "(0, seq[0]), (1, seq[1]), (2, seq[2]), ...\n",
             default_args = {"items", "start"}
     )
-    public static org.python.Iterable enumerate(org.python.Object items, org.python.Object start) {
+    public static org.python.Object enumerate(org.python.Object items, org.python.Object start) {
         if (items == null) {
             throw new org.python.exceptions.TypeError("Required argument 'iterable' (pos 1) not found");
         }
@@ -620,7 +620,7 @@ public class Python {
         org.python.Object increment = new org.python.types.Int(1);
         java.util.List enumList = new java.util.ArrayList();
         try {
-            org.python.Iterable iter = org.Python.iter(items);
+            org.python.Object iter = org.Python.iter(items);
             while (true) {
                 try {
                     java.util.List tuple = new java.util.ArrayList();
@@ -901,7 +901,7 @@ public class Python {
             args = {"iterable"},
             default_args = {"sentinel"}
     )
-    public static org.python.Iterable iter(org.python.Object iterable, org.python.Object sentinel) {
+    public static org.python.Object iter(org.python.Object iterable, org.python.Object sentinel) {
         if (sentinel == null) {
             try {
                 return iterable.__iter__();
@@ -914,7 +914,7 @@ public class Python {
         }
     }
 
-    public static org.python.Iterable iter(org.python.Object iterable) {
+    public static org.python.Object iter(org.python.Object iterable) {
         return org.Python.iter(iterable, null);
     }
 
@@ -982,7 +982,7 @@ public class Python {
             throw new org.python.exceptions.TypeError("max expected 1 arguments, got 0");
         } else if (args.value.size() == 1) {
             try {
-                org.python.Iterable iter = args.value.get(0).__iter__();
+                org.python.Object iter = args.value.get(0).__iter__();
                 max_value = iter.__next__();
                 max_key_value = applyKey(max_value, key);
 
@@ -1055,7 +1055,7 @@ public class Python {
             throw new org.python.exceptions.TypeError("min expected 1 arguments, got 0");
         } else if (args.value.size() == 1) {
             try {
-                org.python.Iterable iter = args.value.get(0).__iter__();
+                org.python.Object iter = args.value.get(0).__iter__();
                 min_value = iter.__next__();
                 min_key_value = applyKey(min_value, key);
 
@@ -1109,18 +1109,16 @@ public class Python {
             default_args = {"default"}
     )
     public static org.python.Object next(org.python.Object iterator, org.python.Object default_) {
-        if (iterator instanceof org.python.Iterable) {
-            try {
-                return ((org.python.Iterable) iterator).__next__();
-            } catch (org.python.exceptions.StopIteration si) {
-                if (default_ != null) {
-                    return default_;
-                } else {
-                    throw si;
-                }
-            }
-        } else {
+        try {
+            return ((org.python.Object) iterator).__next__();
+        } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError("'" + iterator.typeName() + "' object is not an iterator");
+        } catch (org.python.exceptions.StopIteration si) {
+            if (default_ != null) {
+                return default_;
+            } else {
+                throw si;
+            }
         }
     }
 
@@ -1451,7 +1449,7 @@ public class Python {
                     "\n" +
                     "Return a reverse iterator\n"
     )
-    public static org.python.Iterable reversed(
+    public static org.python.Object reversed(
             java.util.List<org.python.Object> args,
             java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (kwargs != null && kwargs.size() != 0) {
@@ -1564,7 +1562,7 @@ public class Python {
             if (reverse == null) {
                 reverse = new org.python.types.Bool(false);
             }
-            org.python.Iterable iterator = org.Python.iter(iterable);
+            org.python.Object iterator = org.Python.iter(iterable);
             java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
             try {
                 while (true) {
@@ -1621,7 +1619,7 @@ public class Python {
             value = new org.python.types.Int(0);
         }
 
-        org.python.Iterable iterator = org.Python.iter(iterable);
+        org.python.Object iterator = org.Python.iter(iterable);
         while (true) {
             org.python.Object next;
             try {
@@ -1680,19 +1678,19 @@ public class Python {
         int count = 0;
         if (item != null) {
             count = 1;
-            org.python.Iterable iter;
+            org.python.Object iter;
             try {
                 iter = org.Python.iter(item);
             } catch (org.python.exceptions.TypeError e) {
                 throw new org.python.exceptions.TypeError("zip argument #" + count + " must support iteration");
             }
-            java.util.List<org.python.Iterable> iters = new java.util.ArrayList<org.python.Iterable>();
+            java.util.List<org.python.Object> iters = new java.util.ArrayList<org.python.Object>();
             iters.add(iter);
             if (moreItems != null) {
-                org.python.Iterable tupIter = org.Python.iter(moreItems);
+                org.python.Object tupIter = org.Python.iter(moreItems);
                 while (true) {
                     count++;
-                    org.python.Iterable it;
+                    org.python.Object it;
                     org.python.Object obj;
                     try {
                         obj = tupIter.__next__();
@@ -1712,7 +1710,7 @@ public class Python {
                 java.util.List tuple = new java.util.ArrayList();
                 for (int i = 0; i < count - 1; i++) {
                     try {
-                        org.python.Iterable it = iters.get(i);
+                        org.python.Object it = iters.get(i);
                         tuple.add(it.__next__());
                     } catch (IndexOutOfBoundsException e) {
                         flag = true;

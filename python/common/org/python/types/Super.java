@@ -437,15 +437,22 @@ public class Super implements org.python.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         throw new org.python.exceptions.AttributeError(this, "__iter__");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __reversed__() {
+    public org.python.Object __reversed__() {
         throw new org.python.exceptions.AttributeError(this, "__reversed__");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __next__() {
+        throw new org.python.exceptions.AttributeError(this, "__next__");
     }
 
     @org.python.Method(

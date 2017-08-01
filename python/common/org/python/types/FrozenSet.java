@@ -57,7 +57,7 @@ public class FrozenSet extends org.python.types.Object {
                         ((org.python.types.Tuple) args[0]).value)
                 );
             } else {
-                org.python.Iterable iterator = org.Python.iter(args[0]);
+                org.python.Object iterator = org.Python.iter(args[0]);
                 java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
                 try {
                     while (true) {
@@ -81,7 +81,7 @@ public class FrozenSet extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return new org.python.types.Set_Iterator(this);
     }
 
@@ -323,7 +323,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     private java.util.Set iterToSet(org.python.Object iterable) {
-        org.python.Iterable iterator = iterable.__iter__();
+        org.python.Object iterator = iterable.__iter__();
         java.util.Set<org.python.Object> set = new java.util.HashSet<org.python.Object>();
         try {
             while (true) {

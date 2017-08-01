@@ -61,7 +61,7 @@ public class Range extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return new RangeIterator(start, stop, step);
     }
 
@@ -189,7 +189,7 @@ public class Range extends org.python.types.Object {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
-    public class RangeIterator extends org.python.types.Object implements org.python.Iterable {
+    public class RangeIterator extends org.python.types.Object implements org.python.Object {
 
         public static final java.lang.String PYTHON_TYPE_NAME = "range_iterator";
 
@@ -217,7 +217,7 @@ public class Range extends org.python.types.Object {
         @org.python.Method(
                  __doc__ = "Implement iter(self)."
         )
-        public org.python.Iterable __iter__() {
+        public org.python.Object __iter__() {
             return this;
         }
 
