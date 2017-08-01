@@ -973,7 +973,7 @@ class Visitor(ast.NodeVisitor):
         for i, arg in enumerate(node.args.kwonlyargs):
             index = len(node.args.kw_defaults) - len(node.args.kwonlyargs) + i
             arg_index[arg.arg] = None
-            if index >= 0:
+            if index >= 0 and node.args.kw_defaults[index] is not None:
                 default = '#%s-kw_default-%s-%x' % (func_name, i, id(node))
                 self.visit(node.args.kw_defaults[index])
                 self.context.add_opcodes(
