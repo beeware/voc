@@ -655,6 +655,9 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             this.value += (((org.python.types.Bool) other).value ? 1 : 0);
             return new org.python.types.Int(this.value);
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex other_cmplx_obj = (org.python.types.Complex) other;
+            return new org.python.types.Complex(this.value + other_cmplx_obj.real.value, other_cmplx_obj.imag.value);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'int' and '" + other.typeName() + "'");
     }
@@ -680,7 +683,27 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
+    public org.python.Object __isub__(org.python.Object other) {
+        if (other instanceof org.python.types.Int) {
+            this.value -= ((org.python.types.Int) other).value;
+            return new org.python.types.Int(this.value);
+        } else if (other instanceof org.python.types.Float) {
+            double this_val = this.value;
+            this_val -= ((org.python.types.Float) other).value;
+            return new org.python.types.Float(this_val);
+        } else if (other instanceof org.python.types.Bool) {
+            this.value -= (((org.python.types.Bool) other).value ? 1 : 0);
+            return new org.python.types.Int(this.value);
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex other_cmplx_obj = (org.python.types.Complex) other;
+            return new org.python.types.Complex(this.value - other_cmplx_obj.real.value, -(other_cmplx_obj.imag.value));
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -=: 'int' and '" + other.typeName() + "'");
+    }
 
+    @org.python.Method(
+            __doc__ = ""
+    )
     public org.python.Object __itruediv__(org.python.Object other) {
         if (other instanceof org.python.types.Int || other instanceof org.python.types.Float || other instanceof org.python.types.Bool) {
             return this.__truediv__(other);
