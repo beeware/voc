@@ -75,7 +75,14 @@ public class Bool extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.types.Str __format__(org.python.Object format_string) {
-        throw new org.python.exceptions.NotImplementedError("bool.__format__ has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError("'bool'.__format__ has not been implemented.");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.types.Str __getitem__(org.python.Object format_string) {
+            throw new org.python.exceptions.TypeError("'bool' object is not subscriptable");
     }
 
     @org.python.Method(
