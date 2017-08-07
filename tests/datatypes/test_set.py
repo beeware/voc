@@ -92,15 +92,17 @@ class SetTests(TranspileTestCase):
             """)
 
     def test_difference(self):
+        # success
         self.assertCodeExecution("""
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.difference(y)
-            w = x.difference([3,4,5])
-            print(x)
-            print(y)
-            print(z)
-            print(w)
+            w = x.difference([3,4,5],(1,6,7,8),y)
+            print(x.difference())
+            print(sorted(x))
+            print(sorted(y))
+            print(sorted(z))
+            print(sorted(w))
             """)
 
         # not iterable test
@@ -108,6 +110,10 @@ class SetTests(TranspileTestCase):
             x = set([1, 2, 3])
             try:
                 print(x.difference(1))
+            except TypeError as err:
+                print(err)
+            try:
+                print(x.difference([3,4,5], 1 , (4,6,2)))
             except TypeError as err:
                 print(err)
             """)
@@ -121,15 +127,34 @@ class SetTests(TranspileTestCase):
             """)
 
     def test_intersection(self):
+        # success
         self.assertCodeExecution("""
             x = {1, 2, 3}
             y = {3, 4, 5}
+            w = frozenset([6,8,23,2,4])
             z = x.intersection(y)
-            w = x.intersection([3,4,5])
-            print(x)
-            print(y)
-            print(z)
-            print(w)
+            t = x.intersection([6,8,23],[2,7,5],w,x)
+            l = x.intersection(w)
+            print(sorted(x.intersection()))
+            print(sorted(x))
+            print(sorted(y))
+            print(sorted(z))
+            print(sorted(w))
+            print(sorted(t))
+            print(sorted(l))
+            """)
+
+        # failure
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            try:
+                z = x.intersection(7)
+            except TypeError as err:
+                print(err)
+            try:
+                t = x.intersection([6,8,23],[2,7,5],9,x)
+            except TypeError as err:
+                print(err)
             """)
 
         self.assertCodeExecution("""
@@ -162,37 +187,112 @@ class SetTests(TranspileTestCase):
             """)
 
     def test_union(self):
+        # success
         self.assertCodeExecution("""
             x = {1, 2, 3}
             y = {3, 4, 5}
+            w = frozenset([6,8,23,2,4])
             z = x.union(y)
-            print(x)
-            print(y)
-            print(z)
+            t = x.union([6,8,23],[2,7,5],w,x)
+            l = x.union(w)
+            print(sorted(x.union()))
+            print(sorted(x))
+            print(sorted(y))
+            print(sorted(z))
+            print(sorted(w))
+            print(sorted(t))
+            print(sorted(l))
+            """)
+
+        # failure
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            try:
+                z = x.union(7)
+            except TypeError as err:
+                print(err)
+            try:
+                t = x.union([6,8,23],[2,7,5],9,x)
+            except TypeError as err:
+                print(err)
             """)
 
     def test_difference_update(self):
+        # success
         self.assertCodeExecution("""
             x = {1, 2, 3}
             y = {3, 4, 5}
-            x.difference_update(y)
-            print(x)
+            x.difference_update(y,"abc",[7,8,9],(3,7,6))
+            print(sorted(x))
+            y.difference_update(x)
+            print(sorted(x))
+            x.difference_update()
+            print(sorted(x))
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                x.difference_update(1)
+            except TypeError as err:
+                print(err)
+            try:
+                x.difference_update([3,4,5], 1 , (4,6,2))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_intersection_update(self):
+        # successful
         self.assertCodeExecution("""
             x = {1, 2, 3}
             y = {3, 4, 5}
-            x.intersection_update(y)
-            print(x)
+            x.intersection_update(y,[1,5,7],(4,7,0))
+            print(sorted(x))
+            y.intersection_update(x)
+            print(sorted(y))
+            y.intersection_update()
+            print(sorted(y))
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                x.intersection_update(1)
+            except TypeError as err:
+                print(err)
+            try:
+                x.intersection_update([3,4,5], 1 , (4,6,2))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_update(self):
+        # successful
         self.assertCodeExecution("""
             x = {1, 2, 3}
             y = {3, 4, 5}
-            print(x.update(y))
-            print(x)
+            print(x.update(y,[3,7,89],(1,78,90,2)))
+            print(sorted(x))
+            print(y.update(y))
+            print(sorted(y))
+            print(y.update())
+            print(sorted(y))
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                x.update(1)
+            except TypeError as err:
+                print(err)
+            try:
+                x.update([3,4,5], 1 , (4,6,2))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_iteration(self):
@@ -289,8 +389,8 @@ class SetTests(TranspileTestCase):
             t = set()
             print(sorted(x.symmetric_difference(y)))
             print(sorted(x.symmetric_difference(z)))
-            print(sorted(t.symmetric_difference(z)))
-            print(sorted(t.symmetric_difference(y)))
+            #print(sorted(t.symmetric_difference(z)))
+            #print(sorted(t.symmetric_difference(y)))
             """)
 
         # unsuccessful
@@ -305,10 +405,6 @@ class SetTests(TranspileTestCase):
                 print(err)
             try:
                 print(l.symmetric_difference(x))
-            except TypeError as err:
-                print(err)
-            try:
-                print(l.symmetric_difference())
             except TypeError as err:
                 print(err)
             """)
@@ -342,10 +438,6 @@ class SetTests(TranspileTestCase):
                 print(err)
             try:
                 print(l.symmetric_difference_update(x))
-            except TypeError as err:
-                print(err)
-            try:
-                print(l.symmetric_difference_update())
             except TypeError as err:
                 print(err)
             """)
