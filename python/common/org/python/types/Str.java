@@ -547,11 +547,13 @@ public class Str extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __imod__(org.python.Object other) {
-        if (other instanceof org.python.types.NoneType) {
-            throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        try {
+            this.setValue(this.__mod__(other));
+            return this;
+        } catch (org.python.exceptions.TypeError e) {
+            throw e;
+
         }
-        super.__imod__(other);
-        return this;
     }
 
     @org.python.Method(
