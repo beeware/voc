@@ -3,7 +3,7 @@ Installation
 
 In this guide we will walk you through setting up your VOC environment for
 development and testing. We will assume that you have Python 3.4 or 3.5, Java 7 or Java 8 JDK,
-and Apache ANT installed, and have virtualenv available for use.
+and Apache ANT installed.
 
 Checking Dependencies
 ---------------------
@@ -50,7 +50,7 @@ Then create a virtual environment and install VOC into it:
 
 .. code-block:: bash
 
-    $ virtualenv -p $(which python3) env
+    $ python3 -m venv env
     $ . env/bin/activate
     $ cd voc
     $ pip install -e .
@@ -59,7 +59,7 @@ For Windows the use of cmd under Administrator permission is suggested instead o
 
 .. code-block:: bash
 
-    > virtualenv -p "C:\Python34\python.exe" env
+    > py -3 -m venv env
     > env\Scripts\activate.bat
     > cd voc
     > pip install -e .
