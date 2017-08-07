@@ -768,7 +768,7 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
     not_implemented = [
-        'test_modulo_bytes',
+        'test_modulo_bool',
         'test_modulo_bytearray',
         'test_modulo_class',
         'test_modulo_complex',
