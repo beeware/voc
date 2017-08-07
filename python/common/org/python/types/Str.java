@@ -458,6 +458,22 @@ public class Str extends org.python.types.Object {
             for (org.python.Object obj : oth.value) {
                 format_args.add(obj.toJava());
             }
+        } else if (other instanceof org.python.types.Int) {
+            if (value.contains("%s")) {
+                //Number of replacements by diff between string with
+                // all cancelled out. Divide 2 as each occurrence has length 2
+                int replaceCount = (value.length() - value.replace("%s", "").length()) / 2;
+                if (replaceCount == 1) {
+                    //Only 1 replacement needed; directly convert
+                    format_args.add(other.toJava());
+                } else {
+                    //Too many replacements required, throw error
+                    throw new org.python.exceptions.TypeError("not enough arguments for format string");
+                }
+            } else {
+                //Value is plain string, can't replace with int
+                throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+            }
         } else if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
         } else {
