@@ -91,10 +91,7 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_float',
         'test_power_int',
 
-        'test_subtract_bool',
         'test_subtract_complex',
-        'test_subtract_float',
-        'test_subtract_int',
 
         'test_true_divide_bool',
         'test_true_divide_complex',
