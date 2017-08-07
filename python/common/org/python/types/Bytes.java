@@ -125,7 +125,11 @@ public class Bytes extends org.python.types.Object {
             System.arraycopy(other_bytes, 0, new_bytes, this.value.length, other_bytes.length);
             return new Bytes(new_bytes);
         }
-        throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to bytes" );
+        if (org.Python.VERSION < 0x03060200) {
+            throw new org.python.exceptions.TypeError("can't concat bytes to " + other.typeName());
+        } else {
+            throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to bytes");
+        }
     }
 
     @org.python.Method(
