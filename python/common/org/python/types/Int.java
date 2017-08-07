@@ -665,6 +665,16 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
+    public org.python.Object __imul__(org.python.Object other) {
+        if (other instanceof org.python.types.Str) {
+            return this.__mul__(other);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: 'int' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
     public org.python.Object __ilshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
             this.value <<= (((org.python.types.Bool) other).value ? 1 : 0);
