@@ -252,6 +252,8 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Int(this.value * (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.List) {
             return other.__mul__(this);
+        } else if (other instanceof org.python.types.Complex) {
+            return other.__mul__(this);
         } else if (other instanceof org.python.types.Tuple) {
             return other.__mul__(this);
         } else if (other instanceof org.python.types.Bytes) {
@@ -272,6 +274,7 @@ public class Int extends org.python.types.Object {
                 System.arraycopy(other_value, 0, bytes, i * len, len);
             }
             return new org.python.types.ByteArray(bytes);
+        } else if (other instanceof org.python.types.Complex) {
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'int' and '" + other.typeName() + "'");
     }
@@ -661,6 +664,24 @@ public class Int extends org.python.types.Object {
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'int' and '" + other.typeName() + "'");
     }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+        if (other instanceof org.python.types.Str ||
+            other instanceof org.python.types.Float ||
+            other instanceof org.python.types.List ||
+            other instanceof org.python.types.ByteArray ||
+            other instanceof org.python.types.Bytes ||
+            other instanceof org.python.types.Tuple ||
+            other instanceof org.python.types.Complex) {
+                return this.__mul__(other);
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: 'int' and '" + other.typeName() + "'");
+        }
+    }
+
 
     @org.python.Method(
             __doc__ = ""
