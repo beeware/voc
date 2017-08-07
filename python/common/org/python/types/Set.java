@@ -338,7 +338,7 @@ public class Set extends org.python.types.Object {
             return new org.python.types.Set(set);
         }
 
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for XOR: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
