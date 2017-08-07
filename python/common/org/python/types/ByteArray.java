@@ -242,17 +242,14 @@ public class ByteArray extends org.python.types.Object {
             System.arraycopy(other_bytes, 0, new_bytes, this.value.length, other_bytes.length);
             return new ByteArray(new_bytes);
         }
-        throw new org.python.exceptions.TypeError("can't concat " + this.typeName() + " to " + other.typeName());
+        throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to " + this.typeName());
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __iadd__(org.python.Object other) {
-        if (other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
-            return this.__add__(other);
-        }
-        throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to " + this.typeName());
+        return this.__add__(other);
     }
 
     @org.python.Method(
