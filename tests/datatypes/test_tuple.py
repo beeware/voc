@@ -281,20 +281,4 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_modulo_complex',
-
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
-        'test_multiply_class',
-        'test_multiply_complex',
-        'test_multiply_dict',
-        'test_multiply_float',
-        'test_multiply_frozenset',
-        'test_multiply_slice',
-        'test_multiply_list',
-        'test_multiply_None',
-        'test_multiply_NotImplemented',
-        'test_multiply_range',
-        'test_multiply_set',
-        'test_multiply_str',
-        'test_multiply_tuple',
     ]
