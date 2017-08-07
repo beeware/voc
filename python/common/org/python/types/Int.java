@@ -469,8 +469,10 @@ public class Int extends org.python.types.Object {
             if (this.value == 0 && other_val < 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
             }
-            // TODO: if this.value < 0 && other_val is not an integer, this will be a Complex result, so change this.value to Complex and delegate it out
-            // return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
+            if (this.value < 0 && Math.floor(other_val) != other_val) {
+                // The result will be complex, so make it a complex type instead
+                return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
+            }
             return new org.python.types.Float(java.lang.Math.pow((double) this.value, other_val));
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
@@ -699,6 +701,14 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Complex(this.value - other_cmplx_obj.real.value, -(other_cmplx_obj.imag.value));
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -=: 'int' and '" + other.typeName() + "'");
+    }
+
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __ipow__(org.python.Object other) {
+        return this.__pow__(other, null);
     }
 
     @org.python.Method(
