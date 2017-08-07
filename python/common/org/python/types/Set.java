@@ -313,12 +313,27 @@ public class Set extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public org.python.Object __xor__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__xor__() has not been implemented");
-    // }
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __xor__(org.python.Object other) {
+        java.util.Set set = ((org.python.types.Set) this.copy()).value;
+        java.util.Set intersect_set = ((org.python.types.Set) this.copy()).value;
+        if (other instanceof org.python.types.Set) {
+            set.addAll(((org.python.types.Set) other).value);
+            intersect_set.retainAll(((org.python.types.Set) other).value);
+            // take away the intersection from the union for XOR
+            set.removeAll(intersect_set);
+            return new org.python.types.Set(set);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            set.addAll(((org.python.types.FrozenSet) other).value);
+            intersect_set.retainAll(((org.python.types.FrozenSet) other).value);
+            // take away the intersection from the union for XOR
+            set.removeAll(intersect_set);
+            return new org.python.types.Set(set);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 
     @org.python.Method(
             __doc__ = ""
