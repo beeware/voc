@@ -23,7 +23,7 @@ instead of using the official PyBee repository, you'll be using your own
 Github fork.
 
 As with the getting started guide, these instructions will assume that you
-have Python 3.4+, a Java 7 or Java 8 JDK, and Apache ANT installed, and have virtualenv available for use.
+have Python 3.4+, a Java 7 or Java 8 JDK, and Apache ANT installed.
 
 **Note:** If you are on Linux, you will need to install an extra package to be able to run the test suite. 
  * **Ubuntu** 12.04 and 14.04: ``libpython3.4-testsuite`` This can be done by running ``apt-get install libpython3.4-testsuite``.
@@ -42,7 +42,7 @@ Then create a virtual environment and install VOC into it:
 
 .. code-block:: bash
 
-    $ virtualenv -p $(which python3) env
+    $ python3 -m venv env
     $ . env/bin/activate
     $ cd voc
     $ pip install -e .
@@ -51,7 +51,7 @@ For Windows the use of cmd under Administrator permission is suggested instead o
 
 .. code-block:: batch
 
-    > virtualenv -p "C:\Python34\python.exe" env
+    > C:\Python34\python.exe -m venv env
     > env\Scripts\activate.bat
     > cd voc
     > pip install -e .
