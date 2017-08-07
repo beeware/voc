@@ -466,6 +466,31 @@ public class Str extends org.python.types.Object {
 
             } catch (IllegalArgumentException e) {
                 throw new org.python.exceptions.TypeError("not enough arguments for format string");
+            }
+
+        } else if (other instanceof org.python.types.Int) {
+            if (value.contains("%s")) {
+                //Number of replacements by diff between string with
+                // all cancelled out. Divide 2 as each occurrence has length 2
+                int replaceCount = (value.length() - value.replace("%s", "").length()) / 2;
+                if (replaceCount == 1) {
+                    //Only 1 replacement needed; directly convert
+                    format_args.add(other.toJava());
+                } else {
+                    //Too many replacements required, throw error
+                    throw new org.python.exceptions.TypeError("not enough arguments for format string");
+                }
+            } else {
+                //Value is plain string, can't replace with int
+                throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+            }
+        } else if (other instanceof org.python.types.Range) {
+            try {
+                format_args.add(other.toJava());
+                Object obj = new org.python.types.Str(java.lang.String.format(this.value, format_args.toArray()));
+
+            } catch (IllegalArgumentException e) {
+                throw new org.python.exceptions.TypeError("not enough arguments for format string");
 
             }
         } else if (other instanceof org.python.types.NoneType) {
@@ -543,14 +568,19 @@ public class Str extends org.python.types.Object {
     public org.python.Object __imod__(org.python.Object other) {
         if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        }  else if (other instanceof org.python.types.Int) {
+            try {
+                this.setValue(this.__mod__(other));
+                return this;
+            } catch (org.python.exceptions.TypeError e) {
+                throw e;
+            }
         } else if (other instanceof org.python.types.Range) {
             try {
                 super.__imod__(other);
                 return this;
-
             } catch (org.python.exceptions.TypeError e) {
                 throw new org.python.exceptions.TypeError("not enough arguments for format string");
-
             }
         } else {
             super.__imod__(other);
