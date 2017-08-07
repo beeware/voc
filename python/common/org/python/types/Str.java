@@ -543,9 +543,19 @@ public class Str extends org.python.types.Object {
     public org.python.Object __imod__(org.python.Object other) {
         if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Range) {
+            try {
+                super.__imod__(other);
+                return this;
+
+            } catch (Exception e) {
+                throw new org.python.exceptions.TypeError("not enough arguments for format string");
+
+            }
+        } else {
+            super.__imod__(other);
+            return this;
         }
-        super.__imod__(other);
-        return this;
     }
 
     @org.python.Method(
