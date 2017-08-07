@@ -665,8 +665,11 @@ public class Int extends org.python.types.Object {
     public org.python.Object __imul__(org.python.Object other) {
         if (other instanceof org.python.types.Str ||
             other instanceof org.python.types.Float ||
-            other instanceof org.python.types.List) {
-            return this.__mul__(other);
+            other instanceof org.python.types.List ||
+            other instanceof org.python.types.ByteArray ||
+            other instanceof org.python.types.Bytes ||
+            other instanceof org.python.types.Tuple) {
+                return this.__mul__(other);
         } else {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: 'int' and '" + other.typeName() + "'");
         }
