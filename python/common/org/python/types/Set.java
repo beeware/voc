@@ -314,7 +314,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __xor__(org.python.Object other) {
         java.util.Set set = ((org.python.types.Set) this.copy()).value;
