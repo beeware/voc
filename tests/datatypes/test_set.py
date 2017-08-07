@@ -365,8 +365,6 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_bytearray',
         'test_multiply_bytes',
 
-        'test_xor_frozenset',
-        'test_xor_set',
     ]
 
 
@@ -376,6 +374,4 @@ class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_modulo_complex',
 
-        'test_xor_frozenset',
-        'test_xor_set',
     ]
