@@ -53,7 +53,6 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     not_implemented = [
 
-        'test_floor_divide_float',
 
         'test_modulo_complex',
         'test_modulo_float',
