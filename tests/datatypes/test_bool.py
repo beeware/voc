@@ -61,7 +61,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_add_complex',
-        'test_add_float',
 
         'test_and_int',
 
