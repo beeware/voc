@@ -464,7 +464,7 @@ public class Str extends org.python.types.Object {
                 format_args.add(other.toJava());
                 Object obj = new org.python.types.Str(java.lang.String.format(this.value, format_args.toArray()));
 
-            } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
                 throw new org.python.exceptions.TypeError("not enough arguments for format string");
 
             }
@@ -548,7 +548,7 @@ public class Str extends org.python.types.Object {
                 super.__imod__(other);
                 return this;
 
-            } catch (Exception e) {
+            } catch (org.python.exceptions.TypeError e) {
                 throw new org.python.exceptions.TypeError("not enough arguments for format string");
 
             }
