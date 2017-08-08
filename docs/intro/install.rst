@@ -12,8 +12,8 @@ To check if you have Python installed, run ``python --version`` at the command l
 
 .. code-block:: bash
 
-	$ python --version
-	Python 3.4.4
+    $ python --version
+    Python 3.4.4
 
 Unfortunately Python 3.6 is not supported at this time. If you do not have Python 3.4 or 3.5 `install Python <https://www.python.org/downloads/>`_  and check again. 
 
@@ -21,18 +21,18 @@ To check if you have the JDK installed, run ``javac -version``
 
 .. code-block:: bash
 
-	$ javac -version
-	javac 1.7.0_101
-	
+    $ javac -version
+    javac 1.7.0_101
+
 If you do not have at least Java 7 `install Java <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_ and check again.
 
 To check if Apache ANT is installed, run ``ant -version``
 
 .. code-block:: bash
 
-	$ ant -version
-	Apache Ant(TM) version 1.9.7 compiled on April 24 2016
-	
+    $ ant -version
+    Apache Ant(TM) version 1.9.7 compiled on April 24 2016
+
 If Apache Ant is not installed, look for the binary file from `Apache <https://ant.apache.org>`_ to download the latest version.
 
 Get a copy of VOC
