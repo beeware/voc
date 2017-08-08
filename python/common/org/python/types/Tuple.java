@@ -409,6 +409,30 @@ public class Tuple extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
+    public org.python.Object __imul__(org.python.Object other) {
+        if (other instanceof org.python.types.Int) {
+            long count = ((org.python.types.Int) other).value;
+            org.python.types.Tuple result = new org.python.types.Tuple();
+            for (long i = 0; i < count; i++) {
+                result.value.addAll(this.value);
+            }
+            return result;
+        } else if (other instanceof org.python.types.Bool) {
+            boolean bool = ((org.python.types.Bool) other).value;
+            if (bool) {
+                return this;
+            } else {
+                return new org.python.types.Tuple();
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+        }
+    }
+
+
+    @org.python.Method(
+            __doc__ = ""
+    )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
