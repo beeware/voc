@@ -559,7 +559,7 @@ public class Str extends org.python.types.Object {
     public org.python.Object __imod__(org.python.Object other) {
         if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
-        }  else if (other instanceof org.python.types.Int) {
+        } else if (other instanceof org.python.types.Int) {
             try {
                 this.setValue(this.__mod__(other));
                 return this;
