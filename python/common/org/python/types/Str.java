@@ -484,15 +484,6 @@ public class Str extends org.python.types.Object {
                 //Value is plain string, can't replace with int
                 throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
             }
-        } else if (other instanceof org.python.types.Range) {
-            try {
-                format_args.add(other.toJava());
-                Object obj = new org.python.types.Str(java.lang.String.format(this.value, format_args.toArray()));
-
-            } catch (IllegalArgumentException e) {
-                throw new org.python.exceptions.TypeError("not enough arguments for format string");
-
-            }
         } else if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
 
