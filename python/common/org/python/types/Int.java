@@ -476,6 +476,10 @@ public class Int extends org.python.types.Object {
                 return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
             }
             return new org.python.types.Float(java.lang.Math.pow((double) this.value, other_val));
+        } else if (other instanceof org.python.types.Complex) { 
+            org.python.types.Complex cmplx_obj = new org.python.types.Complex((double) this.value, 0.0);
+            org.python.types.Complex other_cmplx_obj = (org.python.types.Complex) other;
+            return cmplx_obj.__pow__(other_cmplx_obj, null);
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Int(this.value);
@@ -730,14 +734,7 @@ public class Int extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __ipow__(org.python.Object other) {
-        if (other instanceof org.python.types.Complex) {
-            org.python.types.Complex cmplx_obj = new org.python.types.Complex((double) this.value, 0.0);
-            org.python.types.Complex other_cmplx_obj = (org.python.types.Complex) other;
-            // There seem to be some differences due to rounding errors :-/
-            return cmplx_obj.__pow__(other_cmplx_obj, null);
-        } else {
-            return this.__pow__(other, null);
-        }
+        return this.__pow__(other, null);
     }
 
     @org.python.Method(
