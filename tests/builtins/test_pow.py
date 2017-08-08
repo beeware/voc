@@ -118,7 +118,6 @@ class BuiltinTwoargPowFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTest
         'test_float_float',
 
         'test_int_complex',
-        'test_int_float',
     ]
 
     is_flakey = [

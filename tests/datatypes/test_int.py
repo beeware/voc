@@ -42,7 +42,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_complex',
 
         'test_power_complex',
-        'test_power_float',
 
         'test_true_divide_complex',
     ]
@@ -65,8 +64,8 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_tuple',
 
         'test_power_complex',
-        'test_power_float',
-        'test_power_int',
+
+
 
         'test_true_divide_complex',
     ]
