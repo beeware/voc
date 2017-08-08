@@ -248,6 +248,8 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Int(this.value * ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) * ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Complex) {
+            return ((org.python.types.Complex) other).__mul__(this);
         } else if (other instanceof org.python.types.Bool) {
             return new org.python.types.Int(this.value * (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.List) {
@@ -668,10 +670,21 @@ public class Int extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __imul__(org.python.Object other) {
-        if (other instanceof org.python.types.Int || other instanceof org.python.types.Bool || other instanceof org.python.types.Str) {
+        if (other instanceof org.python.types.Str) {
             return this.__mul__(other);
-        }
+        } else if (other instanceof org.python.types.Int) {
+            return this.__mul__(other);
+        } else if (other instanceof org.python.types.Float) {
+            return this.__mul__(other);
+        } else if (other instanceof org.python.types.Complex) {
+            return this.__mul__(other);
+        } else if (other instanceof org.python.types.Tuple) {
+            return this.__mul__(other);
+        } else if (other instanceof org.python.types.List) {
+            return this.__mul__(other);
+        } else {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: 'int' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -713,12 +726,18 @@ public class Int extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -=: 'int' and '" + other.typeName() + "'");
     }
 
-
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __ipow__(org.python.Object other) {
-        return this.__pow__(other, null);
+        if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx_obj = new org.python.types.Complex((double) this.value, 0.0);
+            org.python.types.Complex other_cmplx_obj = (org.python.types.Complex) other;
+            // There seem to be some differences due to rounding errors :-/
+            return cmplx_obj.__pow__(other_cmplx_obj, null);
+        } else {
+            return this.__pow__(other, null);
+        }
     }
 
     @org.python.Method(

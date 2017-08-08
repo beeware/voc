@@ -58,14 +58,8 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
         'test_multiply_bytearray',
         'test_multiply_bytes',
-        'test_multiply_complex',
-        'test_multiply_float',
-        'test_multiply_list',
-        'test_multiply_tuple',
 
         'test_power_complex',
-
-
 
         'test_true_divide_complex',
     ]
