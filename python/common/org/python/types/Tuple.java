@@ -311,7 +311,12 @@ public class Tuple extends org.python.types.Object {
                 }
                 return new org.python.types.Tuple(sliced);
             } else {
-                int idx = (int) ((org.python.types.Int) index).value;
+                int idx;
+                if (index instanceof org.python.types.Bool) {
+                    idx = (int) ((org.python.types.Bool) index).__int__().value;
+                } else {
+                    idx = (int) ((org.python.types.Int) index).value;
+                }
                 if (idx < 0) {
                     if (-idx > this.value.size()) {
                         throw new org.python.exceptions.IndexError("tuple index out of range");
