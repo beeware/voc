@@ -681,6 +681,23 @@ public class Int extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
+    public org.python.Object __imod__(org.python.Object other) {
+        if (other instanceof org.python.types.Bool) {
+            return this.__mod__(other);
+        } else if (other instanceof org.python.types.Int) {
+            return this.__mod__(other);
+        } else if (other instanceof org.python.types.Float) {
+            return this.__mod__(other);
+        } else if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't mod complex numbers.");
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %=: 'int' and '" + other.typeName() + "'");
+        }
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
     public org.python.Object __imul__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             return this.__mul__(other);

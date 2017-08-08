@@ -78,8 +78,3 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
             "(-35416596.83160829+5518228.872766544j)"
         ],
     }
-
-    not_implemented = [
-        'test_modulo_complex',
-        'test_modulo_float',
-    ]
