@@ -51,15 +51,9 @@ class InplaceIntOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'int'
 
     not_implemented = [
-
-
         'test_modulo_complex',
         'test_modulo_float',
 
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
-
         'test_power_complex',
-
-        'test_true_divide_complex',
+        'test_power_float',
     ]

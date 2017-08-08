@@ -292,6 +292,14 @@ public class Int extends org.python.types.Object {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
             return new org.python.types.Float(this.value / ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Complex) {
+            if (((org.python.types.Complex) other).real.value == 0.0 && ((org.python.types.Complex) other).imag.value == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
+            }
+            org.python.types.Complex cmplx_obj = new org.python.types.Complex((double) this.value, 0.0);
+            org.python.types.Complex other_cmplx_obj = (org.python.types.Complex) other;
+            return cmplx_obj.__truediv__(other_cmplx_obj);
+
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
                 return new org.python.types.Float(this.value);
@@ -676,11 +684,17 @@ public class Int extends org.python.types.Object {
     public org.python.Object __imul__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             return this.__mul__(other);
+        } else if (other instanceof org.python.types.Bool) {
+            return this.__mul__(other);
         } else if (other instanceof org.python.types.Int) {
             return this.__mul__(other);
         } else if (other instanceof org.python.types.Float) {
             return this.__mul__(other);
         } else if (other instanceof org.python.types.Complex) {
+            return this.__mul__(other);
+        } else if (other instanceof org.python.types.ByteArray) {
+            return this.__mul__(other);
+        } else if (other instanceof org.python.types.Bytes) {
             return this.__mul__(other);
         } else if (other instanceof org.python.types.Tuple) {
             return this.__mul__(other);
@@ -734,20 +748,34 @@ public class Int extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __ipow__(org.python.Object other) {
-        return this.__pow__(other, null);
+        if (other instanceof org.python.types.Str) {
+            return this.__pow__(other, null);
+        } else if (other instanceof org.python.types.Bool) {
+            return this.__pow__(other, null);
+        } else if (other instanceof org.python.types.Int) {
+            return this.__pow__(other, null);
+        } else if (other instanceof org.python.types.Float) {
+            return this.__pow__(other, null);
+        } else if (other instanceof org.python.types.Complex) {
+            return this.__pow__(other, null);
+        } else if (other instanceof org.python.types.Tuple) {
+            return this.__pow__(other, null);
+        } else if (other instanceof org.python.types.List) {
+            return this.__pow__(other, null);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'int' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __itruediv__(org.python.Object other) {
-        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float || other instanceof org.python.types.Bool) {
+        if (other instanceof org.python.types.Int || other instanceof org.python.types.Float || other instanceof org.python.types.Bool || other instanceof org.python.types.Complex) {
             return this.__truediv__(other);
         } else {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for /=: 'int' and '" + other.typeName() + "'");
         }
     }
-
 
     @org.python.Method(
             __doc__ = ""
