@@ -92,7 +92,7 @@ public class Int extends org.python.types.Object {
     // }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         return new org.python.types.Str(java.lang.Long.toString(this.value));
@@ -113,7 +113,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -126,7 +126,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -139,7 +139,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -159,7 +159,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -172,7 +172,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -185,7 +185,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "self != 0"
     )
     public org.python.types.Bool __bool__() {
         return new org.python.types.Bool(this.value);
@@ -197,14 +197,14 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("int.__dir__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self+value."
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -222,7 +222,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self-value."
     )
     public org.python.Object __sub__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -239,7 +239,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value."
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
@@ -279,7 +279,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self/value."
     )
     public org.python.Object __truediv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -311,7 +311,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self//value."
     )
     public org.python.Object __floordiv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -337,7 +337,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self%value."
     )
     public org.python.Object __mod__(org.python.Object other) {
         try {
@@ -390,7 +390,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return divmod(self, value)."
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
@@ -499,7 +499,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self<<value."
     )
     public org.python.Object __lshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -515,7 +515,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self>>value."
     )
     public org.python.Object __rshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -531,7 +531,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self&value."
     )
     public org.python.Object __and__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -543,7 +543,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self^value."
     )
     public org.python.Object __xor__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -555,7 +555,7 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self|value."
     )
     public org.python.Object __or__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -567,91 +567,91 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value+self."
     )
     public org.python.Object __radd__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__radd__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value-self."
     )
     public org.python.Object __rsub__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rsub__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value*self."
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rmul__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value/self."
     )
     public org.python.Object __rtruediv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rtruediv__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value//self."
     )
     public org.python.Object __rfloordiv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rfloordiv__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value%self."
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rmod__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return divmod(value, self)."
     )
     public org.python.Object __rdivmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rdivmod__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return pow(value, self, mod)."
     )
     public org.python.Object __rpow__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rpow__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value<<self."
     )
     public org.python.Object __rlshift__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rlshift__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value>>self."
     )
     public org.python.Object __rrshift__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rrshift__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value&self."
     )
     public org.python.Object __rand__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rand__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value^self."
     )
     public org.python.Object __rxor__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__rxor__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value|self."
     )
     public org.python.Object __ror__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("int.__ror__() has not been implemented");
@@ -824,49 +824,49 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "-self"
     )
     public org.python.Object __neg__() {
         return new org.python.types.Int(-this.value);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "+self"
     )
     public org.python.Object __pos__() {
         return new org.python.types.Int(this.value);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "abs(self)"
     )
     public org.python.Object __abs__() {
         return new org.python.types.Int(Math.abs(this.value));
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "~self"
     )
     public org.python.Object __invert__() {
         return new org.python.types.Int(-(this.value + 1));
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "int(self)"
     )
     public org.python.Object __int__() {
         return new org.python.types.Int(this.value);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "float(self)"
     )
     public org.python.Object __float__() {
         return new org.python.types.Float((float) this.value);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Rounding an Integral returns itself.\nRounding with an ndigits argument also returns an integer."
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         if (ndigits instanceof org.python.types.Int) {
