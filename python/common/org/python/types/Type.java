@@ -260,7 +260,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         if (this.klass == null) {
