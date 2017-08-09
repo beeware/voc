@@ -86,7 +86,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self<value."
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
