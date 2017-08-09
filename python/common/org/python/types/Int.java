@@ -484,7 +484,7 @@ public class Int extends org.python.types.Object {
                 return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
             }
             return new org.python.types.Float(java.lang.Math.pow((double) this.value, other_val));
-        } else if (other instanceof org.python.types.Complex) { 
+        } else if (other instanceof org.python.types.Complex) {
             org.python.types.Complex cmplx_obj = new org.python.types.Complex((double) this.value, 0.0);
             org.python.types.Complex other_cmplx_obj = (org.python.types.Complex) other;
             return cmplx_obj.__pow__(other_cmplx_obj, null);
@@ -718,7 +718,7 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.List) {
             return this.__mul__(other);
         } else {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: 'int' and '" + other.typeName() + "'");
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: 'int' and '" + other.typeName() + "'");
         }
     }
 
