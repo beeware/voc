@@ -186,7 +186,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "default object formatter",
             args = {"format_string"}
     )
     public org.python.Object __format__(org.python.Object format_string) {
@@ -194,7 +194,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -202,7 +202,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -210,7 +210,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -222,7 +222,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self!=value.",
             args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
@@ -236,7 +236,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -244,7 +244,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -252,7 +252,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return hash(self)."
     )
     public org.python.Object __hash__() {
         return new org.python.types.Int(this.hashCode());
@@ -293,7 +293,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return getattr(self, name).",
             args = {"name"}
     )
     public org.python.Object __getattribute__(org.python.Object name) {
@@ -352,7 +352,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Implement setattr(self, name, value).",
             args = {"name", "value"}
     )
     public void __setattr__(org.python.Object name, org.python.Object value) {
@@ -406,7 +406,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Implement delattr(self, name).",
             args = {"attr"}
     )
     public void __delattr__(org.python.Object name) {
@@ -448,7 +448,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.Object __dir__() {
         org.python.types.List names = new org.python.types.List(new java.util.ArrayList(this.__dict__.keySet()));

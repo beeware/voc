@@ -100,21 +100,21 @@ public class Dict extends org.python.types.Object {
     }
 
     // @org.python.Method(
-    //     __doc__ = ""
+    //     __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     // )
     // public org.python.Object __new__() {
     //     throw new org.python.exceptions.NotImplementedError("dict.__new__() has not been implemented.");
     // }
 
     // @org.python.Method(
-    //     __doc__ = ""
+    //     __doc__ = "Initialize self.  See help(type(self)) for accurate signature."
     // )
     // public org.python.Object __init__() {
     //     throw new org.python.exceptions.NotImplementedError("dict.__init__() has not been implemented.");
     // }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("{");
@@ -141,7 +141,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "default object formatter"
     )
     public org.python.types.Str __format__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.__format__() has not been implemented.");
@@ -183,7 +183,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -191,7 +191,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -199,7 +199,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -211,7 +211,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -219,7 +219,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -248,21 +248,21 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("dict.__dir__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "x.__getitem__(y) <==> x[y]"
     )
     public org.python.Object __getitem__(org.python.Object item) {
         try {
@@ -283,7 +283,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Set self[key] to value."
     )
     public void __setitem__(org.python.Object item, org.python.Object value) {
         try {
@@ -300,7 +300,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Delete self[key]."
     )
     public void __delitem__(org.python.Object item) {
         org.python.Object value = this.value.remove(item);
@@ -310,7 +310,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {
         // FIXME: Once this is implemented, update org.Python.addToKwargs()
@@ -318,7 +318,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "True if D has a key k, else False.",
             args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
@@ -361,7 +361,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Returns a new dict with keys from iterable and values equal to value.",
             args = {"iterable"},
             default_args = {"value"}
     )
@@ -418,7 +418,7 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "D.keys() -> a set-like object providing a view on D's keys"
     )
     public org.python.Object keys() {
         throw new org.python.exceptions.NotImplementedError("dict.keys() has not been implemented.");
@@ -475,14 +475,14 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "D.update([E, ]**F) -> None.  Update D from dict/iterable E and F.\nIf E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]\nIf E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v\nIn either case, this is followed by: for k in F:  D[k] = F[k]"
     )
     public org.python.Object update(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("dict.update() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "D.values() -> an object providing a view on D's values"
     )
     public org.python.Object values() {
         throw new org.python.exceptions.NotImplementedError("dict.values() has not been implemented.");

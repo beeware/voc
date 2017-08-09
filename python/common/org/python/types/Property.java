@@ -22,7 +22,7 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return an attribute of instance, which is of type owner.",
             args = {"instance", "klass"}
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
@@ -39,7 +39,7 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Set an attribute of instance to value.",
             args = {"instance", "value"}
     )
     public void __set__(org.python.Object instance, org.python.Object value) {
@@ -56,7 +56,7 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Delete an attribute of instance.",
             args = {"instance"}
     )
     public void __delete__(org.python.Object instance) {
@@ -73,7 +73,7 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Descriptor to change the setter on a property.",
             args = {"fn"}
     )
     public org.python.Object setter(org.python.Object fn) {
@@ -82,7 +82,7 @@ public class Property extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Descriptor to change the deleter on a property.",
             args = {"fn"}
     )
     public org.python.Object deleter(org.python.Object fn) {

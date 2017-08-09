@@ -58,14 +58,14 @@ public class Bytes extends org.python.types.Object {
     // }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         return this.__str__();
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return str(self)."
     )
     public org.python.types.Str __str__() {
         StringBuilder sb = new StringBuilder();
@@ -88,7 +88,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -106,7 +106,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self+value."
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -175,21 +175,21 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return key in self."
     )
     public org.python.Object __contains__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.__contains__ has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "default object formatter"
     )
     public org.python.types.Str __format__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.__format__ has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -229,7 +229,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -269,7 +269,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -309,7 +309,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -480,7 +480,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self[key]."
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Slice) {
@@ -525,7 +525,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
@@ -536,14 +536,14 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.length);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value.n"
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -591,28 +591,28 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "helper for pickle"
     )
     public org.python.Object __reduce__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.__reduce__ has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "helper for pickle"
     )
     public org.python.Object __reduce_ex__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.__reduce_ex__ has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value."
     )
     public org.python.Object __rmul__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.__rmul__ has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.capitalize() -> copy of B\n\nReturn a copy of B with only its first character capitalized (ASCII)\nand the rest lower-cased."
     )
     public org.python.Object capitalize() {
         byte[] value = new byte[this.value.length];
@@ -731,7 +731,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.decode(encoding='utf-8', errors='strict') -> str\n\nDecode B using the codec registered for encoding. Default encoding\nis 'utf-8'. errors may be given to set a different error\nhandling scheme.  Default is 'strict' meaning that encoding errors raise\na UnicodeDecodeError.  Other possible values are 'ignore' and 'replace'\nas well as any other name registerd with codecs.register_error that is\nable to handle UnicodeDecodeErrors."
     )
     public org.python.Object decode(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         try {
@@ -743,21 +743,21 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.endswith(suffix[, start[, end]]) -> bool\n\nReturn True if B ends with the specified suffix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nsuffix can also be a tuple of bytes to try."
     )
     public org.python.Object endswith(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.endswith has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.expandtabs(tabsize=8) -> copy of B\n\nReturn a copy of B where all tab characters are expanded using spaces.\nIf tabsize is not given, a tab size of 8 characters is assumed."
     )
     public org.python.Object expandtabs(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.expandtabs has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "B.find(sub[, start[, end]]) -> int\n\nReturn the lowest index in B where substring sub is found,\nsuch that sub is contained within B[start:end].  Optional\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure.",
             args = {"sub"},
             default_args = {"start", "end"}
     )
@@ -796,7 +796,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "bytes.fromhex(string) -> bytes\n\nCreate a bytes object from a string of hexadecimal numbers.\nSpaces between two numbers are accepted.\nExample: bytes.fromhex('B9 01EF') -> b'\\xb9\\x01\\xef'."
     )
     public org.python.Object fromhex(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.fromhex has not been implemented.");
@@ -820,203 +820,203 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalnum(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.isalnum has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.isalpha() -> bool\n\nReturn True if all characters in B are alphabetic\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalpha(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.isalpha has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isdigit(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.isdigit has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.islower() -> bool\n\nReturn True if all cased characters in B are lowercase and there is\nat least one cased character in B, False otherwise."
     )
     public org.python.Object islower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.islower has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.isspace() -> bool\n\nReturn True if all characters in B are whitespace\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isspace(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.isspace has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
     public org.python.Object istitle(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.istitle has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.isupper() -> bool\n\nReturn True if all cased characters in B are uppercase and there is\nat least one cased character in B, False otherwise."
     )
     public org.python.Object isupper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.isupper has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.join(iterable_of_bytes) -> bytes\n\nConcatenate any number of bytes objects, with B in between each pair.\nExample: b'.'.join([b'ab', b'pq', b'rs']) -> b'ab.pq.rs'."
     )
     public org.python.Object join(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.join has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space)."
     )
     public org.python.Object ljust(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.ljust has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.lower() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to lowercase."
     )
     public org.python.Object lower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.lower has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.lstrip([bytes]) -> bytes\n\nStrip leading bytes contained in the argument.\nIf the argument is omitted, strip leading ASCII whitespace."
     )
     public org.python.Object lstrip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.lstrip has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.maketrans(frm, to) -> translation table\n\nReturn a translation table (a bytes object of length 256) suitable\nfor use in the bytes or bytearray translate method where each byte\nin frm is mapped to the byte at the same position in to.\nThe bytes objects frm and to must be of the same length."
     )
     public org.python.Object maketrans(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.maketrans has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.partition(sep) -> (head, sep, tail)\n\nSearch for the separator sep in B, and return the part before it,\nthe separator itself, and the part after it.  If the separator is not\nfound, returns B and two empty bytes objects."
     )
     public org.python.Object partition(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.partition has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.replace(old, new[, count]) -> bytes\n\nReturn a copy of B with all occurrences of subsection\nold replaced by new.  If the optional argument count is\ngiven, only first count occurances are replaced."
     )
     public org.python.Object replace(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.replace has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.rfind(sub[, start[, end]]) -> int\n\nReturn the highest index in B where substring sub is found,\nsuch that sub is contained within B[start:end].  Optional\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure."
     )
     public org.python.Object rfind(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.rfind has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.rindex(sub[, start[, end]]) -> int\n\nLike B.rfind() but raise ValueError when the substring is not found."
     )
     public org.python.Object rindex(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.rindex has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.rjust(width[, fillchar]) -> copy of B\n\nReturn B right justified in a string of length width. Padding is\ndone using the specified fill character (default is a space)"
     )
     public org.python.Object rjust(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.rjust has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.rpartition(sep) -> (head, sep, tail)\n\nSearch for the separator sep in B, starting at the end of B,\nand return the part before it, the separator itself, and the\npart after it.  If the separator is not found, returns two empty\nbytes objects and B."
     )
     public org.python.Object rpartition(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.rpartition has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.rsplit(sep=None, maxsplit=-1) -> list of bytes\n\nReturn a list of the sections in B, using sep as the delimiter,\nstarting at the end of B and working to the front.\nIf sep is not given, B is split on ASCII whitespace characters\n(space, tab, return, newline, formfeed, vertical tab).\nIf maxsplit is given, at most maxsplit splits are done."
     )
     public org.python.Object rsplit(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.rsplit has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.rstrip([bytes]) -> bytes\n\nStrip trailing bytes contained in the argument.\nIf the argument is omitted, strip trailing ASCII whitespace."
     )
     public org.python.Object rstrip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.rstrip has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.split(sep=None, maxsplit=-1) -> list of bytes\n\nReturn a list of the sections in B, using sep as the delimiter.\nIf sep is not specified or is None, B is split on ASCII whitespace\ncharacters (space, tab, return, newline, formfeed, vertical tab).\nIf maxsplit is given, at most maxsplit splits are done."
     )
     public org.python.Object split(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.split has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.splitlines([keepends]) -> list of lines\n\nReturn a list of the lines in B, breaking at line boundaries.\nLine breaks are not included in the resulting list unless keepends\nis given and true."
     )
     public org.python.Object splitlines(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.splitlines has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.startswith(prefix[, start[, end]]) -> bool\n\nReturn True if B starts with the specified prefix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nprefix can also be a tuple of bytes to try."
     )
     public org.python.Object startswith(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.startswith has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.strip([bytes]) -> bytes\n\nStrip leading and trailing bytes contained in the argument.\nIf the argument is omitted, strip leading and trailing ASCII whitespace."
     )
     public org.python.Object strip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.strip has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.swapcase() -> copy of B\n\nReturn a copy of B with uppercase ASCII characters converted\nto lowercase ASCII and vice versa."
     )
     public org.python.Object swapcase(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.swapcase has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.title() -> copy of B\n\nReturn a titlecased version of B, i.e. ASCII words start with uppercase\ncharacters, all remaining cased characters have lowercase."
     )
     public org.python.Object title(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.title has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.translate(table[, deletechars]) -> bytes\n\nReturn a copy of B, where all characters occurring in the\noptional argument deletechars are removed, and the remaining\ncharacters have been mapped through the given translation\ntable, which must be a bytes object of length 256."
     )
     public org.python.Object translate(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.translate has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.upper() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to uppercase."
     )
     public org.python.Object upper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.upper has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.zfill(width) -> copy of B\n\nPad a numeric string B with zeros on the left, to fill a field\nof the specified width.  B is never truncated."
     )
     public org.python.Object zfill(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
         throw new org.python.exceptions.NotImplementedError("bytes.zfill has not been implemented.");
