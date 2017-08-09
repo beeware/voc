@@ -36,14 +36,12 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_add_complex',
         'test_modulo_complex',
         'test_multiply_complex',
-        'test_power_complex',
 
         'test_subtract_complex',
 
         'test_true_divide_bytearray',
         'test_true_divide_bytes',
         'test_true_divide_class',
-        'test_true_divide_complex',
         'test_true_divide_dict',
         'test_true_divide_frozenset',
         'test_true_divide_list',
