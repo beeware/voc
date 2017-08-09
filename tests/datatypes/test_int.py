@@ -38,12 +38,6 @@ class BinaryIntOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_modulo_complex',
-
-        'test_multiply_complex',
-
-        'test_power_complex',
-
-        'test_true_divide_complex',
     ]
 
 
