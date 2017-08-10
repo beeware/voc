@@ -235,7 +235,6 @@ public class Bool extends org.python.types.Object {
         } catch (org.python.exceptions.TypeError ae) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'bool' and '" + other.typeName() + "'");
         }
-        // throw new org.python.exceptions.NotImplementedError("bool.__truediv__() has not been implemented.");
     }
 
     @org.python.Method(
@@ -428,7 +427,12 @@ public class Bool extends org.python.types.Object {
             __doc__ = "Return value/self."
     )
     public org.python.Object __rtruediv__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("bool.__rtruediv__() has not been implemented.");
+        try {
+            org.python.types.Int other_val = (org.python.types.Int)other;
+            return new org.python.types.Int(other_val.value == 1 ? 1 : 0).__truediv__(this);
+        } catch (org.python.exceptions.TypeError ae) {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'bool' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
