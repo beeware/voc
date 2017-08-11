@@ -8,7 +8,7 @@ import multiprocessing
 import os
 
 
-REPO_ROOT = os.path.dirname(os.path.realpath(__file__))
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 MODULES_NOT_COMPILING = [
     'ouroboros/__init__.py',
     'ouroboros/_collections_abc.py',
