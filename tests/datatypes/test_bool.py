@@ -33,26 +33,6 @@ class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
     not_implemented = [
-        'test_add_complex',
-        'test_modulo_complex',
-        'test_multiply_complex',
-
-        'test_subtract_complex',
-
-        'test_true_divide_bytearray',
-        'test_true_divide_bytes',
-        'test_true_divide_class',
-        'test_true_divide_dict',
-        'test_true_divide_frozenset',
-        'test_true_divide_list',
-        'test_true_divide_None',
-        'test_true_divide_NotImplemented',
-        'test_true_divide_range',
-        'test_true_divide_set',
-        'test_true_divide_slice',
-        'test_true_divide_str',
-        'test_true_divide_tuple',
-
     ]
 
 
