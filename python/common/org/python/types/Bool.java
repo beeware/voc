@@ -180,6 +180,10 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
+            return new org.python.types.Complex(cmplx.real.value + other_cmplx.real.value, other_cmplx.imag.value);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'bool' and '" + other.typeName() + "'");
     }
@@ -194,6 +198,10 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) - (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0) - (((org.python.types.Float) other).value));
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
+            return cmplx.__sub__(other_cmplx);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'bool' and '" + other.typeName() + "'");
     }
@@ -208,6 +216,10 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) * (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0) * (((org.python.types.Float) other).value));
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
+            return cmplx.__mul__(other_cmplx);
         } else if (other instanceof org.python.types.Str) {
             if (((org.python.types.Bool) this).value) {
                 return new org.python.types.Str(((org.python.types.Str) other).value);
@@ -230,12 +242,30 @@ public class Bool extends org.python.types.Object {
             __doc__ = "Return self/value."
     )
     public org.python.Object __truediv__(org.python.Object other) {
-        try {
+        if (other instanceof org.python.types.Int) {
             return new org.python.types.Int(this.value ? 1 : 0).__truediv__(other);
-        } catch (org.python.exceptions.TypeError ae) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'bool' and '" + other.typeName() + "'");
+        } else if (other instanceof org.python.types.Bool) {
+            org.python.types.Float other_value = new org.python.types.Float((((org.python.types.Bool) other).value ? 1.0 : 0.0));
+            if (other_value.value == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("division by zero");
+            } else {
+                org.python.types.Float value = new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0));
+                return value.__truediv__(other);
+            }
+        } else if (other instanceof org.python.types.Float) {
+            org.python.types.Float other_value = (org.python.types.Float) other;
+            if (other_value.value == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("float division by zero");
+            } else {
+                org.python.types.Float value = new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0));
+                return value.__truediv__(other);
+            }
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
+            return cmplx.__truediv__(other_cmplx);
         }
-        // throw new org.python.exceptions.NotImplementedError("bool.__truediv__() has not been implemented.");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -290,6 +320,8 @@ public class Bool extends org.python.types.Object {
                     return new org.python.types.Int(1);
                 }
             }
+        } else if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't mod complex numbers.");
         }
         try {
             return new org.python.types.Int(this.value ? 1 : 0).__mod__(other);
