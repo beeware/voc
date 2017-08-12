@@ -50,7 +50,7 @@ public class Tuple extends org.python.types.Object {
     // }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("(");
@@ -71,7 +71,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "default object formatter"
     )
     public org.python.types.Str __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
@@ -106,7 +106,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -140,7 +140,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -174,7 +174,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -186,7 +186,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -220,7 +220,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -259,21 +259,21 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self[key]."
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
@@ -311,7 +311,12 @@ public class Tuple extends org.python.types.Object {
                 }
                 return new org.python.types.Tuple(sliced);
             } else {
-                int idx = (int) ((org.python.types.Int) index).value;
+                int idx;
+                if (index instanceof org.python.types.Bool) {
+                    idx = (int) ((org.python.types.Bool) index).__int__().value;
+                } else {
+                    idx = (int) ((org.python.types.Int) index).value;
+                }
                 if (idx < 0) {
                     if (-idx > this.value.size()) {
                         throw new org.python.exceptions.IndexError("tuple index out of range");
@@ -356,21 +361,21 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {
         return new org.python.types.Tuple_Iterator(this);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return key in self."
     )
     public org.python.Object __contains__(org.python.Object item) {
         return new org.python.types.Bool(this.value.contains(item));
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self+value."
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -385,7 +390,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value.n"
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -431,14 +436,14 @@ public class Tuple extends org.python.types.Object {
 
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value."
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "T.count(value) -> integer -- return number of occurrences of value"
     )
     public org.python.Object count() {
         return new org.python.types.Int(this.value.size());

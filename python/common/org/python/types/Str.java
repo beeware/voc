@@ -138,14 +138,14 @@ public class Str extends org.python.types.Object {
 
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
         return new org.python.types.Str(this.value);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.__format__(format_spec) -> str\n\nReturn a formatted version of S as described by format_spec."
     )
     public org.python.Object __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
@@ -190,7 +190,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -203,7 +203,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -216,7 +216,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -229,7 +229,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -242,7 +242,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -260,7 +260,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented.");
@@ -274,7 +274,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self[key]."
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
@@ -354,7 +354,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfStrs = new java.util.ArrayList<org.python.Object>();
@@ -365,7 +365,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return key in self."
     )
     public org.python.types.Int __contains__(org.python.Object item) {
         if (item instanceof org.python.types.Str) {
@@ -400,7 +400,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self+value."
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
@@ -420,7 +420,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value.n"
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -445,7 +445,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self%value."
     )
     public org.python.Object __mod__(org.python.Object other) {
         java.util.List<java.lang.Object> format_args = new java.util.ArrayList<java.lang.Object>();
@@ -531,14 +531,14 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value."
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value%self."
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmod__() has not been implemented.");
