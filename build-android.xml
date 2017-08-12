@@ -9,6 +9,9 @@
     <condition property="sdk.dir" value="${env.ANDROID_HOME}">
         <isset property="env.ANDROID_HOME" />
     </condition>
+    <condition property="target.platform" value="${env.ANDROID_TARGET}" else="android-14">
+        <isset property="env.ANDROID_TARGET" />
+    </condition>
 
     <!-- quick check on sdk.dir -->
     <fail
@@ -27,7 +30,7 @@
             destdir="${build}/android">
           <src path="${src}/common" />
           <src path="${src}/android" />
-          <classpath path="${sdk.dir}/platforms/android-14/android.jar" />
+          <classpath path="${sdk.dir}/platforms/${target.platform}/android.jar" />
         </javac>
     </target>
 

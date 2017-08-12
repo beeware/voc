@@ -61,7 +61,7 @@ public class Bool extends org.python.types.Object {
     // }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         if (this.value) {
@@ -86,7 +86,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -99,7 +99,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -112,7 +112,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -125,7 +125,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -138,7 +138,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -151,7 +151,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "self != 0"
     )
     public org.python.types.Bool __bool__() {
         return new org.python.types.Bool(this.value);
@@ -163,14 +163,14 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("bool.__dir__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self+value."
     )
 
     public org.python.Object __add__(org.python.Object other) {
@@ -180,12 +180,16 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
+            return new org.python.types.Complex(cmplx.real.value + other_cmplx.real.value, other_cmplx.imag.value);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self-value."
     )
     public org.python.Object __sub__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -194,12 +198,16 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) - (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0) - (((org.python.types.Float) other).value));
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
+            return cmplx.__sub__(other_cmplx);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value."
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -208,6 +216,10 @@ public class Bool extends org.python.types.Object {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) * (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0) * (((org.python.types.Float) other).value));
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
+            return cmplx.__mul__(other_cmplx);
         } else if (other instanceof org.python.types.Str) {
             if (((org.python.types.Bool) this).value) {
                 return new org.python.types.Str(((org.python.types.Str) other).value);
@@ -227,19 +239,37 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self/value."
     )
     public org.python.Object __truediv__(org.python.Object other) {
-        try {
+        if (other instanceof org.python.types.Int) {
             return new org.python.types.Int(this.value ? 1 : 0).__truediv__(other);
-        } catch (org.python.exceptions.TypeError ae) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: 'bool' and '" + other.typeName() + "'");
+        } else if (other instanceof org.python.types.Bool) {
+            org.python.types.Float other_value = new org.python.types.Float((((org.python.types.Bool) other).value ? 1.0 : 0.0));
+            if (other_value.value == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("division by zero");
+            } else {
+                org.python.types.Float value = new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0));
+                return value.__truediv__(other);
+            }
+        } else if (other instanceof org.python.types.Float) {
+            org.python.types.Float other_value = (org.python.types.Float) other;
+            if (other_value.value == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("float division by zero");
+            } else {
+                org.python.types.Float value = new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0));
+                return value.__truediv__(other);
+            }
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
+            return cmplx.__truediv__(other_cmplx);
         }
-        // throw new org.python.exceptions.NotImplementedError("bool.__truediv__() has not been implemented.");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self//value."
     )
     public org.python.Object __floordiv__(org.python.Object other) {
         try {
@@ -254,7 +284,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self%value."
     )
     public org.python.Object __mod__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -290,6 +320,8 @@ public class Bool extends org.python.types.Object {
                     return new org.python.types.Int(1);
                 }
             }
+        } else if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't mod complex numbers.");
         }
         try {
             return new org.python.types.Int(this.value ? 1 : 0).__mod__(other);
@@ -299,7 +331,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return divmod(self, value)."
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
@@ -313,7 +345,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return pow(self, value, mod)."
     )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
         try {
@@ -324,7 +356,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self<<value."
     )
     public org.python.Object __lshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -340,7 +372,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self>>value."
     )
     public org.python.Object __rshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -356,7 +388,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self&value."
     )
     public org.python.Object __and__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -377,7 +409,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self^value."
     )
     public org.python.Object __xor__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -391,7 +423,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self|value."
     )
     public org.python.Object __or__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -404,91 +436,91 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value+self."
     )
     public org.python.Object __radd__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__radd__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value-self."
     )
     public org.python.Object __rsub__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rsub__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value*self."
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value/self."
     )
     public org.python.Object __rtruediv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rtruediv__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value//self."
     )
     public org.python.Object __rfloordiv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rfloordiv__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value%self."
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rmod__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return divmod(value, self)."
     )
     public org.python.Object __rdivmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rdivmod__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return pow(value, self, mod)."
     )
     public org.python.Object __rpow__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rpow__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value<<self."
     )
     public org.python.Object __rlshift__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rlshift__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value>>self."
     )
     public org.python.Object __rrshift__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rrshift__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value&self."
     )
     public org.python.Object __rand__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rand__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value^self."
     )
     public org.python.Object __rxor__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__rxor__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value|self."
     )
     public org.python.Object __ror__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("bool.__ror__() has not been implemented.");
@@ -507,10 +539,26 @@ public class Bool extends org.python.types.Object {
             this_val += ((org.python.types.Int) other).value;
             return new org.python.types.Int(this_val);
         } else if (other instanceof org.python.types.Float) {
-            this_val += ((org.python.types.Float) other).value;
-            return new org.python.types.Float(this_val);
+            return new org.python.types.Float(this_val + ((org.python.types.Float) other).value);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'bool' and '" + other.typeName() + "'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __isub__(org.python.Object other) {
+        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        if (other instanceof org.python.types.Bool) {
+            this_val -= (((org.python.types.Bool) other).value ? 1 : 0);
+            return new org.python.types.Int(this_val);
+        } else if (other instanceof org.python.types.Int) {
+            this_val -= ((org.python.types.Int) other).value;
+            return new org.python.types.Int(this_val);
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float(this_val - ((org.python.types.Float) other).value);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -=: 'bool' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -552,49 +600,49 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "-self"
     )
     public org.python.Object __neg__() {
         return new org.python.types.Int(this.value ? -1 : 0);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "+self"
     )
     public org.python.Object __pos__() {
         return new org.python.types.Int(this.value ? 1 : 0);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "abs(self)"
     )
     public org.python.Object __abs__() {
         return new org.python.types.Int(this.value ? 1 : 0);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "~self"
     )
     public org.python.Object __invert__() {
         return new org.python.types.Int(this.value ? -2 : -1);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "int(self)"
     )
     public org.python.types.Int __int__() {
         return new org.python.types.Int(this.value ? 1 : 0);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "float(self)"
     )
     public org.python.types.Float __float__() {
         return new org.python.types.Float(this.value ? 1 : 0);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Rounding an Integral returns itself.\nRounding with an ndigits argument also returns an integer."
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         if (ndigits instanceof org.python.types.Int) {
@@ -604,7 +652,7 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self converted to an integer, if self is suitable for use as an index into a list."
     )
     public org.python.Object __index__() {
         return new org.python.types.Int(this.value ? 1 : 0);
