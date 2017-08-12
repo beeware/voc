@@ -61,5 +61,4 @@ class BuiltinPrintFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_class',
-        'test_slice',
     ]

@@ -72,7 +72,7 @@ public class Range extends org.python.types.Object {
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
-                org.python.types.Slice slice = (org.python.types.Slice) index;
+                org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
                 return new org.python.types.Range(
                         slice.start == null ? this.__dict__.get("start") : slice.start,
                         slice.stop == null ? this.__dict__.get("stop") : slice.stop,

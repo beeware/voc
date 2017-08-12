@@ -368,7 +368,7 @@ public class Bytes extends org.python.types.Object {
     }
 
     private org.python.Object __getitem__slice(org.python.Object index) {
-        org.python.types.Slice slice = (org.python.types.Slice) index;
+        org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
         byte[] sliced;
         if (slice.start == null && slice.stop == null && slice.step == null) {
             sliced = this.value;
