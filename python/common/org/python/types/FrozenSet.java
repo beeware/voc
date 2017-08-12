@@ -79,7 +79,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {
         return new org.python.types.Set_Iterator(this);
@@ -107,7 +107,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         // Representation of an empty set is different
@@ -131,14 +131,14 @@ public class FrozenSet extends org.python.types.Object {
 
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "x.__contains__(y) <==> y in x.",
             args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object other) {
@@ -161,7 +161,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -176,7 +176,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -191,7 +191,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -206,7 +206,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -221,7 +221,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -237,7 +237,7 @@ public class FrozenSet extends org.python.types.Object {
 
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self-value.",
             args = {"other"}
     )
     public org.python.Object __sub__(org.python.Object other) {
@@ -269,7 +269,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self&value.",
             args = {"other"}
     )
     public org.python.Object __and__(org.python.Object other) {
@@ -285,7 +285,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self|value.",
             args = {"other"}
     )
     public org.python.Object __or__(org.python.Object other) {
@@ -301,7 +301,7 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self^value.",
             args = {"other"}
     )
     public org.python.Object __xor__(org.python.Object other) {
