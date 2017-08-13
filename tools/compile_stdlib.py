@@ -210,14 +210,18 @@ def module_overrides():
     paths = []
     for folder, subfolders, files in os.walk(folder_overrides):
         for fname in files:
+            module_folder = os.path.join('ouroboros',
+                                         folder.replace(folder_overrides, ''))
             if fname.endswith('.java'):
-                module_path = os.path.join('ouroboros',
+                module_path = os.path.join(module_folder ,
                                            fname.replace('.java', '.py'))
-                module_init_path = os.path.join('ouroboros',
+                module_init_path = os.path.join(module_folder,
                                            fname.replace('.java', ''),
                                            '__init__.py')
                 paths += [module_path, module_init_path]
+
     paths += MODULE_MANUAL_OVERRIDES
+
     return list(sorted(paths))
 
 
