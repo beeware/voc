@@ -205,7 +205,7 @@ def ouroboros_compiled_folder(target='java'):
 
 
 def module_overrides():
-    """"""
+    """Find stdlib modules already implemented in java."""
     folder_overrides = os.path.join(REPO_ROOT, 'python', 'common', 'python')
     paths = []
     for folder, subfolders, files in os.walk(folder_overrides):
@@ -271,7 +271,7 @@ def list_files():
 
 def compile_with_voc(args):
     """
-    Compile the given (path, queue1, queue2) with voc.
+    Compile the given (path, queue1, queue2, target) with voc.
 
     Save results in the queues passed by pool.map.
     """
@@ -353,13 +353,15 @@ def run_process(paths, target='java'):
 
 
 def main(target='java'):
-    """"""
+    """Run main compilation process."""
     start = datetime.now()
     clone_update_repo()
-    paths = list_files()
 
+    # List valid files to try to compile
+    paths = list_files()
     print('\nFound: {} python files\n'.format(len(paths)))
 
+    # Run compilation process
     failed_list , xpassed_list = run_process(paths)
     n_err = len(failed_list) + len(xpassed_list)
     n_compiled = len(paths) - len(MODULES_NOT_COMPILING)
