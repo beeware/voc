@@ -23,6 +23,80 @@ public class Slice extends org.python.types.Object {
         this.__dict__.put("step", this.step);
     }
 
+    /* Adaptation of _PySlice_GetLongIndices from CPython's Objects/sliceobject.c */
+    @org.python.Method(
+            __doc__ = "Return indices(self, length).",
+            args = {"length"}
+    )
+    public org.python.types.Tuple indices(org.python.types.Object length) {
+        boolean step_is_negative;
+        long lower, upper, start, stop, len;
+        org.python.types.Int step;
+
+        if (length == org.python.types.NoneType.NONE) {
+            throw new org.python.exceptions.TypeError("'NoneType' object cannot be interpreted as an integer");
+        }
+        len = ((org.python.types.Int)length).value;
+        if (len < 0) {
+            throw new org.python.exceptions.ValueError("length should not be negative");
+        }
+        if (this.step == org.python.types.NoneType.NONE) {
+            step = new org.python.types.Int(1);
+        } else {
+            step = (org.python.types.Int)this.step;
+        }
+        step_is_negative = (step.value < 0);
+
+        /* Compute upper and lower bounds */
+        if (step_is_negative) {
+            lower = -1;
+            upper = lower + len;
+        } else {
+            lower = 0;
+            upper = len;
+        }
+
+        /* Compute start */
+        if (this.start == org.python.types.NoneType.NONE) {
+            start = step_is_negative ? upper : lower;
+        } else {
+            start  = ((org.python.types.Int)this.start).value;
+            if (start < 0) {
+                start += len;
+                if (start < lower) {
+                    start = lower;
+                }
+            } else {
+                if (start > upper) {
+                    start = upper;
+                }
+            }
+        }
+
+        /* Compute stop */
+        if (this.stop == org.python.types.NoneType.NONE) {
+            stop = step_is_negative ? lower : upper;
+        } else {
+            stop = ((org.python.types.Int)this.stop).value;
+            if (stop < 0) {
+                stop += len;
+                if (stop < lower) {
+                    stop = lower;
+                }
+            } else {
+                if (stop > upper) {
+                    stop = upper;
+                }
+            }
+        }
+
+        java.util.List<org.python.Object> tuple = new java.util.ArrayList<org.python.Object>();
+        tuple.add(new org.python.types.Int(start));
+        tuple.add(new org.python.types.Int(stop));
+        tuple.add(step);
+        return new org.python.types.Tuple(tuple);
+    }
+
     private org.python.types.Int validateValueType(org.python.Object value) {
         if (value instanceof org.python.types.Int) {
             return (org.python.types.Int) value;

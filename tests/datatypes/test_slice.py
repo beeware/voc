@@ -167,6 +167,57 @@ class SliceTests(TranspileTestCase):
             print("x[-2:-8:-2] = ", x[-2:-8:-2])
             """)
 
+    def test_indices(self):
+        self.assertCodeExecution("""
+            x = slice(0)
+            print("x.indices(None) = ", end='')
+            try:
+                x.indices(None)
+            except TypeError as err:
+                print(err)
+            print("x.indices(-1) = ", end='')
+            try:
+                x.indices(-1)
+            except ValueError as err:
+                print(err)
+            print("x.indices(0) = ", x.indices(0))
+            print("x.indices(1) = ", x.indices(1))
+            print("x.indices(5) = ", x.indices(5))
+            x = slice(1)
+            print("x.indices(0) = ", x.indices(0))
+            print("x.indices(1) = ", x.indices(1))
+            print("x.indices(5) = ", x.indices(5))
+            x = slice(2, 8)
+            print("x.indices(0) = ", x.indices(0))
+            print("x.indices(1) = ", x.indices(1))
+            print("x.indices(5) = ", x.indices(5))
+            print("x.indices(8) = ", x.indices(8))
+            print("x.indices(9) = ", x.indices(9))
+            x = slice(3, 8, 2)
+            print("x.indices(0) = ", x.indices(0))
+            print("x.indices(1) = ", x.indices(1))
+            print("x.indices(5) = ", x.indices(5))
+            print("x.indices(8) = ", x.indices(8))
+            print("x.indices(9) = ", x.indices(9))
+            x = slice(3, 8, -2)
+            print("x.indices(0) = ", x.indices(0))
+            print("x.indices(1) = ", x.indices(1))
+            print("x.indices(5) = ", x.indices(5))
+            print("x.indices(8) = ", x.indices(8))
+            print("x.indices(9) = ", x.indices(9))
+            x = slice(2, -4, 2)
+            print("x.indices(0) = ", x.indices(0))
+            print("x.indices(1) = ", x.indices(1))
+            print("x.indices(5) = ", x.indices(5))
+            print("x.indices(8) = ", x.indices(8))
+            print("x.indices(12) = ", x.indices(12))
+            x = slice(-8, -4, 2)
+            print("x.indices(0) = ", x.indices(0))
+            print("x.indices(1) = ", x.indices(1))
+            print("x.indices(5) = ", x.indices(5))
+            print("x.indices(8) = ", x.indices(8))
+            print("x.indices(12) = ", x.indices(12))
+            """)
 
 class UnarySliceOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'slice'
