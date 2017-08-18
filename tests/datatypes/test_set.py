@@ -362,7 +362,3 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
 class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'set'
 
-    not_implemented = [
-        'test_modulo_complex',
-
-    ]

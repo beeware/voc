@@ -108,7 +108,3 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceRangeOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'range'
-
-    not_implemented = [
-        'test_modulo_complex',
-    ]
