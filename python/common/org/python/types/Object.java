@@ -612,7 +612,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't mod complex numbers.");
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
