@@ -316,7 +316,3 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceDictOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'dict'
-
-    not_implemented = [
-        'test_modulo_complex',
-    ]

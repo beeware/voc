@@ -202,7 +202,6 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_bytearray',
         'test_modulo_bytes',
         'test_modulo_class',
-        'test_modulo_complex',
         'test_modulo_dict',
         'test_modulo_float',
         'test_modulo_frozenset',
