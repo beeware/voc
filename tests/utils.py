@@ -746,9 +746,12 @@ SAMPLE_DATA = {
 }
 
 
-def _string_substitutions(string):
-    delims = (string[0], string[-1])
-    string = string[1:-1]
+def _string_substitutions(string, delims=None):
+    if delims is None:
+        delims = (string[0], string[-1])
+    str_start = len(delims[0])
+    str_end = -1 * len(delims[1])
+    string = string[str_start:str_end]
     elems = [elem for elem in string.split(", ")]
     perms = permutations(elems)
     return [(delims[0] + ", ".join(list(perm)) + delims[1]) for perm in perms]
@@ -762,13 +765,13 @@ SAMPLE_SUBSTITUTIONS = {
     "{'one', 'two', 'six'}": _string_substitutions("{'one', 'two', 'six'}"),
     "{'a', 'b', 'c'}": _string_substitutions("{'a', 'b', 'c'}"),
 
-    # Normalize list ordering
-    "[1, 2.3456, 7]": _string_substitutions("[1, 2.3456, 7]"),
-    "[1, 2.3456, 'another']": _string_substitutions("[1, 2.3456, 'another']"),
-    "['a', 'b', 'c']": _string_substitutions("['a', 'b', 'c']"),
-    "['an', 'to', 'on']": _string_substitutions("['an', 'to', 'on']"),
+    # Normalize list ordering. These are list elements that came from unordered collections
+    "1, 2.3456, 7]": _string_substitutions("1, 2.3456, 7]", delims=['', ']']),
+    "1, 2.3456, 'another']": _string_substitutions("1, 2.3456, 'another']", delims=['', ']']),
+    "'a', 'b', 'c']": _string_substitutions("'a', 'b', 'c']", delims=['', ']']),
+    "'an', 'to', 'on']": _string_substitutions("'an', 'to', 'on']", delims=['', ']']),
+    "'one', 'two', 'six']": _string_substitutions("'one', 'two', 'six']", delims=['', ']']),
 
-    "['one', 'two', 'six']": _string_substitutions("['one', 'two', 'six']"),
     # Normalize dictionary ordering
     "{'a': 1, 'c': 2.3456, 'd': 7}": _string_substitutions(
                                               "{'a': 1, 'c': 2.3456, 'd': 7}"),
