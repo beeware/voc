@@ -150,8 +150,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_add_complex',
 
-        'test_modulo_complex',
-
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',

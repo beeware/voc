@@ -52,8 +52,6 @@ class InplaceNotImplementedOperationTests(InplaceOperationTestCase, TranspileTes
         'test_lt_complex',
         'test_lt_frozenset',
 
-        'test_modulo_complex',
-
         'test_multiply_bytes',
         'test_multiply_bytearray',
         'test_multiply_list',
