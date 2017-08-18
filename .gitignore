@@ -17,5 +17,3 @@ tests/tmp*
 .env
 
 .DS_Store
-ouroboros-repo/
-ouroboros-compiled/
