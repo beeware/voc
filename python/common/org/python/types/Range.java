@@ -170,6 +170,14 @@ public class Range extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
+        if (other instanceof org.python.types.Range) {
+            org.python.types.Range range2 = (org.python.types.Range)other;
+            return new org.python.types.Bool(
+                (this.start == range2.start) &&
+                (this.stop == range2.stop) &&
+                (this.step == range2.step)
+            );
+        }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
