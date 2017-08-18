@@ -88,10 +88,6 @@ class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
 
-    not_implemented = [
-        'test_subscr_bool',
-    ]
-
     not_implemented_versions = {
         'test_subscr_None': (3.4,),
         'test_subscr_NotImplemented': (3.4,),

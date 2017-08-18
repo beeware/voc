@@ -86,7 +86,12 @@ public class Range extends org.python.types.Object {
                 return new org.python.types.Range(substart, substop, substep);
             } else {
                 long len = ((org.python.types.Int) (this.__len__())).value;
-                long idx = ((org.python.types.Int) index).value;
+                long idx;
+                if (index instanceof org.python.types.Bool) {
+                    idx = ((org.python.types.Bool)index).value ? 1 : 0;
+                } else {
+                    idx = ((org.python.types.Int) index).value;
+                }
 
                 if (idx < 0) {
                     idx = len + idx;
