@@ -137,15 +137,19 @@ IGNORE_MODULES = set([
 def ouroboros_repo_folder():
     """Return the folder where the ouroboros repo was cloned.
 
-    If the repo doesn't exist, clone it.
+    If the repo doesn't exist, return None. It should get cloned by
+    update_repo.
     """
-    path = os.path.join(os.path.dirname(os.path.dirname(REPO_ROOT)), 'ouroboros')
-    if os.path.isdir(os.path.join(path, '.git')):
-        return path
 
-    path = os.path.join(os.path.dirname(REPO_ROOT), 'ouroboros')
-    if not os.path.isdir(os.path.join(path, '.git')):
-        return path
+    for dirpath in (
+        os.path.dirname(os.path.dirname(REPO_ROOT)),
+        os.path.dirname(REPO_ROOT),
+    ):
+        path = os.path.join(dirpath, 'ouroboros')
+        if os.path.isdir(os.path.join(path, '.git')):
+            return path
+    else:
+        return None
 
 
 def native_modules(target):
