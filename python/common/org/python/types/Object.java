@@ -853,8 +853,16 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __imod__(org.python.Object other) {
-        this.setValue(this.__mod__(other));
-        return this;
+        try {
+            this.setValue(this.__mod__(other));
+            return this;
+        } catch (org.python.exceptions.TypeError e) {
+            if (other instanceof org.python.types.Complex) {
+                throw new org.python.exceptions.TypeError("can't mod complex numbers.");
+            } else {
+                throw new org.python.exceptions.TypeError("unsupported operand type(s) for %=: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            }
+        }
     }
 
     @org.python.Method(
