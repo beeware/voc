@@ -203,6 +203,21 @@ public class Range extends org.python.types.Object {
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
+    @org.python.Method(
+            __doc__ = "Implement self*value.",
+            args = {"other"}
+    )
+    public org.python.Object __mul__(org.python.Object other) {
+        if ((other instanceof org.python.types.ByteArray) ||
+                (other instanceof org.python.types.Bytes) ||
+                (other instanceof org.python.types.List) ||
+                (other instanceof org.python.types.Str) ||
+                (other instanceof org.python.types.Tuple)) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'range'");
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'range' and '" + other.typeName() + "'");
+    }
+
     public class RangeIterator extends org.python.types.Object implements org.python.Object {
 
         public static final java.lang.String PYTHON_TYPE_NAME = "range_iterator";

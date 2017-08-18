@@ -89,12 +89,6 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
 
     not_implemented = [
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
-        'test_multiply_list',
-        'test_multiply_str',
-        'test_multiply_tuple',
-
         'test_subscr_bool',
     ]
 
