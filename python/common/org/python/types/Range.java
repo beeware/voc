@@ -72,12 +72,18 @@ public class Range extends org.python.types.Object {
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
-                org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
-                return new org.python.types.Range(
-                        slice.start == null ? this.__dict__.get("start") : slice.start,
-                        slice.stop == null ? this.__dict__.get("stop") : slice.stop,
-                        slice.step == null ? this.__dict__.get("step") : slice.step
-                );
+                org.python.types.Slice.ValidatedValue val = ((org.python.types.Slice)index).validateValueTypes();
+                org.python.types.Slice slice = new org.python.types.Slice(val.start, val.stop, val.step);
+                org.python.types.Tuple indices = slice.indices((org.python.types.Int) (this.__len__()));
+                org.python.Object start = indices.__getitem__(new org.python.types.Int(0));
+                org.python.Object stop = indices.__getitem__(new org.python.types.Int(1));
+                org.python.Object step = indices.__getitem__(new org.python.types.Int(2));
+                org.python.Object rstart = this.__dict__.get("start");
+                org.python.Object rstep = this.__dict__.get("step");
+                org.python.Object substep = step.__mul__(rstep);
+                org.python.Object substart = rstart.__add__(rstep.__mul__(start));
+                org.python.Object substop = rstart.__add__(rstep.__mul__(stop));
+                return new org.python.types.Range(substart, substop, substep);
             } else {
                 long len = ((org.python.types.Int) (this.__len__())).value;
                 long idx = ((org.python.types.Int) index).value;

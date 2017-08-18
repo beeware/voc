@@ -96,7 +96,6 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_tuple',
 
         'test_subscr_bool',
-        'test_subscr_slice',
     ]
 
     not_implemented_versions = {
