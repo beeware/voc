@@ -351,7 +351,3 @@ class BinaryFrozensetOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceFrozensetOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'frozenset'
-
-    not_implemented = [
-        'test_modulo_complex',
-    ]

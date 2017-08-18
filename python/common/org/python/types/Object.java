@@ -853,12 +853,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __imod__(org.python.Object other) {
-        try {
-            this.setValue(this.__mod__(other));
-            return this;
-        } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %=: '" + this.typeName() + "' and '" + other.typeName() + "'");
-        }
+        this.setValue(this.__mod__(other));
+        return this;
     }
 
     @org.python.Method(
