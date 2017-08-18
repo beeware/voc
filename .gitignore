@@ -15,3 +15,5 @@ tests/temp
 tests/tmp*
 .cache/
 .env
+
+.DS_Store
