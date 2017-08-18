@@ -17,8 +17,6 @@ class BinaryNotImplementedOperationTests(BinaryOperationTestCase, TranspileTestC
     data_type = 'NotImplemented'
 
     not_implemented = [
-        'test_modulo_complex',
-
         'test_multiply_bytes',
         'test_multiply_bytearray',
 

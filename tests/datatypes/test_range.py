@@ -94,8 +94,6 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
         'test_eq_range',
 
-        'test_modulo_complex',
-
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_list',
