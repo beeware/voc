@@ -89,18 +89,11 @@ class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
 
     not_implemented = [
-        'test_direct_eq_range',
-        'test_direct_ne_range',
-
-        'test_eq_range',
-
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_list',
         'test_multiply_str',
         'test_multiply_tuple',
-
-        'test_ne_range',
 
         'test_subscr_bool',
         'test_subscr_slice',
