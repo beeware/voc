@@ -278,34 +278,22 @@ public class Tuple extends org.python.types.Object {
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
-                org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
+                org.python.types.Slice.ValidatedValue val = ((org.python.types.Slice) index).validateValueTypes();
                 java.util.List<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
-
-                if (slice.start == null && slice.stop == null && slice.step == null) {
+                if (val.start == null && val.stop == null && val.step == null) {
                     sliced.addAll(this.value);
                 } else {
-                    long start;
-                    if (slice.start != null) {
-                        start = slice.start.value;
-                    } else {
-                        start = 0;
-                    }
-
-                    long stop;
-                    if (slice.stop != null) {
-                        stop = slice.stop.value;
-                    } else {
-                        stop = this.value.size();
-                    }
-
-                    long step;
-                    if (slice.step != null) {
-                        step = slice.step.value;
-                    } else {
-                        step = 1;
-                    }
-
-                    for (long i = start; i < stop; i += step) {
+                    org.python.types.Slice slice = new org.python.types.Slice(val.start, val.stop, val.step);
+                    org.python.types.Tuple indices = slice.indices((org.python.types.Int) (this.__len__()));
+                    long start = ((org.python.types.Int) (indices.value.get(0))).value;
+                    long stop = ((org.python.types.Int) (indices.value.get(1))).value;
+                    long step = ((org.python.types.Int) (indices.value.get(2))).value;
+                    /* If step is negative, we need to stop the loop when i <= stop.
+                     * If step is positive, we need to stop the loop when i >= stop.
+                     * validateValueTypes() has already ensured that step != 0.
+                     */
+                    int cmp = step > 0 ? -1 : 1;
+                    for (long i = start; (i > stop ? 1 : i < stop ? -1 : 0) == cmp; i += step) {
                         sliced.add(this.value.get((int) i));
                     }
                 }
