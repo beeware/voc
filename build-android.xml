@@ -1,48 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="python" default="dist">
 
-    <!-- if sdk.dir was not set from one of the property file, then
-         get it from the ANDROID_HOME env var.
-         This must be done before we load project.properties since
-         the proguard config can use sdk.dir -->
-    <property environment="env" />
-    <condition property="sdk.dir" value="${env.ANDROID_HOME}">
-        <isset property="env.ANDROID_HOME" />
-    </condition>
-    <condition property="target.platform" value="${env.ANDROID_TARGET}" else="android-14">
-        <isset property="env.ANDROID_TARGET" />
-    </condition>
+  <!-- if sdk.dir was not set from one of the property file, then
+       get it from the ANDROID_HOME env var.
+       This must be done before we load project.properties since
+       the proguard config can use sdk.dir -->
+  <property environment="env" />
+  <condition property="sdk.dir" value="${env.ANDROID_HOME}">
+    <isset property="env.ANDROID_HOME" />
+  </condition>
+  <condition property="target.platform" value="${env.ANDROID_TARGET}" else="android-14">
+    <isset property="env.ANDROID_TARGET" />
+  </condition>
 
-    <!-- quick check on sdk.dir -->
-    <fail
-            message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable."
-            unless="sdk.dir"
-    />
+  <!-- quick check on sdk.dir -->
+  <fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable."
+        unless="sdk.dir" />
 
-    <target name="compile" description="Compile the Android-specific source">
-        <mkdir dir="${build}/android"/>
-        <javac
-            debug="true"
-            debuglevel="lines,vars,source"
-            includeantruntime="false"
-            source="1.7"
-            target="1.7"
-            destdir="${build}/android">
-          <src path="${src}/common" />
-          <src path="${src}/android" />
-          <classpath path="${sdk.dir}/platforms/${target.platform}/android.jar" />
-        </javac>
-    </target>
+  <target name="compile" description="Compile the Android-specific source">
+    <mkdir dir="${build}/android"/>
+    <javac debug="true"
+           debuglevel="lines,vars,source"
+           includeantruntime="false"
+           source="1.7"
+           target="1.7"
+           destdir="${build}/android">
+      <src path="${src}/common" />
+      <src path="${src}/android" />
+      <classpath path="${sdk.dir}/platforms/${target.platform}/android.jar" />
+    </javac>
+
+    <exec executable="python">
+      <arg value="tools/compile_stdlib.py"/>
+      <arg value="--fast"/>
+      <arg value="android"/>
+    </exec>
+  </target>
 
   <target name="dist" depends="compile" description="Generate Android Java jar file">
     <mkdir dir="${dist}/android/libs"/>
 
-    <jar jarfile="${dist}/Python-${python-version}-Android-support.b${release}.jar" basedir="${build}/android"/>
+    <jar jarfile="${dist}/Python-${python-version}-Android-support.b${release}.jar"
+         basedir="${build}/android"/>
 
-    <copy
-        tofile="${dist}/android/libs/python-android-support.jar"
-        file="${dist}/Python-${python-version}-Android-support.b${release}.jar"
-        overwrite="true" />
+    <copy tofile="${dist}/android/libs/python-android-support.jar"
+          file="${dist}/Python-${python-version}-Android-support.b${release}.jar"
+          overwrite="true" />
 
     <echo file="${dist}/android/support.version" append="false">Python version: ${python-version}
 Build: ${release}

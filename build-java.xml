@@ -5,50 +5,56 @@
 
   <target name="compile" description="Compile the Oracle-specific source">
     <mkdir dir="${build}/java"/>
-    <javac
-        debug="true"
-        debuglevel="lines,vars,source"
-        includeantruntime="false"
-        destdir="${build}/java">
+    <javac debug="true"
+           debuglevel="lines,vars,source"
+           includeantruntime="false"
+           destdir="${build}/java">
       <src path="${src}/common" />
       <src path="${src}/java" />
     </javac>
   </target>
 
+  <target name="compile_stdlib" description="Compile the standard library">
+    <exec executable="python">
+      <arg value="tools/compile_stdlib.py"/>
+      <arg value="--fast"/>
+      <arg value="java"/>
+    </exec>
+  </target>
+
   <target name="compile-testdaemon" depends="compile" description="Compile the testdaemon source">
     <mkdir dir="${build}/java-testdaemon"/>
-    <javac
-        debug="true"
-        debuglevel="lines,vars,source"
-        includeantruntime="false"
-        source="1.7"
-        target="1.7"
-        destdir="${build}/java-testdaemon">
+    <javac debug="true"
+           debuglevel="lines,vars,source"
+           includeantruntime="false"
+           source="1.7"
+           target="1.7"
+           destdir="${build}/java-testdaemon">
       <src path="${src}/testdaemon" />
       <classpath path="${build}/java" />
     </javac>
   </target>
 
-  <target name="dist" depends="compile" description="Generate Oracle Java jar file">
+  <target name="dist" depends="compile, compile_stdlib" description="Generate Oracle Java jar file">
     <mkdir dir="${dist}"/>
 
-    <jar jarfile="${dist}/Python-${python-version}-Java-support.b${release}.jar" basedir="${build}/java"/>
+    <jar jarfile="${dist}/Python-${python-version}-Java-support.b${release}.jar"
+         basedir="${build}/java" />
 
-    <copy
-        tofile="${dist}/python-java-support.jar"
-        file="${dist}/Python-${python-version}-Java-support.b${release}.jar"
-        overwrite="true" />
+    <copy tofile="${dist}/python-java-support.jar"
+          file="${dist}/Python-${python-version}-Java-support.b${release}.jar"
+          overwrite="true" />
   </target>
 
   <target name="dist-testdaemon" depends="compile-testdaemon" description="Generate testdaemon jar file">
     <mkdir dir="${dist}"/>
 
-    <jar jarfile="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar" basedir="${build}/java-testdaemon"/>
+    <jar jarfile="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar"
+         basedir="${build}/java-testdaemon" />
 
-    <copy
-        tofile="${dist}/python-java-testdaemon.jar"
-        file="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar"
-        overwrite="true" />
+    <copy tofile="${dist}/python-java-testdaemon.jar"
+          file="${dist}/Python-${python-version}-Java-testdaemon.b${release}.jar"
+          overwrite="true" />
   </target>
 
   <target name="clean" description="Clean up">
