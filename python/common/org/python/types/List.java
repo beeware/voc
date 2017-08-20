@@ -721,7 +721,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__="L.reverse() -> None -- reverse the elements of the L in place."
+            __doc__ = "L.reverse() -> None -- reverse the elements of the L in place."
     )
     public org.python.Object reverse() {
         Collections.reverse(this.value);
