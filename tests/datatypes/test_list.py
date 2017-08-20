@@ -144,6 +144,14 @@ class ListTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_reverse(self):
+        # New list
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            x.reverse()
+            print(x)
+            """)
+
     def test_slice(self):
         # Full slice
         self.assertCodeExecution("""
