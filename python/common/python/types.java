@@ -1,9 +1,9 @@
-package python.types;
+package python;
 
 @org.python.Module(
         __doc__ = "\nDefine names for built-in types that aren't directly accessible as a builtin.\n"
 )
-public class __init__ extends org.python.types.Module {
+public class types extends org.python.types.Module {
     static {
         // BuiltinFunctionType = org.python.types.Type.pythonType(org.python.types.BuiltinFunction.class);
         // BuiltinMethodType = org.python.types.Type.pythonType(org.python.types.BuiltinMethod.class);
@@ -69,7 +69,7 @@ public class __init__ extends org.python.types.Module {
     @org.python.Attribute
     public static org.python.Object __cached__ = org.python.types.NoneType.NONE;  // TODO
     @org.python.Attribute
-    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/types/__init__.java");
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/types.java");
     @org.python.Attribute
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
     @org.python.Attribute

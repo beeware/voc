@@ -96,9 +96,20 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.difference(y)
+            w = x.difference([3,4,5])
             print(x)
             print(y)
             print(z)
+            print(w)
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                print(x.difference(1))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_discard(self):
@@ -114,9 +125,11 @@ class SetTests(TranspileTestCase):
             x = {1, 2, 3}
             y = {3, 4, 5}
             z = x.intersection(y)
+            w = x.intersection([3,4,5])
             print(x)
             print(y)
             print(z)
+            print(w)
             """)
 
         self.assertCodeExecution("""
@@ -126,6 +139,15 @@ class SetTests(TranspileTestCase):
             print(x)
             print(y)
             print(z)
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            x = set([1, 2, 3])
+            try:
+                print(x.intersection(1))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_remove(self):
@@ -173,6 +195,161 @@ class SetTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_iteration(self):
+        self.assertCodeExecution("""
+            x = {1, 2, 3}
+            y = set()
+            #We are not printing each element because python and voc store the items in different ways.
+            for s in x:
+                print(x.__contains__(s))
+            for s in y:
+                print(y.__conatins__(s))
+            """)
+
+    def test_isdisjoint(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            print(x.isdisjoint(y))
+            print(x.isdisjoint("hell"))
+            print(x.isdisjoint(z))
+            print(t.isdisjoint(z))
+            print(t.isdisjoint(y))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.isdisjoint(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.isdisjoint(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.isdisjoint(x))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_issubset(self):
+        self.assertCodeExecution("""
+            a = set('abc')
+            b = set('abcde')
+            c = set()
+            print(a.issubset(b))
+            print(a.issubset('ab'))
+            print(a.issubset(a))
+            print(a.issubset(c))
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            a = {1, 2, 3}
+            try:
+                print(a.issubset(1))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_issuperset(self):
+        self.assertCodeExecution("""
+            a = set('abcd')
+            b = set('ab')
+            c = set()
+            print(a.issuperset(b))
+            print(a.issuperset('ab1'))
+            print(a.issuperset(a))
+            print(a.issuperset(c))
+            """)
+
+        # not iterable test
+        self.assertCodeExecution("""
+            a = {1, 2, 3}
+            try:
+                print(a.issuperset(1))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_symmetric_difference(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            print(sorted(x.symmetric_difference(y)))
+            print(sorted(x.symmetric_difference(z)))
+            print(sorted(t.symmetric_difference(z)))
+            print(sorted(t.symmetric_difference(y)))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.symmetric_difference(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference())
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_symmetric_difference_update(self):
+        # successful
+        self.assertCodeExecution("""
+            x = set("hello World !")
+            y = set("hello")
+            z = set()
+            t = set()
+            x.symmetric_difference_update(y)
+            print(sorted(x))
+            #x.test_symmetric_difference_update(z)
+            print(sorted(x))
+            t.symmetric_difference_update(z)
+            print(sorted(t))
+            t.symmetric_difference_update(y)
+            print(sorted(t))
+            """)
+
+        # unsuccessful
+        self.assertCodeExecution("""
+            x = 9.3
+            y = 5
+            l = set("hello World !")
+            m = set("hello")
+            try:
+                print(l.symmetric_difference_update(y))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference_update(x))
+            except TypeError as err:
+                print(err)
+            try:
+                print(l.symmetric_difference_update())
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
@@ -181,144 +358,7 @@ class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
 
-    not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-        'test_and_set',
-
-        'test_direct_eq_bytes',
-        'test_direct_eq_set',
-        'test_direct_ge_bytearray',
-        'test_direct_ge_bytes',
-        'test_direct_ge_set',
-        'test_direct_gt_bytearray',
-        'test_direct_gt_bytes',
-        'test_direct_gt_set',
-        'test_direct_le_bytearray',
-        'test_direct_le_bytes',
-        'test_direct_le_set',
-        'test_direct_lt_bytearray',
-        'test_direct_lt_bytes',
-        'test_direct_lt_set',
-        'test_direct_ne_bytearray',
-        'test_direct_ne_bytes',
-        'test_direct_ne_set',
-
-        'test_direct_eq_frozenset',
-        'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_lt_frozenset',
-        'test_direct_ne_frozenset',
-
-        'test_direct_eq_list',
-
-        'test_direct_eq_slice',
-        'test_direct_ne_slice',
-        'test_direct_ge_slice',
-        'test_direct_le_slice',
-
-        'test_direct_gt_tuple',
-        'test_direct_le_tuple',
-
-        'test_eq_class',
-        'test_eq_frozenset',
-
-        'test_ge_class',
-        'test_ge_frozenset',
-
-        'test_gt_class',
-        'test_gt_frozenset',
-
-        'test_le_class',
-        'test_le_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_lt_class',
-        'test_lt_frozenset',
-
-        'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_frozenset',
-
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_ne_class',
-        'test_ne_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-        'test_or_set',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-        'test_subtract_set',
-
-        'test_subscr_class',
-        'test_subscr_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
-        'test_xor_set',
-    ]
-
 
 class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'set'
 
-    not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-        'test_and_set',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_frozenset',
-
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-        'test_or_set',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-        'test_subtract_set',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
-        'test_xor_set',
-    ]

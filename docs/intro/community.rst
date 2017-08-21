@@ -32,6 +32,6 @@ want to contribute code, please `fork the code`_ and `submit a pull request`_.
 .. _fork the code: https://github.com/pybee/voc
 .. _submit a pull request: https://github.com/pybee/voc/pulls
 
-.. _Code of Conduct: http://pybee.org/contributing/index.html
+.. _Code of Conduct: https://pybee.org/community/behavior/code-of-conduct/
 .. _Russell Keith-Magee: mailto:russell@keith-magee.com
 .. _First Timers Guide: http://pybee.org/contributing/how/first-time/what/voc/

@@ -10,6 +10,4 @@ class BuiltinFormatFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_class',
-        'test_frozenset',
-        'test_slice',
     ]

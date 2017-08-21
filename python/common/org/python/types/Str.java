@@ -11,6 +11,7 @@ public class Str extends org.python.types.Object {
      */
     void setValue(org.python.Object obj) {
         this.value = ((org.python.types.Str) obj).value;
+
     }
 
     public java.lang.Object toJava() {
@@ -66,22 +67,85 @@ public class Str extends org.python.types.Object {
     //     throw new org.python.exceptions.NotImplementedError("__init__() has not been implemented.");
     // }
 
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __repr__() {
-        return new org.python.types.Str("'" + this.value + "'");
+    private static boolean isCharPrintable(char c) {
+        // ASCII non-printable
+        if ((int) c <= 0x1f || (int) c >= 0x7f && (int) c <= 0xa0 || (int) c == 0xad) {
+            return false;
+        }
+        if ((int) c == 0x2029) {
+            return false;
+        }
+        if (Character.isISOControl(c)) {
+            return false;
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = ""
+    )
+    public org.python.Object __repr__() {
+    /*
+    * Reference: https://www.python.org/dev/peps/pep-3138/#id7
+    * TODO: Need to treat the leading surrogate pair characters
+    */
+        StringBuilder sb = new StringBuilder();
+        boolean hasDoubleQuote = false;
+        boolean hasSingleQuote = false;
+
+        for (char c : this.value.toCharArray()) {
+            if (c == '\'') {
+                hasSingleQuote = true;
+            } else if (c == '"') {
+                hasDoubleQuote = true;
+            }
+
+            if (c == '\n') {
+                sb.append("\\n");
+            } else if (c == '\t') {
+                sb.append("\\t");
+            } else if (c == '\r') {
+                sb.append("\\r");
+            } else if (c == '\\') {
+                sb.append("\\\\");
+            // ASCII Non-Printable
+            } else if (c <= 0x1f || c >= 0x7f && c <= 0xa0 || c == 0xad) {
+                sb.append(String.format("\\x%02x", (int) c));
+            } else if (!this.isCharPrintable(c)) {
+                sb.append(String.format("\\u%04x", (int) c));
+            } else {
+                sb.append((char) c);
+            }
+        }
+
+        // Decide if we wanna wrap the result with single or double quotes
+        String quote;
+        String repr = sb.toString();
+
+        if (hasSingleQuote) {
+            if (hasDoubleQuote) {
+                quote = "'";
+                repr = repr.replaceAll("'", "\\\\'");
+            } else {
+                quote = "\"";
+            }
+        } else {
+            quote = "'";
+        }
+
+        return new org.python.types.Str(quote + repr + quote);
+    }
+
+
+    @org.python.Method(
+            __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
         return new org.python.types.Str(this.value);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "S.__format__(format_spec) -> str\n\nReturn a formatted version of S as described by format_spec."
     )
     public org.python.Object __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
@@ -126,7 +190,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -139,7 +203,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -152,7 +216,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -165,7 +229,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -178,7 +242,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -196,7 +260,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented.");
@@ -210,12 +274,12 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self[key]."
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
-                org.python.types.Slice slice = (org.python.types.Slice) index;
+                org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
                 java.lang.String sliced;
 
                 if (slice.start == null && slice.stop == null && slice.step == null) {
@@ -290,9 +354,9 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfStrs = new java.util.ArrayList<org.python.Object>();
         for (int i = 0; i < this.value.length(); i++) {
             listOfStrs.add(new org.python.types.Str(this.value.substring(i, i + 1)));
@@ -301,7 +365,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return key in self."
     )
     public org.python.types.Int __contains__(org.python.Object item) {
         if (item instanceof org.python.types.Str) {
@@ -336,7 +400,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self+value."
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
@@ -356,7 +420,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value.n"
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -381,7 +445,7 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self%value."
     )
     public org.python.Object __mod__(org.python.Object other) {
         java.util.List<java.lang.Object> format_args = new java.util.ArrayList<java.lang.Object>();
@@ -396,8 +460,34 @@ public class Str extends org.python.types.Object {
             for (org.python.Object obj : oth.value) {
                 format_args.add(obj.toJava());
             }
+        } else if (other instanceof org.python.types.Range) {
+            try {
+                format_args.add(other.toJava());
+                Object obj = new org.python.types.Str(java.lang.String.format(this.value, format_args.toArray()));
+
+            } catch (IllegalArgumentException e) {
+                throw new org.python.exceptions.TypeError("not enough arguments for format string");
+            }
+
+        } else if (other instanceof org.python.types.Int) {
+            if (value.contains("%s")) {
+                //Number of replacements by diff between string with
+                // all cancelled out. Divide 2 as each occurrence has length 2
+                int replaceCount = (value.length() - value.replace("%s", "").length()) / 2;
+                if (replaceCount == 1) {
+                    //Only 1 replacement needed; directly convert
+                    format_args.add(other.toJava());
+                } else {
+                    //Too many replacements required, throw error
+                    throw new org.python.exceptions.TypeError("not enough arguments for format string");
+                }
+            } else {
+                //Value is plain string, can't replace with int
+                throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+            }
         } else if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+
         } else {
             format_args.add(other.toJava());
         }
@@ -561,14 +651,14 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value."
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return value%self."
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmod__() has not been implemented.");
@@ -589,9 +679,24 @@ public class Str extends org.python.types.Object {
     public org.python.Object __imod__(org.python.Object other) {
         if (other instanceof org.python.types.NoneType) {
             throw new org.python.exceptions.TypeError("not all arguments converted during string formatting");
+        } else if (other instanceof org.python.types.Int) {
+            try {
+                this.setValue(this.__mod__(other));
+                return this;
+            } catch (org.python.exceptions.TypeError e) {
+                throw e;
+            }
+        } else if (other instanceof org.python.types.Range) {
+            try {
+                super.__imod__(other);
+                return this;
+            } catch (org.python.exceptions.TypeError e) {
+                throw new org.python.exceptions.TypeError("not enough arguments for format string");
+            }
+        } else {
+            super.__imod__(other);
+            return this;
         }
-        super.__imod__(other);
-        return this;
     }
 
     @org.python.Method(
@@ -956,7 +1061,27 @@ public class Str extends org.python.types.Object {
                     "such as \"def\" and \"class\".\n"
     )
     public org.python.Object isidentifier() {
-        throw new org.python.exceptions.NotImplementedError("isidentifier() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+        }
+        boolean firstCheck = true;
+        for (char ch : this.value.toCharArray()) {
+            // Beginning with underscores seems to blow up on isUnicodeIdentifierStart
+            if (ch == '_') {
+                continue;
+            }
+            if (firstCheck) {
+                if (!(Character.isUnicodeIdentifierStart(ch))) {
+                    return new org.python.types.Bool(false);
+                }
+                firstCheck = false;
+            } else {
+                if (!(Character.isUnicodeIdentifierPart(ch))) {
+                    return new org.python.types.Bool(false);
+                }
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -979,7 +1104,15 @@ public class Str extends org.python.types.Object {
                     "False otherwise.\n"
     )
     public org.python.Object isnumeric() {
-        throw new org.python.exceptions.NotImplementedError("isnumeric() has not been implemented.");
+        if (this.value.isEmpty()) {
+            return new org.python.types.Bool(false);
+        }
+        for (char ch : this.value.toCharArray()) {
+            if (!(Character.isDigit(ch))) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -989,7 +1122,12 @@ public class Str extends org.python.types.Object {
                     "printable in repr() or S is empty, False otherwise.\n"
     )
     public org.python.Object isprintable() {
-        throw new org.python.exceptions.NotImplementedError("isprintable() has not been implemented.");
+        for (char ch : this.value.toCharArray()) {
+            if (!this.isCharPrintable(ch)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
@@ -1052,7 +1190,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object join(org.python.Object iterable) {
         java.util.List<org.python.Object> temp_list = new java.util.ArrayList<org.python.Object>();
-        org.python.Iterable iter = null;
+        org.python.Object iter = null;
         try {
             iter = org.Python.iter(iterable);
         } catch (org.python.exceptions.TypeError e) {
@@ -1196,10 +1334,51 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Return a copy of S with all occurrences of substring\n" +
                     "old replaced by new.  If the optional argument count is\n" +
-                    "given, only the first count occurrences are replaced.\n"
+                    "given, only the first count occurrences are replaced.\n",
+            default_args = {"repChars", "repWith", "num"}
     )
-    public org.python.Object replace() {
-        throw new org.python.exceptions.NotImplementedError("replace() has not been implemented.");
+    public org.python.Object replace(org.python.Object repChars, org.python.Object repWith, org.python.Object num) {
+
+        if (repWith == null && repChars == null) {
+            throw new org.python.exceptions.TypeError("replace() takes at least 2 arguments (0 given)");
+        } else if (repWith == null || repChars == null) {
+            throw new org.python.exceptions.TypeError("replace() takes at least 2 arguments (1 given)");
+        } else if (!(repChars instanceof org.python.types.Str)) {
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + repChars.typeName() + "' object to str implicitly");
+            } else {
+                throw new org.python.exceptions.TypeError("replace() argument 1 must be str, not " + repChars.typeName());
+            }
+        } else if (!(repWith instanceof org.python.types.Str)) {
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + repWith.typeName() + "' object to str implicitly");
+            } else {
+                throw new org.python.exceptions.TypeError("replace() argument 2 must be str, not " + repWith.typeName());
+            }
+        }
+        int no;
+        if (num == null) {
+            no = this.value.length();
+        } else {
+            no = Integer.parseInt(num.toString());
+        }
+        java.lang.String replace = ((org.python.types.Str) repChars).value;
+        java.lang.String replaceWith = ((org.python.types.Str) repWith).value;
+        java.lang.String str = this.value;
+        java.lang.String ret_str = str;
+        if (replace == "") {
+            ret_str = replaceWith;
+            for (int i = 0; i < str.length(); i++) {
+                char c = str.charAt(i);
+                ret_str += c;
+                ret_str += replaceWith;
+            } //  ^^^^  to cover the border case of replacing an empty string with something
+        } else {
+            for (int i = 0; i < no && i < str.length(); i++) {
+                ret_str = ret_str.replaceFirst(replace, replaceWith);
+            }
+        }
+        return new org.python.types.Str(ret_str);
     }
 
     @org.python.Method(
@@ -1301,10 +1480,41 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Search for the separator sep in S, starting at the end of S, and return\n" +
                     "the part before it, the separator itself, and the part after it.  If the\n" +
-                    "separator is not found, return two empty strings and S.\n"
+                    "separator is not found, return two empty strings and S.\n",
+            default_args = {"sep"}
     )
-    public org.python.Object rpartition() {
-        throw new org.python.exceptions.NotImplementedError("rpartition() has not been implemented.");
+    public org.python.Object rpartition(org.python.types.Object sep) {
+        java.util.List<org.python.Object> tuple = new java.util.ArrayList<org.python.Object>();
+        if (sep == null) {
+            throw new org.python.exceptions.TypeError("rpartition() takes exactly one argument (0 given)");
+        }
+        if (!(sep instanceof org.python.types.Str)) {
+            if (org.Python.VERSION < 0x03060000) {
+                throw new org.python.exceptions.TypeError("Can't convert '" + org.Python.typeName(sep.getClass()) + "' object to str implicitly");
+            }
+            return new org.python.exceptions.TypeError("must be str, not " + org.Python.typeName(sep.getClass()));
+        }
+        java.lang.String sepStr = ((org.python.types.Str) sep).value;
+        if (sepStr.equals("")) {
+            throw new org.python.exceptions.ValueError("empty separator");
+        }
+        if (this.value.equals("")) {
+            tuple.add(new org.python.types.Str(""));
+            tuple.add(new org.python.types.Str(""));
+            tuple.add(new org.python.types.Str(""));
+            return new org.python.types.Tuple(tuple);
+        }
+        int i = this.value.lastIndexOf(sepStr);
+        if (i != -1) {
+            tuple.add(new org.python.types.Str(this.value.substring(0, i)));
+            tuple.add(new org.python.types.Str(sepStr));
+            tuple.add(new org.python.types.Str(this.value.substring(i + sepStr.length())));
+            return new org.python.types.Tuple(tuple);
+        }
+        tuple.add(new org.python.types.Str(""));
+        tuple.add(new org.python.types.Str(""));
+        tuple.add(new org.python.types.Str(this.value));
+        return new org.python.types.Tuple(tuple);
     }
 
     @org.python.Method(
@@ -1399,15 +1609,82 @@ public class Str extends org.python.types.Object {
         return result_list;
     }
 
+    private static boolean isLineBreak(char character) {
+        // List of line boundaries from https://docs.python.org/3.4/library/stdtypes.html#str.splitlines
+        switch (character) {
+            case '\n':
+            case '\r':
+            case '\u000B':
+            case '\u000C':
+            case '\u001C':
+            case '\u001D':
+            case '\u001E':
+            case '\u0085':
+            case '\u2028':
+            case '\u2029':
+                return true;
+            default:
+                return false;
+        }
+    }
+
     @org.python.Method(
             __doc__ = "S.splitlines([keepends]) -> list of strings\n" +
                     "\n" +
                     "Return a list of the lines in S, breaking at line boundaries.\n" +
                     "Line breaks are not included in the resulting list unless keepends\n" +
-                    "is given and true.\n"
+                    "is given and true.\n",
+            default_args = {"keepends"}
     )
-    public org.python.Object splitlines() {
-        throw new org.python.exceptions.NotImplementedError("splitlines() has not been implemented.");
+    public org.python.Object splitlines(org.python.Object keepends) {
+        if (keepends == null) {
+            keepends = new org.python.types.Bool(false);
+        }
+
+        org.python.types.List result = new org.python.types.List();
+        char current;
+
+        int start = 0;
+        int end;
+        int start_extra;
+        boolean skip = false;
+
+        for (int i = 0; i < this.value.length(); i++) {
+            current = this.value.charAt(i);
+            char next = current;
+
+            if (i < this.value.length() - 1) {
+                next = this.value.charAt(i + 1);
+            }
+
+            if (this.isLineBreak(current)) {
+                end = i;
+                if (current == '\r' && next == '\n') {
+                    skip = true;
+                    start_extra = 1;
+                    if (keepends.toBoolean()) {
+                        end++;
+                    }
+                } else {
+                    start_extra = 0;
+                }
+                if (keepends.toBoolean()) {
+                    end++;
+                }
+                result.append(this.__getitem__(new org.python.types.Slice(new org.python.types.Int(start), new org.python.types.Int(end))));
+                start = i + 1 + start_extra;
+                if (skip) {
+                    skip = false;
+                    i++;
+                }
+            }
+        }
+        org.python.types.Str last = (org.python.types.Str) this.__getitem__(new org.python.types.Slice(new org.python.types.Int(start), org.python.types.NoneType.NONE));
+        if (last.value.length() > 0) {
+            result.append(last);
+        }
+        return result;
+
     }
 
     @org.python.Method(

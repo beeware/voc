@@ -84,7 +84,7 @@ public class TestDaemon {
             } finally {
                 // always cleanup the module cache in ImportLib
                 try {
-                    Class<?> importlib = joinedClassLoader.loadClass("python.sys.__init__");
+                    Class<?> importlib = joinedClassLoader.loadClass("python.sys");
                     Field importlib_modules = importlib.getDeclaredField("modules");
                     importlib_modules.set(null, new org.python.types.Dict());
                 } catch (ReflectiveOperationException e) {

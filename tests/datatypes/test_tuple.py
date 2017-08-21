@@ -219,6 +219,48 @@ class TupleTests(TranspileTestCase):
             print((y,) == (x,)) # False, y is not x, y.__eq__(x)
             """)
 
+    def test_iteration(self):
+        self.assertCodeExecution("""
+            a = (1, 2, 3, 4, 5)
+            b = ()
+            for x in a:
+                print(x)
+            for x in b:
+                print(x)
+            """)
+
+    def test_index(self):
+        # success
+        self.assertCodeExecution("""
+            a = (1, 2, 3, 4, 3)
+            print(a.index(2))
+            print(a.index(2,1))
+            print(a.index(2,1,5))
+            print(a.index(2,0,1000))
+            print(a.index(2,-300))
+            """)
+
+        # raise exceptions
+        self.assertCodeExecution("""
+            a = (1, 2, 3, 4, 3)
+            try:
+                print(a.index('2'))
+            except ValueError as err:
+                print(err)
+            try:
+                print(a.index(2,0,-50))
+            except ValueError as err:
+                print(err)
+            try:
+                print(a.index(7,0,5))
+            except ValueError as err:
+                print(err)
+            try:
+                print(a.index())
+            except TypeError as err:
+                print(err)
+            """)
+
 
 class UnaryTupleOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
@@ -227,137 +269,6 @@ class UnaryTupleOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
 
-    not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_direct_eq_bytes',
-        'test_direct_ge_bytes',
-        'test_direct_gt_bytes',
-        'test_direct_le_bytes',
-        'test_direct_lt_bytes',
-        'test_direct_ne_bytes',
-
-        'test_direct_eq_frozenset',
-        'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_lt_frozenset',
-        'test_direct_ne_frozenset',
-
-        'test_direct_ge_tuple',
-        'test_direct_gt_tuple',
-        'test_direct_le_tuple',
-        'test_direct_lt_tuple',
-
-        'test_eq_class',
-        'test_eq_frozenset',
-
-        'test_ge_class',
-        'test_ge_frozenset',
-        'test_ge_tuple',
-
-        'test_gt_class',
-        'test_gt_frozenset',
-        'test_gt_tuple',
-
-        'test_le_class',
-        'test_le_frozenset',
-        'test_le_tuple',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_lt_class',
-        'test_lt_frozenset',
-        'test_lt_tuple',
-
-        'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_frozenset',
-
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_ne_class',
-        'test_ne_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subscr_bool',
-        'test_subscr_class',
-        'test_subscr_frozenset',
-        'test_subscr_slice',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
-    ]
-
 
 class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
-
-    not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_frozenset',
-
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
-        'test_multiply_class',
-        'test_multiply_complex',
-        'test_multiply_dict',
-        'test_multiply_float',
-        'test_multiply_frozenset',
-        'test_multiply_slice',
-        'test_multiply_list',
-        'test_multiply_None',
-        'test_multiply_NotImplemented',
-        'test_multiply_range',
-        'test_multiply_set',
-        'test_multiply_str',
-        'test_multiply_tuple',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
-    ]

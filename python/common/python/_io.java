@@ -1,4 +1,4 @@
-package python._io;
+package python;
 
 @org.python.Module(
         __doc__ =
@@ -38,7 +38,7 @@ package python._io;
                         "\n" +
                         "\n"
 )
-public class __init__ extends org.python.types.Module {
+public class _io extends org.python.types.Module {
     @org.python.Method(
             __doc__ = "Create and return a new object.  See help(type) for accurate signature."
     )
@@ -67,6 +67,8 @@ public class __init__ extends org.python.types.Module {
     public static org.python.Object __loader__ = org.python.types.NoneType.NONE;  // TODO
     @org.python.Attribute
     public static org.python.Object __name__ = new org.python.types.Str("_io");
+    @org.python.Attribute()
+    public static org.python.Object __file__ = new org.python.types.Str("python/common/python/_io.java");
     @org.python.Attribute
     public static org.python.Object __package__ = new org.python.types.Str("");
     @org.python.Attribute

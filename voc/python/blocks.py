@@ -22,6 +22,12 @@ class IgnoreBlock(Exception):
     pass
 
 
+class BlockCodeTooLarge(Exception):
+    """Enable a block to be flagged too large to transpile."""
+    def __init__(self, code_length):
+        self.code_length = code_length
+
+
 class Accumulator:
     def __init__(self, local_vars=None):
         self.opcodes = []
@@ -109,7 +115,7 @@ class Block(Accumulator):
             'annotation': None
         }
 
-    def store_name(self, name):
+    def store_name(self, name, declare=False):
         raise NotImplementedError('Abstract class `block` cannot be used directly.')
 
     def store_dynamic(self):
@@ -133,6 +139,12 @@ class Block(Accumulator):
     @property
     def can_ignore_empty(self):
         return False
+
+    @property
+    def has_nested_structure(self):
+        """Whether the block has nested structures inside.
+        """
+        return any([self.blocks, self.loops, self.try_catches])
 
     def add_str(self, value):
         self.add_opcodes(
@@ -321,7 +333,7 @@ class Block(Accumulator):
                 ),
 
                 # globals
-                # JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                # JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
                 JavaOpcodes.ACONST_NULL(),  # globals
 
                 # Default args
@@ -343,7 +355,9 @@ class Block(Accumulator):
         )
 
         for arg in function.parameters:
-            if arg['kind'] == ArgType.POSITIONAL_OR_KEYWORD and arg['default']:
+            if arg['kind'] in (
+                    ArgType.POSITIONAL_OR_KEYWORD,
+                    ArgType.KEYWORD_ONLY) and arg['default']:
                 self.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(arg['name']),
@@ -455,6 +469,10 @@ class Block(Accumulator):
             instruction.java_offset = offset
             offset += len(instruction)
         # print('>>>>> end set offsets')
+
+        # The maximum length of a method in JVM is 65534 bytes. (See: Section 4.7.3, JVM 7 Specs)
+        if offset > 65534:
+            raise BlockCodeTooLarge(offset)
 
         # Construct the exception table, updating any
         # end-of-exception GOTO operations with the right opcode.

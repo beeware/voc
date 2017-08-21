@@ -14,3 +14,6 @@ tests/temp
 .pydevproject
 tests/tmp*
 .cache/
+.env
+
+.DS_Store

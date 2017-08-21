@@ -3,7 +3,7 @@ from ..java import (
     Annotation, Code as JavaCode, ConstantElementValue, Method as JavaMethod,
     RuntimeVisibleAnnotations, opcodes as JavaOpcodes, Classref as JavaClassref
 )
-from .blocks import Block, Accumulator
+from .blocks import Block, Accumulator, BlockCodeTooLarge
 from .structures import (
     TRY, CATCH, END_TRY,
     ArgType,
@@ -205,9 +205,13 @@ def return_statement(accumulator, annotation):
         )
 
 
+class MethodCodeTooLarge(Exception):
+    pass
+
+
 class Function(Block):
-    def __init__(self, module, name, code, parameters, returns, static=False):
-        super().__init__(parent=module)
+    def __init__(self, parent, name, code, parameters, returns, static=False):
+        super().__init__(parent=parent)
         self.name = name
 
         # Python can redefine function symbols. Keep a track of any
@@ -247,8 +251,8 @@ class Function(Block):
     def add_self(self):
         pass
 
-    def store_name(self, name):
-        if name in self.local_vars:
+    def store_name(self, name, declare=False):
+        if declare or name in self.local_vars:
             self.add_opcodes(
                 # Store in a local variable
                 ASTORE_name(name),
@@ -263,7 +267,7 @@ class Function(Block):
             self.add_opcodes(
                 ASTORE_name('#value'),
 
-                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
 
                 python.Str(self.module.full_name),
 
@@ -286,7 +290,7 @@ class Function(Block):
             )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
 
                 python.Str(self.module.full_name),
 
@@ -298,7 +302,7 @@ class Function(Block):
 
     def load_globals(self):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
 
             python.Str(self.module.full_name),
             python.Object.get_item(),
@@ -323,7 +327,7 @@ class Function(Block):
             )
         except NameError:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
 
                 python.Str(self.module.full_name),
 
@@ -424,11 +428,11 @@ class Function(Block):
 
     def add_function(self, name, code, parameter_signatures, return_signature):
         # If a function is added to a function, it is added as an anonymous
-        # inner class.
+        # inner class to the function/method's parent module/class.
         from .klass import ClosureClass
         klass = ClosureClass(
-            module=self.module,
-            name='%s$%s$%s' % (self.module.name, self.name, name),
+            parent=self._parent,
+            name=name,
             closure_var_names=code.co_freevars,
         )
         self.module.classes.append(klass)
@@ -503,7 +507,7 @@ class Function(Block):
             # return was not added at the root level (i.e., it's not a return
             # as the last statement of an IF statement), add one.
             try:
-                return_required = self.opcodes[-1].depth > 0
+                return_required = self.opcodes[-1].needs_implicit_return
             except AttributeError:
                 return_required = True
         else:
@@ -529,14 +533,18 @@ class Function(Block):
         ]
 
     def transpile_method(self):
-        return [
-            JavaMethod(
-                self.pyimpl_name,
-                self.signature,
-                static=self.static,
-                attributes=[self.transpile_code()] + self.method_attributes()
-            )
-        ]
+        try:
+            return [
+                JavaMethod(
+                    self.pyimpl_name,
+                    self.signature,
+                    static=self.static,
+                    attributes=[self.transpile_code()] + self.method_attributes()
+                )
+            ]
+        except BlockCodeTooLarge as e:
+            raise MethodCodeTooLarge("Code is too large for method %s: %d > 65534"
+                                     % (self.name, e.code_length))
 
     def transpile_wrapper(self):
         return []
@@ -615,7 +623,7 @@ class InitMethod(Function):
                 )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
 
                 python.Str(self.module.full_name),
 
@@ -669,7 +677,7 @@ class Method(Function):
         )
 
     def __repr__(self):
-        return '<InstanceMethod %s.%s (%s parameters)>' % (self.klass.name, self.name, len(self.parameters))
+        return '<Method %s.%s (%s parameters)>' % (self.klass.name, self.name, len(self.parameters))
 
     @property
     def pyimpl_name(self):
@@ -844,10 +852,10 @@ class MainFunction(Function):
     def can_ignore_empty(self):
         return True
 
-    def store_name(self, name):
+    def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.module.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -870,7 +878,7 @@ class MainFunction(Function):
 
     def load_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.module.full_name),
             python.Object.get_item(),
 
@@ -880,7 +888,7 @@ class MainFunction(Function):
 
     def delete_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
             python.Str(self.module.full_name),
             python.Object.get_item(),
 
@@ -904,13 +912,13 @@ class MainFunction(Function):
                 ASTORE_name('#module'),
 
                 # Register the module by it's full name
-                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
                 python.Str(self.module.full_name),
                 ALOAD_name('#module'),
                 python.Object.set_item(),
 
                 # Register the same module as __main__
-                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
                 python.Str('__main__'),
                 ALOAD_name('#module'),
                 python.Object.set_item(),
@@ -999,7 +1007,7 @@ class Closure(Function):
             )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys/__init__', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
                 python.Str(self.module.full_name),
                 python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -1151,6 +1159,128 @@ class GeneratorFunction(Function):
         return [
             JavaMethod(
                 self.method_name,
+                self.signature,
+                static=self.static,
+                attributes=[
+                    JavaCode(
+                        max_stack=len(self.parameters) + 9,
+                        max_locals=len(self.parameters) + 8,
+                        code=wrapper.opcodes
+                    )
+                ]
+            )
+        ]
+
+
+class GeneratorMethod(Method):
+    def __init__(self, klass, name, code, generator, parameters, returns=None, static=False):
+        super().__init__(
+            klass,
+            name=name,
+            code=code,
+            parameters=parameters,
+            returns=returns,
+            static=static,
+        )
+        self.generator = generator
+
+    @property
+    def klass(self):
+        return self._parent
+
+    def add_self(self):
+        self.local_vars['<generator>'] = len(self.local_vars)
+        self.has_self = True
+
+    def visitor_setup(self):
+        self.add_opcodes(
+            # Restore the variables needed for the entry of the generator.
+            ALOAD_name('<generator>'),
+            JavaOpcodes.GETFIELD('org/python/types/Generator', 'stack', 'Ljava/util/Map;'),
+            ASTORE_name('#locals'),
+        )
+
+        for param in self.parameters:
+            self.add_opcodes(
+                ALOAD_name('#locals'),
+                java.Map.get(param['name']),
+                ASTORE_name(param['name'])
+            )
+
+    def visitor_teardown(self):
+        if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
+            self.add_opcodes(
+                java.New('org/python/exceptions/StopIteration'),
+                java.Init('org/python/exceptions/StopIteration'),
+                JavaOpcodes.ATHROW(),
+            )
+
+    def transpile_method(self):
+        return [
+            JavaMethod(
+                self.method_name + "$generator",
+                '(Lorg/python/types/Generator;)Lorg/python/Object;',
+                static=True,
+                attributes=[self.transpile_code()] + self.method_attributes()
+            )
+        ]
+
+    def transpile_wrapper(self):
+        wrapper = Accumulator()
+
+        wrapper.add_opcodes(
+            # Construct a generator instance
+            java.New('org/python/types/Generator'),
+
+            # p1: The name of the generator
+            JavaOpcodes.LDC_W(self.generator),
+
+            # p2: The actual generator method
+            java.Class.forName(self.klass.class_name),
+
+            JavaOpcodes.LDC_W(self.method_name + "$generator"),
+            java.Array(1, 'java/lang/Class'),
+
+            JavaOpcodes.DUP(),
+            ICONST_val(0),
+            java.Class.forName('org.python.types.Generator'),
+            JavaOpcodes.AASTORE(),
+
+            JavaOpcodes.INVOKEVIRTUAL(
+                'java/lang/Class',
+                'getMethod',
+                args=['Ljava/lang/String;', '[Ljava/lang/Class;'],
+                returns='Ljava/lang/reflect/Method;'
+            ),
+
+            # p3: The arguments passed to the generator method. These will be
+            # restored on the first call to the generator.
+            java.Map(),
+        )
+
+        for i, param in enumerate(self.parameters):
+            wrapper.add_opcodes(
+                JavaOpcodes.DUP(),
+                JavaOpcodes.LDC_W(param['name']),
+
+                JavaOpcodes.ALOAD(i + (0 if self.static else 1)),
+                java.Map.put(),
+            )
+
+        # Construct and return the generator object.
+        wrapper.add_opcodes(
+            java.Init(
+                'org/python/types/Generator',
+                'Ljava/lang/String;',
+                'Ljava/lang/reflect/Method;',
+                'Ljava/util/Map;',
+            ),
+            JavaOpcodes.ARETURN(),
+        )
+
+        return super().transpile_wrapper() + [
+            JavaMethod(
+                self.pyimpl_name,
                 self.signature,
                 static=self.static,
                 attributes=[

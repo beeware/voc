@@ -64,7 +64,7 @@ public class List extends org.python.types.Object {
                         ((org.python.types.Tuple) args[0]).value
                 );
             } else {
-                org.python.Iterable iterator = org.Python.iter(args[0]);
+                org.python.Object iterator = org.Python.iter(args[0]);
                 java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
                 try {
                     while (true) {
@@ -101,7 +101,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement self+=value."
     )
     public org.python.Object __iadd__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -131,7 +131,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("[");
@@ -149,14 +149,14 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "default object formatter"
     )
     public org.python.types.Str __format__() {
         throw new org.python.exceptions.NotImplementedError("list.__format__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -190,7 +190,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -224,7 +224,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -236,7 +236,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -270,7 +270,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -309,19 +309,19 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "x.__getitem__(y) <==> x[y]"
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
-                org.python.types.Slice slice = (org.python.types.Slice) index;
+                org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
                 java.util.List<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
 
                 if (slice.start == null && slice.stop == null && slice.step == null) {
@@ -337,36 +337,50 @@ public class List extends org.python.types.Object {
                     if (step < 0) {
                         long start;
                         if (slice.start != null) {
-                            start = Math.min(slice.start.value, this.value.size());
+                            if (slice.start.value < 0) {
+                                start = Math.max((this.value.size() + slice.start.value), -1);
+                            } else {
+                                start = Math.min(slice.start.value, this.value.size() - 1);
+                            }
                         } else {
                             start = this.value.size() - 1;
                         }
 
                         long stop;
                         if (slice.stop != null) {
-                            stop = Math.min(slice.stop.value, start);
+                            if (slice.stop.value < 0) {
+                                stop = Math.max((this.value.size() + slice.stop.value), 0);
+                            } else {
+                                stop = Math.min(slice.stop.value, this.value.size());
+                            }
                         } else {
                             stop = -1;
                         }
-
                         for (long i = start; i > stop; i += step) {
                             sliced.add(this.value.get((int) i));
                         }
                     } else {
                         long start;
                         if (slice.start != null) {
-                            start = Math.min(slice.start.value, this.value.size());
+                            if (slice.start.value < 0) {
+                                start = Math.max((this.value.size() + slice.start.value), 0);
+                            } else {
+                                start = Math.min(slice.start.value, this.value.size());
+                            }
                         } else {
                             start = 0;
                         }
 
                         long stop;
                         if (slice.stop != null) {
-                            stop = Math.min(slice.stop.value, this.value.size());
+                            if (slice.stop.value < 0) {
+                                stop = Math.max((this.value.size() + slice.stop.value), 0);
+                            } else {
+                                stop = Math.min(slice.stop.value, this.value.size());
+                            }
                         } else {
                             stop = this.value.size();
                         }
-
                         for (long i = start; i < stop; i += step) {
                             sliced.add(this.value.get((int) i));
                         }
@@ -402,8 +416,9 @@ public class List extends org.python.types.Object {
         }
     }
 
+
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Set self[key] to value."
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
         try {
@@ -435,7 +450,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Delete self[key]."
     )
     public void __delitem__(org.python.Object index) {
         try {
@@ -467,21 +482,29 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return new org.python.types.List_Iterator(this);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Reverse the list in place and returns\n" +
+                      "an iterator that iterates over all the objects\n" +
+                      "in the list in reverse order. Does not\n" +
+                      "modify the original list."
     )
-    public org.python.Iterable __reversed__() {
-        throw new org.python.exceptions.NotImplementedError("list.__reversed__() has not been implemented.");
+    public org.python.Object __reversed__() {
+        org.python.types.List list = new org.python.types.List();
+        for (int i = this.value.size() - 1; i >= 0; i--) {
+            list.append(this.value.get(i));
+        }
+        org.python.Object iter = new org.python.types.List_Iterator(list);
+        return iter;
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return key in self.",
             args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
@@ -497,7 +520,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self+value."
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -512,7 +535,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value.n"
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -534,7 +557,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement self*=value."
     )
     public org.python.Object __imul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -557,14 +580,14 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value."
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "L.append(object) -> None -- append object to end",
             args = {"item"}
     )
     public org.python.Object append(org.python.Object item) {
@@ -573,7 +596,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "L.clear() -> None -- remove all items from L"
     )
     public org.python.Object clear() {
         this.value.clear();
@@ -588,7 +611,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "L.count(value) -> integer -- return number of occurrences of value",
             args = {"other"}
     )
     public org.python.Object count(org.python.Object other) {
@@ -603,7 +626,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "L.extend(iterable) -> None -- extend list by appending elements from the iterable"
     )
     public org.python.Object extend(org.python.Object other) {
         return org.python.types.NoneType.NONE;
@@ -683,7 +706,7 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "L.remove(value) -> None -- remove first occurrence of value.\nRaises ValueError if the value is not present.",
             args = {"item"}
     )
     public org.python.Object remove(org.python.Object item) {

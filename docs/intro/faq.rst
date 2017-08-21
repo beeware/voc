@@ -121,8 +121,7 @@ Can I make an Android app already?
 Yes, but currently you have to use Android Java API (you'll be able to use `toga`_
 once `toga-android`_ is more mature).
 
-There is an example todo list app, you can see `a video of it <https://www.youtube.com/watch?v=RisCgSIWwLA>`_
-and `check the code <https://gist.github.com/freakboy3742/7beb22c587e57240610777a44af645d8>`_.
+You can see `here an example TicTacToe app that does that <https://github.com/eliasdorneles/tictactoe-voc>`_.
 
 
 .. _Vereenigde Oostindische Compagnie (VOC): https://en.wikipedia.org/wiki/Dutch_East_India_Company

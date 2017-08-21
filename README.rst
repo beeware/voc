@@ -17,8 +17,8 @@ VOC
 .. image:: https://img.shields.io/pypi/l/voc.svg
     :target: https://github.com/pybee/voc/blob/master/LICENSE
 
-.. image:: https://travis-ci.org/pybee/voc.svg?branch=master
-    :target: https://travis-ci.org/pybee/voc
+.. image:: https://beekeeper.herokuapp.com/projects/pybee/voc/shield
+    :target: https://beekeeper.herokuapp.com/projects/pybee/voc
 
 .. image:: https://badges.gitter.im/pybee/general.svg
     :target: https://gitter.im/pybee/general

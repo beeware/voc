@@ -190,3 +190,39 @@ class StaticMethodTests(TranspileTestCase):
             obj.foo(1, 2)
             MyClass.foo(3, 4)
             """, run_in_function=False)
+
+
+class InnerClassTests(TranspileTestCase):
+    def test_inner_simple(self):
+        self.assertCodeExecution("""
+            class MyClass:
+                class InnerClass:
+                    def __init__(self, val):
+                        print("VAL: ", val)
+                        self.value = val
+
+                    def stuff(self, delta):
+                        print("DELTA: ", delta)
+                        return self.value + delta
+
+            obj = MyClass.InnerClass(4)
+            obj.stuff(5)
+        """, run_in_function=False)
+
+    def test_inner_namespaced(self):
+        self.assertCodeExecution("""
+            class MyClass1:
+                class InnerClass:
+                    def stuff(self):
+                        print('STUFF FROM 1')
+
+            class MyClass2:
+                class InnerClass:
+                    def stuff(self):
+                        print('STUFF FROM 2')
+
+            obj = MyClass1.InnerClass()
+            obj.stuff()
+            obj = MyClass2.InnerClass()
+            obj.stuff()
+        """, run_in_function=False)

@@ -86,3 +86,27 @@ class AssignmentTests(TranspileTestCase):
             print(y)
             print(z)
             """)
+
+    def test_increment_assignment(self):
+        self.assertCodeExecution("""
+            a = 1
+            a += 1
+            print(a)
+            """)
+
+    def test_increment_assignment_attribute(self):
+        self.assertCodeExecution("""
+            class Thing(object):
+                a = 1
+
+            t = Thing()
+            t.a += 1
+            print(t.a)
+            """)
+
+    def test_increment_assignment_subscript(self):
+        self.assertCodeExecution("""
+            a = [0, 1, 2]
+            a[0] += 1
+            print(a)
+            """)

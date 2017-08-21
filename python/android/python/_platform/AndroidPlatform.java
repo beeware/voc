@@ -1,8 +1,8 @@
-package python.platform;
+package python._platform;
 
 import android.os.Debug;
 
-public class AndroidPlatform implements python.Platform {
+public class AndroidPlatform implements python.PlatformInterface {
     private org.python.stdlib._io.TextIOWrapper _stderr;
     private org.python.stdlib._io.TextIOWrapper _stdout;
     private org.python.stdlib._io.TextIOWrapper _stdin;
@@ -18,11 +18,11 @@ public class AndroidPlatform implements python.Platform {
     }
 
     public void debug(java.lang.String msg) {
-        android.util.Log.d("Python", msg);
+        android.util.Log.i("Python", msg);
     }
 
     public void debug(java.lang.String msg, java.lang.Object obj) {
-        android.util.Log.d("Python", msg + " " + obj);
+        android.util.Log.i("Python", msg + " " + obj);
     }
 
     public org.python.Object getPlatform() {

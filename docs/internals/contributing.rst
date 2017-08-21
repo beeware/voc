@@ -23,11 +23,11 @@ instead of using the official PyBee repository, you'll be using your own
 Github fork.
 
 As with the getting started guide, these instructions will assume that you
-have Python 3.4+, a Java 7 or Java 8 JDK, and Apache ANT installed, and have virtualenv available for use.
+have Python 3.4+, a Java 7 or Java 8 JDK, and Apache ANT installed.
 
 **Note:** If you are on Linux, you will need to install an extra package to be able to run the test suite. 
-* **Ubuntu** 12.04 and 14.04: ``libpython3.4-testsuite`` This can be done by running ``apt-get install libpython3.4-testsuite``.
-* **Ubuntu** 16.04 and 16.10: ``libpython3.5-testsuite`` This can be done by running ``apt-get install libpython3.5-testsuite``.
+ * **Ubuntu** 12.04 and 14.04: ``libpython3.4-testsuite`` This can be done by running ``apt-get install libpython3.4-testsuite``.
+ * **Ubuntu** 16.04 and 16.10: ``libpython3.5-testsuite`` This can be done by running ``apt-get install libpython3.5-testsuite``.
 
 Start by forking VOC into your own Github repository; then
 check out your fork to your own computer into a development directory:
@@ -42,7 +42,7 @@ Then create a virtual environment and install VOC into it:
 
 .. code-block:: bash
 
-    $ virtualenv -p $(which python3) env
+    $ python3 -m venv env
     $ . env/bin/activate
     $ cd voc
     $ pip install -e .
@@ -51,7 +51,7 @@ For Windows the use of cmd under Administrator permission is suggested instead o
 
 .. code-block:: batch
 
-    > virtualenv -p "C:\Python34\python.exe" env
+    > py -3 -m venv env
     > env\Scripts\activate.bat
     > cd voc
     > pip install -e .
@@ -108,6 +108,14 @@ Or, to run all the datatypes tests:
 
     $ python setup.py test -s tests.datatypes
 
+Or you can use Cricket, a GUI tool for running test suites. To start cricket in the background:
+
+.. code-block:: bash
+
+    $ pip install -r requirements/tests.txt
+    $ cricket-unittest &
+
+This should open a GUI window that lists all the tests. From there you can "Run all" or select specific tests and "Run selected."
 
 Running the code style checks
 -----------------------------

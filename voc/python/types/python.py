@@ -25,7 +25,7 @@ class Iterable:
         def process(self, context):
             context.add_opcodes(
                 JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Iterable',
+                    'org/python/Object',
                     '__next__',
                     args=[],
                     returns='Lorg/python/Object;'
@@ -179,7 +179,7 @@ class Object:
                     'org/python/Object',
                     '__iter__',
                     args=[],
-                    returns='Lorg/python/Iterable;'
+                    returns='Lorg/python/Object;'
                 )
             )
 
