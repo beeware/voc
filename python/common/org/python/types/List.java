@@ -721,6 +721,14 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "L.reverse() -> None -- reverse the elements of the L in place."
+    )
+    public org.python.Object reverse() {
+        Collections.reverse(this.value);
+        return org.python.types.NoneType.NONE;
+    }
+
+    @org.python.Method(
             __doc__ = "L.sort(key=None, reverse=False) -> None -- stable sort *IN PLACE*",
             args = {},
             default_args = {"key", "reverse"}
