@@ -1451,7 +1451,32 @@ public class Python {
             args = {"sequence"}
     )
     public static org.python.Object reversed(org.python.Object sequence) {
-        return sequence.__reversed__();
+        // Try the __reversed__() protocol.
+        try {
+            return sequence.__reversed__();
+        } catch (org.python.exceptions.AttributeError ae) {
+        }
+
+        if (!(sequence instanceof org.python.types.Dict)) {
+            try {
+                // Check the argument really is a sequence.
+                // There probably should be a better way to introspect for these
+                // methods without catually calling them, but this will do for now.
+                try {
+                    sequence.__getitem__(new org.python.types.Int(0));
+                } catch (org.python.exceptions.IndexError e) {
+                }
+
+                // Wrap the sequence into a generic reverse iterator.
+                return new org.python.types.Reversed(sequence);
+            } catch (org.python.exceptions.AttributeError | org.python.exceptions.TypeError e) {
+            }
+        }
+
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("argument to reversed() must be a sequence");
+        }
+        throw new org.python.exceptions.TypeError("'" + sequence.typeName() + "' object is not reversible");
     }
 
     @org.python.Method(
