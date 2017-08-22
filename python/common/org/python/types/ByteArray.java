@@ -621,8 +621,12 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
-    public org.python.Object __iter__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.__iter__ has not been implemented.");
+    public org.python.Object __iter__() {
+        java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
+        for (byte b: this.value) {
+            listOfBytes.add(new org.python.types.Int(b));
+        }
+        return new org.python.types.List(listOfBytes).__iter__();
     }
 
     @org.python.Method(

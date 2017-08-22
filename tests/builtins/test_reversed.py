@@ -14,7 +14,7 @@ def _iterate_test(datatype):
 
 
 class ReversedTests(TranspileTestCase):
-    # test_iterate_bytearray = _iterate_test('bytearray')
+    test_iterate_bytearray = _iterate_test('bytearray')
     test_iterate_bytes = _iterate_test('bytes')
     test_iterate_list = _iterate_test('list')
     test_iterate_range = _iterate_test('range')
