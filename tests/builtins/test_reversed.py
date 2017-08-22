@@ -24,7 +24,3 @@ class ReversedTests(TranspileTestCase):
 
 class BuiltinReversedFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["reversed"]
-
-    not_implemented = [
-        'test_range',
-    ]
