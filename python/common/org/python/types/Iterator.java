@@ -7,22 +7,6 @@ class Iterator extends org.python.types.Object implements org.python.Object {
         return this.iterator.hashCode();
     }
 
-    public Iterator(org.python.types.List list) {
-        this.iterator = list.value.iterator();
-    }
-
-    public Iterator(org.python.types.Tuple tuple) {
-        this.iterator = tuple.value.iterator();
-    }
-
-    public Iterator(org.python.types.Set set) {
-        this.iterator = set.value.iterator();
-    }
-
-    public Iterator(org.python.types.Dict dict) {
-        this.iterator = dict.value.keySet().iterator();
-    }
-
     @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
