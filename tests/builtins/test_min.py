@@ -76,6 +76,5 @@ class BuiltinMinFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["min"]
 
     not_implemented = [
-        'test_bytearray',
         'test_tuple',
     ]

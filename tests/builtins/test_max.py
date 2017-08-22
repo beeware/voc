@@ -72,7 +72,3 @@ class MaxTests(TranspileTestCase):
 
 class BuiltinMaxFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["max"]
-
-    not_implemented = [
-        'test_bytearray',
-    ]

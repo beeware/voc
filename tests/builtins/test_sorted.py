@@ -26,6 +26,5 @@ class BuiltinSortedFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["sorted"]
 
     not_implemented = [
-        'test_bytearray',
         'test_fozenset',
     ]
