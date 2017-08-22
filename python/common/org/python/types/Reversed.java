@@ -7,7 +7,7 @@ public class Reversed extends Object implements org.python.Object {
 
     public Reversed(org.python.Object sequence) {
         this.sequence = sequence;
-        this.index = ((Int)sequence.__len__()).value - 1;
+        this.index = ((Int) sequence.__len__()).value - 1;
     }
 
     @org.python.Method(
