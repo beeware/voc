@@ -495,12 +495,7 @@ public class List extends org.python.types.Object {
                       "modify the original list."
     )
     public org.python.Object __reversed__() {
-        org.python.types.List list = new org.python.types.List();
-        for (int i = this.value.size() - 1; i >= 0; i--) {
-            list.append(this.value.get(i));
-        }
-        org.python.Object iter = new org.python.types.List_Iterator(list);
-        return iter;
+        return new org.python.types.List_ReverseIterator(this);
     }
 
     @org.python.Method(

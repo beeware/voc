@@ -1447,18 +1447,11 @@ public class Python {
     @org.python.Method(
             __doc__ = "reversed(sequence) -> reverse iterator over values of the sequence" +
                     "\n" +
-                    "Return a reverse iterator\n"
+                    "Return a reverse iterator\n",
+            args = {"sequence"}
     )
-    public static org.python.Object reversed(
-            java.util.List<org.python.Object> args,
-            java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("reversed() takes no keyword arguments");
-        }
-        if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("reversed() takes exactly one argument (" + args.size() + " given)");
-        }
-        return args.get(0).__reversed__();
+    public static org.python.Object reversed(org.python.Object sequence) {
+        return sequence.__reversed__();
     }
 
     @org.python.Method(

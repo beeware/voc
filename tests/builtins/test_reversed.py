@@ -18,12 +18,10 @@ class BuiltinReversedFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_float',
         'test_frozenset',
         'test_int',
-        'test_list',
         'test_None',
         'test_NotImplemented',
         'test_range',
         'test_set',
         'test_slice',
         'test_str',
-        'test_tuple',
     ]
