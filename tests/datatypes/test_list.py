@@ -466,6 +466,52 @@ class ListTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_insert(self):
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.insert(0, 4)
+            print(x)
+            x.insert(1, 5)
+            print(x)
+            x.insert(len(x), 6)
+            print(x)
+            x.insert(200, 7)
+            print(x)
+            x.insert(-1, 8)
+            print(x)
+            x.insert(-len(x), 9)
+            print(x)
+            x.insert(-200, 10)
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.insert(0, "hello")
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.insert(0, [1, 2])
+            print(x)
+            """)
+
+        # cases for 'TypeError: wrong type'
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            try:
+                print(x.insert('a', 4))
+            except TypeError as err:
+                print(err)
+
+            x = [1, 2, 3]
+            try:
+                print(x.insert([1,2,3], 4))
+            except TypeError as err:
+                print(err)
+            """)
+
     def test_lt_reflected(self):
         self.assertCodeExecution("""
             class A:

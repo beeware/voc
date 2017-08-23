@@ -681,6 +681,27 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "L.insert(index, value) -> None -- Insert an item at a given index.",
+            args = {"index", "item"}
+    )
+    public org.python.Object insert(org.python.Object index, org.python.Object item) {
+        if (!(index instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError(
+                "'" + index.typeName() + "' object cannot be interpreted as an integer"
+            );
+        }
+        int posIndex = toPositiveIndex(((Long) index.toJava()).intValue());
+        if (posIndex >= 0 && posIndex < this.value.size()) {
+            this.value.add(posIndex, item);
+        } else if (posIndex >= this.value.size()) {
+            this.value.add(item);
+        } else if (posIndex < 0) {
+            this.value.add(0, item);
+        }
+        return org.python.types.NoneType.NONE;
+    }
+
+    @org.python.Method(
             __doc__ = "L.pop([index]) -> item -- remove and return item at index (default last).",
             default_args = {"item"}
     )
