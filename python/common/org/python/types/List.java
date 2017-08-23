@@ -695,9 +695,7 @@ public class List extends org.python.types.Object {
                 "'" + index.typeName() + "' object cannot be interpreted as an integer"
             );
         }
-
         int posIndex = toPositiveIndex(((Long) index.toJava()).intValue());
-
         if (posIndex >= 0 && posIndex < this.value.size()) {
             this.value.add(posIndex, item);
         } else if (posIndex >= this.value.size()) {
@@ -705,7 +703,6 @@ public class List extends org.python.types.Object {
         } else if (posIndex < 0) {
             this.value.add(0, item);
         }
-
         return org.python.types.NoneType.NONE;
     }
 
