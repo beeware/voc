@@ -29,6 +29,5 @@ class BuiltinSumFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["sum"]
 
     not_implemented = [
-        'test_bytearray',
         'test_frozenzet',
     ]
