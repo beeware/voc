@@ -66,6 +66,22 @@ public class Range extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "Reverse the list in place and returns\n" +
+                      "an iterator that iterates over all the objects\n" +
+                      "in the list in reverse order. Does not\n" +
+                      "modify the original list."
+    )
+    public org.python.Object __reversed__() {
+        // TODO: Will need to check for overflows and underflows and many
+        // other edge cases in the future...
+        long n = (this.stop - this.start + 1) / this.step;
+        long start = this.start + (n - 1) * this.step;
+        long stop = this.start - this.step;
+        long step = 0 - this.step;
+        return new RangeIterator(start, stop, step);
+    }
+
+    @org.python.Method(
             __doc__ = "Implement __getitem__(self).",
             args = {"index"}
     )

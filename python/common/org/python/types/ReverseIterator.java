@@ -1,7 +1,8 @@
 package org.python.types;
 
-class Iterator extends org.python.types.Object implements org.python.Object {
-    java.util.Iterator<org.python.Object> iterator;
+
+class ReverseIterator extends org.python.types.Object implements org.python.Object {
+    java.util.ListIterator<org.python.Object> iterator;
 
     public int hashCode() {
         return this.iterator.hashCode();
@@ -36,7 +37,7 @@ class Iterator extends org.python.types.Object implements org.python.Object {
         }
 
         try {
-            return this.iterator.next();
+            return this.iterator.previous();
         } catch (java.util.NoSuchElementException e) {
             throw new org.python.exceptions.StopIteration();
         }

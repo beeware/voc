@@ -495,12 +495,7 @@ public class List extends org.python.types.Object {
                       "modify the original list."
     )
     public org.python.Object __reversed__() {
-        org.python.types.List list = new org.python.types.List();
-        for (int i = this.value.size() - 1; i >= 0; i--) {
-            list.append(this.value.get(i));
-        }
-        org.python.Object iter = new org.python.types.List_Iterator(list);
-        return iter;
+        return new org.python.types.List_ReverseIterator(this);
     }
 
     @org.python.Method(
@@ -686,6 +681,27 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "L.insert(index, value) -> None -- Insert an item at a given index.",
+            args = {"index", "item"}
+    )
+    public org.python.Object insert(org.python.Object index, org.python.Object item) {
+        if (!(index instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError(
+                "'" + index.typeName() + "' object cannot be interpreted as an integer"
+            );
+        }
+        int posIndex = toPositiveIndex(((Long) index.toJava()).intValue());
+        if (posIndex >= 0 && posIndex < this.value.size()) {
+            this.value.add(posIndex, item);
+        } else if (posIndex >= this.value.size()) {
+            this.value.add(item);
+        } else if (posIndex < 0) {
+            this.value.add(0, item);
+        }
+        return org.python.types.NoneType.NONE;
+    }
+
+    @org.python.Method(
             __doc__ = "L.pop([index]) -> item -- remove and return item at index (default last).",
             default_args = {"item"}
     )
@@ -718,6 +734,14 @@ public class List extends org.python.types.Object {
             }
         }
         throw new org.python.exceptions.ValueError("list.remove(x): x not in list");
+    }
+
+    @org.python.Method(
+            __doc__ = "L.reverse() -> None -- reverse the elements of the L in place."
+    )
+    public org.python.Object reverse() {
+        Collections.reverse(this.value);
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
