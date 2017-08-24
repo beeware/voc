@@ -52,13 +52,6 @@ public class Range extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __iadd__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'range' and '" + other.typeName() + "'");
-    }
-
-    @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {
@@ -255,13 +248,6 @@ public class Range extends org.python.types.Object {
             this.stop = stop;
             this.step = step;
             index = this.start;
-        }
-
-        @org.python.Method(
-                __doc__ = ""
-        )
-        public org.python.Object __iadd__(org.python.Object other) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'range_iterator' and '" + other.typeName() + "'");
         }
 
         @org.python.Method(

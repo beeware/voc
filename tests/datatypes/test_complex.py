@@ -72,11 +72,6 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'complex'
 
     not_implemented = [
-        'test_add_bool',
-        'test_add_complex',
-        'test_add_float',
-        'test_add_int',
-
         'test_and_none',
 
         'test_eq_None',

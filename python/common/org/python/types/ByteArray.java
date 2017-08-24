@@ -253,10 +253,15 @@ public class ByteArray extends org.python.types.Object {
             __doc__ = "Implement self+=value."
     )
     public org.python.Object __iadd__(org.python.Object other) {
-        if (other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
-            return this.__add__(other);
+        try {
+            return super.__iadd__(other);
+        } catch (org.python.exceptions.TypeError ae) {
+            if (org.Python.VERSION < 0x03060200) {
+                throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to " + this.typeName());
+            } else {
+                throw ae;
+            }
         }
-        throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to " + this.typeName());
     }
 
     @org.python.Method(

@@ -661,11 +661,7 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'list'
 
     not_implemented = [
-        'test_add_bytearray',
-        'test_add_bytes',
         'test_add_dict',
         'test_add_frozenset',
-        'test_add_range',
         'test_add_set',
-        'test_add_str',
     ]

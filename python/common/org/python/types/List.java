@@ -106,14 +106,42 @@ public class List extends org.python.types.Object {
     public org.python.Object __iadd__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
             this.value.addAll(((org.python.types.List) other).value);
-            return this;
         } else if (other instanceof org.python.types.Tuple) {
             this.value.addAll(((org.python.types.Tuple) other).value);
-            return this;
+        } else if (other instanceof org.python.types.Set) {
+            this.value.addAll(((org.python.types.Set) other).value);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            this.value.addAll(((org.python.types.FrozenSet) other).value);
+        } else if (
+                (other instanceof org.python.types.Str) ||
+                (other instanceof org.python.types.Dict) ||
+                (other instanceof org.python.types.Range) ||
+                (other instanceof org.python.types.Bytes) ||
+                (other instanceof org.python.types.ByteArray)) {
+            org.python.Object iter = null;
+            if (other instanceof org.python.types.Str) {
+                iter = ((org.python.types.Str)other).__iter__();
+            } else if (other instanceof org.python.types.Dict) {
+                iter = ((org.python.types.Dict)other).__iter__();
+            } else if (other instanceof org.python.types.Range) {
+                iter = ((org.python.types.Range)other).__iter__();
+            } else if (other instanceof org.python.types.Bytes) {
+                iter = ((org.python.types.Bytes)other).__iter__();
+            } else if (other instanceof org.python.types.ByteArray) {
+                iter = ((org.python.types.ByteArray)other).__iter__();
+            }
+            while (true) {
+                try {
+                    this.value.add(iter.__next__());
+                } catch (org.python.exceptions.StopIteration ae) {
+                    break;
+                }
+            }
         } else {
             throw new org.python.exceptions.TypeError(
                     String.format("'%s' object is not iterable", Python.typeName(other.getClass())));
         }
+        return this;
     }
 
     @org.python.Method(

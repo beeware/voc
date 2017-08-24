@@ -148,8 +148,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
     not_implemented = [
-        'test_add_complex',
-
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
