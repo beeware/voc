@@ -1620,7 +1620,7 @@ public class Str extends org.python.types.Object {
 }
 
 
-class PythonFormatter {
+final class PythonFormatter {
 
     /*############################# =- Public -= #############################*/
     /*--- Public class methods  ---------------=------------------------------*/
@@ -1662,7 +1662,7 @@ class PythonFormatter {
         if (arg instanceof org.python.types.Tuple) {
             return new PythonFormatter(formatString.value, ((org.python.types.Tuple) arg).value)._format();
         } else if (arg instanceof org.python.types.Dict) {
-            return new PythonFormatter(formatString.value, ((org.python.types.Dict)  arg).value)._format();
+            return new PythonFormatter(formatString.value, ((org.python.types.Dict) arg).value)._format();
         } else {
             return new PythonFormatter(formatString.value, arg)._format();
         }
@@ -1681,17 +1681,17 @@ class PythonFormatter {
     /*############################# =- Private -= ############################*/
     /*--- Private constructor  -----------------------------------------------*/
     private PythonFormatter(java.lang.String formatString, java.util.List<org.python.Object> args) {
-        this.formatString   = formatString;
-        this.args           = args;
-        this.kwargs         = null;
+        this.formatString = formatString;
+        this.args         = args;
+        this.kwargs       = null;
 
-        conversionFlags     = new java.util.HashMap<>();
+        conversionFlags   = new java.util.HashMap<>();
     }
 
     private PythonFormatter(java.lang.String formatString, java.util.Map<org.python.Object, org.python.Object> kwargs) {
-        this.formatString         = formatString;
-        this.args                 = new java.util.LinkedList<>();
-        this.kwargs               = kwargs;
+        this.formatString = formatString;
+        this.args         = new java.util.LinkedList<>();
+        this.kwargs       = kwargs;
 
         // necessary for certain edge cases
         args.add(new org.python.types.Dict(kwargs));
@@ -1705,9 +1705,9 @@ class PythonFormatter {
         this.kwargs         = null;
 
         this.singleValueIsAllowed = arg instanceof org.python.types.Bytes
-                                ||  arg instanceof org.python.types.ByteArray
-                                ||  arg instanceof org.python.types.Range
-                                ||  arg instanceof org.python.types.List;
+                                 || arg instanceof org.python.types.ByteArray
+                                 || arg instanceof org.python.types.Range
+                                 || arg instanceof org.python.types.List;
 
         this.args.add(arg);
 
@@ -1734,7 +1734,7 @@ class PythonFormatter {
 
         java.lang.StringBuilder outputStringBuilder = new StringBuilder();
 
-        char [] fmt = formatString.toCharArray();
+        char[] fmt = formatString.toCharArray();
 
         for (int i = 0; fmt.length > i; i++) {
 
@@ -1788,39 +1788,38 @@ class PythonFormatter {
             resetConversionFlags();
             for (; conversionFlags.containsKey(fmt[i]); i++) {
                 switch (fmt[i]) {
+                    case '#':
+                        conversionFlags.put(fmt[i], true);
+                        break;
 
-                case '#':
-                    conversionFlags.put(fmt[i], true);
-                    break;
+                    case '0':
+                        // '-' overrides '0'.
+                        if (!conversionFlags.get('-')) {
+                            conversionFlags.put('0', true);
+                        }
+                        break;
 
-                case '0':
-                    // '-' overrides '0'.
-                    if (!conversionFlags.get('-')) {
-                        conversionFlags.put('0', true);
-                    };
-                    break;
+                    case '-':
+                        conversionFlags.put('-', true);
+                        conversionFlags.put('0', false);
+                        break;
 
-                case '-':
-                    conversionFlags.put('-', true);
-                    conversionFlags.put('0', false);
-                    break;
+                    case ' ':
+                        // '+' overrides ' '
+                        if (!conversionFlags.get('+')) {
+                            conversionFlags.put(' ', true);
+                        }
+                        break;
 
-                case ' ':
-                    // '+' overrides ' '
-                    if (!conversionFlags.get('+')) {
-                        conversionFlags.put(' ', true);
-                    };
-                    break;
+                    case '+':
+                        conversionFlags.put('+', true);
+                        conversionFlags.put(' ', false);
+                        break;
 
-                case '+':
-                    conversionFlags.put('+', true);
-                    conversionFlags.put(' ', false);
-                    break;
-
-                default:
-                    /* this isn't a python error. I'm just throwing an exception to the
-                    caller that the conversion flag isn't legal. */
-                    throw new org.python.exceptions.TypeError("illegal character");
+                    default:
+                        /* this isn't a python error. I'm just throwing an exception to the
+                        caller that the conversion flag isn't legal. */
+                        throw new org.python.exceptions.TypeError("illegal character");
                 }
             }
 
@@ -2242,11 +2241,11 @@ class PythonFormatter {
     private boolean singleValueIsAllowed = false;
 
     /*############################ =- Constants -= ###########################*/
-    public static final Integer DEFAULT_MINIMUM_WIDTH =    0;
-    public static final Integer DEFAULT_PRECSION      =    6;
-    public static final Integer PRECSION_NOT_SET      =   -1;
+    public static final Integer DEFAULT_MINIMUM_WIDTH =  0;
+    public static final Integer DEFAULT_PRECSION      =  6;
+    public static final Integer PRECSION_NOT_SET      = -1;
 
-    public static final char    SIGN_POSITIV          =  '-';
-    public static final char    SIGN_NEGATIV          =  '+';
-    public static final char    SIGN_UNDEFINED        = '\0';
+    public static final char SIGN_POSITIV   =  '-';
+    public static final char SIGN_NEGATIV   =  '+';
+    public static final char SIGN_UNDEFINED = '\0';
 }
