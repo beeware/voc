@@ -1633,9 +1633,6 @@ class PythonFormatter {
      * make use if values that have a key of String type since no type cast
      * is performed with the key obtained from the format String.
      *
-     * Known incompatibilities: "%(1)s" % [1] e.g. does not throw the correct error
-     * "TypeError: list indices must be integers, not str" but just a key error.
-     *
      * @param  formatString                        Any Python String.
      * @param  arg                                 Any Python objct. Passing
      *                                             {@link org.python.types.Dict Dict} or
@@ -1690,25 +1687,27 @@ class PythonFormatter {
 
         conversionFlags     = new java.util.HashMap<>();
     }
+
     private PythonFormatter(java.lang.String formatString, java.util.Map<org.python.Object, org.python.Object> kwargs) {
-        this.formatString   = formatString;
-        this.args           = new java.util.LinkedList<>();
-        this.kwargs         = kwargs;
+        this.formatString         = formatString;
+        this.args                 = new java.util.LinkedList<>();
+        this.kwargs               = kwargs;
+
+        // necessary for certain edge cases
+        args.add(new org.python.types.Dict(kwargs));
 
         conversionFlags     = new java.util.HashMap<>();
     }
+
     private PythonFormatter(java.lang.String formatString, org.python.Object arg) {
         this.formatString   = formatString;
         this.args           = new java.util.LinkedList<>();
         this.kwargs         = null;
 
-        if (
-            arg instanceof org.python.types.Bytes ||
-            arg instanceof org.python.types.ByteArray ||
-            arg instanceof org.python.types.Range ||
-            arg instanceof org.python.types.List) {
-            this.singleValueIsAllowed = true;
-        }
+        this.singleValueIsAllowed = arg instanceof org.python.types.Bytes
+                                ||  arg instanceof org.python.types.ByteArray
+                                ||  arg instanceof org.python.types.Range
+                                ||  arg instanceof org.python.types.List;
 
         this.args.add(arg);
 
@@ -1748,13 +1747,11 @@ class PythonFormatter {
             i++;
             if (fmt[i] == '(') {
                 i++;
-                if (kwargs == null) {
-                    throw new org.python.exceptions.TypeError("format requires a mapping");
-                }
+
+                handleMappingExceptions();
 
                 java.lang.StringBuilder keyBuilder = new java.lang.StringBuilder();
-                int openBrackets = 1;
-                for (; openBrackets > 0; i++) {
+                for (int openBrackets = 1; openBrackets > 0; i++) {
                     if (i >= fmt.length) {
                         throw new org.python.exceptions.ValueError("incomplete format key");
                     }
@@ -1771,7 +1768,7 @@ class PythonFormatter {
                 org.python.types.Str key = new org.python.types.Str(keyBuilder.toString());
 
                 if (!kwargs.containsKey(key)) {
-                    throw new org.python.exceptions.KeyError(key.__repr__());
+                    throw new org.python.exceptions.KeyError(key);
                 }
 
                 // This is really not intuitiv. But appatently Python behaves
@@ -1779,13 +1776,12 @@ class PythonFormatter {
                 //
                 //      %(C)*%s" % {'C': 234, 'D': 2}
                 //
-                // The * is evaluated as we know, not eval() of the expression
-                // yields "%s" instead of raising an error since the is no
-                // arglist. If the value of key 'C' would be of type str.
-                // "TypeError: * wants int" would be raised. Anyway, this works.
-                args.add(kwargs.get(key));
-            } else if (kwargs != null && currentArgumentIndex == 0) {
-                args.add(new org.python.types.Dict(kwargs));
+                // The * is evaluated as we know it. eval() of the expression
+                // yields "%s" instead of raising an error due to the missing
+                // arglist as one would expect. Instead if the value for key 'C'
+                // is of type str "TypeError: * wants int" will be raised.
+                // Anyway, this works.
+                args.add(currentArgumentIndex, kwargs.get(key));
             }
 
             // now inside a format specification fmt[i] == '%'. Going forward.
@@ -1829,13 +1825,10 @@ class PythonFormatter {
             }
 
             // Parsing the minimum width
-            int minimumWidth = DEFAULT_MINIMUM_WIDTH; // default
+            long minimumWidth = DEFAULT_MINIMUM_WIDTH;
             if (fmt[i] == '*') {
                 i++;
-                if (!(peekNextArg() instanceof org.python.types.Int)) { // TODO wrap peek
-                    throw new org.python.exceptions.TypeError("* wants int");
-                }
-                minimumWidth = (int) ((org.python.types.Int) popNextArg()).value;
+                minimumWidth = getIntValueForStarInFormatSpecification();
             } else {
                 while (java.lang.Character.isDigit(fmt[i])) {
                     minimumWidth = (10 * minimumWidth) + fmt[i++] - '0';
@@ -1847,10 +1840,7 @@ class PythonFormatter {
                 ++i;
                 if (fmt[i] == '*') {
                     ++i;
-                    if (!(peekNextArg() instanceof org.python.types.Int)) {
-                        throw new org.python.exceptions.TypeError("* wants int");
-                    }
-                    precision = ((org.python.types.Int) popNextArg()).value;
+                    precision = getIntValueForStarInFormatSpecification();
                 } else {
                     /* Python accepts the precision to be omitted and just assumes
                     it to be 0. Java would throw UnknownFormatConversionException.*/
@@ -1924,7 +1914,7 @@ class PythonFormatter {
             switch (conversionChar) {
 
                 case 'g': case 'G':
-                    java.lang.Double value = (java.lang.Double) fmtObjectJava;
+                    java.lang.Double value = ((java.lang.Number) fmtObjectJava).doubleValue();
                     if (value >= java.lang.Math.pow(10, precision) || value < .0001) {
                         preFormattedObject = toExp(fmtObjectJava, precision, conversionChar);
                     } else {
@@ -1974,7 +1964,7 @@ class PythonFormatter {
             }
 
             char paddingChar = conversionFlags.get('0') ? '0' : ' ';
-            int missingStringLength = java.lang.Math.max(0, minimumWidth - preFormattedObject.length() - signToUse.length());
+            long missingStringLength = java.lang.Math.max(0L, minimumWidth - preFormattedObject.length() - signToUse.length());
             java.lang.String padding = getPaddingOfLength(paddingChar, missingStringLength);
 
             if (conversionFlags.get('-')) {
@@ -1993,6 +1983,22 @@ class PythonFormatter {
         ensureNoArgumentsAreLeft();
 
         return new org.python.types.Str(outputStringBuilder.toString());
+    }
+
+    /**
+     * Pops and casts the next value for the argument list for a starred
+     * expression.
+     *
+     * @return The Integer value for the next argument of the arg list.
+     */
+    private java.lang.Long getIntValueForStarInFormatSpecification() {
+        if (peekNextArg() instanceof org.python.types.Int) {
+            return ((org.python.types.Int) popNextArg()).value;
+        } else if (peekNextArg() instanceof org.python.types.Bool) {
+            return ((org.python.types.Bool) popNextArg()).value ? 1L : 0L;
+        } else {
+            throw new org.python.exceptions.TypeError("* wants int");
+        }
     }
 
 
@@ -2131,7 +2137,7 @@ class PythonFormatter {
      * @throws org.python.exceptions.TypeError if not all arguments were converted during string formatting
      */
     private void ensureNoArgumentsAreLeft() throws org.python.exceptions.TypeError {
-        if (!singleValueIsAllowed && currentArgumentIndex < args.size()) {
+        if (!singleValueIsAllowed && kwargs == null && currentArgumentIndex < args.size()) {
             throw new org.python.exceptions.TypeError(
                 "not all arguments converted during string formatting");
         }
@@ -2174,15 +2180,39 @@ class PythonFormatter {
                 throw new org.python.exceptions.TypeError("%c requires int or char");
             }
         } else if ("fFgGeE".indexOf(conversion) != -1) {
-            if (!(pythonObject instanceof org.python.types.Int
-                    || pythonObject instanceof org.python.types.Float)) {
+            if (pythonObject instanceof org.python.types.Complex) {
+                throw new org.python.exceptions.TypeError("can't convert complex to float");
+            } else if (!(pythonObject instanceof org.python.types.Int
+                    || pythonObject instanceof org.python.types.Float
+                    || pythonObject instanceof org.python.types.Bool)) {
                 throw new org.python.exceptions.TypeError("a float is required");
             }
         } else if ("diouxX".indexOf(conversion) != -1) {
             if (!(pythonObject instanceof org.python.types.Int
-                    || pythonObject instanceof org.python.types.Float)) {
+                    || pythonObject instanceof org.python.types.Float
+                    || pythonObject instanceof org.python.types.Bool)) {
                 throw new org.python.exceptions.TypeError("%" + conversion + " format: a number is required, not " + pythonObject.typeName());
             }
+        }
+    }
+
+    private void handleMappingExceptions() {
+
+        if (singleValueIsAllowed) {
+            org.python.Object arg = peekNextArg();
+            if (arg instanceof org.python.types.Range) {
+                throw new org.python.exceptions.TypeError("range indices must be integers or slices, not str");
+            } else if (arg instanceof org.python.types.Bytes) {
+                throw new org.python.exceptions.TypeError("byte indices must be integers, not str");
+            } else if (arg instanceof org.python.types.ByteArray) {
+                throw new org.python.exceptions.TypeError(arg.typeName() + " indices must be integers");
+            } else {
+                throw new org.python.exceptions.TypeError(arg.typeName() + " indices must be integers, not str");
+            }
+        }
+
+        if (kwargs == null) {
+            throw new org.python.exceptions.TypeError("format requires a mapping");
         }
     }
 
@@ -2193,13 +2223,13 @@ class PythonFormatter {
      * @return         A string of length length which's only character is
      *                   filling.
      */
-    private static String getPaddingOfLength(char filling, int length) {
-        char str[] = new char[length];
+    private static String getPaddingOfLength(char filling, long length) {
+        java.lang.StringBuilder buffer = new StringBuilder();
         while (length-- > 0) {
-            str[length] = filling;
+            buffer.append(filling);
         }
 
-        return new java.lang.String(str);
+        return new java.lang.String(buffer);
     }
 
     /*############################# =- Fields -= #############################*/
