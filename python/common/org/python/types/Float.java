@@ -531,26 +531,6 @@ public class Float extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object __iadd__(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            long other_val = ((org.python.types.Int) other).value;
-            this.value += ((double) other_val);
-            return new org.python.types.Float(this.value);
-        } else if (other instanceof org.python.types.Bool) {
-            if (((org.python.types.Bool) other).value) {
-                this.value += 1.0;
-            }
-            return new org.python.types.Float(this.value);
-        } else if (other instanceof org.python.types.Float) {
-            double other_val = ((org.python.types.Float) other).value;
-            return new org.python.types.Float(this.value + other_val);
-        }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'float' and '" + other.typeName() + "'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
     public org.python.Object __ilshift__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: 'float' and '" + other.typeName() + "'");
     }

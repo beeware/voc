@@ -520,23 +520,6 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
-            args = {"other"}
-    )
-    public org.python.Object __iadd__(org.python.Object other) {
-        try {
-            this.setValue(this.__add__(other));
-            return this;
-        } catch (org.python.exceptions.TypeError e) {
-            if (org.Python.VERSION < 0x03060000) {
-                throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
-            } else {
-                throw new org.python.exceptions.TypeError("must be str, not " + other.typeName());
-            }
-        }
-    }
-
-    @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __round__(org.python.Object ndigits) {

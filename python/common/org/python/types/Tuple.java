@@ -438,19 +438,6 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __iadd__(org.python.Object other) {
-        if (other instanceof org.python.types.Tuple) {
-            this.value.addAll(((org.python.types.Tuple) other).value);
-            return this;
-        } else {
-            throw new org.python.exceptions.TypeError(
-                    String.format("can only concatenate tuple (not \"%s\") to tuple", org.Python.typeName(other.getClass())));
-        }
-    }
-
-    @org.python.Method(
             __doc__ = "index of the first occurrence of x in s (at or after index i and before index j)",
             default_args = {"item", "start", "end"}
     )

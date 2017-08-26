@@ -1,4 +1,11 @@
-from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
+from itertools import permutations
+from .. utils import (
+    BinaryOperationTestCase,
+    InplaceOperationTestCase,
+    SAMPLE_SUBSTITUTIONS,
+    TranspileTestCase,
+    UnaryOperationTestCase,
+)
 
 
 class ListTests(TranspileTestCase):
@@ -660,12 +667,26 @@ class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
 class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'list'
 
-    not_implemented = [
-        'test_add_bytearray',
-        'test_add_bytes',
-        'test_add_dict',
-        'test_add_frozenset',
-        'test_add_range',
-        'test_add_set',
-        'test_add_str',
-    ]
+    # Several tests add a list to an iterable with a non-deterministic
+    # ordering. We define these substitions here where the first part of the
+    # values are the list (in its original order) and the last part is the
+    # non-deterministic iterable.
+    substitutions = {}
+    for prefix in (
+        [],
+        ['a', 'b', 'c'],
+        [3, 4, 5],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    ):
+        for suffix in (
+            [1, 2.3456, 7],
+            ['on', 'to', 'an'],
+            ['one', 'two', 'six'],
+            ['a', 'd', 'c'],
+        ):
+            from_vals = []
+            for perm in permutations(suffix):
+                from_vals.append(repr(prefix + list(perm)))
+            substitutions[repr(prefix + suffix)] = from_vals
+
+    substitutions.update(SAMPLE_SUBSTITUTIONS)
