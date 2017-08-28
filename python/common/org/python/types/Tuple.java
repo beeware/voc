@@ -273,7 +273,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self[key]."
+            __doc__ = "Return self[key].",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
@@ -333,7 +334,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"index", "value"}
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
         throw new org.python.exceptions.TypeError(
@@ -342,7 +344,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"item"}
     )
     public void __delitem__(org.python.Object item) {
         throw new org.python.exceptions.TypeError("'tuple' object doesn't support item deletion");
@@ -356,14 +359,16 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return key in self."
+            __doc__ = "Return key in self.",
+            args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
         return new org.python.types.Bool(this.value.contains(item));
     }
 
     @org.python.Method(
-            __doc__ = "Return self+value."
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -378,7 +383,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value.n"
+            __doc__ = "Return self*value.n",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -400,7 +406,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __imul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -424,7 +431,8 @@ public class Tuple extends org.python.types.Object {
 
 
     @org.python.Method(
-            __doc__ = "Return self*value."
+            __doc__ = "Return self*value.",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
