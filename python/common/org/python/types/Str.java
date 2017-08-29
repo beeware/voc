@@ -274,7 +274,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self[key]."
+            __doc__ = "Return self[key].",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
@@ -365,7 +366,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return key in self."
+            __doc__ = "Return key in self.",
+            args = {"item"}
     )
     public org.python.types.Int __contains__(org.python.Object item) {
         if (item instanceof org.python.types.Str) {
@@ -400,7 +402,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self+value."
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
@@ -420,7 +423,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value.n"
+            __doc__ = "Return self*value.n",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -445,7 +449,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self%value."
+            __doc__ = "Return self%value.",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         return org.python.types.PythonFormatter.format(this, other);
@@ -489,14 +494,16 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value."
+            __doc__ = "Return self*value.",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value%self."
+            __doc__ = "Return value%self.",
+            args = {"other"}
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmod__() has not been implemented.");
@@ -512,7 +519,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __imod__(org.python.Object other) {
         this.setValue(this.__mod__(other));
@@ -520,7 +528,8 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
 

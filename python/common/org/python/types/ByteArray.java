@@ -173,7 +173,8 @@ public class ByteArray extends org.python.types.Object {
 */
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __and__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
@@ -223,7 +224,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self+value."
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -250,7 +252,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Implement self+=value."
+            __doc__ = "Implement self+=value.",
+            args = {"other"}
     )
     public org.python.Object __iadd__(org.python.Object other) {
         try {
@@ -265,7 +268,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value.n"
+            __doc__ = "Return self*value.n",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -290,14 +294,16 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Implement self*=value."
+            __doc__ = "Implement self*=value.",
+            args = {"other"}
     )
     public org.python.Object __imul__(org.python.Object other) {
         return this.__mul__(other);
     }
 
     @org.python.Method(
-            __doc__ = "Return self[key]."
+            __doc__ = "Return self[key].",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Slice) {
@@ -554,7 +560,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         if (org.Python.VERSION < 0x03050000) {
@@ -585,7 +592,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __imod__(org.python.Object other) {
         if (org.Python.VERSION < 0x03050000) {
