@@ -137,8 +137,9 @@ class ListTests(TranspileTestCase):
         # extend a frozenset
         self.assertCodeExecution("""
             x = [1, 2, 3]
-            x.extend(frozenset([8, "theta"]))
-            print(x)
+            y = frozenset([8, "theta"])
+            x.extend(y)
+            set([x[3], x[4]]) == y
             """)
 
         # extend a set
