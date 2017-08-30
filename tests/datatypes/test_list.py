@@ -119,6 +119,61 @@ class ListTests(TranspileTestCase):
             print(x[4], x[5])
             """)
 
+    def test_extend(self):
+        # extend a list
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend([4, "hello"])
+            print(x)
+            """)
+
+        # extend a tuple
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend((5, "world", "hello"))
+            print(x)
+            """)
+
+        # extend a frozenset
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(frozenset([8, "theta"]))
+            print(x)
+            """)
+
+        # extend a set
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = set(["beta", "alpha"])
+            x.extend(y)
+            set([x[3], x[4]]) == y
+            """)
+
+        # extend a dict
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            y = {"alpha": 4, "theta": 6, "beta": 5}
+            x.extend(y)
+            set([x[3], x[4], x[5]]) == set(["alpha", "theta", "beta"])
+            """)
+
+        # extend an iterator
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(iter([4,5,6]))
+            print(x)
+            """)
+
+        # # extend non-iterable
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            try:
+                x.extend(4)
+            except TypeError as err:
+                print(err)
+            print(x)
+            """)
+
     def test_remove(self):
         # Remove integer
         self.assertCodeExecution("""
