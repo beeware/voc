@@ -101,7 +101,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Implement self+=value."
+            __doc__ = "Implement self+=value.",
+            args = {"other"}
     )
     public org.python.Object __iadd__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -344,7 +345,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "x.__getitem__(y) <==> x[y]"
+            __doc__ = "x.__getitem__(y) <==> x[y]",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
@@ -446,7 +448,8 @@ public class List extends org.python.types.Object {
 
 
     @org.python.Method(
-            __doc__ = "Set self[key] to value."
+            __doc__ = "Set self[key] to value.",
+            args = {"index", "value"}
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
         try {
@@ -478,7 +481,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Delete self[key]."
+            __doc__ = "Delete self[key].",
+            args = {"index"}
     )
     public void __delitem__(org.python.Object index) {
         try {
@@ -543,7 +547,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self+value."
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -558,7 +563,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value.n"
+            __doc__ = "Return self*value.n",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -580,7 +586,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Implement self*=value."
+            __doc__ = "Implement self*=value.",
+            args = {"other"}
     )
     public org.python.Object __imul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -603,7 +610,8 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value."
+            __doc__ = "Return self*value.",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("list.__rmul__() has not been implemented.");

@@ -253,7 +253,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self+value."
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -274,7 +275,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self-value."
+            __doc__ = "Return self-value.",
+            args = {"other"}
     )
     public org.python.Object __sub__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -293,7 +295,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value."
+            __doc__ = "Return self*value.",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
 
@@ -323,7 +326,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self/value."
+            __doc__ = "Return self/value.",
+            args = {"other"}
     )
     public org.python.Object __truediv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -349,7 +353,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self//value."
+            __doc__ = "Return self//value.",
+            args = {"other"}
     )
     public org.python.Object __floordiv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -375,7 +380,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self%value."
+            __doc__ = "Return self%value.",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         try {
@@ -418,7 +424,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return divmod(self, value)."
+            __doc__ = "Return divmod(self, value).",
+            args = {"other"}
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
@@ -432,7 +439,9 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return pow(self, value, mod)."
+            __doc__ = "Return pow(self, value, mod).",
+            args = {"other"},
+            default_args = {"modulo"}
     )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
         if (modulo != null) {
@@ -473,70 +482,80 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return value+self."
+            __doc__ = "Return value+self.",
+            args = {"other"}
     )
     public org.python.Object __radd__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__radd__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value-self."
+            __doc__ = "Return value-self.",
+            args = {"other"}
     )
     public org.python.Object __rsub__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rsub__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value*self."
+            __doc__ = "Return value*self.",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value/self."
+            __doc__ = "Return value/self.",
+            args = {"other"}
     )
     public org.python.Object __rtruediv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rtruediv__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value//self."
+            __doc__ = "Return value//self.",
+            args = {"other"}
     )
     public org.python.Object __rfloordiv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rfloordiv__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value%self."
+            __doc__ = "Return value%self.",
+            args = {"other"}
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rmod__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return divmod(value, self)."
+            __doc__ = "Return divmod(value, self).",
+            args = {"other"}
     )
     public org.python.Object __rdivmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rdivmod__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return pow(value, self, mod)."
+            __doc__ = "Return pow(value, self, mod).",
+            args = {"other"}
     )
     public org.python.Object __rpow__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rpow__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ilshift__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __irshift__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: 'float' and '" + other.typeName() + "'");
@@ -582,7 +601,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return the Integral closest to x, rounding half toward even.\nWhen an argument is passed, work like built-in round(x, ndigits)."
+            __doc__ = "Return the Integral closest to x, rounding half toward even.\nWhen an argument is passed, work like built-in round(x, ndigits).",
+            args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         if (ndigits instanceof org.python.types.Int) {

@@ -220,7 +220,8 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
@@ -255,7 +256,8 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "x.__getitem__(y) <==> x[y]"
+            __doc__ = "x.__getitem__(y) <==> x[y]",
+            args = {"item"}
     )
     public org.python.Object __getitem__(org.python.Object item) {
         try {
@@ -276,7 +278,8 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Set self[key] to value."
+            __doc__ = "Set self[key] to value.",
+            args = {"item", "value"}
     )
     public void __setitem__(org.python.Object item, org.python.Object value) {
         try {
@@ -293,7 +296,8 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Delete self[key]."
+            __doc__ = "Delete self[key].",
+            args = {"item"}
     )
     public void __delitem__(org.python.Object item) {
         org.python.Object value = this.value.remove(item);
