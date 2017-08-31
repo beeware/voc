@@ -752,7 +752,7 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'list'
 
     # Several tests add a list to an iterable with a non-deterministic
-    # ordering. We define these subsitutions here where the first part of the
+    # ordering. We define these substitutions here where the first part of the
     # values are the list (in its original order) and the last part is the
     # non-deterministic iterable.
     substitutions = {}
