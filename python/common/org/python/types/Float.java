@@ -290,6 +290,11 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Float(this.value - 1.0);
             }
             return new org.python.types.Float(this.value);
+        } else if (other instanceof org.python.types.Complex) {
+            return new org.python.types.Complex(
+                new org.python.types.Float(this.value - ((org.python.types.Complex)other).real.value),
+                new org.python.types.Float(-((org.python.types.Complex)other).imag.value)
+            );
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'float' and '" + other.typeName() + "'");
     }

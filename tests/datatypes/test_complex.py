@@ -264,11 +264,6 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_subscr_str',
         'test_subscr_tuple',
 
-        'test_subtract_bool',
-        'test_subtract_complex',
-        'test_subtract_float',
-        'test_subtract_int',
-
         'test_true_divide_bool',
         'test_true_divide_complex',
         'test_true_divide_float',
