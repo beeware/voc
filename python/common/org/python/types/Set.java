@@ -392,13 +392,6 @@ public class Set extends org.python.types.Object {
     //     throw new org.python.exceptions.NotImplementedError("__ixor__() has not been implemented");
     // }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public void __ior__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__ior__() has not been implemented");
-    // }
-
     @org.python.Method(
             __doc__ = "Add an element to a set.\n\nThis has no effect if the element is already present.",
             args = {"other"}
