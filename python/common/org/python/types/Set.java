@@ -381,13 +381,6 @@ public class Set extends org.python.types.Object {
     // @org.python.Method(
     //     __doc__ = ""
     // )
-    // public void __isub__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__isub__() has not been implemented");
-    // }
-
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
     // public void __iand__(org.python.Object other) {
     //     throw new org.python.exceptions.NotImplementedError("__iand__() has not been implemented");
     // }
