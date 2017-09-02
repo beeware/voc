@@ -661,6 +661,27 @@ public class List extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object extend(org.python.Object other) {
+        if (other instanceof org.python.types.List) {
+            this.value.addAll(((org.python.types.List) other).value);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            this.value.addAll(((org.python.types.FrozenSet) other).value);
+        } else if (other instanceof org.python.types.Set) {
+            this.value.addAll(((org.python.types.Set) other).value);
+        } else if (other instanceof org.python.types.Tuple) {
+            this.value.addAll(((org.python.types.Tuple) other).value);
+        } else if (other instanceof org.python.types.Dict) {
+            this.value.addAll(((org.python.types.Dict) other).value.keySet());
+        } else if (other instanceof org.python.types.Iterator) {
+            try {
+                while (true) {
+                    org.python.Object next = other.__next__();
+                    this.value.add(next);
+                }
+            } catch (org.python.exceptions.StopIteration si) {
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
+        }
         return org.python.types.NoneType.NONE;
     }
 

@@ -119,6 +119,90 @@ class ListTests(TranspileTestCase):
             print(x[4], x[5])
             """)
 
+    def extend_substitutions(self, prefix, suffix):
+        possible_vals = []
+        for perm in permutations(suffix):
+            possible_vals.append(repr(prefix + list(perm)))
+        return possible_vals
+
+    def test_extend(self):
+        # extend a list
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend([4, "hello"])
+            print(x)
+            """)
+
+        # extend a tuple
+        x = [1, 2, 3]
+        y = [5, "world", "hello"]
+        self.assertCodeExecution("""
+            x = %(x)s
+            x.extend(%(y)s)
+            print(x)
+            """ % {
+                'x': x,
+                'y': y,
+            },
+            substitutions={repr(x + y): self.extend_substitutions(x, y)})
+
+        # extend a frozenset
+        x = [1, 2, 3]
+        y = [8, "theta"]
+        self.assertCodeExecution("""
+            x = %(x)s
+            y = frozenset(%(y)s)
+            x.extend(y)
+            """ % {
+                'x': x,
+                'y': y,
+            },
+            substitutions={repr(x + y): self.extend_substitutions(x, y)})
+
+        # extend a set
+        x = [1, 2, 3]
+        y = ["beta", "alpha"]
+        self.assertCodeExecution("""
+            x = %(x)s
+            y = set(%(y)s)
+            x.extend(y)
+            """ % {
+                'x': x,
+                'y': y,
+            },
+            substitutions={repr(x + y): self.extend_substitutions(x, y)})
+
+        # extend a dict
+        x = [1, 2, 3]
+        y = {"alpha": 4, "theta": 6, "beta": 5}
+        keys = list(y.keys())
+        self.assertCodeExecution("""
+            x = %(x)s
+            y = %(y)s
+            x.extend(y)
+            """ % {
+                'x': x,
+                'y': y,
+            },
+            substitutions={repr(x + keys): self.extend_substitutions(x, keys)})
+
+        # extend an iterator
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(iter([4,5,6]))
+            print(x)
+            """)
+
+        # # extend non-iterable
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            try:
+                x.extend(4)
+            except TypeError as err:
+                print(err)
+            print(x)
+            """)
+
     def test_remove(self):
         # Remove integer
         self.assertCodeExecution("""
@@ -668,7 +752,7 @@ class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'list'
 
     # Several tests add a list to an iterable with a non-deterministic
-    # ordering. We define these substitions here where the first part of the
+    # ordering. We define these substitutions here where the first part of the
     # values are the list (in its original order) and the last part is the
     # non-deterministic iterable.
     substitutions = {}
