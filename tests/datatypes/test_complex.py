@@ -72,11 +72,6 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'complex'
 
     not_implemented = [
-        'test_add_bool',
-        'test_add_complex',
-        'test_add_float',
-        'test_add_int',
-
         'test_and_none',
 
         'test_eq_None',
@@ -268,11 +263,6 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_subscr_set',
         'test_subscr_str',
         'test_subscr_tuple',
-
-        'test_subtract_bool',
-        'test_subtract_complex',
-        'test_subtract_float',
-        'test_subtract_int',
 
         'test_true_divide_bool',
         'test_true_divide_complex',

@@ -1447,18 +1447,36 @@ public class Python {
     @org.python.Method(
             __doc__ = "reversed(sequence) -> reverse iterator over values of the sequence" +
                     "\n" +
-                    "Return a reverse iterator\n"
+                    "Return a reverse iterator\n",
+            args = {"sequence"}
     )
-    public static org.python.Object reversed(
-            java.util.List<org.python.Object> args,
-            java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (kwargs != null && kwargs.size() != 0) {
-            throw new org.python.exceptions.TypeError("reversed() takes no keyword arguments");
+    public static org.python.Object reversed(org.python.Object sequence) {
+        // Try the __reversed__() protocol.
+        try {
+            return sequence.__reversed__();
+        } catch (org.python.exceptions.AttributeError ae) {
         }
-        if (args == null || args.size() != 1) {
-            throw new org.python.exceptions.TypeError("reversed() takes exactly one argument (" + args.size() + " given)");
+
+        if (!(sequence instanceof org.python.types.Dict)) {
+            try {
+                // Check the argument really is a sequence.
+                // There probably should be a better way to introspect for these
+                // methods without catually calling them, but this will do for now.
+                try {
+                    sequence.__getitem__(new org.python.types.Int(0));
+                } catch (org.python.exceptions.IndexError e) {
+                }
+
+                // Wrap the sequence into a generic reverse iterator.
+                return new org.python.types.Reversed(sequence);
+            } catch (org.python.exceptions.AttributeError | org.python.exceptions.TypeError e) {
+            }
         }
-        return args.get(0).__reversed__();
+
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError("argument to reversed() must be a sequence");
+        }
+        throw new org.python.exceptions.TypeError("'" + sequence.typeName() + "' object is not reversible");
     }
 
     @org.python.Method(

@@ -7,7 +7,3 @@ class AnyTests(TranspileTestCase):
 
 class BuiltinAnyFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["any"]
-
-    not_implemented = [
-        'test_bytearray',
-    ]

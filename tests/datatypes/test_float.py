@@ -138,8 +138,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_str',
         'test_subscr_tuple',
 
-        'test_subtract_complex',
-
         'test_true_divide_complex',
     ]
 
@@ -148,8 +146,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
     not_implemented = [
-        'test_add_complex',
-
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
@@ -163,8 +159,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
         'test_power_complex',
         'test_power_float',
-
-        'test_subtract_complex',
 
         'test_true_divide_complex',
     ]

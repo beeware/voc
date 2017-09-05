@@ -53,8 +53,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_bytes_str',
         'test_bytes_tuple',
 
-        'test_class_bytearray',
-
         'test_complex_bytearray',
         'test_complex_bytes',
         'test_complex_dict',
@@ -114,8 +112,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_list_set',
         'test_list_str',
         'test_list_tuple',
-
-        'test_None_bytearray',
 
         'test_NotImplemented_bytearray',
         'test_NotImplemented_bytes',

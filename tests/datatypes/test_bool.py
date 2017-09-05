@@ -40,8 +40,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
     not_implemented = [
-        'test_add_complex',
-
         'test_and_int',
 
         'test_floor_divide_bool',
@@ -68,8 +66,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_power_complex',
         'test_power_float',
         'test_power_int',
-
-        'test_subtract_complex',
 
         'test_true_divide_bool',
         'test_true_divide_complex',
