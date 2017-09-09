@@ -72,8 +72,6 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'complex'
 
     not_implemented = [
-        'test_and_none',
-
         'test_eq_None',
         'test_eq_NotImplemented',
         'test_eq_slice',
