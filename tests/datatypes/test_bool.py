@@ -58,8 +58,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
 
-        'test_or_int',
-
         'test_power_bool',
         'test_power_complex',
         'test_power_float',

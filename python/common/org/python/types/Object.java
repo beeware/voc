@@ -946,8 +946,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __ior__(org.python.Object other) {
         try {
-            this.setValue(this.__or__(other));
-            return this;
+            return this.__or__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for |=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
