@@ -672,11 +672,11 @@ public class List extends org.python.types.Object {
         } else if (other instanceof org.python.types.Dict) {
             this.value.addAll(((org.python.types.Dict) other).value.keySet());
         } else if (
-            (other instanceof org.python.types.Str) ||
-            (other instanceof org.python.types.Range) ||
-            (other instanceof org.python.types.Bytes) ||
-            (other instanceof org.python.types.ByteArray) ||
-            (other instanceof org.python.types.Iterator)) {
+                (other instanceof org.python.types.Str) ||
+                (other instanceof org.python.types.Range) ||
+                (other instanceof org.python.types.Bytes) ||
+                (other instanceof org.python.types.ByteArray) ||
+                (other instanceof org.python.types.Iterator)) {
             org.python.Object iter = null;
             if (other instanceof org.python.types.Str) {
                 iter = ((org.python.types.Str)other).__iter__();
