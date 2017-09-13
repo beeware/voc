@@ -671,13 +671,30 @@ public class List extends org.python.types.Object {
             this.value.addAll(((org.python.types.Tuple) other).value);
         } else if (other instanceof org.python.types.Dict) {
             this.value.addAll(((org.python.types.Dict) other).value.keySet());
-        } else if (other instanceof org.python.types.Iterator) {
-            try {
-                while (true) {
-                    org.python.Object next = other.__next__();
-                    this.value.add(next);
+        } else if (
+                (other instanceof org.python.types.Str) ||
+                (other instanceof org.python.types.Range) ||
+                (other instanceof org.python.types.Bytes) ||
+                (other instanceof org.python.types.ByteArray) ||
+                (other instanceof org.python.types.Iterator)) {
+            org.python.Object iter = null;
+            if (other instanceof org.python.types.Str) {
+                iter = ((org.python.types.Str)other).__iter__();
+            } else if (other instanceof org.python.types.Range) {
+                iter = ((org.python.types.Range)other).__iter__();
+            } else if (other instanceof org.python.types.Bytes) {
+                iter = ((org.python.types.Bytes)other).__iter__();
+            } else if (other instanceof org.python.types.ByteArray) {
+                iter = ((org.python.types.ByteArray)other).__iter__();
+            } else if (other instanceof org.python.types.Iterator) {
+                iter = other;
+            }
+            while (true) {
+                try {
+                    this.value.add(iter.__next__());
+                } catch (org.python.exceptions.StopIteration si) {
+                    break;
                 }
-            } catch (org.python.exceptions.StopIteration si) {
             }
         } else {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");

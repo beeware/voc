@@ -193,7 +193,35 @@ class ListTests(TranspileTestCase):
             print(x)
             """)
 
-        # # extend non-iterable
+        # extend bytearray
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(bytearray(b'abc'))
+            print(x)
+            """)
+
+        # extend byte
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(b'def')
+            print(x)
+            """)
+
+        # extend str
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(b'string')
+            print(x)
+            """)
+
+        # extend range
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(range(5))
+            print(x)
+            """)
+
+        # extend non-iterable
         self.assertCodeExecution("""
             x = [1, 2, 3]
             try:
