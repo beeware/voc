@@ -638,7 +638,7 @@ public class Super implements org.python.Object {
             __doc__ = "",
             args = {"other"}
     )
-    public org.python.Object __rpow__(org.python.Object other) {
+    public org.python.Object __rpow__(org.python.Object other, org.python.Object modulus) {
         throw new org.python.exceptions.AttributeError(this, "__rpow__");
     }
 

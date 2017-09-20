@@ -150,6 +150,20 @@ public interface Object extends Comparable {
     public org.python.Object __xor__(org.python.Object other);
     public org.python.Object __or__(org.python.Object other);
 
+    public org.python.Object __radd__(org.python.Object other);
+    public org.python.Object __rsub__(org.python.Object other);
+    public org.python.Object __rmul__(org.python.Object other);
+    public org.python.Object __rtruediv__(org.python.Object other);
+    public org.python.Object __rfloordiv__(org.python.Object other);
+    public org.python.Object __rmod__(org.python.Object other);
+    public org.python.Object __rdivmod__(org.python.Object other);
+    public org.python.Object __rpow__(org.python.Object other, org.python.Object modulus);
+    public org.python.Object __rlshift__(org.python.Object other);
+    public org.python.Object __rrshift__(org.python.Object other);
+    public org.python.Object __rand__(org.python.Object other);
+    public org.python.Object __rxor__(org.python.Object other);
+    public org.python.Object __ror__(org.python.Object other);
+
     public org.python.Object __iadd__(org.python.Object other);
     public org.python.Object __isub__(org.python.Object other);
     public org.python.Object __imul__(org.python.Object other);

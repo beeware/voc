@@ -735,7 +735,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = "",
             args = {"other"}
     )
-    public org.python.Object __rpow__(org.python.Object other) {
+    public org.python.Object __rpow__(org.python.Object other, org.python.Object modulus) {
         throw new org.python.exceptions.AttributeError(this, "__rpow__");
     }
 
@@ -1127,5 +1127,398 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object[] args = new org.python.Object[1];
         args[0] = y;
         return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, null);
+    }
+
+    // for arithmetic operators
+    public static org.python.Object add(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__radd__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__add__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__radd__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object sub(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rsub__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__sub__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rsub__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object mul(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rmul__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__mul__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rmul__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object truediv(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rtruediv__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__truediv__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rtruediv__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object floordiv(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rfloordiv__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__floordiv__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rfloordiv__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for //: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object mod(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rmod__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__mod__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rmod__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object divmod(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rdivmod__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__divmod__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rdivmod__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object pow(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rpow__(lhs, null)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__pow__(rhs, null)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rpow__(lhs, null)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object pow(org.python.Object lhs, org.python.Object rhs, org.python.Object modulus) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rpow__(lhs, modulus)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__pow__(rhs, modulus)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rpow__(lhs, modulus)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object lshift(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rlshift__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__lshift__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rlshift__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object rshift(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rrshift__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__rshift__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rrshift__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object and(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rand__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__and__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rand__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object xor(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__rxor__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__xor__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__rxor__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
+    }
+
+    public static org.python.Object or(org.python.Object lhs, org.python.Object rhs) {
+        org.python.Object ret = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        boolean subclassCase = lhs.type() != rhs.type()
+                && ((org.python.types.Bool)org.Python.isinstance(rhs, lhs.type())).value;
+
+        if (subclassCase) {
+            try {
+                if ((ret = rhs.__ror__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        if ((ret = lhs.__or__(rhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+            return ret;
+
+        if (!subclassCase) {
+            try {
+                if ((ret = rhs.__ror__(lhs)) != org.python.types.NotImplementedType.NOT_IMPLEMENTED)
+                    return ret;
+            }
+            catch (org.python.exceptions.AttributeError e) {}
+        }
+
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: '" + lhs.typeName() + "' and '" + rhs.typeName() + "'");
     }
 }

@@ -893,25 +893,26 @@ class Visitor(ast.NodeVisitor):
         else:
             self.visit(node.left)
             self.visit(node.right)
+
             self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE(
-                    'org/python/Object',
+                JavaOpcodes.INVOKESTATIC(
+                    'org/python/types/Object',
                     {
-                        ast.Add: '__add__',
-                        ast.Sub: '__sub__',
-                        ast.Mult: '__mul__',
-                        ast.Div: '__truediv__',
-                        ast.FloorDiv: '__floordiv__',
-                        ast.Mod: '__mod__',
-                        ast.Pow: '__pow__',
-                        ast.LShift: '__lshift__',
-                        ast.RShift: '__rshift__',
-                        ast.BitOr: '__or__',
-                        ast.BitXor: '__xor__',
-                        ast.BitAnd: '__and__',
+                        ast.Add: 'add',
+                        ast.Sub: 'sub',
+                        ast.Mult: 'mul',
+                        ast.Div: 'truediv',
+                        ast.FloorDiv: 'floordiv',
+                        ast.Mod: 'mod',
+                        ast.Pow: 'pow',
+                        ast.LShift: 'lshift',
+                        ast.RShift: 'rshift',
+                        ast.BitOr: 'or',
+                        ast.BitXor: 'xor',
+                        ast.BitAnd: 'and',
                         # ast.MatMult:
                     }[type(node.op)],
-                    args=['Lorg/python/Object;'],
+                    args=['Lorg/python/Object;', 'Lorg/python/Object;'],
                     returns='Lorg/python/Object;'
                 )
             )
