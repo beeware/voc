@@ -224,7 +224,6 @@ class BytesTests(TranspileTestCase):
             print(b'test' in b'pybee')
         """)
 
-
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 

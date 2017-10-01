@@ -195,9 +195,7 @@ public class Bytes extends org.python.types.Object {
         else {
               throw new org.python.exceptions.TypeError("invalid type for this method");
         }
-        // throw new org.python.exceptions.NotImplementedError("bytes.__contains__ has not been implemented.");
     }
-
 
     @org.python.Method(
             __doc__ = "default object formatter"
