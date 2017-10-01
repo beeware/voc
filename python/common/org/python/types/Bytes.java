@@ -170,11 +170,34 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return key in self."
+            __doc__ = "Return true if contains the arg",
+            args = {"slice"}
     )
-    public org.python.Object __contains__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__contains__ has not been implemented.");
+    public org.python.Object __contains__(org.python.Object slice) {
+        if (slice instanceof org.python.types.Bytes) {
+            int counter_slice = 0;
+            for (int i = 0; i < this.value.length +1; i++){
+                if (counter_slice == ((org.python.types.Bytes) slice).value.length){
+                    return new org.python.types.Bool(true);
+                }
+                else if (i == this.value.length){
+                    break;
+                }
+                else if (((org.python.types.Bytes) slice).value[counter_slice] == this.value[i]){
+                    counter_slice++;
+                }
+                else {
+                    counter_slice = 0;
+                }
+            }
+            return new org.python.types.Bool(false);
+        }
+        else {
+              throw new org.python.exceptions.TypeError("invalid type for this method");
+        }
+        // throw new org.python.exceptions.NotImplementedError("bytes.__contains__ has not been implemented.");
     }
+
 
     @org.python.Method(
             __doc__ = "default object formatter"
