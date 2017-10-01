@@ -177,7 +177,7 @@ public class Bytes extends org.python.types.Object {
         byte[] bslice;
         if (slice instanceof org.python.types.Int) {
             int islice = (int) ((org.python.types.Int) slice).value;
-            if (islice < 0 || islice > 255){
+            if (islice < 0 || islice > 255) {
                 throw new org.python.exceptions.ValueError("byte must be in range(0, 256)\n");
             }
             bslice = new byte[1];
@@ -192,16 +192,16 @@ public class Bytes extends org.python.types.Object {
             throw new org.python.exceptions.TypeError(error_message);
         }
         int counter_slice = 0;
-        for (int i = 0; i < this.value.length +1; i++){
-          if (counter_slice == bslice.length){
-              return new org.python.types.Bool(true);
-          } else if (i == this.value.length){
-              break;
-          } else if (bslice[counter_slice] == this.value[i]){
-              counter_slice++;
-          } else {
-              counter_slice = 0;
-          }
+        for (int i = 0; i < this.value.length + 1; i++) {
+            if (counter_slice == bslice.length) {
+                return new org.python.types.Bool(true);
+            } else if (i == this.value.length) {
+                break;
+            } else if (bslice[counter_slice] == this.value[i]) {
+                counter_slice++;
+            } else {
+                counter_slice = 0;
+            }
         }
         return new org.python.types.Bool(false);
     }
