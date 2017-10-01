@@ -216,6 +216,14 @@ class BytesTests(TranspileTestCase):
             print(b'abcd'.find(b'ab', 3, 4))
         """, exits_early=True)
 
+    def test_contains(self):
+        self.assertCodeExecution("""
+            print(b'py' in b'pybee')
+            print(b'bee' in b'pybee')
+            print(b'ybe' in b'pybee')
+            print(b'test' in b'pybee')
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
