@@ -222,7 +222,14 @@ class BytesTests(TranspileTestCase):
             print(b'bee' in b'pybee')
             print(b'ybe' in b'pybee')
             print(b'test' in b'pybee')
+            print(101 in b'pybee')
         """)
+        self.assertCodeExecution("""
+            print(300 in b'pybee') #Test ValueError invalid integer range
+        """, exits_early=True)
+        self.assertCodeExecution("""
+            print(['b', 'e'] in b'pybee') #Test TypeError invalid byte array
+        """, exits_early=True)
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
