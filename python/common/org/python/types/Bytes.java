@@ -675,7 +675,7 @@ public class Bytes extends org.python.types.Object {
         byte[] fillByte;
         if (byteToFill instanceof org.python.types.Bytes) {
             if (((org.python.types.Bytes) byteToFill).value.length != 1) {
-                throw new org.python.exceptions.TypeError("The fill bytes must be exactly one char in bytes");
+                throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not bytes");
             }
             fillByte = ((org.python.types.Bytes) byteToFill).value;
         }
@@ -683,7 +683,7 @@ public class Bytes extends org.python.types.Object {
             fillByte = " ".getBytes();
         }
         else {
-            throw new org.python.exceptions.TypeError("Fill bytes must be of type Bytes");
+            throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not " + byteToFill.typeName());
         }
 
         if (width instanceof org.python.types.Int) {
@@ -712,7 +712,8 @@ public class Bytes extends org.python.types.Object {
         } else if (width instanceof org.python.types.Bool) {
             return new org.python.types.Bytes(this.value);
         } else {
-            throw new org.python.exceptions.TypeError("The width must be of type Int");
+            throw new org.python.exceptions.TypeError("'" + width.typeName() +
+              "'" + " object cannot be interpreted as an integer\n");
         }
     }
 
