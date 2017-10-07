@@ -158,12 +158,26 @@ public class Slice extends org.python.types.Object {
             this.step.__repr__()));
     }
 
+    private org.python.types.Tuple convertSliceToTuple(org.python.types.Slice slice) {
+        org.python.types.Tuple tupleFromSlice = new org.python.types.Tuple();
+        tupleFromSlice.value.add(slice.start);
+        tupleFromSlice.value.add(slice.stop);
+        tupleFromSlice.value.add(slice.step);
+        return tupleFromSlice;
+    }
+
     @org.python.Method(
             __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__ge__(otherSliceAsTuple);
+        }
+        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -171,7 +185,13 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__gt__(otherSliceAsTuple);
+        }
+        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -179,7 +199,13 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__eq__(otherSliceAsTuple);
+        }
+        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -187,7 +213,13 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__lt__(otherSliceAsTuple);
+        }
+        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
     @org.python.Method(
@@ -195,6 +227,12 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__le__(otherSliceAsTuple);
+        }
+        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 }
