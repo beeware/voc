@@ -231,6 +231,28 @@ class BytesTests(TranspileTestCase):
             print(['b', 'e'] in b'pybee') #Test TypeError invalid byte array
         """, exits_early=True)
 
+    def test_center(self):
+        self.assertCodeExecution("""
+            print(b'pybee'.center(12))
+            print(b'pybee'.center(13))
+            print(b'pybee'.center(2))
+            print(b'pybee'.center(2, b'a'))
+            print(b'pybee'.center(12, b'a'))
+            print(b'pybee'.center(13, b'a'))
+            print(b'pybee'.center(-5))
+            print(b''.center(5))
+            print(b'pybee'.center(True, b'a'))
+            """)
+        self.assertCodeExecution("""
+            print(b'pybee'.center('5'))
+            """, exits_early=True)
+        self.assertCodeExecution("""
+            print(b'pybee'.center(12, b'as'))
+            """, exits_early=True)
+        self.assertCodeExecution("""
+            print(b'pybee'.center(12, 'a'))
+            """, exits_early=True)
+
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 
