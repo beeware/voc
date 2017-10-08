@@ -244,6 +244,19 @@ class BytesTests(TranspileTestCase):
             print(b'\x46\x55\x43\x4B'.isalpha())
         """)
 
+    def test_isdigit(self):
+        self.assertCodeExecution("""
+            print(b'testdigit'.isdigit())
+            print(b'TestDigit'.isdigit())
+            print(b'test digit'.isdigit())
+            print(b'666'.isdigit())
+            print(b'66.6'.isdigit())
+            print(b' '.isdigit())
+            print(b''.isdigit())
+            print(b'/@. test'.isdigit())
+            print(b'\x46\x55\x43\x4B'.isdigit())
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
