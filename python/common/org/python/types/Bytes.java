@@ -675,7 +675,12 @@ public class Bytes extends org.python.types.Object {
         byte[] fillByte;
         if (byteToFill instanceof org.python.types.Bytes) {
             if (((org.python.types.Bytes) byteToFill).value.length != 1) {
-                throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not bytes");
+                if (org.Python.VERSION < 0x030502F0) {
+                    throw new org.python.exceptions.TypeError("must be a byte string of length 1, not bytes");
+                }
+                else {
+                    throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not bytes");
+                }
             }
             fillByte = ((org.python.types.Bytes) byteToFill).value;
         }
@@ -683,7 +688,12 @@ public class Bytes extends org.python.types.Object {
             fillByte = " ".getBytes();
         }
         else {
-            throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not " + byteToFill.typeName());
+            if (org.Python.VERSION < 0x030502F0) {
+                throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + byteToFill.typeName());
+            }
+            else{
+                throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not " + byteToFill.typeName());
+            }
         }
 
         if (width instanceof org.python.types.Int) {
