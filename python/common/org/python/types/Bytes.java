@@ -641,13 +641,10 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.__rmul__ has not been implemented.");
     }
 
-    @org.python.Method(
-            __doc__ = "B.capitalize() -> copy of B\n\nReturn a copy of B with only its first character capitalized (ASCII)\nand the rest lower-cased."
-    )
-    public org.python.Object capitalize() {
-        byte[] value = new byte[this.value.length];
-        for (int i = 0; i < this.value.length; i++) {
-            byte b = this.value[i];
+    public static byte[] _capitalize(byte[] input) {
+        byte[] value = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            byte b = input[i];
             if (b < 127 && b > 32) {
                 char c = (char) b;
                 if (i == 0) {
@@ -660,7 +657,15 @@ public class Bytes extends org.python.types.Object {
                 value[i] = b;
             }
         }
-        return new Bytes(value);
+        return value;
+    }
+
+    @org.python.Method(
+            __doc__ = "B.capitalize() -> copy of B\n\nReturn a copy of B with only its first character capitalized (ASCII)\nand the rest lower-cased."
+    )
+
+    public org.python.Object capitalize() {
+        return new Bytes(_capitalize(this.value));
     }
 
     @org.python.Method(
@@ -943,11 +948,25 @@ public class Bytes extends org.python.types.Object {
         return new org.python.types.Bool(true);
     }
 
+    public static boolean _islower(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        byte[] value = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            byte b = input[i];
+            if ((b < 97 || b > 122) && b != ' ') {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = "B.islower() -> bool\n\nReturn True if all cased characters in B are lowercase and there is\nat least one cased character in B, False otherwise."
     )
-    public org.python.Object islower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.islower has not been implemented.");
+    public org.python.Object islower() {
+        return new Bool(_islower(this.value));
     }
 
     @org.python.Method(

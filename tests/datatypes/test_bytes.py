@@ -11,6 +11,21 @@ class BytesTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_islower(self):
+        self.assertCodeExecution("""
+            print(b'abc'.islower())
+            print(b''.islower())
+            print(b'Abccc'.islower())
+            print(b'HELLO WORD'.islower())
+            print(b'@#$%!'.islower())
+            print(b'hello world'.islower())
+            print(b'hello world   '.islower())
+            # TODO: uncomment when adding support for literal hex bytes
+            #print(b'\xf0'.islower())
+
+        """)
+        # self.assertCodeExecution("""""")
+
     def test_getattr(self):
         self.assertCodeExecution("""
             x = b'hello, world'
@@ -290,8 +305,6 @@ class BytesTests(TranspileTestCase):
             print(b'/@. test'.upper())
             print(b'\x46\x55\x43\x4B'.upper())
         """)
-
-
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
