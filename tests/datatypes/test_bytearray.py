@@ -20,6 +20,26 @@ class BytearrayTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_capitalize(self):
+        self.assertCodeExecution("""
+            print(bytearray(b"abc").capitalize())
+            print(bytearray().capitalize())
+            """)
+
+    def test_islower(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'abc').islower())
+            print(bytearray(b'').islower())
+            print(bytearray(b'Abccc').islower())
+            print(bytearray(b'HELLO WORD').islower())
+            print(bytearray(b'@#$%!').islower())
+            print(bytearray(b'hello world').islower())
+            print(bytearray(b'hello world   ').islower())
+            # TODO: uncomment when adding support for literal hex bytes
+            #print(b'\xf0'.islower())
+        """)
+        # self.assertCodeExecution("""""")
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
