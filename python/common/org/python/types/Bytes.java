@@ -1114,8 +1114,13 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.upper() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to uppercase."
     )
-    public org.python.Object upper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.upper has not been implemented.");
+    public org.python.Object upper() {
+        byte[] result = new byte[this.value.length];
+        for (int idx = 0; idx < this.value.length; ++idx) {
+            char lc = (char) this.value[idx];
+            result[idx] = (byte) Character.toUpperCase(lc);
+        }
+        return new Bytes(result);
     }
 
     @org.python.Method(

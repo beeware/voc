@@ -268,18 +268,31 @@ class BytesTests(TranspileTestCase):
             print(b'pybee'.center(-5))
             print(b''.center(5))
             print(b'pybee'.center(True, b'a'))
-            """)
+        """)
         self.assertCodeExecution("""
             print(b'pybee'.center('5'))
-            """, exits_early=True)
+        """, exits_early=True)
         self.assertCodeExecution("""
             print(b'pybee'.center(12, b'as'))
-            """, exits_early=True)
+        """, exits_early=True)
         self.assertCodeExecution("""
             print(b'pybee'.center(12, 'a'))
-            """, exits_early=True)
+        """, exits_early=True)
 
-        
+    def test_upper(self):
+        self.assertCodeExecution("""
+            print(b'testupper'.upper())
+            print(b'TestUpper'.upper())
+            print(b'test upper'.upper())
+            print(b'666'.upper())
+            print(b' '.upper())
+            print(b''.upper())
+            print(b'/@. test'.upper())
+            print(b'\x46\x55\x43\x4B'.upper())
+        """)
+
+
+
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 
