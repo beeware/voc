@@ -177,7 +177,9 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__ge__(otherSliceAsTuple);
         }
-        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -191,7 +193,9 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__gt__(otherSliceAsTuple);
         }
-        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -205,7 +209,9 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__eq__(otherSliceAsTuple);
         }
-        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -219,7 +225,9 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__lt__(otherSliceAsTuple);
         }
-        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -233,6 +241,8 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__le__(otherSliceAsTuple);
         }
-        else return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 }
