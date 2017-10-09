@@ -949,24 +949,24 @@ public class Bytes extends org.python.types.Object {
     }
 
     public static boolean _islower(byte[] input) {
-      if (input.length == 0) {
-        return false;
-      }
-      byte[] value = new byte[input.length];
-      for (int i = 0; i < input.length; i++) {
-          byte b = input[i];
-          if ((b < 97 || b > 122) && b != ' ') {
-              return false;
-          }
-      }
-      return true;
+        if (input.length == 0) {
+            return false;
+        }
+        byte[] value = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            byte b = input[i];
+            if ((b < 97 || b > 122) && b != ' ') {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.islower() -> bool\n\nReturn True if all cased characters in B are lowercase and there is\nat least one cased character in B, False otherwise."
     )
     public org.python.Object islower() {
-      return new Bool(_islower(this.value));
+        return new Bool(_islower(this.value));
     }
 
     @org.python.Method(

@@ -38,7 +38,8 @@ class BytearrayTests(TranspileTestCase):
             # TODO: uncomment when adding support for literal hex bytes
             #print(b'\xf0'.islower())
         """)
-        #self.assertCodeExecution("""""")
+        # self.assertCodeExecution("""""")
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'

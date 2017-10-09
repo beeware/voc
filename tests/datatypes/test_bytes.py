@@ -24,8 +24,7 @@ class BytesTests(TranspileTestCase):
             #print(b'\xf0'.islower())
 
         """)
-        #self.assertCodeExecution("""""")
-
+        # self.assertCodeExecution("""""")
 
     def test_getattr(self):
         self.assertCodeExecution("""
