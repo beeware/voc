@@ -641,13 +641,10 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.__rmul__ has not been implemented.");
     }
 
-    @org.python.Method(
-            __doc__ = "B.capitalize() -> copy of B\n\nReturn a copy of B with only its first character capitalized (ASCII)\nand the rest lower-cased."
-    )
-    public org.python.Object capitalize() {
-        byte[] value = new byte[this.value.length];
-        for (int i = 0; i < this.value.length; i++) {
-            byte b = this.value[i];
+    public static byte[] _capitalize(byte[] input) {
+        byte[] value = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            byte b = input[i];
             if (b < 127 && b > 32) {
                 char c = (char) b;
                 if (i == 0) {
@@ -660,7 +657,15 @@ public class Bytes extends org.python.types.Object {
                 value[i] = b;
             }
         }
-        return new Bytes(value);
+        return value;
+    }
+
+    @org.python.Method(
+            __doc__ = "B.capitalize() -> copy of B\n\nReturn a copy of B with only its first character capitalized (ASCII)\nand the rest lower-cased."
+    )
+
+    public org.python.Object capitalize() {
+        return new Bytes(_capitalize(this.value));
     }
 
     @org.python.Method(

@@ -20,6 +20,12 @@ class BytearrayTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_capitalize(self):
+        self.assertCodeExecution("""
+            print(bytearray(b"abc").capitalize())
+            print(bytearray().capitalize())
+            """)
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
