@@ -1130,16 +1130,20 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.translate has not been implemented.");
     }
 
-    @org.python.Method(
-            __doc__ = "B.upper() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to uppercase."
-    )
-    public org.python.Object upper() {
-        byte[] result = new byte[this.value.length];
+    public static byte[] _upper(byte[] input) {
+        byte[] result = new byte[input.length];
         for (int idx = 0; idx < this.value.length; ++idx) {
             char lc = (char) this.value[idx];
             result[idx] = (byte) Character.toUpperCase(lc);
         }
-        return new Bytes(result);
+        return result;
+    }
+
+    @org.python.Method(
+            __doc__ = "B.upper() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to uppercase."
+    )
+    public org.python.Object upper() {
+        return new Bytes(_upper(this.value));
     }
 
     @org.python.Method(
