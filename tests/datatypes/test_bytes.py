@@ -306,6 +306,7 @@ class BytesTests(TranspileTestCase):
             print(b'\x46\x55\x43\x4B'.upper())
         """)
 
+
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 

@@ -219,6 +219,7 @@ class SliceTests(TranspileTestCase):
             print("x.indices(12) = ", x.indices(12))
             """)
 
+
 class UnarySliceOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'slice'
 
