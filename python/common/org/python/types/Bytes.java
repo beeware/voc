@@ -184,6 +184,8 @@ public class Bytes extends org.python.types.Object {
             bslice[0] = (byte) islice;
         } else if (slice instanceof org.python.types.Bytes) {
             bslice = ((org.python.types.Bytes) slice).value;
+        } else if (slice instanceof org.python.types.ByteArray) {
+            bslice = ((org.python.types.ByteArray) slice).value;
         } else {
             String error_message = "a bytes-like object is required, not '" + slice.typeName() + "'\n";
             if (org.Python.VERSION < 0x03050000) {
