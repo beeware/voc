@@ -11,6 +11,21 @@ class BytesTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_islower(self):
+        self.assertCodeExecution("""
+            print(b'abc'.islower())
+            print(b''.islower())
+            print(b'Abccc'.islower())
+            print(b'HELLO WORD'.islower())
+            print(b'@#$%!'.islower())
+            print(b'hello world'.islower())
+            print(b'hello world   '.islower())
+            # TODO: uncomment when adding support for literal hex bytes
+            #print(b'\xf0'.islower())
+
+        """)
+        # self.assertCodeExecution("""""")
+
     def test_getattr(self):
         self.assertCodeExecution("""
             x = b'hello, world'
@@ -268,18 +283,29 @@ class BytesTests(TranspileTestCase):
             print(b'pybee'.center(-5))
             print(b''.center(5))
             print(b'pybee'.center(True, b'a'))
-            """)
+        """)
         self.assertCodeExecution("""
             print(b'pybee'.center('5'))
-            """, exits_early=True)
+        """, exits_early=True)
         self.assertCodeExecution("""
             print(b'pybee'.center(12, b'as'))
-            """, exits_early=True)
+        """, exits_early=True)
         self.assertCodeExecution("""
             print(b'pybee'.center(12, 'a'))
-            """, exits_early=True)
+        """, exits_early=True)
 
-        
+    def test_upper(self):
+        self.assertCodeExecution("""
+            print(b'testupper'.upper())
+            print(b'TestUpper'.upper())
+            print(b'test upper'.upper())
+            print(b'666'.upper())
+            print(b' '.upper())
+            print(b''.upper())
+            print(b'/@. test'.upper())
+            print(b'\x46\x55\x43\x4B'.upper())
+        """)
+
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 

@@ -853,8 +853,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __imod__(org.python.Object other) {
         try {
-            this.setValue(this.__mod__(other));
-            return this;
+            return this.__mod__(other);
         } catch (org.python.exceptions.TypeError e) {
             if (other instanceof org.python.types.Complex) {
                 throw new org.python.exceptions.TypeError("can't mod complex numbers.");

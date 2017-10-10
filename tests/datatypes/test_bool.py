@@ -40,7 +40,4 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
     not_implemented = [
-        'test_modulo_bool',
-        'test_modulo_float',
-        'test_modulo_int',
     ]
