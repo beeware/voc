@@ -40,6 +40,32 @@ class BytearrayTests(TranspileTestCase):
         """)
         # self.assertCodeExecution("""""")
 
+    def test_upper(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'abc').upper())
+            print(bytearray(b'').upper())
+            print(bytearray(b'Abccc').upper())
+            print(bytearray(b'HELLO WORD').upper())
+            print(bytearray(b'@#$%!').upper())
+            print(bytearray(b'hello world').upper())
+            print(bytearray(b'hello world   ').upper())
+            # TODO: uncomment when adding support for literal hex bytes
+            #print(b'\xf0'.upper())
+        """)
+
+    def test_isalpha(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'abc').isalpha())
+            print(bytearray(b'').isalpha())
+            print(bytearray(b'Abccc').isalpha())
+            print(bytearray(b'HELLO WORD').isalpha())
+            print(bytearray(b'@#$%!').isalpha())
+            print(bytearray(b'hello world').isalpha())
+            print(bytearray(b'hello world   ').isalpha())
+            # TODO: uncomment when adding support for literal hex bytes
+            #print(b'\xf0'.isalpha())
+        """)
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
