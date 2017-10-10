@@ -918,19 +918,23 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.isalnum has not been implemented.");
     }
 
+    public static boolean _isalpha(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!(ch >= 'A' && ch <= 'Z') && !(ch >= 'a' && ch <= 'z')) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = "B.isalpha() -> bool\n\nReturn True if all characters in B are alphabetic\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalpha() {
-        if (this.value.length == 0) {
-            return new org.python.types.Bool(false);
-        }
-        for (byte ch : this.value) {
-            if (!(ch >= 'A' && ch <= 'Z') && !(ch >= 'a' && ch <= 'z')) {
-                return new org.python.types.Bool(false);
-            }
-        }
-        return new org.python.types.Bool(true);
+        return new Bool(_isalpha(this.value));
     }
 
     @org.python.Method(
@@ -1132,8 +1136,8 @@ public class Bytes extends org.python.types.Object {
 
     public static byte[] _upper(byte[] input) {
         byte[] result = new byte[input.length];
-        for (int idx = 0; idx < this.value.length; ++idx) {
-            char lc = (char) this.value[idx];
+        for (int idx = 0; idx < input.length; ++idx) {
+            char lc = (char) input[idx];
             result[idx] = (byte) Character.toUpperCase(lc);
         }
         return result;
