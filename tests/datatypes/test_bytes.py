@@ -306,6 +306,15 @@ class BytesTests(TranspileTestCase):
             print(b'\x46\x55\x43\x4B'.upper())
         """)
 
+    def test_isspace(self):
+        self.assertCodeExecution("""
+            print(b'testupper'.isspace())
+            print(b'test isspace'.isspace())
+            print(b' '.isspace())
+            print(b''.isspace())
+            print(b'\x46'.isspace())
+        """)
+
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 

@@ -40,6 +40,15 @@ class BytearrayTests(TranspileTestCase):
         """)
         # self.assertCodeExecution("""""")
 
+    def test_isspace(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'testupper').isspace())
+            print(bytearray(b'test isspace').isspace())
+            print(bytearray(b' ').isspace())
+            print(bytearray(b'').isspace())
+            print(bytearray(b'\x46').isspace())
+        """)
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
