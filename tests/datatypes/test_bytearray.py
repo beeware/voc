@@ -21,12 +21,6 @@ class BytearrayTests(TranspileTestCase):
             """)
     def test_contains(self):
         self.assertCodeExecution("""
-            x = bytearray([1,2,3])
-            y = bytearray([1,2])
-            print(x in y)
-            print(y in x)
-            """)
-        self.assertCodeExecution("""
             print(bytearray([1,2,3]) in bytearray([1,2]))
             print(bytearray([1,2]) in bytearray([1,2,3]))
             print(bytearray([1,2,4]) in bytearray([1,2,3]))
