@@ -44,10 +44,6 @@ class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_floor_divide_float',
         'test_floor_divide_int',
 
-        'test_modulo_bool',
-        'test_modulo_float',
-        'test_modulo_int',
-
         'test_multiply_bool',
         'test_multiply_bytearray',
         'test_multiply_bytes',
