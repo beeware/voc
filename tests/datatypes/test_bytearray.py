@@ -19,6 +19,7 @@ class BytearrayTests(TranspileTestCase):
             except AttributeError as err:
                 print(err)
             """)
+
     def test_contains(self):
         self.assertCodeExecution("""
             print(bytearray([1,2,3]) in bytearray([1,2]))

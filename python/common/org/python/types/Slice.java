@@ -176,8 +176,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__ge__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
@@ -192,8 +191,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__gt__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
@@ -208,8 +206,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__eq__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
@@ -224,8 +221,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__lt__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
@@ -240,8 +236,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__le__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
