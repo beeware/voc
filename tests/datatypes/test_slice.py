@@ -219,6 +219,7 @@ class SliceTests(TranspileTestCase):
             print("x.indices(12) = ", x.indices(12))
             """)
 
+
 class UnarySliceOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'slice'
 
@@ -234,26 +235,11 @@ class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'slice'
 
     not_implemented = [
-        'test_direct_eq_slice',
-        'test_direct_ge_slice',
-        'test_direct_gt_slice',
-        'test_direct_le_slice',
-        'test_direct_lt_slice',
-        'test_direct_ne_slice',
-
-        'test_eq_slice',
-        'test_ge_slice',
-        'test_gt_slice',
-        'test_le_slice',
-        'test_lt_slice',
-
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_list',
         'test_multiply_str',
         'test_multiply_tuple',
-
-        'test_ne_slice',
 
         'test_subscr_bool',
         'test_subscr_bytearray',
