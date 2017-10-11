@@ -872,8 +872,7 @@ public class Bytes extends org.python.types.Object {
                 endIndex = this.value.length;
             }
 
-            byte[] thisValuePart = Arrays.copyOfRange(this.value, startIndex,
-                endIndex);
+            byte[] thisValuePart = Arrays.copyOfRange(this.value, startIndex, endIndex);
             boolean ok = Arrays.equals(thisValuePart, substringValue);
             return new org.python.types.Bool(ok);
         } else {
