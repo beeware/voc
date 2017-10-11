@@ -1156,11 +1156,24 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.strip has not been implemented.");
     }
 
+    public static byte[] _swapcase(byte[] input) {
+        byte[] result = new byte[input.length];
+        for (int idx = 0; idx < input.length; ++idx) {
+            char lc = (char) input[idx];
+            if(Character.isUpperCase(lc)){
+                result[idx] = (byte) Character.toLowerCase(lc);
+            }else{
+                result[idx] = (byte) Character.toUpperCase(lc);
+            }
+        }
+        return result;
+    }
+
     @org.python.Method(
             __doc__ = "B.swapcase() -> copy of B\n\nReturn a copy of B with uppercase ASCII characters converted\nto lowercase ASCII and vice versa."
     )
-    public org.python.Object swapcase(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.swapcase has not been implemented.");
+    public org.python.Object swapcase() {
+        return new Bytes(_swapcase(this.value));
     }
 
     @org.python.Method(
