@@ -307,10 +307,6 @@ class BytesTests(TranspileTestCase):
         """)
 
     def test_isspace(self):
-        # TODO: Fix this AssertionError: EOL while scanning string literal
-        # print(b' \n'.isspace())
-        # print(b' \r'.isspace())
-
         self.assertCodeExecution("""
             print(b'testisspace'.isspace())
             print(b'test isspace'.isspace())
@@ -320,6 +316,8 @@ class BytesTests(TranspileTestCase):
             print(b'   \t\t'.isspace())
             print(b' \x0b'.isspace())
             print(b' \f'.isspace())
+            print(b' \\n'.isspace())
+            print(b' \\r'.isspace())
         """)
 
 

@@ -42,10 +42,6 @@ class BytearrayTests(TranspileTestCase):
         # self.assertCodeExecution("""""")
 
     def test_isspace(self):
-        # TODO: Fix this AssertionError: EOL while scanning string literal
-        # print(b' \n'.isspace())
-        # print(b' \r'.isspace())
-
         self.assertCodeExecution("""
             print(bytearray(b'testupper').isspace())
             print(bytearray(b'test isspace').isspace())
@@ -55,6 +51,8 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'   \t\t').isspace())
             print(bytearray(b' \x0b').isspace())
             print(bytearray(b' \f').isspace())
+            print(bytearray(b' \\n').isspace())
+            print(bytearray(b' \\r').isspace())
         """)
 
 
