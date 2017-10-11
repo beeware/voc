@@ -361,4 +361,3 @@ class BinarySetOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceSetOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'set'
-
