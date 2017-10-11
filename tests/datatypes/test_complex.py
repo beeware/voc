@@ -205,12 +205,8 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_modulo_str',
         'test_modulo_tuple',
 
-        'test_multiply_bool',
         'test_multiply_bytearray',
         'test_multiply_bytes',
-        'test_multiply_complex',
-        'test_multiply_float',
-        'test_multiply_int',
         'test_multiply_list',
         'test_multiply_none',
         'test_multiply_str',
@@ -235,10 +231,7 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_ne_str',
         'test_ne_tuple',
 
-        'test_power_bool',
         'test_power_complex',
-        'test_power_float',
-        'test_power_int',
         'test_power_none',
 
         'test_rshift_none',
@@ -262,9 +255,5 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_subscr_str',
         'test_subscr_tuple',
 
-        'test_true_divide_bool',
-        'test_true_divide_complex',
-        'test_true_divide_float',
-        'test_true_divide_int',
         'test_true_divide_none',
     ]
