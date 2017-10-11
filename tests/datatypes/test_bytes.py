@@ -338,7 +338,7 @@ class BytesTests(TranspileTestCase):
             print(b"[Hello] World".lower())
             """)
 
-        def test_isspace(self):
+    def test_isspace(self):
         self.assertCodeExecution("""
             print(b'testisspace'.isspace())
             print(b'test isspace'.isspace())
