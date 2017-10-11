@@ -19,6 +19,31 @@ class BytearrayTests(TranspileTestCase):
             except AttributeError as err:
                 print(err)
             """)
+    def test_contains(self):
+        self.assertCodeExecution("""
+            print(bytearray([1,2,3]) in bytearray([1,2]))
+            print(bytearray([1,2]) in bytearray([1,2,3]))
+            print(bytearray([1,2,4]) in bytearray([1,2,3]))
+            print(bytearray([8,9,0,1]) in bytearray([1,2,3]))
+            print(101 in bytearray([1,2,3]))
+            print(101 in bytearray([1,2,3,101]))
+            print(b'pybee' in bytearray([1,2]))
+            print(bytearray([1,2]) in b'pybee')
+        """)
+        self.assertCodeExecution("""
+            try:
+                print(300 in bytearray([1,2,3]))
+                print("No error raised")
+            except ValueError:
+                print("Raised a ValueError")
+        """)
+        self.assertCodeExecution("""
+            try:
+                print(['b', 'e'] in bytearray([1,2,3]))
+                print("No error raised")
+            except TypeError:
+                print("Raised a TypeError")
+        """)
 
     def test_capitalize(self):
         self.assertCodeExecution("""
