@@ -121,15 +121,15 @@ public class List extends org.python.types.Object {
                 (other instanceof org.python.types.ByteArray)) {
             org.python.Object iter = null;
             if (other instanceof org.python.types.Str) {
-                iter = ((org.python.types.Str)other).__iter__();
+                iter = ((org.python.types.Str) other).__iter__();
             } else if (other instanceof org.python.types.Dict) {
-                iter = ((org.python.types.Dict)other).__iter__();
+                iter = ((org.python.types.Dict) other).__iter__();
             } else if (other instanceof org.python.types.Range) {
-                iter = ((org.python.types.Range)other).__iter__();
+                iter = ((org.python.types.Range) other).__iter__();
             } else if (other instanceof org.python.types.Bytes) {
-                iter = ((org.python.types.Bytes)other).__iter__();
+                iter = ((org.python.types.Bytes) other).__iter__();
             } else if (other instanceof org.python.types.ByteArray) {
-                iter = ((org.python.types.ByteArray)other).__iter__();
+                iter = ((org.python.types.ByteArray) other).__iter__();
             }
             while (true) {
                 try {
@@ -679,13 +679,13 @@ public class List extends org.python.types.Object {
                 (other instanceof org.python.types.Iterator)) {
             org.python.Object iter = null;
             if (other instanceof org.python.types.Str) {
-                iter = ((org.python.types.Str)other).__iter__();
+                iter = ((org.python.types.Str) other).__iter__();
             } else if (other instanceof org.python.types.Range) {
-                iter = ((org.python.types.Range)other).__iter__();
+                iter = ((org.python.types.Range) other).__iter__();
             } else if (other instanceof org.python.types.Bytes) {
-                iter = ((org.python.types.Bytes)other).__iter__();
+                iter = ((org.python.types.Bytes) other).__iter__();
             } else if (other instanceof org.python.types.ByteArray) {
-                iter = ((org.python.types.ByteArray)other).__iter__();
+                iter = ((org.python.types.ByteArray) other).__iter__();
             } else if (other instanceof org.python.types.Iterator) {
                 iter = other;
             }

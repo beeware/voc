@@ -81,7 +81,7 @@ public class Range extends org.python.types.Object {
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
-                org.python.types.Slice.ValidatedValue val = ((org.python.types.Slice)index).validateValueTypes();
+                org.python.types.Slice.ValidatedValue val = ((org.python.types.Slice) index).validateValueTypes();
                 org.python.types.Slice slice = new org.python.types.Slice(val.start, val.stop, val.step);
                 org.python.types.Tuple indices = slice.indices((org.python.types.Int) (this.__len__()));
                 org.python.Object start = indices.__getitem__(new org.python.types.Int(0));
@@ -97,7 +97,7 @@ public class Range extends org.python.types.Object {
                 long len = ((org.python.types.Int) (this.__len__())).value;
                 long idx;
                 if (index instanceof org.python.types.Bool) {
-                    idx = ((org.python.types.Bool)index).value ? 1 : 0;
+                    idx = ((org.python.types.Bool) index).value ? 1 : 0;
                 } else {
                     idx = ((org.python.types.Int) index).value;
                 }
@@ -191,7 +191,7 @@ public class Range extends org.python.types.Object {
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Range) {
-            org.python.types.Range range2 = (org.python.types.Range)other;
+            org.python.types.Range range2 = (org.python.types.Range) other;
             return new org.python.types.Bool(
                 (this.start == range2.start) &&
                 (this.stop == range2.stop) &&

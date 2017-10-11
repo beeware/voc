@@ -682,21 +682,17 @@ public class Bytes extends org.python.types.Object {
             if (((org.python.types.Bytes) byteToFill).value.length != 1) {
                 if (org.Python.VERSION < 0x030502F0) {
                     throw new org.python.exceptions.TypeError("must be a byte string of length 1, not bytes");
-                }
-                else {
+                } else {
                     throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not bytes");
                 }
             }
             fillByte = ((org.python.types.Bytes) byteToFill).value;
-        }
-        else if (byteToFill == null) {
+        } else if (byteToFill == null) {
             fillByte = " ".getBytes();
-        }
-        else {
+        } else {
             if (org.Python.VERSION < 0x030502F0) {
                 throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + byteToFill.typeName());
-            }
-            else{
+            } else {
                 throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not " + byteToFill.typeName());
             }
         }
@@ -717,7 +713,7 @@ public class Bytes extends org.python.types.Object {
                     returnBytes[i] = fillByte[0];
                 }
                 for (int i = lenfirst; i < (iwidth - lensecond); i++) {
-                    returnBytes[i] = this.value[i-lenfirst];
+                    returnBytes[i] = this.value[i - lenfirst];
                 }
                 for (int i = (iwidth - lensecond); i < iwidth; i++) {
                     returnBytes[i] = fillByte[0];
