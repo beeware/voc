@@ -107,6 +107,26 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'hello world   ').isalpha())
         """)
 
+    def test_isupper(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'abc').isupper())
+            print(bytearray(b'ABC').isupper())
+            print(bytearray(b'').isupper())
+            print(bytearray(b'Abccc').isupper())
+            print(bytearray(b'HELLO WORD').isupper())
+            print(bytearray(b'@#$%!').isupper())
+            print(bytearray(b'hello world').isupper())
+            print(bytearray(b'hello world   ').isupper())
+        """)
+
+    def test_lower(self):
+        self.assertCodeExecution("""
+            print(bytearray(b"abc").lower())
+            print(bytearray(b"HELLO WORLD!").lower())
+            print(bytearray(b"hElLO wOrLd").lower())
+            print(bytearray(b"[Hello] World").lower())
+            """)
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'

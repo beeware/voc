@@ -26,6 +26,17 @@ class BytesTests(TranspileTestCase):
         """)
         # self.assertCodeExecution("""""")
 
+    def test_isupper(self):
+        self.assertCodeExecution("""
+            print(b'abc'.isupper())
+            print(b''.isupper())
+            print(b'Abccc'.isupper())
+            print(b'HELLO WORD'.isupper())
+            print(b'@#$%!'.isupper())
+            print(b'hello world'.isupper())
+            print(b'hello world   '.isupper())
+        """)
+
     def test_getattr(self):
         self.assertCodeExecution("""
             x = b'hello, world'
@@ -318,6 +329,14 @@ class BytesTests(TranspileTestCase):
             print(b'/@. test'.upper())
             print(b'\x46\x55\x43\x4B'.upper())
         """)
+
+    def test_lower(self):
+        self.assertCodeExecution("""
+            print(b"abc".lower())
+            print(b"HELLO WORLD!".lower())
+            print(b"hElLO wOrLd".lower())
+            print(b"[Hello] World".lower())
+            """)
 
     def test_isspace(self):
         self.assertCodeExecution("""

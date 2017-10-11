@@ -1007,11 +1007,25 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.istitle has not been implemented.");
     }
 
+    public static boolean _isupper(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        byte[] value = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            byte b = input[i];
+            if ((b < 65 || b > 90) && b != ' ') {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = "B.isupper() -> bool\n\nReturn True if all cased characters in B are uppercase and there is\nat least one cased character in B, False otherwise."
     )
-    public org.python.Object isupper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.isupper has not been implemented.");
+    public org.python.Object isupper() {
+        return new Bool(_isupper(this.value));
     }
 
     @org.python.Method(
@@ -1028,11 +1042,20 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.ljust has not been implemented.");
     }
 
+    public static byte[] _lower(byte[] input) {
+        byte[] result = new byte[input.length];
+        for (int idx = 0; idx < input.length; ++idx) {
+            char lc = (char) input[idx];
+            result[idx] = (byte) Character.toLowerCase(lc);
+        }
+        return result;
+    }
+
     @org.python.Method(
             __doc__ = "B.lower() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to lowercase."
     )
-    public org.python.Object lower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.lower has not been implemented.");
+    public org.python.Object lower() {
+        return new Bytes(_lower(this.value));
     }
 
     @org.python.Method(

@@ -784,8 +784,8 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.isupper() -> bool\n\nReturn True if all cased characters in B are uppercase and there is\nat least one cased character in B, False otherwise."
     )
-    public org.python.Object isupper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.isupper has not been implemented.");
+    public org.python.Object isupper() {
+        return new Bool(Bytes._isupper(this.value));
     }
 
     @org.python.Method(
@@ -805,8 +805,8 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.lower() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to lowercase."
     )
-    public org.python.Object lower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.lower has not been implemented.");
+    public org.python.Object lower() {
+        return new ByteArray(Bytes._lower(this.value));
     }
 
     @org.python.Method(
