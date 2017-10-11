@@ -974,7 +974,8 @@ public class Bytes extends org.python.types.Object {
             return false;
         }
         for (byte ch : input) {
-            if (ch != ' ') {
+            // VT \x0b = 11
+            if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r' && ch != 11 && ch != '\f') {
                 return false;
             }
         }

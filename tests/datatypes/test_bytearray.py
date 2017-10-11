@@ -22,11 +22,14 @@ class BytearrayTests(TranspileTestCase):
 
     def test_capitalize(self):
         self.assertCodeExecution("""
-            print(bytearray(b"abc").capitalize())
+            print(bytearray(b'abc').capitalize())
             print(bytearray().capitalize())
-            """)
+        """)
 
     def test_islower(self):
+        # TODO: add this test when adding support for literal hex bytes
+        # print(b'\xf0'.islower())
+
         self.assertCodeExecution("""
             print(bytearray(b'abc').islower())
             print(bytearray(b'').islower())
@@ -35,18 +38,23 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'@#$%!').islower())
             print(bytearray(b'hello world').islower())
             print(bytearray(b'hello world   ').islower())
-            # TODO: uncomment when adding support for literal hex bytes
-            #print(b'\xf0'.islower())
         """)
         # self.assertCodeExecution("""""")
 
     def test_isspace(self):
+        # TODO: Fix this AssertionError: EOL while scanning string literal
+        # print(b' \n'.isspace())
+        # print(b' \r'.isspace())
+
         self.assertCodeExecution("""
             print(bytearray(b'testupper').isspace())
             print(bytearray(b'test isspace').isspace())
             print(bytearray(b' ').isspace())
             print(bytearray(b'').isspace())
             print(bytearray(b'\x46').isspace())
+            print(bytearray(b'   \t\t').isspace())
+            print(bytearray(b' \x0b').isspace())
+            print(bytearray(b' \f').isspace())
         """)
 
 
