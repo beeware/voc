@@ -35,11 +35,7 @@ class BytesTests(TranspileTestCase):
             print(b'@#$%!'.isupper())
             print(b'hello world'.isupper())
             print(b'hello world   '.isupper())
-            # TODO: uncomment when adding support for literal hex bytes
-            #print(b'\xf0'.isupper())
-
         """)
-        # self.assertCodeExecution("""""")
 
     def test_getattr(self):
         self.assertCodeExecution("""
@@ -318,7 +314,7 @@ class BytesTests(TranspileTestCase):
             print(b' '.upper())
             print(b''.upper())
             print(b'/@. test'.upper())
-            #print(b'\x46\x55\x43\x4B'.upper())
+            print(b'\x46\x55\x43\x4B'.upper())
         """)
 
     def test_lower(self):

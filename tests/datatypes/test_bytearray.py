@@ -50,10 +50,7 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'@#$%!').isupper())
             print(bytearray(b'hello world').isupper())
             print(bytearray(b'hello world   ').isupper())
-            # TODO: uncomment when adding support for literal hex bytes
-            #print(b'\xf0'.isupper())
         """)
-        # self.assertCodeExecution("""""")
 
     def test_lower(self):
         self.assertCodeExecution("""
