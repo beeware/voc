@@ -338,6 +338,15 @@ class BytesTests(TranspileTestCase):
             print(b"[Hello] World".lower())
             """)
 
+    def test_swapcase(self):
+        self.assertCodeExecution("""
+            print(b"abc".swapcase())
+            print(b"ABC".swapcase())
+            print(b"HELLO WORLD!".swapcase())
+            print(b"hElLO wOrLd".swapcase())
+            print(b"[Hello] World".swapcase())
+            """)
+
     def test_isspace(self):
         self.assertCodeExecution("""
             print(b'testisspace'.isspace())
