@@ -813,8 +813,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __imul__(org.python.Object other) {
         try {
-            this.setValue(this.__mul__(other));
-            return this;
+            return this.__mul__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -826,8 +825,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __itruediv__(org.python.Object other) {
         try {
-            this.setValue(this.__truediv__(other));
-            return this;
+            return this.__truediv__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for /=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -839,8 +837,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __ifloordiv__(org.python.Object other) {
         try {
-            this.setValue(this.__floordiv__(other));
-            return this;
+            return this.__floordiv__(other);
         } catch (org.python.exceptions.TypeError e) {
             if (other instanceof org.python.types.Complex) {
                 throw new org.python.exceptions.TypeError("can't take floor of complex number.");
@@ -884,8 +881,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __ipow__(org.python.Object other) {
-        this.setValue(this.__pow__(other, null));
-        return this;
+        return this.__pow__(other, null);
     }
 
     @org.python.Method(
@@ -932,8 +928,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __ixor__(org.python.Object other) {
         try {
-            this.setValue(this.__xor__(other));
-            return this;
+            return this.__xor__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }

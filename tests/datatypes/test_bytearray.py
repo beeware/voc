@@ -19,14 +19,42 @@ class BytearrayTests(TranspileTestCase):
             except AttributeError as err:
                 print(err)
             """)
+    def test_contains(self):
+        self.assertCodeExecution("""
+            print(bytearray([1,2,3]) in bytearray([1,2]))
+            print(bytearray([1,2]) in bytearray([1,2,3]))
+            print(bytearray([1,2,4]) in bytearray([1,2,3]))
+            print(bytearray([8,9,0,1]) in bytearray([1,2,3]))
+            print(101 in bytearray([1,2,3]))
+            print(101 in bytearray([1,2,3,101]))
+            print(b'pybee' in bytearray([1,2]))
+            print(bytearray([1,2]) in b'pybee')
+        """)
+        self.assertCodeExecution("""
+            try:
+                print(300 in bytearray([1,2,3]))
+                print("No error raised")
+            except ValueError:
+                print("Raised a ValueError")
+        """)
+        self.assertCodeExecution("""
+            try:
+                print(['b', 'e'] in bytearray([1,2,3]))
+                print("No error raised")
+            except TypeError:
+                print("Raised a TypeError")
+        """)
 
     def test_capitalize(self):
         self.assertCodeExecution("""
-            print(bytearray(b"abc").capitalize())
+            print(bytearray(b'abc').capitalize())
             print(bytearray().capitalize())
-            """)
+        """)
 
     def test_islower(self):
+        # TODO: add this test when adding support for literal hex bytes
+        # print(b'\xf0'.islower())
+
         self.assertCodeExecution("""
             print(bytearray(b'abc').islower())
             print(bytearray(b'').islower())
@@ -35,10 +63,49 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'@#$%!').islower())
             print(bytearray(b'hello world').islower())
             print(bytearray(b'hello world   ').islower())
-            # TODO: uncomment when adding support for literal hex bytes
-            #print(b'\xf0'.islower())
         """)
-        # self.assertCodeExecution("""""")
+
+    def test_isspace(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'testupper').isspace())
+            print(bytearray(b'test isspace').isspace())
+            print(bytearray(b' ').isspace())
+            print(bytearray(b'').isspace())
+            print(bytearray(b'\x46').isspace())
+            print(bytearray(b'   \t\t').isspace())
+            print(bytearray(b' \x0b').isspace())
+            print(bytearray(b' \f').isspace())
+            print(bytearray(b' \\n').isspace())
+            print(bytearray(b' \\r').isspace())
+        """)
+
+    def test_upper(self):
+        # TODO: add this test when adding support for literal hex bytes
+        # print(bytearray(b'\xf0').upper())
+
+        self.assertCodeExecution("""
+            print(bytearray(b'abc').upper())
+            print(bytearray(b'').upper())
+            print(bytearray(b'Abccc').upper())
+            print(bytearray(b'HELLO WORD').upper())
+            print(bytearray(b'@#$%!').upper())
+            print(bytearray(b'hello world').upper())
+            print(bytearray(b'hello world   ').upper())
+        """)
+
+    def test_isalpha(self):
+        # TODO: add this test when adding support for literal hex bytes
+        # print(bytearray(b'\xf0').isalpha())
+
+        self.assertCodeExecution("""
+            print(bytearray(b'abc').isalpha())
+            print(bytearray(b'').isalpha())
+            print(bytearray(b'Abccc').isalpha())
+            print(bytearray(b'HELLO WORD').isalpha())
+            print(bytearray(b'@#$%!').isalpha())
+            print(bytearray(b'hello world').isalpha())
+            print(bytearray(b'hello world   ').isalpha())
+        """)
 
     def test_isupper(self):
         self.assertCodeExecution("""

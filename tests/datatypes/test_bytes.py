@@ -257,6 +257,19 @@ class BytesTests(TranspileTestCase):
             print(['b', 'e'] in b'pybee') #Test TypeError invalid byte array
         """, exits_early=True)
 
+    def test_isalnum(self):
+        self.assertCodeExecution("""
+            print(b'w1thnumb3r2'.isalnum())
+            print(b'withoutnumber'.isalnum())
+            print(b'with spaces'.isalnum())
+            print(b'666'.isalnum())
+            print(b'66.6'.isalnum())
+            print(b' '.isalnum())
+            print(b''.isalnum())
+            print(b'/@. test'.isalnum())
+            print(b'\x46\x55\x43\x4B'.isalnum())
+        """)
+
     def test_isalpha(self):
         self.assertCodeExecution("""
             print(b'testalpha'.isalpha())
@@ -324,6 +337,20 @@ class BytesTests(TranspileTestCase):
             print(b"hElLO wOrLd".lower())
             print(b"[Hello] World".lower())
             """)
+
+    def test_isspace(self):
+        self.assertCodeExecution("""
+            print(b'testisspace'.isspace())
+            print(b'test isspace'.isspace())
+            print(b' '.isspace())
+            print(b''.isspace())
+            print(b' \x46'.isspace())
+            print(b'   \t\t'.isspace())
+            print(b' \x0b'.isspace())
+            print(b' \f'.isspace())
+            print(b' \\n'.isspace())
+            print(b' \\r'.isspace())
+        """)
 
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
