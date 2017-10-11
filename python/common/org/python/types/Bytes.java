@@ -682,21 +682,17 @@ public class Bytes extends org.python.types.Object {
             if (((org.python.types.Bytes) byteToFill).value.length != 1) {
                 if (org.Python.VERSION < 0x030502F0) {
                     throw new org.python.exceptions.TypeError("must be a byte string of length 1, not bytes");
-                }
-                else {
+                } else {
                     throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not bytes");
                 }
             }
             fillByte = ((org.python.types.Bytes) byteToFill).value;
-        }
-        else if (byteToFill == null) {
+        } else if (byteToFill == null) {
             fillByte = " ".getBytes();
-        }
-        else {
+        } else {
             if (org.Python.VERSION < 0x030502F0) {
                 throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + byteToFill.typeName());
-            }
-            else{
+            } else {
                 throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not " + byteToFill.typeName());
             }
         }
@@ -717,7 +713,7 @@ public class Bytes extends org.python.types.Object {
                     returnBytes[i] = fillByte[0];
                 }
                 for (int i = lenfirst; i < (iwidth - lensecond); i++) {
-                    returnBytes[i] = this.value[i-lenfirst];
+                    returnBytes[i] = this.value[i - lenfirst];
                 }
                 for (int i = (iwidth - lensecond); i < iwidth; i++) {
                     returnBytes[i] = fillByte[0];
@@ -914,23 +910,36 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isalnum(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.isalnum has not been implemented.");
+    public org.python.Object isalnum() {
+        if (this.value.length == 0) {
+            return new org.python.types.Bool(false);
+        }
+        for (byte ch: this.value) {
+            if (!(ch >= 'A' && ch <= 'Z') && !(ch >= 'a' && ch <= 'z') &&
+                        !(ch >= '0' && ch <= '9')) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
+    }
+
+    public static boolean _isalpha(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!(ch >= 'A' && ch <= 'Z') && !(ch >= 'a' && ch <= 'z')) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.isalpha() -> bool\n\nReturn True if all characters in B are alphabetic\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalpha() {
-        if (this.value.length == 0) {
-            return new org.python.types.Bool(false);
-        }
-        for (byte ch : this.value) {
-            if (!(ch >= 'A' && ch <= 'Z') && !(ch >= 'a' && ch <= 'z')) {
-                return new org.python.types.Bool(false);
-            }
-        }
-        return new org.python.types.Bool(true);
+        return new Bool(_isalpha(this.value));
     }
 
     @org.python.Method(
@@ -1143,16 +1152,20 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.translate has not been implemented.");
     }
 
+    public static byte[] _upper(byte[] input) {
+        byte[] result = new byte[input.length];
+        for (int idx = 0; idx < input.length; ++idx) {
+            char lc = (char) input[idx];
+            result[idx] = (byte) Character.toUpperCase(lc);
+        }
+        return result;
+    }
+
     @org.python.Method(
             __doc__ = "B.upper() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to uppercase."
     )
     public org.python.Object upper() {
-        byte[] result = new byte[this.value.length];
-        for (int idx = 0; idx < this.value.length; ++idx) {
-            char lc = (char) this.value[idx];
-            result[idx] = (byte) Character.toUpperCase(lc);
-        }
-        return new Bytes(result);
+        return new Bytes(_upper(this.value));
     }
 
     @org.python.Method(

@@ -39,7 +39,6 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'hello world').islower())
             print(bytearray(b'hello world   ').islower())
         """)
-        # self.assertCodeExecution("""""")
 
     def test_isspace(self):
         self.assertCodeExecution("""
@@ -53,6 +52,34 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b' \f').isspace())
             print(bytearray(b' \\n').isspace())
             print(bytearray(b' \\r').isspace())
+        """)
+
+    def test_upper(self):
+        # TODO: add this test when adding support for literal hex bytes
+        # print(bytearray(b'\xf0').upper())
+
+        self.assertCodeExecution("""
+            print(bytearray(b'abc').upper())
+            print(bytearray(b'').upper())
+            print(bytearray(b'Abccc').upper())
+            print(bytearray(b'HELLO WORD').upper())
+            print(bytearray(b'@#$%!').upper())
+            print(bytearray(b'hello world').upper())
+            print(bytearray(b'hello world   ').upper())
+        """)
+
+    def test_isalpha(self):
+        # TODO: add this test when adding support for literal hex bytes
+        # print(bytearray(b'\xf0').isalpha())
+
+        self.assertCodeExecution("""
+            print(bytearray(b'abc').isalpha())
+            print(bytearray(b'').isalpha())
+            print(bytearray(b'Abccc').isalpha())
+            print(bytearray(b'HELLO WORD').isalpha())
+            print(bytearray(b'@#$%!').isalpha())
+            print(bytearray(b'hello world').isalpha())
+            print(bytearray(b'hello world   ').isalpha())
         """)
 
 
