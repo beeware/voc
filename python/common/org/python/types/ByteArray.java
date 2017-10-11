@@ -606,10 +606,10 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "Return true if contains the arg",
-        args = {"slice"}
+            __doc__ = "Return true if contains the arg",
+            args = {"slice"}
     )
-    public org.python.Object __contains__(org.python.Object slice) {       
+    public org.python.Object __contains__(org.python.Object slice) {
         return new Bytes(this.value).__contains__(slice);
     }
 

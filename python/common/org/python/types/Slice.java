@@ -36,14 +36,14 @@ public class Slice extends org.python.types.Object {
         if (length == org.python.types.NoneType.NONE) {
             throw new org.python.exceptions.TypeError("'NoneType' object cannot be interpreted as an integer");
         }
-        len = ((org.python.types.Int)length).value;
+        len = ((org.python.types.Int) length).value;
         if (len < 0) {
             throw new org.python.exceptions.ValueError("length should not be negative");
         }
         if (this.step == org.python.types.NoneType.NONE) {
             step = new org.python.types.Int(1);
         } else {
-            step = (org.python.types.Int)this.step;
+            step = (org.python.types.Int) this.step;
         }
         step_is_negative = (step.value < 0);
 
@@ -60,7 +60,7 @@ public class Slice extends org.python.types.Object {
         if (this.start == org.python.types.NoneType.NONE) {
             start = step_is_negative ? upper : lower;
         } else {
-            start  = ((org.python.types.Int)this.start).value;
+            start = ((org.python.types.Int) this.start).value;
             if (start < 0) {
                 start += len;
                 if (start < lower) {
@@ -77,7 +77,7 @@ public class Slice extends org.python.types.Object {
         if (this.stop == org.python.types.NoneType.NONE) {
             stop = step_is_negative ? lower : upper;
         } else {
-            stop = ((org.python.types.Int)this.stop).value;
+            stop = ((org.python.types.Int) this.stop).value;
             if (stop < 0) {
                 stop += len;
                 if (stop < lower) {
@@ -176,8 +176,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__ge__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
@@ -192,8 +191,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__gt__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
@@ -208,8 +206,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__eq__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
@@ -224,8 +221,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__lt__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }
@@ -240,8 +236,7 @@ public class Slice extends org.python.types.Object {
             org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
             org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
             return thisSliceAsTuple.__le__(otherSliceAsTuple);
-        }
-        else {
+        } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
     }

@@ -1673,17 +1673,17 @@ final class PythonFormatter {
     /*############################# =- Private -= ############################*/
     /*--- Private constructor  -----------------------------------------------*/
     private PythonFormatter(java.lang.String formatString, java.util.List<org.python.Object> args) {
-        this.formatString   = formatString;
-        this.args           = args;
-        this.kwargs         = null;
+        this.formatString = formatString;
+        this.args = args;
+        this.kwargs = null;
 
         fillCharacterQueue();
     }
 
     private PythonFormatter(java.lang.String formatString, java.util.Map<org.python.Object, org.python.Object> kwargs) {
-        this.formatString   = formatString;
-        this.args           = new java.util.LinkedList<>();
-        this.kwargs         = kwargs;
+        this.formatString = formatString;
+        this.args = new java.util.LinkedList<>();
+        this.kwargs = kwargs;
 
         // necessary for certain edge cases
         this.args.add(new org.python.types.Dict(kwargs));
@@ -1691,9 +1691,9 @@ final class PythonFormatter {
     }
 
     private PythonFormatter(java.lang.String formatString, org.python.Object arg) {
-        this.formatString   = formatString;
-        this.args           = new java.util.LinkedList<>();
-        this.kwargs         = null;
+        this.formatString = formatString;
+        this.args = new java.util.LinkedList<>();
+        this.kwargs = null;
 
         this.singleValueIsAllowed = arg instanceof org.python.types.Bytes
                                  || arg instanceof org.python.types.ByteArray
@@ -2361,11 +2361,9 @@ final class PythonFormatter {
     private java.lang.Integer currentArgumentIndex = 0;
     private boolean singleValueIsAllowed = false;
 
-
-
     /*############################ =- Constants -= ###########################*/
     public static final java.lang.Long DEFAULT_MINIMUM_WIDTH = 0L;
-    public static final java.lang.Long DEFAULT_PRECSION =  6L;
+    public static final java.lang.Long DEFAULT_PRECSION = 6L;
     public static final java.lang.Long PRECSION_NOT_SET = -1L;
 
     public static final char SIGN_POSITIV = '-';
