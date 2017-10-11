@@ -31,11 +31,19 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray([1,2]) in b'pybee')
         """)
         self.assertCodeExecution("""
-            print(300 in bytearray([1,2,3])) #Test ValueError invalid integer range
-        """, exits_early=True)
+            try:
+                print(300 in bytearray([1,2,3]))
+                print("No error raised")
+            except ValueError:
+                print("Raised a ValueError")
+        """)
         self.assertCodeExecution("""
-            print(['b', 'e'] in bytearray([1,2,3])) #Test TypeError invalid byte array
-        """, exits_early=True)
+            try:
+                print(['b', 'e'] in bytearray([1,2,3]))
+                print("No error raised")
+            except TypeError:
+                print("Raised a TypeError")
+        """)
 
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
