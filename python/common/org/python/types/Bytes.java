@@ -1,6 +1,8 @@
 package org.python.types;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Bytes extends org.python.types.Object {
     public byte[] value;
@@ -832,11 +834,65 @@ public class Bytes extends org.python.types.Object {
         }
     }
 
+    private org.python.Object endsOrStartsWith(org.python.Object substring, org.python.Object start, org.python.Object end, int direction) {
+        if (start != null || end != null) {
+            Bytes sliced = (Bytes) this.__getitem__(new org.python.types.Slice(start, end));
+            return sliced.endsOrStartsWith(substring, null, null, direction);
+        }
+
+        if (substring instanceof org.python.types.Tuple) {
+            org.python.types.Tuple tuple = (org.python.types.Tuple) substring;
+            int length = (int) tuple.__len__().value;
+            for (int i = 0; i < length; i++) {
+                org.python.Object item = tuple.__getitem__(new org.python.types.Int(i));
+                if (item instanceof org.python.types.Tuple) {
+                    throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + item.typeName() + "'");
+                }
+                boolean ok = ((org.python.types.Bool) this.endsOrStartsWith(item, null, null, direction)).value;
+                if (ok) {
+                    return new org.python.types.Bool(true);
+                }
+            }
+            return new org.python.types.Bool(false);
+
+        } else if (substring instanceof Bytes) {
+            byte[] substringValue = ((Bytes) substring).value;
+            if (substringValue.length > this.value.length) {
+                return new org.python.types.Bool(false);
+            }
+
+            int startIndex;
+            int endIndex;
+
+            if (direction < 0) {
+                startIndex = 0;
+                endIndex = substringValue.length;
+            } else {
+                startIndex = this.value.length - substringValue.length;
+                endIndex = this.value.length;
+            }
+
+            byte[] thisValuePart = Arrays.copyOfRange(this.value, startIndex, endIndex);
+            boolean ok = Arrays.equals(thisValuePart, substringValue);
+            return new org.python.types.Bool(ok);
+        } else {
+            String methodName;
+            if (direction < 0) {
+                methodName = "startswith";
+            } else {
+                methodName = "endswith";
+            }
+            throw new org.python.exceptions.TypeError(methodName + " first arg must be bytes or a tuple of bytes, not " + substring.typeName());
+        }
+    }
+
     @org.python.Method(
-            __doc__ = "B.endswith(suffix[, start[, end]]) -> bool\n\nReturn True if B ends with the specified suffix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nsuffix can also be a tuple of bytes to try."
+            __doc__ = "B.endswith(suffix[, start[, end]]) -> bool\n\nReturn True if B ends with the specified suffix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nsuffix can also be a tuple of bytes to try.",
+            args = {"suffix"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object endswith(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.endswith has not been implemented.");
+    public org.python.Object endswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
+        return endsOrStartsWith(suffix, start, end, 1);
     }
 
     @org.python.Method(
@@ -1143,10 +1199,12 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.startswith(prefix[, start[, end]]) -> bool\n\nReturn True if B starts with the specified prefix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nprefix can also be a tuple of bytes to try."
+            __doc__ = "B.startswith(prefix[, start[, end]]) -> bool\n\nReturn True if B starts with the specified prefix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nprefix can also be a tuple of bytes to try.",
+            args = {"prefix"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object startswith(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.startswith has not been implemented.");
+    public org.python.Object startswith(org.python.Object prefix, org.python.Object start, org.python.Object end) {
+        return endsOrStartsWith(prefix, start, end, -1);
     }
 
     @org.python.Method(
