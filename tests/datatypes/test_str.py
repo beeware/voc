@@ -28,8 +28,8 @@ class StrTests(TranspileTestCase):
             """)
 
     def test_isspace(self):
-        self.assertCodeExecution("""
-            for s in ['''  \t \r''', ' ', '\t\tnope\t\t', '']:
+        self.assertCodeExecution(r"""
+            for s in ['\x1f \v \f \n \t \r', ' ', '\t\tnope\t\t', '']:
                 print(s.isspace())
             """)
 
@@ -231,8 +231,8 @@ class StrTests(TranspileTestCase):
             """)
 
     def test_split(self):
-        self.assertCodeExecution("""
-            for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
+        self.assertCodeExecution(r"""
+            for s in ['\vhello,        world', '\nHEllo, WORLD\f', 'átomo', '']:
                 print(s.split())
                 print(s.split("o"))
                 print(s.split(maxsplit=2))
@@ -241,6 +241,7 @@ class StrTests(TranspileTestCase):
                     print(s.split(5))
                 except TypeError as err:
                     print(err)
+
             """)
 
     def test_index(self):

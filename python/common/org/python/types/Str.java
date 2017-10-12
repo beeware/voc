@@ -953,7 +953,7 @@ public class Str extends org.python.types.Object {
             return new org.python.types.Bool(false);
         }
         for (char ch : this.value.toCharArray()) {
-            if (" \t\n\r".indexOf(ch) == -1) {
+            if (!Character.isWhitespace(ch)) {
                 return new org.python.types.Bool(false);
             }
         }
@@ -1394,8 +1394,10 @@ public class Str extends org.python.types.Object {
             }
         }
 
+        java.lang.String value = this.value.toString();
         if (sep == null) {
-            sep = new org.python.types.Str(" ");
+            value = value.trim();
+            sep = new org.python.types.Str("\\s+");
         } else if (!(sep instanceof org.python.types.Str)) {
             if (org.Python.VERSION < 0x03060000) {
                 throw new org.python.exceptions.TypeError("Can't convert '" + sep.typeName() + "' object to str implicitly");
@@ -1406,10 +1408,10 @@ public class Str extends org.python.types.Object {
 
         java.lang.String[] result;
         if (maxsplit == null) {
-            result = this.value.toString().split(((org.python.types.Str) sep).toString());
+            result = value.split(((org.python.types.Str) sep).toString());
         } else {
             int number = java.lang.Integer.parseInt(maxsplit.toString());
-            result = this.value.toString().split(((org.python.types.Str) sep).toString(), number + 1);
+            result = value.split(((org.python.types.Str) sep).toString(), number + 1);
         }
         org.python.types.List result_list = new org.python.types.List();
         for (java.lang.String w : result) {
