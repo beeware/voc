@@ -682,15 +682,19 @@ public class Bytes extends org.python.types.Object {
     )
     public org.python.Object center(org.python.Object width, org.python.Object byteToFill) {
         byte[] fillByte;
-        if (byteToFill instanceof org.python.types.Bytes) {
-            if (((org.python.types.Bytes) byteToFill).value.length != 1) {
+        if (byteToFill instanceof org.python.types.Bytes || byteToFill instanceof org.python.types.ByteArray) {
+            if(byteToFill instanceof org.python.types.ByteArray){
+                fillByte = ((org.python.types.ByteArray) byteToFill).value; 
+            } else {
+                fillByte = ((org.python.types.Bytes) byteToFill).value; 
+            }
+            if (fillByte.length != 1) {
                 if (org.Python.VERSION < 0x030502F0) {
                     throw new org.python.exceptions.TypeError("must be a byte string of length 1, not bytes");
                 } else {
                     throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not bytes");
                 }
             }
-            fillByte = ((org.python.types.Bytes) byteToFill).value;
         } else if (byteToFill == null) {
             fillByte = " ".getBytes();
         } else {
