@@ -127,6 +127,21 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b"hElLO wOrLd").lower())
             print(bytearray(b"[Hello] World").lower())
             """)
+    def test_count(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'abcabca').count(97))
+            print(bytearray(b'abcabca').count(b'abc'))
+            print(bytearray(b'qqq').count(b'q'))
+            print(bytearray(b'qqq').count(b'qq'))
+            print(bytearray(b'qqq').count(b'qqq'))
+            print(bytearray(b'qqq').count(b'qqqq'))
+            print(bytearray(b'abcdefgh').count(b'bc',-7, -5))
+            print(bytearray(b'abcdefgh').count(b'bc',1, -5))
+            print(bytearray(b'abcdefgh').count(b'bc',0, 3))
+            print(bytearray(b'abcdefgh').count(b'bc',-7, 500))
+            print(bytearray(b'qqaqqbqqqcqqqdqqqqeqqqqf').count(b'qq'),1)
+            print(bytearray(b'').count(b'q'),0)
+        """)
 
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
