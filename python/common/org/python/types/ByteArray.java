@@ -689,7 +689,7 @@ public class ByteArray extends org.python.types.Object {
         byte[] fillByte;
         if (byteToFill instanceof org.python.types.ByteArray || byteToFill instanceof org.python.types.Bytes) {
             if(byteToFill instanceof org.python.types.ByteArray){
-                fillByte = ((org.python.types.ByteArray) byteToFill).value; 
+                fillByte = ((org.python.types.ByteArray) byteToFill).value;
             } else {
                 fillByte = ((org.python.types.Bytes) byteToFill).value; 
             }
