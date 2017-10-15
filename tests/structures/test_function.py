@@ -344,3 +344,12 @@ class FunctionTests(TranspileTestCase):
 
             print(myfunc(10))
             """, exits_early=True)
+
+    def test_long_argument(self):
+        self.assertCodeExecution("""
+            class SomeClass:
+                def somefunc(self, x: long):
+                    return x
+
+            SomeClass().somefunc(1)
+        """)

@@ -11,7 +11,7 @@ from .structures import (
 from .types import java, python
 from .types.primitives import (
     ALOAD_name, ASTORE_name, free_name,
-    DLOAD_name, FLOAD_name,
+    DLOAD_name, FLOAD_name, LLOAD_name,
     ICONST_val, ILOAD_name,
 )
 # from .debug import DEBUG, DEBUG_value
@@ -91,7 +91,7 @@ def to_python(accumulator, annotation, var_name):
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
             java.New('org/python/types/Int'),
-            ILOAD_name(var_name),
+            LLOAD_name(var_name),
             java.Init('org/python/types/Int', 'J'),
         )
     elif annotation == "float":
@@ -233,11 +233,18 @@ class Function(Block):
         self.add_self()
 
         # Reserve space for the registers that will hold arguments.
-        for i, param in enumerate(self.parameters):
-            self.local_vars[param['name']] = len(self.local_vars)
+        index = 0
+        for param in self.parameters:
+            self.local_vars[param['name']] = index
+            # long and double need the space for two variables
+            # https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-2.html#jvms-2.6.1
+            if param['annotation'] in ('long', 'double'):
+                index += 2
+            else:
+                index += 1
 
         # Reserve space for the register that will hold locals
-        self.local_vars['#locals'] = len(self.local_vars)
+        self.local_vars['#locals'] = index
 
         self.static = static
 
@@ -754,7 +761,10 @@ class Method(Function):
                 attributes=[
                     JavaCode(
                         max_stack=len(self.parameters) + 5,
-                        max_locals=len(self.parameters),
+                        max_locals=len(self.parameters) + len([
+                            p for p in self.parameters
+                            if p['annotation'] in ('long', 'double')
+                        ]),
                         code=binding.opcodes
                     )
                 ]
@@ -776,7 +786,7 @@ class Method(Function):
                         'char': JavaOpcodes.ILOAD(i + 1),
                         'short': JavaOpcodes.ILOAD(i + 1),
                         'int': JavaOpcodes.ILOAD(i + 1),
-                        'long': JavaOpcodes.ILOAD(i + 1),
+                        'long': JavaOpcodes.LLOAD(i + 1),
                         'float': JavaOpcodes.FLOAD(i + 1),
                         'double': JavaOpcodes.DLOAD(i + 1),
                     }.get(param['annotation'], JavaOpcodes.ALOAD(i + 1))
