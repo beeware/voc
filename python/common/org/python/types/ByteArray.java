@@ -691,7 +691,7 @@ public class ByteArray extends org.python.types.Object {
             if(byteToFill instanceof org.python.types.ByteArray){
                 fillByte = ((org.python.types.ByteArray) byteToFill).value;
             } else {
-                fillByte = ((org.python.types.Bytes) byteToFill).value; 
+                fillByte = ((org.python.types.Bytes) byteToFill).value;
             }
             if (fillByte.length != 1) {
                 if (org.Python.VERSION < 0x030502F0) {
