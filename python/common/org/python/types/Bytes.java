@@ -920,9 +920,9 @@ public class Bytes extends org.python.types.Object {
         }
         byte[] _sub;
         if(sub instanceof org.python.types.ByteArray){
-            _sub = ((org.python.types.ByteArray) sub).value; 
+            _sub = ((org.python.types.ByteArray) sub).value;
         } else {
-            _sub = ((org.python.types.Bytes) sub).value; 
+            _sub = ((org.python.types.Bytes) sub).value;
         }
         if (_sub.length <= 0) {
             return new Int(0);
