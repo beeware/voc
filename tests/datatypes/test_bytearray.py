@@ -128,6 +128,23 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b"[Hello] World").lower())
             """)
 
+    def test_find(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'').find(b'a'))
+            print(bytearray(b'abcd').find(b''))
+            print(bytearray(b'abcd').find(b'...'))
+            print(bytearray(b'abcd').find(b'a'))
+            print(bytearray(b'abcd').find(b'b'))
+            print(bytearray(b'abcd').find(b'c'))
+            print(bytearray(b'abcd').find(b'd'))
+            print(bytearray(b'abcd').find(bytearray(b'ab')))
+            print(bytearray(b'abcd').find(b'bc'))
+            print(bytearray(b'abcd').find(b'cd'))
+            print(bytearray(b'abcd').find(b'cd', 2))
+            print(bytearray(b'abcd').find(bytearray(b'ab'), 3))
+            print(bytearray(b'abcd').find(b'cd', 2, 3))
+            print(bytearray(b'abcd').find(bytearray(b'ab'), 3, 4))
+        """)
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'

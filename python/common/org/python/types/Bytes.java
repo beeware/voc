@@ -903,7 +903,9 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.find(sub[, start[, end]]) -> int\n\nReturn the lowest index in B where substring sub is found,\nsuch that sub is contained within B[start:end].  Optional\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure.",
+            __doc__ = "B.find(sub[, start[, end]]) -> int"+
+            "\n\nReturn the lowest index in B where substring sub is found,\nsuch that sub is contained within B[start:end].  Optional"+
+            "\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure.",
             args = {"sub"},
             default_args = {"start", "end"}
     )
@@ -916,21 +918,26 @@ public class Bytes extends org.python.types.Object {
         if (end == null || end instanceof org.python.types.NoneType) {
             _end = this.value.length;
         }
-        Bytes _sub = (Bytes) sub;
-        if (_sub.value.length <= 0) {
+        byte[] _sub;
+        if(sub instanceof org.python.types.ByteArray){
+            _sub = ((org.python.types.ByteArray) sub).value; 
+        } else {
+            _sub = ((org.python.types.Bytes) sub).value; 
+        }
+        if (_sub.length <= 0) {
             return new Int(0);
         }
         int pos = -1;
         for (int i = 0; _start < _end; _start++) {
             byte b1 = this.value[_start];
-            byte b2 = _sub.value[i];
+            byte b2 = _sub[i];
             if (b1 == b2) {
                 i++;
                 if (pos == -1) {
                     pos = _start;
                 }
             }
-            if (i == _sub.value.length) {
+            if (i == _sub.length) {
                 break;
             }
             if (b1 != b2) {
