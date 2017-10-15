@@ -686,59 +686,7 @@ public class ByteArray extends org.python.types.Object {
             default_args = {"byteToFill"}
     )
     public org.python.Object center(org.python.Object width, org.python.Object byteToFill) {
-        byte[] fillByte;
-        if (byteToFill instanceof org.python.types.ByteArray || byteToFill instanceof org.python.types.Bytes) {
-            if(byteToFill instanceof org.python.types.ByteArray){
-                fillByte = ((org.python.types.ByteArray) byteToFill).value;
-            } else {
-                fillByte = ((org.python.types.Bytes) byteToFill).value;
-            }
-            if (fillByte.length != 1) {
-                if (org.Python.VERSION < 0x030502F0) {
-                    throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + byteToFill.typeName());
-                } else {
-                    throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not " + byteToFill.typeName());
-                }
-            }
-        } else if (byteToFill == null) {
-            fillByte = " ".getBytes();
-        } else {
-            if (org.Python.VERSION < 0x030502F0) {
-                throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + byteToFill.typeName());
-            } else {
-                throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not " + byteToFill.typeName());
-            }
-        }
-
-        if (width instanceof org.python.types.Int) {
-            int iwidth = (int) ((org.python.types.Int) width).value;
-            if (this.value.length >= iwidth) {
-                return new org.python.types.ByteArray(this.value);
-            } else {
-                int diff = iwidth - this.value.length;
-                int lenfirst = (diff) / 2;
-                int lensecond = diff - lenfirst;
-
-                byte[] returnBytes;
-                returnBytes = new byte[iwidth];
-
-                for (int i = 0; i < lenfirst; i++) {
-                    returnBytes[i] = fillByte[0];
-                }
-                for (int i = lenfirst; i < (iwidth - lensecond); i++) {
-                    returnBytes[i] = this.value[i - lenfirst];
-                }
-                for (int i = (iwidth - lensecond); i < iwidth; i++) {
-                    returnBytes[i] = fillByte[0];
-                }
-                return new org.python.types.ByteArray(returnBytes);
-            }
-        } else if (width instanceof org.python.types.Bool) {
-            return new org.python.types.ByteArray(this.value);
-        } else {
-            throw new org.python.exceptions.TypeError("'" + width.typeName() +
-              "'" + " object cannot be interpreted as an integer\n");
-        }
+        return new org.python.types.ByteArray(Bytes._center(this.value, width, byteToFill));
     }
 
     @org.python.Method(
