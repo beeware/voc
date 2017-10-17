@@ -679,17 +679,23 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.center(width[, fillchar]) -> copy of B\n\nReturn B centered in a string of length width.  Padding is\ndone using the specified fill character (default is a space)."
+            __doc__ = "B.center(width[, fillchar]) -> copy of B" +
+            "\n\nReturn B centered in a string of length width.  Padding is" +
+            "\ndone using the specified fill character (default is a space).",
+            args = {"width"},
+            default_args = {"byteToFill"}
     )
-    public org.python.Object center(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.center has not been implemented.");
+    public org.python.Object center(org.python.Object width, org.python.Object byteToFill) {
+        return new org.python.types.ByteArray(Bytes._center(this.value, width, byteToFill));
     }
 
     @org.python.Method(
-            __doc__ = "B.count(sub[, start[, end]]) -> int\n\nReturn the number of non-overlapping occurrences of subsection sub in\nbytes B[start:end].  Optional arguments start and end are interpreted\nas in slice notation."
+            __doc__ = "B.count(sub[, start[, end]]) -> int\n\nReturn the number of non-overlapping occurrences of subsection sub in\nbytes B[start:end].  Optional arguments start and end are interpreted\nas in slice notation.",
+            args = {"sub"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object count(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.count has not been implemented.");
+    public org.python.Object count(org.python.Object sub, org.python.Object start, org.python.Object end) {
+        return new Bytes(this.value).count(sub, start, end);
     }
 
     @org.python.Method(

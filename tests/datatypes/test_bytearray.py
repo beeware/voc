@@ -127,6 +127,21 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b"hElLO wOrLd").lower())
             print(bytearray(b"[Hello] World").lower())
             """)
+    def test_count(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'abcabca').count(97))
+            print(bytearray(b'abcabca').count(b'abc'))
+            print(bytearray(b'qqq').count(b'q'))
+            print(bytearray(b'qqq').count(b'qq'))
+            print(bytearray(b'qqq').count(b'qqq'))
+            print(bytearray(b'qqq').count(b'qqqq'))
+            print(bytearray(b'abcdefgh').count(b'bc',-7, -5))
+            print(bytearray(b'abcdefgh').count(b'bc',1, -5))
+            print(bytearray(b'abcdefgh').count(b'bc',0, 3))
+            print(bytearray(b'abcdefgh').count(b'bc',-7, 500))
+            print(bytearray(b'qqaqqbqqqcqqqdqqqqeqqqqf').count(b'qq'),1)
+            print(bytearray(b'').count(b'q'),0)
+        """)
 
     def test_find(self):
         self.assertCodeExecution("""
@@ -145,6 +160,21 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'abcd').find(b'cd', 2, 3))
             print(bytearray(b'abcd').find(bytearray(b'ab'), 3, 4))
         """)
+
+    def test_center(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'pybee').center(12))
+            print(bytearray(b'pybee').center(13))
+            print(bytearray(b'pybee').center(2))
+            print(bytearray(b'pybee').center(2, b'a'))
+            print(bytearray(b'pybee').center(12, b'a'))
+            print(bytearray(b'pybee').center(13, b'a'))
+            print(bytearray(b'pybee').center(-5))
+            print(bytearray(b'').center(5))
+            print(bytearray(b'pybee').center(True, b'a'))
+            print(bytearray(b'pybee').center(True, bytearray(b'a')))
+        """)
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'

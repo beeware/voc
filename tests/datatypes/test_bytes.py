@@ -307,6 +307,7 @@ class BytesTests(TranspileTestCase):
             print(b'pybee'.center(-5))
             print(b''.center(5))
             print(b'pybee'.center(True, b'a'))
+            print(b'pybee'.center(True, bytearray(b'a')))
         """)
         self.assertCodeExecution("""
             print(b'pybee'.center('5'))
