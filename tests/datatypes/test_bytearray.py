@@ -143,7 +143,19 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'').count(b'q'),0)
         """)
 
-
+    def test_center(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'pybee').center(12))
+            print(bytearray(b'pybee').center(13))
+            print(bytearray(b'pybee').center(2))
+            print(bytearray(b'pybee').center(2, b'a'))
+            print(bytearray(b'pybee').center(12, b'a'))
+            print(bytearray(b'pybee').center(13, b'a'))
+            print(bytearray(b'pybee').center(-5))
+            print(bytearray(b'').center(5))
+            print(bytearray(b'pybee').center(True, b'a'))
+            print(bytearray(b'pybee').center(True, bytearray(b'a')))
+        """)
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 
