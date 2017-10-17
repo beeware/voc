@@ -143,6 +143,24 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'').count(b'q'),0)
         """)
 
+    def test_find(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'').find(b'a'))
+            print(bytearray(b'abcd').find(b''))
+            print(bytearray(b'abcd').find(b'...'))
+            print(bytearray(b'abcd').find(b'a'))
+            print(bytearray(b'abcd').find(b'b'))
+            print(bytearray(b'abcd').find(b'c'))
+            print(bytearray(b'abcd').find(b'd'))
+            print(bytearray(b'abcd').find(bytearray(b'ab')))
+            print(bytearray(b'abcd').find(b'bc'))
+            print(bytearray(b'abcd').find(b'cd'))
+            print(bytearray(b'abcd').find(b'cd', 2))
+            print(bytearray(b'abcd').find(bytearray(b'ab'), 3))
+            print(bytearray(b'abcd').find(b'cd', 2, 3))
+            print(bytearray(b'abcd').find(bytearray(b'ab'), 3, 4))
+        """)
+
     def test_center(self):
         self.assertCodeExecution("""
             print(bytearray(b'pybee').center(12))
@@ -156,6 +174,8 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'pybee').center(True, b'a'))
             print(bytearray(b'pybee').center(True, bytearray(b'a')))
         """)
+
+
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 

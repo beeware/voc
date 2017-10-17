@@ -725,10 +725,15 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.find(sub[, start[, end]]) -> int\n\nReturn the lowest index in B where subsection sub is found,\nsuch that sub is contained within B[start,end].  Optional\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure."
+            __doc__ = "B.find(sub[, start[, end]]) -> int"+
+            "\n\nReturn the lowest index in B where subsection sub is found,"+
+            "\nsuch that sub is contained within B[start,end].  Optional"+
+            "\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure.",
+            args = {"sub"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object find(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.find has not been implemented.");
+    public org.python.Object find(org.python.Object sub, org.python.Object start, org.python.Object end) {
+        return new Bytes(this.value).find(sub, start, end);
     }
 
     @org.python.Method(
