@@ -686,7 +686,7 @@ public class Bytes extends org.python.types.Object {
     public static byte[] _center(byte[] input, org.python.Object width, org.python.Object byteToFill) {
         byte[] fillByte;
         if (byteToFill instanceof org.python.types.Bytes || byteToFill instanceof org.python.types.ByteArray) {
-            if(byteToFill instanceof org.python.types.ByteArray){
+            if (byteToFill instanceof org.python.types.ByteArray) {
                 fillByte = ((org.python.types.ByteArray) byteToFill).value;
             } else {
                 fillByte = ((org.python.types.Bytes) byteToFill).value;
@@ -910,8 +910,8 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.find(sub[, start[, end]]) -> int"+
-            "\n\nReturn the lowest index in B where substring sub is found,\nsuch that sub is contained within B[start:end].  Optional"+
+            __doc__ = "B.find(sub[, start[, end]]) -> int" +
+            "\n\nReturn the lowest index in B where substring sub is found,\nsuch that sub is contained within B[start:end].  Optional" +
             "\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure.",
             args = {"sub"},
             default_args = {"start", "end"}
@@ -926,7 +926,7 @@ public class Bytes extends org.python.types.Object {
             _end = this.value.length;
         }
         byte[] _sub;
-        if(sub instanceof org.python.types.ByteArray){
+        if (sub instanceof org.python.types.ByteArray) {
             _sub = ((org.python.types.ByteArray) sub).value;
         } else {
             _sub = ((org.python.types.Bytes) sub).value;
@@ -1232,9 +1232,9 @@ public class Bytes extends org.python.types.Object {
         byte[] result = new byte[input.length];
         for (int idx = 0; idx < input.length; ++idx) {
             char lc = (char) input[idx];
-            if(Character.isUpperCase(lc)){
+            if (Character.isUpperCase(lc)) {
                 result[idx] = (byte) Character.toLowerCase(lc);
-            }else{
+            } else {
                 result[idx] = (byte) Character.toUpperCase(lc);
             }
         }

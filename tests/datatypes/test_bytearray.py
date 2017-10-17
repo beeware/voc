@@ -127,6 +127,7 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b"hElLO wOrLd").lower())
             print(bytearray(b"[Hello] World").lower())
             """)
+
     def test_count(self):
         self.assertCodeExecution("""
             print(bytearray(b'abcabca').count(97))
