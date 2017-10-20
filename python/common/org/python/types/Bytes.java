@@ -1131,8 +1131,18 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.lstrip([bytes]) -> bytes\n\nStrip leading bytes contained in the argument.\nIf the argument is omitted, strip leading ASCII whitespace."
     )
-    public org.python.Object lstrip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.lstrip has not been implemented.");
+    public Bytes lstrip() {
+        int start = 0;
+        int end = this.value.length;
+
+        while (start < end && Character.isWhitespace(this.value[start])) {
+            start++;
+        }
+
+        byte[] slice = Arrays.copyOfRange(this.value, start, end);
+
+
+        return new Bytes(slice);
     }
 
     @org.python.Method(
@@ -1194,8 +1204,17 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.rstrip([bytes]) -> bytes\n\nStrip trailing bytes contained in the argument.\nIf the argument is omitted, strip trailing ASCII whitespace."
     )
-    public org.python.Object rstrip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.rstrip has not been implemented.");
+    public Bytes rstrip() {
+        int start = 0;
+        int end = this.value.length - 1;
+
+        while (end > start && Character.isWhitespace(this.value[end])) {
+            end--;
+        }
+
+        byte[] slice = Arrays.copyOfRange(this.value, start, end + 1);
+
+        return new Bytes(slice);
     }
 
     @org.python.Method(
@@ -1224,8 +1243,8 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.strip([bytes]) -> bytes\n\nStrip leading and trailing bytes contained in the argument.\nIf the argument is omitted, strip leading and trailing ASCII whitespace."
     )
-    public org.python.Object strip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.strip has not been implemented.");
+    public org.python.Object strip() {
+        return this.lstrip().rstrip();
     }
 
     public static byte[] _swapcase(byte[] input) {
