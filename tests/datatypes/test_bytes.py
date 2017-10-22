@@ -421,6 +421,21 @@ class BytesTests(TranspileTestCase):
             print(b"abcde".startswith((b"da", b"aaa"), -4))
         """)
 
+    def test_strip(self):
+        self.assertCodeExecution(r"""
+            print(b"abcde".lstrip())
+            print(b"      abcde".lstrip())
+            print(b"\n   \t  abcde".lstrip())
+            print(b"abcde".rstrip())
+            print(b"abcde      ".rstrip())
+            print(b"abcde   \t  \n".rstrip())
+            print(b"abcde".strip())
+            print(b"abcde      ".strip())
+            print(b"    abcde   \t  \n".strip())
+            print(b"".strip())
+            print(b" \n".strip())
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
