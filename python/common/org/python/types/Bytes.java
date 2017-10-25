@@ -1000,11 +1000,15 @@ public class Bytes extends org.python.types.Object {
             return false;
         }
         for (byte ch : input) {
-            if (!(ch >= 'A' && ch <= 'Z') && !(ch >= 'a' && ch <= 'z')) {
+            if (!_isalpha(ch)) {
                 return false;
             }
         }
         return true;
+    }
+
+    public static boolean _isalpha(byte ch) {
+        return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
     }
 
     @org.python.Method(
@@ -1074,6 +1078,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
     public org.python.Object istitle(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+
         throw new org.python.exceptions.NotImplementedError("bytes.istitle has not been implemented.");
     }
 
@@ -1267,11 +1272,30 @@ public class Bytes extends org.python.types.Object {
         return new Bytes(_swapcase(this.value));
     }
 
+    public static byte[] _title(byte[] input) {
+        byte[] result = new byte[input.length];
+        boolean flag = true;
+
+        for (int idx = 0; idx < input.length; ++idx) {
+            byte lc = input[idx];
+            if (flag && _isalpha(lc)) {
+                flag = false;
+                result[idx] = (byte) Character.toUpperCase((char) lc);
+            } else if (!_isalpha(lc)) {
+                flag = true;
+                result[idx] = lc;
+            } else {
+                result[idx] = (byte) Character.toLowerCase((char) lc);
+            }
+        }
+        return result;
+    }
+
     @org.python.Method(
             __doc__ = "B.title() -> copy of B\n\nReturn a titlecased version of B, i.e. ASCII words start with uppercase\ncharacters, all remaining cased characters have lowercase."
     )
-    public org.python.Object title(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.title has not been implemented.");
+    public org.python.Object title() {
+        return new Bytes(_title(this.value));
     }
 
     @org.python.Method(

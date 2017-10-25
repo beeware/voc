@@ -436,6 +436,13 @@ class BytesTests(TranspileTestCase):
             print(b" \n".strip())
         """)
 
+    def test_title(self):
+        self.assertCodeExecution(r"""
+            print(b"abcd".title())
+            print(b"coca cola".title())
+            print(b"they are from UK, are they not?".title())
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
