@@ -1085,14 +1085,12 @@ public class Bytes extends org.python.types.Object {
         boolean matches = Arrays.equals(this.value, _title(this.value));
 
         for (int idx = 0; idx < this.value.length; ++idx) {
-            if(_isalpha(this.value[idx]) && matches) {
+            if (_isalpha(this.value[idx]) && matches) {
                 return new org.python.types.Bool(true);
             }
         }
 
         return new org.python.types.Bool(false);
-    }
-
     }
 
     public static boolean _isupper(byte[] input) {
@@ -1291,9 +1289,9 @@ public class Bytes extends org.python.types.Object {
 
         for (int idx = 0; idx < input.length; ++idx) {
             byte lc = input[idx];
-            if(!_isalpha(lc)) {
-              result[idx] = lc;
-              capitalizeNext = true;
+            if (!_isalpha(lc)) {
+                result[idx] = lc;
+                capitalizeNext = true;
             } else if (capitalizeNext) {
                 result[idx] = (byte) Character.toUpperCase((char) lc);
                 capitalizeNext = false;
