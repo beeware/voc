@@ -1287,16 +1287,16 @@ public class Bytes extends org.python.types.Object {
 
     public static byte[] _title(byte[] input) {
         byte[] result = new byte[input.length];
-        boolean flag = true;
+        boolean capitalizeNext = true;
 
         for (int idx = 0; idx < input.length; ++idx) {
             byte lc = input[idx];
-            if (flag && _isalpha(lc)) {
-                flag = false;
+            if(!_isalpha(lc)) {
+              result[idx] = lc;
+              capitalizeNext = true;
+            } else if (capitalizeNext) {
                 result[idx] = (byte) Character.toUpperCase((char) lc);
-            } else if (!_isalpha(lc)) {
-                flag = true;
-                result[idx] = lc;
+                capitalizeNext = false;
             } else {
                 result[idx] = (byte) Character.toLowerCase((char) lc);
             }
