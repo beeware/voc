@@ -1077,9 +1077,8 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
-    public org.python.Object istitle(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-
-        throw new org.python.exceptions.NotImplementedError("bytes.istitle has not been implemented.");
+    public org.python.Object istitle() {
+        return new Bool(Arrays.equals(this.value, _title(this.value)));
     }
 
     public static boolean _isupper(byte[] input) {

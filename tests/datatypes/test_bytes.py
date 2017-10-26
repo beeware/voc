@@ -443,6 +443,13 @@ class BytesTests(TranspileTestCase):
             print(b"they are from UK, are they not?".title())
         """)
 
+    def test_istitle(self):
+        self.assertCodeExecution(r"""
+            print(b"abcd".istitle())
+            print(b"coca cola".istitle())
+            print(b"they are from UK, are they not?".istitle())
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
