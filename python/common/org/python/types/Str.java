@@ -973,13 +973,14 @@ public class Str extends org.python.types.Object {
             return new org.python.types.Bool(false);
         }
 
-        boolean matches = this.value.equals(_title(this.value));
-
-        for (int idx = 0; idx < this.value.length(); idx++) {
-            if (Character.isLetter(this.value.charAt(idx)) && matches) {
-                return new org.python.types.Bool(true);
+        if (this.value.equals(_title(this.value))) {
+            for (int idx = 0; idx < this.value.length(); idx++) {
+                if (Character.isLetter(this.value.charAt(idx))) {
+                    return new org.python.types.Bool(true);
+                }
             }
         }
+
         return new org.python.types.Bool(false);
     }
 

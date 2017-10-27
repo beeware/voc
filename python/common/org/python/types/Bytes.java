@@ -1082,11 +1082,11 @@ public class Bytes extends org.python.types.Object {
             return new org.python.types.Bool(false);
         }
 
-        boolean matches = Arrays.equals(this.value, _title(this.value));
-
-        for (int idx = 0; idx < this.value.length; ++idx) {
-            if (_isalpha(this.value[idx]) && matches) {
-                return new org.python.types.Bool(true);
+        if (Arrays.equals(this.value, _title(this.value))) {
+            for (int idx = 0; idx < this.value.length; ++idx) {
+                if (_isalpha(this.value[idx])) {
+                    return new org.python.types.Bool(true);
+                }
             }
         }
 
