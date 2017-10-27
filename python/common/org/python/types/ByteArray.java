@@ -788,8 +788,8 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
-    public org.python.Object istitle(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.istitle has not been implemented.");
+    public org.python.Object istitle() {
+        return new Bool(Bytes._istitle(this.value));
     }
 
     @org.python.Method(
@@ -928,8 +928,8 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.title() -> copy of B\n\nReturn a titlecased version of B, i.e. ASCII words start with uppercase\ncharacters, all remaining cased characters have lowercase."
     )
-    public org.python.Object title(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.title has not been implemented.");
+    public org.python.Object title() {
+        return new ByteArray(Bytes._title(this.value));
     }
 
     @org.python.Method(

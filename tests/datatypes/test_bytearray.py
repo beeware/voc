@@ -176,6 +176,30 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'pybee').center(True, bytearray(b'a')))
         """)
 
+    def test_title(self):
+        self.assertCodeExecution(r"""
+            print(bytearray(b"").title())
+            print(bytearray(b"abcd").title())
+            print(bytearray(b"NOT").title())
+            print(bytearray(b"coca cola").title())
+            print(bytearray(b"they are from UK, are they not?").title())
+            print(bytearray(b'/@.').title())
+            print(bytearray(b'\x46\x55\x43\x4B').title())
+            print(bytearray(b"py.bee").title())
+        """)
+
+    def test_istitle(self):
+        self.assertCodeExecution(r"""
+            print(bytearray(b"").istitle())
+            print(bytearray(b"abcd").istitle())
+            print(bytearray(b"NOT").istitle())
+            print(bytearray(b"coca cola").istitle())
+            print(bytearray(b"they are from UK, are they not?").istitle())
+            print(bytearray(b'/@.').istitle())
+            print(bytearray(b'\x46\x55\x43\x4B').istitle())
+            print(bytearray(b"py.bee").title())
+        """)
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
