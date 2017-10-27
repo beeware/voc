@@ -1243,6 +1243,13 @@ class Visitor(ast.NodeVisitor):
             if isinstance(generator, ast.comprehension):
                 self.visit(generator.target)
 
+        if node.generators[0].ifs:
+            self.visit(node.generators[0].ifs[0])
+
+            self.context.add_opcodes(
+                IF([python.Object.as_boolean()], JavaOpcodes.IFEQ),
+            )
+
         self.visit(node.elt)
 
         # And add it to the result list
@@ -1252,6 +1259,12 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.SWAP(),
                 python.List.append(),
         )
+
+        if node.generators[0].ifs:
+            self.context.add_opcodes(
+                END_IF()
+            )
+
         self.context.add_opcodes(
             END_LOOP(),
         )
