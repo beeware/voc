@@ -438,9 +438,24 @@ class BytesTests(TranspileTestCase):
 
     def test_title(self):
         self.assertCodeExecution(r"""
+            print(b"".title())
             print(b"abcd".title())
+            print(b"NOT".title())
             print(b"coca cola".title())
             print(b"they are from UK, are they not?".title())
+            print(b'/@.'.title())
+            print(b'\x46\x55\x43\x4B'.title())
+        """)
+
+    def test_istitle(self):
+        self.assertCodeExecution(r"""
+            print(b"".istitle())
+            print(b"abcd".istitle())
+            print(b"NOT".istitle())
+            print(b"coca cola".istitle())
+            print(b"they are from UK, are they not?".istitle())
+            print(b'/@.'.istitle())
+            print(b'\x46\x55\x43\x4B'.istitle())
         """)
 
 

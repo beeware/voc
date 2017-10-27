@@ -1077,9 +1077,20 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
-    public org.python.Object istitle(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
+    public org.python.Object istitle() {
+        if (this.value.length == 0) {
+            return new org.python.types.Bool(false);
+        }
 
-        throw new org.python.exceptions.NotImplementedError("bytes.istitle has not been implemented.");
+        boolean matches = Arrays.equals(this.value, _title(this.value));
+
+        for (int idx = 0; idx < this.value.length; ++idx) {
+            if (_isalpha(this.value[idx]) && matches) {
+                return new org.python.types.Bool(true);
+            }
+        }
+
+        return new org.python.types.Bool(false);
     }
 
     public static boolean _isupper(byte[] input) {
@@ -1274,16 +1285,16 @@ public class Bytes extends org.python.types.Object {
 
     public static byte[] _title(byte[] input) {
         byte[] result = new byte[input.length];
-        boolean flag = true;
+        boolean capitalizeNext = true;
 
         for (int idx = 0; idx < input.length; ++idx) {
             byte lc = input[idx];
-            if (flag && _isalpha(lc)) {
-                flag = false;
-                result[idx] = (byte) Character.toUpperCase((char) lc);
-            } else if (!_isalpha(lc)) {
-                flag = true;
+            if (!_isalpha(lc)) {
                 result[idx] = lc;
+                capitalizeNext = true;
+            } else if (capitalizeNext) {
+                result[idx] = (byte) Character.toUpperCase((char) lc);
+                capitalizeNext = false;
             } else {
                 result[idx] = (byte) Character.toLowerCase((char) lc);
             }
