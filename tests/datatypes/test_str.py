@@ -55,10 +55,17 @@ class StrTests(TranspileTestCase):
             """)
 
     def test_istitle(self):
-        self.assertCodeExecution("""
-            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '']:
-                print(s.istitle())
-            """)
+        self.assertCodeExecution(r"""
+            print("".istitle())
+            print("abcd".istitle())
+            print("NOT".istitle())
+            print("coca cola".istitle())
+            print("they are from UK, are they not?".istitle())
+            print("/@.".istitle())
+            print("\u00c4".istitle())
+            print("\x41".istitle())
+            print("py.bee".istitle())
+        """)
 
     def test_join(self):
         self.assertCodeExecution("""
@@ -388,9 +395,16 @@ class StrTests(TranspileTestCase):
             """)
 
     def test_title(self):
-        self.assertCodeExecution("""
-            s = ' foo  bar    baz '
-            print(s.title())
+        self.assertCodeExecution(r"""
+            print("".title())
+            print("abcd".title())
+            print("NOT".title())
+            print("coca cola".title())
+            print("they are from UK, are they not?".title())
+            print("/@.".title())
+            print("\u00c4".title())
+            print("\x41".title())
+            print("py.bee".title())
         """)
 
     def test_len(self):

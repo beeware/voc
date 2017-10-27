@@ -445,6 +445,7 @@ class BytesTests(TranspileTestCase):
             print(b"they are from UK, are they not?".title())
             print(b'/@.'.title())
             print(b'\x46\x55\x43\x4B'.title())
+            print(b"py.bee".title())
         """)
 
     def test_istitle(self):
@@ -456,6 +457,7 @@ class BytesTests(TranspileTestCase):
             print(b"they are from UK, are they not?".istitle())
             print(b'/@.'.istitle())
             print(b'\x46\x55\x43\x4B'.istitle())
+            print(b"py.bee".title())
         """)
 
 
