@@ -972,12 +972,16 @@ public class Str extends org.python.types.Object {
         if (this.value.isEmpty()) {
             return new org.python.types.Bool(false);
         }
-        for (int c = 1; c < this.value.length(); c++) {
-            if (this.value.charAt(c - 1) == ' ' && !(Character.isUpperCase(this.value.charAt(c)))) {
-                return new org.python.types.Bool(false);
+
+        if (this.value.equals(_title(this.value))) {
+            for (int idx = 0; idx < this.value.length(); idx++) {
+                if (Character.isLetter(this.value.charAt(idx))) {
+                    return new org.python.types.Bool(true);
+                }
             }
         }
-        return new org.python.types.Bool(true);
+
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -1565,6 +1569,27 @@ public class Str extends org.python.types.Object {
         return new org.python.types.Str(swapcase.toString());
     }
 
+    public static String _title(String input) {
+        if (input.isEmpty()) {
+            return input;
+        }
+
+        java.lang.StringBuffer title = new java.lang.StringBuffer();
+        title.append(Character.toUpperCase(input.charAt(0)));
+        for (int c = 1; c < input.length(); c++) {
+            if (!(Character.isLetter(title.charAt(c - 1)))) {
+                title.append(Character.toUpperCase(input.charAt(c)));
+            } else if (Character.isUpperCase(input.charAt(c))) {
+                title.append(Character.toLowerCase(input.charAt(c)));
+            } else {
+                title.append(input.charAt(c));
+            }
+        }
+
+        return title.toString();
+    }
+
+
     @org.python.Method(
             __doc__ = "S.title() -> str\n" +
                     "\n" +
@@ -1572,21 +1597,7 @@ public class Str extends org.python.types.Object {
                     "characters, all remaining cased characters have lower case.\n"
     )
     public org.python.Object title() {
-        if (this.value.isEmpty()) {
-            return new org.python.types.Str(this.value);
-        }
-        java.lang.StringBuffer title = new java.lang.StringBuffer();
-        title.append(Character.toUpperCase(this.value.charAt(0)));
-        for (int c = 1; c < this.value.length(); c++) {
-            if (title.charAt(c - 1) == ' ') {
-                title.append(Character.toUpperCase(this.value.charAt(c)));
-            } else if (Character.isUpperCase(this.value.charAt(c))) {
-                title.append(Character.toLowerCase(this.value.charAt(c)));
-            } else {
-                title.append(this.value.charAt(c));
-            }
-        }
-        return new org.python.types.Str(title.toString());
+        return new org.python.types.Str(_title(this.value));
     }
 
     @org.python.Method(

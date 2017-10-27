@@ -1074,23 +1074,27 @@ public class Bytes extends org.python.types.Object {
         return new Bool(_isspace(this.value));
     }
 
+    public static boolean _istitle(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+
+        if (Arrays.equals(input, _title(input))) {
+            for (int idx = 0; idx < input.length; ++idx) {
+                if (_isalpha(input[idx])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     @org.python.Method(
             __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
     public org.python.Object istitle() {
-        if (this.value.length == 0) {
-            return new org.python.types.Bool(false);
-        }
-
-        boolean matches = Arrays.equals(this.value, _title(this.value));
-
-        for (int idx = 0; idx < this.value.length; ++idx) {
-            if (_isalpha(this.value[idx]) && matches) {
-                return new org.python.types.Bool(true);
-            }
-        }
-
-        return new org.python.types.Bool(false);
+        return new org.python.types.Bool(_istitle(this.value));
     }
 
     public static boolean _isupper(byte[] input) {
