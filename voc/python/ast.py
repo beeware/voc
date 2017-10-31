@@ -1244,7 +1244,9 @@ class Visitor(ast.NodeVisitor):
                 self.visit(generator.target)
 
         if node.generators[0].ifs:
-            self.visit(node.generators[0].ifs[0])
+            self.visit(
+                ast.BoolOp(ast.And(), node.generators[0].ifs)
+            )
 
             self.context.add_opcodes(
                 IF([python.Object.as_boolean()], JavaOpcodes.IFEQ),
