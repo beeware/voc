@@ -1173,10 +1173,23 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.partition(sep) -> (head, sep, tail)\n\nSearch for the separator sep in B, and return the part before it,\nthe separator itself, and the part after it.  If the separator is not\nfound, returns B and two empty bytes objects."
+            __doc__ = "B.partition(sep) -> (head, sep, tail)\n\nSearch for the separator sep in B, and return the part before it,\nthe separator itself, and the part after it.  If the separator is not\nfound, returns B and two empty bytes objects.",
+            args = {"sep"}
     )
-    public org.python.Object partition(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.partition has not been implemented.");
+    public org.python.Object partition(org.python.Object sep) {
+        Tuple result = new Tuple();
+        int pos = (int) this.find(sep, null, null).value;
+        if (pos < 0) {
+            result.value.add(this);
+            result.value.add(new Bytes(""));
+            result.value.add(new Bytes(""));
+        }
+        else {
+            result.value.add(new Bytes(Arrays.copyOfRange(this.value, 0, pos)));
+            result.value.add(sep);
+            result.value.add(new Bytes(Arrays.copyOfRange(this.value, pos + ((Bytes)sep).value.length, this.value.length)));
+        }
+        return result;
     }
 
     @org.python.Method(
