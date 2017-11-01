@@ -14,6 +14,7 @@ class ListComprehensionTests(TranspileTestCase):
         self.assertCodeExecution("""
             print([v for v in range(100) if v % 2 == 0])
             print([v for v in range(100) if v % 2 == 0 if v % 3 == 0])
+            print([v for v in range(100) if v % 2 == 0 if v % 3 == 0 if v > 10 if v < 80])
             """)
 
     def test_method(self):
