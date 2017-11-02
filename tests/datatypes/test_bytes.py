@@ -55,6 +55,20 @@ class BytesTests(TranspileTestCase):
             print(b'\xc8'.capitalize())
         """)
 
+    def test_partition(self):
+        self.assertCodeExecution(r"""
+            print(b'hello, world'.partition(b','))
+            print(b'hello, world'.partition(b'h'))
+            print(b'hello, world'.partition(b'd'))
+            print(b'hello, world'.partition(b', '))
+            print(b'hello, world'.partition(b'l'))
+            print(b'2015638687'.partition(b'a'))
+            print(b'\xc8'.partition(b' '))
+        """)
+        # self.assertCodeExecution(r"""
+        #     print(b'hello, world'.partition(None))
+        # """, exits_early=True)
+
     def test_repr(self):
         self.assertCodeExecution(r"""
             print(repr(b'\xc8'))
