@@ -953,7 +953,7 @@ public class Str extends org.python.types.Object {
             return new org.python.types.Bool(false);
         }
         for (char ch : this.value.toCharArray()) {
-            if (!Character.isWhitespace(ch)) {
+            if (!isWhitespace(ch)) {
                 return new org.python.types.Bool(false);
             }
         }
@@ -1090,7 +1090,7 @@ public class Str extends org.python.types.Object {
         int start = 0;
         int end = this.value.length();
         if (chars == null || chars instanceof org.python.types.NoneType) {
-            while (start < end && java.lang.Character.isWhitespace(this.value.charAt(start))) {
+            while (start < end && isWhitespace(this.value.charAt(start))) {
                 start++;
             }
         } else if (chars instanceof org.python.types.Str) {
@@ -1357,7 +1357,7 @@ public class Str extends org.python.types.Object {
         int start = 0;
         int end = this.value.length();
         if (chars == null || chars instanceof org.python.types.NoneType) {
-            while (end > start && java.lang.Character.isWhitespace(this.value.charAt(end - 1))) {
+            while (end > start && isWhitespace(this.value.charAt(end - 1))) {
                 end--;
             }
         } else if (chars instanceof org.python.types.Str) {
@@ -1440,6 +1440,26 @@ public class Str extends org.python.types.Object {
             case '\u0085':
             case '\u2028':
             case '\u2029':
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private static boolean isWhitespace(char character) {
+        // Compared to Java, Python does not consider U+180E as whitespace,
+        // but it does U+0085, U+00A0, U+2007, and U+202F.
+        if (character == '\u180E') {
+            return false;
+        }
+        if (Character.isWhitespace(character)) {
+            return true;
+        }
+        switch (character) {
+            case '\u0085':
+            case '\u00A0':
+            case '\u2007':
+            case '\u202F':
                 return true;
             default:
                 return false;
