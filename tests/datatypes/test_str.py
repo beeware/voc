@@ -29,7 +29,8 @@ class StrTests(TranspileTestCase):
 
     def test_isspace(self):
         self.assertCodeExecution(r"""
-            for s in ['\x1f \v \f \n \t \r', ' ', '\t\tnope\t\t', '']:
+            for s in ['\x1f \v \f \n \t \r', ' ', '\x85\xa0', '\u2007', '\u202f',
+            '\u180e', '\t\tnope\t\t', '']:
                 print(s.isspace())
             """)
 
@@ -487,6 +488,13 @@ class StrTests(TranspileTestCase):
             print(str.lstrip('ab'))
             """)
 
+        self.assertCodeExecution(r"""
+            str="\u180eabc"
+            print(str.lstrip())
+            str="\x85abc"
+            print(str.lstrip())
+            """)
+
     def test_rstrip(self):
         self.assertCodeExecution("""
             str = " fooggg\t\t   "
@@ -509,6 +517,13 @@ class StrTests(TranspileTestCase):
             str=""
             print(str.rstrip())
             print(str.rstrip('ab'))
+            """)
+
+        self.assertCodeExecution(r"""
+            str="abc\u180e"
+            print(str.rstrip())
+            str="abc\x85"
+            print(str.rstrip())
             """)
 
     def test_rfind(self):
