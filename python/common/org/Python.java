@@ -326,9 +326,16 @@ public class Python {
                     "returns package A when fromlist is empty, but its submodule B when\n" +
                     "fromlist is not empty.  Level is used to determine whether to perform\n" +
                     "absolute or relative imports. 0 is absolute while a positive number\n" +
-                    "is the number of parent directories to search relative to the current module.\n"
+                    "is the number of parent directories to search relative to the current module.\n",
+            args = {"name"},
+            default_args = {"globals", "locals", "fromlist", "level"}
     )
-    public static org.python.Object __import__() {
+    public static org.python.Object __import__(
+            org.python.Object name,
+            org.python.Object globals,
+            org.python.Object locals,
+            org.python.Object fromlist,
+            org.python.Object level) {
         throw new org.python.exceptions.NotImplementedError("Builtin function '__import__' not implemented");
     }
 
@@ -394,9 +401,10 @@ public class Python {
                     "As repr(), return a string containing a printable representation of an\n" +
                     "object, but escape the non-ASCII characters in the string returned by\n" +
                     "repr() using \\x, \\u or \\U escapes.  This generates a string similar\n" +
-                    "to that returned by repr() in Python 2.\n"
+                    "to that returned by repr() in Python 2.\n",
+            args = {"object"}
     )
-    public static org.python.types.Str ascii() {
+    public static org.python.types.Str ascii(org.python.Object object) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'ascii' not implemented");
     }
 
@@ -485,9 +493,10 @@ public class Python {
                     "object is passed as the implied first argument.\n" +
                     "\n" +
                     "Class methods are different than C++ or Java static methods.\n" +
-                    "If you want those, see the staticmethod builtin.\n"
+                    "If you want those, see the staticmethod builtin.\n",
+            args = {"function"}
     )
-    public static org.python.Object classmethod() {
+    public static org.python.Object classmethod(org.python.Object function) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'classmethod' not implemented");
     }
 
@@ -504,9 +513,16 @@ public class Python {
                     "The dont_inherit argument, if non-zero, stops the compilation inheriting\n" +
                     "the effects of any future statements in effect in the code calling\n" +
                     "compile; if absent or zero these statements do influence the compilation,\n" +
-                    "in addition to any features explicitly specified.\n"
+                    "in addition to any features explicitly specified.\n",
+            args = {"source", "filename", "mode"},
+            default_args = {"flags", "dont_inherit"}
     )
-    public static org.python.Object compile() {
+    public static org.python.Object compile(
+            org.python.Object source,
+            org.python.Object filename,
+            org.python.Object mode,
+            org.python.Object flags,
+            org.python.Object dont_inherit) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'compile' not implemented");
     }
 
@@ -647,9 +663,11 @@ public class Python {
                     "or a code object as returned by compile().\n" +
                     "The globals must be a dictionary and locals can be any mapping,\n" +
                     "defaulting to the current globals and locals.\n" +
-                    "If only globals is given, locals defaults to it.\n"
+                    "If only globals is given, locals defaults to it.\n",
+            args = {"source"},
+            default_args = {"globals", "locals"}
     )
-    public static org.python.Object eval() {
+    public static org.python.Object eval(org.python.Object source, org.python.Object globals, org.python.Object locals) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'eval' not implemented");
     }
 
@@ -659,9 +677,11 @@ public class Python {
                     "Read and execute code from an object, which can be a string or a code\n" +
                     "object.\n" +
                     "The globals and locals are dictionaries, defaulting to the current\n" +
-                    "globals and locals.  If only globals is given, locals defaults to it.\n"
+                    "globals and locals.  If only globals is given, locals defaults to it.\n",
+            args = {"object"},
+            default_args = {"globals", "locals"}
     )
-    public static org.python.Object exec() {
+    public static org.python.Object exec(org.python.Object object, org.python.Object globals, org.python.Object locals) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'exec' not implemented");
     }
 
@@ -760,9 +780,10 @@ public class Python {
 
     @org.python.Method(
             __doc__ = "Define the built-in 'help'." +
-                    "This is a wrapper around pydoc.help (with a twist).\n"
+                    "This is a wrapper around pydoc.help (with a twist).\n",
+            default_args = {"object"}
     )
-    public static org.python.Object help() {
+    public static org.python.Object help(org.python.Object object) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'help' not implemented");
     }
 
@@ -1614,9 +1635,10 @@ public class Python {
                     "(e.g. C().f()).  The instance is ignored except for its class.\n" +
                     "\n" +
                     "Static methods in Python are similar to those found in Java or C++.\n" +
-                    "For a more advanced concept, see the classmethod builtin.\n"
+                    "For a more advanced concept, see the classmethod builtin.\n",
+            args = {"function"}
     )
-    public static org.python.Object staticmethod() {
+    public static org.python.Object staticmethod(org.python.Object function) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'staticmethod' not implemented");
     }
 
