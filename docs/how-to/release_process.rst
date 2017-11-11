@@ -53,7 +53,7 @@ others can benefit from the changes that have been made recently.
     $ twine upload dist/voc-0.1.2*
 
 10. Check that you have AWS credentials in a file named  ``.env`` file in the
-    root directory of your project checkout
+    root directory of your project checkout::
 
     AWS_ACCESS_KEY_ID=...
     AWS_SECRET_ACCESS_KEY=...
