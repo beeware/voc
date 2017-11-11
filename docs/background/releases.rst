@@ -1,6 +1,27 @@
 Release History
 ===============
 
+0.1.5
+-----
+
+Added support for if conditions in list comprehensions
+Added support for printf-style formatting
+Several fixes for arguments handling and operations with numbers
+Many bugfixes and improvements to docs, tests and error messages
+Added implementations for many builtin functions and type methods
+VOC jar library now ships with the stdlib modules that it already compiles
+
+
+0.1.4
+-----
+
+Added support for self-assignment for attributes and subscript
+Added support for multiple comparison
+Improved support for slices
+Many bugfixes and improvements to docs and tests
+Added implementations for many builtin functions and type methods
+VOC is now tested in Python 3.6, and uses BeeKeeper for CI
+
 0.1.3
 -----
 
