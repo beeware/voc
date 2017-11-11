@@ -4,18 +4,25 @@ package org.python.exceptions;
         __doc__ = "Common base class for all exceptions"
 )
 public class BaseException extends org.python.types.Object {
+    @org.python.Attribute()
+    org.python.types.Tuple args = new org.python.types.Tuple();
+
     public BaseException() {
         super();
-        // System.out.println("EX: " + this);
     }
 
     public BaseException(String msg) {
         super(msg);
-        // System.out.println("EX: " + this);
+        this.args.value.add(new org.python.types.Str(msg));
     }
 
     public BaseException(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        super(args[0].toString());
+        super(buildTuple(args).toString());
+        this.args = buildTuple(args);
+    }
+
+    private static org.python.types.Tuple buildTuple(org.python.Object[] args) {
+        return new org.python.types.Tuple(java.util.Arrays.asList(args));
     }
 
     @org.python.Method(
@@ -29,7 +36,10 @@ public class BaseException extends org.python.types.Object {
             __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
-        return new org.python.types.Str(this.getMessage());
+        if (this.args.value.size() == 1) {
+            return this.args.value.get(0).__str__();
+        }
+        return this.args.__str__();
     }
 
     public java.lang.String toString() {

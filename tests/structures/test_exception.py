@@ -79,6 +79,19 @@ class ExceptionTests(TranspileTestCase):
             print('Done.')
             """)
 
+    def test_raising_exceptions_multiple_args(self):
+        self.assertCodeExecution("""
+            for exc in [KeyError, ValueError, TypeError]:
+                try:
+                    raise exc("one")
+                except Exception as e:
+                    print(e)
+                try:
+                    raise exc("one", 2)
+                except Exception as e:
+                    print(e)
+        """)
+
     @expectedFailure
     def test_raise_custom_exception_import_from(self):
         self.assertCodeExecution(

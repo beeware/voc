@@ -614,26 +614,10 @@ class Visitor(ast.NodeVisitor):
                 ALOAD_name(self.current_exc_name[-1]),
             )
         else:
-            if getattr(node.exc, 'func', None) is not None:
-                name = node.exc.func.id
-                args = node.exc.args
-            else:
-                name = node.exc.id
-                args = []
-
-            exception = self.full_classref(name, default_prefix='org.python.exceptions')
-            self.context.add_opcodes(
-                java.New(exception),
-            )
-
-            for arg in args:
-                self.visit(arg)
-
-            self.context.add_opcodes(
-                java.Init(exception, *(['Lorg/python/Object;'] * len(args)))
-            )
+            self.visit(node.exc)
 
         self.context.add_opcodes(
+            JavaOpcodes.CHECKCAST('java/lang/Throwable'),
             JavaOpcodes.ATHROW(),
         )
 
