@@ -15,7 +15,8 @@ others can benefit from the changes that have been made recently.
 
     $ git pull
 
-2. Confirm that the trunk currently builds for JDK and Android::
+2. Confirm that the trunk currently builds for JDK and Android on each version
+   of Python you're planning to support::
 
     $ ant clean
     $ ant
@@ -51,7 +52,15 @@ others can benefit from the changes that have been made recently.
 
     $ twine upload dist/voc-0.1.2*
 
-10. Create the GitHub release for each support package versions, and upload
-    the support zipfile.
+10. Check that you have AWS credentials in a file named  ``.env`` file in the
+    root directory of your project checkout
+
+    AWS_ACCESS_KEY_ID=...
+    AWS_SECRET_ACCESS_KEY=...
+    AWS_REGION=us-west-2
+
+11. Upload the support zipfile to S3::
+
+    $ python tools/upload b3
 
 11. Check that Read The Docs has updated.

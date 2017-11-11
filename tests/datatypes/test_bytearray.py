@@ -204,15 +204,9 @@ class BytearrayTests(TranspileTestCase):
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 
-    not_implemented = [
-    ]
-
 
 class BinaryBytearrayOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
-
-    not_implemented = [
-    ]
 
     not_implemented_versions = {
         'test_modulo_complex': (3.4, ),
@@ -221,9 +215,6 @@ class BinaryBytearrayOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceBytearrayOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
-
-    not_implemented = [
-    ]
 
     not_implemented_versions = {
         'test_modulo_complex': (3.4, ),
