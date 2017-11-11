@@ -25,19 +25,10 @@ class BoolTests(TranspileTestCase):
 class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
-    not_implemented = [
-    ]
-
 
 class BinaryBoolOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'bool'
 
-    not_implemented = [
-    ]
-
 
 class InplaceBoolOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'bool'
-
-    not_implemented = [
-    ]
