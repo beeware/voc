@@ -627,8 +627,25 @@ class Visitor(ast.NodeVisitor):
             for arg in args:
                 self.visit(arg)
 
-            self.context.add_opcodes(
-                java.Init(exception, *(['Lorg/python/Object;'] * len(args)))
+            for i in args:       #store the arguments passed in local variable #name
+                self.context.add_opcodes(
+                ASTORE_name(str(i)),
+                )
+
+            self.context.add_opcodes(    #declaring array of python objects 
+                ICONST_val(len(args)), 
+                JavaOpcodes.ANEWARRAY('org/python/types/Object'),
+            )
+            for i in args:      #storing the passed objects in the array
+                self.context.add_opcodes(  
+                  JavaOpcodes.DUP(),
+                  ICONST_val(len(args)-args.index(i)-1),
+                  ALOAD_name(str(i)),
+                 JavaOpcodes.AASTORE(),
+                )
+
+            self.context.add_opcodes(     
+                java.Init(exception, '[Lorg/python/Object;')
             )
 
         self.context.add_opcodes(
