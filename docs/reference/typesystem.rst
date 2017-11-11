@@ -51,21 +51,21 @@ These are data types built into the VOC support library. All the basic Python
 types like ``dict`` and ``list`` are Builtin types. The standard Python
 exceptions are also builtin types.
 
-* Python instance attributes are stored on the Java instance. When storing
-* instance attributes, VOC will look for a Field on the Java class that
-* matches the name of the Python attribute; if one exists, and it has been
-* annotated in the Java source with a ``@org.python.Attribute`` annotation,
-* that field will be used for storage. Otherwise, the value will be placed in
-* the `__dict__` for the instance.
+Python instance attributes are stored on the Java instance. When storing
+instance attributes, VOC will look for a Field on the Java class that
+matches the name of the Python attribute; if one exists, and it has been
+annotated in the Java source with a ``@org.python.Attribute`` annotation,
+that field will be used for storage. Otherwise, the value will be placed in
+the `__dict__` for the instance.
 
-* Python instance methods are instance methods on the Java class, with
-* prototypes that match Python name-for-name, excluding the ``self`` argument,
-* which will be implicitly added. ``*args`` is mapped to ``org.python.Object
-* [] args``, and ``**kwargs`` to ``java.util.Map<java.lang.String,
-* org.python.Object> kwargs``. Arguments with default values should be passed
-* in as ``null`` (a Java ``null``, not a Python ``None``); the method
-* implementation is then responsible for substituting an appropriate Python
-* value if a null was provided in the argument list.
+Python instance methods are instance methods on the Java class, with
+prototypes that match Python name-for-name, excluding the ``self`` argument,
+which will be implicitly added. ``*args`` is mapped to ``org.python.Object []
+args``, and ``**kwargs`` to ``java.util.Map<java.lang.String,
+org.python.Object> kwargs``. Arguments with default values should be passed in
+as ``null`` (a Java ``null``, not a Python ``None``); the method
+implementation is then responsible for substituting an appropriate Python
+value if a null was provided in the argument list.
 
 * Each Object class has a static `__class__` attribute, which is an instance
 * of ``org.python.types.Type()``, constructed wrapping the Java class

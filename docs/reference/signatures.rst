@@ -1,6 +1,5 @@
-Python signatures for java-defined methods
+Python signatures for Java-defined methods
 ==========================================
-
 
 In essence, a method is not much different from a Java method. One defines a
 method as follows. Here is a simple example of a 1-argument function.

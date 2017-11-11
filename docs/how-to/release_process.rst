@@ -1,6 +1,14 @@
 Release Process
 ===============
 
+.. note:: For Developers Only!
+
+    This guide is provided for the benefit of the VOC team. As an end user,
+    you shouldn't ever need to use these instructions.
+
+So, it's time for a new VOC release! Here's how to publish a new version so
+others can benefit from the changes that have been made recently.
+
 1. Update local checkout
 
    Make sure your developer checkout of VOC is up to date with a::
@@ -46,4 +54,4 @@ Release Process
 10. Create the GitHub release for each support package versions, and upload
     the support zipfile.
 
-11. Check that Read The Docs has updated
+11. Check that Read The Docs has updated.
