@@ -1,5 +1,8 @@
-Getting Started
-===============
+.. _background:
+
+=========
+About VOC
+=========
 
 VOC is a transpiler that takes Python 3.4+ source code, and compiles it into a
 Java class file that can then be executed on a JVM.
@@ -15,3 +18,5 @@ defined in Java code.
    community
    faq
    install
+   releases
+   roadmap

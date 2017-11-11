@@ -1,6 +1,5 @@
 Contributing to VOC
-=======================
-
+===================
 
 If you experience problems with VOC, `log them on GitHub`_.
 
@@ -18,14 +17,14 @@ Setting up your development environment
 ---------------------------------------
 
 The process of setting up a development environment is very similar to
-the :doc:`/intro/getting-started` process. The biggest difference is that
+the :doc:`/background/install` process. The biggest difference is that
 instead of using the official PyBee repository, you'll be using your own
 Github fork.
 
 As with the getting started guide, these instructions will assume that you
 have Python 3.4+, a Java 7 or Java 8 JDK, and Apache ANT installed.
 
-**Note:** If you are on Linux, you will need to install an extra package to be able to run the test suite. 
+**Note:** If you are on Linux, you will need to install an extra package to be able to run the test suite.
  * **Ubuntu** 12.04 and 14.04: ``libpython3.4-testsuite`` This can be done by running ``apt-get install libpython3.4-testsuite``.
  * **Ubuntu** 16.04 and 16.10: ``libpython3.5-testsuite`` This can be done by running ``apt-get install libpython3.5-testsuite``.
 

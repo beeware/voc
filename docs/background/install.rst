@@ -1,3 +1,4 @@
+============
 Installation
 ============
 
@@ -85,4 +86,4 @@ Next Steps
 ----------
 
 You now have a working VOC environment, so you can :doc:`start the first
-tutorial </tutorials/tutorial-0>`.
+tutorial </tutorial/tutorial-0>`.
