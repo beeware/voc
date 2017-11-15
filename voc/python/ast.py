@@ -1911,9 +1911,9 @@ class Visitor(ast.NodeVisitor):
                 )
             elif node.args:
                 self.context.add_opcodes(
-                    java.New('org/python/exceptions/TypeError'),
-                    JavaOpcodes.LDC_W(node.func.id + "() takes no arguments (" + len(node.args) + " given)"),
-                    java.Init('org/python/exceptions/TypeError', 'Ljava/lang/String;'),
+                    java.New('org/python/exceptions/NotImplementedError'),
+                    JavaOpcodes.LDC_W(node.func.id + "(object) not yet implemented"),
+                    java.Init('org/python/exceptions/NotImplementedError', 'Ljava/lang/String;'),
                     JavaOpcodes.ATHROW()
                 )
             else:
