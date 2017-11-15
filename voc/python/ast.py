@@ -614,7 +614,15 @@ class Visitor(ast.NodeVisitor):
                 ALOAD_name(self.current_exc_name[-1]),
             )
         else:
-            self.visit(node.exc)
+            if isinstance(node.exc, ast.Name):
+                # handle "raise ValueError" as if "raise ValueError()"
+                exception = self.full_classref(node.exc.id, default_prefix='org.python.exceptions')
+                self.context.add_opcodes(
+                    java.New(exception),
+                    java.Init(exception)
+                )
+            else:
+                self.visit(node.exc)
 
         self.context.add_opcodes(
             JavaOpcodes.CHECKCAST('java/lang/Throwable'),

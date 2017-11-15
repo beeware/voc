@@ -17,8 +17,15 @@ public class BaseException extends org.python.types.Object {
     }
 
     public BaseException(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        super(buildTuple(args).toString());
+        super(buildMessage(buildTuple(args)));
         this.args = buildTuple(args);
+    }
+
+    private static String buildMessage(org.python.types.Tuple tupArgs) {
+        if (tupArgs.value.size() == 0) {
+            return "";
+        }
+        return tupArgs.toString();
     }
 
     private static org.python.types.Tuple buildTuple(org.python.Object[] args) {
