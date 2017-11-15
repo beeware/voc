@@ -13,6 +13,6 @@ public class StopIteration extends org.python.exceptions.Exception {
     }
 
     public StopIteration(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        this(args[0]);
+        super(args, kwargs);
     }
 }
