@@ -317,6 +317,8 @@ class Visitor(ast.NodeVisitor):
             elif isinstance(target, ast.Name):
                 # delete is performed by visit(target) with context Del
                 pass
+            elif isinstance(target, (ast.Tuple, ast.List)):
+                self.visit_Delete(ast.Delete(target.elts))
             else:
                 raise NotImplementedError('No handler for Delete of type %s' % target)
 
