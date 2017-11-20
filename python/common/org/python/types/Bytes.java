@@ -48,7 +48,71 @@ public class Bytes extends org.python.types.Object {
             default_args = {"source", "encoding", "errors"}
     )
     public Bytes(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytes' not implemented");
+        org.python.Object source = args[0];
+        org.python.Object encoding = args[1];
+        org.python.Object errors = args[2];
+
+        if (encoding != null && !(encoding instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("bytes() argument 2 must be str, not " + encoding.typeName());
+        } else if (errors != null && !(errors instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("bytes() argument 3 must be str, not " + errors.typeName());
+        } else if (source == null) {
+            if (encoding != null || errors != null) {
+                throw new org.python.exceptions.TypeError("encoding or errors without sequence argument");
+            }
+            this.value = new byte[0];
+        } else if (source instanceof org.python.types.Str) {
+            if (encoding == null) {
+                throw new org.python.exceptions.TypeError("string argument without an encoding");
+            }
+            org.python.Object bytes = ((org.python.types.Str) source).encode(encoding, errors);
+            this.value = ((org.python.types.Bytes) bytes).value;
+        } else if (encoding != null || errors != null) {
+            // Message changed with CPython commit 5aac3ed79999f6948d11f979ab3e42b9b60e9083
+            if (org.Python.VERSION < 0x03050200) {
+                throw new org.python.exceptions.TypeError("encoding or errors without a string argument");
+            } else if (encoding != null) {
+                throw new org.python.exceptions.TypeError("encoding without a string argument");
+            } else {
+                throw new org.python.exceptions.TypeError("errors without a string argument");
+            }
+        } else if (source instanceof org.python.types.Int || source instanceof org.python.types.Bool) {
+            int int_value = (int) ((org.python.types.Int) source.__int__()).value;
+            if (int_value < 0) {
+                throw new org.python.exceptions.ValueError("negative count");
+            }
+            this.value = new byte[int_value];
+        } else {
+            org.python.Object iter = null;
+            try {
+                iter = org.Python.iter(source);
+            } catch (org.python.exceptions.TypeError e) {
+                // Message changed with CPython commit 03f17f86717372ca010273dc8946fd19914a534b
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError("'" + source.typeName() + "' object is not iterable");
+                } else {
+                    throw new org.python.exceptions.TypeError("cannot convert '" + source.typeName() + "' object to bytes");
+                }
+            }
+
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            try {
+                while (true) {
+                    org.python.Object item = iter.__next__();
+                    if (!(item instanceof org.python.types.Int || item instanceof org.python.types.Bool)) {
+                        throw new org.python.exceptions.TypeError(
+                                "'" + item.typeName() + "' object cannot be interpreted as an integer");
+                    }
+                    long b = ((org.python.types.Int) item.__int__()).value;
+                    if (b < 0 || b > 255) {
+                        throw new org.python.exceptions.ValueError("bytes must be in range(0, 256)");
+                    }
+                    baos.write((int) b);
+                }
+            } catch (org.python.exceptions.StopIteration e) {
+            }
+            this.value = baos.toByteArray();
+        }
     }
 
     // public org.python.Object __new__() {
