@@ -79,6 +79,10 @@ public class Bytes extends org.python.types.Object {
                 sb.append("\\t");
             } else if (c == '\r') {
                 sb.append("\\r");
+            } else if (c == '\'') {
+                sb.append("\\'");
+            } else if (c == '\\') {
+                sb.append("\\\\");
             } else if (c >= 32 && c < 127) {
                 sb.append((char) c);
             } else {
