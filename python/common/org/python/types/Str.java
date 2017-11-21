@@ -322,13 +322,15 @@ public class Str extends org.python.types.Object {
             } else if (index instanceof org.python.types.Bool) {
                 boolean slice = ((org.python.types.Bool) index).value;
                 java.lang.String sliced;
-
                 if (this.value.length() == 0) {
                     throw new org.python.exceptions.IndexError("string index out of range");
-                } else {
+              } else {
                     if (slice) {
-                        sliced = this.value.substring(1, 2);
-                    } else {
+                        if (this.value.length() < 2) {
+                            throw new org.python.exceptions.IndexError("string index out of range");
+                      } else {
+                            sliced = this.value.substring(1, 2);                
+                  } else {
                         sliced = this.value.substring(0, 1);
                     }
                     return new org.python.types.Str(sliced);
