@@ -28,7 +28,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
             // Declare the type, and install it the known types list
             // (Replacing any placeholders)
-            python_type = declarePythonType(java_class);
+            python_type = declarePythonType(java_class, null, null, null);
 
             // Since we have a freshly created type, resolve
             // any placeholders that referenced this type.
@@ -78,20 +78,6 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 ((org.python.types.Tuple) bases).value,
                 to_dict
         );
-    }
-
-    public static org.python.types.Type declarePythonType(
-            java.lang.String name,
-            java.util.List<org.python.Object> bases,
-            java.util.Map<java.lang.String, org.python.Object> dict
-    ) {
-        return org.python.types.Type.declarePythonType(org.python.types.Object.class, name, bases, dict);
-    }
-
-    public static org.python.types.Type declarePythonType(
-            java.lang.Class java_class
-    ) {
-        return org.python.types.Type.declarePythonType(java_class, null, null, null);
     }
 
     public static org.python.types.Type declarePythonType(
