@@ -61,6 +61,20 @@ public class Type extends org.python.types.Object implements org.python.Callable
         }
     }
 
+    public static org.python.types.Type pythonType(java.lang.Class java_class, java.lang.Class base_java_class) {
+        org.python.types.Type python_type = pythonType(java_class);
+
+        if (base_java_class != null) {
+            org.python.types.Type base_python_type = known_types.get(base_java_class);
+            java.util.List<org.python.Object> bases = new java.util.ArrayList<org.python.Object>();
+            bases.add(base_python_type);
+            python_type.__dict__.put("__base__", base_python_type);
+            python_type.__dict__.put("__bases__", new org.python.types.Tuple(bases));
+        }
+
+        return python_type;
+    }
+
     public static org.python.types.Type declarePythonType(
             org.python.Object name,
             org.python.Object bases,
