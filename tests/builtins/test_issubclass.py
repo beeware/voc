@@ -88,6 +88,15 @@ class IssubclassTests(TranspileTestCase):
             print(issubclass(MyClass3, MyClass1))
             """, run_in_function=False)
 
+    def test_builtins(self):
+        self.assertCodeExecution("""
+            builtin_classes = (object, bytearray, bytes, complex, dict, int,
+                float, frozenset, list, memoryview, set, str, tuple, bool)
+            for base in builtin_classes:
+                for sub in builtin_classes:
+                    print(sub, base, issubclass(sub, base))
+            """, run_in_function=False)
+
 
 class BuiltinIssubclassFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["issubclass"]

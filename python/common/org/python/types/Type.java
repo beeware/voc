@@ -28,13 +28,26 @@ public class Type extends org.python.types.Object implements org.python.Callable
 
             // Declare the type, and install it the known types list
             // (Replacing any placeholders)
-            python_type = declarePythonType(java_class);
+            python_type = declarePythonType(java_class, null, null, null);
 
             // Since we have a freshly created type, resolve
             // any placeholders that referenced this type.
             // These will have been created as a consequence of
             // calling the constructor for this type.
             placeholder.resolve(python_type);
+
+            // After object type is resolved, clean up subclasses that
+            // reference the placeholder.
+            if (java_class == org.python.types.Object.class) {
+                java.util.List<org.python.Object> bases = new java.util.ArrayList<org.python.Object>();
+                bases.add(python_type);
+                for (org.python.types.Type type : known_types.values()) {
+                    if (type.__dict__.get("__base__") == placeholder) {
+                        type.__dict__.put("__base__", python_type);
+                        type.__dict__.put("__bases__", new org.python.types.Tuple(bases));
+                    }
+                }
+            }
         }
         // System.out.println("GOT TYPE " + java_class + " " + python_type.origin);
         return python_type;
@@ -46,6 +59,20 @@ public class Type extends org.python.types.Object implements org.python.Callable
         } catch (ClassNotFoundException e) {
             throw new org.python.exceptions.RuntimeError("Unknown Class " + java_class_name);
         }
+    }
+
+    public static org.python.types.Type pythonType(java.lang.Class java_class, java.lang.Class base_java_class) {
+        org.python.types.Type python_type = pythonType(java_class);
+
+        if (base_java_class != null) {
+            org.python.types.Type base_python_type = known_types.get(base_java_class);
+            java.util.List<org.python.Object> bases = new java.util.ArrayList<org.python.Object>();
+            bases.add(base_python_type);
+            python_type.__dict__.put("__base__", base_python_type);
+            python_type.__dict__.put("__bases__", new org.python.types.Tuple(bases));
+        }
+
+        return python_type;
     }
 
     public static org.python.types.Type declarePythonType(
@@ -65,20 +92,6 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 ((org.python.types.Tuple) bases).value,
                 to_dict
         );
-    }
-
-    public static org.python.types.Type declarePythonType(
-            java.lang.String name,
-            java.util.List<org.python.Object> bases,
-            java.util.Map<java.lang.String, org.python.Object> dict
-    ) {
-        return org.python.types.Type.declarePythonType(org.python.types.Object.class, name, bases, dict);
-    }
-
-    public static org.python.types.Type declarePythonType(
-            java.lang.Class java_class
-    ) {
-        return org.python.types.Type.declarePythonType(java_class, null, null, null);
     }
 
     public static org.python.types.Type declarePythonType(
@@ -120,9 +133,18 @@ public class Type extends org.python.types.Object implements org.python.Callable
         }
 
         // Set __base__ and __bases__ for the type
-        if (bases != null && bases.size() > 0) {
+        if (java_class == org.python.types.Object.class) {
+            python_type.__dict__.put("__base__", org.python.types.NoneType.NONE);
+            python_type.__dict__.put("__bases__", new org.python.types.Tuple());
+        } else if (bases != null && bases.size() > 0) {
             python_type.__dict__.put("__base__", bases.get(0));
             python_type.__dict__.put("__bases__", new org.python.types.Tuple(bases));
+        } else {
+            org.python.types.Type base_python_type = known_types.get(org.python.types.Object.class);
+            java.util.List<org.python.Object> default_bases = new java.util.ArrayList<org.python.Object>();
+            default_bases.add(base_python_type);
+            python_type.__dict__.put("__base__", base_python_type);
+            python_type.__dict__.put("__bases__", new org.python.types.Tuple(default_bases));
         }
 
         // Update the dictionary of the type.
