@@ -327,7 +327,11 @@ public class Str extends org.python.types.Object {
                     throw new org.python.exceptions.IndexError("string index out of range");
                 } else {
                     if (slice) {
-                        sliced = this.value.substring(1, 2);
+                        if (this.value.length() < 2){
+                            throw new org.python.exceptions.IndexError("string index out of range");
+                        } else {
+                            sliced = this.value.substring(1, 2);
+                        }
                     } else {
                         sliced = this.value.substring(0, 1);
                     }
