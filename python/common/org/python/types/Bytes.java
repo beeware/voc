@@ -1251,10 +1251,64 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.split(sep=None, maxsplit=-1) -> list of bytes\n\nReturn a list of the sections in B, using sep as the delimiter.\nIf sep is not specified or is None, B is split on ASCII whitespace\ncharacters (space, tab, return, newline, formfeed, vertical tab).\nIf maxsplit is given, at most maxsplit splits are done."
+            __doc__ = "B.split(sep=None, maxsplit=None) -> list of bytes\n" +
+                    "\nReturn a list of the sections in B, using sep as the delimiter.\n" +
+                    "If sep is not specified or is None, B is split on ASCII whitespace\n" +
+                    "characters (space, tab, return, newline, formfeed, vertical tab).\n" +
+                    "If maxsplit is given, at most maxsplit splits are done.",
+            default_args = {"sep", "maxsplit"}
     )
-    public org.python.Object split(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.split has not been implemented.");
+    public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
+        if (this.value.length == 0) {
+            if (sep == null) {
+                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
+                    return new org.python.types.List();
+                }
+                throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
+            } else if (sep instanceof org.python.types.Bytes) {
+                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
+                    org.python.types.List result_list = new org.python.types.List();
+                    result_list.append(new org.python.types.Bytes(""));
+                    return result_list;
+                }
+                throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
+            }
+        }
+
+        if (sep == null) {
+            sep = new org.python.types.Bytes(" ".getBytes());
+        } else if (!(sep instanceof org.python.types.Bytes)) {
+            throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
+        }
+
+        if (maxsplit == null) {
+            maxsplit = this.count(sep, null, null);
+        } else if (!(maxsplit instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
+        }
+
+        org.python.types.List result_list = new org.python.types.List();
+        org.python.types.Int start = new org.python.types.Int(0);
+        int imaxsplit = (int) ((org.python.types.Int)  this.count(sep, null, null)).value;
+        int index;
+
+        for (int i=0; i<imaxsplit+1; i++) {
+            byte[] slice;
+            if (i==imaxsplit) {
+                index = this.value.length;
+                slice = new byte[this.value.length - (int) start.value];
+            } else {
+                index = (int) this.find(sep, start, null).value;
+                slice = new byte[index - (int) start.value];
+            }
+            for (int j=(int) start.value; j<index; j++){
+                slice[j] = this.value[j];
+            }
+            result_list.append(new org.python.types.Bytes(slice));
+            start.value = index+1;
+            slice = null;
+        }
+        return result_list;
     }
 
     @org.python.Method(
