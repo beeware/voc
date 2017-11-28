@@ -476,16 +476,18 @@ class BytesTests(TranspileTestCase):
 
     def test_split(self):
         self.assertCodeExecution("""
+            print(b''.split())
             print(b'py bee'.split())
-            print(b'pyXbee'.split(b'x'))
+            print(b'pyXbXee'.split(b'X'))
             print(b'pyXbee'.split(b'z'))
+            print(b'pyZZbee'.split(b'ZZ'))
             print(b'pybebyp'.split(b'e', 1))
             """)
         self.assertCodeExecution("""
-            print(b'pyXbee'.split('a'))
+            print(b''.split('a'))
             """, exits_early=True)
         self.assertCodeExecution("""
-            print(b''.split('a'))
+            print(b'pyXbee'.split('a'))
             """, exits_early=True)
         self.assertCodeExecution("""
             print(b'pyXbee'.split(maxsplit='5'))

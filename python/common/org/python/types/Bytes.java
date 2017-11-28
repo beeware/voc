@@ -1268,45 +1268,52 @@ public class Bytes extends org.python.types.Object {
             } else if (sep instanceof org.python.types.Bytes) {
                 if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
                     org.python.types.List result_list = new org.python.types.List();
-                    result_list.append(new org.python.types.Bytes(""));
+                    result_list.append(new org.python.types.Bytes("".getBytes()));
                     return result_list;
                 }
                 throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
+            } else {
+                throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
             }
         }
 
+        byte[] bsep;
         if (sep == null) {
-            sep = new org.python.types.Bytes(" ".getBytes());
+            bsep = " ".getBytes();
         } else if (!(sep instanceof org.python.types.Bytes)) {
             throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
+        } else {
+            bsep = ((org.python.types.Bytes) sep).value;
         }
 
+        int imaxsplit;
         if (maxsplit == null) {
-            maxsplit = this.count(sep, null, null);
+            imaxsplit = (int) ((org.python.types.Int) this.count(new org.python.types.Bytes(bsep), null, null)).value;
         } else if (!(maxsplit instanceof org.python.types.Int)) {
             throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
+        } else {
+            imaxsplit = (int) ((org.python.types.Int) maxsplit).value;
         }
 
         org.python.types.List result_list = new org.python.types.List();
-        org.python.types.Int start = new org.python.types.Int(0);
-        int imaxsplit = (int) ((org.python.types.Int)  this.count(sep, null, null)).value;
-        int index;
-
-        for (int i=0; i<imaxsplit+1; i++) {
-            byte[] slice;
-            if (i==imaxsplit) {
-                index = this.value.length;
-                slice = new byte[this.value.length - (int) start.value];
-            } else {
-                index = (int) this.find(sep, start, null).value;
-                slice = new byte[index - (int) start.value];
+        int start = 0;
+        boolean equal;
+        for (int i=0; i < this.value.length; i++){
+            equal = true;
+            if (((int) result_list.value.size()) ==  imaxsplit) {
+                result_list.append(new org.python.types.Bytes(Arrays.copyOfRange(this.value, start, this.value.length)));
+                break;
             }
-            for (int j=(int) start.value; j<index; j++){
-                slice[j] = this.value[j];
+            for (int j=0; j < bsep.length; j++){
+                if (bsep[j] != this.value[i+j]) {
+                    equal = false;
+                }
             }
-            result_list.append(new org.python.types.Bytes(slice));
-            start.value = index+1;
-            slice = null;
+            if (equal) {
+                result_list.append(new org.python.types.Bytes(Arrays.copyOfRange(this.value, start, i)));
+                start = i + bsep.length;
+                i = start;
+            }
         }
         return result_list;
     }
