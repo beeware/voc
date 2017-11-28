@@ -1259,37 +1259,24 @@ public class Bytes extends org.python.types.Object {
             default_args = {"sep", "maxsplit"}
     )
     public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
-        if (this.value.length == 0) {
-            if (sep == null) {
-                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
-                    return new org.python.types.List();
-                }
-                throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
-            } else if (sep instanceof org.python.types.Bytes) {
-                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
-                    org.python.types.List result_list = new org.python.types.List();
-                    result_list.append(new org.python.types.Bytes("".getBytes()));
-                    return result_list;
-                }
-                throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
-            } else {
-                if (org.Python.VERSION < 0x30500f0) {
-                    throw new org.python.exceptions.TypeError("'" + sep.typeName() + "' does not support the buffer interface");
-                } else {
-                    throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
-                }
-            }
+        if (maxsplit != null && !(maxsplit instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
         }
-
-        byte[] bsep;
-        if (sep == null) {
-            bsep = " ".getBytes();
-        } else if (!(sep instanceof org.python.types.Bytes)) {
+        if (sep != null && !(sep instanceof org.python.types.Bytes)) {
             if (org.Python.VERSION < 0x30500f0) {
                 throw new org.python.exceptions.TypeError("'" + sep.typeName() + "' does not support the buffer interface");
             } else {
                 throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
             }
+        }
+
+        if (this.value.length == 0) {
+            return new org.python.types.List();
+        }
+
+        byte[] bsep;
+        if (sep == null) {
+            bsep = " ".getBytes();
         } else {
             bsep = ((org.python.types.Bytes) sep).value;
         }
@@ -1297,8 +1284,6 @@ public class Bytes extends org.python.types.Object {
         int imaxsplit;
         if (maxsplit == null) {
             imaxsplit = (int) ((org.python.types.Int) this.count(new org.python.types.Bytes(bsep), null, null)).value;
-        } else if (!(maxsplit instanceof org.python.types.Int)) {
-            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
         } else {
             if ((int) ((org.python.types.Int) maxsplit).value < 0) {
                 imaxsplit = (int) ((org.python.types.Int) this.count(new org.python.types.Bytes(bsep), null, null)).value;
@@ -1310,14 +1295,14 @@ public class Bytes extends org.python.types.Object {
         org.python.types.List result_list = new org.python.types.List();
         int start = 0;
         boolean equal;
-        for (int i=0; i < this.value.length; i++){
+        for (int i = 0; i < this.value.length; i++) {
             equal = true;
-            if (((int) result_list.value.size()) ==  imaxsplit) {
+            if ((int) result_list.value.size() == imaxsplit) {
                 result_list.append(new org.python.types.Bytes(Arrays.copyOfRange(this.value, start, this.value.length)));
                 break;
             }
-            for (int j=0; j < bsep.length; j++){
-                if (bsep[j] != this.value[i+j]) {
+            for (int j = 0; j < bsep.length; j++) {
+                if (bsep[j] != this.value[i + j]) {
                     equal = false;
                 }
             }
