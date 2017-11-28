@@ -1300,7 +1300,11 @@ public class Bytes extends org.python.types.Object {
         } else if (!(maxsplit instanceof org.python.types.Int)) {
             throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
         } else {
-            imaxsplit = (int) ((org.python.types.Int) maxsplit).value;
+            if ((int) ((org.python.types.Int) maxsplit).value < 0) {
+                imaxsplit = (int) ((org.python.types.Int) this.count(new org.python.types.Bytes(bsep), null, null)).value;
+            } else {
+                imaxsplit = (int) ((org.python.types.Int) maxsplit).value;
+            }
         }
 
         org.python.types.List result_list = new org.python.types.List();

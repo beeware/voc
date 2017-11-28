@@ -482,6 +482,8 @@ class BytesTests(TranspileTestCase):
             print(b'pyXbee'.split(b'z'))
             print(b'pyZZbee'.split(b'ZZ'))
             print(b'pybebyp'.split(b'e', 1))
+            print(b'aabaabaa'.split(b'b', 1))
+            print(b'aabaabaa'.split(b'b', -1))
             """)
         self.assertCodeExecution("""
             print(b''.split('a'))
