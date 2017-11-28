@@ -1251,10 +1251,68 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.split(sep=None, maxsplit=-1) -> list of bytes\n\nReturn a list of the sections in B, using sep as the delimiter.\nIf sep is not specified or is None, B is split on ASCII whitespace\ncharacters (space, tab, return, newline, formfeed, vertical tab).\nIf maxsplit is given, at most maxsplit splits are done."
+            __doc__ = "B.split(sep=None, maxsplit=None) -> list of bytes\n" +
+                    "\nReturn a list of the sections in B, using sep as the delimiter.\n" +
+                    "If sep is not specified or is None, B is split on ASCII whitespace\n" +
+                    "characters (space, tab, return, newline, formfeed, vertical tab).\n" +
+                    "If maxsplit is given, at most maxsplit splits are done.",
+            default_args = {"sep", "maxsplit"}
     )
-    public org.python.Object split(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.split has not been implemented.");
+    public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
+        if (maxsplit != null && !(maxsplit instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
+        }
+        if (sep != null && !(sep instanceof org.python.types.Bytes)) {
+            if (org.Python.VERSION < 0x30500f0) {
+                throw new org.python.exceptions.TypeError("'" + sep.typeName() + "' does not support the buffer interface");
+            } else {
+                throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
+            }
+        }
+
+        if (this.value.length == 0) {
+            return new org.python.types.List();
+        }
+
+        byte[] bsep;
+        if (sep == null) {
+            bsep = " ".getBytes();
+        } else {
+            bsep = ((org.python.types.Bytes) sep).value;
+        }
+
+        int imaxsplit;
+        if (maxsplit == null) {
+            imaxsplit = (int) ((org.python.types.Int) this.count(new org.python.types.Bytes(bsep), null, null)).value;
+        } else {
+            if ((int) ((org.python.types.Int) maxsplit).value < 0) {
+                imaxsplit = (int) ((org.python.types.Int) this.count(new org.python.types.Bytes(bsep), null, null)).value;
+            } else {
+                imaxsplit = (int) ((org.python.types.Int) maxsplit).value;
+            }
+        }
+
+        org.python.types.List result_list = new org.python.types.List();
+        int start = 0;
+        boolean equal;
+        for (int i = 0; i < this.value.length; i++) {
+            equal = true;
+            if ((int) result_list.value.size() == imaxsplit) {
+                result_list.append(new org.python.types.Bytes(Arrays.copyOfRange(this.value, start, this.value.length)));
+                break;
+            }
+            for (int j = 0; j < bsep.length; j++) {
+                if (bsep[j] != this.value[i + j]) {
+                    equal = false;
+                }
+            }
+            if (equal) {
+                result_list.append(new org.python.types.Bytes(Arrays.copyOfRange(this.value, start, i)));
+                start = i + bsep.length;
+                i = start;
+            }
+        }
+        return result_list;
     }
 
     @org.python.Method(

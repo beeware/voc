@@ -474,6 +474,30 @@ class BytesTests(TranspileTestCase):
             print(b"py.bee".title())
         """)
 
+    def test_split(self):
+        self.assertCodeExecution("""
+            print(b''.split())
+            print(b'py bee'.split())
+            print(b'pyXbXee'.split(b'X'))
+            print(b'pyXbee'.split(b'z'))
+            print(b'pyZZbee'.split(b'ZZ'))
+            print(b'pybebyp'.split(b'e', 1))
+            print(b'aabaabaa'.split(b'b', 1))
+            print(b'aabaabaa'.split(b'b', -1))
+            print(b'one two three'.split(maxsplit=1))
+            """)
+        self.assertCodeExecution("""
+            print(b''.split('a'))
+            """, exits_early=True)
+        self.assertCodeExecution("""
+            print(b'pyXbee'.split('a'))
+            """, exits_early=True)
+        self.assertCodeExecution("""
+            print(b'pyXbee'.split(maxsplit='5'))
+            """, exits_early=True)
+        self.assertCodeExecution("""
+            print(b''.split(maxsplit='5'))
+            """, exits_early=True)
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
