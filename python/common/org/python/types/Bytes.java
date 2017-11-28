@@ -1273,7 +1273,11 @@ public class Bytes extends org.python.types.Object {
                 }
                 throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
             } else {
-                throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
+                if (org.Python.VERSION < 0x30500f0) {
+                    throw new org.python.exceptions.TypeError("'" + sep.typeName() + "' does not support the buffer interface");
+                } else {
+                    throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
+                }
             }
         }
 
@@ -1281,7 +1285,11 @@ public class Bytes extends org.python.types.Object {
         if (sep == null) {
             bsep = " ".getBytes();
         } else if (!(sep instanceof org.python.types.Bytes)) {
-            throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
+            if (org.Python.VERSION < 0x30500f0) {
+                throw new org.python.exceptions.TypeError("'" + sep.typeName() + "' does not support the buffer interface");
+            } else {
+                throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
+            }
         } else {
             bsep = ((org.python.types.Bytes) sep).value;
         }
