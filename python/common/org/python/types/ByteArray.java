@@ -378,14 +378,14 @@ public class ByteArray extends org.python.types.Object {
                 } else {
                     idx = this.value.length + idx;
                     // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int(this.value[idx]);
+                    return new org.python.types.Int((long) this.value[idx] & 0xff);
                 }
             } else {
                 if (idx >= this.value.length) {
                     throw new org.python.exceptions.IndexError("bytearray index out of range");
                 } else {
                     // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int(this.value[idx]);
+                    return new org.python.types.Int((long) this.value[idx] & 0xff);
                 }
             }
         } else {
@@ -638,7 +638,7 @@ public class ByteArray extends org.python.types.Object {
     public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
         for (byte b: this.value) {
-            listOfBytes.add(new org.python.types.Int(b));
+            listOfBytes.add(new org.python.types.Int((long) b & 0xff));
         }
         return new org.python.types.List(listOfBytes).__iter__();
     }
