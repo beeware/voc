@@ -5,7 +5,7 @@ package org.python.exceptions;
 )
 public class BaseException extends org.python.types.Object {
     @org.python.Attribute()
-    org.python.types.Tuple args = new org.python.types.Tuple();
+    public org.python.types.Tuple args = new org.python.types.Tuple();
 
     public BaseException() {
         super();
