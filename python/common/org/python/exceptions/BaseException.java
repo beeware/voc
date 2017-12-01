@@ -17,15 +17,8 @@ public class BaseException extends org.python.types.Object {
     }
 
     public BaseException(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        super(buildMessage(buildTuple(args)));
+        super();
         this.args = buildTuple(args);
-    }
-
-    private static String buildMessage(org.python.types.Tuple tupArgs) {
-        if (tupArgs.value.size() == 0) {
-            return "";
-        }
-        return tupArgs.toString();
     }
 
     private static org.python.types.Tuple buildTuple(org.python.Object[] args) {
@@ -36,14 +29,16 @@ public class BaseException extends org.python.types.Object {
             __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
-        return new org.python.types.Str(this.getClass().getSimpleName() + "(\"" + this.getMessage() + "\",)");
+        return new org.python.types.Str(this.getClass().getSimpleName() + this.args.toString());
     }
 
     @org.python.Method(
             __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
-        if (this.args.value.size() == 1) {
+        if (this.args.value.size() == 0) {
+            return new org.python.types.Str("");
+        } else if (this.args.value.size() == 1) {
             return this.args.value.get(0).__str__();
         }
         return this.args.__str__();
@@ -51,5 +46,9 @@ public class BaseException extends org.python.types.Object {
 
     public java.lang.String toString() {
         return this.getClass().getSimpleName() + ": " + this.getMessage();
+    }
+
+    public java.lang.String getMessage() {
+        return this.__str__().toString();
     }
 }
