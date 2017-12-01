@@ -200,6 +200,18 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b"py.bee").title())
         """)
 
+    def test_repr(self):
+        self.assertCodeExecution(r"""
+            print(repr(bytearray(b'\xc8')))
+            print(repr(bytearray(b'abcdef \xc8 abcdef')))
+            print(repr(bytearray(b'abcdef \xc8 abcdef\n\r\t')))
+            print(bytearray(b'abcdef \xc8 abcdef\n\r\t'))
+            for b in range(0, 256, 16):
+                print(repr(bytearray(range(b, b+16))))
+            for b in range(0, 256, 16):
+                print(bytearray(range(b, b+16)))
+        """)
+
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'

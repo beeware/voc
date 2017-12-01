@@ -643,9 +643,10 @@ public class Str extends org.python.types.Object {
                     "handling scheme. Default is 'strict' meaning that encoding errors raise\n" +
                     "a UnicodeEncodeError. Other possible values are 'ignore', 'replace' and\n" +
                     "'xmlcharrefreplace' as well as any other name registered with\n" +
-                    "codecs.register_error that can handle UnicodeEncodeErrors.\n"
+                    "codecs.register_error that can handle UnicodeEncodeErrors.\n",
+            default_args = {"encoding", "errors"}
     )
-    public org.python.Object encode() {
+    public org.python.Object encode(org.python.Object encoding, org.python.Object errors) {
         throw new org.python.exceptions.NotImplementedError("encode() has not been implemented.");
     }
 

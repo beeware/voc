@@ -47,62 +47,57 @@ public class ByteArray extends org.python.types.Object {
             default_args = {"source", "encoding", "errors"}
     )
     public ByteArray(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args[0] == null) {
-            // bytearray()
-            this.value = new byte[0];
-        } else {
-            if (args[1] == null) {
-                if (args[0] instanceof org.python.types.Int) {
-                    // bytearray(int)
-                    this.value = new byte[(int) ((org.python.types.Int) args[0].__int__()).value];
-                } else {
+        org.python.Object source = args[0];
+        org.python.Object encoding = args[1];
+        org.python.Object errors = args[2];
 
-                    org.python.Object iterator = null;
-                    try {
-                        iterator = org.Python.iter(args[0]);
-                    } catch (org.python.exceptions.TypeError e) {
-                        // Not an iterator
-                    }
-                    if (iterator != null) {
-                        // bytearray(iterable_of_ints)
-                        java.util.List<Byte> generated = new java.util.ArrayList<Byte>();
-                        try {
-                            while (true) {
-                                org.python.Object next = iterator.__next__();
-                                if (next instanceof org.python.types.Int) {
-                                    long value = ((org.python.types.Int) next.__int__()).value;
-                                    if ((value < 0) || (value > 255)) {
-                                        throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
-                                    } else {
-                                        generated.add(new Byte((byte) value));
-                                    }
-                                } else if (next instanceof org.python.types.Str) {
-                                    // TODO: Can take ASCII single-character strings
-                                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with strings not implemented");
-                                }
-                            }
-                        } catch (org.python.exceptions.StopIteration si) {
-                        }
-                        byte[] primative_bytes = new byte[generated.size()];
-                        for (int i = 0; i < primative_bytes.length; i++) {
-                            primative_bytes[i] = generated.get(i);
-                        }
-                        this.value = primative_bytes;
-                    } else {
-                        // bytearray(bytes_or_buffer)
-                        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with bytes_or_buffer not implemented");
-                    }
-                }
-            } else {
-                // bytearray(string, args[1][, errors])
-                if (args[2] == null) {
-                    // bytearray(string, args[1])
-                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
-                } else {
-                    // bytearray(string, args[1], errors)
-                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
-                }
+        if (encoding != null && !(encoding instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("bytearray() argument 2 must be str, not " + encoding.typeName());
+        } else if (errors != null && !(errors instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("bytearray() argument 3 must be str, not " + errors.typeName());
+        } else if (source == null) {
+            if (encoding != null || errors != null) {
+                throw new org.python.exceptions.TypeError("encoding or errors without sequence argument");
             }
+            this.value = new byte[0];
+        } else if (source instanceof org.python.types.Str) {
+            if (encoding == null) {
+                throw new org.python.exceptions.TypeError("string argument without an encoding");
+            }
+            org.python.Object bytes = ((org.python.types.Str) source).encode(encoding, errors);
+            this.value = ((org.python.types.Bytes) bytes).value;
+        } else if (encoding != null || errors != null) {
+            throw new org.python.exceptions.TypeError("encoding or errors without a string argument");
+        } else if (source instanceof org.python.types.Int || source instanceof org.python.types.Bool) {
+            int int_value = (int) ((org.python.types.Int) source.__int__()).value;
+            if (int_value < 0) {
+                throw new org.python.exceptions.ValueError("negative count");
+            }
+            this.value = new byte[int_value];
+        } else {
+            org.python.Object iter = null;
+            try {
+                iter = org.Python.iter(source);
+            } catch (org.python.exceptions.TypeError e) {
+                throw new org.python.exceptions.TypeError("'" + source.typeName() + "' object is not iterable");
+            }
+
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            try {
+                while (true) {
+                    org.python.Object item = iter.__next__();
+                    if (!(item instanceof org.python.types.Int || item instanceof org.python.types.Bool)) {
+                        throw new org.python.exceptions.TypeError("an integer is required");
+                    }
+                    long b = ((org.python.types.Int) item.__int__()).value;
+                    if (b < 0 || b > 255) {
+                        throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
+                    }
+                    baos.write((int) b);
+                }
+            } catch (org.python.exceptions.StopIteration e) {
+            }
+            this.value = baos.toByteArray();
         }
     }
 
@@ -131,11 +126,21 @@ public class ByteArray extends org.python.types.Object {
     public org.python.types.Str __str__() {
         StringBuilder sb = new StringBuilder();
         sb.append("bytearray(b'");
-        for (int c : this.value) {
-            if (c >= 32 && c < 128) {
+        for (byte c : this.value) {
+            if (c == '\n') {
+                sb.append("\\n");
+            } else if (c == '\t') {
+                sb.append("\\t");
+            } else if (c == '\r') {
+                sb.append("\\r");
+            } else if (c == '\'') {
+                sb.append("\\'");
+            } else if (c == '\\') {
+                sb.append("\\\\");
+            } else if (c >= 32 && c < 127) {
                 sb.append((char) c);
             } else {
-                sb.append(String.format("\\x%02d", c));
+                sb.append(String.format("\\x%02x", c));
             }
         }
         sb.append("')");
@@ -378,14 +383,14 @@ public class ByteArray extends org.python.types.Object {
                 } else {
                     idx = this.value.length + idx;
                     // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int(this.value[idx]);
+                    return new org.python.types.Int((long) this.value[idx] & 0xff);
                 }
             } else {
                 if (idx >= this.value.length) {
                     throw new org.python.exceptions.IndexError("bytearray index out of range");
                 } else {
                     // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int(this.value[idx]);
+                    return new org.python.types.Int((long) this.value[idx] & 0xff);
                 }
             }
         } else {
@@ -638,7 +643,7 @@ public class ByteArray extends org.python.types.Object {
     public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
         for (byte b: this.value) {
-            listOfBytes.add(new org.python.types.Int(b));
+            listOfBytes.add(new org.python.types.Int((long) b & 0xff));
         }
         return new org.python.types.List(listOfBytes).__iter__();
     }

@@ -75,6 +75,10 @@ class BytesTests(TranspileTestCase):
             print(repr(b'abcdef \xc8 abcdef'))
             print(repr(b'abcdef \xc8 abcdef\n\r\t'))
             print(b'abcdef \xc8 abcdef\n\r\t')
+            for b in range(0, 256, 16):
+                print(repr(bytes(range(b, b+16))))
+            for b in range(0, 256, 16):
+                print(bytes(range(b, b+16)))
         """)
 
     def test_iter(self):
