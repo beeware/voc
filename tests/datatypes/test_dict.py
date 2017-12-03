@@ -256,7 +256,7 @@ class DictTests(TranspileTestCase):
     def test_fromkeys(self):
         self.assertCodeExecution("""
             keys = [1, 2]
-            print({}.fromkeys(keys))
+            print(dict.fromkeys(keys))
             """)
 
         # non-iterable error test
@@ -264,7 +264,7 @@ class DictTests(TranspileTestCase):
             keys = 1
             value = 2
             try:
-                print({}.fromkeys(keys, value))
+                print(dict.fromkeys(keys, value))
             except TypeError as err:
                 print(err)
             """)
@@ -282,7 +282,7 @@ class DictTests(TranspileTestCase):
         self.assertCodeExecution("""
             keys = [[1], 2]
             try:
-                print({}.fromkeys(keys))
+                print(dict.fromkeys(keys))
             except TypeError as err:
                 print(err)
             """)
@@ -291,7 +291,7 @@ class DictTests(TranspileTestCase):
     def test_fromkeys_missing_iterable(self):
         self.assertCodeExecution("""
             try:
-                print({}.fromkeys())
+                print(dict.fromkeys())
             except TypeError as err:
                 print(err)
             """)
