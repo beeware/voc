@@ -362,7 +362,7 @@ public class Dict extends org.python.types.Object {
             args = {"iterable"},
             default_args = {"value"}
     )
-    public org.python.Object fromkeys(org.python.Object iterable, org.python.Object value) {
+    public static org.python.Object fromkeys(org.python.Object iterable, org.python.Object value) {
         org.python.types.Dict result = new org.python.types.Dict();
         try {
             org.python.Object iter = iterable.__iter__();
