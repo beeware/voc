@@ -287,6 +287,23 @@ class DictTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_update(self):
+        self.assertCodeExecution("""
+            a = {}
+            a.update([('a', 1), ('b',2)])
+            print(a)
+        """)
+
+        self.assertCodeExecution("""
+            a = {}
+            a.update([('a', 1, 2), ('b',2)])
+        """, exits_early=True)
+
+        self.assertCodeExecution("""
+            a = {}
+            a.update('1')
+        """, exits_early=True)
+
     @expectedFailure
     def test_fromkeys_missing_iterable(self):
         self.assertCodeExecution("""
