@@ -290,8 +290,13 @@ class DictTests(TranspileTestCase):
     def test_update(self):
         self.assertCodeExecution("""
             a = {}
-            a.update([('a', 1), ('b',2)])
-            print(a)
+            a.update([('a', 1), ('b', 2)])
+            b = {}
+            b.update({'a': 1, 'b':2})
+            print(a == b)
+            c = {}
+            c.update(a=1, b=2)
+            print(c == a)
         """)
 
         self.assertCodeExecution("""
@@ -303,6 +308,23 @@ class DictTests(TranspileTestCase):
             a = {}
             a.update('1')
         """, exits_early=True)
+
+        self.assertCodeExecution("""
+            a = {}
+            a.update(1)
+        """, exits_early=True)
+
+        self.assertCodeExecution("""
+            a = {}
+            x = set([1, 2])
+            a.update(x)
+        """, exits_early=True)
+
+    def test_keys(self):
+        self.assertCodeExecution("""
+            a = {'z': 1, 'y': 2}
+            print(a.keys())
+        """)
 
     @expectedFailure
     def test_fromkeys_missing_iterable(self):
