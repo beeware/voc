@@ -291,12 +291,13 @@ class DictTests(TranspileTestCase):
         self.assertCodeExecution("""
             a = {}
             a.update([('a', 1), ('b', 2)])
+            print(sorted(a))
             b = {}
             b.update({'a': 1, 'b':2})
-            print(a == b)
+            print(sorted(b))
             c = {}
             c.update(a=1, b=2)
-            print(c == a)
+            print(sorted(c))
         """)
 
         self.assertCodeExecution("""

@@ -472,30 +472,40 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "D.update([E, ]**F) -> None.  Update D from dict/iterable E and F." +
-            "If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]" +
-            "If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v" +
+            __doc__ = "D.update([E, ]**F) -> None.  Update D from dict/iterable E and F.\n" +
+            "If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]\n" +
+            "If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v\n" +
             "In either case, this is followed by: for k in F:  D[k] = F[k]",
-            default_args = {"args", "kwargs"}
+            default_args = {"iterable"},
+            kwargs = "kwargs"
     )
-    public org.python.Object update(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args[0] == null) {
-            for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : kwargs.entrySet()) {
-                this.value.put(new Str(entry.getKey()), entry.getValue());
+    public org.python.Object update(org.python.Object iterable, org.python.types.Dict kwargs) {
+        if (iterable == null) {
+            if (kwargs != null) {
+                org.python.Object iterator = org.Python.iter(kwargs);
+                while (true) {
+                    try {
+                        org.python.Object key = iterator.__next__();
+                        org.python.Object value = kwargs.__getitem__(key);
+                        this.value.put(key, value);
+                    } catch (org.python.exceptions.StopIteration si) {
+                        break;
+                    }
+                }
             }
-        } else if (args[0] instanceof org.python.types.Dict) {
-            org.python.Object iterator = org.Python.iter(args[0]);
+        } else if (iterable instanceof org.python.types.Dict) {
+            org.python.Object iterator = org.Python.iter(iterable);
             while (true) {
                 try {
                     org.python.Object key = iterator.__next__();
-                    org.python.Object value = args[0].__getitem__(key);
+                    org.python.Object value = iterable.__getitem__(key);
                     this.value.put(key, value);
                 } catch (org.python.exceptions.StopIteration si) {
                     break;
                 }
             }
         } else {
-            org.python.Object iterator = org.Python.iter(args[0]);
+            org.python.Object iterator = org.Python.iter(iterable);
             java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
             java.util.List<org.python.Object> pair;
             while (true) {
