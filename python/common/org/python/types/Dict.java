@@ -472,10 +472,70 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "D.update([E, ]**F) -> None.  Update D from dict/iterable E and F.\nIf E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]\nIf E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v\nIn either case, this is followed by: for k in F:  D[k] = F[k]"
+            __doc__ = "D.update([E, ]**F) -> None.  Update D from dict/iterable E and F.\n" +
+            "If E is present and has a .keys() method, then does:  for k in E: D[k] = E[k]\n" +
+            "If E is present and lacks a .keys() method, then does:  for k, v in E: D[k] = v\n" +
+            "In either case, this is followed by: for k in F:  D[k] = F[k]",
+            default_args = {"iterable"},
+            kwargs = "kwargs"
     )
-    public org.python.Object update(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.update() has not been implemented.");
+    public org.python.Object update(org.python.Object iterable, org.python.types.Dict kwargs) {
+        if (iterable == null) {
+            if (kwargs != null) {
+                org.python.Object iterator = org.Python.iter(kwargs);
+                while (true) {
+                    try {
+                        org.python.Object key = iterator.__next__();
+                        org.python.Object value = kwargs.__getitem__(key);
+                        this.value.put(key, value);
+                    } catch (org.python.exceptions.StopIteration si) {
+                        break;
+                    }
+                }
+            }
+        } else if (iterable instanceof org.python.types.Dict) {
+            org.python.Object iterator = org.Python.iter(iterable);
+            while (true) {
+                try {
+                    org.python.Object key = iterator.__next__();
+                    org.python.Object value = iterable.__getitem__(key);
+                    this.value.put(key, value);
+                } catch (org.python.exceptions.StopIteration si) {
+                    break;
+                }
+            }
+        } else {
+            org.python.Object iterator = org.Python.iter(iterable);
+            int size = 0;
+            java.util.List<org.python.Object> pair;
+            while (true) {
+                try {
+                    org.python.Object next = iterator.__next__();
+                    if (next instanceof org.python.types.List) {
+                        pair = ((org.python.types.List) next).value;
+                    } else if (next instanceof org.python.types.Tuple) {
+                        pair = ((org.python.types.Tuple) next).value;
+                    } else if (next instanceof org.python.types.Str) {
+                        throw new org.python.exceptions.ValueError(
+                        "dictionary update sequence element #" + size + " has length 1; 2 is required");
+                    } else {
+                        throw new org.python.exceptions.TypeError("cannot convert dictionary update sequence element #" + size + " to a sequence");
+                    }
+
+                    if (pair.size() != 2) {
+                        throw new org.python.exceptions.ValueError(
+                        "dictionary update sequence element #" + size + " has length " + pair.size() +"; 2 is required");
+                    }
+                    org.python.Object key = pair.get(0);
+                    org.python.Object value = pair.get(1);
+                    this.value.put(key, value);
+                    size++;
+                } catch (org.python.exceptions.StopIteration si) {
+                    break;
+                }
+            }
+        }
+        return org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
