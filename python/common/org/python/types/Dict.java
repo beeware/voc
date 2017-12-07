@@ -506,7 +506,7 @@ public class Dict extends org.python.types.Object {
             }
         } else {
             org.python.Object iterator = org.Python.iter(iterable);
-            java.util.Map<org.python.Object, org.python.Object> generated = new java.util.HashMap<org.python.Object, org.python.Object>();
+            int size = 0;
             java.util.List<org.python.Object> pair;
             while (true) {
                 try {
@@ -517,19 +517,19 @@ public class Dict extends org.python.types.Object {
                         pair = ((org.python.types.Tuple) next).value;
                     } else if (next instanceof org.python.types.Str) {
                         throw new org.python.exceptions.ValueError(
-                        "dictionary update sequence element #" + generated.size() + " has length 1; 2 is required");
+                        "dictionary update sequence element #" + size + " has length 1; 2 is required");
                     } else {
-                        throw new org.python.exceptions.TypeError("cannot convert dictionary update sequence element #" + generated.size() + " to a sequence");
+                        throw new org.python.exceptions.TypeError("cannot convert dictionary update sequence element #" + size + " to a sequence");
                     }
 
                     if (pair.size() != 2) {
                         throw new org.python.exceptions.ValueError(
-                        "dictionary update sequence element #" + generated.size() + " has length " + pair.size() +"; 2 is required");
+                        "dictionary update sequence element #" + size + " has length " + pair.size() +"; 2 is required");
                     }
                     org.python.Object key = pair.get(0);
                     org.python.Object value = pair.get(1);
                     this.value.put(key, value);
-                    generated.put(pair.get(0), pair.get(1));
+                    size++;
                 } catch (org.python.exceptions.StopIteration si) {
                     break;
                 }

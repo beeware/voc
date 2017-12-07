@@ -301,25 +301,41 @@ class DictTests(TranspileTestCase):
         """)
 
         self.assertCodeExecution("""
-            a = {}
-            a.update([('a', 1, 2), ('b',2)])
-        """, exits_early=True)
+            try:
+                a = {}
+                a.update([('a', 1, 2), ('b',2)])
+                print('An error should have been raised!')
+            except ValueError:
+                print('Received a ValueError as expected')
+        """)
 
         self.assertCodeExecution("""
-            a = {}
-            a.update('1')
-        """, exits_early=True)
+            try:
+                a = {}
+                a.update('1')
+                print('An error should have been raised')
+            except ValueError:
+                print('Received a ValueError as expected')
+        """)
 
         self.assertCodeExecution("""
-            a = {}
-            a.update(1)
-        """, exits_early=True)
+            try:
+                a = {}
+                a.update(1)
+                print('An error should have been raised')
+            except TypeError:
+                print('Received a TypeError as expected')
+        """)
 
         self.assertCodeExecution("""
-            a = {}
-            x = set([1, 2])
-            a.update(x)
-        """, exits_early=True)
+            try:
+                a = {}
+                x = set([1, 2])
+                a.update(x)
+                print('An error should have been raised')
+            except TypeError:
+                print('Received a TypeError as expected')
+        """)
 
     def test_keys(self):
         self.assertCodeExecution("""
