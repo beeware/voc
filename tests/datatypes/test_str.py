@@ -713,6 +713,19 @@ class StrTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+    def test_rsplit(self):
+        self.assertCodeExecution(r"""
+            for s in ['\vhello,  eeeeee      world', 'eeedddedededeiakelaoweeeedeeee', 'átomo', '','     Hello there   this is a           sentence   for the     rsplit              test             ']:
+                print(s.rsplit())
+                print(s.rsplit("e"))
+                print(s.rsplit(maxsplit=2))
+                print(s.rsplit("e",3))
+                print(s.rsplit(" ", -10)
+                try:
+                    print(s.rsplit(5))
+                except TypeError as err:
+                    print(err)
+            """)
 
     def test_isnumeric(self):
         self.assertCodeExecution("""
