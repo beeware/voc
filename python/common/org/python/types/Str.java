@@ -1412,7 +1412,7 @@ public class Str extends org.python.types.Object {
                         temp = j;
                         result_list.insert(new org.python.types.Int(0), new org.python.types.Str(sb.toString()));
                         break;
-                    } 
+                    }
                     else {
                         sb.insert(0, value.charAt(j));
                     }
@@ -1422,7 +1422,7 @@ public class Str extends org.python.types.Object {
                 result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0,j+1)));
             }
         }
-        else {    //handles non-whitespace and non-default whitespace delimiters (Ex. rsplit("e",12) rsplit(" ",2))
+        else {  //handles non-whitespace and non-default whitespace delimiters (Ex. rsplit("e",12) rsplit(" ",2))
             int lastIndex = 0, count = 0, number = 0;
             while(lastIndex != -1) {
                 lastIndex = value.indexOf(sepStr,lastIndex);
