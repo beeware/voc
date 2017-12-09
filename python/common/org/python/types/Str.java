@@ -1391,7 +1391,7 @@ public class Str extends org.python.types.Object {
                     }
                     count++;
                 }
-            }   
+            }
             //handles provided maxsplit argument (ex. rsplit(maxsplit=2))
             if (maxsplit != null && java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {
                 number = java.lang.Integer.parseInt(maxsplit.toString());
@@ -1424,8 +1424,7 @@ public class Str extends org.python.types.Object {
             int lastIndex = 0, count = 0, number = 0;
             while(lastIndex != -1) {
                 lastIndex = value.indexOf(sepStr,lastIndex);
-                if(lastIndex != -1) 
-                {
+                if(lastIndex != -1) {
                     count ++;
                     lastIndex += sepStr.length();
                 }
