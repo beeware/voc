@@ -1439,7 +1439,8 @@ public class Str extends org.python.types.Object {
                     number = java.lang.Integer.parseInt(maxsplit.toString());
                 } else {
                     number = count;     //handles negative maxsplit
-                } if (number > count) {
+                } 
+                if (number > count) {
                     numEnd = number - count;
                 }
                 int temp = value.length(), j = 0;
