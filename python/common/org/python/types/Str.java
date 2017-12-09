@@ -1401,7 +1401,7 @@ public class Str extends org.python.types.Object {
             int numEnd = 0;
             if (number > count) { //prevent going out of bounds later
                 numEnd = number - count;
-          } for (int i = number; i > numEnd; i--) {
+            }for (int i = number; i > numEnd; i--) {
                 java.lang.StringBuilder sb = new StringBuilder();
                 for (j = temp; j >= 0; j--) {
                     if (value.charAt(j) == ' ') {
