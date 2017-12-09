@@ -1430,7 +1430,7 @@ public class Str extends org.python.types.Object {
                     count ++;
                     lastIndex += sepStr.length();
                 }
-            } 
+            }
             if (count == 0) {
                 result_list.insert(new org.python.types.Int(0),new org.python.types.Str(value));  //if no matches found, simply return array containing original string
             } else {
