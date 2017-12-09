@@ -1454,8 +1454,8 @@ public class Str extends org.python.types.Object {
                             } else {
                                 result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(j+sepStr.length(),temp)));
                                 temp = j;
-                           }
-                           break;
+                            }
+                            break;
                         }
                     }
                 }
