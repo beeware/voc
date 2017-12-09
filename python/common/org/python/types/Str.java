@@ -1412,7 +1412,8 @@ public class Str extends org.python.types.Object {
                         temp = j;
                         result_list.insert(new org.python.types.Int(0), new org.python.types.Str(sb.toString()));
                         break;
-                } else {
+                    } 
+                    else {
                         sb.insert(0, value.charAt(j));
                     }
                 }
