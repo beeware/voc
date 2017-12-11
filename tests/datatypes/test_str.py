@@ -715,7 +715,7 @@ class StrTests(TranspileTestCase):
             """)
     def test_rsplit(self):
         self.assertCodeExecution(r"""
-           for s in ['This is for rsplit', ' eeed d ded  eded   ', 'átomo', '',' t e s t i n g   r s p l i t ']:
+           for s in ['This is for rsplit', ' eeed d ded  eded   ', 'átomo', '',' t e s t i n g   r s p l i t ', 'a b c']:
                 print(s.rsplit())
                 print(s.rsplit("e"))
                 print(s.rsplit(maxsplit=2))

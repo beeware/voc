@@ -1419,6 +1419,8 @@ public class Str extends org.python.types.Object {
             }
             if (j != 0) {
                 result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, j + 1)));
+            } else if (j == 0 && value.charAt(j) != ' ') {
+                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, 1)));
             }
         } else {  //handles non-whitespace and non-default whitespace delimiters (Ex. rsplit("e",12) rsplit(" ",2))
             int lastIndex = 0, count = 0, number = 0;
