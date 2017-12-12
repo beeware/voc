@@ -1404,7 +1404,7 @@ public class Str extends org.python.types.Object {
                         count++;
                     }
                 }
-                if (maxsplit != null && java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {
+                if (maxsplit != null && java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {	//check for positive maxsplit
                     number = java.lang.Integer.parseInt(maxsplit.toString());
                 } else {
                     number = count;
