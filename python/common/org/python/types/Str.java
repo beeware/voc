@@ -1404,8 +1404,8 @@ public class Str extends org.python.types.Object {
                         count++;
                     }
                 }
-                if (maxsplit != null && java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {	//check for positive maxsplit
-                    number = java.lang.Integer.parseInt(maxsplit.toString());
+                if (maxsplit != null && java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {
+                    number = java.lang.Integer.parseInt(maxsplit.toString());  //check for positive maxsplit
                 } else {
                     number = count;
                 }
@@ -1444,8 +1444,7 @@ public class Str extends org.python.types.Object {
                     result_list.append(new org.python.types.Str(""));
                 }
                 return result_list;
-            }
-            else {
+            } else {
                 int lastIndex = 0, count = 0, number = 0;
                 while (lastIndex != -1) {
                     lastIndex = value.indexOf(sepStr, lastIndex);
