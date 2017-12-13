@@ -1348,14 +1348,17 @@ public class Str extends org.python.types.Object {
             default_args = {"sep", "maxsplit"}
     )
     public org.python.Object rsplit(org.python.Object sep, org.python.Object maxsplit) {
+        if (maxsplit == null) {
+            return this.split(sep, null);
+        }
         if (this.value.isEmpty()) { //handles empty strings
             if (sep == null) {
-                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
+                if (maxsplit instanceof org.python.types.Int) {
                     return new org.python.types.List();
                 }
                 throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' cannot be interpreted as an integer");
             } else if (sep instanceof org.python.types.Str) {
-                if (maxsplit == null || maxsplit instanceof org.python.types.Int) {
+                if (maxsplit instanceof org.python.types.Int) {
                     org.python.types.List result_list = new org.python.types.List();
                     result_list.append(new org.python.types.Str(""));
                     return result_list;
@@ -1381,108 +1384,84 @@ public class Str extends org.python.types.Object {
 
         org.python.types.List result_list = new org.python.types.List();
         if (wspace) {    //handles whitespace delimiters (default case)
-            if (maxsplit == null) {
-                value = value.trim();   //simply call split() for null maxsplit, set sep to default whitespace
-                sep = new org.python.types.Str("\\s+");
-                java.lang.String[] result = value.split(((org.python.types.Str) sep).toString());
-                for (java.lang.String w : result) {
-                    result_list.append(new org.python.types.Str(w));
+            value = value.replaceAll("\\s++$", ""); //trim trailing spaces
+            int temp = value.length() - 1, j = value.length() - 1;
+            int count = 0, number = 0;
+            for (int i = 0; i < value.length(); i++) {   //count number of whitespace sequences
+                if (value.charAt(i) == ' ') {
+                    while (value.charAt(i) == ' ') {
+                        i++;
+                    }
+                    count++;
                 }
-                if (this.value.endsWith(sep.toString())) {
-                    result_list.append(new org.python.types.Str(""));
-                }
-                return result_list;
+            }
+            if (java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {
+                number = java.lang.Integer.parseInt(maxsplit.toString());  //check for positive maxsplit
             } else {
-                value = value.replaceAll("\\s++$", ""); //trim trailing spaces
-                int temp = value.length() - 1, j = value.length() - 1;
-                int count = 0, number = 0;
-                for (int i = 0; i < value.length(); i++) {   //count number of whitespace sequences
-                    if (value.charAt(i) == ' ') {
-                        while (value.charAt(i) == ' ') {
-                            i++;
+                number = count;
+            }
+            int numEnd = 0;
+            if (number > count) { //prevent going out of bounds later
+                numEnd = number - count;
+            }
+            for (int i = number; i > numEnd; i--) {
+                java.lang.StringBuilder sb = new StringBuilder();
+                for (j = temp; j >= 0; j--) {
+                    if (value.charAt(j) == ' ') {
+                        while (value.charAt(j) == ' ' && j != 0) {
+                            j--;
                         }
-                        count++;
+                        temp = j;
+                        result_list.insert(new org.python.types.Int(0), new org.python.types.Str(sb.toString()));
+                        break;
+                    } else {
+                        sb.insert(0, value.charAt(j));
                     }
                 }
-                if (maxsplit != null && java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {
-                    number = java.lang.Integer.parseInt(maxsplit.toString());  //check for positive maxsplit
+            }
+            if (j != 0) {
+                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, j + 1)));
+            } else if (j == 0 && value.charAt(j) != ' ') {
+                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, 1)));
+            }
+        } else {  //handles non-whitespace and non-default whitespace delimiters (Ex. rsplit("e",12) rsplit(" ",2))
+            int lastIndex = 0, count = 0, number = 0;
+            while (lastIndex != -1) {
+                lastIndex = value.indexOf(sepStr, lastIndex);
+                if (lastIndex != -1) {
+                    count++;
+                    lastIndex += sepStr.length();
+                }
+            }
+            if (count == 0) {
+                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value));  //if no matches found, simply return array containing original string
+            } else {
+                int numEnd = 0;
+                if (java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {
+                    number = java.lang.Integer.parseInt(maxsplit.toString());
                 } else {
                     number = count;
                 }
-                int numEnd = 0;
-                if (number > count) { //prevent going out of bounds later
+                if (number > count) {
                     numEnd = number - count;
                 }
+                int temp = value.length(), j = 0;
                 for (int i = number; i > numEnd; i--) {
-                    java.lang.StringBuilder sb = new StringBuilder();
                     for (j = temp; j >= 0; j--) {
-                        if (value.charAt(j) == ' ') {
-                            while (value.charAt(j) == ' ' && j != 0) {
+                        if (value.substring(j, temp).contains(sepStr)) {
+                            if (i == 0) {   //prevent going over string bounds
+                                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(j + sepStr.length(), value.length())));
+                                temp = j;
                                 j--;
+                            } else {
+                                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(j + sepStr.length(), temp)));
+                                temp = j;
                             }
-                            temp = j;
-                            result_list.insert(new org.python.types.Int(0), new org.python.types.Str(sb.toString()));
                             break;
-                        } else {
-                            sb.insert(0, value.charAt(j));
                         }
                     }
                 }
-                if (j != 0) {
-                    result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, j + 1)));
-                } else if (j == 0 && value.charAt(j) != ' ') {
-                    result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, 1)));
-                }
-            }
-        } else {  //handles non-whitespace and non-default whitespace delimiters (Ex. rsplit("e",12) rsplit(" ",2))
-            if (maxsplit == null) {
-                java.lang.String[] result = value.split(((org.python.types.Str) sep).toString());
-                for (java.lang.String w : result) {
-                    result_list.append(new org.python.types.Str(w));
-                }
-                if (this.value.endsWith(sep.toString())) {
-                    result_list.append(new org.python.types.Str(""));
-                }
-                return result_list;
-            } else {
-                int lastIndex = 0, count = 0, number = 0;
-                while (lastIndex != -1) {
-                    lastIndex = value.indexOf(sepStr, lastIndex);
-                    if (lastIndex != -1) {
-                        count++;
-                        lastIndex += sepStr.length();
-                    }
-                }
-                if (count == 0) {
-                    result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value));  //if no matches found, simply return array containing original string
-                } else {
-                    int numEnd = 0;
-                    if (maxsplit != null && java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {
-                        number = java.lang.Integer.parseInt(maxsplit.toString());
-                    } else {
-                        number = count;
-                    }
-                    if (number > count) {
-                        numEnd = number - count;
-                    }
-                    int temp = value.length(), j = 0;
-                    for (int i = number; i > numEnd; i--) {
-                        for (j = temp; j >= 0; j--) {
-                            if (value.substring(j, temp).contains(sepStr)) {
-                                if (i == 0) {   //prevent going over string bounds
-                                    result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(j + sepStr.length(), value.length())));
-                                    temp = j;
-                                    j--;
-                                } else {
-                                    result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(j + sepStr.length(), temp)));
-                                    temp = j;
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, j)));
-                }
+                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, j)));
             }
         }
         return result_list;
