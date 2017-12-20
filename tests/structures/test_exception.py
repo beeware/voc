@@ -85,11 +85,11 @@ class ExceptionTests(TranspileTestCase):
                 try:
                     raise exc("one")
                 except Exception as e:
-                    print(e)
+                    print(e, e.args, str(e), repr(e))
                 try:
                     raise exc("one", 2)
                 except Exception as e:
-                    print(e)
+                    print(e, e.args)
         """)
 
     @expectedFailure

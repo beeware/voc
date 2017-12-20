@@ -1,30 +1,21 @@
 package org.python.exceptions;
 
 public class KeyError extends org.python.exceptions.LookupError {
-    private String customMessage = null;
     public KeyError(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        super(convertToReprIfOneArgument(args), kwargs);
-        if (args.length == 1) {
-            customMessage = args[0].__repr__().toString();
-        }
+        super(args, kwargs);
     }
 
-    @Override
-    public String getMessage() {
-        if (customMessage != null) {
-            return customMessage;
+    @org.python.Method(
+            __doc__ = "Return str(self)."
+    )
+    public org.python.Object __str__() {
+        if (this.args.value.size() == 1) {
+            return this.args.value.get(0).__repr__();
         }
-        return super.getMessage();
-    }
-
-    private static org.python.Object[] convertToReprIfOneArgument(org.python.Object[] args) {
-        if (args.length == 1) {
-            return new org.python.Object[] { args[0].__repr__() };
-        }
-        return args;
+        return this.args.__str__();
     }
 
     public KeyError(org.python.Object key) {
-        super(key.__repr__().toString());
+        super(new org.python.Object[] {key}, null);
     }
 }
