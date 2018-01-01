@@ -1,0 +1,56 @@
+description = "Build Python support libraries for voc"
+
+ant.importBuild "build.xml"
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    checkstyle
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "4.4.1"
+}
+
+task checkstyle(type: Checkstyle) {
+    configFile = new File(rootDir, "checkstyle.xml")
+    ignoreFailures = true
+    showViolations = true
+    source = "python"
+    classpath = files("python")
+    checkstyleClasspath = configurations.checkstyle
+    includes = ["**/*.java"]
+}
+
+task all {
+    dependsOn = [java, android]
+}
+
+task upload(type: Exec) {
+    description = "Upload assets to S3"
+    dependsOn = [java, android]
+    workingDir = "tools"
+    commandLine = ["python", "upload.py"]
+}
+
+task clean(type: Delete) {
+    description = "Clean up"
+    delete = ["build", "dist"]
+}
+
+task test(type: Exec) {
+    description = "Runs all tests in non-parallel mode"
+    workingDir = rootDir
+    executable = "sh"
+    args = [".", "env/bin/activate", "python", "setup.py", "test"]
+}
+
+//Java build
+
+//Android build
+
+dependencies {
+    checkstyle group: "com.puppycrawl.tools", name: "checkstyle", version: "6.19"
+}

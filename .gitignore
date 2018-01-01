@@ -15,5 +15,8 @@ tests/temp
 tests/tmp*
 .cache/
 .env
+.gradle
+.idea
+*.iml
 
 .DS_Store

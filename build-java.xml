@@ -57,8 +57,4 @@
           overwrite="true" />
   </target>
 
-  <target name="clean" description="Clean up">
-    <delete dir="${build}"/>
-    <delete dir="${dist}"/>
-  </target>
 </project>

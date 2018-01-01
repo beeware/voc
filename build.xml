@@ -22,18 +22,6 @@
   <property name="build" location="build"/>
   <property name="dist" location="dist"/>
 
-  <target name="checkstyle" description="Runs checkstyle">
-    <taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties">
-      <classpath>
-        <pathelement location="lib/checkstyle-6.19-all.jar" />
-      </classpath>
-    </taskdef>
-    <checkstyle config="checkstyle.xml" failureProperty="checkstyle.failure.property">
-      <formatter type="plain" />
-      <fileset dir="python" includes="**/*.java" />
-    </checkstyle>
-  </target>
-
   <target name="java">
     <ant antfile="build-java.xml" target="dist"/>
     <ant antfile="build-java.xml" target="dist-testdaemon"/>
@@ -43,17 +31,4 @@
     <ant antfile="build-android.xml" target="dist"/>
   </target>
 
-  <target name="all" depends="java, android" />
-
-  <target name="upload" depends="java, android" description="Upload assets to S3">
-    <exec executable="python">
-      <arg value="tools/upload.py"/>
-      <arg value="b${release}"/>
-    </exec>
-  </target>
-
-  <target name="clean" description="Clean up">
-    <delete dir="${build}"/>
-    <delete dir="${dist}"/>
-  </target>
 </project>
