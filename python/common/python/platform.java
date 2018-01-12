@@ -25,7 +25,9 @@ public class platform extends org.python.types.Module {
             platform_class_name = "python._platform.JavaPlatform";
         } else if (vendor.equals("The Android Project")) {
             platform_class_name = "python._platform.AndroidPlatform";
-        } else {
+        } else if (vendor.equals("Azul Systems, Inc.")) {
+	    platform_class_name = "python._platform.JavaPlatform";
+	} else {
             throw new org.python.exceptions.RuntimeError("Unknown platform vendor '" + vendor + "'");
         }
 
