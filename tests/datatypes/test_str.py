@@ -778,6 +778,40 @@ class StrTests(TranspileTestCase):
         print(s1.splitlines(True))
         """)
 
+    def test_zfill(self):
+        self.assertCodeExecution("""
+            s = '42'
+            print(s.zfill(5))
+
+            try:
+                print(s.zfill('string'))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(s.zfill({}))
+            except TypeError as err:
+                print(err)
+
+            s = '-42'
+            print(s.zfill(5))
+
+            s = '+42'
+            print(s.zfill(5))
+
+            s = ''
+            print(s.zfill(5))
+
+            s = '-.-42'
+            print(s.zfill(6))
+        """)
+
+    @expectedFailure
+    def test_zfill_arg_handling():
+        self.assertCodeExecution("""
+            s = "42"
+            s.zfill()
+        """)
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
