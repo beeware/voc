@@ -1764,8 +1764,47 @@ public class Str extends org.python.types.Object {
     public org.python.Object upper() {
         return new org.python.types.Str(this.value.toUpperCase());
     }
-}
 
+    @org.python.Method(
+            __doc__ = "S.zfill() -> str\n" +
+                    "\n" +
+                    "Return a copy of the string left filled with ASCII '0' \n" +
+                    "digits to make a string of length width.\n",
+            args = {"width"}
+    )
+    public org.python.Object zfill(org.python.Object width) {
+
+
+        if (width instanceof org.python.types.Float) {
+            throw new org.python.exceptions.TypeError("integer argument expected, got float");
+        }
+        else if (!(width instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("'" + org.Python.typeName(width.getClass()) +
+                                                      "' object cannot be interpreted as an integer");
+        }
+
+        int w = (int) ((org.python.types.Int) width).value;
+
+        if (this.value.length() >= w) {
+            return new org.python.types.Str(this.value);
+        }
+
+        int fill = w - this.value.length();
+
+        java.lang.StringBuffer str = new java.lang.StringBuffer(w);
+
+        if (this.value.length() != 0 && (this.value.charAt(0) == '-' || this.value.charAt(0) == '+')) {
+            str.append(this.value.charAt(0));
+            this.value = this.value.substring(1);
+        }
+
+        for(int i = 0; i < fill; i++) {
+            str.append('0');
+        }
+
+        return new org.python.types.Str(str.toString() + this.value);
+    }
+}
 
 final class PythonFormatter {
 
