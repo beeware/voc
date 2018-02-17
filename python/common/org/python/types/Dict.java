@@ -418,7 +418,7 @@ public class Dict extends org.python.types.Object {
             __doc__ = "D.keys() -> a set-like object providing a view on D's keys"
     )
     public org.python.Object keys() {
-        // FIXME: This should return a dict_view object, not compose a new list.
+        // FIXME: This should return a dict_keys object, not compose a new list.
         org.python.types.List objects = new org.python.types.List();
 
         for (org.python.Object o : this.value.keySet()) {
