@@ -226,6 +226,20 @@ class BytesTests(TranspileTestCase):
             print(b'abcabca'.count(97, 3, [])) #Test Slicing Error on End
         """, exits_early=True)
 
+    def test_expandtabs(self):
+        self.assertCodeExecution("""
+            print(b''.expandtabs())
+            print(b'\t'.expandtabs())
+            print(b'a\t'.expandtabs())
+            print(b'a\t'.expandtabs())
+            print(b'a \t'.expandtabs(tabsize=3))
+            print(b'a  \t '.expandtabs(tabsize=3))
+            print(b'a  \t '.expandtabs(tabsize=3))
+            print(b'a  \t b'.expandtabs(tabsize=-1))
+            print(b'a  \t b \t'.expandtabs(tabsize=-1))
+            print(b'a  \t  b\t '.expandtabs(tabsize=4))
+        """)
+
     def test_find(self):
         self.assertCodeExecution("""
             print(b''.find(b'a'))
