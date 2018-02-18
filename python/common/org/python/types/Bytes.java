@@ -909,7 +909,7 @@ public class Bytes extends org.python.types.Object {
         }
     }
 
-    private org.python.Object endsOrStartsWith(org.python.Object substring, org.python.Object start, org.python.Object end, int direction) {
+    public org.python.Object endsOrStartsWith(org.python.Object substring, org.python.Object start, org.python.Object end, int direction) {
         if (start != null || end != null) {
             Bytes sliced = (Bytes) this.__getitem__(new org.python.types.Slice(start, end));
             return sliced.endsOrStartsWith(substring, null, null, direction);
