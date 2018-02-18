@@ -1,5 +1,6 @@
 package org.python.types;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -971,10 +972,70 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.expandtabs(tabsize=8) -> copy of B\n\nReturn a copy of B where all tab characters are expanded using spaces.\nIf tabsize is not given, a tab size of 8 characters is assumed."
+            __doc__ = "B.expandtabs(tabsize=8) -> copy of B\n\nReturn a copy of B where all tab characters are expanded using spaces.\nIf tabsize is not given, a tab size of 8 characters is assumed.",
+            default_args = {"tabsize"}
     )
-    public org.python.Object expandtabs(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.expandtabs has not been implemented.");
+    public org.python.Object expandtabs(org.python.types.Object tabsize) {
+        // CPython implementation https://github.com/python/cpython/blob/master/Objects/stringlib/transmogrify.h#L21
+        // TODO: check overflows
+
+        if (this.value == null) {
+            return null;
+        }
+
+        if (this.value.length == 0) {
+            return new org.python.types.Bytes(new byte[0]);
+        }
+
+        int tabsize_int = 8;
+
+        if (tabsize != null) {
+            tabsize_int = (int) ((org.python.types.Int) tabsize).value;
+        }
+
+
+        int output_size = 0;
+        for (int i = 0, j = 0; i < this.value.length; i++) {
+            byte c = this.value[i];
+
+            if (c == '\t') {
+                if (tabsize_int > 0) {
+                    j += (tabsize_int - (j % tabsize_int));
+                }
+            } else {
+                j++;
+
+                if (c == '\n' || c == '\r') {
+                    output_size += j;
+                    j = 0;
+                }
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0, j = 0; i < this.value.length; i++) {
+            byte c = this.value[i];
+
+            if (c == '\t') {
+                if (tabsize_int > 0) {
+                    output_size = tabsize_int - (j % tabsize_int);
+                    j += output_size;
+                    while (output_size-- > 0) {
+                        sb.append(' ');
+                    }
+                }
+            } else {
+                j++;
+                sb.append((char)c);
+
+                if (c == '\n' || c == '\r') {
+                    j = 0;
+                }
+            }
+        }
+
+        return new Bytes(sb.toString());
     }
 
     @org.python.Method(
