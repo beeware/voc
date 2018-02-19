@@ -987,55 +987,41 @@ public class Bytes extends org.python.types.Object {
             return new org.python.types.Bytes(new byte[0]);
         }
 
-        int tabsize_int = 8;
+        int tabsizeInt = 8;
 
         if (tabsize != null) {
-            tabsize_int = (int) ((org.python.types.Int) tabsize).value;
+            tabsizeInt = (int) ((org.python.types.Int) tabsize).value;
         }
 
+        ArrayList<Character> buffer = new ArrayList<>();
 
-        int output_size = 0;
-        for (int i = 0, j = 0; i < this.value.length; i++) {
-            byte c = this.value[i];
-
-            if (c == '\t') {
-                if (tabsize_int > 0) {
-                    j += (tabsize_int - (j % tabsize_int));
-                }
-            } else {
-                j++;
-
-                if (c == '\n' || c == '\r') {
-                    output_size += j;
-                    j = 0;
-                }
-            }
-        }
-
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0, j = 0; i < this.value.length; i++) {
-            byte c = this.value[i];
+        for (int i = 0, lineIndex = 0; i < this.value.length; i++) {
+            char c = (char) this.value[i];
 
             if (c == '\t') {
-                if (tabsize_int > 0) {
-                    output_size = tabsize_int - (j % tabsize_int);
-                    j += output_size;
-                    while (output_size-- > 0) {
-                        sb.append(' ');
+                if (tabsizeInt > 0) {
+                    int untilClosestColumn = tabsizeInt - (lineIndex % tabsizeInt);
+                    lineIndex += untilClosestColumn;
+                    while (untilClosestColumn-- > 0) {
+                        buffer.add(' ');
                     }
                 }
             } else {
-                j++;
-                sb.append((char)c);
+                lineIndex++;
+                buffer.add(c);
 
                 if (c == '\n' || c == '\r') {
-                    j = 0;
+                    lineIndex = 0;
                 }
             }
         }
 
-        return new Bytes(sb.toString());
+        byte[] bytes = new byte[buffer.size()];
+        for (int i = 0; i < buffer.size(); i++) {
+            bytes[i] = (byte) ((char) buffer.get(i));
+        }
+
+        return new org.python.types.Bytes(bytes);
     }
 
     @org.python.Method(
