@@ -212,6 +212,21 @@ class BytearrayTests(TranspileTestCase):
                 print(bytearray(range(b, b+16)))
         """)
 
+    def test_endswith(self):
+        self.assertCodeExecution(r"""
+            print(bytearray(b'banana').endswith(b'ana'))
+            print(bytearray(b'banana').endswith(b''))
+            print(bytearray(b'').endswith(b'ana'))
+            print(bytearray(b'').endswith(b''))
+        """)
+
+    def test_startswith(self):
+        self.assertCodeExecution(r"""
+            print(bytearray(b'banana').startswith(b'ana'))
+            print(bytearray(b'banana').startswith(b''))
+            print(bytearray(b'').startswith(b'ana'))
+            print(bytearray(b'').startswith(b''))
+        """)
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
