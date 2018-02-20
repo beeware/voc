@@ -976,7 +976,7 @@ public class Bytes extends org.python.types.Object {
             default_args = {"tabsize"}
     )
     public org.python.Object expandtabs(org.python.types.Object tabsize) {
-        // CPython implementation https://github.com/python/cpython/blob/master/Objects/stringlib/transmogrify.h#L21
+        // CPython implementation https://github.com/python/cpython/blob/3.6/Objects/stringlib/transmogrify.h#L21
         // TODO: check overflows
 
         if (this.value == null) {
