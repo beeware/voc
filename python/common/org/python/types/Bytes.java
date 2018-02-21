@@ -990,35 +990,40 @@ public class Bytes extends org.python.types.Object {
         int tabsizeInt = 8;
 
         if (tabsize != null) {
-            tabsizeInt = (int) ((org.python.types.Int) tabsize).value;
+            try {
+                tabsizeInt = (int) ((org.python.types.Int) tabsize).value;
+            } catch (ClassCastException exc) {
+                throw new ClassCastException(String.format("The input value %s is an invalid argument", tabsize));
+            }
         }
 
-        ArrayList<Character> buffer = new ArrayList<>();
+        ArrayList<Byte> buffer = new ArrayList<>();
 
         for (int i = 0, lineIndex = 0; i < this.value.length; i++) {
-            char c = (char) this.value[i];
+            byte b = this.value[i];
 
-            if (c == '\t') {
+            if (b == '\t') {
                 if (tabsizeInt > 0) {
                     int untilClosestColumn = tabsizeInt - (lineIndex % tabsizeInt);
                     lineIndex += untilClosestColumn;
                     while (untilClosestColumn-- > 0) {
-                        buffer.add(' ');
+                        buffer.add((byte) ' ');
                     }
                 }
             } else {
                 lineIndex++;
-                buffer.add(c);
+                buffer.add(b);
 
-                if (c == '\n' || c == '\r') {
+                if (b == '\n' || b == '\r') {
                     lineIndex = 0;
                 }
             }
         }
 
+        // TODO refactor
         byte[] bytes = new byte[buffer.size()];
         for (int i = 0; i < buffer.size(); i++) {
-            bytes[i] = (byte) ((char) buffer.get(i));
+            bytes[i] = buffer.get(i);
         }
 
         return new org.python.types.Bytes(bytes);
