@@ -713,9 +713,10 @@ class StrTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
     def test_rsplit(self):
         self.assertCodeExecution(r"""
-           for s in ['This is for rsplit', ' eeed d ded  eded   ', 'átomo', '',' t e s t i n g   r s p l i t ', 'a b c']:
+           for s in ['This is for rsplit',' eeed d ded  eded   ','átomo','',' t e s t i n g   r s p l i t ','a b c']:
                 print(s.rsplit())
                 print(s.rsplit("e"))
                 print(s.rsplit(maxsplit=2))
@@ -807,11 +808,12 @@ class StrTests(TranspileTestCase):
         """)
 
     @expectedFailure
-    def test_zfill_arg_handling():
+    def test_zfill_arg_handling(self):
         self.assertCodeExecution("""
             s = "42"
             s.zfill()
         """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

@@ -524,7 +524,7 @@ public class Dict extends org.python.types.Object {
 
                     if (pair.size() != 2) {
                         throw new org.python.exceptions.ValueError(
-                        "dictionary update sequence element #" + size + " has length " + pair.size() +"; 2 is required");
+                        "dictionary update sequence element #" + size + " has length " + pair.size() + "; 2 is required");
                     }
                     org.python.Object key = pair.get(0);
                     org.python.Object value = pair.get(1);
