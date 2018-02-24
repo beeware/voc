@@ -503,6 +503,7 @@ class BytesTests(TranspileTestCase):
             print(b''.split(maxsplit='5'))
             """, exits_early=True)
 
+
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
 

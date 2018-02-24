@@ -9,7 +9,7 @@ public class Exception extends org.python.exceptions.BaseException {
         super(msg);
     }
 
-    @org.python.Method(__doc__="", varargs="args")
+    @org.python.Method(__doc__ = "", varargs = "args")
     public Exception(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         super(args, kwargs);
     }

@@ -1777,8 +1777,7 @@ public class Str extends org.python.types.Object {
 
         if (width instanceof org.python.types.Float) {
             throw new org.python.exceptions.TypeError("integer argument expected, got float");
-        }
-        else if (!(width instanceof org.python.types.Int)) {
+        } else if (!(width instanceof org.python.types.Int)) {
             throw new org.python.exceptions.TypeError("'" + org.Python.typeName(width.getClass()) +
                                                       "' object cannot be interpreted as an integer");
         }
@@ -1798,7 +1797,7 @@ public class Str extends org.python.types.Object {
             this.value = this.value.substring(1);
         }
 
-        for(int i = 0; i < fill; i++) {
+        for (int i = 0; i < fill; i++) {
             str.append('0');
         }
 

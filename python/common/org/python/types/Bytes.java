@@ -1251,11 +1251,10 @@ public class Bytes extends org.python.types.Object {
             result.value.add(this);
             result.value.add(new Bytes(""));
             result.value.add(new Bytes(""));
-        }
-        else {
+        } else {
             result.value.add(new Bytes(Arrays.copyOfRange(this.value, 0, pos)));
             result.value.add(sep);
-            result.value.add(new Bytes(Arrays.copyOfRange(this.value, pos + ((Bytes)sep).value.length, this.value.length)));
+            result.value.add(new Bytes(Arrays.copyOfRange(this.value, pos + ((Bytes) sep).value.length, this.value.length)));
         }
         return result;
     }
