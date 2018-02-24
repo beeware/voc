@@ -430,7 +430,7 @@ public class Str extends org.python.types.Object {
             __doc__ = "Return self*value.n",
             args = {"other"}
     )
-    public org.python.Object __mul__(org.python.Object other) {
+   public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
             long other_int = ((org.python.types.Int) other).value;
             if (other_int < 1) {
