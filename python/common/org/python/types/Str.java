@@ -943,6 +943,21 @@ public class Str extends org.python.types.Object {
             if (!this.isCharPrintable(ch)) {
                 return new org.python.types.Bool(false);
             }
+            // Every characters except space ' ' in the following categories are 
+            // not printable:
+            //  0 - UNASSIGNED
+            // 12 - SPACE_SEPARATOR
+            // 13 - LINE_SEPARATOR
+            // 14 - PARAGRAPH_SEPARATOR
+            // 15 - CONTROL
+            // 16 - FORMAT
+            // 17 - PRIVATE_USE
+            // 18 - SURROGATE
+            else if((Character.getType(ch) == 0 ||
+                    (Character.getType(ch) >= 12 && Character.getType(ch) <= 18))
+                     && ch != ' ') {
+                return new org.python.types.Bool(false);
+            }
         }
         return new org.python.types.Bool(true);
     }
