@@ -748,10 +748,9 @@ class StrTests(TranspileTestCase):
             print(str_.isprintable())
             """)
 
-    @expectedFailure
     def test_isprintable_missing_cases(self):
         self.assertCodeExecution(r"""
-        tests = ['\u2028']:
+        tests = ['\u2028', '\u2029', '\u00A0']
         for test in tests:
             print(test.isprintable())
         """)
