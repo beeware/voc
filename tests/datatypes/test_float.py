@@ -112,7 +112,7 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
-        'test_multiply_complex',
+        #'test_multiply_complex',
         'test_multiply_NotImplemented',
         'test_multiply_range',
 
@@ -148,7 +148,7 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
-        'test_multiply_complex',
+        #'test_multiply_complex',
         'test_multiply_list',
         'test_multiply_NotImplemented',
         'test_multiply_range',
