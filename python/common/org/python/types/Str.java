@@ -540,6 +540,7 @@ public class Str extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("type str doesn't define __round__ method");
     }
 
+
     @org.python.Method(
             __doc__ = "S.capitalize() -> str\n" +
                     "\n" +
