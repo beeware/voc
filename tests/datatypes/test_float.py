@@ -115,7 +115,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_NotImplemented',
         'test_multiply_range',
 
-        'test_power_complex',
         'test_power_float',
 
         'test_subscr_bool',
@@ -153,7 +152,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
 
-        'test_power_complex',
         'test_power_float',
 
         'test_true_divide_complex',
