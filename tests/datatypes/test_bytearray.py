@@ -228,6 +228,7 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'').startswith(b''))
         """)
 
+
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
 
