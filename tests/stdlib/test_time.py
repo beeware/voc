@@ -106,11 +106,13 @@ class TimeModuleTests(TranspileTestCase):
 
     #######################################################
     # ctime
-    @expectedFailure
     def test_ctime(self):
         self.assertCodeExecution("""
             import time
             print(time.ctime())
+            print(time.ctime(0))
+            now = time.time()
+            time.ctime(now - now % 3600)
             """)
 
     #######################################################

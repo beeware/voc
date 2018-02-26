@@ -106,7 +106,7 @@ public class time extends org.python.types.Module {
         return new org.python.types.Str(ft.format(currentDate));
     }
     public static org.python.Object ctime(org.python.Object seconds) {
-        java.util.Date currentDate = new java.util.Date(((org.python.types.Int) seconds.__int__()).value * 1000);
+        java.util.Date currentDate = new java.util.Date((long) (((org.python.types.Int) seconds.__int__()).value * 1000));
         java.text.SimpleDateFormat ft = new java.text.SimpleDateFormat ("E MMM dd HH:mm:ss yyyy");
         return new org.python.types.Str(ft.format(currentDate));
     }
