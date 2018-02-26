@@ -107,7 +107,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
     not_implemented = [
-        'test_modulo_complex',
 
         'test_multiply_bytearray',
         'test_multiply_bytes',

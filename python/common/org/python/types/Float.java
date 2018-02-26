@@ -355,7 +355,9 @@ public class Float extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
-        }
+        }// else if (other instanceof org.python.types.Complex){
+           // return other.__truediv__(this);
+        //}
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.typeName() + "'");
     }
 
@@ -423,9 +425,11 @@ public class Float extends org.python.types.Object {
                     double result = (((((double) this.value) % other_val) + other_val) % other_val);
                     return new org.python.types.Float(result);
                 }
+            } else if (other instanceof org.python.types.Complex){
+                throw new org.python.exceptions.TypeError("can't mod complex numbers.");
             }
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
+            throw e;
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
     }
@@ -456,7 +460,7 @@ public class Float extends org.python.types.Object {
         }
 
         if (other instanceof org.python.types.Int) {
-            long other_val = ((org.python.types.Int) other).value;
+            long other_val = ((org.python.types.Int) other).value; // exponent
             if (other_val < 0) {
                 if (this.value == 0) {
                     throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
@@ -484,7 +488,8 @@ public class Float extends org.python.types.Object {
             } else {
                 return new org.python.types.Float(1);
             }
-        }
+         } 
+         
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'float' and '" + other.typeName() + "'");
     }
 
