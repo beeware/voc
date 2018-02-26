@@ -108,7 +108,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
 
-        'test_multiply_bytearray',
         'test_multiply_bytes',
         'test_multiply_class',
         'test_multiply_complex',
