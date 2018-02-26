@@ -423,7 +423,7 @@ public class List extends org.python.types.Object {
                     throw new org.python.exceptions.IndexError("list index out of range");
                 } else {
                     return this.value.get(idx);
-                }               
+                }
             } else {
                 int idx = (int) ((org.python.types.Int) index).value;
                 if (idx < 0) {
