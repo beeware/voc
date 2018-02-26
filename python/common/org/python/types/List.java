@@ -420,7 +420,7 @@ public class List extends org.python.types.Object {
             } else if (index instanceof org.python.types.Bool){
                 int idx = ((org.python.types.Bool)index).value ? 1 : 0;
                 if (idx >= this.value.size()){
-                    throw new org.python.exceptions.IndexError("list index out of range"); 
+                    throw new org.python.exceptions.IndexError("list index out of range");
                 } else {
                     return this.value.get(idx);
                 }
