@@ -488,8 +488,8 @@ public class Float extends org.python.types.Object {
             } else {
                 return new org.python.types.Float(1);
             }
-         } 
-         
+        } 
+
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'float' and '" + other.typeName() + "'");
     }
 
