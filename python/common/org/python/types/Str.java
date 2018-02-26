@@ -282,24 +282,35 @@ public class Str extends org.python.types.Object {
             if (index instanceof org.python.types.Slice) {
                 org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
                 java.lang.String sliced;
-
                 if (slice.start == null && slice.stop == null && slice.step == null) {
                     sliced = this.value;
                 } else {
                     long start;
                     if (slice.start != null) {
-                        start = toPositiveIndex(slice.start.value);
+                        if (slice.start.value < 0) {
+                            // computes starting index from end of string
+                            // sets to 0 if computed value went below 0
+                            start = Math.max(0, this.value.length() + slice.start.value);
+                        } else {
+                            start = slice.start.value;
+                        }
                     } else {
                         start = 0;
                     }
 
                     long stop;
                     if (slice.stop != null) {
-                        stop = toPositiveIndex(slice.stop.value);
+                        if (slice.stop.value < 0) {
+                            // computes ending index from end of string
+                            // sets to 0 if computed value went below 0
+                            stop = Math.max(0, this.value.length() + slice.stop.value);
+                        } else {
+                            // if stop goes beyond string length, sets it to the length
+                            stop = Math.min(this.value.length(), slice.stop.value);
+                        }
                     } else {
                         stop = this.value.length();
                     }
-                    stop = Math.max(start, stop);
 
                     long step;
                     if (slice.step != null) {
@@ -309,11 +320,21 @@ public class Str extends org.python.types.Object {
                     }
 
                     if (step == 1) {
-                        sliced = this.value.substring((int) start, (int) stop);
+                        if (start < stop) {
+                            sliced = this.value.substring((int) start, (int) stop);
+                        } else {
+                            sliced = "";
+                        }
                     } else {
                         java.lang.StringBuffer buffer = new java.lang.StringBuffer();
-                        for (long i = start; i < stop; i += step) {
+                        long i = start;
+                        while (true) {
+                            if ((i >= stop && step > 0) || (i <= stop && step < 0)
+                                    || i >= this.value.length() || i < 0) {
+                                break;
+                            }
                             buffer.append(this.value.charAt((int) i));
+                            i += step;
                         }
                         sliced = buffer.toString();
                     }
