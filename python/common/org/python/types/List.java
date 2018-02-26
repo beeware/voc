@@ -417,6 +417,13 @@ public class List extends org.python.types.Object {
                     }
                 }
                 return new org.python.types.List(sliced);
+            } else if (index instanceof org.python.types.Bool){
+                int idx = ((org.python.types.Bool)index).value ? 1 : 0;
+                if (idx >= this.value.size()){
+                    throw new org.python.exceptions.IndexError("list index out of range");    
+                } else {
+                    return this.value.get(idx);
+                }
             } else {
                 int idx = (int) ((org.python.types.Int) index).value;
                 if (idx < 0) {
