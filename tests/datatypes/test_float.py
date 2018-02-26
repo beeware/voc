@@ -135,7 +135,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_subscr_str',
         'test_subscr_tuple',
 
-        'test_true_divide_complex',
     ]
 
 

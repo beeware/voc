@@ -358,28 +358,8 @@ public class Float extends org.python.types.Object {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
         } else if (other instanceof org.python.types.Complex){
-
-            double other_real = ((org.python.types.Complex)other).real.value;
-            double other_imag = ((org.python.types.Complex)other).imag.value; 
-
-            if (other_real == 0.0 && other_imag == 0.0){
-                throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
-            } else if (this.value == 0.0){
-                return new org.python.types.Complex(0.0, 0.0);
-            } else if (other_imag == 0.0){
-                return new org.python.types.Complex(this.value/other_real, 0.0*java.lang.Math.signum(other_real));
-            } else if (other_real == 0.0){
-                return new org.python.types.Complex(0.0*java.lang.Math.signum(other_real), -this.value/other_imag);
-            } else {
-                org.python.types.Complex other_conjugate = (org.python.types.Complex)((org.python.types.Complex)other).conjugate();
-                org.python.types.Complex numerator = (org.python.types.Complex) this.__mul__(other_conjugate);
-                org.python.types.Float denominator = new org.python.types.Float(other_real*other_real + other_imag*other_imag);
-                org.python.types.Float real1, imag1;
-                real1 = (org.python.types.Float)numerator.real.__truediv__(denominator);
-                imag1 = (org.python.types.Float)numerator.imag.__truediv__(denominator);
-                return new org.python.types.Complex(real1, imag1);
-            }
-
+            org.python.types.Complex dummycomplex = new org.python.types.Complex(this.value, 0.0);
+            return dummycomplex.__truediv__((org.python.types.Complex) other);         
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.typeName() + "'");
     }
