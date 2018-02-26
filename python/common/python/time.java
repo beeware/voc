@@ -66,9 +66,17 @@ public class time extends org.python.types.Module {
     @org.python.Attribute
     public static org.python.Object __spec__ = org.python.types.NoneType.NONE;  // TODO
     public static org.python.types.Int altzone;
-
+    //TODO
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "str(object='') -> str"+
+                      "str(bytes_or_buffer[, encoding[, errors]]) -> str\n"+
+                      "Create a new string object from the given object. If encoding or\n"+
+                      "errors is specified, then the object must expose a data buffer\n"+
+                      "that will be decoded using the given encoding and error handler.\n"+
+                      "Otherwise, returns the result of object.__str__() (if defined)\n"+
+                      "or repr(object).\n"+
+                      "encoding defaults to sys.getdefaultencoding().\n"+
+                      "errors defaults to 'strict'."
     )
     public static org.python.Object asctime() {
         throw new org.python.exceptions.NotImplementedError("time.asctime() has not been implemented.");
@@ -89,10 +97,21 @@ public class time extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "str(object='') -> str\n"+
+                      "str(bytes_or_buffer[, encoding[, errors]]) -> str\n"+
+                      "Create a new string object from the given object. If encoding or"+
+                      "errors is specified, then the object must expose a data buffer"+
+                      "that will be decoded using the given encoding and error handler."+
+                      "Otherwise, returns the result of object.__str__() (if defined)"+
+                      "or repr(object)."+
+                      "encoding defaults to sys.getdefaultencoding().\n"+
+                      "errors defaults to 'strict'."
     )
     public static org.python.Object ctime() {
-        throw new org.python.exceptions.NotImplementedError("time.ctime() has not been implemented.");
+      long currentDateTime = System.currentTimeMillis();
+      java.util.Date currentDate = new java.util.Date(currentDateTime);
+      java.text.SimpleDateFormat ft = new java.text.SimpleDateFormat ("E MMM dd HH:mm:ss yyyy");
+      return new org.python.types.Str(ft.format(currentDate));
     }
 
     public static org.python.types.Int daylight;
@@ -112,11 +131,16 @@ public class time extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "tuple() -> empty tuple\n"+
+                      "tuple(iterable) -> tuple initialized from iterable's \n"+
+                      "If the argument is a tuple, the return value is the same object."
     )
     public static org.python.Object localtime() {
-        throw new org.python.exceptions.NotImplementedError("time.localtime() has not been implemented.");
+
+            //return new org.python.types.Tuple(  m_year=time_in_seconds/365*24*60*60, tm_mon=2, tm_mday=23, tm_hour=15, tm_min=40, tm_sec=30, tm_wday=4, tm_yday=54, tm_isdst=0);
+            throw new org.python.exceptions.NotImplementedError("time.mktime() has not been implemented.");
     }
+
 
     @org.python.Method(
             __doc__ = ""
