@@ -110,11 +110,15 @@ class TimeModuleTests(TranspileTestCase):
         self.assertCodeExecution("""
             import time
             print(time.ctime())
+            """)
+    def test_ctime_with_parameter(self):
+        self.assertCodeExecution("""
+            import time
             print(time.ctime(0))
             print(time.ctime(1000))
             now = time.time()
             time.ctime((now - (now % 3600)))
-            """)
+        """)
 
     #######################################################
     # daylight
