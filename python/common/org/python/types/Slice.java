@@ -123,10 +123,6 @@ public class Slice extends org.python.types.Object {
         }
     }
 
-    public int hashCode() {
-        throw new org.python.exceptions.AttributeError("not a method");
-    }
-
     public class ValidatedValue {
         public org.python.types.Int start;
         public org.python.types.Int stop;
