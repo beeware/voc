@@ -89,26 +89,30 @@ public class time extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = "str(object='') -> str\n"+
-                      "str(bytes_or_buffer[, encoding[, errors]]) -> str\n"+
-                      "Create a new string object from the given object. If encoding or"+
-                      "errors is specified, then the object must expose a data buffer"+
-                      "that will be decoded using the given encoding and error handler."+
-                      "Otherwise, returns the result of object.__str__() (if defined)"+
-                      "or repr(object)."+
-                      "encoding defaults to sys.getdefaultencoding().\n"+
-                      "errors defaults to 'strict'."
+            __doc__ = "ctime(seconds) -> string\n\n"+
+                      "Convert a time in seconds since the Epoch to a string in local time.\n"+
+                      "This is equivalent to asctime(localtime(seconds)). When the time tuple is\n"+
+                      "not present, current time as returned by localtime() is used.",
+            default_args = {"seconds"}
     )
-    public static org.python.Object ctime() {
-        long currentDateTime = System.currentTimeMillis();
-        java.util.Date currentDate = new java.util.Date(currentDateTime);
-        java.text.SimpleDateFormat ft = new java.text.SimpleDateFormat ("E MMM dd HH:mm:ss yyyy");
-        return new org.python.types.Str(ft.format(currentDate));
-    }
     public static org.python.Object ctime(org.python.Object seconds) {
-        java.util.Date currentDate = new java.util.Date((long) (((org.python.types.Int) seconds.__int__()).value * 1000));
-        java.text.SimpleDateFormat ft = new java.text.SimpleDateFormat ("E MMM dd HH:mm:ss yyyy");
-        return new org.python.types.Str(ft.format(currentDate));
+        java.util.Date date;
+        if(seconds == null){
+            long currentTimeInMillis = System.currentTimeMillis();
+            date = new java.util.Date(currentTimeInMillis);
+        } else {
+            date = new java.util.Date((long) (((org.python.types.Int) seconds.__int__()).value * 1000));
+        }
+        java.text.SimpleDateFormat ft = new java.text.SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
+        String padded_date = ft.format(date);
+        if(Character.toString(padded_date.charAt(8)).equals("0")) {
+            java.lang.StringBuilder sb = new StringBuilder();
+            sb.append(padded_date.substring(0,7));
+            sb.append("  ");
+            sb.append(padded_date.substring(9,padded_date.length()));
+            padded_date = sb.toString();
+        }
+        return new org.python.types.Str(padded_date);
     }
 
     public static org.python.types.Int daylight;
