@@ -107,7 +107,6 @@ public class NoneType extends org.python.types.Object {
         }
     }
 
-
     @org.python.Method(
             __doc__ = ""
     )
