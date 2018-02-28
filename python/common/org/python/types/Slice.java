@@ -265,14 +265,17 @@ public class Slice extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("'slice' object does not support item deletion");
     }
 
+    // @org.python.Method(
+    //     __doc__ = "Return true if "
+    // )
+
+
     @org.python.Method(
             __doc__ = "",
             args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes ||
-                other instanceof org.python.types.List || other instanceof org.python.types.Str ||
-                other instanceof org.python.types.Tuple) {
+        if (org.python.types.Object.isSequence(other)) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'slice'");
         } else {
             return super.__mul__(other);
@@ -284,9 +287,7 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __imul__(org.python.Object other) {
-        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes ||
-                other instanceof org.python.types.List || other instanceof org.python.types.Str ||
-                other instanceof org.python.types.Tuple) {
+        if (org.python.types.Object.isSequence(other)) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'slice'");
         } else {
             return super.__imul__(other);
