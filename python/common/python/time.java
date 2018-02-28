@@ -101,7 +101,7 @@ public class time extends org.python.types.Module {
             long currentTimeInMillis = System.currentTimeMillis();
             date = new java.util.Date(currentTimeInMillis);
         } else {
-            date = new java.util.Date((long) (((org.python.types.Int) seconds.__int__()).value * 1000));
+            date = new java.util.Date(((org.python.types.Int) seconds.__int__()).value * 1000L);
         }
         java.text.SimpleDateFormat ft = new java.text.SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
         String padded_date = ft.format(date);
