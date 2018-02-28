@@ -28,19 +28,6 @@ class UnaryNoneTypeOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryNoneTypeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'None'
 
-    not_implemented = [
-        'test_multiply_bytes',
-        'test_multiply_bytearray',
-    ]
-
 
 class InplaceNoneTypeOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'None'
-
-    not_implemented = [
-        'test_multiply_bytes',
-        'test_multiply_bytearray',
-        'test_multiply_list',
-        'test_multiply_str',
-        'test_multiply_tuple',
-    ]
