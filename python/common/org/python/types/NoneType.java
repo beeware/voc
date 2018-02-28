@@ -98,11 +98,25 @@ public class NoneType extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
+        if (org.python.types.Object.isSequence(other)) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NoneType'");
         } else {
             throw new org.python.exceptions.TypeError(
                     String.format("unsupported operand type(s) for *: 'NoneType' and '%s'",
+                            Python.typeName(other.getClass())));
+        }
+    }
+
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+        if (org.python.types.Object.isSequence(other)) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NoneType'");
+        } else {
+            throw new org.python.exceptions.TypeError(
+                    String.format("unsupported operand type(s) for *=: 'NoneType' and '%s'",
                             Python.typeName(other.getClass())));
         }
     }
