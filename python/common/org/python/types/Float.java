@@ -329,6 +329,8 @@ public class Float extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
         } else if (other instanceof org.python.types.Slice) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and 'slice'");
+        } else if (other instanceof org.python.types.ByteArray){
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
         }
 
         throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
@@ -393,41 +395,39 @@ public class Float extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
-        try {
-            if (other instanceof org.python.types.Bool) {
-                if (((org.python.types.Bool) other).value) {
-                    return new org.python.types.Float(this.value - Math.floor(this.value));
-                } else {
-                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
-                }
-            } else if (other instanceof org.python.types.Int) {
-                long other_val = ((org.python.types.Int) other).value;
-                if (other_val == 0) {
-                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
-                } else {
-                    // Reference: http://stackoverflow.com/a/4412200
-                    // This translates to (a % b + b) %b
-                    // This expression works as the result of (a % b) is necessarily lower than b,
-                    // no matter if a is positive or negative. Adding b takes care of the negative
-                    // values of a, since (a % b) is a negative value between -b and 0, (a % b + b)
-                    // is necessarily lower than b and positive. The last modulo is there in case a
-                    // was positive to begin with, since if a is positive (a % b + b) would become
-                    // larger than b. Therefore, (a % b + b) % b turns it into smaller than b again
-                    // (and doesn't affect negative a values).
-                    double result = (((((double) this.value) % other_val) + other_val) % other_val);
-                    return new org.python.types.Float(result);
-                }
-            } else if (other instanceof org.python.types.Float) {
-                double other_val = ((org.python.types.Float) other).value;
-                if (other_val == 0.0) {
-                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
-                } else {
-                    double result = (((((double) this.value) % other_val) + other_val) % other_val);
-                    return new org.python.types.Float(result);
-                }
+        if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Float(this.value - Math.floor(this.value));
+            } else {
+                throw new org.python.exceptions.ZeroDivisionError("float modulo");
             }
-        } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val == 0) {
+                throw new org.python.exceptions.ZeroDivisionError("float modulo");
+            } else {
+                // Reference: http://stackoverflow.com/a/4412200
+                // This translates to (a % b + b) %b
+                // This expression works as the result of (a % b) is necessarily lower than b,
+                // no matter if a is positive or negative. Adding b takes care of the negative
+                // values of a, since (a % b) is a negative value between -b and 0, (a % b + b)
+                // is necessarily lower than b and positive. The last modulo is there in case a
+                // was positive to begin with, since if a is positive (a % b + b) would become
+                // larger than b. Therefore, (a % b + b) % b turns it into smaller than b again
+                // (and doesn't affect negative a values).
+                double result = (((((double) this.value) % other_val) + other_val) % other_val);
+                return new org.python.types.Float(result);
+            }
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            if (other_val == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("float modulo");
+            } else {
+                double result = (((((double) this.value) % other_val) + other_val) % other_val);
+                return new org.python.types.Float(result);
+            }
+        } else if (other instanceof org.python.types.Complex){
+            throw new org.python.exceptions.TypeError("can't mod complex numbers.");
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
     }
