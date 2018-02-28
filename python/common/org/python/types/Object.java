@@ -1122,4 +1122,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         args[0] = y;
         return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, null);
     }
+
+    public static boolean isSequence(org.python.Object other) {
+        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes ||
+                other instanceof org.python.types.List || other instanceof org.python.types.Str ||
+                other instanceof org.python.types.Tuple) {
+
+            return true;
+        }
+        return false;
+    }
+
 }
