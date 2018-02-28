@@ -265,11 +265,6 @@ public class Slice extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("'slice' object does not support item deletion");
     }
 
-    // @org.python.Method(
-    //     __doc__ = "Return true if "
-    // )
-
-
     @org.python.Method(
             __doc__ = "",
             args = {"other"}
