@@ -418,7 +418,12 @@ public class List extends org.python.types.Object {
                 }
                 return new org.python.types.List(sliced);
             } else {
-                int idx = (int) ((org.python.types.Int) index).value;
+                int idx;
+                if (index instanceof org.python.types.Bool) {
+                    idx = (int) ((org.python.types.Bool) index).__int__().value;
+                } else {
+                    idx = (int) ((org.python.types.Int) index).value;
+                }
                 if (idx < 0) {
                     if (-idx > this.value.size()) {
                         throw new org.python.exceptions.IndexError("list index out of range");
@@ -453,7 +458,13 @@ public class List extends org.python.types.Object {
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
         try {
-            int idx = (int) ((org.python.types.Int) index).value;
+
+            int idx;
+            if (index instanceof org.python.types.Bool) {
+                idx = (int) ((org.python.types.Bool) index).__int__().value;
+            } else {
+                idx = (int) ((org.python.types.Int) index).value;
+            }
             if (idx < 0) {
                 if (-idx > this.value.size()) {
                     throw new org.python.exceptions.IndexError("list assignment index out of range");
@@ -486,7 +497,12 @@ public class List extends org.python.types.Object {
     )
     public void __delitem__(org.python.Object index) {
         try {
-            int idx = (int) ((org.python.types.Int) index).value;
+            int idx;
+            if (index instanceof org.python.types.Bool) {
+                idx = (int) ((org.python.types.Bool) index).__int__().value;
+            } else {
+                idx = (int) ((org.python.types.Int) index).value;
+            }
             if (idx < 0) {
                 if (-idx > this.value.size()) {
                     throw new org.python.exceptions.IndexError("list index out of range");
