@@ -359,6 +359,9 @@ public class Float extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
+        } else if (other instanceof org.python.types.Complex){
+            org.python.types.Complex dummycomplex = new org.python.types.Complex(this.value, 0.0);
+            return dummycomplex.__truediv__((org.python.types.Complex) other);         
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.typeName() + "'");
     }
