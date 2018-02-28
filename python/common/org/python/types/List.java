@@ -419,10 +419,9 @@ public class List extends org.python.types.Object {
                 return new org.python.types.List(sliced);
             } else {
                 int idx;
-                if (index instanceof org.python.types.Bool){
-                    idx = ((org.python.types.Bool)index).value ? 1 : 0;
-                }
-                else{
+                if (index instanceof org.python.types.Bool) {
+                    idx = (int) ((org.python.types.Bool) index).__int__().value;
+                } else {
                     idx = (int) ((org.python.types.Int) index).value;
                 }
                 if (idx < 0) {
@@ -461,10 +460,9 @@ public class List extends org.python.types.Object {
         try {
 
             int idx;
-            if (index instanceof org.python.types.Bool){
-                idx = ((org.python.types.Bool)index).value ? 1 : 0;
-            }
-            else{
+            if (index instanceof org.python.types.Bool) {
+                idx = (int) ((org.python.types.Bool) index).__int__().value;
+            } else {
                 idx = (int) ((org.python.types.Int) index).value;
             }
             if (idx < 0) {
@@ -500,10 +498,9 @@ public class List extends org.python.types.Object {
     public void __delitem__(org.python.Object index) {
         try {
             int idx;
-            if (index instanceof org.python.types.Bool){
-                idx = ((org.python.types.Bool)index).value ? 1 : 0;
-            }
-            else{
+            if (index instanceof org.python.types.Bool) {
+                idx = (int) ((org.python.types.Bool) index).__int__().value;
+            } else {
                 idx = (int) ((org.python.types.Int) index).value;
             }
             if (idx < 0) {
