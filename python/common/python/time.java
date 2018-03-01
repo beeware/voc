@@ -89,15 +89,15 @@ public class time extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = "ctime(seconds) -> string\n\n"+
-                      "Convert a time in seconds since the Epoch to a string in local time.\n"+
-                      "This is equivalent to asctime(localtime(seconds)). When the time tuple is\n"+
+            __doc__ = "ctime(seconds) -> string\n\n" +
+                      "Convert a time in seconds since the Epoch to a string in local time.\n" +
+                      "This is equivalent to asctime(localtime(seconds)). When the time tuple is\n" +
                       "not present, current time as returned by localtime() is used.",
             default_args = {"seconds"}
     )
     public static org.python.Object ctime(org.python.Object seconds) {
         java.util.Date date;
-        if(seconds == null){
+        if (seconds == null) {
             long currentTimeInMillis = System.currentTimeMillis();
             date = new java.util.Date(currentTimeInMillis);
         } else {
@@ -105,11 +105,11 @@ public class time extends org.python.types.Module {
         }
         java.text.SimpleDateFormat ft = new java.text.SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
         String padded_date = ft.format(date);
-        if(Character.toString(padded_date.charAt(8)).equals("0")) {
+        if (Character.toString(padded_date.charAt(8)).equals("0")) {
             java.lang.StringBuilder sb = new StringBuilder();
-            sb.append(padded_date.substring(0,7));
+            sb.append(padded_date.substring(0, 7));
             sb.append("  ");
-            sb.append(padded_date.substring(9,padded_date.length()));
+            sb.append(padded_date.substring(9, padded_date.length()));
             padded_date = sb.toString();
         }
         return new org.python.types.Str(padded_date);

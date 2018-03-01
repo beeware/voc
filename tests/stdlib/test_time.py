@@ -111,6 +111,7 @@ class TimeModuleTests(TranspileTestCase):
             import time
             print(time.ctime()[:10], time.ctime()[-4:])
             """)
+
     def test_ctime_with_parameter(self):
         self.assertCodeExecution("""
             import time
