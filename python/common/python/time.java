@@ -101,6 +101,18 @@ public class time extends org.python.types.Module {
             long currentTimeInMillis = System.currentTimeMillis();
             date = new java.util.Date(currentTimeInMillis);
         } else {
+            //Type checking the parameter
+            String parameterType = seconds.getClass().getSimpleName();
+            if (!parameterType.equals("Int") && !parameterType.equals("Float")) {
+                if (parameterType.equals("Str")) {
+                    parameterType = "str";
+                } else if (parameterType.equals("List")) {
+                    parameterType = "list";
+                } else if (parameterType.equals("Tuple")) {
+                    parameterType = "tuple";
+                }
+                throw new org.python.exceptions.TypeError("an integer is required (got type " + parameterType + ")");
+            }
             date = new java.util.Date(((org.python.types.Int) seconds.__int__()).value * 1000L);
         }
         java.text.SimpleDateFormat ft = new java.text.SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
