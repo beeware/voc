@@ -21,16 +21,10 @@ public class platform extends org.python.types.Module {
         java.lang.String platform_class_name;
         java.lang.Class platform_class;
 
-        if (vendor.equals("Oracle Corporation")) {
-            platform_class_name = "python._platform.JavaPlatform";
-        } else if (vendor.equals("The Android Project")) {
+        if (vendor.equals("The Android Project")) {
             platform_class_name = "python._platform.AndroidPlatform";
-        } else if (vendor.equals("Azul Systems, Inc.")) {
-            platform_class_name = "python._platform.JavaPlatform";
-        } else if (vendor.equals("JetBrains s.r.o")) {
-            platform_class_name = "python._platform.JavaPlatform";
         } else {
-            throw new org.python.exceptions.RuntimeError("Unknown platform vendor '" + vendor + "'");
+            platform_class_name = "python._platform.JavaPlatform";
         }
 
         try {
