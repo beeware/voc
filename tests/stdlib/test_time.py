@@ -119,6 +119,7 @@ class TimeModuleTests(TranspileTestCase):
             print(time.ctime(1000))
             now = time.time()
             print(time.ctime((now - (now % 3600))))
+            print(time.ctime(1000.67))
             try:
                 time.ctime('today')
             except Exception as e:
