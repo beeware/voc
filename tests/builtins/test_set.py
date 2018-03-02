@@ -13,6 +13,10 @@ class BuiltinSetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_str',
     ]
 
+    not_implemented_versions = {
+            'test_tuple': (3.4,)
+            }
+
     is_flakey = [
         'test_dict',
     ]
