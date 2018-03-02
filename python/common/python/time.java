@@ -102,16 +102,8 @@ public class time extends org.python.types.Module {
             date = new java.util.Date(currentTimeInMillis);
         } else {
             //Type checking the parameter
-            String parameterType = seconds.getClass().getSimpleName();
-            if (!parameterType.equals("Int") && !parameterType.equals("Float")) {
-                if (parameterType.equals("Str")) {
-                    parameterType = "str";
-                } else if (parameterType.equals("List")) {
-                    parameterType = "list";
-                } else if (parameterType.equals("Tuple")) {
-                    parameterType = "tuple";
-                }
-                throw new org.python.exceptions.TypeError("an integer is required (got type " + parameterType + ")");
+            if (!(seconds instanceof org.python.types.Int) && !(seconds instanceof org.python.types.Float)) {
+                throw new org.python.exceptions.TypeError("an integer is required (got type " + seconds.typeName() + ")");
             }
             date = new java.util.Date(((org.python.types.Int) seconds.__int__()).value * 1000L);
         }
