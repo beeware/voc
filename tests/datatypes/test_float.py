@@ -95,6 +95,15 @@ class FloatTests(TranspileTestCase):
         code = '\n'.join(template.format(number) for number in numbers)
         self.assertCodeExecution(code)
 
+    def test_mul_TypeError(self):
+        self.assertCodeExecution("""
+            a = 5.6
+            try:
+                print(a*None);
+            except TypeError as e:
+                print(e)
+            """)
+
 
 class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'float'

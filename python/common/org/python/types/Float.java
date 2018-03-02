@@ -315,11 +315,10 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Float(this.value * (((org.python.types.Bool) other).__int__().value));
         } else if (other instanceof org.python.types.Complex) {
             return ((org.python.types.Complex) other).__mul__(this);
-        } else {
-            super.__mul__(other);
         }
 
-        throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
+        return super.__mul__(other);
+
     }
 
 
@@ -339,10 +338,8 @@ public class Float extends org.python.types.Object {
             return new org.python.types.Float(this.value * (((org.python.types.Bool) other).__int__().value));
         } else if (other instanceof org.python.types.Complex) {
             return ((org.python.types.Complex) other).__imul__(this);
-        } else {
-            super.__imul__(other);
         }
-        throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
+        return super.__imul__(other);
     }
 
 

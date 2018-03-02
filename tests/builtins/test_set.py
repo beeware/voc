@@ -11,7 +11,6 @@ class BuiltinSetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     not_implemented = [
         'test_bytes',
         'test_str',
-        'test_tuple',
     ]
 
     is_flakey = [
