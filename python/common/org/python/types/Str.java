@@ -285,7 +285,7 @@ public class Str extends org.python.types.Object {
                 if (slice.start == null && slice.stop == null && slice.step == null) {
                     sliced = this.value;
                 } else {
-                    long start;
+                    long start = 0;
                     if (slice.start != null) {
                         if (slice.start.value < 0) {
                             // computes starting index from end of string
@@ -294,11 +294,9 @@ public class Str extends org.python.types.Object {
                         } else {
                             start = slice.start.value;
                         }
-                    } else {
-                        start = 0;
                     }
 
-                    long stop;
+                    long stop = this.value.length();
                     if (slice.stop != null) {
                         if (slice.stop.value < 0) {
                             // computes ending index from end of string
@@ -308,31 +306,27 @@ public class Str extends org.python.types.Object {
                             // if stop goes beyond string length, sets it to the length
                             stop = Math.min(this.value.length(), slice.stop.value);
                         }
-                    } else {
-                        stop = this.value.length();
                     }
 
-                    long step;
+                    long step = 1;
                     if (slice.step != null) {
                         step = slice.step.value;
-                    } else {
-                        step = 1;
                     }
 
                     if (step == 1) {
+                        sliced = "";
                         if (start < stop) {
                             sliced = this.value.substring((int) start, (int) stop);
-                        } else {
-                            sliced = "";
                         }
                     } else {
                         java.lang.StringBuffer buffer = new java.lang.StringBuffer();
                         long i = start;
-                        while (true) {
-                            if ((i >= stop && step > 0) || (i <= stop && step < 0)
-                                    || i >= this.value.length() || i < 0) {
-                                break;
-                            }
+                        while (
+                                !((i >= stop) && (step > 0))
+                                && !((i <= stop) && (step < 0))
+                                && !(i >= this.value.length())
+                                && !(i < 0)
+                        ) {
                             buffer.append(this.value.charAt((int) i));
                             i += step;
                         }
@@ -2584,3 +2578,4 @@ final class PythonFormatter {
     public static final char SIGN_NEGATIV = '+';
     public static final char SIGN_UNDEFINED = '\0';
 }
+
