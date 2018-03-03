@@ -1,4 +1,10 @@
-from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
+from .. utils import (
+    TranspileTestCase,
+    UnaryOperationTestCase,
+    BinaryOperationTestCase,
+    InplaceOperationTestCase,
+    SAMPLE_SUBSTITUTIONS
+)
 
 
 class FloatTests(TranspileTestCase):
@@ -115,14 +121,28 @@ class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
+    substitutions = {
+        "(-0.8946025309573877+0.446862743585361j)": [
+            "(-0.8946025309573877+0.44686274358536093j)"
+        ]
+    }
+
+    substitutions.update(SAMPLE_SUBSTITUTIONS)
+
     not_implemented = [
-        'test_power_complex',
     ]
 
 
 class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
+    substitutions = {
+        "(-0.8946025309573877+0.446862743585361j)": [
+            "(-0.8946025309573877+0.44686274358536093j)"
+        ]
+    }
+
+    substitutions.update(SAMPLE_SUBSTITUTIONS)
+
     not_implemented = [
-        'test_power_complex',
     ]

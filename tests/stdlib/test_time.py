@@ -106,12 +106,33 @@ class TimeModuleTests(TranspileTestCase):
 
     #######################################################
     # ctime
-    @expectedFailure
     def test_ctime(self):
         self.assertCodeExecution("""
             import time
-            print(time.ctime())
+            print(time.ctime()[:10], time.ctime()[-4:])
             """)
+
+    def test_ctime_with_parameter(self):
+        self.assertCodeExecution("""
+            import time
+            print(time.ctime(0))
+            print(time.ctime(1000))
+            now = time.time()
+            print(time.ctime((now - (now % 3600))))
+            print(time.ctime(1000.67))
+            try:
+                time.ctime('today')
+            except Exception as e:
+                print(e)
+            try:
+                time.ctime([1,2])
+            except Exception as e:
+                print(e)
+            try:
+                time.ctime((1,2))
+            except Exception as e:
+                print(e)
+        """)
 
     #######################################################
     # daylight
