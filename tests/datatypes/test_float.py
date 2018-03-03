@@ -1,4 +1,10 @@
-from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
+from .. utils import (
+    TranspileTestCase,
+    UnaryOperationTestCase,
+    BinaryOperationTestCase,
+    InplaceOperationTestCase,
+    SAMPLE_SUBSTITUTIONS
+)
 
 
 class FloatTests(TranspileTestCase):
@@ -106,6 +112,14 @@ class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
+    substitutions = {
+        "(-0.8946025309573877+0.446862743585361j)": [
+            "(-0.8946025309573877+0.44686274358536093j)"
+        ]
+    }
+
+    substitutions.update(SAMPLE_SUBSTITUTIONS)
+
     not_implemented = [
 
         'test_multiply_bytes',
@@ -113,7 +127,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_multiply_NotImplemented',
         'test_multiply_range',
 
-        'test_power_complex',
         'test_power_float',
 
         'test_subscr_bool',
@@ -140,6 +153,14 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
 class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'float'
 
+    substitutions = {
+        "(-0.8946025309573877+0.446862743585361j)": [
+            "(-0.8946025309573877+0.44686274358536093j)"
+        ]
+    }
+
+    substitutions.update(SAMPLE_SUBSTITUTIONS)
+
     not_implemented = [
         'test_multiply_bytearray',
         'test_multiply_bytes',
@@ -150,7 +171,6 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_str',
         'test_multiply_tuple',
 
-        'test_power_complex',
         'test_power_float',
 
     ]
