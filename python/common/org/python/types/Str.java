@@ -286,33 +286,51 @@ public class Str extends org.python.types.Object {
                 if (slice.start == null && slice.stop == null && slice.step == null) {
                     sliced = this.value;
                 } else {
-                    long start;
-                    if (slice.start != null) {
-                        start = toPositiveIndex(slice.start.value);
-                    } else {
-                        start = 0;
-                    }
-
-                    long stop;
-                    if (slice.stop != null) {
-                        stop = toPositiveIndex(slice.stop.value);
-                    } else {
-                        stop = this.value.length();
-                    }
-                    stop = Math.max(start, stop);
-
-                    long step;
+                    long step = 1;
                     if (slice.step != null) {
                         step = slice.step.value;
-                    } else {
-                        step = 1;
                     }
 
-                    if (step == 1) {
-                        sliced = this.value.substring((int) start, (int) stop);
+                    if (step == 0) {
+                        throw new org.python.exceptions.ValueError("slice step cannot be zero");
+                    }
+
+                    if (step > 0) {
+                        long start = 0;
+                        if (slice.start != null) {
+                          start = toPositiveIndex(slice.start.value);
+                        }
+
+                        long stop = this.value.length();
+                        if (slice.stop != null) {
+                            stop = toPositiveIndex(slice.stop.value);
+                        }
+
+                        stop = Math.max(start, stop);
+
+                        if (step == 1) {
+                            sliced = this.value.substring((int) start, (int) stop);
+                        } else {
+                            java.lang.StringBuffer buffer = new java.lang.StringBuffer();
+                            for (long i = start; i < stop; i += step) {
+                                buffer.append(this.value.charAt((int) i));
+                            }
+                            sliced = buffer.toString();
+                        }
                     } else {
+                        long start = this.value.length() - 1;
+                        if (slice.start != null) {
+                            start = toPositiveIndex(slice.start.value);
+                        }
+
+                        long stop = -1;
+                        if (slice.stop != null) {
+                            stop = toPositiveIndex(slice.stop.value);
+                        }
+                        start = Math.max(stop, start);
+
                         java.lang.StringBuffer buffer = new java.lang.StringBuffer();
-                        for (long i = start; i < stop; i += step) {
+                        for (long i = start; i > stop; i += step) {
                             buffer.append(this.value.charAt((int) i));
                         }
                         sliced = buffer.toString();
