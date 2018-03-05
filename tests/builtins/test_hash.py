@@ -10,7 +10,6 @@ class BuiltinHashFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_bool',
-        'test_bytearray',
         'test_bytes',
         'test_class',
         'test_complex',
@@ -23,7 +22,6 @@ class BuiltinHashFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_NotImplemented',
         'test_range',
         'test_set',
-        'test_slice',
         'test_str',
         'test_tuple',
     ]

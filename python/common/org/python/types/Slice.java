@@ -97,6 +97,10 @@ public class Slice extends org.python.types.Object {
         return new org.python.types.Tuple(tuple);
     }
 
+    public int hashCode() {
+        throw new org.python.exceptions.TypeError("unhashable type: 'slice'");
+    }
+
     private org.python.types.Int validateValueType(org.python.Object value) {
         if (value instanceof org.python.types.Int) {
             return (org.python.types.Int) value;

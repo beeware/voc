@@ -329,7 +329,7 @@ public class Float extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
         } else if (other instanceof org.python.types.Slice) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and 'slice'");
-        } else if (other instanceof org.python.types.ByteArray){
+        } else if (other instanceof org.python.types.ByteArray) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
         }
 
@@ -359,9 +359,9 @@ public class Float extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
-        } else if (other instanceof org.python.types.Complex){
+        } else if (other instanceof org.python.types.Complex) {
             org.python.types.Complex dummycomplex = new org.python.types.Complex(this.value, 0.0);
-            return dummycomplex.__truediv__((org.python.types.Complex) other);         
+            return dummycomplex.__truediv__((org.python.types.Complex) other);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.typeName() + "'");
     }
@@ -429,7 +429,7 @@ public class Float extends org.python.types.Object {
                 double result = (((((double) this.value) % other_val) + other_val) % other_val);
                 return new org.python.types.Float(result);
             }
-        } else if (other instanceof org.python.types.Complex){
+        } else if (other instanceof org.python.types.Complex) {
             throw new org.python.exceptions.TypeError("can't mod complex numbers.");
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");

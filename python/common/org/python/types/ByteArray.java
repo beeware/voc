@@ -16,7 +16,7 @@ public class ByteArray extends org.python.types.Object {
     }
 
     public int hashCode() {
-        return this.value.hashCode();
+        throw new org.python.exceptions.TypeError("unhashable type: 'bytearray'");
     }
 
     public ByteArray() {
