@@ -10,10 +10,10 @@ class BuiltinSetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_bytes',
-        'test_str',
-        'test_tuple',
+        'test_str'
     ]
 
     is_flakey = [
         'test_dict',
+        'test_tuple'
     ]
