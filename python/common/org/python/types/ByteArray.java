@@ -761,8 +761,16 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isalnum(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.isalnum has not been implemented.");
+    public org.python.Object isalnum() {
+        if (this.value.length == 0) {
+            return new org.python.types.Bool(false);
+        }
+        for (byte ch: this.value) {
+            if (!Bytes._isalpha(ch) && !Bytes._isnum(ch)) {
+                return new org.python.types.Bool(false);
+            }
+        }
+        return new org.python.types.Bool(true);
     }
 
     @org.python.Method(
