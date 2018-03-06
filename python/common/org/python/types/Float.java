@@ -305,36 +305,44 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object __mul__(org.python.Object other) {
 
-        if (other instanceof org.python.types.Str) {
+        if (org.python.types.Object.isSequence(other)) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + "float" + "'");
         } else if (other instanceof org.python.types.Int) {
             return new org.python.types.Float(this.value * ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) * ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Float(this.value * (((org.python.types.Bool) other).value ? 1 : 0));
+            return new org.python.types.Float(this.value * (((org.python.types.Bool) other).__int__().value));
         } else if (other instanceof org.python.types.Complex) {
             return ((org.python.types.Complex) other).__mul__(this);
-        } else if (other instanceof org.python.types.Dict) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.NoneType) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.Set) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.FrozenSet) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
-        } else if (other instanceof org.python.types.Slice) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and 'slice'");
-        } else if (other instanceof org.python.types.ByteArray){
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
         }
 
-        throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
+        return super.__mul__(other);
+
     }
+
+
+    @org.python.Method(
+            __doc__ = "Return self*value.",
+            args = {"other"}
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+
+        if (org.python.types.Object.isSequence(other)) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + "float" + "'");
+        } else if (other instanceof org.python.types.Int) {
+            return new org.python.types.Float(this.value * ((org.python.types.Int) other).value);
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float(((double) this.value) * ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Float(this.value * (((org.python.types.Bool) other).__int__().value));
+        } else if (other instanceof org.python.types.Complex) {
+            return ((org.python.types.Complex) other).__imul__(this);
+        }
+        return super.__imul__(other);
+    }
+
+
 
     @org.python.Method(
             __doc__ = "Return self/value.",
@@ -359,9 +367,9 @@ public class Float extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
-        } else if (other instanceof org.python.types.Complex){
+        } else if (other instanceof org.python.types.Complex) {
             org.python.types.Complex dummycomplex = new org.python.types.Complex(this.value, 0.0);
-            return dummycomplex.__truediv__((org.python.types.Complex) other);         
+            return dummycomplex.__truediv__((org.python.types.Complex) other);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.typeName() + "'");
     }
@@ -429,7 +437,7 @@ public class Float extends org.python.types.Object {
                 double result = (((((double) this.value) % other_val) + other_val) % other_val);
                 return new org.python.types.Float(result);
             }
-        } else if (other instanceof org.python.types.Complex){
+        } else if (other instanceof org.python.types.Complex) {
             throw new org.python.exceptions.TypeError("can't mod complex numbers.");
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
@@ -479,9 +487,9 @@ public class Float extends org.python.types.Object {
             double other_val = ((org.python.types.Float) other).value;
             if (this.value == 0 && other_val < 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
+            } else if (this.value < 0 && other_val != Math.round(other_val)) {
+                return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
             }
-            // TODO: if this.value < 0 && other_val is not an integer, this will be a Complex result, so change this.value to Complex and delegate it out
-            // return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
             return new org.python.types.Float(java.lang.Math.pow(this.value, other_val));
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
@@ -724,4 +732,31 @@ public class Float extends org.python.types.Object {
         }
         return new org.python.types.Str(result);
     }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __getitem__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("'float' object is not subscriptable");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other", "value"}
+    )
+    public void __setitem__(org.python.Object other, org.python.Object value) {
+        throw new org.python.exceptions.TypeError("'float' object does not support item assignment");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public void __delitem__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("'float' object does not support item deletion");
+    }
+
+
+
 }
