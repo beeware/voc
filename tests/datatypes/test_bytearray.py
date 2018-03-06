@@ -228,6 +228,33 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'').startswith(b''))
         """)
 
+    def test_isalnum(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'0').isalnum())
+            print(bytearray(b'9').isalnum())
+            print(bytearray(b'1234567890').isalnum())
+            print(bytearray(b'89A23gM23z').isalnum())
+            print(bytearray(b':923').isalnum())
+            print(bytearray(b'\\923').isalnum())
+            print(bytearray(b' jdf fhd 33').isalnum())
+            print(bytearray(b'@#$%^&*').isalnum())
+            print(bytearray(b'"478\t47ads:').isalnum())
+            print(bytearray(b'AbZ').isalnum())
+        """)
+
+    def test_isdigit(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'0').isdigit())
+            print(bytearray(b'9').isdigit())
+            print(bytearray(b'1234567890').isdigit())
+            print(bytearray(b'8923g23823').isdigit())
+            print(bytearray(b'923').isdigit())
+            print(bytearray(b'\\923').isdigit())
+            print(bytearray(b'000').isdigit())
+            print(bytearray(b'@#$%^&*').isdigit())
+            print(bytearray(b'"478\t47ads:').isdigit())
+            print(bytearray(b'AbZ').isdigit())
+        """)
 
 class UnaryBytearrayOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytearray'
