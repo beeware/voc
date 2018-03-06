@@ -858,14 +858,61 @@ public class Int extends org.python.types.Object {
     public org.python.Object __float__() {
         return new org.python.types.Float((float) this.value);
     }
-
     @org.python.Method(
-            __doc__ = "Rounding an Integral returns itself.\nRounding with an ndigits argument also returns an integer."
+            __doc__ = "",
+            args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        if (ndigits instanceof org.python.types.Int) {
-            return new org.python.types.Int(this.value);
+        if(ndigits instanceof org.python.types.Int) {
+            long dividend, divisor = 1, remainder, digits = 0, this_val, ndigits_val, result = 1, i = 0;
+            boolean f = true;
+            ndigits_val = ((org.python.types.Int) ndigits).value;
+            this_val = ((org.python.types.Int) this).value;
+            if (ndigits_val == 0) {
+                return new org.python.types.Int(this_val);
+            }
+            if(this_val < 0) {
+                this_val = -this_val;
+                f = false;
+            }
+            if (ndigits_val < 0) {
+                dividend = this_val;
+                while (dividend > 0) {
+                    dividend = dividend / 10;
+                    digits += 1;
+                }
+                if (digits < -ndigits_val) {
+                    return new org.python.types.Int(0);
+                }
+                while (i > ndigits_val) {
+                    divisor = divisor * 10;
+                    i -= 1;
+                }
+                remainder = this_val % divisor;
+                dividend = this_val / divisor;
+                if (remainder > 5 * (divisor / 10)) {
+                    result = dividend + 1;
+                }
+                if (remainder < 5 * (divisor / 10)) {
+                    result = dividend;
+                }
+                if (remainder == 5 * (divisor / 10)) {
+                    if (dividend % 2 == 0) {
+                        result = dividend;
+                    } else {
+                        result = dividend + 1;
+                    }
+                }
+                result = result * divisor;
+                if(f == false) {
+                    result = -result;
+                }
+                return new org.python.types.Int(result);
+            } else {
+                throw new org.python.exceptions.ValueError("ndigits can not be positive for integers");
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
         }
-        throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
     }
 }

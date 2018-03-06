@@ -28,6 +28,27 @@ class IntTests(TranspileTestCase):
             int('q', 16)
             """)
 
+    def test_round(self):
+        self.assertCodeExecution("""
+            x=31
+            try:
+                print(round(x,-2))
+            except AttributeError as err:
+                print(err)""")
+        self.assertCodeExecution("""
+                x=3151
+                try:
+                    print(round(x,-4))
+                except ValueError as err:
+                    print(err)
+                """)
+        self.assertCodeExecution("""
+                x=-360
+                try:
+                    print(round(x,-2))
+                except AttributeError as err:
+                    print(err)""")
+
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'int'
