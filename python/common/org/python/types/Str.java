@@ -68,14 +68,17 @@ public class Str extends org.python.types.Object {
     // }
 
     private static boolean isCharPrintable(char c) {
-        // ASCII non-printable
-        if ((int) c <= 0x1f || (int) c >= 0x7f && (int) c <= 0xa0 || (int) c == 0xad) {
-            return false;
-        }
-        if ((int) c == 0x2029) {
-            return false;
-        }
-        if (Character.isISOControl(c)) {
+        // Characters except space ' ' in the following categories are
+        // not printable:
+        //  0 - UNASSIGNED
+        // 12 - SPACE_SEPARATOR
+        // 13 - LINE_SEPARATOR
+        // 14 - PARAGRAPH_SEPARATOR
+        // 15 - CONTROL
+        // 16 - FORMAT
+        // 17 - PRIVATE_USE
+        // 18 - SURROGATE
+        if ((Character.getType(c) == 0 || (Character.getType(c) >= 12 && Character.getType(c) <= 18)) && c != ' ') {
             return false;
         }
         return true;
