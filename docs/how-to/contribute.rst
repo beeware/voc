@@ -116,19 +116,6 @@ Or you can use Cricket, a GUI tool for running test suites. To start cricket in 
 
 This should open a GUI window that lists all the tests. From there you can "Run all" or select specific tests and "Run selected."
 
-Finding the places to contribute
------------------------------
-
-Hopefully you are all setup by now and would like to find some issues to work on, you can always go
-to the voc repo and find some issues to work on or go to  python/common/org/python/types and browse through the 
-files over there to find some unimplemented methods and implement it.
-These are the files which are required by the voc to convert the python code into java bytecode, 
-after you have implemented those you will have to go to tests/builtins and find the python file for the 
-java method you modified (in /python/types) and write a few test cases to check if it's working properly.
-You can also test the code like you did with your hello world program :doc:`/tutorial/tutorial-0` and
-try out your self written methods and watch them transform into java class with the magic of voc.
-If you feel that it's working then submit a PR and wait till your code gets merged.
-
 Running the code style checks
 -----------------------------
 
