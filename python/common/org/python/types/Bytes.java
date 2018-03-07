@@ -1095,6 +1095,7 @@ public class Bytes extends org.python.types.Object {
         return new Bool(_isalpha(this.value));
     }
 
+
     public static boolean _isdigit(byte ch){
       if (!(ch >= '0' && ch <= '9')) {
           return false;
@@ -1113,6 +1114,7 @@ public class Bytes extends org.python.types.Object {
         }
         return true;
     }
+
 
     @org.python.Method(
             __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."

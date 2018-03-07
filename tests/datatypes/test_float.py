@@ -101,6 +101,15 @@ class FloatTests(TranspileTestCase):
         code = '\n'.join(template.format(number) for number in numbers)
         self.assertCodeExecution(code)
 
+    def test_mul_TypeError(self):
+        self.assertCodeExecution("""
+            a = 5.6
+            try:
+                print(a*None);
+            except TypeError as e:
+                print(e)
+            """)
+
 
 class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'float'
@@ -121,32 +130,6 @@ class BinaryFloatOperationTests(BinaryOperationTestCase, TranspileTestCase):
     substitutions.update(SAMPLE_SUBSTITUTIONS)
 
     not_implemented = [
-
-        'test_multiply_bytes',
-        'test_multiply_class',
-        'test_multiply_NotImplemented',
-        'test_multiply_range',
-
-        'test_power_float',
-
-        'test_subscr_bool',
-        'test_subscr_bytearray',
-        'test_subscr_bytes',
-        'test_subscr_class',
-        'test_subscr_complex',
-        'test_subscr_dict',
-        'test_subscr_float',
-        'test_subscr_frozenset',
-        'test_subscr_int',
-        'test_subscr_list',
-        'test_subscr_None',
-        'test_subscr_NotImplemented',
-        'test_subscr_range',
-        'test_subscr_set',
-        'test_subscr_slice',
-        'test_subscr_str',
-        'test_subscr_tuple',
-
     ]
 
 
@@ -162,15 +145,4 @@ class InplaceFloatOperationTests(InplaceOperationTestCase, TranspileTestCase):
     substitutions.update(SAMPLE_SUBSTITUTIONS)
 
     not_implemented = [
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
-        'test_multiply_class',
-        'test_multiply_list',
-        'test_multiply_NotImplemented',
-        'test_multiply_range',
-        'test_multiply_str',
-        'test_multiply_tuple',
-
-        'test_power_float',
-
     ]

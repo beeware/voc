@@ -2,6 +2,65 @@
 from unittest import expectedFailure
 
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
+from .. utils import adjust
+
+
+class SubscrSliceTest(TranspileTestCase):
+    def test_subscr_str_extended(self):
+        str_samples = [
+                        '""',
+                        '"3"',
+                        '"This is another string"',
+                        '"Mÿ hôvèrçràft îß fûłl öf éêlś"',
+                        '"One arg: %s"',
+                        '"Three args: %s | %s | %s"',
+                    ]
+        slice_samples = [
+                        'slice(0)',
+                        'slice(5)',
+                        'slice(-1)',
+                        'slice(-7)',
+                        'slice(2, 7)',
+                        'slice(-1, 2)',
+                        'slice(2, -7)',
+                        'slice(-2, -7)',
+                        'slice(0, 0)',
+                        'slice(-10, 0)',
+                        'slice(0, -10)',
+                        'slice(2, 7, 2)',
+                        'slice(7, 2, -1)',
+                        'slice(7, 2, 10)',
+                        'slice(2, 7, 0)'
+                    ]
+
+        data = []
+        for x in str_samples:
+            for y in slice_samples:
+                data.append((x, y))
+
+        self.assertCodeExecution(
+            '##################################################\n'.join(
+                adjust("""
+                    try:
+                        print('>>> x = %(x)s')
+                        print('>>> y = %(y)s')
+                        print('>>> x[y]')
+                        x = %(x)s
+                        y = %(y)s
+                        print(x[y])
+                    except Exception as e:
+                        print(type(e), ':', e)
+                    print()
+                    """ % {
+                        'x': x,
+                        'y': y
+                    }
+                )
+                for x, y in data
+            ),
+            "Error running test_subscr_str_extended",
+            run_in_function=False,
+        )
 
 
 class StrTests(TranspileTestCase):
@@ -749,10 +808,9 @@ class StrTests(TranspileTestCase):
             print(str_.isprintable())
             """)
 
-    @expectedFailure
     def test_isprintable_missing_cases(self):
         self.assertCodeExecution(r"""
-        tests = ['\u2028']:
+        tests = ['\u2028', '\u2029', '\u00A0']
         for test in tests:
             print(test.isprintable())
         """)
@@ -824,7 +882,6 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_modulo_class',
-        'test_subscr_slice',
     ]
 
 
