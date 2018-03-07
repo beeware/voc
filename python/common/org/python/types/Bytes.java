@@ -1047,27 +1047,27 @@ public class Bytes extends org.python.types.Object {
         return pos;
     }
 
-    public static boolean _isalnum(byte ch){
-      return _isalpha(ch) || _isdigit(ch) ;
+    public static boolean _isalnum(byte ch) {
+        return _isalpha(ch) || _isdigit(ch);
     }
 
-    public static boolean _isalnum(byte[] input){
-      if(input.length == 0) {
-        return false;
-      }
-      for (byte ch : input) {
-          if (!_isalnum(ch)) {
-              return false;
-          }
-      }
-      return true;
+    public static boolean _isalnum(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!_isalnum(ch)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalnum() {
-    return  new Bool(_isalnum(this.value));
+        return new Bool(_isalnum(this.value));
     }
 
 
@@ -1095,11 +1095,11 @@ public class Bytes extends org.python.types.Object {
         return new Bool(_isalpha(this.value));
     }
 
-    public static boolean _isdigit(byte ch){
-      if (!(ch >= '0' && ch <= '9')) {
-          return false;
-      }
-      return true;
+    public static boolean _isdigit(byte ch) {
+        if (!(ch >= '0' && ch <= '9')) {
+            return false;
+        }
+        return true;
     }
 
     public static boolean _isdigit(byte[] input) {
@@ -1119,7 +1119,7 @@ public class Bytes extends org.python.types.Object {
     )
 
     public org.python.Object isdigit() {
-      return new Bool(_isdigit(this.value));
+        return new Bool(_isdigit(this.value));
     }
 
     public static boolean _islower(byte[] input) {
