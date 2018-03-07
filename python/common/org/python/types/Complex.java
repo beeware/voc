@@ -447,7 +447,7 @@ public class Complex extends org.python.types.Object {
             if (b.imag.value != 0. || b.real.value < 0.) {
                 throw new org.python.exceptions.ZeroDivisionError("0.0 to a negative or complex power");
             }
-            r.real.value = 1.0;
+            r.real.value = 0.0;
             r.imag.value = 0.0;
         } else {
             vabs = Math.hypot(this.real.value, this.imag.value);
@@ -474,7 +474,7 @@ public class Complex extends org.python.types.Object {
                 r = (org.python.types.Complex) r.__mul__(p);
             }
             mask <<= 1;
-            p = (Complex) p.__mul__(p);
+            p = (org.python.types.Complex) p.__mul__(p);
         }
         return r;
     }

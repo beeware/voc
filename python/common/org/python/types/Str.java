@@ -68,14 +68,17 @@ public class Str extends org.python.types.Object {
     // }
 
     private static boolean isCharPrintable(char c) {
-        // ASCII non-printable
-        if ((int) c <= 0x1f || (int) c >= 0x7f && (int) c <= 0xa0 || (int) c == 0xad) {
-            return false;
-        }
-        if ((int) c == 0x2029) {
-            return false;
-        }
-        if (Character.isISOControl(c)) {
+        // Characters except space ' ' in the following categories are
+        // not printable:
+        //  0 - UNASSIGNED
+        // 12 - SPACE_SEPARATOR
+        // 13 - LINE_SEPARATOR
+        // 14 - PARAGRAPH_SEPARATOR
+        // 15 - CONTROL
+        // 16 - FORMAT
+        // 17 - PRIVATE_USE
+        // 18 - SURROGATE
+        if ((Character.getType(c) == 0 || (Character.getType(c) >= 12 && Character.getType(c) <= 18)) && c != ' ') {
             return false;
         }
         return true;
@@ -282,38 +285,53 @@ public class Str extends org.python.types.Object {
             if (index instanceof org.python.types.Slice) {
                 org.python.types.Slice.ValidatedValue slice = ((org.python.types.Slice) index).validateValueTypes();
                 java.lang.String sliced;
-
                 if (slice.start == null && slice.stop == null && slice.step == null) {
                     sliced = this.value;
                 } else {
-                    long start;
+                    long start = 0;
                     if (slice.start != null) {
-                        start = toPositiveIndex(slice.start.value);
-                    } else {
-                        start = 0;
+                        if (slice.start.value < 0) {
+                            // computes starting index from end of string
+                            // sets to 0 if computed value went below 0
+                            start = Math.max(0, this.value.length() + slice.start.value);
+                        } else {
+                            start = slice.start.value;
+                        }
                     }
 
-                    long stop;
+                    long stop = this.value.length();
                     if (slice.stop != null) {
-                        stop = toPositiveIndex(slice.stop.value);
-                    } else {
-                        stop = this.value.length();
+                        if (slice.stop.value < 0) {
+                            // computes ending index from end of string
+                            // sets to 0 if computed value went below 0
+                            stop = Math.max(0, this.value.length() + slice.stop.value);
+                        } else {
+                            // if stop goes beyond string length, sets it to the length
+                            stop = Math.min(this.value.length(), slice.stop.value);
+                        }
                     }
-                    stop = Math.max(start, stop);
 
-                    long step;
+                    long step = 1;
                     if (slice.step != null) {
                         step = slice.step.value;
-                    } else {
-                        step = 1;
                     }
 
                     if (step == 1) {
-                        sliced = this.value.substring((int) start, (int) stop);
+                        sliced = "";
+                        if (start < stop) {
+                            sliced = this.value.substring((int) start, (int) stop);
+                        }
                     } else {
                         java.lang.StringBuffer buffer = new java.lang.StringBuffer();
-                        for (long i = start; i < stop; i += step) {
+                        long i = start;
+                        while (
+                                !((i >= stop) && (step > 0))
+                                && !((i <= stop) && (step < 0))
+                                && !(i >= this.value.length())
+                                && !(i < 0)
+                        ) {
                             buffer.append(this.value.charAt((int) i));
+                            i += step;
                         }
                         sliced = buffer.toString();
                     }
@@ -2563,3 +2581,4 @@ final class PythonFormatter {
     public static final char SIGN_NEGATIV = '+';
     public static final char SIGN_UNDEFINED = '\0';
 }
+
