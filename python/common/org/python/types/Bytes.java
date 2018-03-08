@@ -1193,8 +1193,40 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.join(iterable_of_bytes) -> bytes\n\nConcatenate any number of bytes objects, with B in between each pair.\nExample: b'.'.join([b'ab', b'pq', b'rs']) -> b'ab.pq.rs'."
     )
-    public org.python.Object join(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.join has not been implemented.");
+    public org.python.Object join(org.python.Object iterable) {
+        // Check if other is an iterable
+        java.util.List<org.python.Object> temp_list = new java.util.ArrayList<org.python.Object>();
+        org.python.Object iter = null;
+        try {
+            iter = org.Python.iter(iterable);
+        } catch (org.python.exceptions.TypeError e) {
+            throw new org.python.exceptions.TypeError("can only join an iterable");
+        }
+        // Save elements in a known list for iterating later
+        try {
+            while (true) {
+                org.python.Object item = iter.__next__();
+                temp_list.add(item);
+            }
+        } catch (org.python.exceptions.StopIteration e) {
+        }
+        // perform join
+        org.python.Object joinedBytes = null;
+        int i = 0;
+        for (org.python.Object item : temp_list) {
+            if (item instanceof org.python.types.Bytes) {
+                item = (org.python.types.Bytes) item;
+            } else if (item instanceof org.python.types.ByteArray) {
+                item = (org.python.types.ByteArray) item;
+            } else throw new org.python.exceptions.TypeError("sequence item "+i+": expected bytes-like object, "+item.typeName()+" found");
+            if (i == 0) {
+                joinedBytes = (org.python.types.Bytes) item;
+            } else {
+                joinedBytes = joinedBytes.__add__(__add__(item));
+            }
+            i++;
+        }
+        return joinedBytes;
     }
 
     @org.python.Method(
