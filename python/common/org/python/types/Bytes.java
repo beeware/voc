@@ -1191,7 +1191,8 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.join(iterable_of_bytes) -> bytes\n\nConcatenate any number of bytes objects, with B in between each pair.\nExample: b'.'.join([b'ab', b'pq', b'rs']) -> b'ab.pq.rs'."
+            __doc__ = "B.join(iterable_of_bytes) -> bytes\n\nConcatenate any number of bytes objects, with B in between each pair.\nExample: b'.'.join([b'ab', b'pq', b'rs']) -> b'ab.pq.rs'.",
+            args = {"iterable"}
     )
     public org.python.Object join(org.python.Object iterable) {
         // Check if other is an iterable
@@ -1217,8 +1218,11 @@ public class Bytes extends org.python.types.Object {
             if (item instanceof org.python.types.Bytes) {
                 item = (org.python.types.Bytes) item;
             } else if (item instanceof org.python.types.ByteArray) {
-                item = (org.python.types.ByteArray) item;
-            } else throw new org.python.exceptions.TypeError("sequence item "+i+": expected bytes-like object, "+item.typeName()+" found");
+                item = new Bytes(((org.python.types.ByteArray) item).value);
+
+            } else {
+                throw new org.python.exceptions.TypeError("sequence item "+i+": expected bytes-like object, "+item.typeName()+" found");
+            }
             if (i == 0) {
                 joinedBytes = (org.python.types.Bytes) item;
             } else {
