@@ -1221,7 +1221,7 @@ public class Bytes extends org.python.types.Object {
                 item = new Bytes(((org.python.types.ByteArray) item).value);
 
             } else {
-                throw new org.python.exceptions.TypeError("sequence item "+i+": expected bytes-like object, "+item.typeName()+" found");
+                throw new org.python.exceptions.TypeError("sequence item " + i + ": expected bytes-like object, " + item.typeName() + " found");
             }
             if (i == 0) {
                 joinedBytes = (org.python.types.Bytes) item;
