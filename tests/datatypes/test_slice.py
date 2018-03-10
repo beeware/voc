@@ -219,69 +219,14 @@ class SliceTests(TranspileTestCase):
             print("x.indices(12) = ", x.indices(12))
             """)
 
+
 class UnarySliceOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'slice'
-
-    not_implemented = [
-        'test_unary_invert',
-        'test_unary_negative',
-        'test_unary_not',
-        'test_unary_positive',
-    ]
 
 
 class BinarySliceOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'slice'
 
-    not_implemented = [
-        'test_direct_eq_slice',
-        'test_direct_ge_slice',
-        'test_direct_gt_slice',
-        'test_direct_le_slice',
-        'test_direct_lt_slice',
-        'test_direct_ne_slice',
-
-        'test_eq_slice',
-        'test_ge_slice',
-        'test_gt_slice',
-        'test_le_slice',
-        'test_lt_slice',
-
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
-        'test_multiply_list',
-        'test_multiply_str',
-        'test_multiply_tuple',
-
-        'test_ne_slice',
-
-        'test_subscr_bool',
-        'test_subscr_bytearray',
-        'test_subscr_bytes',
-        'test_subscr_class',
-        'test_subscr_complex',
-        'test_subscr_dict',
-        'test_subscr_float',
-        'test_subscr_frozenset',
-        'test_subscr_int',
-        'test_subscr_list',
-        'test_subscr_None',
-        'test_subscr_NotImplemented',
-        'test_subscr_range',
-        'test_subscr_set',
-        'test_subscr_slice',
-        'test_subscr_str',
-        'test_subscr_tuple',
-    ]
-
 
 class InplaceSliceOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'slice'
-
-    not_implemented = [
-        'test_multiply_bytearray',
-        'test_multiply_bytes',
-        'test_multiply_list',
-        'test_multiply_str',
-        'test_multiply_tuple',
-    ]

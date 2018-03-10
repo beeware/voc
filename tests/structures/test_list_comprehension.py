@@ -6,11 +6,15 @@ class ListComprehensionTests(TranspileTestCase):
         self.assertCodeExecution("""
             x = [1, 2, 3, 4, 5]
             print([v**2 for v in x])
+
+            print([v for v in x])
             """)
 
+    def test_list_comprehension_with_if_condition(self):
         self.assertCodeExecution("""
-            x = [1, 2, 3, 4, 5]
-            print([v for v in x])
+            print([v for v in range(100) if v % 2 == 0])
+            print([v for v in range(100) if v % 2 == 0 if v % 3 == 0])
+            print([v for v in range(100) if v % 2 == 0 if v % 3 == 0 if v > 10 if v < 80])
             """)
 
     def test_method(self):

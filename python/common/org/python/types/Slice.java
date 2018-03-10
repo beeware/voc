@@ -36,14 +36,14 @@ public class Slice extends org.python.types.Object {
         if (length == org.python.types.NoneType.NONE) {
             throw new org.python.exceptions.TypeError("'NoneType' object cannot be interpreted as an integer");
         }
-        len = ((org.python.types.Int)length).value;
+        len = ((org.python.types.Int) length).value;
         if (len < 0) {
             throw new org.python.exceptions.ValueError("length should not be negative");
         }
         if (this.step == org.python.types.NoneType.NONE) {
             step = new org.python.types.Int(1);
         } else {
-            step = (org.python.types.Int)this.step;
+            step = (org.python.types.Int) this.step;
         }
         step_is_negative = (step.value < 0);
 
@@ -60,7 +60,7 @@ public class Slice extends org.python.types.Object {
         if (this.start == org.python.types.NoneType.NONE) {
             start = step_is_negative ? upper : lower;
         } else {
-            start  = ((org.python.types.Int)this.start).value;
+            start = ((org.python.types.Int) this.start).value;
             if (start < 0) {
                 start += len;
                 if (start < lower) {
@@ -77,7 +77,7 @@ public class Slice extends org.python.types.Object {
         if (this.stop == org.python.types.NoneType.NONE) {
             stop = step_is_negative ? lower : upper;
         } else {
-            stop = ((org.python.types.Int)this.stop).value;
+            stop = ((org.python.types.Int) this.stop).value;
             if (stop < 0) {
                 stop += len;
                 if (stop < lower) {
@@ -158,12 +158,27 @@ public class Slice extends org.python.types.Object {
             this.step.__repr__()));
     }
 
+    private org.python.types.Tuple convertSliceToTuple(org.python.types.Slice slice) {
+        org.python.types.Tuple tupleFromSlice = new org.python.types.Tuple();
+        tupleFromSlice.value.add(slice.start);
+        tupleFromSlice.value.add(slice.stop);
+        tupleFromSlice.value.add(slice.step);
+        return tupleFromSlice;
+    }
+
     @org.python.Method(
             __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__ge__(otherSliceAsTuple);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -171,7 +186,14 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__gt__(otherSliceAsTuple);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -179,7 +201,14 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__eq__(otherSliceAsTuple);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -187,7 +216,14 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__lt__(otherSliceAsTuple);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
     }
 
     @org.python.Method(
@@ -195,6 +231,90 @@ public class Slice extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
-        return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+
+        if (other instanceof org.python.types.Slice) {
+            org.python.types.Tuple otherSliceAsTuple = convertSliceToTuple((org.python.types.Slice) other);
+            org.python.types.Tuple thisSliceAsTuple = convertSliceToTuple(this);
+            return thisSliceAsTuple.__le__(otherSliceAsTuple);
+        } else {
+            return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index"}
+    )
+    public org.python.Object __getitem__(org.python.Object index) {
+        throw new org.python.exceptions.TypeError("'slice' object is not subscriptable");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index", "value"}
+    )
+    public void __setitem__(org.python.Object index, org.python.Object value) {
+        throw new org.python.exceptions.TypeError("'slice' object does not support item assignment");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index"}
+    )
+    public void __delitem__(org.python.Object index) {
+        throw new org.python.exceptions.TypeError("'slice' object does not support item deletion");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __mul__(org.python.Object other) {
+        if (org.python.types.Object.isSequence(other)) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'slice'");
+        } else {
+            return super.__mul__(other);
+        }
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+        if (org.python.types.Object.isSequence(other)) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'slice'");
+        } else {
+            return super.__imul__(other);
+        }
+    }
+
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'slice'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'slice'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'slice'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __not__() {
+        return new org.python.types.Bool(false);
     }
 }

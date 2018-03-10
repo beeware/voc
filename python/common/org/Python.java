@@ -22,7 +22,6 @@ public class Python {
         builtins.put("False", org.python.types.Bool.FALSE);
 
         // Primitives, which are both functions and types.
-        builtins.put("bool", org.python.types.Type.pythonType(org.python.types.Bool.class));
         builtins.put("bytearray", org.python.types.Type.pythonType(org.python.types.ByteArray.class));
         builtins.put("bytes", org.python.types.Type.pythonType(org.python.types.Bytes.class));
         builtins.put("complex", org.python.types.Type.pythonType(org.python.types.Complex.class));
@@ -36,101 +35,120 @@ public class Python {
         builtins.put("str", org.python.types.Type.pythonType(org.python.types.Str.class));
         builtins.put("tuple", org.python.types.Type.pythonType(org.python.types.Tuple.class));
 
+        // subclasses of int
+        java.lang.Class base = org.python.types.Int.class;
+        builtins.put("bool", org.python.types.Type.pythonType(org.python.types.Bool.class, base));
+
         // Add all the builtin exceptions
         builtins.put("BaseException", org.python.types.Type.pythonType(org.python.exceptions.BaseException.class));
 
-        builtins.put("SystemExit", org.python.types.Type.pythonType(org.python.exceptions.SystemExit.class));
-        builtins.put("KeyboardInterrupt", org.python.types.Type.pythonType(org.python.exceptions.KeyboardInterrupt.class));
-        builtins.put("GeneratorExit", org.python.types.Type.pythonType(org.python.exceptions.GeneratorExit.class));
-        builtins.put("Exception", org.python.types.Type.pythonType(org.python.exceptions.Exception.class));
+        base = org.python.exceptions.BaseException.class;
+        builtins.put("SystemExit", org.python.types.Type.pythonType(org.python.exceptions.SystemExit.class, base));
+        builtins.put("KeyboardInterrupt", org.python.types.Type.pythonType(org.python.exceptions.KeyboardInterrupt.class, base));
+        builtins.put("GeneratorExit", org.python.types.Type.pythonType(org.python.exceptions.GeneratorExit.class, base));
+        builtins.put("Exception", org.python.types.Type.pythonType(org.python.exceptions.Exception.class, base));
 
         // subclasses of Exception
-        builtins.put("StopIteration", org.python.types.Type.pythonType(org.python.exceptions.StopIteration.class));
-        // New in Python 3.5: builtins.put("StopAsyncIteration", org.python.types.Type.pythonType(org.python.exceptions.StopAsyncIteration.class));
-        builtins.put("ArithmeticError", org.python.types.Type.pythonType(org.python.exceptions.ArithmeticError.class));
-        builtins.put("AssertionError", org.python.types.Type.pythonType(org.python.exceptions.AssertionError.class));
-        builtins.put("AttributeError", org.python.types.Type.pythonType(org.python.exceptions.AttributeError.class));
-        builtins.put("BufferError", org.python.types.Type.pythonType(org.python.exceptions.BufferError.class));
-        builtins.put("EOFError", org.python.types.Type.pythonType(org.python.exceptions.EOFError.class));
-        builtins.put("ImportError", org.python.types.Type.pythonType(org.python.exceptions.ImportError.class));
-        builtins.put("LookupError", org.python.types.Type.pythonType(org.python.exceptions.LookupError.class));
-        builtins.put("MemoryError", org.python.types.Type.pythonType(org.python.exceptions.MemoryError.class));
-        builtins.put("NameError", org.python.types.Type.pythonType(org.python.exceptions.NameError.class));
-        builtins.put("OSError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class));
-        builtins.put("ReferenceError", org.python.types.Type.pythonType(org.python.exceptions.ReferenceError.class));
-        builtins.put("RuntimeError", org.python.types.Type.pythonType(org.python.exceptions.RuntimeError.class));
-        builtins.put("SyntaxError", org.python.types.Type.pythonType(org.python.exceptions.SyntaxError.class));
-        builtins.put("SystemError", org.python.types.Type.pythonType(org.python.exceptions.SystemError.class));
-        builtins.put("TypeError", org.python.types.Type.pythonType(org.python.exceptions.TypeError.class));
-        builtins.put("ValueError", org.python.types.Type.pythonType(org.python.exceptions.ValueError.class));
-        builtins.put("Warning", org.python.types.Type.pythonType(org.python.exceptions.Warning.class));
+        base = org.python.exceptions.Exception.class;
+        builtins.put("StopIteration", org.python.types.Type.pythonType(org.python.exceptions.StopIteration.class, base));
+        // New in Python 3.5: builtins.put("StopAsyncIteration", org.python.types.Type.pythonType(org.python.exceptions.StopAsyncIteration.class, base));
+        builtins.put("ArithmeticError", org.python.types.Type.pythonType(org.python.exceptions.ArithmeticError.class, base));
+        builtins.put("AssertionError", org.python.types.Type.pythonType(org.python.exceptions.AssertionError.class, base));
+        builtins.put("AttributeError", org.python.types.Type.pythonType(org.python.exceptions.AttributeError.class, base));
+        builtins.put("BufferError", org.python.types.Type.pythonType(org.python.exceptions.BufferError.class, base));
+        builtins.put("EOFError", org.python.types.Type.pythonType(org.python.exceptions.EOFError.class, base));
+        builtins.put("ImportError", org.python.types.Type.pythonType(org.python.exceptions.ImportError.class, base));
+        builtins.put("LookupError", org.python.types.Type.pythonType(org.python.exceptions.LookupError.class, base));
+        builtins.put("MemoryError", org.python.types.Type.pythonType(org.python.exceptions.MemoryError.class, base));
+        builtins.put("NameError", org.python.types.Type.pythonType(org.python.exceptions.NameError.class, base));
+        builtins.put("OSError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class, base));
+        builtins.put("ReferenceError", org.python.types.Type.pythonType(org.python.exceptions.ReferenceError.class, base));
+        builtins.put("RuntimeError", org.python.types.Type.pythonType(org.python.exceptions.RuntimeError.class, base));
+        builtins.put("SyntaxError", org.python.types.Type.pythonType(org.python.exceptions.SyntaxError.class, base));
+        builtins.put("SystemError", org.python.types.Type.pythonType(org.python.exceptions.SystemError.class, base));
+        builtins.put("TypeError", org.python.types.Type.pythonType(org.python.exceptions.TypeError.class, base));
+        builtins.put("ValueError", org.python.types.Type.pythonType(org.python.exceptions.ValueError.class, base));
+        builtins.put("Warning", org.python.types.Type.pythonType(org.python.exceptions.Warning.class, base));
 
         // subclasses of ArithmeticError
-        builtins.put("FloatingPointError", org.python.types.Type.pythonType(org.python.exceptions.FloatingPointError.class));
-        builtins.put("OverflowError", org.python.types.Type.pythonType(org.python.exceptions.OverflowError.class));
-        builtins.put("ZeroDivisionError", org.python.types.Type.pythonType(org.python.exceptions.ZeroDivisionError.class));
+        base = org.python.exceptions.ArithmeticError.class;
+        builtins.put("FloatingPointError", org.python.types.Type.pythonType(org.python.exceptions.FloatingPointError.class, base));
+        builtins.put("OverflowError", org.python.types.Type.pythonType(org.python.exceptions.OverflowError.class, base));
+        builtins.put("ZeroDivisionError", org.python.types.Type.pythonType(org.python.exceptions.ZeroDivisionError.class, base));
 
         // subclasses of ImportError
-        // New in 3.6: builtins.put("ModuleNotFoundError", org.python.types.Type.pythonType(org.python.exceptions.ModuleNotFoundError.class));
+        // base = org.python.exceptions.ImportError.class;
+        // New in 3.6: builtins.put("ModuleNotFoundError", org.python.types.Type.pythonType(org.python.exceptions.ModuleNotFoundError.class, base));
 
         // subclasses of LookupError
-        builtins.put("IndexError", org.python.types.Type.pythonType(org.python.exceptions.IndexError.class));
-        builtins.put("KeyError", org.python.types.Type.pythonType(org.python.exceptions.KeyError.class));
+        base = org.python.exceptions.LookupError.class;
+        builtins.put("IndexError", org.python.types.Type.pythonType(org.python.exceptions.IndexError.class, base));
+        builtins.put("KeyError", org.python.types.Type.pythonType(org.python.exceptions.KeyError.class, base));
 
         // subclasses of NameError
-        builtins.put("UnboundLocalError", org.python.types.Type.pythonType(org.python.exceptions.UnboundLocalError.class));
+        base = org.python.exceptions.NameError.class;
+        builtins.put("UnboundLocalError", org.python.types.Type.pythonType(org.python.exceptions.UnboundLocalError.class, base));
 
         // subclasses of OSError
-        builtins.put("BlockingIOError", org.python.types.Type.pythonType(org.python.exceptions.BlockingIOError.class));
-        builtins.put("ChildProcessError", org.python.types.Type.pythonType(org.python.exceptions.ChildProcessError.class));
-        builtins.put("ConnectionError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionError.class));
-        builtins.put("FileExistsError", org.python.types.Type.pythonType(org.python.exceptions.FileExistsError.class));
-        builtins.put("FileNotFoundError", org.python.types.Type.pythonType(org.python.exceptions.FileNotFoundError.class));
-        builtins.put("InterruptedError", org.python.types.Type.pythonType(org.python.exceptions.InterruptedError.class));
-        builtins.put("IsADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.IsADirectoryError.class));
-        builtins.put("NotADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.NotADirectoryError.class));
-        builtins.put("PermissionError", org.python.types.Type.pythonType(org.python.exceptions.PermissionError.class));
-        builtins.put("ProcessLookupError", org.python.types.Type.pythonType(org.python.exceptions.ProcessLookupError.class));
-        builtins.put("TimeoutError", org.python.types.Type.pythonType(org.python.exceptions.TimeoutError.class));
+        base = org.python.exceptions.OSError.class;
+        builtins.put("BlockingIOError", org.python.types.Type.pythonType(org.python.exceptions.BlockingIOError.class, base));
+        builtins.put("ChildProcessError", org.python.types.Type.pythonType(org.python.exceptions.ChildProcessError.class, base));
+        builtins.put("ConnectionError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionError.class, base));
+        builtins.put("FileExistsError", org.python.types.Type.pythonType(org.python.exceptions.FileExistsError.class, base));
+        builtins.put("FileNotFoundError", org.python.types.Type.pythonType(org.python.exceptions.FileNotFoundError.class, base));
+        builtins.put("InterruptedError", org.python.types.Type.pythonType(org.python.exceptions.InterruptedError.class, base));
+        builtins.put("IsADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.IsADirectoryError.class, base));
+        builtins.put("NotADirectoryError", org.python.types.Type.pythonType(org.python.exceptions.NotADirectoryError.class, base));
+        builtins.put("PermissionError", org.python.types.Type.pythonType(org.python.exceptions.PermissionError.class, base));
+        builtins.put("ProcessLookupError", org.python.types.Type.pythonType(org.python.exceptions.ProcessLookupError.class, base));
+        builtins.put("TimeoutError", org.python.types.Type.pythonType(org.python.exceptions.TimeoutError.class, base));
 
-        builtins.put("IOError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class));
-        builtins.put("EnvironmentError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class));
+        base = org.python.exceptions.Exception.class;
+        builtins.put("IOError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class, base));
+        builtins.put("EnvironmentError", org.python.types.Type.pythonType(org.python.exceptions.OSError.class, base));
 
         // subclasses of ConnectionError
-        builtins.put("BrokenPipeError", org.python.types.Type.pythonType(org.python.exceptions.BrokenPipeError.class));
-        builtins.put("ConnectionAbortedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionAbortedError.class));
-        builtins.put("ConnectionRefusedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionRefusedError.class));
-        builtins.put("ConnectionResetError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionResetError.class));
+        base = org.python.exceptions.ConnectionError.class;
+        builtins.put("BrokenPipeError", org.python.types.Type.pythonType(org.python.exceptions.BrokenPipeError.class, base));
+        builtins.put("ConnectionAbortedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionAbortedError.class, base));
+        builtins.put("ConnectionRefusedError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionRefusedError.class, base));
+        builtins.put("ConnectionResetError", org.python.types.Type.pythonType(org.python.exceptions.ConnectionResetError.class, base));
 
         // subclasses of RuntimeError
-        builtins.put("NotImplementedError", org.python.types.Type.pythonType(org.python.exceptions.NotImplementedError.class));
-        // new in Python 3.5: builtins.put("RecursionError", org.python.types.Type.pythonType(org.python.exceptions.RecursionError.class));
+        base = org.python.exceptions.RuntimeError.class;
+        builtins.put("NotImplementedError", org.python.types.Type.pythonType(org.python.exceptions.NotImplementedError.class, base));
+        // new in Python 3.5: builtins.put("RecursionError", org.python.types.Type.pythonType(org.python.exceptions.RecursionError.class, base));
 
         // subclasses of SyntaxError
-        builtins.put("IndentationError", org.python.types.Type.pythonType(org.python.exceptions.IndentationError.class));
+        base = org.python.exceptions.SyntaxError.class;
+        builtins.put("IndentationError", org.python.types.Type.pythonType(org.python.exceptions.IndentationError.class, base));
 
         // subclasses of IndentationError
-        builtins.put("TabError", org.python.types.Type.pythonType(org.python.exceptions.TabError.class));
+        base = org.python.exceptions.IndentationError.class;
+        builtins.put("TabError", org.python.types.Type.pythonType(org.python.exceptions.TabError.class, base));
 
         // subclasses of ValueError
-        builtins.put("UnicodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeError.class));
+        base = org.python.exceptions.ValueError.class;
+        builtins.put("UnicodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeError.class, base));
 
         // subclasses of UnicodeError
-        builtins.put("UnicodeDecodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeDecodeError.class));
-        builtins.put("UnicodeEncodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeEncodeError.class));
-        builtins.put("UnicodeTranslateError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeTranslateError.class));
+        base = org.python.exceptions.UnicodeError.class;
+        builtins.put("UnicodeDecodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeDecodeError.class, base));
+        builtins.put("UnicodeEncodeError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeEncodeError.class, base));
+        builtins.put("UnicodeTranslateError", org.python.types.Type.pythonType(org.python.exceptions.UnicodeTranslateError.class, base));
 
         // subclasses of Warning
-        builtins.put("DeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.DeprecationWarning.class));
-        builtins.put("PendingDeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.PendingDeprecationWarning.class));
-        builtins.put("RuntimeWarning", org.python.types.Type.pythonType(org.python.exceptions.RuntimeWarning.class));
-        builtins.put("SyntaxWarning", org.python.types.Type.pythonType(org.python.exceptions.SyntaxWarning.class));
-        builtins.put("UserWarning", org.python.types.Type.pythonType(org.python.exceptions.UserWarning.class));
-        builtins.put("FutureWarning", org.python.types.Type.pythonType(org.python.exceptions.FutureWarning.class));
-        builtins.put("ImportWarning", org.python.types.Type.pythonType(org.python.exceptions.ImportWarning.class));
-        builtins.put("UnicodeWarning", org.python.types.Type.pythonType(org.python.exceptions.UnicodeWarning.class));
-        builtins.put("BytesWarning", org.python.types.Type.pythonType(org.python.exceptions.BytesWarning.class));
-        builtins.put("ResourceWarning", org.python.types.Type.pythonType(org.python.exceptions.ResourceWarning.class));
+        base = org.python.exceptions.Warning.class;
+        builtins.put("DeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.DeprecationWarning.class, base));
+        builtins.put("PendingDeprecationWarning", org.python.types.Type.pythonType(org.python.exceptions.PendingDeprecationWarning.class, base));
+        builtins.put("RuntimeWarning", org.python.types.Type.pythonType(org.python.exceptions.RuntimeWarning.class, base));
+        builtins.put("SyntaxWarning", org.python.types.Type.pythonType(org.python.exceptions.SyntaxWarning.class, base));
+        builtins.put("UserWarning", org.python.types.Type.pythonType(org.python.exceptions.UserWarning.class, base));
+        builtins.put("FutureWarning", org.python.types.Type.pythonType(org.python.exceptions.FutureWarning.class, base));
+        builtins.put("ImportWarning", org.python.types.Type.pythonType(org.python.exceptions.ImportWarning.class, base));
+        builtins.put("UnicodeWarning", org.python.types.Type.pythonType(org.python.exceptions.UnicodeWarning.class, base));
+        builtins.put("BytesWarning", org.python.types.Type.pythonType(org.python.exceptions.BytesWarning.class, base));
+        builtins.put("ResourceWarning", org.python.types.Type.pythonType(org.python.exceptions.ResourceWarning.class, base));
 
         org.Python.initializeModule(org.Python.class, builtins);
     }
@@ -326,9 +344,16 @@ public class Python {
                     "returns package A when fromlist is empty, but its submodule B when\n" +
                     "fromlist is not empty.  Level is used to determine whether to perform\n" +
                     "absolute or relative imports. 0 is absolute while a positive number\n" +
-                    "is the number of parent directories to search relative to the current module.\n"
+                    "is the number of parent directories to search relative to the current module.\n",
+            args = {"name"},
+            default_args = {"globals", "locals", "fromlist", "level"}
     )
-    public static org.python.Object __import__() {
+    public static org.python.Object __import__(
+            org.python.Object name,
+            org.python.Object globals,
+            org.python.Object locals,
+            org.python.Object fromlist,
+            org.python.Object level) {
         throw new org.python.exceptions.NotImplementedError("Builtin function '__import__' not implemented");
     }
 
@@ -394,9 +419,10 @@ public class Python {
                     "As repr(), return a string containing a printable representation of an\n" +
                     "object, but escape the non-ASCII characters in the string returned by\n" +
                     "repr() using \\x, \\u or \\U escapes.  This generates a string similar\n" +
-                    "to that returned by repr() in Python 2.\n"
+                    "to that returned by repr() in Python 2.\n",
+            args = {"object"}
     )
-    public static org.python.types.Str ascii() {
+    public static org.python.types.Str ascii(org.python.Object object) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'ascii' not implemented");
     }
 
@@ -485,9 +511,10 @@ public class Python {
                     "object is passed as the implied first argument.\n" +
                     "\n" +
                     "Class methods are different than C++ or Java static methods.\n" +
-                    "If you want those, see the staticmethod builtin.\n"
+                    "If you want those, see the staticmethod builtin.\n",
+            args = {"function"}
     )
-    public static org.python.Object classmethod() {
+    public static org.python.Object classmethod(org.python.Object function) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'classmethod' not implemented");
     }
 
@@ -504,9 +531,16 @@ public class Python {
                     "The dont_inherit argument, if non-zero, stops the compilation inheriting\n" +
                     "the effects of any future statements in effect in the code calling\n" +
                     "compile; if absent or zero these statements do influence the compilation,\n" +
-                    "in addition to any features explicitly specified.\n"
+                    "in addition to any features explicitly specified.\n",
+            args = {"source", "filename", "mode"},
+            default_args = {"flags", "dont_inherit"}
     )
-    public static org.python.Object compile() {
+    public static org.python.Object compile(
+            org.python.Object source,
+            org.python.Object filename,
+            org.python.Object mode,
+            org.python.Object flags,
+            org.python.Object dont_inherit) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'compile' not implemented");
     }
 
@@ -647,9 +681,11 @@ public class Python {
                     "or a code object as returned by compile().\n" +
                     "The globals must be a dictionary and locals can be any mapping,\n" +
                     "defaulting to the current globals and locals.\n" +
-                    "If only globals is given, locals defaults to it.\n"
+                    "If only globals is given, locals defaults to it.\n",
+            args = {"source"},
+            default_args = {"globals", "locals"}
     )
-    public static org.python.Object eval() {
+    public static org.python.Object eval(org.python.Object source, org.python.Object globals, org.python.Object locals) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'eval' not implemented");
     }
 
@@ -659,9 +695,11 @@ public class Python {
                     "Read and execute code from an object, which can be a string or a code\n" +
                     "object.\n" +
                     "The globals and locals are dictionaries, defaulting to the current\n" +
-                    "globals and locals.  If only globals is given, locals defaults to it.\n"
+                    "globals and locals.  If only globals is given, locals defaults to it.\n",
+            args = {"object"},
+            default_args = {"globals", "locals"}
     )
-    public static org.python.Object exec() {
+    public static org.python.Object exec(org.python.Object object, org.python.Object globals, org.python.Object locals) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'exec' not implemented");
     }
 
@@ -760,9 +798,10 @@ public class Python {
 
     @org.python.Method(
             __doc__ = "Define the built-in 'help'." +
-                    "This is a wrapper around pydoc.help (with a twist).\n"
+                    "This is a wrapper around pydoc.help (with a twist).\n",
+            default_args = {"object"}
     )
-    public static org.python.Object help() {
+    public static org.python.Object help(org.python.Object object) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'help' not implemented");
     }
 
@@ -1614,9 +1653,10 @@ public class Python {
                     "(e.g. C().f()).  The instance is ignored except for its class.\n" +
                     "\n" +
                     "Static methods in Python are similar to those found in Java or C++.\n" +
-                    "For a more advanced concept, see the classmethod builtin.\n"
+                    "For a more advanced concept, see the classmethod builtin.\n",
+            args = {"function"}
     )
-    public static org.python.Object staticmethod() {
+    public static org.python.Object staticmethod(org.python.Object function) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'staticmethod' not implemented");
     }
 

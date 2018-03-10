@@ -8,7 +8,7 @@ Setup
 -----
 
 This tutorial assumes you've read and followed the instructions in
-:doc:`/intro/getting-started`. If you've done this, you should have:
+:doc:`/background/install`. If you've done this, you should have:
 
 * Java 6 (or higher) installed and available on your path,
 * An ``env`` directory for your virtualenv

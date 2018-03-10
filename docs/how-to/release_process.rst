@@ -1,13 +1,22 @@
 Release Process
 ===============
 
+.. note:: For Developers Only!
+
+    This guide is provided for the benefit of the VOC team. As an end user,
+    you shouldn't ever need to use these instructions.
+
+So, it's time for a new VOC release! Here's how to publish a new version so
+others can benefit from the changes that have been made recently.
+
 1. Update local checkout
 
    Make sure your developer checkout of VOC is up to date with a::
 
     $ git pull
 
-2. Confirm that the trunk currently builds for JDK and Android::
+2. Confirm that the trunk currently builds for JDK and Android on each version
+   of Python you're planning to support::
 
     $ ant clean
     $ ant
@@ -43,7 +52,15 @@ Release Process
 
     $ twine upload dist/voc-0.1.2*
 
-10. Create the GitHub release for each support package versions, and upload
-    the support zipfile.
+10. Check that you have AWS credentials in a file named  ``.env`` file in the
+    root directory of your project checkout::
 
-11. Check that Read The Docs has updated
+    AWS_ACCESS_KEY_ID=...
+    AWS_SECRET_ACCESS_KEY=...
+    AWS_REGION=us-west-2
+
+11. Upload the support zipfile to S3::
+
+    $ python tools/upload b3
+
+11. Check that Read The Docs has updated.

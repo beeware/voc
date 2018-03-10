@@ -317,6 +317,8 @@ class Visitor(ast.NodeVisitor):
             elif isinstance(target, ast.Name):
                 # delete is performed by visit(target) with context Del
                 pass
+            elif isinstance(target, (ast.Tuple, ast.List)):
+                self.visit_Delete(ast.Delete(target.elts))
             else:
                 raise NotImplementedError('No handler for Delete of type %s' % target)
 
@@ -612,26 +614,18 @@ class Visitor(ast.NodeVisitor):
                 ALOAD_name(self.current_exc_name[-1]),
             )
         else:
-            if getattr(node.exc, 'func', None) is not None:
-                name = node.exc.func.id
-                args = node.exc.args
+            if isinstance(node.exc, ast.Name):
+                # handle "raise ValueError" as if "raise ValueError()"
+                exception = self.full_classref(node.exc.id, default_prefix='org.python.exceptions')
+                self.context.add_opcodes(
+                    java.New(exception),
+                    java.Init(exception)
+                )
             else:
-                name = node.exc.id
-                args = []
-
-            exception = self.full_classref(name, default_prefix='org.python.exceptions')
-            self.context.add_opcodes(
-                java.New(exception),
-            )
-
-            for arg in args:
-                self.visit(arg)
-
-            self.context.add_opcodes(
-                java.Init(exception, *(['Lorg/python/Object;'] * len(args)))
-            )
+                self.visit(node.exc)
 
         self.context.add_opcodes(
+            JavaOpcodes.CHECKCAST('java/lang/Throwable'),
             JavaOpcodes.ATHROW(),
         )
 
@@ -1243,6 +1237,15 @@ class Visitor(ast.NodeVisitor):
             if isinstance(generator, ast.comprehension):
                 self.visit(generator.target)
 
+        if node.generators[0].ifs:
+            self.visit(
+                ast.BoolOp(ast.And(), node.generators[0].ifs)
+            )
+
+            self.context.add_opcodes(
+                IF([python.Object.as_boolean()], JavaOpcodes.IFEQ),
+            )
+
         self.visit(node.elt)
 
         # And add it to the result list
@@ -1252,6 +1255,12 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.SWAP(),
                 python.List.append(),
         )
+
+        if node.generators[0].ifs:
+            self.context.add_opcodes(
+                END_IF()
+            )
+
         self.context.add_opcodes(
             END_LOOP(),
         )
@@ -1896,9 +1905,9 @@ class Visitor(ast.NodeVisitor):
                 )
             elif node.args:
                 self.context.add_opcodes(
-                    java.New('org/python/exceptions/TypeError'),
-                    JavaOpcodes.LDC_W(node.func.id + "() takes no arguments (" + len(node.args) + " given)"),
-                    java.Init('org/python/exceptions/TypeError', 'Ljava/lang/String;'),
+                    java.New('org/python/exceptions/NotImplementedError'),
+                    JavaOpcodes.LDC_W(node.func.id + "(object) not yet implemented"),
+                    java.Init('org/python/exceptions/NotImplementedError', 'Ljava/lang/String;'),
                     JavaOpcodes.ATHROW()
                 )
             else:

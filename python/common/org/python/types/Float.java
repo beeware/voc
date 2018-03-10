@@ -253,7 +253,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self+value."
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -274,7 +275,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self-value."
+            __doc__ = "Return self-value.",
+            args = {"other"}
     )
     public org.python.Object __sub__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -288,42 +290,63 @@ public class Float extends org.python.types.Object {
                 return new org.python.types.Float(this.value - 1.0);
             }
             return new org.python.types.Float(this.value);
+        } else if (other instanceof org.python.types.Complex) {
+            return new org.python.types.Complex(
+                new org.python.types.Float(this.value - ((org.python.types.Complex) other).real.value),
+                new org.python.types.Float(-((org.python.types.Complex) other).imag.value)
+            );
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value."
+            __doc__ = "Return self*value.",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
 
-        if (other instanceof org.python.types.Str) {
+        if (org.python.types.Object.isSequence(other)) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + "float" + "'");
         } else if (other instanceof org.python.types.Int) {
             return new org.python.types.Float(this.value * ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
             return new org.python.types.Float(((double) this.value) * ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Float(this.value * (((org.python.types.Bool) other).value ? 1 : 0));
-        } else if (other instanceof org.python.types.Dict) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.NoneType) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.Set) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and '" + other.typeName() + "'");
-        } else if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'float'");
-        } else if (other instanceof org.python.types.Slice) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'float' and 'slice'");
+            return new org.python.types.Float(this.value * (((org.python.types.Bool) other).__int__().value));
+        } else if (other instanceof org.python.types.Complex) {
+            return ((org.python.types.Complex) other).__mul__(this);
         }
 
-        throw new org.python.exceptions.NotImplementedError("float.__mul__() has not been implemented.");
+        return super.__mul__(other);
+
     }
 
+
     @org.python.Method(
-            __doc__ = "Return self/value."
+            __doc__ = "Return self*value.",
+            args = {"other"}
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+
+        if (org.python.types.Object.isSequence(other)) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + "float" + "'");
+        } else if (other instanceof org.python.types.Int) {
+            return new org.python.types.Float(this.value * ((org.python.types.Int) other).value);
+        } else if (other instanceof org.python.types.Float) {
+            return new org.python.types.Float(((double) this.value) * ((org.python.types.Float) other).value);
+        } else if (other instanceof org.python.types.Bool) {
+            return new org.python.types.Float(this.value * (((org.python.types.Bool) other).__int__().value));
+        } else if (other instanceof org.python.types.Complex) {
+            return ((org.python.types.Complex) other).__imul__(this);
+        }
+        return super.__imul__(other);
+    }
+
+
+
+    @org.python.Method(
+            __doc__ = "Return self/value.",
+            args = {"other"}
     )
     public org.python.Object __truediv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -344,12 +367,16 @@ public class Float extends org.python.types.Object {
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             }
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex dummycomplex = new org.python.types.Complex(this.value, 0.0);
+            return dummycomplex.__truediv__((org.python.types.Complex) other);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for /: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = "Return self//value."
+            __doc__ = "Return self//value.",
+            args = {"other"}
     )
     public org.python.Object __floordiv__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -375,50 +402,50 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self%value."
+            __doc__ = "Return self%value.",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
-        try {
-            if (other instanceof org.python.types.Bool) {
-                if (((org.python.types.Bool) other).value) {
-                    return new org.python.types.Float(this.value - Math.floor(this.value));
-                } else {
-                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
-                }
-            } else if (other instanceof org.python.types.Int) {
-                long other_val = ((org.python.types.Int) other).value;
-                if (other_val == 0) {
-                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
-                } else {
-                    // Reference: http://stackoverflow.com/a/4412200
-                    // This translates to (a % b + b) %b
-                    // This expression works as the result of (a % b) is necessarily lower than b,
-                    // no matter if a is positive or negative. Adding b takes care of the negative
-                    // values of a, since (a % b) is a negative value between -b and 0, (a % b + b)
-                    // is necessarily lower than b and positive. The last modulo is there in case a
-                    // was positive to begin with, since if a is positive (a % b + b) would become
-                    // larger than b. Therefore, (a % b + b) % b turns it into smaller than b again
-                    // (and doesn't affect negative a values).
-                    double result = (((((double) this.value) % other_val) + other_val) % other_val);
-                    return new org.python.types.Float(result);
-                }
-            } else if (other instanceof org.python.types.Float) {
-                double other_val = ((org.python.types.Float) other).value;
-                if (other_val == 0.0) {
-                    throw new org.python.exceptions.ZeroDivisionError("float modulo");
-                } else {
-                    double result = (((((double) this.value) % other_val) + other_val) % other_val);
-                    return new org.python.types.Float(result);
-                }
+        if (other instanceof org.python.types.Bool) {
+            if (((org.python.types.Bool) other).value) {
+                return new org.python.types.Float(this.value - Math.floor(this.value));
+            } else {
+                throw new org.python.exceptions.ZeroDivisionError("float modulo");
             }
-        } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
+        } else if (other instanceof org.python.types.Int) {
+            long other_val = ((org.python.types.Int) other).value;
+            if (other_val == 0) {
+                throw new org.python.exceptions.ZeroDivisionError("float modulo");
+            } else {
+                // Reference: http://stackoverflow.com/a/4412200
+                // This translates to (a % b + b) %b
+                // This expression works as the result of (a % b) is necessarily lower than b,
+                // no matter if a is positive or negative. Adding b takes care of the negative
+                // values of a, since (a % b) is a negative value between -b and 0, (a % b + b)
+                // is necessarily lower than b and positive. The last modulo is there in case a
+                // was positive to begin with, since if a is positive (a % b + b) would become
+                // larger than b. Therefore, (a % b + b) % b turns it into smaller than b again
+                // (and doesn't affect negative a values).
+                double result = (((((double) this.value) % other_val) + other_val) % other_val);
+                return new org.python.types.Float(result);
+            }
+        } else if (other instanceof org.python.types.Float) {
+            double other_val = ((org.python.types.Float) other).value;
+            if (other_val == 0.0) {
+                throw new org.python.exceptions.ZeroDivisionError("float modulo");
+            } else {
+                double result = (((((double) this.value) % other_val) + other_val) % other_val);
+                return new org.python.types.Float(result);
+            }
+        } else if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't mod complex numbers.");
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = "Return divmod(self, value)."
+            __doc__ = "Return divmod(self, value).",
+            args = {"other"}
     )
     public org.python.Object __divmod__(org.python.Object other) {
         try {
@@ -432,7 +459,9 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return pow(self, value, mod)."
+            __doc__ = "Return pow(self, value, mod).",
+            args = {"other"},
+            default_args = {"modulo"}
     )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
         if (modulo != null) {
@@ -458,9 +487,9 @@ public class Float extends org.python.types.Object {
             double other_val = ((org.python.types.Float) other).value;
             if (this.value == 0 && other_val < 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("0.0 cannot be raised to a negative power");
+            } else if (this.value < 0 && other_val != Math.round(other_val)) {
+                return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
             }
-            // TODO: if this.value < 0 && other_val is not an integer, this will be a Complex result, so change this.value to Complex and delegate it out
-            // return (new org.python.types.Complex(this.value, 0)).__pow__(other, modulo);
             return new org.python.types.Float(java.lang.Math.pow(this.value, other_val));
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
@@ -468,95 +497,89 @@ public class Float extends org.python.types.Object {
             } else {
                 return new org.python.types.Float(1);
             }
+        } else if (other instanceof org.python.types.Complex) {
+            org.python.types.Complex cmplx_obj = new org.python.types.Complex((double) this.value, 0.0);
+            org.python.types.Complex other_cmplx_obj = (org.python.types.Complex) other;
+            return cmplx_obj.__pow__(other_cmplx_obj, null);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for ** or pow(): 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = "Return value+self."
+            __doc__ = "Return value+self.",
+            args = {"other"}
     )
     public org.python.Object __radd__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__radd__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value-self."
+            __doc__ = "Return value-self.",
+            args = {"other"}
     )
     public org.python.Object __rsub__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rsub__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value*self."
+            __doc__ = "Return value*self.",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value/self."
+            __doc__ = "Return value/self.",
+            args = {"other"}
     )
     public org.python.Object __rtruediv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rtruediv__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value//self."
+            __doc__ = "Return value//self.",
+            args = {"other"}
     )
     public org.python.Object __rfloordiv__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rfloordiv__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return value%self."
+            __doc__ = "Return value%self.",
+            args = {"other"}
     )
     public org.python.Object __rmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rmod__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return divmod(value, self)."
+            __doc__ = "Return divmod(value, self).",
+            args = {"other"}
     )
     public org.python.Object __rdivmod__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rdivmod__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = "Return pow(value, self, mod)."
+            __doc__ = "Return pow(value, self, mod).",
+            args = {"other"}
     )
     public org.python.Object __rpow__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("float.__rpow__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __iadd__(org.python.Object other) {
-        if (other instanceof org.python.types.Int) {
-            long other_val = ((org.python.types.Int) other).value;
-            this.value += ((double) other_val);
-            return new org.python.types.Float(this.value);
-        } else if (other instanceof org.python.types.Bool) {
-            if (((org.python.types.Bool) other).value) {
-                this.value += 1.0;
-            }
-            return new org.python.types.Float(this.value);
-        } else if (other instanceof org.python.types.Float) {
-            double other_val = ((org.python.types.Float) other).value;
-            return new org.python.types.Float(this.value + other_val);
-        }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'float' and '" + other.typeName() + "'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __ilshift__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: 'float' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __irshift__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: 'float' and '" + other.typeName() + "'");
@@ -602,7 +625,8 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return the Integral closest to x, rounding half toward even.\nWhen an argument is passed, work like built-in round(x, ndigits)."
+            __doc__ = "Return the Integral closest to x, rounding half toward even.\nWhen an argument is passed, work like built-in round(x, ndigits).",
+            args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         if (ndigits instanceof org.python.types.Int) {
@@ -708,4 +732,31 @@ public class Float extends org.python.types.Object {
         }
         return new org.python.types.Str(result);
     }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __getitem__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("'float' object is not subscriptable");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other", "value"}
+    )
+    public void __setitem__(org.python.Object other, org.python.Object value) {
+        throw new org.python.exceptions.TypeError("'float' object does not support item assignment");
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public void __delitem__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("'float' object does not support item deletion");
+    }
+
+
+
 }

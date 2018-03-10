@@ -256,7 +256,7 @@ class DictTests(TranspileTestCase):
     def test_fromkeys(self):
         self.assertCodeExecution("""
             keys = [1, 2]
-            print({}.fromkeys(keys))
+            print(dict.fromkeys(keys))
             """)
 
         # non-iterable error test
@@ -264,7 +264,7 @@ class DictTests(TranspileTestCase):
             keys = 1
             value = 2
             try:
-                print({}.fromkeys(keys, value))
+                print(dict.fromkeys(keys, value))
             except TypeError as err:
                 print(err)
             """)
@@ -282,16 +282,66 @@ class DictTests(TranspileTestCase):
         self.assertCodeExecution("""
             keys = [[1], 2]
             try:
-                print({}.fromkeys(keys))
+                print(dict.fromkeys(keys))
             except TypeError as err:
                 print(err)
             """)
+
+    def test_update(self):
+        self.assertCodeExecution("""
+            a = {}
+            a.update([('a', 1), ('b', 2)])
+            print(sorted(a))
+            b = {}
+            b.update({'a': 1, 'b':2})
+            print(sorted(b))
+            c = {}
+            c.update(a=1, b=2)
+            print(sorted(c))
+        """)
+
+        self.assertCodeExecution("""
+            try:
+                a = {}
+                a.update([('a', 1, 2), ('b',2)])
+                print('An error should have been raised!')
+            except ValueError:
+                print('Received a ValueError as expected')
+        """)
+
+        self.assertCodeExecution("""
+            try:
+                a = {}
+                a.update('1')
+                print('An error should have been raised')
+            except ValueError:
+                print('Received a ValueError as expected')
+        """)
+
+        self.assertCodeExecution("""
+            try:
+                a = {}
+                a.update(1)
+                print('An error should have been raised')
+            except TypeError:
+                print('Received a TypeError as expected')
+        """)
+
+        self.assertCodeExecution("""
+            try:
+                a = {}
+                x = set([1, 2])
+                a.update(x)
+                print('An error should have been raised')
+            except TypeError:
+                print('Received a TypeError as expected')
+        """)
 
     @expectedFailure
     def test_fromkeys_missing_iterable(self):
         self.assertCodeExecution("""
             try:
-                print({}.fromkeys())
+                print(dict.fromkeys())
             except TypeError as err:
                 print(err)
             """)

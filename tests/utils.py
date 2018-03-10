@@ -762,6 +762,7 @@ SAMPLE_SUBSTITUTIONS = {
     "{'one', 'two', 'six'}": _string_substitutions("{'one', 'two', 'six'}"),
     "{'a', 'b', 'c'}": _string_substitutions("{'a', 'b', 'c'}"),
 
+
     # Normalize list ordering
     "[1, 2.3456, 7]": _string_substitutions("[1, 2.3456, 7]"),
     "[1, 2.3456, 'another']": _string_substitutions("[1, 2.3456, 'another']"),

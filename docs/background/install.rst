@@ -1,3 +1,4 @@
+============
 Installation
 ============
 
@@ -15,7 +16,7 @@ To check if you have Python installed, run ``python --version`` at the command l
     $ python --version
     Python 3.4.4
 
-Unfortunately Python 3.6 is not supported at this time. If you do not have Python 3.4 or 3.5 `install Python <https://www.python.org/downloads/>`_  and check again. 
+If you do not have Python 3.4 or newer `install Python <https://www.python.org/downloads/>`_  and check again.
 
 To check if you have the JDK installed, run ``javac -version``
 
@@ -85,4 +86,4 @@ Next Steps
 ----------
 
 You now have a working VOC environment, so you can :doc:`start the first
-tutorial </tutorials/tutorial-0>`.
+tutorial </tutorial/tutorial-0>`.

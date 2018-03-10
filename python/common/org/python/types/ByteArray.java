@@ -47,62 +47,57 @@ public class ByteArray extends org.python.types.Object {
             default_args = {"source", "encoding", "errors"}
     )
     public ByteArray(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        if (args[0] == null) {
-            // bytearray()
-            this.value = new byte[0];
-        } else {
-            if (args[1] == null) {
-                if (args[0] instanceof org.python.types.Int) {
-                    // bytearray(int)
-                    this.value = new byte[(int) ((org.python.types.Int) args[0].__int__()).value];
-                } else {
+        org.python.Object source = args[0];
+        org.python.Object encoding = args[1];
+        org.python.Object errors = args[2];
 
-                    org.python.Object iterator = null;
-                    try {
-                        iterator = org.Python.iter(args[0]);
-                    } catch (org.python.exceptions.TypeError e) {
-                        // Not an iterator
-                    }
-                    if (iterator != null) {
-                        // bytearray(iterable_of_ints)
-                        java.util.List<Byte> generated = new java.util.ArrayList<Byte>();
-                        try {
-                            while (true) {
-                                org.python.Object next = iterator.__next__();
-                                if (next instanceof org.python.types.Int) {
-                                    long value = ((org.python.types.Int) next.__int__()).value;
-                                    if ((value < 0) || (value > 255)) {
-                                        throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
-                                    } else {
-                                        generated.add(new Byte((byte) value));
-                                    }
-                                } else if (next instanceof org.python.types.Str) {
-                                    // TODO: Can take ASCII single-character strings
-                                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with strings not implemented");
-                                }
-                            }
-                        } catch (org.python.exceptions.StopIteration si) {
-                        }
-                        byte[] primative_bytes = new byte[generated.size()];
-                        for (int i = 0; i < primative_bytes.length; i++) {
-                            primative_bytes[i] = generated.get(i);
-                        }
-                        this.value = primative_bytes;
-                    } else {
-                        // bytearray(bytes_or_buffer)
-                        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' with bytes_or_buffer not implemented");
-                    }
-                }
-            } else {
-                // bytearray(string, args[1][, errors])
-                if (args[2] == null) {
-                    // bytearray(string, args[1])
-                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
-                } else {
-                    // bytearray(string, args[1], errors)
-                    throw new org.python.exceptions.NotImplementedError("Builtin function 'bytearray' not implemented");
-                }
+        if (encoding != null && !(encoding instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("bytearray() argument 2 must be str, not " + encoding.typeName());
+        } else if (errors != null && !(errors instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("bytearray() argument 3 must be str, not " + errors.typeName());
+        } else if (source == null) {
+            if (encoding != null || errors != null) {
+                throw new org.python.exceptions.TypeError("encoding or errors without sequence argument");
             }
+            this.value = new byte[0];
+        } else if (source instanceof org.python.types.Str) {
+            if (encoding == null) {
+                throw new org.python.exceptions.TypeError("string argument without an encoding");
+            }
+            org.python.Object bytes = ((org.python.types.Str) source).encode(encoding, errors);
+            this.value = ((org.python.types.Bytes) bytes).value;
+        } else if (encoding != null || errors != null) {
+            throw new org.python.exceptions.TypeError("encoding or errors without a string argument");
+        } else if (source instanceof org.python.types.Int || source instanceof org.python.types.Bool) {
+            int int_value = (int) ((org.python.types.Int) source.__int__()).value;
+            if (int_value < 0) {
+                throw new org.python.exceptions.ValueError("negative count");
+            }
+            this.value = new byte[int_value];
+        } else {
+            org.python.Object iter = null;
+            try {
+                iter = org.Python.iter(source);
+            } catch (org.python.exceptions.TypeError e) {
+                throw new org.python.exceptions.TypeError("'" + source.typeName() + "' object is not iterable");
+            }
+
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            try {
+                while (true) {
+                    org.python.Object item = iter.__next__();
+                    if (!(item instanceof org.python.types.Int || item instanceof org.python.types.Bool)) {
+                        throw new org.python.exceptions.TypeError("an integer is required");
+                    }
+                    long b = ((org.python.types.Int) item.__int__()).value;
+                    if (b < 0 || b > 255) {
+                        throw new org.python.exceptions.ValueError("byte must be in range(0, 256)");
+                    }
+                    baos.write((int) b);
+                }
+            } catch (org.python.exceptions.StopIteration e) {
+            }
+            this.value = baos.toByteArray();
         }
     }
 
@@ -131,11 +126,21 @@ public class ByteArray extends org.python.types.Object {
     public org.python.types.Str __str__() {
         StringBuilder sb = new StringBuilder();
         sb.append("bytearray(b'");
-        for (int c : this.value) {
-            if (c >= 32 && c < 128) {
+        for (byte c : this.value) {
+            if (c == '\n') {
+                sb.append("\\n");
+            } else if (c == '\t') {
+                sb.append("\\t");
+            } else if (c == '\r') {
+                sb.append("\\r");
+            } else if (c == '\'') {
+                sb.append("\\'");
+            } else if (c == '\\') {
+                sb.append("\\\\");
+            } else if (c >= 32 && c < 127) {
                 sb.append((char) c);
             } else {
-                sb.append(String.format("\\x%02d", c));
+                sb.append(String.format("\\x%02x", c));
             }
         }
         sb.append("')");
@@ -173,7 +178,8 @@ public class ByteArray extends org.python.types.Object {
 */
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __and__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
@@ -223,7 +229,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self+value."
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -242,7 +249,7 @@ public class ByteArray extends org.python.types.Object {
             System.arraycopy(other_bytes, 0, new_bytes, this.value.length, other_bytes.length);
             return new ByteArray(new_bytes);
         }
-        if (org.Python.VERSION < 0x03060200) {
+        if (org.Python.VERSION < 0x03050400 || (org.Python.VERSION >= 0x03060000 && org.Python.VERSION < 0x03060200)) {
             throw new org.python.exceptions.TypeError("can't concat " + this.typeName() + " to " + other.typeName());
         } else {
             throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to " + this.typeName());
@@ -250,17 +257,24 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Implement self+=value."
+            __doc__ = "Implement self+=value.",
+            args = {"other"}
     )
     public org.python.Object __iadd__(org.python.Object other) {
-        if (other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
-            return this.__add__(other);
+        try {
+            return super.__iadd__(other);
+        } catch (org.python.exceptions.TypeError ae) {
+            if (org.Python.VERSION < 0x03050400 || (org.Python.VERSION >= 0x03060000 && org.Python.VERSION < 0x03060200)) {
+                throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to " + this.typeName());
+            } else {
+                throw ae;
+            }
         }
-        throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to " + this.typeName());
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value.n"
+            __doc__ = "Return self*value.n",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -285,14 +299,16 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Implement self*=value."
+            __doc__ = "Implement self*=value.",
+            args = {"other"}
     )
     public org.python.Object __imul__(org.python.Object other) {
         return this.__mul__(other);
     }
 
     @org.python.Method(
-            __doc__ = "Return self[key]."
+            __doc__ = "Return self[key].",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Slice) {
@@ -367,14 +383,14 @@ public class ByteArray extends org.python.types.Object {
                 } else {
                     idx = this.value.length + idx;
                     // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int(this.value[idx]);
+                    return new org.python.types.Int((long) this.value[idx] & 0xff);
                 }
             } else {
                 if (idx >= this.value.length) {
                     throw new org.python.exceptions.IndexError("bytearray index out of range");
                 } else {
                     // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int(this.value[idx]);
+                    return new org.python.types.Int((long) this.value[idx] & 0xff);
                 }
             }
         } else {
@@ -549,7 +565,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         if (org.Python.VERSION < 0x03050000) {
@@ -580,7 +597,8 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __imod__(org.python.Object other) {
         if (org.Python.VERSION < 0x03050000) {
@@ -593,10 +611,11 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return key in self."
+            __doc__ = "Return true if contains the arg",
+            args = {"slice"}
     )
-    public org.python.Object __contains__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.__contains__ has not been implemented.");
+    public org.python.Object __contains__(org.python.Object slice) {
+        return new Bytes(this.value).__contains__(slice);
     }
 
     @org.python.Method(
@@ -624,7 +643,7 @@ public class ByteArray extends org.python.types.Object {
     public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
         for (byte b: this.value) {
-            listOfBytes.add(new org.python.types.Int(b));
+            listOfBytes.add(new org.python.types.Int((long) b & 0xff));
         }
         return new org.python.types.List(listOfBytes).__iter__();
     }
@@ -660,22 +679,28 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.capitalize() -> copy of B\n\nReturn a copy of B with only its first character capitalized (ASCII)\nand the rest lower-cased."
     )
-    public org.python.Object capitalize(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.capitalize has not been implemented.");
+    public org.python.Object capitalize() {
+        return new ByteArray(Bytes._capitalize(this.value));
     }
 
     @org.python.Method(
-            __doc__ = "B.center(width[, fillchar]) -> copy of B\n\nReturn B centered in a string of length width.  Padding is\ndone using the specified fill character (default is a space)."
+            __doc__ = "B.center(width[, fillchar]) -> copy of B" +
+            "\n\nReturn B centered in a string of length width.  Padding is" +
+            "\ndone using the specified fill character (default is a space).",
+            args = {"width"},
+            default_args = {"byteToFill"}
     )
-    public org.python.Object center(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.center has not been implemented.");
+    public org.python.Object center(org.python.Object width, org.python.Object byteToFill) {
+        return new org.python.types.ByteArray(Bytes._center(this.value, width, byteToFill));
     }
 
     @org.python.Method(
-            __doc__ = "B.count(sub[, start[, end]]) -> int\n\nReturn the number of non-overlapping occurrences of subsection sub in\nbytes B[start:end].  Optional arguments start and end are interpreted\nas in slice notation."
+            __doc__ = "B.count(sub[, start[, end]]) -> int\n\nReturn the number of non-overlapping occurrences of subsection sub in\nbytes B[start:end].  Optional arguments start and end are interpreted\nas in slice notation.",
+            args = {"sub"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object count(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.count has not been implemented.");
+    public org.python.Object count(org.python.Object sub, org.python.Object start, org.python.Object end) {
+        return new Bytes(this.value).count(sub, start, end);
     }
 
     @org.python.Method(
@@ -691,10 +716,13 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.endswith(suffix[, start[, end]]) -> bool\n\nReturn True if B ends with the specified suffix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nsuffix can also be a tuple of bytes to try."
+            __doc__ = "B.endswith(suffix[, start[, end]]) -> bool\n\nReturn True if B ends with the specified suffix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nsuffix can also be a tuple of bytes to try.",
+            args = {"suffix"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object endswith(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.endswith has not been implemented.");
+    public org.python.Object endswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
+
+        return new Bytes(this.value).endsOrStartsWith(suffix, start, end, 1);
     }
 
     @org.python.Method(
@@ -705,10 +733,15 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.find(sub[, start[, end]]) -> int\n\nReturn the lowest index in B where subsection sub is found,\nsuch that sub is contained within B[start,end].  Optional\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure."
+            __doc__ = "B.find(sub[, start[, end]]) -> int" +
+            "\n\nReturn the lowest index in B where subsection sub is found," +
+            "\nsuch that sub is contained within B[start,end].  Optional" +
+            "\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure.",
+            args = {"sub"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object find(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.find has not been implemented.");
+    public org.python.Object find(org.python.Object sub, org.python.Object start, org.python.Object end) {
+        return new Bytes(this.value).find(sub, start, end);
     }
 
     @org.python.Method(
@@ -728,50 +761,51 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isalnum(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.isalnum has not been implemented.");
+    public org.python.Object isalnum() {
+
+        return new Bool(Bytes._isalnum(this.value));
     }
 
     @org.python.Method(
             __doc__ = "B.isalpha() -> bool\n\nReturn True if all characters in B are alphabetic\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isalpha(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.isalpha has not been implemented.");
+    public org.python.Object isalpha() {
+        return new Bool(Bytes._isalpha(this.value));
     }
 
     @org.python.Method(
             __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isdigit(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.isdigit has not been implemented.");
+    public org.python.Object isdigit() {
+        return new Bool(Bytes._isdigit(this.value));
     }
 
     @org.python.Method(
             __doc__ = "B.islower() -> bool\n\nReturn True if all cased characters in B are lowercase and there is\nat least one cased character in B, False otherwise."
     )
-    public org.python.Object islower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.islower has not been implemented.");
+    public org.python.Object islower() {
+        return new Bool(Bytes._islower(this.value));
     }
 
     @org.python.Method(
             __doc__ = "B.isspace() -> bool\n\nReturn True if all characters in B are whitespace\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isspace(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.isspace has not been implemented.");
+    public org.python.Object isspace() {
+        return new Bool(Bytes._isspace(this.value));
     }
 
     @org.python.Method(
             __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
-    public org.python.Object istitle(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.istitle has not been implemented.");
+    public org.python.Object istitle() {
+        return new Bool(Bytes._istitle(this.value));
     }
 
     @org.python.Method(
             __doc__ = "B.isupper() -> bool\n\nReturn True if all cased characters in B are uppercase and there is\nat least one cased character in B, False otherwise."
     )
-    public org.python.Object isupper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.isupper has not been implemented.");
+    public org.python.Object isupper() {
+        return new Bool(Bytes._isupper(this.value));
     }
 
     @org.python.Method(
@@ -791,8 +825,8 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.lower() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to lowercase."
     )
-    public org.python.Object lower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.lower has not been implemented.");
+    public org.python.Object lower() {
+        return new ByteArray(Bytes._lower(this.value));
     }
 
     @org.python.Method(
@@ -880,10 +914,12 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.startswith(prefix[, start[, end]]) -> bool\n\nReturn True if B starts with the specified prefix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nprefix can also be a tuple of bytes to try."
+            __doc__ = "B.startswith(prefix[, start[, end]]) -> bool\n\nReturn True if B starts with the specified prefix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nprefix can also be a tuple of bytes to try.",
+            args = {"prefix"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object startswith(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.startswith has not been implemented.");
+    public org.python.Object startswith(org.python.Object prefix, org.python.Object start, org.python.Object end) {
+        return new Bytes(this.value).endsOrStartsWith(prefix, start, end, -1);
     }
 
     @org.python.Method(
@@ -903,8 +939,8 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.title() -> copy of B\n\nReturn a titlecased version of B, i.e. ASCII words start with uppercase\ncharacters, all remaining cased characters have lowercase."
     )
-    public org.python.Object title(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.title has not been implemented.");
+    public org.python.Object title() {
+        return new ByteArray(Bytes._title(this.value));
     }
 
     @org.python.Method(
@@ -917,8 +953,8 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.upper() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to uppercase."
     )
-    public org.python.Object upper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.upper has not been implemented.");
+    public org.python.Object upper() {
+        return new ByteArray(Bytes._upper(this.value));
     }
 
     @org.python.Method(

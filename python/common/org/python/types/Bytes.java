@@ -1,6 +1,8 @@
 package org.python.types;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Bytes extends org.python.types.Object {
     public byte[] value;
@@ -46,7 +48,71 @@ public class Bytes extends org.python.types.Object {
             default_args = {"source", "encoding", "errors"}
     )
     public Bytes(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'bytes' not implemented");
+        org.python.Object source = args[0];
+        org.python.Object encoding = args[1];
+        org.python.Object errors = args[2];
+
+        if (encoding != null && !(encoding instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("bytes() argument 2 must be str, not " + encoding.typeName());
+        } else if (errors != null && !(errors instanceof org.python.types.Str)) {
+            throw new org.python.exceptions.TypeError("bytes() argument 3 must be str, not " + errors.typeName());
+        } else if (source == null) {
+            if (encoding != null || errors != null) {
+                throw new org.python.exceptions.TypeError("encoding or errors without sequence argument");
+            }
+            this.value = new byte[0];
+        } else if (source instanceof org.python.types.Str) {
+            if (encoding == null) {
+                throw new org.python.exceptions.TypeError("string argument without an encoding");
+            }
+            org.python.Object bytes = ((org.python.types.Str) source).encode(encoding, errors);
+            this.value = ((org.python.types.Bytes) bytes).value;
+        } else if (encoding != null || errors != null) {
+            // Message changed with CPython commit 5aac3ed79999f6948d11f979ab3e42b9b60e9083
+            if (org.Python.VERSION < 0x03050200) {
+                throw new org.python.exceptions.TypeError("encoding or errors without a string argument");
+            } else if (encoding != null) {
+                throw new org.python.exceptions.TypeError("encoding without a string argument");
+            } else {
+                throw new org.python.exceptions.TypeError("errors without a string argument");
+            }
+        } else if (source instanceof org.python.types.Int || source instanceof org.python.types.Bool) {
+            int int_value = (int) ((org.python.types.Int) source.__int__()).value;
+            if (int_value < 0) {
+                throw new org.python.exceptions.ValueError("negative count");
+            }
+            this.value = new byte[int_value];
+        } else {
+            org.python.Object iter = null;
+            try {
+                iter = org.Python.iter(source);
+            } catch (org.python.exceptions.TypeError e) {
+                // Message changed with CPython commit 03f17f86717372ca010273dc8946fd19914a534b
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError("'" + source.typeName() + "' object is not iterable");
+                } else {
+                    throw new org.python.exceptions.TypeError("cannot convert '" + source.typeName() + "' object to bytes");
+                }
+            }
+
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            try {
+                while (true) {
+                    org.python.Object item = iter.__next__();
+                    if (!(item instanceof org.python.types.Int || item instanceof org.python.types.Bool)) {
+                        throw new org.python.exceptions.TypeError(
+                                "'" + item.typeName() + "' object cannot be interpreted as an integer");
+                    }
+                    long b = ((org.python.types.Int) item.__int__()).value;
+                    if (b < 0 || b > 255) {
+                        throw new org.python.exceptions.ValueError("bytes must be in range(0, 256)");
+                    }
+                    baos.write((int) b);
+                }
+            } catch (org.python.exceptions.StopIteration e) {
+            }
+            this.value = baos.toByteArray();
+        }
     }
 
     // public org.python.Object __new__() {
@@ -77,6 +143,10 @@ public class Bytes extends org.python.types.Object {
                 sb.append("\\t");
             } else if (c == '\r') {
                 sb.append("\\r");
+            } else if (c == '\'') {
+                sb.append("\\'");
+            } else if (c == '\\') {
+                sb.append("\\\\");
             } else if (c >= 32 && c < 127) {
                 sb.append((char) c);
             } else {
@@ -106,7 +176,8 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self+value."
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
@@ -125,7 +196,7 @@ public class Bytes extends org.python.types.Object {
             System.arraycopy(other_bytes, 0, new_bytes, this.value.length, other_bytes.length);
             return new Bytes(new_bytes);
         }
-        if (org.Python.VERSION < 0x03060200) {
+        if (org.Python.VERSION < 0x03050400 || (org.Python.VERSION >= 0x03060000 && org.Python.VERSION < 0x03060200)) {
             throw new org.python.exceptions.TypeError("can't concat bytes to " + other.typeName());
         } else {
             throw new org.python.exceptions.TypeError("can't concat " + other.typeName() + " to bytes");
@@ -133,14 +204,8 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __iadd__(org.python.Object other) {
-        return this.__add__(other);
-    }
-
-    @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __and__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: 'bytes' and '" + other.typeName() + "'");
@@ -175,10 +240,42 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return key in self."
+            __doc__ = "Return true if contains the arg",
+            args = {"slice"}
     )
-    public org.python.Object __contains__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__contains__ has not been implemented.");
+    public org.python.Object __contains__(org.python.Object slice) {
+        byte[] bslice;
+        if (slice instanceof org.python.types.Int) {
+            int islice = (int) ((org.python.types.Int) slice).value;
+            if (islice < 0 || islice > 255) {
+                throw new org.python.exceptions.ValueError("byte must be in range(0, 256)\n");
+            }
+            bslice = new byte[1];
+            bslice[0] = (byte) islice;
+        } else if (slice instanceof org.python.types.Bytes) {
+            bslice = ((org.python.types.Bytes) slice).value;
+        } else if (slice instanceof org.python.types.ByteArray) {
+            bslice = ((org.python.types.ByteArray) slice).value;
+        } else {
+            String error_message = "a bytes-like object is required, not '" + slice.typeName() + "'\n";
+            if (org.Python.VERSION < 0x03050000) {
+                error_message = "'" + slice.typeName() + "' does not support the buffer interface\n";
+            }
+            throw new org.python.exceptions.TypeError(error_message);
+        }
+        int counter_slice = 0;
+        for (int i = 0; i < this.value.length + 1; i++) {
+            if (counter_slice == bslice.length) {
+                return new org.python.types.Bool(true);
+            } else if (i == this.value.length) {
+                break;
+            } else if (bslice[counter_slice] == this.value[i]) {
+                counter_slice++;
+            } else {
+                counter_slice = 0;
+            }
+        }
+        return new org.python.types.Bool(false);
     }
 
     @org.python.Method(
@@ -349,7 +446,8 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
         if (org.Python.VERSION < 0x03050000) {
@@ -467,20 +565,21 @@ public class Bytes extends org.python.types.Object {
             } else {
                 idx = this.value.length + idx;
                 // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                return new org.python.types.Int(this.value[idx]);
+                return new org.python.types.Int((long) this.value[idx] & 0xff);
             }
         } else {
             if (idx >= this.value.length) {
                 throw new org.python.exceptions.IndexError("index out of range");
             } else {
                 // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                return new org.python.types.Int(this.value[idx]);
+                return new org.python.types.Int((long) this.value[idx] & 0xff);
             }
         }
     }
 
     @org.python.Method(
-            __doc__ = "Return self[key]."
+            __doc__ = "Return self[key].",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Slice) {
@@ -530,7 +629,7 @@ public class Bytes extends org.python.types.Object {
     public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
         for (byte b: this.value) {
-            listOfBytes.add(new org.python.types.Int(b));
+            listOfBytes.add(new org.python.types.Int((long) b & 0xff));
         }
         return new org.python.types.List(listOfBytes).__iter__();
     }
@@ -543,7 +642,8 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Return self*value.n"
+            __doc__ = "Return self*value.n",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
@@ -568,14 +668,16 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __imul__(org.python.Object other) {
         return this.__mul__(other);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
     )
     public org.python.Object __imod__(org.python.Object other) {
         if (org.Python.VERSION < 0x03050000) {
@@ -611,13 +713,10 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.__rmul__ has not been implemented.");
     }
 
-    @org.python.Method(
-            __doc__ = "B.capitalize() -> copy of B\n\nReturn a copy of B with only its first character capitalized (ASCII)\nand the rest lower-cased."
-    )
-    public org.python.Object capitalize() {
-        byte[] value = new byte[this.value.length];
-        for (int i = 0; i < this.value.length; i++) {
-            byte b = this.value[i];
+    public static byte[] _capitalize(byte[] input) {
+        byte[] value = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            byte b = input[i];
             if (b < 127 && b > 32) {
                 char c = (char) b;
                 if (i == 0) {
@@ -630,14 +729,82 @@ public class Bytes extends org.python.types.Object {
                 value[i] = b;
             }
         }
-        return new Bytes(value);
+        return value;
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "B.capitalize() -> copy of B\n\nReturn a copy of B with only its first character capitalized (ASCII)\nand the rest lower-cased."
     )
-    public org.python.Object center(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.center has not been implemented.");
+
+    public org.python.Object capitalize() {
+        return new Bytes(_capitalize(this.value));
+    }
+
+    @org.python.Method(
+            __doc__ = "B.center(width[, fillbyte]) -> bytes\n" +
+                    "\n" +
+                    "Return S centered in a bytes of length width. Padding is\n" +
+                    "done using the specified fill character (default is a space)\n",
+            args = {"width"},
+            default_args = {"byteToFill"}
+    )
+    public org.python.Object center(org.python.Object width, org.python.Object byteToFill) {
+        return new org.python.types.Bytes(_center(this.value, width, byteToFill));
+    }
+    public static byte[] _center(byte[] input, org.python.Object width, org.python.Object byteToFill) {
+        byte[] fillByte;
+        if (byteToFill instanceof org.python.types.Bytes || byteToFill instanceof org.python.types.ByteArray) {
+            if (byteToFill instanceof org.python.types.ByteArray) {
+                fillByte = ((org.python.types.ByteArray) byteToFill).value;
+            } else {
+                fillByte = ((org.python.types.Bytes) byteToFill).value;
+            }
+            if (fillByte.length != 1) {
+                if (org.Python.VERSION < 0x030502F0) {
+                    throw new org.python.exceptions.TypeError("must be a byte string of length 1, not bytes");
+                } else {
+                    throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not bytes");
+                }
+            }
+        } else if (byteToFill == null) {
+            fillByte = " ".getBytes();
+        } else {
+            if (org.Python.VERSION < 0x030502F0) {
+                throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + byteToFill.typeName());
+            } else {
+                throw new org.python.exceptions.TypeError("center() argument 2 must be a byte string of length 1, not " + byteToFill.typeName());
+            }
+        }
+
+        if (width instanceof org.python.types.Int) {
+            int iwidth = (int) ((org.python.types.Int) width).value;
+            if (input.length >= iwidth) {
+                return input;
+            } else {
+                int diff = iwidth - input.length;
+                int lenfirst = (diff) / 2;
+                int lensecond = diff - lenfirst;
+
+                byte[] returnBytes;
+                returnBytes = new byte[iwidth];
+
+                for (int i = 0; i < lenfirst; i++) {
+                    returnBytes[i] = fillByte[0];
+                }
+                for (int i = lenfirst; i < (iwidth - lensecond); i++) {
+                    returnBytes[i] = input[i - lenfirst];
+                }
+                for (int i = (iwidth - lensecond); i < iwidth; i++) {
+                    returnBytes[i] = fillByte[0];
+                }
+                return returnBytes;
+            }
+        } else if (width instanceof org.python.types.Bool) {
+            return input;
+        } else {
+            throw new org.python.exceptions.TypeError("'" + width.typeName() +
+              "'" + " object cannot be interpreted as an integer\n");
+        }
     }
 
     @org.python.Method(
@@ -742,11 +909,65 @@ public class Bytes extends org.python.types.Object {
         }
     }
 
+    public org.python.Object endsOrStartsWith(org.python.Object substring, org.python.Object start, org.python.Object end, int direction) {
+        if (start != null || end != null) {
+            Bytes sliced = (Bytes) this.__getitem__(new org.python.types.Slice(start, end));
+            return sliced.endsOrStartsWith(substring, null, null, direction);
+        }
+
+        if (substring instanceof org.python.types.Tuple) {
+            org.python.types.Tuple tuple = (org.python.types.Tuple) substring;
+            int length = (int) tuple.__len__().value;
+            for (int i = 0; i < length; i++) {
+                org.python.Object item = tuple.__getitem__(new org.python.types.Int(i));
+                if (item instanceof org.python.types.Tuple) {
+                    throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + item.typeName() + "'");
+                }
+                boolean ok = ((org.python.types.Bool) this.endsOrStartsWith(item, null, null, direction)).value;
+                if (ok) {
+                    return new org.python.types.Bool(true);
+                }
+            }
+            return new org.python.types.Bool(false);
+
+        } else if (substring instanceof Bytes) {
+            byte[] substringValue = ((Bytes) substring).value;
+            if (substringValue.length > this.value.length) {
+                return new org.python.types.Bool(false);
+            }
+
+            int startIndex;
+            int endIndex;
+
+            if (direction < 0) {
+                startIndex = 0;
+                endIndex = substringValue.length;
+            } else {
+                startIndex = this.value.length - substringValue.length;
+                endIndex = this.value.length;
+            }
+
+            byte[] thisValuePart = Arrays.copyOfRange(this.value, startIndex, endIndex);
+            boolean ok = Arrays.equals(thisValuePart, substringValue);
+            return new org.python.types.Bool(ok);
+        } else {
+            String methodName;
+            if (direction < 0) {
+                methodName = "startswith";
+            } else {
+                methodName = "endswith";
+            }
+            throw new org.python.exceptions.TypeError(methodName + " first arg must be bytes or a tuple of bytes, not " + substring.typeName());
+        }
+    }
+
     @org.python.Method(
-            __doc__ = "B.endswith(suffix[, start[, end]]) -> bool\n\nReturn True if B ends with the specified suffix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nsuffix can also be a tuple of bytes to try."
+            __doc__ = "B.endswith(suffix[, start[, end]]) -> bool\n\nReturn True if B ends with the specified suffix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nsuffix can also be a tuple of bytes to try.",
+            args = {"suffix"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object endswith(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.endswith has not been implemented.");
+    public org.python.Object endswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
+        return endsOrStartsWith(suffix, start, end, 1);
     }
 
     @org.python.Method(
@@ -757,7 +978,9 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.find(sub[, start[, end]]) -> int\n\nReturn the lowest index in B where substring sub is found,\nsuch that sub is contained within B[start:end].  Optional\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure.",
+            __doc__ = "B.find(sub[, start[, end]]) -> int" +
+            "\n\nReturn the lowest index in B where substring sub is found,\nsuch that sub is contained within B[start:end].  Optional" +
+            "\narguments start and end are interpreted as in slice notation.\n\nReturn -1 on failure.",
             args = {"sub"},
             default_args = {"start", "end"}
     )
@@ -770,21 +993,26 @@ public class Bytes extends org.python.types.Object {
         if (end == null || end instanceof org.python.types.NoneType) {
             _end = this.value.length;
         }
-        Bytes _sub = (Bytes) sub;
-        if (_sub.value.length <= 0) {
+        byte[] _sub;
+        if (sub instanceof org.python.types.ByteArray) {
+            _sub = ((org.python.types.ByteArray) sub).value;
+        } else {
+            _sub = ((org.python.types.Bytes) sub).value;
+        }
+        if (_sub.length <= 0) {
             return new Int(0);
         }
         int pos = -1;
         for (int i = 0; _start < _end; _start++) {
             byte b1 = this.value[_start];
-            byte b2 = _sub.value[i];
+            byte b2 = _sub[i];
             if (b1 == b2) {
                 i++;
                 if (pos == -1) {
                     pos = _start;
                 }
             }
-            if (i == _sub.value.length) {
+            if (i == _sub.length) {
                 break;
             }
             if (b1 != b2) {
@@ -819,53 +1047,164 @@ public class Bytes extends org.python.types.Object {
         return pos;
     }
 
+    public static boolean _isalnum(byte ch) {
+        return _isalpha(ch) || _isdigit(ch);
+    }
+
+    public static boolean _isalnum(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!_isalnum(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isalnum(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.isalnum has not been implemented.");
+    public org.python.Object isalnum() {
+        return new Bool(_isalnum(this.value));
+    }
+
+
+
+    public static boolean _isalpha(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!_isalpha(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean _isalpha(byte ch) {
+        return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
     }
 
     @org.python.Method(
             __doc__ = "B.isalpha() -> bool\n\nReturn True if all characters in B are alphabetic\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isalpha(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.isalpha has not been implemented.");
+    public org.python.Object isalpha() {
+        return new Bool(_isalpha(this.value));
+    }
+
+    public static boolean _isdigit(byte ch) {
+        if (!(ch >= '0' && ch <= '9')) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean _isdigit(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!_isdigit(ch)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isdigit(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.isdigit has not been implemented.");
+
+    public org.python.Object isdigit() {
+        return new Bool(_isdigit(this.value));
+    }
+
+    public static boolean _islower(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        byte[] value = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            byte b = input[i];
+            if ((b < 97 || b > 122) && b != ' ') {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.islower() -> bool\n\nReturn True if all cased characters in B are lowercase and there is\nat least one cased character in B, False otherwise."
     )
-    public org.python.Object islower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.islower has not been implemented.");
+    public org.python.Object islower() {
+        return new Bool(_islower(this.value));
+    }
+
+    public static boolean _isspace(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            // VT \x0b = 11
+            if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r' && ch != 11 && ch != '\f') {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.isspace() -> bool\n\nReturn True if all characters in B are whitespace\nand there is at least one character in B, False otherwise."
     )
-    public org.python.Object isspace(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.isspace has not been implemented.");
+    public org.python.Object isspace() {
+        return new Bool(_isspace(this.value));
+    }
+
+    public static boolean _istitle(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+
+        if (Arrays.equals(input, _title(input))) {
+            for (int idx = 0; idx < input.length; ++idx) {
+                if (_isalpha(input[idx])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @org.python.Method(
             __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
-    public org.python.Object istitle(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.istitle has not been implemented.");
+    public org.python.Object istitle() {
+        return new org.python.types.Bool(_istitle(this.value));
+    }
+
+    public static boolean _isupper(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        byte[] value = new byte[input.length];
+        for (int i = 0; i < input.length; i++) {
+            byte b = input[i];
+            if ((b < 65 || b > 90) && b != ' ') {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.isupper() -> bool\n\nReturn True if all cased characters in B are uppercase and there is\nat least one cased character in B, False otherwise."
     )
-    public org.python.Object isupper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.isupper has not been implemented.");
+    public org.python.Object isupper() {
+        return new Bool(_isupper(this.value));
     }
 
     @org.python.Method(
@@ -876,24 +1215,96 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space)."
+            __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space).",
+            args = {"width"},
+            default_args = {"fillingChar"}
     )
-    public org.python.Object ljust(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.ljust has not been implemented.");
+    public org.python.Object ljust(org.python.Object width, org.python.Object fillingChar) {
+        return new org.python.types.Bytes(_ljust(this.value, width, fillingChar));
+    }
+
+    public static byte [] _ljust(byte[] input, org.python.Object width, org.python.Object fillingChar) {
+        byte[] fillChar;
+        if (fillingChar instanceof org.python.types.Bytes || fillingChar instanceof org.python.types.ByteArray) {
+            if (fillingChar instanceof org.python.types.ByteArray) {
+                fillChar = ((org.python.types.ByteArray) fillingChar).value;
+            } else {
+                fillChar = ((org.python.types.Bytes) fillingChar).value;
+            }
+            if (fillChar.length != 1) {
+                if (org.Python.VERSION < 0x030502F0) {
+                    throw new org.python.exceptions.TypeError("must be a byte string of length 1, not bytes");
+                } else {
+                    throw new org.python.exceptions.TypeError("ljust() argument 2 must be a byte string of length 1, not bytes");
+                }
+            }
+        } else if (fillingChar == null) {
+            fillChar = " ".getBytes();
+        } else {
+            if (org.Python.VERSION < 0x030502F0) {
+                throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + fillingChar.typeName());
+            } else {
+                throw new org.python.exceptions.TypeError("ljust() argument 2 must be a byte string of length 1, not " + fillingChar.typeName());
+            }
+        }
+
+        if (width instanceof org.python.types.Int) {
+            int iwidth = (int) ((org.python.types.Int) width).value;
+            if (input.length >= iwidth) {
+                return input;
+            } else {
+                int diff = iwidth - input.length;
+
+                byte[] returnBytes;
+                returnBytes = new byte[iwidth];
+
+                for (int i = 0; i < input.length; i++) {
+                    returnBytes[i] = input[i];
+                }
+                for (int i = input.length; i < iwidth; i++) {
+                    returnBytes[i] = fillChar[0];
+                }
+                return returnBytes;
+            }
+        } else if (width instanceof org.python.types.Bool) {
+            return input;
+        } else {
+            throw new org.python.exceptions.TypeError("'" + width.typeName() +
+                "'" + " object cannot be interpreted as an integer\n");
+        }
+    }
+
+    public static byte[] _lower(byte[] input) {
+        byte[] result = new byte[input.length];
+        for (int idx = 0; idx < input.length; ++idx) {
+            char lc = (char) input[idx];
+            result[idx] = (byte) Character.toLowerCase(lc);
+        }
+        return result;
     }
 
     @org.python.Method(
             __doc__ = "B.lower() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to lowercase."
     )
-    public org.python.Object lower(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.lower has not been implemented.");
+    public org.python.Object lower() {
+        return new Bytes(_lower(this.value));
     }
 
     @org.python.Method(
             __doc__ = "B.lstrip([bytes]) -> bytes\n\nStrip leading bytes contained in the argument.\nIf the argument is omitted, strip leading ASCII whitespace."
     )
-    public org.python.Object lstrip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.lstrip has not been implemented.");
+    public Bytes lstrip() {
+        int start = 0;
+        int end = this.value.length;
+
+        while (start < end && Character.isWhitespace(this.value[start])) {
+            start++;
+        }
+
+        byte[] slice = Arrays.copyOfRange(this.value, start, end);
+
+
+        return new Bytes(slice);
     }
 
     @org.python.Method(
@@ -904,10 +1315,22 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.partition(sep) -> (head, sep, tail)\n\nSearch for the separator sep in B, and return the part before it,\nthe separator itself, and the part after it.  If the separator is not\nfound, returns B and two empty bytes objects."
+            __doc__ = "B.partition(sep) -> (head, sep, tail)\n\nSearch for the separator sep in B, and return the part before it,\nthe separator itself, and the part after it.  If the separator is not\nfound, returns B and two empty bytes objects.",
+            args = {"sep"}
     )
-    public org.python.Object partition(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.partition has not been implemented.");
+    public org.python.Object partition(org.python.Object sep) {
+        Tuple result = new Tuple();
+        int pos = (int) this.find(sep, null, null).value;
+        if (pos < 0) {
+            result.value.add(this);
+            result.value.add(new Bytes(""));
+            result.value.add(new Bytes(""));
+        } else {
+            result.value.add(new Bytes(Arrays.copyOfRange(this.value, 0, pos)));
+            result.value.add(sep);
+            result.value.add(new Bytes(Arrays.copyOfRange(this.value, pos + ((Bytes) sep).value.length, this.value.length)));
+        }
+        return result;
     }
 
     @org.python.Method(
@@ -955,15 +1378,82 @@ public class Bytes extends org.python.types.Object {
     @org.python.Method(
             __doc__ = "B.rstrip([bytes]) -> bytes\n\nStrip trailing bytes contained in the argument.\nIf the argument is omitted, strip trailing ASCII whitespace."
     )
-    public org.python.Object rstrip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.rstrip has not been implemented.");
+    public Bytes rstrip() {
+        int start = 0;
+        int end = this.value.length - 1;
+
+        while (end > start && Character.isWhitespace(this.value[end])) {
+            end--;
+        }
+
+        byte[] slice = Arrays.copyOfRange(this.value, start, end + 1);
+
+        return new Bytes(slice);
     }
 
     @org.python.Method(
-            __doc__ = "B.split(sep=None, maxsplit=-1) -> list of bytes\n\nReturn a list of the sections in B, using sep as the delimiter.\nIf sep is not specified or is None, B is split on ASCII whitespace\ncharacters (space, tab, return, newline, formfeed, vertical tab).\nIf maxsplit is given, at most maxsplit splits are done."
+            __doc__ = "B.split(sep=None, maxsplit=None) -> list of bytes\n" +
+                    "\nReturn a list of the sections in B, using sep as the delimiter.\n" +
+                    "If sep is not specified or is None, B is split on ASCII whitespace\n" +
+                    "characters (space, tab, return, newline, formfeed, vertical tab).\n" +
+                    "If maxsplit is given, at most maxsplit splits are done.",
+            default_args = {"sep", "maxsplit"}
     )
-    public org.python.Object split(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.split has not been implemented.");
+    public org.python.Object split(org.python.Object sep, org.python.Object maxsplit) {
+        if (maxsplit != null && !(maxsplit instanceof org.python.types.Int)) {
+            throw new org.python.exceptions.TypeError("'" + maxsplit.typeName() + "' object cannot be interpreted as an integer");
+        }
+        if (sep != null && !(sep instanceof org.python.types.Bytes)) {
+            if (org.Python.VERSION < 0x30500f0) {
+                throw new org.python.exceptions.TypeError("'" + sep.typeName() + "' does not support the buffer interface");
+            } else {
+                throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sep.typeName() + "'");
+            }
+        }
+
+        if (this.value.length == 0) {
+            return new org.python.types.List();
+        }
+
+        byte[] bsep;
+        if (sep == null) {
+            bsep = " ".getBytes();
+        } else {
+            bsep = ((org.python.types.Bytes) sep).value;
+        }
+
+        int imaxsplit;
+        if (maxsplit == null) {
+            imaxsplit = (int) ((org.python.types.Int) this.count(new org.python.types.Bytes(bsep), null, null)).value;
+        } else {
+            if ((int) ((org.python.types.Int) maxsplit).value < 0) {
+                imaxsplit = (int) ((org.python.types.Int) this.count(new org.python.types.Bytes(bsep), null, null)).value;
+            } else {
+                imaxsplit = (int) ((org.python.types.Int) maxsplit).value;
+            }
+        }
+
+        org.python.types.List result_list = new org.python.types.List();
+        int start = 0;
+        boolean equal;
+        for (int i = 0; i < this.value.length; i++) {
+            equal = true;
+            if ((int) result_list.value.size() == imaxsplit) {
+                result_list.append(new org.python.types.Bytes(Arrays.copyOfRange(this.value, start, this.value.length)));
+                break;
+            }
+            for (int j = 0; j < bsep.length; j++) {
+                if (bsep[j] != this.value[i + j]) {
+                    equal = false;
+                }
+            }
+            if (equal) {
+                result_list.append(new org.python.types.Bytes(Arrays.copyOfRange(this.value, start, i)));
+                start = i + bsep.length;
+                i = start;
+            }
+        }
+        return result_list;
     }
 
     @org.python.Method(
@@ -974,31 +1464,65 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.startswith(prefix[, start[, end]]) -> bool\n\nReturn True if B starts with the specified prefix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nprefix can also be a tuple of bytes to try."
+            __doc__ = "B.startswith(prefix[, start[, end]]) -> bool\n\nReturn True if B starts with the specified prefix, False otherwise.\nWith optional start, test B beginning at that position.\nWith optional end, stop comparing B at that position.\nprefix can also be a tuple of bytes to try.",
+            args = {"prefix"},
+            default_args = {"start", "end"}
     )
-    public org.python.Object startswith(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.startswith has not been implemented.");
+    public org.python.Object startswith(org.python.Object prefix, org.python.Object start, org.python.Object end) {
+        return endsOrStartsWith(prefix, start, end, -1);
     }
 
     @org.python.Method(
             __doc__ = "B.strip([bytes]) -> bytes\n\nStrip leading and trailing bytes contained in the argument.\nIf the argument is omitted, strip leading and trailing ASCII whitespace."
     )
-    public org.python.Object strip(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.strip has not been implemented.");
+    public org.python.Object strip() {
+        return this.lstrip().rstrip();
+    }
+
+    public static byte[] _swapcase(byte[] input) {
+        byte[] result = new byte[input.length];
+        for (int idx = 0; idx < input.length; ++idx) {
+            char lc = (char) input[idx];
+            if (Character.isUpperCase(lc)) {
+                result[idx] = (byte) Character.toLowerCase(lc);
+            } else {
+                result[idx] = (byte) Character.toUpperCase(lc);
+            }
+        }
+        return result;
     }
 
     @org.python.Method(
             __doc__ = "B.swapcase() -> copy of B\n\nReturn a copy of B with uppercase ASCII characters converted\nto lowercase ASCII and vice versa."
     )
-    public org.python.Object swapcase(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.swapcase has not been implemented.");
+    public org.python.Object swapcase() {
+        return new Bytes(_swapcase(this.value));
+    }
+
+    public static byte[] _title(byte[] input) {
+        byte[] result = new byte[input.length];
+        boolean capitalizeNext = true;
+
+        for (int idx = 0; idx < input.length; ++idx) {
+            byte lc = input[idx];
+            if (!_isalpha(lc)) {
+                result[idx] = lc;
+                capitalizeNext = true;
+            } else if (capitalizeNext) {
+                result[idx] = (byte) Character.toUpperCase((char) lc);
+                capitalizeNext = false;
+            } else {
+                result[idx] = (byte) Character.toLowerCase((char) lc);
+            }
+        }
+        return result;
     }
 
     @org.python.Method(
             __doc__ = "B.title() -> copy of B\n\nReturn a titlecased version of B, i.e. ASCII words start with uppercase\ncharacters, all remaining cased characters have lowercase."
     )
-    public org.python.Object title(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.title has not been implemented.");
+    public org.python.Object title() {
+        return new Bytes(_title(this.value));
     }
 
     @org.python.Method(
@@ -1008,11 +1532,20 @@ public class Bytes extends org.python.types.Object {
         throw new org.python.exceptions.NotImplementedError("bytes.translate has not been implemented.");
     }
 
+    public static byte[] _upper(byte[] input) {
+        byte[] result = new byte[input.length];
+        for (int idx = 0; idx < input.length; ++idx) {
+            char lc = (char) input[idx];
+            result[idx] = (byte) Character.toUpperCase(lc);
+        }
+        return result;
+    }
+
     @org.python.Method(
             __doc__ = "B.upper() -> copy of B\n\nReturn a copy of B with all ASCII characters converted to uppercase."
     )
-    public org.python.Object upper(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.upper has not been implemented.");
+    public org.python.Object upper() {
+        return new Bytes(_upper(this.value));
     }
 
     @org.python.Method(
