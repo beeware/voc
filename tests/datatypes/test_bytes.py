@@ -277,7 +277,7 @@ class BytesTests(TranspileTestCase):
 
     def test_isalnum(self):
         self.assertCodeExecution("""
-            print(b'w1thnumb3r2'.isalnum('jk'))
+            print(b'w1thnumb3r2'.isalnum())
             print(b'withoutnumber'.isalnum())
             print(b'with spaces'.isalnum())
             print(b'666'.isalnum())
