@@ -1047,21 +1047,30 @@ public class Bytes extends org.python.types.Object {
         return pos;
     }
 
+    public static boolean _isalnum(byte ch) {
+        return _isalpha(ch) || _isdigit(ch);
+    }
+
+    public static boolean _isalnum(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!_isalnum(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalnum() {
-        if (this.value.length == 0) {
-            return new org.python.types.Bool(false);
-        }
-        for (byte ch: this.value) {
-            if (!(ch >= 'A' && ch <= 'Z') && !(ch >= 'a' && ch <= 'z') &&
-                        !(ch >= '0' && ch <= '9')) {
-                return new org.python.types.Bool(false);
-            }
-        }
-        return new org.python.types.Bool(true);
+        return new Bool(_isalnum(this.value));
     }
+
+
 
     public static boolean _isalpha(byte[] input) {
         if (input.length == 0) {
@@ -1086,23 +1095,31 @@ public class Bytes extends org.python.types.Object {
         return new Bool(_isalpha(this.value));
     }
 
-    public static boolean _isnum(byte ch) {
-        return (ch >= '0' && ch <= '9');
+    public static boolean _isdigit(byte ch) {
+        if (!(ch >= '0' && ch <= '9')) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean _isdigit(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!_isdigit(ch)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."
     )
+
     public org.python.Object isdigit() {
-        if (this.value.length == 0) {
-            return new org.python.types.Bool(false);
-        }
-        for (byte ch : this.value) {
-            if (!(ch >= '0' && ch <= '9')) {
-                return new org.python.types.Bool(false);
-            }
-        }
-        return new org.python.types.Bool(true);
+        return new Bool(_isdigit(this.value));
     }
 
     public static boolean _islower(byte[] input) {
@@ -1198,10 +1215,63 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space)."
+            __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space).",
+            args = {"width"},
+            default_args = {"fillingChar"}
     )
-    public org.python.Object ljust(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.ljust has not been implemented.");
+    public org.python.Object ljust(org.python.Object width, org.python.Object fillingChar) {
+        return new org.python.types.Bytes(_ljust(this.value, width, fillingChar));
+    }
+
+    public static byte [] _ljust(byte[] input, org.python.Object width, org.python.Object fillingChar) {
+        byte[] fillChar;
+        if (fillingChar instanceof org.python.types.Bytes || fillingChar instanceof org.python.types.ByteArray) {
+            if (fillingChar instanceof org.python.types.ByteArray) {
+                fillChar = ((org.python.types.ByteArray) fillingChar).value;
+            } else {
+                fillChar = ((org.python.types.Bytes) fillingChar).value;
+            }
+            if (fillChar.length != 1) {
+                if (org.Python.VERSION < 0x030502F0) {
+                    throw new org.python.exceptions.TypeError("must be a byte string of length 1, not bytes");
+                } else {
+                    throw new org.python.exceptions.TypeError("ljust() argument 2 must be a byte string of length 1, not bytes");
+                }
+            }
+        } else if (fillingChar == null) {
+            fillChar = " ".getBytes();
+        } else {
+            if (org.Python.VERSION < 0x030502F0) {
+                throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + fillingChar.typeName());
+            } else {
+                throw new org.python.exceptions.TypeError("ljust() argument 2 must be a byte string of length 1, not " + fillingChar.typeName());
+            }
+        }
+
+        if (width instanceof org.python.types.Int) {
+            int iwidth = (int) ((org.python.types.Int) width).value;
+            if (input.length >= iwidth) {
+                return input;
+            } else {
+                int diff = iwidth - input.length;
+
+                byte[] returnBytes;
+                returnBytes = new byte[iwidth];
+
+                for (int i = 0; i < input.length; i++) {
+                    returnBytes[i] = input[i];
+                }
+                for (int i = input.length; i < iwidth; i++) {
+                    returnBytes[i] = fillChar[0];
+                }
+                return returnBytes;
+            }
+        } else if (width instanceof org.python.types.Bool) {
+            return input;
+        } else {
+            throw new org.python.exceptions.TypeError("'" + width.typeName() +
+                "'" + " object cannot be interpreted as an integer\n");
+        }
     }
 
     public static byte[] _lower(byte[] input) {
