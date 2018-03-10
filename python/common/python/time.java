@@ -97,7 +97,7 @@ public class time extends org.python.types.Module {
     )
     public static org.python.Object ctime(org.python.Object seconds) {
         java.util.Date date;
-        if (seconds == null) {
+        if ((seconds == null) || (seconds instanceof org.python.types.NoneType)) {
             long currentTimeInMillis = System.currentTimeMillis();
             date = new java.util.Date(currentTimeInMillis);
         } else {

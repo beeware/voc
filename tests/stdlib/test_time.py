@@ -132,6 +132,7 @@ class TimeModuleTests(TranspileTestCase):
                 time.ctime((1,2))
             except Exception as e:
                 print(e)
+            time.ctime(None)
         """)
 
     #######################################################
