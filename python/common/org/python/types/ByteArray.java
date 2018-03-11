@@ -808,10 +808,13 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.join(iterable_of_bytes) -> bytearray\n\nConcatenate any number of bytes/bytearray objects, with B\nin between each pair, and return the result as a new bytearray."
+            __doc__ = "B.join(iterable_of_bytes) -> bytearray\n\nConcatenate any number of bytes/bytearray objects, with B\nin between each pair, and return the result as a new bytearray.",
+            args = {"iterable"}
     )
-    public org.python.Object join(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.join has not been implemented.");
+    public org.python.Object join(org.python.Object iterable) {
+        org.python.types.Bytes temp = new org.python.types.Bytes(this.value);
+        org.python.types.Bytes res = (org.python.types.Bytes) temp.join(iterable);
+        return new ByteArray(res.value);
     }
 
     @org.python.Method(

@@ -503,6 +503,20 @@ class BytesTests(TranspileTestCase):
             print(b''.split(maxsplit='5'))
             """, exits_early=True)
 
+    def test_join(self):
+        self.assertCodeExecution("""
+            b = bytes(b'.')
+            print(b.join([b'12', b'dh']))
+            print(b.join([bytearray(b'12'), bytearray(b'dh')]))
+            b = bytes(b' ')
+            print(b.join([b'd', bytearray(b'l22-'), b'=ej*']))
+            print(b.join([bytearray(b'31'), b'`', b'^']))
+            print(b.join([bytearray(b'dh')]))
+            b = bytes(b'%#@!')
+            print(b.join([b'1',b'd',b'<']))
+            print(b.join([b'12']))
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'
