@@ -349,6 +349,32 @@ class BytesTests(TranspileTestCase):
             print(b'\x46\x55\x43\x4B'.upper())
         """)
 
+    def test_ljust(self):
+        self.assertCodeExecution("""
+            print(b'testMoreThanWidth'.ljust(5))
+            print(b'testEqualWidth'.ljust(14))
+            print(b'testLessThanWidth'.ljust(20))
+            print(b'testMoreWithFill'.ljust(2, b'x'))
+            print(b'testEqualWithFill'.ljust(17, b'x'))
+            print(b'testLessWithFill'.ljust(25, b'x'))
+            print(b'testNegative'.ljust(-20))
+            print(b''.ljust(5))
+            print(b'testNoChangeWidthOne'.ljust(True, b'x'))
+            print(b'testBArraySecondArg'.ljust(True, bytearray(b'x')))
+            try:
+                print(b'testStrArgError'.ljust('5'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(b'testMoreLengthError'.ljust(12, b'as'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(b'testStrFillingChar'.ljust(12, 'a'))
+            except Exception as e:
+                print(str(e))
+        """)
+
     def test_lower(self):
         self.assertCodeExecution("""
             print(b"abc".lower())

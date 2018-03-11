@@ -1229,10 +1229,63 @@ public class Bytes extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space)."
+              __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space).",
+              args = {"width"},
+              default_args = {"fillingChar"}
     )
-    public org.python.Object ljust(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.ljust has not been implemented.");
+    public org.python.Object ljust(org.python.Object width, org.python.Object fillingChar) {
+        return new org.python.types.Bytes(_ljust(this.value, width, fillingChar));
+    }
+
+    public static byte[] _ljust(byte[] input, org.python.Object width, org.python.Object fillingChar) {
+        byte[] fillChar;
+        if (fillingChar instanceof org.python.types.Bytes || fillingChar instanceof org.python.types.ByteArray) {
+            if (fillingChar instanceof org.python.types.ByteArray) {
+                fillChar = ((org.python.types.ByteArray) fillingChar).value;
+            } else {
+                fillChar = ((org.python.types.Bytes) fillingChar).value;
+            }
+            if (fillChar.length != 1) {
+                if (org.Python.VERSION < 0x030502F0) {
+                    throw new org.python.exceptions.TypeError("must be a byte string of length 1, not bytes");
+                } else {
+                    throw new org.python.exceptions.TypeError("ljust() argument 2 must be a byte string of length 1, not bytes");
+                }
+            }
+        } else if (fillingChar == null) {
+            fillChar = " ".getBytes();
+        } else {
+            if (org.Python.VERSION < 0x030502F0) {
+                throw new org.python.exceptions.TypeError("must be a byte string of length 1, not " + fillingChar.typeName());
+            } else {
+                throw new org.python.exceptions.TypeError("ljust() argument 2 must be a byte string of length 1, not " + fillingChar.typeName());
+            }
+        }
+
+        if (width instanceof org.python.types.Int) {
+            int iwidth = (int) ((org.python.types.Int) width).value;
+            if (input.length >= iwidth) {
+                return input;
+            } else {
+                int diff = iwidth - input.length;
+
+                byte[] returnBytes;
+                returnBytes = new byte[iwidth];
+
+                for (int i = 0; i < input.length; i++) {
+                    returnBytes[i] = input[i];
+                }
+                for (int i = input.length; i < iwidth; i++) {
+                    returnBytes[i] = fillChar[0];
+                }
+                return returnBytes;
+            }
+        } else if (width instanceof org.python.types.Bool) {
+            return input;
+        } else {
+            throw new org.python.exceptions.TypeError("'" + width.typeName() +
+                "'" + " object cannot be interpreted as an integer");
+        }
     }
 
     public static byte[] _lower(byte[] input) {
