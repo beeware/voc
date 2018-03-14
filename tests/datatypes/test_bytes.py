@@ -375,6 +375,32 @@ class BytesTests(TranspileTestCase):
                 print(str(e))
         """)
 
+    def test_rjust(self):
+        self.assertCodeExecution("""
+            print(b'testMoreThanWidth'.rjust(5))
+            print(b'testEqualWidth'.rjust(14))
+            print(b'testLessThanWidth'.rjust(20))
+            print(b'testMoreWithFill'.rjust(2, b'x'))
+            print(b'testEqualWithFill'.rjust(17, b'x'))
+            print(b'testLessWithFill'.rjust(25, b'x'))
+            print(b'testNegative'.rjust(-20))
+            print(b''.rjust(5))
+            print(b'testNoChangeWidthOne'.rjust(True, b'x'))
+            print(b'testBArraySecondArg'.rjust(True, bytearray(b'x')))
+            try:
+                print(b'testStrArgError'.rjust('5'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(b'testMoreLengthError'.rjust(12, b'as'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(b'testStrFillingChar'.rjust(12, 'a'))
+            except Exception as e:
+                print(str(e))
+        """)
+
     def test_lower(self):
         self.assertCodeExecution("""
             print(b"abc".lower())
