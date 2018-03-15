@@ -1,0 +1,15 @@
+#
+# Config file for automatic testing at travis-ci.org
+#
+
+language: bash
+services: docker
+
+before_script:
+  - env | sort
+
+script:
+  - docker build .
+
+after_script:
+  - docker images
