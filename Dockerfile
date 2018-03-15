@@ -4,7 +4,7 @@
 # https://voc.readthedocs.io/en/latest/background/install.html
 #
 # https://hub.docker.com/_/python/
-FROM python:3.5-alpine
+FROM python:3.6-alpine
 
 
 # prepare
