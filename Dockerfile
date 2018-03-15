@@ -39,10 +39,6 @@ RUN set -ex && \
     mkdir /opt && \
     mv apache-ant-${ANT_VERSION} /opt/ant
 
-RUN set -ex && \
-    ls -la /opt/ant && \
-    ls -la /opt/ant/bin
-
 ENV ANT_HOME /opt/ant
 ENV PATH ${PATH}:/opt/ant/bin
 
@@ -66,10 +62,15 @@ RUN set -ex && \
     ant java && \
     ls -la dist
 
+
+#
+#__________________________________________________________________________________________________
+# build a "Hello World"
 # https://voc.readthedocs.io/en/latest/tutorial/tutorial-0.html
+#
 RUN set -ex && \
     mkdir ~/tutorial0 && \
     cd ~/tutorial0 && \
     echo "print('Hello World!')">example.py && \
     voc -v example.py && \
-    java -classpath ~/pybee/voc/dist/python-java-support.jar:. python.example && \
+    java -classpath ~/pybee/voc/dist/python-java-support.jar:. python.example
