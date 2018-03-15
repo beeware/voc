@@ -1,0 +1,31 @@
+#
+# Config file for automatic testing at travis-ci.org
+#
+
+language: bash
+services: docker
+
+before_script:
+  - env | sort
+
+script:
+    # create docker image
+    - docker build -t pybee:latest .
+
+    # List all installed packages:
+    - docker run -t pybee:latest pip freeze
+
+    # Just print some version info:
+    - docker run -t pybee:latest uname -a
+
+    - docker run -t pybee:latest python --version
+    - docker run -t pybee:latest javac -version
+    - docker run -t pybee:latest ant -version
+
+    - docker run -t pybee:latest voc --version
+
+    #- docker run -t pybee:latest vod --version # https://github.com/pybee/voc/issues/768
+
+after_script:
+  - docker images
+
