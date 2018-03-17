@@ -762,7 +762,8 @@ public class ByteArray extends org.python.types.Object {
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalnum() {
-        return (new Bytes(this.value)).isalnum();
+
+        return new Bool(Bytes._isalnum(this.value));
     }
 
     @org.python.Method(
@@ -776,7 +777,7 @@ public class ByteArray extends org.python.types.Object {
             __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isdigit() {
-        return (new Bytes(this.value)).isdigit();
+        return new Bool(Bytes._isdigit(this.value));
     }
 
     @org.python.Method(
