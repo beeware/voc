@@ -1047,20 +1047,27 @@ public class Bytes extends org.python.types.Object {
         return pos;
     }
 
+    public static boolean _isalnum(byte ch) {
+        return _isalpha(ch) || _isdigit(ch);
+    }
+
+    public static boolean _isalnum(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!_isalnum(ch)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalnum() {
-        if (this.value.length == 0) {
-            return new org.python.types.Bool(false);
-        }
-        for (byte ch: this.value) {
-            if (!(ch >= 'A' && ch <= 'Z') && !(ch >= 'a' && ch <= 'z') &&
-                        !(ch >= '0' && ch <= '9')) {
-                return new org.python.types.Bool(false);
-            }
-        }
-        return new org.python.types.Bool(true);
+        return new Bool(_isalnum(this.value));
     }
 
     public static boolean _isalpha(byte[] input) {
@@ -1086,23 +1093,30 @@ public class Bytes extends org.python.types.Object {
         return new Bool(_isalpha(this.value));
     }
 
-    public static boolean _isnum(byte ch) {
-        return (ch >= '0' && ch <= '9');
+    public static boolean _isdigit(byte ch) {
+        if (!(ch >= '0' && ch <= '9')) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean _isdigit(byte[] input) {
+        if (input.length == 0) {
+            return false;
+        }
+        for (byte ch : input) {
+            if (!_isdigit(ch)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @org.python.Method(
             __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isdigit() {
-        if (this.value.length == 0) {
-            return new org.python.types.Bool(false);
-        }
-        for (byte ch : this.value) {
-            if (!(ch >= '0' && ch <= '9')) {
-                return new org.python.types.Bool(false);
-            }
-        }
-        return new org.python.types.Bool(true);
+        return new Bool(_isdigit(this.value));
     }
 
     public static boolean _islower(byte[] input) {
