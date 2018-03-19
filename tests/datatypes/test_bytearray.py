@@ -94,6 +94,58 @@ class BytearrayTests(TranspileTestCase):
             print(bytearray(b'hello world   ').upper())
         """)
 
+    def test_ljust(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'testMoreThanWidth').ljust(5))
+            print(bytearray(b'testEqualWidth').ljust(14))
+            print(bytearray(b'testLessThanWidth').ljust(20))
+            print(bytearray(b'testMoreWithFill').ljust(2, b'x'))
+            print(bytearray(b'testEqualWithFill').ljust(17, b'x'))
+            print(bytearray(b'testLessWithFill').ljust(25, b'x'))
+            print(bytearray(b'testNegative').ljust(-20))
+            print(bytearray(b'').ljust(5))
+            print(bytearray(b'testNoChangeWidthOne').ljust(True, b'x'))
+            print(bytearray(b'testBArraySecondArg').ljust(True, bytearray(b'x')))
+            try:
+                print(bytearray(b'testStrArgError').ljust('5'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(bytearray(b'testMoreLengthError').ljust(12, b'as'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(bytearray(b'testStrFillingChar').ljust(12, 'a'))
+            except Exception as e:
+                print(str(e))
+        """)
+
+    def test_rjust(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'testMoreThanWidth').rjust(5))
+            print(bytearray(b'testEqualWidth').rjust(14))
+            print(bytearray(b'testLessThanWidth').rjust(20))
+            print(bytearray(b'testMoreWithFill').rjust(2, b'x'))
+            print(bytearray(b'testEqualWithFill').rjust(17, b'x'))
+            print(bytearray(b'testLessWithFill').rjust(25, b'x'))
+            print(bytearray(b'testNegative').rjust(-20))
+            print(bytearray(b'').rjust(5))
+            print(bytearray(b'testNoChangeWidthOne').rjust(True, b'x'))
+            print(bytearray(b'testBArraySecondArg').rjust(True, bytearray(b'x')))
+            try:
+                print(bytearray(b'testStrArgError').rjust('5'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(bytearray(b'testMoreLengthError').rjust(12, b'as'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(bytearray(b'testStrFillingChar').rjust(12, 'a'))
+            except Exception as e:
+                print(str(e))
+        """)
+
     def test_isalpha(self):
         # TODO: add this test when adding support for literal hex bytes
         # print(bytearray(b'\xf0').isalpha())

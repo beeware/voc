@@ -762,7 +762,7 @@ public class ByteArray extends org.python.types.Object {
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalnum() {
-        return (new Bytes(this.value)).isalnum();
+        return new Bool(Bytes._isalnum(this.value));
     }
 
     @org.python.Method(
@@ -776,7 +776,7 @@ public class ByteArray extends org.python.types.Object {
             __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isdigit() {
-        return (new Bytes(this.value)).isdigit();
+        return new Bool(Bytes._isdigit(this.value));
     }
 
     @org.python.Method(
@@ -818,10 +818,12 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space)."
+            __doc__ = "B.ljust(width[, fillchar]) -> copy of B\n\nReturn B left justified in a string of length width. Padding is\ndone using the specified fill character (default is a space).",
+            args = {"width"},
+            default_args = {"fillingChar"}
     )
-    public org.python.Object ljust(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.ljust has not been implemented.");
+    public org.python.Object ljust(org.python.Object width, org.python.Object fillingChar) {
+        return new org.python.types.ByteArray(Bytes._ljust(this.value, width, fillingChar));
     }
 
     @org.python.Method(
@@ -874,10 +876,12 @@ public class ByteArray extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "B.rjust(width[, fillchar]) -> copy of B\n\nReturn B right justified in a string of length width. Padding is\ndone using the specified fill character (default is a space)"
+            __doc__ = "B.rjust(width[, fillchar]) -> copy of B\n\nReturn B right justified in a string of length width. Padding is\ndone using the specified fill character (default is a space).",
+            args = {"width"},
+            default_args = {"fillingChar"}
     )
-    public org.python.Object rjust(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytearray.rjust has not been implemented.");
+    public org.python.Object rjust(org.python.Object width, org.python.Object fillingChar) {
+        return new org.python.types.ByteArray(Bytes._rjust(this.value, width, fillingChar));
     }
 
     @org.python.Method(
