@@ -131,7 +131,35 @@ Compiling and running this will give you an output like::
     ...
 
 
-.. TODO:: add an example with more complex types
+Example: extending HashMap
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is another example, showing how to extend a Java class with slightly more
+involved type annotations, and calling the parent class method::
+
+    class SpyingHashMap(extends=java.util.HashMap):
+        def __init__(self):
+            self.counter = 0
+
+        def put(self, key: java.lang.Object, value: java.lang.Object) -> java.lang.Object:
+            print('Putting %s in key %s' % (value, key))
+            return super().put(key, value)
+
+
+    m = SpyingHashMap()
+    m.put("hello", "it's me")
+    m.put("from where?", "the other side")
+    print('map entries are:', m.entrySet())
+
+Here again it's important to notice how the type annotations need the full
+absolute path for the types.
+
+Compiling and running the above code will give you::
+
+    Putting it's me in key hello
+    Putting the other side in key from where?
+    map entries are: [hello=it's me, from where?=the other side]
+
 
 .. TODO:: add an example with custom constructor
 
