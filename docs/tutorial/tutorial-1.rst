@@ -71,18 +71,117 @@ If you see an error message like::
     Error: Could not find or load main class python.javainfo
 
 This usually happens because the classpath is incorrect, causing the JVM to fail to find the class or something that was imported in a class.
-Make sure to include the correct path to the ``python-java-support.jar`` file and the current directory in the classpath, separated by ``:``.
+Ensure you're inside of the correct directory, and make sure to include the correct path to the ``python-java-support.jar`` file and the current directory in the classpath, separated by ``:``.
 
 
 Extending a Java class
 ----------------------
 
-TODO: example extending a java class.
+For extending a Java class, you will need to use some special syntax.
+Here is an example code which creates three Java threads, by
+extending the ``java.lang.Thread``::
+
+    from java.lang import Math
+
+
+    class MyThread(extends=java.lang.Thread):
+        def __init__(self, id):
+            self.id = id
+            self.counter = 0
+
+        def run(self) -> void:
+            print('Starting thread %d' % self.id)
+            for i in range(10):
+                self.sleep(Math.random() * 1000)
+                self.counter += 1
+                print('Thread %d executed %d times' % (self.id, self.counter))
+
+
+    MyThread(1).start()
+    MyThread(2).start()
+    MyThread(3).start()
+
+There are two important syntax features to notice here:
+
+1) Extending a Java class: ``MyThread(extends=java.lang.Thread)``
+
+.. note:: Notice how we provide the full absolute path to the Java class being extended.
+    This is required even if you import the class, because of a limitation of the current
+    way the transpilation is implemented.
+
+2) Annotating return type for the run() method: ``-> void``. This is needed in order
+for the method to be executable from the Java side. In practice, VOC generates two
+methods like these: one to be callable from Python code, and the other with the
+Java types got from the annotations.
+
+Compiling and running this will give you an output like::
+
+    Starting thread 1
+    Starting thread 2
+    Starting thread 3
+    Thread 3 executed 1 times
+    Thread 3 executed 2 times
+    Thread 1 executed 1 times
+    Thread 3 executed 3 times
+    Thread 2 executed 1 times
+    Thread 1 executed 2 times
+    Thread 3 executed 4 times
+    Thread 2 executed 2 times
+    Thread 3 executed 5 times
+    ...
+
+
+.. TODO:: add an example with more complex types
+
+.. TODO:: add an example with custom constructor
+
+Common problems
+~~~~~~~~~~~~~~~
+
+1) Forgetting to declare ``self`` as argument for the run method, will give you an error like this::
+
+   Exception in thread "main" java.lang.ClassFormatError: Arguments can't fit into locals in class file python/extend_thread/MyThread
+
+If you get the above error, double check that you're declaring the ``self`` as first argument in all methods of the Python classes.
+
+
+2) Trying to extend a Java interface instead of implementing it, will give you this error::
+
+    Exception in thread "main" java.lang.IncompatibleClassChangeError: class python.error_extends.MyThread has interface java.lang.Runnable as super class
+
+If you get the above error, make sure the thing you're trying to extend is a class and not an interface. Look below to see how to implement a Java interface.
 
 
 Implementing a Java interface
 -----------------------------
 
-TODO: example implementing a Java interface, which can be called by Java code.
+Implementing a Java interface is similar to extending a Java class: much like in Java,
+you simply use ``implements`` instead of ``extends``.
+
+Here is the threads example from earlier, re-written to use a Python class
+implementing the Java interface ``java.lang.Runnable``::
+
+
+    from java.lang import Math, Thread
+
+
+    class MyThread(implements=java.lang.Runnable):
+        def __init__(self, id):
+            self.id = id
+            self.counter = 0
+
+        def run(self) -> void:
+            print('Starting thread %d' % self.id)
+            for i in range(10):
+                Thread.sleep(Math.random() * 1000)
+                self.counter += 1
+                print('Thread %d executed %d times' % (self.id, self.counter))
+
+
+    Thread(MyThread(1)).start()
+    Thread(MyThread(2)).start()
+    Thread(MyThread(3)).start()
+
+
 
 .. _classpath: https://en.wikipedia.org/wiki/Classpath_(Java)
