@@ -168,14 +168,16 @@ Common problems
 
 1) Forgetting to declare ``self`` as argument for the run method, will give you an error like this::
 
-   Exception in thread "main" java.lang.ClassFormatError: Arguments can't fit into locals in class file python/extend_thread/MyThread
+    Exception in thread "main" java.lang.ClassFormatError:
+        Arguments can't fit into locals in class file python/extend_thread/MyThread
 
 If you get the above error, double check that you're declaring the ``self`` as first argument in all methods of the Python classes.
 
 
 2) Trying to extend a Java interface instead of implementing it, will give you this error::
 
-    Exception in thread "main" java.lang.IncompatibleClassChangeError: class python.error_extends.MyThread has interface java.lang.Runnable as super class
+    Exception in thread "main" java.lang.IncompatibleClassChangeError:
+        class python.error_extends.MyThread has interface java.lang.Runnable as super class
 
 If you get the above error, make sure the thing you're trying to extend is a class and not an interface. Look below to see how to implement a Java interface.
 
