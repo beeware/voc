@@ -401,6 +401,30 @@ class BytesTests(TranspileTestCase):
                 print(str(e))
         """)
 
+    def test_expandtabs(self):
+        self.assertCodeExecution("""
+            print(b'testNoTabs'.expandtabs())
+            print(b'test\t'.expandtabs())
+            print(b'testDoubleTab\t\t'.expandtabs())
+            print(b'testTab\tandText'.expandtabs())
+            print(b'testTab\t'.expandtabs(4))
+            print(b'testTab\t\t'.expandtabs(4))
+            print(b'test\t\t'.expandtabs(-4))
+            print(b''.expandtabs(5))
+            try:
+                print(b'testErrorChar\t'.expandtabs('a'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(b'testErrorChars\t'.expandtabs('as'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(b'testErrorCharNum\t'.expandtabs('1'))
+            except Exception as e:
+                print(str(e))
+        """)
+
     def test_lower(self):
         self.assertCodeExecution("""
             print(b"abc".lower())
