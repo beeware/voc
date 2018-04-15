@@ -59,7 +59,7 @@ no arguments, there is no need to supply any of the named
         __doc__ = "Return 4, always and ever."
     )
     public org.python.Object constant_4() {
-        return org.python.types.Int(4);
+        return new org.python.types.Int(4);
     }
 
 
