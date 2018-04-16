@@ -146,6 +146,30 @@ class BytearrayTests(TranspileTestCase):
                 print(str(e))
         """)
 
+    def test_expandtabs(self):
+        self.assertCodeExecution("""
+            print(bytearray(b'testNoTabs').expandtabs())
+            print(bytearray(b'test\t').expandtabs())
+            print(bytearray(b'testDoubleTab\t\t').expandtabs())
+            print(bytearray(b'testTab\tandText').expandtabs())
+            print(bytearray(b'testTab\t').expandtabs(4))
+            print(bytearray(b'testTab\t\t').expandtabs(4))
+            print(bytearray(b'test\t\t').expandtabs(-4))
+            print(bytearray(b'').expandtabs(5))
+            try:
+                print(bytearray(b'testErrorChar\t').expandtabs('a'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(bytearray(b'testErrorChars\t').expandtabs('as'))
+            except Exception as e:
+                print(str(e))
+            try:
+                print(bytearray(b'testErrorCharNum\t').expandtabs('1'))
+            except Exception as e:
+                print(str(e))
+        """)
+
     def test_isalpha(self):
         # TODO: add this test when adding support for literal hex bytes
         # print(bytearray(b'\xf0').isalpha())
