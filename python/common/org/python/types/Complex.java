@@ -499,7 +499,11 @@ public class Complex extends org.python.types.Object {
                     return calUPow(other_obj.value);
                 } else {
                     org.python.types.Complex c1 = new org.python.types.Complex(1, 0);
-                    return c1.__truediv__(calUPow(-other_obj.value));
+                    try {
+                        return c1.__truediv__(calUPow(-other_obj.value));
+                    } catch (org.python.exceptions.ZeroDivisionError e) {
+                        throw new org.python.exceptions.ZeroDivisionError("0.0 to a negative or complex power");
+                    }
                 }
             } else if (other instanceof org.python.types.Float) {
                 org.python.types.Float other_obj = (org.python.types.Float) other;

@@ -38,6 +38,18 @@ class ComplexTests(TranspileTestCase):
             print(x != y)
             print(y.__ne__(x))
             """)
+    
+    def test_power_complex_with_zero_base(self):
+        self.assertCodeExecution("""
+            x = 0+0j
+            y = 1+0j
+            z = -1
+            print(x ** y)
+            try:
+                print(x ** z)
+            except ZeroDivisionError as err:
+                print(err)
+            """)
 
 
 class UnaryComplexOperationTests(UnaryOperationTestCase, TranspileTestCase):
