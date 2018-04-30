@@ -117,12 +117,12 @@ public class NotImplementedType extends org.python.types.Object {
             return this.__mul__(other);
         } catch (org.python.exceptions.TypeError e) {
             if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple || other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
-              throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NotImplementedType'");
+                throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NotImplementedType'");
             } else {
-              throw new org.python.exceptions.TypeError(
-                String.format("unsupported operand type(s) for *=: 'NotImplementedType' and '%s'",
-                      other.typeName())
-              );
+                throw new org.python.exceptions.TypeError(
+                        String.format("unsupported operand type(s) for *=: 'NotImplementedType' and '%s'",
+                                other.typeName())
+                );
             }
         }
     }
