@@ -199,13 +199,70 @@ def update_repo():
         ).wait()
 
 
-def compile_module(args):
+def write_file(path, content):
+    dir_path = os.path.dirname(path)
+    if not os.path.isdir(dir_path):
+        os.mkdir(dir_path)
+    with open(path, 'w') as f:
+        f.write(content)
+
+
+def write_result_file(output_path, extension, content):
+    result_path = os.path.splitext(output_path)[0] + extension
+    write_file(result_path, content)
+
+
+def run_cmd(cmd):
+    pipe = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=REPO_ROOT
+    )
+    stdout, stderr = pipe.communicate()
+    return pipe.returncode, stdout, stderr
+
+
+def run_smoke_test(mod_name, output_path):
+    test_path = os.path.join(REPO_ROOT, 'stdlib_tests', 'test_%s.py' % mod_name)
+    if not os.path.exists(test_path):
+        write_result_file(output_path, '.test.notest', '')
+        return
+    test_dir = os.path.join(REPO_ROOT, 'build', 'stdlib_tests')
+    _, stdout, stderr = run_cmd([
+        'voc',
+        '-v',
+        '-o', test_dir,
+        '-p', 'stdlib_tests',
+        test_path,
+    ])
+    if stderr:
+        write_result_file(output_path, '.test.stderr', stderr)
+    else:
+        _, py_stdout, py_stderr = run_cmd(['python', test_path])
+        # XXX: fix this for multiple-levels:
+        test_mod_name = 'python.' + os.path.splitext(os.path.basename(test_path))[0]
+        _, voc_stdout, voc_stderr = run_cmd([
+            'java',
+            '-cp', './dist/python-java-support.jar:' + test_dir,
+            test_mod_name
+        ])
+        if py_stdout == voc_stdout and py_stderr == voc_stderr:
+            write_result_file(output_path, '.test.works', stdout.decode('utf-8'))
+        else:
+            write_result_file(output_path, '.test.fails.voc_stdout', voc_stdout.decode('utf-8'))
+            write_result_file(output_path, '.test.fails.voc_stderr', voc_stderr.decode('utf-8'))
+            write_result_file(output_path, '.test.fails.py_stdout', py_stdout.decode('utf-8'))
+            write_result_file(output_path, '.test.fails.py_stderr', py_stderr.decode('utf-8'))
+
+
+def _compile_module(args):
     """
     Compile the given (name, target, passed, failed) with voc.
 
     Save results in the queues passed by pool.map.
     """
-    name, target, passed, failed = args
+    name, target, passed, failed, fast = args
 
     module_path = os.path.join(ouroboros_repo_folder(), 'ouroboros', name)
     output_path = os.path.join(REPO_ROOT, 'build', target, 'python', name)
@@ -220,7 +277,7 @@ def compile_module(args):
         last_output_timestamp = os.path.getmtime(output_path)
         last_input_timestamp = os.path.getmtime(module_path)
 
-        if last_input_timestamp <= last_output_timestamp:
+        if fast and last_input_timestamp <= last_output_timestamp:
             # The file hasn't been modified; don't rebuild.
             return
 
@@ -254,11 +311,15 @@ def compile_module(args):
         else:
             print('F', end='', flush=True)
             failed.append(name)
+        if not fast:
+            write_result_file(output_path, '.compile.stderr', stderr)
     else:
         print('.', end='', flush=True)
         passed.append(name)
+        if not fast:
+            run_smoke_test(name, output_path)
 
-def compile(modules, target):
+def compile_modules(modules, target, fast):
     """Run main compilation process on all modules found."""
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
@@ -267,11 +328,11 @@ def compile(modules, target):
     failed = m.list()
 
     args = [
-        (name, target, passed, failed)
+        (name, target, passed, failed, fast)
         for name in modules
     ]
 
-    pool.map(compile_module, args)
+    pool.map(_compile_module, args)
     pool.close()
     pool.join()
 
@@ -288,7 +349,7 @@ def main(target, fast):
     print('Compiling %s python modules...' % len(modules))
 
     # Run compilation process
-    passed, failed = compile(modules, target)
+    passed, failed = compile_modules(modules, target, fast)
 
     print()
     print("Built %s modules" % len(passed))
@@ -308,7 +369,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--fast',
         action='store_true',
-        help='Fast compile; ignore any known-bad modules'
+        help="Fast compile; ignore any known-bad modules and skip already compiled files"
     )
 
     args = parser.parse_args()
