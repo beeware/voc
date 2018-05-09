@@ -99,7 +99,7 @@ public class DictKeys extends org.python.types.FrozenSet {
     public org.python.types.Set __or__(org.python.Object other) {
         java.util.Set<org.python.Object> generated = this.fromIter(other);
         generated.addAll(this.value);
-        return new org.python.types.Set(generated);	
+        return new org.python.types.Set(generated);
     }
 
     @org.python.Method(
@@ -109,7 +109,7 @@ public class DictKeys extends org.python.types.FrozenSet {
         java.util.Set<org.python.Object> set1 = new java.util.HashSet<org.python.Object>(this.value);
         java.util.Set<org.python.Object> set2 = this.fromIter(other);
         set1.removeAll(set2);
-        return new org.python.types.Set(set1);	
+        return new org.python.types.Set(set1);
     }
 
     @org.python.Method(
@@ -122,7 +122,7 @@ public class DictKeys extends org.python.types.FrozenSet {
         java.util.Set<org.python.Object> tmp = new java.util.HashSet<org.python.Object>(s1);
         tmp.retainAll(this.value);
         sym_dif.removeAll(tmp);
-        return new org.python.types.Set(sym_dif);	
+        return new org.python.types.Set(sym_dif);
     }
 
     @org.python.Method(
@@ -143,9 +143,9 @@ public class DictKeys extends org.python.types.FrozenSet {
         generated.retainAll(this.value);
         return new org.python.types.Bool(generated.size() > 0);
     }
-    /** 
+    /**
      * The following methods are not present in Python's dict_keys but are present in DictKeys (inherited from FrozenSet)
-     * <p> 
+     * <p>
      * Hence, throw an AttributeError every time any of these methods is called
      */
     public org.python.Object issubset(org.python.Object other) {
