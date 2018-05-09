@@ -3,7 +3,7 @@ package org.python.types;
 public class DictKeys extends org.python.types.FrozenSet {
     static {
         org.python.types.Type.declarePythonType(DictKeys.class,"dict_keys",null,null);
-	}
+    }
 
 	public DictKeys(org.python.types.Dict dict) {
 		this.value = dict.value.keySet();
