@@ -1,8 +1,8 @@
 package org.python.types;
 
 public class DictKeys extends org.python.types.FrozenSet {
-	static {
-		org.python.types.Type.declarePythonType(DictKeys.class,"dict_keys",null,null);
+    static {
+        org.python.types.Type.declarePythonType(DictKeys.class,"dict_keys",null,null);
 	}
 
 	public DictKeys(org.python.types.Dict dict) {
@@ -17,7 +17,7 @@ public class DictKeys extends org.python.types.FrozenSet {
      */
 	private java.util.Set<org.python.Object> fromIter(org.python.Object obj) {
     	java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
-		org.python.Object iterator = org.Python.iter(obj);
+	    org.python.Object iterator = org.Python.iter(obj);
 		try {
 			while (true) {
 				org.python.Object next = iterator.__next__();
