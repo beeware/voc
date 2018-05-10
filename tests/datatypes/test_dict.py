@@ -356,6 +356,7 @@ class DictTests(TranspileTestCase):
                 s += i
             print(s)
             x[4] = 'D'
+            s = 0
             for i in y:
                 s += i
             print(s)
@@ -386,6 +387,25 @@ class DictTests(TranspileTestCase):
                 y = x.keys()
                 print(y[0])
                 print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.keys()
+                y[0] = 7
+                y['abc'] = 7
+                print('A TypeError should have been raised by now')
+            except TypeError as err:
+                print(err)
+            """)
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2}
+                y = x.keys()
+                del y[0]
+                print('A TypeError should have been raised by now')
             except TypeError as err:
                 print(err)
             """)
