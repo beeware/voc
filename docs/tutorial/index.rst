@@ -12,3 +12,4 @@ you've set up your development environment as described in :doc:`/background/ins
    :glob:
 
    tutorial-0
+   tutorial-1
