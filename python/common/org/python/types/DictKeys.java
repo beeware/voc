@@ -97,10 +97,18 @@ public class DictKeys extends org.python.types.FrozenSet {
         }
     }
 
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index", "value"}
+    )
     public void __setitem__(org.python.Object item, org.python.Object value) {
         throw new org.python.exceptions.TypeError("'dict_keys' object does not support item assignment");
     }
 
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index"}
+    )
     public void __delitem__(org.python.Object item) {
         throw new org.python.exceptions.TypeError("'dict_keys' object doesn't support item deletion");
     }
