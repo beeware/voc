@@ -361,6 +361,7 @@ class DictTests(TranspileTestCase):
                 s += i
             print(s)
             """)
+
         self.assertCodeExecution("""
             x = {'A' : 1,'B' : 2,'C' : 3}
             y = x.keys()
@@ -371,6 +372,7 @@ class DictTests(TranspileTestCase):
             print('A' in y)
             print('D' not in y)
             """)
+
         self.assertCodeExecution("""
             x = {1 : 1,2 : 2,3 : 3}
             y = {1 : 1,2 : 2,3 : 3,4 : 4}
@@ -381,6 +383,7 @@ class DictTests(TranspileTestCase):
             print(sum(k1 - k2))
             print(sum(k1 ^ k2))
             """)
+
         self.assertCodeExecution("""
             try:
                 x = {1 : 'a',2 : 'b',3 : 'c'}
@@ -390,6 +393,7 @@ class DictTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
         self.assertCodeExecution("""
             try:
                 x = {1 : 1,2 : 2,3 : 3}
@@ -400,6 +404,7 @@ class DictTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
         self.assertCodeExecution("""
             try:
                 x = {1 : 1,2 : 2}
@@ -409,6 +414,7 @@ class DictTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
         self.assertCodeExecution("""
             try:
                 x = {1 : 'a',2 : 'b',3 : 'c'}
@@ -418,6 +424,7 @@ class DictTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
         self.assertCodeExecution("""
             try:
                 x = {1 : 'a',2 : 'b',3 : 'c'}
@@ -427,6 +434,7 @@ class DictTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
         self.assertCodeExecution("""
             try:
                 x = {1 : 'a',2 : 'b',3 : 'c'}
@@ -436,6 +444,7 @@ class DictTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
         self.assertCodeExecution("""
             try:
                 x = {1 : 'a',2 : 'b',3 : 'c'}
@@ -445,10 +454,12 @@ class DictTests(TranspileTestCase):
             except TypeError as err:
                 print(err)
             """)
+
         self.assertCodeExecution("""
             x = {1 : 1}
             print(type(x.keys()))
             """)
+
         self.assertCodeExecution("""
             try:
                 x = {1 : 1,2 : 2}
