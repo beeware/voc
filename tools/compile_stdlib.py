@@ -226,7 +226,7 @@ def run_cmd(cmd):
 def run_smoke_test(mod_name, output_path):
     test_path = os.path.join(REPO_ROOT, 'stdlib_tests', 'test_%s.py' % mod_name)
     if not os.path.exists(test_path):
-        write_result_file(output_path, '.test.notest', '')
+        write_result_file(output_path, '.test-notest', '')
         return
     test_dir = os.path.join(REPO_ROOT, 'build', 'stdlib_tests')
     _, stdout, stderr = run_cmd([
@@ -237,7 +237,7 @@ def run_smoke_test(mod_name, output_path):
         test_path,
     ])
     if stderr:
-        write_result_file(output_path, '.test.stderr', stderr)
+        write_result_file(output_path, '.test-compile-stderr', stderr)
     else:
         _, py_stdout, py_stderr = run_cmd(['python', test_path])
         # XXX: fix this for multiple-levels:
@@ -248,12 +248,12 @@ def run_smoke_test(mod_name, output_path):
             test_mod_name
         ])
         if py_stdout == voc_stdout and py_stderr == voc_stderr:
-            write_result_file(output_path, '.test.works', stdout.decode('utf-8'))
+            write_result_file(output_path, '.test-works', stdout.decode('utf-8'))
         else:
-            write_result_file(output_path, '.test.fails.voc_stdout', voc_stdout.decode('utf-8'))
-            write_result_file(output_path, '.test.fails.voc_stderr', voc_stderr.decode('utf-8'))
-            write_result_file(output_path, '.test.fails.py_stdout', py_stdout.decode('utf-8'))
-            write_result_file(output_path, '.test.fails.py_stderr', py_stderr.decode('utf-8'))
+            write_result_file(output_path, '.test-fails-voc_stdout', voc_stdout.decode('utf-8'))
+            write_result_file(output_path, '.test-fails-voc_stderr', voc_stderr.decode('utf-8'))
+            write_result_file(output_path, '.test-fails-py_stdout', py_stdout.decode('utf-8'))
+            write_result_file(output_path, '.test-fails-py_stderr', py_stderr.decode('utf-8'))
 
 
 def _compile_module(args):
@@ -262,7 +262,7 @@ def _compile_module(args):
 
     Save results in the queues passed by pool.map.
     """
-    name, target, passed, failed, fast = args
+    name, target, passed, failed, fast, collect_status = args
 
     module_path = os.path.join(ouroboros_repo_folder(), 'ouroboros', name)
     output_path = os.path.join(REPO_ROOT, 'build', target, 'python', name)
@@ -311,15 +311,15 @@ def _compile_module(args):
         else:
             print('F', end='', flush=True)
             failed.append(name)
-        if not fast:
-            write_result_file(output_path, '.compile.stderr', stderr)
+        if collect_status:
+            write_result_file(output_path, '.compile-stderr', stderr)
     else:
         print('.', end='', flush=True)
         passed.append(name)
-        if not fast:
+        if collect_status:
             run_smoke_test(name, output_path)
 
-def compile_modules(modules, target, fast):
+def compile_modules(modules, target, fast, collect_status=False):
     """Run main compilation process on all modules found."""
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
@@ -328,7 +328,7 @@ def compile_modules(modules, target, fast):
     failed = m.list()
 
     args = [
-        (name, target, passed, failed, fast)
+        (name, target, passed, failed, fast, collect_status)
         for name in modules
     ]
 
@@ -339,17 +339,17 @@ def compile_modules(modules, target, fast):
     return passed, failed
 
 
-def main(target, fast):
+def main(args):
     """Run main compilation process."""
-    start = datetime.now()
     update_repo()
 
     # List valid files to try to compile
-    modules = module_list(target, fast)
+    modules = module_list(args.target, args.fast)
     print('Compiling %s python modules...' % len(modules))
 
     # Run compilation process
-    passed, failed = compile_modules(modules, target, fast)
+    passed, failed = compile_modules(modules, args.target, args.fast,
+                                     collect_status=args.collect_status)
 
     print()
     print("Built %s modules" % len(passed))
@@ -371,6 +371,10 @@ if __name__ == '__main__':
         action='store_true',
         help="Fast compile; ignore any known-bad modules and skip already compiled files"
     )
+    parser.add_argument(
+        '--collect-status',
+        action='store_true',
+        help="Run stdlib tests and collect status info of stdlib modules"
+    )
 
-    args = parser.parse_args()
-    main(target=args.target, fast=args.fast)
+    main(parser.parse_args())
