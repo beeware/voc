@@ -5,6 +5,21 @@ public class DictKeys extends org.python.types.FrozenSet {
         org.python.types.Type.declarePythonType(DictKeys.class,"dict_keys",null,null);
     }
 
+    /**
+     * A utility method to update the internal value of this object.
+     *
+     * Used by __i*__ operations to do an in-place operation.
+     * obj must be of type org.python.types.FrozenSet
+     */
+    void setValue(org.python.Object obj) {
+        this.value = ((org.python.types.DictKeys) obj).value;
+    }
+
+    @Override
+    public org.python.Object __hash__() {
+        throw new org.python.exceptions.AttributeError(this, "__hash__");
+    }
+
     public DictKeys(org.python.types.Dict dict) {
         this.value = dict.value.keySet();
     }
@@ -28,11 +43,6 @@ public class DictKeys extends org.python.types.FrozenSet {
         return generated;
     }
 
-    @Override
-    public org.python.Object __hash__() {
-        throw new org.python.exceptions.AttributeError(this, "__hash__");
-    }
-
     @org.python.Method(
             __doc__ = "Return repr(self)."
     )
@@ -52,6 +62,30 @@ public class DictKeys extends org.python.types.FrozenSet {
     }
 
     @org.python.Method(
+            __doc__ = "default object formatter"
+    )
+    public org.python.types.Str __format__(org.python.Object other) {
+        throw new org.python.exceptions.NotImplementedError("dict_keys.__format__() has not been implemented.");
+    }
+
+    @org.python.Method(
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
+    )
+    public org.python.types.List __dir__() {
+        throw new org.python.exceptions.NotImplementedError("dict_keys.__dir__() has not been implemented.");
+    }
+
+    public boolean __setattr_null(java.lang.String name, org.python.Object value) {
+        // Builtin types can't have attributes set on them.
+        return false;
+    }
+
+    public boolean __delattr_null(java.lang.String name) {
+        // Can't delete attributes of Builtin types
+        return false;
+    }
+
+    @org.python.Method(
             __doc__ = "",
             args = {"index"}
     )
@@ -61,6 +95,14 @@ public class DictKeys extends org.python.types.FrozenSet {
         } else {
             throw new org.python.exceptions.TypeError("'dict_keys' object is not subscriptable");
         }
+    }
+
+    public void __setitem__(org.python.Object item, org.python.Object value) {
+        throw new org.python.exceptions.TypeError("'dict_keys' object does not support item assignment");
+    }
+
+    public void __delitem__(org.python.Object item) {
+        throw new org.python.exceptions.TypeError("'dict_keys' object doesn't support item deletion");
     }
 
     @org.python.Method(
@@ -123,6 +165,36 @@ public class DictKeys extends org.python.types.FrozenSet {
         tmp.retainAll(this.value);
         sym_dif.removeAll(tmp);
         return new org.python.types.Set(sym_dif);
+    }
+
+    @org.python.Method(
+            __doc__ = "Return value&self."
+    )
+    public org.python.types.Set __rand__(org.python.Object other) {
+        return this.__and__(other);
+    }
+
+    @org.python.Method(
+            __doc__ = "Return value|self."
+    )
+    public org.python.types.Set __ror__(org.python.Object other) {
+        return this.__or__(other);
+    }
+
+    @org.python.Method(
+            __doc__ = "Return value^self."
+    )
+    public org.python.types.Set __rxor__(org.python.Object other) {
+        return this.__xor__(other);
+    }
+
+    @org.python.Method(
+            __doc__ = "Return value-self."
+    )
+    public org.python.types.Set __rsub__(org.python.Object other) {
+        java.util.Set<org.python.Object> generated = this.fromIter(other);
+        generated.removeAll(this.value);
+        return new org.python.types.Set(generated);
     }
 
     @org.python.Method(
