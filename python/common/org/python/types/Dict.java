@@ -418,7 +418,20 @@ public class Dict extends org.python.types.Object {
             __doc__ = "D.keys() -> a set-like object providing a view on D's keys"
     )
     public org.python.Object keys() {
-        throw new org.python.exceptions.NotImplementedError("dict.keys() has not been implemented.");
+        // throw new org.python.exceptions.NotImplementedError("dict.keys() has not been implemented.");
+        org.python.types.List keys = new org.python.types.List();
+
+        if (this.value.isEmpty()) {
+            return new org.python.types.List();
+        }
+
+        for (org.python.Object key : this.value.keySet()) {
+            if (key != null){
+                keys.append(key);
+            }
+        }
+
+        return keys;
     }
 
     @org.python.Method(
@@ -542,6 +555,19 @@ public class Dict extends org.python.types.Object {
             __doc__ = "D.values() -> an object providing a view on D's values"
     )
     public org.python.Object values() {
-        throw new org.python.exceptions.NotImplementedError("dict.values() has not been implemented.");
+        // throw new org.python.exceptions.NotImplementedError("dict.values() has not been implemented.");
+
+        org.python.types.List values = new org.python.types.List();
+
+        if (this.value.isEmpty()) {
+            return new org.python.types.List();
+        }
+
+        for (org.python.Object item : this.value.keySet()) {
+            if (item != null) {
+                values.append(this.value.get(item));
+            }
+        }
+        return values;
     }
 }
