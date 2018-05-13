@@ -398,20 +398,7 @@ public class Dict extends org.python.types.Object {
             __doc__ = "D.items() -> a set-like object providing a view on D's items"
     )
     public org.python.Object items() {
-        // FIXME: This should return a dict_view object, not compose a new list.
-        org.python.types.List result = new org.python.types.List();
-        java.util.List<org.python.Object> item;
-        org.python.types.Tuple tuple;
-
-        for (org.python.Object key : this.value.keySet()) {
-            item = new java.util.ArrayList<org.python.Object>();
-            item.add(key);
-            item.add(this.value.get(key));
-
-            tuple = new org.python.types.Tuple(item);
-            result.append(tuple);
-        }
-        return result;
+        return new org.python.types.DictItems(this);
     }
 
     @org.python.Method(
@@ -542,6 +529,7 @@ public class Dict extends org.python.types.Object {
             __doc__ = "D.values() -> an object providing a view on D's values"
     )
     public org.python.Object values() {
-        throw new org.python.exceptions.NotImplementedError("dict.values() has not been implemented.");
+        //throw new org.python.exceptions.NotImplementedError("dict.values() has not been implemented.");
+        return new org.python.types.DictValues(this);
     }
 }
