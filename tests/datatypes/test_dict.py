@@ -337,6 +337,15 @@ class DictTests(TranspileTestCase):
                 print('Received a TypeError as expected')
         """)
 
+    def test_method_keys(self):
+        self.assertCodeExecution("""
+            x = {}
+            x['1'] = "no"
+            x[5] = 7
+            x["iot"] = "2020"
+            print(x.keys())
+        """)
+
     @expectedFailure
     def test_fromkeys_missing_iterable(self):
         self.assertCodeExecution("""
