@@ -346,6 +346,129 @@ class DictTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_keys(self):
+        self.assertCodeExecution("""
+            x = {1 : 'A', 2 : 'B', 3 : 'C'}
+            s = 0
+            y = x.keys()
+            print(y)
+            for i in y:
+                s += i
+            print(s)
+            x[4] = 'D'
+            s = 0
+            for i in y:
+                s += i
+            print(s)
+            """)
+
+        self.assertCodeExecution("""
+            x = {'A' : 1,'B' : 2,'C' : 3}
+            y = x.keys()
+            print('A' in y)
+            print('D' not in y)
+            del x['A']
+            x['D'] = 4
+            print('A' in y)
+            print('D' not in y)
+            """)
+
+        self.assertCodeExecution("""
+            x = {1 : 1,2 : 2,3 : 3}
+            y = {1 : 1,2 : 2,3 : 3,4 : 4}
+            k1 = x.keys()
+            k2 = y.keys()
+            print(sum(k1 & k2))
+            print(sum(k1 | k2))
+            print(sum(k1 - k2))
+            print(sum(k1 ^ k2))
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(y[0])
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.keys()
+                y[0] = 7
+                y['abc'] = 7
+                print('A TypeError should have been raised by now')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2}
+                y = x.keys()
+                del y[0]
+                print('A TypeError should have been raised by now')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(y['abc'])
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(+y)
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(-y)
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(~y)
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            x = {1 : 1}
+            print(type(x.keys()))
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2}
+                y = x.keys()
+                print(y * 3)
+            except TypeError as err:
+                print(err)
+            """)
+
     def test_values(self):
         self.assertCodeExecution("""
             x = {1 : 1,2 : 2,3 : 3}
