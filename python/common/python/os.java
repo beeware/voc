@@ -650,10 +650,10 @@ public class os extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return a string representing the current working directory."
     )
     public static org.python.Object getcwd() {
-        throw new org.python.exceptions.NotImplementedError("'getcwd' has not been implemented");
+        return new org.python.types.Str(System.getProperty("user.dir"));
     }
 
     @org.python.Method(
