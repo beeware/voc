@@ -165,10 +165,10 @@ class Visitor(ast.NodeVisitor):
         try:
             super().visit(node)
         except Exception as e:
-            print()
-            print("Problem occurred in %s" % self.filename)
-            print('Node: %s' % dump(node))
-            print()
+            logging.warning(
+                "Problem occurred in " + str(self.filename)
+            )
+            logging.debug('Node: ' + dump(node))
             raise
         return self._root_module
 
