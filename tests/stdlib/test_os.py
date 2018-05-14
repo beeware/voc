@@ -34,3 +34,9 @@ class OsModuleTests(TranspileTestCase):
             import os
             print(os.getcwd())
         """)
+
+    def test_cpu_count(self):
+        self.assertCodeExecution("""
+            import os
+            print(os.cpu_count())
+        """)
