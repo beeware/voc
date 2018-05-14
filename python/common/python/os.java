@@ -422,10 +422,10 @@ public class os extends org.python.types.Module {
     public static org.python.Object confstr_names;
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return the number of CPUs in the system."
     )
     public static org.python.Object cpu_count() {
-        throw new org.python.exceptions.NotImplementedError("'cpu_count' has not been implemented");
+	return new org.python.types.Int(Runtime.getRuntime().availableProcessors());     
     }
 
     @org.python.Method(
