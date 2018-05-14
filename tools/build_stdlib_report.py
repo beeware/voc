@@ -128,12 +128,15 @@ def build_info(mod_name, result_files):
             test_errors = read_file(result_files[0])
         elif '.test-fails' in result_files[0]:
             test_status = 'FAILED'
+            test_errors = "\n".join([read_file(f) for f in result_files])
+
     return dict(
         module=mod_name,
         result_files=result_files,
         compile_status=compile_status,
         compile_errors=compile_errors,
         test_status=test_status,
+        test_errors=test_errors
     )
 
 
