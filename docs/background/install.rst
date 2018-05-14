@@ -25,7 +25,7 @@ To check if you have the JDK installed, run ``javac -version``
     $ javac -version
     javac 1.7.0_101
 
-If you do not have a Java 7 or Java 8 JDK `install Java <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_ in one of those versions and check again.
+If you do not have at least Java 7 `install Java <http://www.oracle.com/technetwork/java/javase/downloads/index.html>`_ and check again.
 
 To check if Apache ANT is installed, run ``ant -version``
 
