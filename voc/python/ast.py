@@ -1,4 +1,5 @@
 import ast
+import logging
 import sys
 import traceback
 
@@ -159,11 +160,11 @@ class Visitor(ast.NodeVisitor):
         try:
             super().visit(node)
         except Exception as e:
-            traceback.print_exc()
             print()
             print("Problem occurred in %s" % self.filename)
             print('Node: %s' % dump(node))
-            sys.exit(1)
+            print()
+            raise
         return self._root_module
 
     def visit_Module(self, node):
@@ -215,15 +216,26 @@ class Visitor(ast.NodeVisitor):
     # Statements
     @node_visitor
     def visit_FunctionDef(self, node):
-        function = self._create_function(node, node.name, node.decorator_list)
+        try:
+            function = self._create_function(node, node.name, node.decorator_list)
 
-        self.push_context(function)
+            self.push_context(function)
 
-        LocalsVisitor(function).visit(node)
+            LocalsVisitor(function).visit(node)
 
-        for child in node.body:
-            self.visit(child)
-        self.pop_context()
+            for child in node.body:
+                self.visit(child)
+            self.pop_context()
+            
+        except NotImplementedError as e:
+            # The function contains features not implemented
+            # 
+            logging.warning(
+                'Function ' + node.name + 
+                ' contains not implmented features: ' + str(e)
+            )
+            raise
+            
 
     @node_visitor
     def visit_ClassDef(self, node):
