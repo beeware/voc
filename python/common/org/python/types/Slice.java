@@ -318,7 +318,7 @@ public class Slice extends org.python.types.Object {
         return new org.python.types.Bool(false);
     }
 
-   @org.python.Method(
+    @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __hash__() {
