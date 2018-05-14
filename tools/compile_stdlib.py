@@ -3,11 +3,11 @@
 
 # Standard library imports
 import argparse
-from datetime import datetime
 import subprocess
 import multiprocessing
 import os
 import sys
+import traceback
 
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -185,18 +185,29 @@ def module_list(target, fast):
 def update_repo():
     """Update the ouroboros repository inside the voc folder."""
     repo_folder = ouroboros_repo_folder()
-    if repo_folder is None  :
-        print('Cloning Ouroboros...')
-        subprocess.Popen(
-            ['git', 'clone', 'https://github.com/pybee/ouroboros.git'],
-            cwd=os.path.dirname(REPO_ROOT)
-        ).wait()
-    else:
-        print('Updating Ouroboros...')
-        subprocess.Popen(
-            ['git', 'pull', 'origin', 'master'],
-            cwd=repo_folder
-        ).wait()
+    git_cmd = []
+    try:
+        if repo_folder is None:
+            print('Cloning Ouroboros...')
+            git_cmd = ['git', 'clone', 'https://github.com/pybee/ouroboros.git']
+            subprocess.Popen(
+                git_cmd,
+                cwd=os.path.dirname(REPO_ROOT)
+            ).wait()
+        else:
+            print('Updating Ouroboros...')
+            git_cmd = ['git', 'pull', 'origin', 'master']
+            subprocess.Popen(
+                git_cmd,
+                cwd=repo_folder
+            ).wait()
+    except FileNotFoundError as no_git:
+        # This can be a problem in Windows -- particular with developers installing
+        # git to run in the MinGW shell exclusively.
+        raise Exception(
+            "git was not found on the command line in order to clone/pull ouroboros.\n"
+            "Command attempted to run in path: {}\nCommand: {}".format
+            (repo_folder, " ".join(git_cmd)))
 
 
 def write_file(path, content):
@@ -319,6 +330,7 @@ def _compile_module(args):
         if collect_status:
             run_smoke_test(name, output_path)
 
+
 def compile_modules(modules, target, fast, collect_status=False):
     """Run main compilation process on all modules found."""
     pool = multiprocessing.Pool(multiprocessing.cpu_count())
@@ -341,22 +353,30 @@ def compile_modules(modules, target, fast, collect_status=False):
 
 def main(args):
     """Run main compilation process."""
-    update_repo()
+    try:
+        update_repo()
 
-    # List valid files to try to compile
-    modules = module_list(args.target, args.fast)
-    print('Compiling %s python modules...' % len(modules))
+        # List valid files to try to compile
+        modules = module_list(args.target, args.fast)
+        print('Compiling %s python modules...' % len(modules))
 
-    # Run compilation process
-    passed, failed = compile_modules(modules, args.target, args.fast,
-                                     collect_status=args.collect_status)
+        # Run compilation process
+        passed, failed = compile_modules(modules, args.target, args.fast,
+                                         collect_status=args.collect_status)
 
-    print()
-    print("Built %s modules" % len(passed))
-    if failed:
-        print("%s modules failed to build" % len(failed))
-        for name in sorted(failed):
-            print(name)
+        print()
+        print("Built %s modules" % len(passed))
+        if failed:
+            print("%s modules failed to build" % len(failed))
+            for name in sorted(failed):
+                print(name)
+            sys.exit(1)
+
+    except Exception as e:
+        print("Encountered an exception during the build process")
+        traceback.print_exc()
+        sys.exit(1)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
