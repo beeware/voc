@@ -123,6 +123,11 @@ class Visitor(ast.NodeVisitor):
 
         self.symbol_namespace = {}
         self.code_objects = {}
+        
+        # Functions using not implemented 
+        # features must not abort the compilation 
+        # if they are not used, only ensue a warning
+        self.notimplemented = {}
 
     @property
     def context(self):
@@ -216,27 +221,33 @@ class Visitor(ast.NodeVisitor):
     # Statements
     @node_visitor
     def visit_FunctionDef(self, node):
+        function = self._create_function(node, node.name, node.decorator_list)
+
+        self.push_context(function)
+
+        LocalsVisitor(function).visit(node)
+
         try:
-            function = self._create_function(node, node.name, node.decorator_list)
-
-            self.push_context(function)
-
-            LocalsVisitor(function).visit(node)
-
             for child in node.body:
                 self.visit(child)
-            self.pop_context()
-            
+                
         except NotImplementedError as e:
             # The function contains features not implemented
-            # 
+            # this should only give a warning if the function
+            # is not called, and abort the compilation 
+            # otherwise
+            logging.debug('Error with node: ', node)
             logging.warning(
                 'Function ' + node.name + 
-                ' contains not implmented features: ' + str(e)
+                ' contains not implemented features: ' + str(e)
             )
-            raise
+            # Prepare to abort the compilation if it is called
+            self.notimplemented[node.name] = str(e)
+        
+        finally:
+            self.pop_context()
             
-
+        
     @node_visitor
     def visit_ClassDef(self, node):
         # Construct a class.
@@ -1906,6 +1917,16 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Call(self, node):
+        # Check if the callable function contains 
+        # not implemented features, if it does, abort
+        # compilation
+        if node.func.id in self.notimplemented:
+            error = self.notimplemented[node.func.id]
+            raise RuntimeError(
+                'Call to function that uses non '
+                'implemented features ' + node.func.id +
+                ' ' + error
+            )
         if is_call(node, ('locals', 'globals', 'vars')):
             # **kwargs is node.keywords[None] in Python 3.5; node.kwargs in earlier versions
             if None in node.keywords or getattr(node, 'kwargs', None):
