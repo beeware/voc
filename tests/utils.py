@@ -1,6 +1,7 @@
 import atexit
 import contextlib
 from io import StringIO, BytesIO
+import difflib
 import os
 import re
 import shutil
@@ -302,6 +303,24 @@ def cleanse_python(raw, substitutions):
     return out
 
 
+def message_output(code, py_out, java_out):
+    diff_generator = difflib.unified_diff(py_out, java_out)
+    diff = '\n'.join(diff_generator)
+
+    msg = '''
+For this code:\t{code}
+
+The output (with CPython 3.5.2) is:\t{expected_python_output}
+
+But compiling with VOC and running with java -cp we got:\t{expected_java_output}
+
+The diff is:\t{diff}
+                    '''.format(code=code.strip(),
+                               expected_python_output=py_out,
+                               expected_java_output=java_out,
+                               diff=diff if diff else "None")
+    return msg
+
 class TranspileTestCase(TestCase):
 
     @classmethod
@@ -400,12 +419,14 @@ class TranspileTestCase(TestCase):
 
             # Confirm that both output strings end with the canary statement
             substring_start = - (len(END_OF_CODE_STRING)+1)
+            assert_message_output = message_output(code, py_out, java_out)
             if exits_early:
-                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE, assert_message_output)
+                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE, assert_message_output)
             else:
-                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+
+                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE, assert_message_output)
+                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE, assert_message_output)
 
         # ==================================================
         # Pass 2 - run the code in a function's context
@@ -439,12 +460,13 @@ class TranspileTestCase(TestCase):
 
             # Confirm that both output strings end with the canary statement
             substring_start = - (len(END_OF_CODE_STRING)+1)
+            assert_message_output = message_output(code, py_out, java_out)
             if exits_early:
-                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE, assert_message_output)
+                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE, assert_message_output)
             else:
-                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE, assert_message_output)
+                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE, assert_message_output)
 
     def assertJavaExecution(
                 self, code, out,
