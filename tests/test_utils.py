@@ -29,11 +29,6 @@ print('Done.')
 
 
 class AssertCodeExecutionTests(TranspileTestCase):
-    @unittest.expectedFailure
-    def test_fail_unexpected_exception(self):
-        self.assertCodeExecution("""
-            raise ValueError
-            """)
 
     def test_allow_expected_exception(self):
         self.assertCodeExecution("""
