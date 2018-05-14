@@ -399,14 +399,16 @@ class TranspileTestCase(TestCase):
             self.assertEqual(java_out, py_out, context)
 
             # Confirm that both output strings end with the canary statement
-            substring_start = - (len(END_OF_CODE_STRING)+1)
             if exits_early:
-                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed to raise exception \n%s" % java_out)
+                if py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed to raise exception \n%s" % py_out)
             else:
-                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-
+                if not java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed prematurely \n%s" % java_out)
+                if not py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed prematurely \n%s" % py_out)
         # ==================================================
         # Pass 2 - run the code in a function's context
         # ==================================================
@@ -438,13 +440,16 @@ class TranspileTestCase(TestCase):
             self.assertEqual(java_out, py_out, context)
 
             # Confirm that both output strings end with the canary statement
-            substring_start = - (len(END_OF_CODE_STRING)+1)
             if exits_early:
-                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed to raise exception \n%s" % java_out)
+                if py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed to raise exception \n%s" % py_out)
             else:
-                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if not java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed prematurely \n%s" % java_out)
+                if not py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed prematurely \n%s" % py_out)
 
     def assertJavaExecution(
                 self, code, out,
