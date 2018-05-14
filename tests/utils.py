@@ -408,7 +408,7 @@ class TranspileTestCase(TestCase):
                 if not java_out.endswith(END_OF_CODE_STRING_NEWLINE):
                     self.fail("Java test failed prematurely \n%s" % java_out)
                 if not py_out.endswith(END_OF_CODE_STRING_NEWLINE):
-                    self.fail("Java test failed prematurely \n%s" % py_out)
+                    self.fail("Python test failed prematurely \n%s" % py_out)
         # ==================================================
         # Pass 2 - run the code in a function's context
         # ==================================================
@@ -449,7 +449,7 @@ class TranspileTestCase(TestCase):
                 if not java_out.endswith(END_OF_CODE_STRING_NEWLINE):
                     self.fail("Java test failed prematurely \n%s" % java_out)
                 if not py_out.endswith(END_OF_CODE_STRING_NEWLINE):
-                    self.fail("Java test failed prematurely \n%s" % py_out)
+                    self.fail("Python test failed prematurely \n%s" % py_out)
 
     def assertJavaExecution(
                 self, code, out,
