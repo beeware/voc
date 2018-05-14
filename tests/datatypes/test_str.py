@@ -814,7 +814,7 @@ class StrTests(TranspileTestCase):
         for test in tests:
             print(test.isprintable())
         """)
-    
+
     @expectedFailure
     def test_isprintable_surrogate_cases(self):
         self.assertCodeExecution(r"""
