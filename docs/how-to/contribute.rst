@@ -135,7 +135,7 @@ project's directory::
     flake8 && ant checkstyle
 
 Contributing tests for checking Standard Library (STDLIB) Modules
------------------------------
+-----------------------------------------------------------------
 -  The purpose of these tests is to ensure that the packages from the
    Python standard library are working within voc.
 -  You can check out the status of tests, such as if they exist and if
@@ -144,7 +144,7 @@ Contributing tests for checking Standard Library (STDLIB) Modules
 -  ``python tools/compile_stdlib.py java --collect-status && python tools/build_stdlib_report.py --html``
 -  Check out the resultant ``voc/report.html`` file
 How to create a new test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -  Create a new python file in a work directory with the name.
    ``test_YourTestName``. This test name must match the name of
    the STDLIB you are testing. You will later move it to the
@@ -157,7 +157,7 @@ How to create a new test
    ``java -cp /YourPath/voc/dist/python-java-support.jar:/YourPath/ python.test_YourTestName``
 -  If satisfied, move the test file to the voc/stdlib_tests directory.
 Test Guidelines
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -  Try to avoid using other libraries.
 -  If using other libraries, be careful as they may not be implemented
    yet and this will cause further yak shaving.
