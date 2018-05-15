@@ -537,13 +537,13 @@ class Visitor(ast.NodeVisitor):
             )
 
             self.context.add_opcodes(
-                JavaOpcodes.ACONST_NULL(),
+                java.Array(0),
                 JavaOpcodes.ACONST_NULL(),
                 python.Callable.invoke(),
             )
 
             if item.optional_vars:
-                self.context.store_name(item.optional_vars.id)
+                self.visit(item.optional_vars)
             else:
                 self.context.add_opcodes(
                     JavaOpcodes.POP(),
