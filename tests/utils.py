@@ -15,6 +15,7 @@ from voc.python.blocks import Block as PyBlock
 from voc.python.modules import Module as PyModule
 from voc.java.constants import ConstantPool, Utf8
 from voc.java.klass import ClassFileReader, ClassFileWriter
+
 from voc.java.attributes import Code as JavaCode
 from voc.transpiler import Transpiler
 
@@ -378,7 +379,7 @@ class TranspileTestCase(TestCase):
             extra_code=None,
             run_in_global=True, run_in_function=True, exits_early=False,
             args=None, substitutions=None):
-        "Run code as native python, and under Java and check the output is identical"
+        """"Run code as native python, and under Java and check the output is identical"""
         self.maxDiff = None
         # ==================================================
         # Pass 1 - run the code in the global context
@@ -395,7 +396,14 @@ class TranspileTestCase(TestCase):
                 self.fail(e)
             finally:
                 # Clean up the test directory where the class file was written.
-                shutil.rmtree(self.temp_dir)
+                # (we have to set ignore_errors for this to work on Windows)
+                # Ignoring all errors can be anxiety-inducing so we'll do one more
+                # check on the directory afterwards now.
+                shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+                if os.path.exists(self.temp_dir):
+                    raise IsADirectoryError("{} was unsuccessfully deleted".format
+                                            (self.temp_dir))
                 # print(java_out)
 
             # Cleanse the Python and Java output, producing a simple
