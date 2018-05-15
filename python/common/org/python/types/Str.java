@@ -1788,12 +1788,12 @@ public class Str extends org.python.types.Object {
                     "\n" +
                     "Return a copy of the string left filled with ASCII '0' \n" +
                     "digits to make a string of length width.\n",
-            args = {"width"}
+            default_args = {"width"}
     )
     public org.python.Object zfill(org.python.Object width) {
-
-
-        if (width instanceof org.python.types.Float) {
+        if (width == null) {
+            throw new org.python.exceptions.TypeError("zfill() takes exactly 1 argument (0 given)");
+        } else if (width instanceof org.python.types.Float) {
             throw new org.python.exceptions.TypeError("integer argument expected, got float");
         } else if (!(width instanceof org.python.types.Int)) {
             throw new org.python.exceptions.TypeError("'" + org.Python.typeName(width.getClass()) +
