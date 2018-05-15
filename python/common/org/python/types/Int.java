@@ -347,7 +347,7 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __mod__(org.python.Object other) {
         if (other instanceof org.python.types.Complex) {
-                throw new org.python.exceptions.TypeError("can't mod complex numbers.");
+            throw new org.python.exceptions.TypeError("can't mod complex numbers.");
         }
         try {
             if (other instanceof org.python.types.Bool) {
