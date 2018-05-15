@@ -134,9 +134,9 @@ project's directory::
 
     flake8 && ant checkstyle
 
-Contributing tests for checking Standard Library (STDLIB) Modules
+Contributing tests for checking Standard Library Modules
 -----------------------------------------------------------------
--  The purpose of the STDLIB tests are to ensure that the packages from the
+-  The purpose of the Standard Library tests are to ensure that the packages from the
    Python standard library are working within voc.
 -  You can check out the status of tests, such as if they exist and if
    they are passing, with the following commands from within the voc
@@ -146,11 +146,11 @@ Contributing tests for checking Standard Library (STDLIB) Modules
 
 How to create a new test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--  Create a new python file in the voc/stdlib_tests  directory with the name
+-  Create a new python file in the voc/stdlib_tests directory with the name
    ``test_LibraryName``. This test name must match the name of
-   the STDLIB you are testing. 
--  Import the library that needs a test into the test_LibraryName.py.
--  Try to instantiate the STDLIB class as an object and call multiple methods for it.
+   the python standard library module you are testing. 
+-  Import the module that needs testing into the test_LibraryName.py file.
+-  Try to instantiate the module as an object and call multiple methods for it.
 -  Make sure you have followed the guide at :doc:`/background/install` 
 -  Compile the test ``voc test_YourTestName``
 -  Run the code with
