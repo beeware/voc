@@ -226,7 +226,6 @@ class Visitor(ast.NodeVisitor):
             self.visit(child)
                 
         self.pop_context()
-            
         
     @node_visitor
     def visit_ClassDef(self, node):
