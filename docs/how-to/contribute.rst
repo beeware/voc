@@ -136,27 +136,25 @@ project's directory::
 
 Contributing tests for checking Standard Library (STDLIB) Modules
 -----------------------------------------------------------------
--  The purpose of these tests is to ensure that the packages from the
+-  The purpose of the STDLIB tests are to ensure that the packages from the
    Python standard library are working within voc.
 -  You can check out the status of tests, such as if they exist and if
-   they are passing with the following commands from within the voc
+   they are passing, with the following commands from within the voc
    directory:
 -  ``python tools/compile_stdlib.py java --collect-status && python tools/build_stdlib_report.py --html``
--  Check out the resultant ``voc/report.html`` file
+-  Check out the resultant ``voc/report.html`` file.
 
 How to create a new test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
--  Create a new python file in a work directory with the name.
-   ``test_YourTestName``. This test name must match the name of
-   the STDLIB you are testing. You will later move it to the
-   voc/stdlib_tests directory.
--  Import the desired library that needs a test.
--  Try to instantiate the object and call multiple methods for it.
+-  Create a new python file in the voc/stdlib_tests  directory with the name
+   ``test_LibraryName``. This test name must match the name of
+   the STDLIB you are testing. 
+-  Import the library that needs a test into the test_LibraryName.py.
+-  Try to instantiate the STDLIB class as an object and call multiple methods for it.
 -  Make sure you have followed the guide at :doc:`/background/install` 
 -  Compile the test ``voc test_YourTestName``
 -  Run the code with
    ``java -cp /YourPath/voc/dist/python-java-support.jar:/YourPath/ python.test_YourTestName``
--  If satisfied, move the test file to the voc/stdlib_tests directory.
 
 Test Guidelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
