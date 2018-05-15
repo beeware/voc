@@ -189,7 +189,10 @@ class IncrementalEncoder(UTF8IncrementalEncoder):
         elif input[0] == '\x00':
             return _java_null_sequence()
         elif "\ud800" <= input[0] <= "\udfff":
-            return _encode_unicode_surrogate(input)
+            if "strict" in self.errors:
+                return _encode_unicode_surrogate(input)
+            else:
+                return codecs.utf_8_encode(input[0], self.errors)
         index = _index_of_first_special_character(input)
         if index == -1:
             # No special characters found; encode the remaining
