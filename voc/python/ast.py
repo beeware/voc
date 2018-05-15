@@ -123,11 +123,6 @@ class Visitor(ast.NodeVisitor):
 
         self.symbol_namespace = {}
         self.code_objects = {}
-        
-        # Functions using not implemented 
-        # features must not abort the compilation 
-        # if they are not used, only ensue a warning
-        self.notimplemented = {}
 
     @property
     def context(self):
@@ -227,25 +222,10 @@ class Visitor(ast.NodeVisitor):
 
         LocalsVisitor(function).visit(node)
 
-        try:
-            for child in node.body:
-                self.visit(child)
+        for child in node.body:
+            self.visit(child)
                 
-        except NotImplementedError as e:
-            # The function contains features not implemented
-            # this should only give a warning if the function
-            # is not called, and abort the compilation 
-            # otherwise
-            logging.debug('Error with node: ', node)
-            logging.warning(
-                'Function ' + node.name + 
-                ' contains not implemented features: ' + str(e)
-            )
-            # Prepare to abort the compilation if it is called
-            self.notimplemented[node.name] = str(e)
-        
-        finally:
-            self.pop_context()
+        self.pop_context()
             
         
     @node_visitor
@@ -1770,7 +1750,17 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_YieldFrom(self, node):
         # expr value):
-        raise NotImplementedError('No handler for YieldFrom')
+        logging.warning(
+            '"yield from" statement not yet implemented. '
+            'Will throw a NotImplementedError at runtime'
+        )
+        self.context.add_opcodes(
+            java.THROW(
+                'org/python/exceptions/NotImplementedError',
+                ['Ljava/lang/String;',
+                 JavaOpcodes.LDC_W('"yield from" statement not yet implemented')]
+            )
+        )
 
     @node_visitor
     def visit_Compare(self, node):
@@ -1917,16 +1907,7 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Call(self, node):
-        # Check if the callable function contains 
-        # not implemented features, if it does, abort
-        # compilation
-        if node.func.id in self.notimplemented:
-            error = self.notimplemented[node.func.id]
-            raise RuntimeError(
-                'Call to function that uses non '
-                'implemented features ' + node.func.id +
-                ' ' + error
-            )
+
         if is_call(node, ('locals', 'globals', 'vars')):
             # **kwargs is node.keywords[None] in Python 3.5; node.kwargs in earlier versions
             if None in node.keywords or getattr(node, 'kwargs', None):
