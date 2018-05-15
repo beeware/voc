@@ -143,6 +143,7 @@ Contributing tests for checking Standard Library (STDLIB) Modules
    directory:
 -  ``python tools/compile_stdlib.py java --collect-status && python tools/build_stdlib_report.py --html``
 -  Check out the resultant ``voc/report.html`` file
+
 How to create a new test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -  Create a new python file in a work directory with the name.
@@ -156,6 +157,7 @@ How to create a new test
 -  Run the code with
    ``java -cp /YourPath/voc/dist/python-java-support.jar:/YourPath/ python.test_YourTestName``
 -  If satisfied, move the test file to the voc/stdlib_tests directory.
+
 Test Guidelines
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -  Try to avoid using other libraries.
