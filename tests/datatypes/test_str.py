@@ -815,7 +815,6 @@ class StrTests(TranspileTestCase):
             print(test.isprintable())
         """)
 
-#    @expectedFailure
     def test_isprintable_surrogate_cases(self):
         self.assertCodeExecution(r"""
         tests = ['\ud801', '\udbff', '\udc00', '\udfff']
