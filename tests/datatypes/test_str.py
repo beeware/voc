@@ -815,10 +815,10 @@ class StrTests(TranspileTestCase):
             print(test.isprintable())
         """)
 
-    @expectedFailure
+#    @expectedFailure
     def test_isprintable_surrogate_cases(self):
         self.assertCodeExecution(r"""
-        tests = ['\ud800', '\udbff', '\udc00', '\udfff']
+        tests = ['\ud801', '\udbff', '\udc00', '\udfff']
         for test in tests:
             print(test.isprintable())
         """)
