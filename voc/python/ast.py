@@ -159,11 +159,11 @@ class Visitor(ast.NodeVisitor):
         try:
             super().visit(node)
         except Exception as e:
-            traceback.print_exc()
-            print()
-            print("Problem occurred in %s" % self.filename)
-            print('Node: %s' % dump(node))
-            sys.exit(1)
+            print(
+                "Problem occurred in " + str(self.filename)
+            )
+            print('Node: ' + dump(node))
+            raise
         return self._root_module
 
     def visit_Module(self, node):
@@ -223,8 +223,9 @@ class Visitor(ast.NodeVisitor):
 
         for child in node.body:
             self.visit(child)
+                
         self.pop_context()
-
+        
     @node_visitor
     def visit_ClassDef(self, node):
         # Construct a class.
@@ -1747,7 +1748,17 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_YieldFrom(self, node):
         # expr value):
-        raise NotImplementedError('No handler for YieldFrom')
+        print(
+            '"yield from" statement not yet implemented. '
+            'Will throw a NotImplementedError at runtime'
+        )
+        self.context.add_opcodes(
+            java.THROW(
+                'org/python/exceptions/NotImplementedError',
+                ['Ljava/lang/String;',
+                 JavaOpcodes.LDC_W('"yield from" statement not yet implemented')]
+            )
+        )
 
     @node_visitor
     def visit_Compare(self, node):
@@ -1894,6 +1905,7 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Call(self, node):
+
         if is_call(node, ('locals', 'globals', 'vars')):
             # **kwargs is node.keywords[None] in Python 3.5; node.kwargs in earlier versions
             if None in node.keywords or getattr(node, 'kwargs', None):
