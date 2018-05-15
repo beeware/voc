@@ -215,7 +215,7 @@ def _index_of_first_special_character(input):
 def _encode_unicode_surrogate(input):
     encoded = bytes(bytearray([
         0xED,
-        0xB0 | ((ord(input[0]) >> 6) & 0x0f),
+        0xA0 | ((ord(input[0]) >> 6) & 0x0f),
         0x80 | (ord(input[0]) & 0x3f),
     ]))
     return encoded, 1
