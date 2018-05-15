@@ -77,8 +77,8 @@ public class Str extends org.python.types.Object {
         // 15 - CONTROL
         // 16 - FORMAT
         // 17 - PRIVATE_USE
-        // 18 - SURROGATE
-        if ((Character.getType(c) == 0 || (Character.getType(c) >= 12 && Character.getType(c) <= 18)) && c != ' ') {
+        // 19 - SURROGATE
+        if ((Character.getType(c) == 0 || (Character.getType(c) >= 12 && Character.getType(c) <= 19)) && c != ' ') {
             return false;
         }
         return true;
