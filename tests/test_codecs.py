@@ -390,7 +390,6 @@ class MUTF8Test(ReadTest, unittest.TestCase):
                                          u, u.encode(self.encoding))
 
     def test_lone_surrogates(self):
-        self.assertRaises(UnicodeEncodeError, "\ud800".encode, self.encoding)
         self.assertRaises(UnicodeDecodeError, b"\xed\xa0\x80".decode, self.encoding)
         self.assertEqual("[\uDC80]".encode(self.encoding, "backslashreplace"),
                          b'[\\udc80]')
