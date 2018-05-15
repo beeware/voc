@@ -1,5 +1,4 @@
 import ast
-import logging
 import sys
 import traceback
 
@@ -160,10 +159,10 @@ class Visitor(ast.NodeVisitor):
         try:
             super().visit(node)
         except Exception as e:
-            logging.warning(
+            print(
                 "Problem occurred in " + str(self.filename)
             )
-            logging.debug('Node: ' + dump(node))
+            print('Node: ' + dump(node))
             raise
         return self._root_module
 
@@ -1749,7 +1748,7 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_YieldFrom(self, node):
         # expr value):
-        logging.warning(
+        print(
             '"yield from" statement not yet implemented. '
             'Will throw a NotImplementedError at runtime'
         )
