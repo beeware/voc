@@ -211,9 +211,7 @@ def update_repo():
 
 
 def write_file(path, content):
-    dir_path = os.path.dirname(path)
-    if not os.path.isdir(dir_path):
-        os.mkdir(dir_path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w') as f:
         f.write(content)
 
