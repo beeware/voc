@@ -112,6 +112,34 @@ def build_info(mod_name, result_files):
     test_status = 'N/A'
     compile_errors = ''
     test_errors = ''
+
+    def build_test_error_mesg():
+        def find_file_with_ext(ext):
+            files = [f for f in result_files if f.endswith(ext)]
+            if files:
+                return files[0]
+
+        py_stderr = read_file(find_file_with_ext('.test-fails-py_stderr'))
+        py_stdout = read_file(find_file_with_ext('.test-fails-py_stdout'))
+        voc_stderr = read_file(find_file_with_ext('.test-fails-voc_stderr'))
+        voc_stdout = read_file(find_file_with_ext('.test-fails-voc_stdout'))
+
+        out = ''
+        marker = '-' * 20
+        if py_stdout or voc_stdout:
+            out += (
+                'Expected output was:\n{marker}\n{py_stdout}{marker}\n\n'
+                'Received output was:\n{marker}\n{voc_stdout}{marker}\n\n'
+                .format(marker=marker, py_stdout=py_stdout, voc_stdout=voc_stdout)
+            )
+        if py_stderr or voc_stderr:
+            out += (
+                'CPython stderr was:\n{marker}\n{py_stderr}{marker}\n\n'
+                'Java/VOC stderr was:\n{marker}\n{voc_stderr}{marker}\n\n'
+                .format(marker=marker, py_stderr=py_stderr, voc_stderr=voc_stderr)
+            )
+        return out
+
     if result_files:
         if result_files[0].endswith('.compile-stderr'):
             compile_status = 'FAILED'
@@ -128,7 +156,7 @@ def build_info(mod_name, result_files):
             test_errors = read_file(result_files[0])
         elif '.test-fails' in result_files[0]:
             test_status = 'FAILED'
-            test_errors = "\n".join([read_file(f) for f in result_files])
+            test_errors = build_test_error_mesg()
 
     return dict(
         module=mod_name,
