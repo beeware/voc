@@ -182,42 +182,63 @@ class IncrementalEncoder(UTF8IncrementalEncoder):
         # CESU-8 sequences always start with 0xed,
         # Java nulls always start with 0xc0.
 
-        index1 = 0
-        try:
-            while ord(input[index1]) <= 0xffff:
-                index1 += 1
-        except IndexError:
-            index1 = -1
-        index2 = input.find('\x00')
-
-        # Set `index` to whichever index comes first.
-        if index1 != -1 and index2 != -1:
-            index = min(index1, index2)
-        elif index1 != -1:
-            index = index1
-        elif index2 != -1:
-            index = index2
-        else:
+        if len(input) == 0:
+            return codecs.utf_8_encode("")
+        if ord(input[0]) > 0xffff:
+            return _to_cesu_bytearray(input)
+        elif input[0] == '\x00':
+            return _java_null_sequence()
+        elif "\ud800" <= input[0] <= "\udfff":
+            if "strict" in self.errors:
+                return _encode_unicode_surrogate(input)
+            else:
+                return codecs.utf_8_encode(input[0], self.errors)
+        index = _index_of_first_special_character(input)
+        if index == -1:
             # No special characters found; encode the remaining
             # input as standard UTF-8
             return codecs.utf_8_encode(input, self.errors)
-
-        if index1 == 0:
-            # Encode a six-byte sequence starting with 0xed.
-            return bytes(bytearray([
-                    0xED,
-                    0xA0 | (((ord(input[0]) >> 16) - 1) & 0x0f),
-                    0x80 | ((ord(input[0]) >> 10) & 0x3f),
-                    0xED,
-                    0xB0 | ((ord(input[0]) >> 6) & 0x0f),
-                    0x80 | (ord(input[0]) & 0x3f),
-                ])), 1
-        elif index2 == 0:
-            # Encode a two-byte sequence, 0xc0 0x80.
-            return b'\xc0\x80', 1
         else:
             # Encode the bytes up until the next weird thing as UTF-8.
             return codecs.utf_8_encode(input[:index], self.errors)
+
+
+def _index_of_first_special_character(input):
+    special_detectors = [
+        lambda c: ord(c) > 0xffff,
+        lambda c: c == '\x00',
+        lambda c: "\ud800" <= c <= "\udfff"
+        ]
+    for ix, ch in enumerate(input):
+        if any([check_fn(ch) for check_fn in special_detectors]):
+            return ix
+    return -1
+
+
+def _encode_unicode_surrogate(input):
+    encoded = bytes(bytearray([
+        0xED,
+        0xA0 | ((ord(input[0]) >> 6) & 0x0f),
+        0x80 | (ord(input[0]) & 0x3f),
+    ]))
+    return encoded, 1
+
+
+def _to_cesu_bytearray(input):
+    # Encode a six-byte sequence starting with 0xed.
+    return bytes(bytearray([
+        0xED,
+        0xA0 | (((ord(input[0]) >> 16) - 1) & 0x0f),
+        0x80 | ((ord(input[0]) >> 10) & 0x3f),
+        0xED,
+        0xB0 | ((ord(input[0]) >> 6) & 0x0f),
+        0x80 | (ord(input[0]) & 0x3f),
+    ])), 1
+
+
+def _java_null_sequence():
+    # Encode a two-byte sequence, 0xc0 0x80.
+    return b'\xc0\x80', 1
 
 
 # Everything below here is boilerplate that matches the modules in the
