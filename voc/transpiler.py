@@ -47,7 +47,7 @@ class Transpiler:
             basedir = []
 
         for namespace, class_name, javaclassfile in self.classfiles:
-            dirname = os.path.join(*(basedir + namespace.split('.')))
+            dirname = os.path.join(*(basedir))
             classfilename = os.path.join(dirname, '%s.class' % class_name)
 
             try:
