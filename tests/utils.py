@@ -204,6 +204,8 @@ JAVA_STACK = re.compile(
     re.MULTILINE
 )
 
+PYDEV_CONNECT = re.compile("pydev debugger: process \\d+ is connecting[\r|\n]+")
+
 PYTHON_EXCEPTION = re.compile(
     'Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), ' +
     'in .*\r?\n    .*\r?\n)+(?P<exception>[^:]*)(?::\s)?(?P<message>.*\n)$')
@@ -276,6 +278,8 @@ def cleanse_python(raw, substitutions):
         '### EXCEPTION ###{linesep}\\g<exception>: \\g<message>'.format(linesep=os.linesep),
         raw
     )
+
+    out = PYDEV_CONNECT.sub('', out)
 
     stack = PYTHON_STACK.findall(raw)
     out = '%s%s%s' % (
