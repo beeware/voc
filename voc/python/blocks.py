@@ -7,7 +7,7 @@ from ..java import (
 from .structures import (
     ArgType, OpcodePosition,
     TRY, CATCH, END_TRY,
-    jump, resolve_jump,
+    jump, resolve_jump, IF, END_IF
 )
 from .types import java, python
 from .types.primitives import (
@@ -152,11 +152,31 @@ class Block(Accumulator):
         )
 
     def add_int(self, value):
-        self.add_opcodes(
-            java.New('org/python/types/Int'),
-            LCONST_val(value),
-            java.Init('org/python/types/Int', 'J'),
-        )
+        if -5 <= value and value < 257:
+            index = value + 5 # index of this value in the smallints list
+
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', 'Lorg/python/types/List;'),
+                JavaOpcodes.LDC_W(index),
+                python.Object.get_item(),
+                IF([], JavaOpcodes.IFNULL),
+                JavaOpcodes.LDC_W(index),
+                # Create and initialize this integer
+                java.New('org/python/types/Int'),
+                LCONST_val(value),
+                java.Init('org/python/types/Int', 'J'),
+                JavaOpcodes.DUP_X1(), # Keep the integer object below the parameters 
+                # Put the Int in smallints
+                python.Object.set_item(),
+                END_IF(),
+                JavaOpcodes.CHECKCAST('org/python/types/Int'),
+            )
+        else:
+            self.add_opcodes(
+                java.New('org/python/types/Int'),
+                LCONST_val(value),
+                java.Init('org/python/types/Int', 'J'),
+            )
 
     def add_float(self, value):
         self.add_opcodes(
@@ -199,6 +219,7 @@ class Block(Accumulator):
 
                 elif isinstance(value, int):
                     self.add_opcodes(
+                        # TODO Check if small int, and generate a lookup if so.
                         java.New('org/python/types/Int'),
                         LCONST_val(value),
                         java.Init('org/python/types/Int', 'J'),

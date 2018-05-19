@@ -73,7 +73,7 @@ def to_python(accumulator, annotation, var_name):
     elif annotation == "short":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
+            # TODO Check if small int, and generate a lookup if so. Here, and below? 
             java.New('org/python/types/Int'),
             ILOAD_name(var_name),
             java.Init('org/python/types/Int', 'S'),
