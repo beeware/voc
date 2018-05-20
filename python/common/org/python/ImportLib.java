@@ -291,7 +291,7 @@ public class ImportLib {
                 }
             }
         } else {
-            org.python.Iterable iter = all_obj.__iter__();
+            org.python.Object iter = all_obj.__iter__();
             try {
                 while (true) {
                     java.lang.String name = ((org.python.types.Str) iter.__next__()).value;

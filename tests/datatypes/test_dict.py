@@ -256,7 +256,7 @@ class DictTests(TranspileTestCase):
     def test_fromkeys(self):
         self.assertCodeExecution("""
             keys = [1, 2]
-            print({}.fromkeys(keys))
+            print(dict.fromkeys(keys))
             """)
 
         # non-iterable error test
@@ -264,7 +264,7 @@ class DictTests(TranspileTestCase):
             keys = 1
             value = 2
             try:
-                print({}.fromkeys(keys, value))
+                print(dict.fromkeys(keys, value))
             except TypeError as err:
                 print(err)
             """)
@@ -282,18 +282,309 @@ class DictTests(TranspileTestCase):
         self.assertCodeExecution("""
             keys = [[1], 2]
             try:
-                print({}.fromkeys(keys))
+                print(dict.fromkeys(keys))
             except TypeError as err:
                 print(err)
             """)
+
+    def test_update(self):
+        self.assertCodeExecution("""
+            a = {}
+            a.update([('a', 1), ('b', 2)])
+            print(sorted(a))
+            b = {}
+            b.update({'a': 1, 'b':2})
+            print(sorted(b))
+            c = {}
+            c.update(a=1, b=2)
+            print(sorted(c))
+        """)
+
+        self.assertCodeExecution("""
+            try:
+                a = {}
+                a.update([('a', 1, 2), ('b',2)])
+                print('An error should have been raised!')
+            except ValueError:
+                print('Received a ValueError as expected')
+        """)
+
+        self.assertCodeExecution("""
+            try:
+                a = {}
+                a.update('1')
+                print('An error should have been raised')
+            except ValueError:
+                print('Received a ValueError as expected')
+        """)
+
+        self.assertCodeExecution("""
+            try:
+                a = {}
+                a.update(1)
+                print('An error should have been raised')
+            except TypeError:
+                print('Received a TypeError as expected')
+        """)
+
+        self.assertCodeExecution("""
+            try:
+                a = {}
+                x = set([1, 2])
+                a.update(x)
+                print('An error should have been raised')
+            except TypeError:
+                print('Received a TypeError as expected')
+        """)
 
     @expectedFailure
     def test_fromkeys_missing_iterable(self):
         self.assertCodeExecution("""
             try:
-                print({}.fromkeys())
+                print(dict.fromkeys())
             except TypeError as err:
                 print(err)
+            """)
+
+    def test_keys(self):
+        self.assertCodeExecution("""
+            x = {1 : 'A', 2 : 'B', 3 : 'C'}
+            s = 0
+            y = x.keys()
+            print(y)
+            for i in y:
+                s += i
+            print(s)
+            x[4] = 'D'
+            s = 0
+            for i in y:
+                s += i
+            print(s)
+            """)
+
+        self.assertCodeExecution("""
+            x = {'A' : 1,'B' : 2,'C' : 3}
+            y = x.keys()
+            print('A' in y)
+            print('D' not in y)
+            del x['A']
+            x['D'] = 4
+            print('A' in y)
+            print('D' not in y)
+            """)
+
+        self.assertCodeExecution("""
+            x = {1 : 1,2 : 2,3 : 3}
+            y = {1 : 1,2 : 2,3 : 3,4 : 4}
+            k1 = x.keys()
+            k2 = y.keys()
+            print(sum(k1 & k2))
+            print(sum(k1 | k2))
+            print(sum(k1 - k2))
+            print(sum(k1 ^ k2))
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(y[0])
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.keys()
+                y[0] = 7
+                y['abc'] = 7
+                print('A TypeError should have been raised by now')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2}
+                y = x.keys()
+                del y[0]
+                print('A TypeError should have been raised by now')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(y['abc'])
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(+y)
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(-y)
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 'a',2 : 'b',3 : 'c'}
+                y = x.keys()
+                print(~y)
+                print('An error should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            x = {1 : 1}
+            print(type(x.keys()))
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2}
+                y = x.keys()
+                print(y * 3)
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_values(self):
+        self.assertCodeExecution("""
+            x = {1 : 1,2 : 2,3 : 3}
+            y = x.values()
+            print(type(y))
+            print(len(y))
+            print(3 in y)
+            print(42 not in y)
+            if y:
+                print('Working as expected')
+            s = 0
+            for i in y:
+                s += i
+            print(s)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2}
+                print(x.values() * 'a')
+                print('A TypeError should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.values()
+                print(y[0])
+                print('A TypeError should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.values()
+                print(y['a'])
+                print('A TypeError should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.values()
+                y[0] = 7
+                print('A TypeError should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.values()
+                del y[0]
+                print('A TypeError should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.values()
+                print(+y)
+                print('A TypeError should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.values()
+                print(-y)
+                print('A TypeError should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+        self.assertCodeExecution("""
+            try:
+                x = {1 : 1,2 : 2,3 : 3}
+                y = x.values()
+                print(~y)
+                print('A TypeError should have been raised')
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_items(self):
+        self.assertCodeExecution("""
+            x = {1 : 1,2 : 2,3 : 3}
+            x2 = {1 : 1,2 : 2,3 : 3,4 : 4}
+            y = x.items()
+            y2 = x2.items()
+            print(len(y))
+            print((1,1) in y)
+            print((1,2) not in y)
+            s1 = 0
+            s2 = 0
+            for i,j in y:
+                s1 += i
+                s2 += j
+            print(s1)
+            print(s2)
+            s = {(1,1),(1,2),(2,2),(2,3)}
+            print(len(y & s))
+            print(len(y | s))
+            print(len(y ^ s))
+            print(len(y - s))
             """)
 
 
@@ -305,120 +596,14 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'dict'
 
     not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_direct_eq_bytes',
-        'test_direct_ge_bytes',
-        'test_direct_gt_bytes',
-        'test_direct_le_bytes',
-        'test_direct_lt_bytes',
-        'test_direct_ne_bytes',
-
-        'test_direct_eq_frozenset',
-        'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_lt_frozenset',
-        'test_direct_ne_frozenset',
-
-        'test_eq_class',
-        'test_eq_frozenset',
-
-        'test_ge_class',
-        'test_ge_frozenset',
-
-        'test_gt_class',
-        'test_gt_frozenset',
-
-        'test_le_class',
-        'test_le_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_lt_class',
-        'test_lt_frozenset',
-
-        'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_frozenset',
-
         'test_multiply_bytearray',
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_ne_class',
-        'test_ne_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
 
         'test_subscr_bytearray',
         'test_subscr_class',
         'test_subscr_complex',
-        'test_subscr_frozenset',
-        'test_subscr_slice',
 
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
     ]
 
 
 class InplaceDictOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'dict'
-
-    not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_frozenset',
-
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
-    ]

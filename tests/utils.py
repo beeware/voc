@@ -9,11 +9,13 @@ import sys
 import tempfile
 import traceback
 from unittest import TestCase
+from itertools import permutations
 
 from voc.python.blocks import Block as PyBlock
 from voc.python.modules import Module as PyModule
 from voc.java.constants import ConstantPool, Utf8
 from voc.java.klass import ClassFileReader, ClassFileWriter
+
 from voc.java.attributes import Code as JavaCode
 from voc.transpiler import Transpiler
 
@@ -202,6 +204,8 @@ JAVA_STACK = re.compile(
     re.MULTILINE
 )
 
+PYDEV_CONNECT = re.compile("pydev debugger: process \\d+ is connecting[\r|\n]+")
+
 PYTHON_EXCEPTION = re.compile(
     'Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), ' +
     'in .*\r?\n    .*\r?\n)+(?P<exception>[^:]*)(?::\s)?(?P<message>.*\n)$')
@@ -274,6 +278,8 @@ def cleanse_python(raw, substitutions):
         '### EXCEPTION ###{linesep}\\g<exception>: \\g<message>'.format(linesep=os.linesep),
         raw
     )
+
+    out = PYDEV_CONNECT.sub('', out)
 
     stack = PYTHON_STACK.findall(raw)
     out = '%s%s%s' % (
@@ -365,7 +371,7 @@ class TranspileTestCase(TestCase):
             extra_code=None,
             run_in_global=True, run_in_function=True, exits_early=False,
             args=None, substitutions=None):
-        "Run code as native python, and under Java and check the output is identical"
+        """"Run code as native python, and under Java and check the output is identical"""
         self.maxDiff = None
         # ==================================================
         # Pass 1 - run the code in the global context
@@ -382,7 +388,14 @@ class TranspileTestCase(TestCase):
                 self.fail(e)
             finally:
                 # Clean up the test directory where the class file was written.
-                shutil.rmtree(self.temp_dir)
+                # (we have to set ignore_errors for this to work on Windows)
+                # Ignoring all errors can be anxiety-inducing so we'll do one more
+                # check on the directory afterwards now.
+                shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+                if os.path.exists(self.temp_dir):
+                    raise IsADirectoryError("{} was unsuccessfully deleted".format
+                                            (self.temp_dir))
                 # print(java_out)
 
             # Cleanse the Python and Java output, producing a simple
@@ -398,14 +411,16 @@ class TranspileTestCase(TestCase):
             self.assertEqual(java_out, py_out, context)
 
             # Confirm that both output strings end with the canary statement
-            substring_start = - (len(END_OF_CODE_STRING)+1)
             if exits_early:
-                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed to raise exception \n%s" % java_out)
+                if py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed to raise exception \n%s" % py_out)
             else:
-                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-
+                if not java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed prematurely \n%s" % java_out)
+                if not py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed prematurely \n%s" % py_out)
         # ==================================================
         # Pass 2 - run the code in a function's context
         # ==================================================
@@ -437,13 +452,16 @@ class TranspileTestCase(TestCase):
             self.assertEqual(java_out, py_out, context)
 
             # Confirm that both output strings end with the canary statement
-            substring_start = - (len(END_OF_CODE_STRING)+1)
             if exits_early:
-                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed to raise exception \n%s" % java_out)
+                if py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed to raise exception \n%s" % py_out)
             else:
-                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if not java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed prematurely \n%s" % java_out)
+                if not py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed prematurely \n%s" % py_out)
 
     def assertJavaExecution(
                 self, code, out,
@@ -586,14 +604,50 @@ class TranspileTestCase(TestCase):
 
 
 class NotImplementedToExpectedFailure:
+    def _is_flakey(self):
+        return self._testMethodName in getattr(self, "is_flakey", [])
+
+    def _is_not_implemented(self):
+        '''
+        A test is expected to fail if:
+          (a) Its name can be found in the test case's 'not_implemented' list
+          (b) Its name can be found in the test case's 'is_flakey' list
+          (c) Its name can be found in the test case's
+              'not_implemented_versions' dictionary _and_ the current
+              python version is in the dict entry's list
+        :return: True if test is expected to fail
+        '''
+        method_name = self._testMethodName
+        if method_name in getattr(self, 'not_implemented', []):
+            return True
+
+        if self._is_flakey():
+            # -- Flakey tests sometimes fail, sometimes pass
+            return True
+
+        not_implemented_versions = getattr(self, 'not_implemented_versions', {})
+        if method_name in not_implemented_versions:
+            py_version = float("%s.%s" % (sys.version_info.major, sys.version_info.minor))
+            if py_version in not_implemented_versions[method_name]:
+                return True
+
+        return False
+
     def run(self, result=None):
         # Override the run method to inject the "expectingFailure" marker
         # when the test case runs.
-        if self._testMethodName in getattr(self, 'not_implemented', []):
+        if self._is_not_implemented():
             # Mark 'expecting failure' on class. It will only be applicable
             # for this specific run.
+
+            # -- Save the original test_method _before_ we
+            # overwrite it with wrapper
+            test_method = getattr(self, self._testMethodName)
+
             def wrapper(*args, **kwargs):
-                return getattr(self, self._testMethodName)(*args, **kwargs)
+                if self._is_flakey():
+                    raise Exception("Flakey test that sometimes fails and sometimes passes")
+                return test_method(*args, **kwargs)
 
             wrapper.__unittest_expecting_failure__ = True
             setattr(self, self._testMethodName, wrapper)
@@ -646,7 +700,9 @@ SAMPLE_DATA = {
         ],
     'frozenset': [
             'frozenset()',
-            'frozenset({1, 2.3456, "another"})',
+            'frozenset({"on","to","an"})',
+            'frozenset({"one","two","six"})',
+            'frozenset({1, 2.3456, 7})',
         ],
     'int': [
             '0',
@@ -671,7 +727,9 @@ SAMPLE_DATA = {
         ],
     'set': [
             'set()',
-            'set({1, 2.3456, "another"})',
+            'set({"on","to","an"})',
+            'set({"one","two","six"})',
+            'set({1, 2.3456, 7})',
         ],
     'slice': [
             'slice(0)',
@@ -705,30 +763,45 @@ SAMPLE_DATA = {
 }
 
 
+def _string_substitutions(string):
+    delims = (string[0], string[-1])
+    string = string[1:-1]
+    elems = [elem for elem in string.split(", ")]
+    perms = permutations(elems)
+    return [(delims[0] + ", ".join(list(perm)) + delims[1]) for perm in perms]
+
+
 SAMPLE_SUBSTITUTIONS = {
     # Normalize set ordering
-    "{1, 2.3456, 'another'}": [
-        "{1, 'another', 2.3456}",
-        "{2.3456, 1, 'another'}",
-        "{2.3456, 'another', 1}",
-        "{'another', 1, 2.3456}",
-        "{'another', 2.3456, 1}",
-    ],
-    "{'a', 'b', 'c'}": [
-        "{'a', 'c', 'b'}",
-        "{'b', 'a', 'c'}",
-        "{'b', 'c', 'a'}",
-        "{'c', 'a', 'b'}",
-        "{'c', 'b', 'a'}",
-    ],
+    "{1, 2.3456, 7}": _string_substitutions("{1, 2.3456, 7}"),
+    "{1, 2.3456, 'another'}": _string_substitutions("{1, 2.3456, 'another'}"),
+    "{'an', 'to', 'on'}": _string_substitutions("{'an', 'to', 'on'}"),
+    "{'one', 'two', 'six'}": _string_substitutions("{'one', 'two', 'six'}"),
+    "{'a', 'b', 'c'}": _string_substitutions("{'a', 'b', 'c'}"),
+
+
+    # Normalize list ordering
+    "[1, 2.3456, 7]": _string_substitutions("[1, 2.3456, 7]"),
+    "[1, 2.3456, 'another']": _string_substitutions("[1, 2.3456, 'another']"),
+    "['a', 'b', 'c']": _string_substitutions("['a', 'b', 'c']"),
+    "['an', 'to', 'on']": _string_substitutions("['an', 'to', 'on']"),
+
+    "['one', 'two', 'six']": _string_substitutions("['one', 'two', 'six']"),
     # Normalize dictionary ordering
-    "{'a': 1, 'c': 2.3456, 'd': 'another'}": [
-        "{'a': 1, 'd': 'another', 'c': 2.3456}",
-        "{'c': 2.3456, 'd': 'another', 'a': 1}",
-        "{'c': 2.3456, 'a': 1, 'd': 'another'}",
-        "{'d': 'another', 'a': 1, 'c': 2.3456}",
-        "{'d': 'another', 'c': 2.3456, 'a': 1}",
-    ],
+    "{'a': 1, 'c': 2.3456, 'd': 7}": _string_substitutions(
+                                              "{'a': 1, 'c': 2.3456, 'd': 7}"),
+    "{'a': 1, 'c': 2.3456, 'd': 'another'}": _string_substitutions(
+                                      "{'a': 1, 'c': 2.3456, 'd': 'another'}"),
+    "{'a': 'n', 't': 'o', 'o': 'n'}": _string_substitutions(
+                                             "{'a': 'n', 't': 'o', 'o': 'n'}"),
+    "{'to', 'two', 'one', 'an', 'on', 'six'}": _string_substitutions(
+                                    "{'to', 'two', 'one', 'an', 'on', 'six'}"),
+    "{1, 2.3456, 7, 'one', 'six', 'two'}": _string_substitutions(
+                                        "{1, 2.3456, 7, 'one', 'six', 'two'}"),
+    "{1, 2.3456, 7, 'on', 'an', 'to'}": _string_substitutions(
+                                        "{1, 2.3456, 7, 'on', 'an', 'to'}"),
+    "{1, 2.3456, 7, 1, 2.3456, 7}": _string_substitutions(
+                                        "{1, 2.3456, 7, 1, 2.3456, 7}"),
     # Normalize precision error
     "-3.14159": ["-3.1415900000000008"],
 }

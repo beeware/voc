@@ -10,3 +10,6 @@ pytest==2.9.2
 
 # Support for parallel test execution
 pytest-xdist==1.14
+
+# Install cricket for GUI testsuite
+cricket

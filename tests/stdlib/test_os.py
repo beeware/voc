@@ -1,3 +1,5 @@
+import unittest
+
 from ..utils import TranspileTestCase
 
 
@@ -25,3 +27,16 @@ class OsModuleTests(TranspileTestCase):
             except Exception as e:
                 print(type(e), e)
             """)
+
+    @unittest.expectedFailure
+    def test_getcwd(self):
+        self.assertCodeExecution("""
+            import os
+            print(os.getcwd())
+        """)
+
+    def test_cpu_count(self):
+        self.assertCodeExecution("""
+            import os
+            print(os.cpu_count())
+        """)

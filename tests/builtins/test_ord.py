@@ -11,6 +11,4 @@ class BuiltinOrdFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     not_implemented = [
         'test_bytes',
         'test_bytearray',
-        'test_class',
-        'test_frozenset',
     ]

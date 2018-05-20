@@ -1,4 +1,66 @@
+
+from unittest import expectedFailure
+
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
+from .. utils import adjust
+
+
+class SubscrSliceTest(TranspileTestCase):
+    def test_subscr_str_extended(self):
+        str_samples = [
+                        '""',
+                        '"3"',
+                        '"This is another string"',
+                        '"Mÿ hôvèrçràft îß fûłl öf éêlś"',
+                        '"One arg: %s"',
+                        '"Three args: %s | %s | %s"',
+                    ]
+        slice_samples = [
+                        'slice(0)',
+                        'slice(5)',
+                        'slice(-1)',
+                        'slice(-7)',
+                        'slice(2, 7)',
+                        'slice(-1, 2)',
+                        'slice(2, -7)',
+                        'slice(-2, -7)',
+                        'slice(0, 0)',
+                        'slice(-10, 0)',
+                        'slice(0, -10)',
+                        'slice(2, 7, 2)',
+                        'slice(7, 2, -1)',
+                        'slice(7, 2, 10)',
+                        'slice(2, 7, 0)'
+                    ]
+
+        data = []
+        for x in str_samples:
+            for y in slice_samples:
+                data.append((x, y))
+
+        self.assertCodeExecution(
+            '##################################################\n'.join(
+                adjust("""
+                    try:
+                        print('>>> x = %(x)s')
+                        print('>>> y = %(y)s')
+                        print('>>> x[y]')
+                        x = %(x)s
+                        y = %(y)s
+                        print(x[y])
+                    except Exception as e:
+                        print(type(e), ':', e)
+                    print()
+                    """ % {
+                        'x': x,
+                        'y': y
+                    }
+                )
+                for x, y in data
+            ),
+            "Error running test_subscr_str_extended",
+            run_in_function=False,
+        )
 
 
 class StrTests(TranspileTestCase):
@@ -25,8 +87,9 @@ class StrTests(TranspileTestCase):
             """)
 
     def test_isspace(self):
-        self.assertCodeExecution("""
-            for s in ['''  \t \r''', ' ', '\t\tnope\t\t', '']:
+        self.assertCodeExecution(r"""
+            for s in ['\x1f \v \f \n \t \r', ' ', '\x85\xa0', '\u2007', '\u202f',
+            '\u180e', '\t\tnope\t\t', '']:
                 print(s.isspace())
             """)
 
@@ -52,10 +115,17 @@ class StrTests(TranspileTestCase):
             """)
 
     def test_istitle(self):
-        self.assertCodeExecution("""
-            for s in ['Hello World', 'hello wORLd.', 'Hello world.', '']:
-                print(s.istitle())
-            """)
+        self.assertCodeExecution(r"""
+            print("".istitle())
+            print("abcd".istitle())
+            print("NOT".istitle())
+            print("coca cola".istitle())
+            print("they are from UK, are they not?".istitle())
+            print("/@.".istitle())
+            print("\u00c4".istitle())
+            print("\x41".istitle())
+            print("py.bee".istitle())
+        """)
 
     def test_join(self):
         self.assertCodeExecution("""
@@ -228,8 +298,8 @@ class StrTests(TranspileTestCase):
             """)
 
     def test_split(self):
-        self.assertCodeExecution("""
-            for s in ['hello, world', 'HEllo, WORLD', 'átomo', '']:
+        self.assertCodeExecution(r"""
+            for s in ['\vhello,        world', '\nHEllo, WORLD\f', 'átomo', '']:
                 print(s.split())
                 print(s.split("o"))
                 print(s.split(maxsplit=2))
@@ -238,6 +308,7 @@ class StrTests(TranspileTestCase):
                     print(s.split(5))
                 except TypeError as err:
                     print(err)
+
             """)
 
     def test_index(self):
@@ -384,9 +455,16 @@ class StrTests(TranspileTestCase):
             """)
 
     def test_title(self):
-        self.assertCodeExecution("""
-            s = ' foo  bar    baz '
-            print(s.title())
+        self.assertCodeExecution(r"""
+            print("".title())
+            print("abcd".title())
+            print("NOT".title())
+            print("coca cola".title())
+            print("they are from UK, are they not?".title())
+            print("/@.".title())
+            print("\u00c4".title())
+            print("\x41".title())
+            print("py.bee".title())
         """)
 
     def test_len(self):
@@ -469,6 +547,13 @@ class StrTests(TranspileTestCase):
             print(str.lstrip('ab'))
             """)
 
+        self.assertCodeExecution(r"""
+            str="\u180eabc"
+            print(str.lstrip())
+            str="\x85abc"
+            print(str.lstrip())
+            """)
+
     def test_rstrip(self):
         self.assertCodeExecution("""
             str = " fooggg\t\t   "
@@ -491,6 +576,13 @@ class StrTests(TranspileTestCase):
             str=""
             print(str.rstrip())
             print(str.rstrip('ab'))
+            """)
+
+        self.assertCodeExecution(r"""
+            str="abc\u180e"
+            print(str.rstrip())
+            str="abc\x85"
+            print(str.rstrip())
             """)
 
     def test_rfind(self):
@@ -681,6 +773,111 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_rsplit(self):
+        self.assertCodeExecution(r"""
+           for s in ['This is for rsplit',' eeed d ded  eded   ','átomo','',' t e s t i n g   r s p l i t ','a b c']:
+                print(s.rsplit())
+                print(s.rsplit("e"))
+                print(s.rsplit(maxsplit=2))
+                print(s.rsplit(maxsplit=-5))
+                print(s.rsplit("e",-9))
+                print(s.rsplit(" ", -10))
+                try:
+                    print(s.split(2))
+                except TypeError as err:
+                    print(err)
+            """)
+
+    def test_isnumeric(self):
+        self.assertCodeExecution("""
+        for str_ in ['123', '123.4', 'abc', '', ' ', 'ABCD', 'ABCD ', '12323445',
+        '123.', '.12', '1A', 'A1', '!@#', 'A1@#']:
+            print(str_.isnumeric())
+            """)
+
+    def test_isidentifier(self):
+        self.assertCodeExecution("""
+        for str_ in ['_sjkd', 'abc', 'ABC', 'b13s', 'foo_bar', 'eÃⱣỉ', 'ÃⱣỉ', "22222", " ", "", "/",
+        "4a2a", "*", "ab cd", "!z", "&a", "@", "%"]:
+            print(str_, str_.isidentifier())
+            """)
+
+    def test_isprintable(self):
+        self.assertCodeExecution("""
+        for str_ in [chr(i) for i in range(33)] + ['AAA', 'bcd', '1234', 'eÃⱣỉ', 'ÃⱣỉ', '', '\x07' + 'foo', '\u2029']:
+            print(str_.isprintable())
+            """)
+
+    def test_isprintable_missing_cases(self):
+        self.assertCodeExecution(r"""
+        tests = ['\u2028', '\u2029', '\u00A0']
+        for test in tests:
+            print(test.isprintable())
+        """)
+
+    def test_isprintable_surrogate_cases(self):
+        self.assertCodeExecution(r"""
+        tests = ['\ud801', '\udbff', '\udc00', '\udfff']
+        for test in tests:
+            print(test.isprintable())
+        """)
+
+    def test_repr(self):
+        self.assertCodeExecution(r"""
+        tests = ["\r\n", "áéíóú", "\u000B", "\u2029", "\\", "'", "\"", "\"'"]
+        for test in tests:
+            print(repr(test))
+        """)
+
+    def test_splitlines(self):
+        self.assertCodeExecution(r"""
+        str_ = "aaa\nbbb\rccc\r\nddd\n\reee"
+
+        print(str_.splitlines())
+        print(str_.splitlines(True))
+        print("Don't Panic\n".splitlines())
+        print('\n'.splitlines())
+        print(''.splitlines())
+
+        s1 = '\r\n\r\n\v\f\x0b\x0c\u2029\x1c\x1d\x1e\x85'
+        print(s1.splitlines())
+        print(s1.splitlines(True))
+        """)
+
+    def test_zfill(self):
+        self.assertCodeExecution("""
+            s = '42'
+            print(s.zfill(5))
+
+            try:
+                print(s.zfill('string'))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(s.zfill({}))
+            except TypeError as err:
+                print(err)
+
+            s = '-42'
+            print(s.zfill(5))
+
+            s = '+42'
+            print(s.zfill(5))
+
+            s = ''
+            print(s.zfill(5))
+
+            s = '-.-42'
+            print(s.zfill(6))
+
+            s = "42"
+            try:
+                s.zfill()
+            except TypeError as err:
+                print(err)
+        """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
@@ -690,90 +887,7 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
     not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_direct_eq_bytes',
-        'test_direct_ge_bytes',
-        'test_direct_gt_bytes',
-        'test_direct_le_bytes',
-        'test_direct_lt_bytes',
-        'test_direct_ne_bytes',
-
-        'test_direct_eq_frozenset',
-        'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_lt_frozenset',
-        'test_direct_ne_frozenset',
-
-        'test_eq_class',
-        'test_eq_frozenset',
-
-        'test_ge_class',
-        'test_ge_frozenset',
-
-        'test_gt_class',
-        'test_gt_frozenset',
-
-        'test_le_class',
-        'test_le_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_lt_class',
-        'test_lt_frozenset',
-
-        'test_modulo_bool',
-        'test_modulo_bytes',
-        'test_modulo_bytearray',
         'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_dict',
-        'test_modulo_float',
-        'test_modulo_frozenset',
-        'test_modulo_slice',
-        'test_modulo_int',
-        'test_modulo_list',
-        'test_modulo_None',
-        'test_modulo_NotImplemented',
-        'test_modulo_range',
-        'test_modulo_set',
-        'test_modulo_str',
-        'test_modulo_tuple',
-
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_ne_class',
-        'test_ne_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subscr_bool',
-        'test_subscr_class',
-        'test_subscr_frozenset',
-        'test_subscr_slice',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
     ]
 
 
@@ -781,51 +895,5 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
     not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_modulo_bool',
-        'test_modulo_bytes',
-        'test_modulo_bytearray',
         'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_dict',
-        'test_modulo_float',
-        'test_modulo_frozenset',
-        'test_modulo_slice',
-        'test_modulo_int',
-        'test_modulo_list',
-        'test_modulo_None',
-        'test_modulo_NotImplemented',
-        'test_modulo_range',
-        'test_modulo_set',
-        'test_modulo_str',
-        'test_modulo_tuple',
-
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
     ]

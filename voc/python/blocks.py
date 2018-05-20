@@ -140,6 +140,12 @@ class Block(Accumulator):
     def can_ignore_empty(self):
         return False
 
+    @property
+    def has_nested_structure(self):
+        """Whether the block has nested structures inside.
+        """
+        return any([self.blocks, self.loops, self.try_catches])
+
     def add_str(self, value):
         self.add_opcodes(
             python.Str(value),
@@ -349,7 +355,9 @@ class Block(Accumulator):
         )
 
         for arg in function.parameters:
-            if arg['kind'] == ArgType.POSITIONAL_OR_KEYWORD and arg['default']:
+            if arg['kind'] in (
+                    ArgType.POSITIONAL_OR_KEYWORD,
+                    ArgType.KEYWORD_ONLY) and arg['default']:
                 self.add_opcodes(
                     JavaOpcodes.DUP(),
                     JavaOpcodes.LDC_W(arg['name']),

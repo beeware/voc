@@ -17,8 +17,8 @@ VOC
 .. image:: https://img.shields.io/pypi/l/voc.svg
     :target: https://github.com/pybee/voc/blob/master/LICENSE
 
-.. image:: https://travis-ci.org/pybee/voc.svg?branch=master
-    :target: https://travis-ci.org/pybee/voc
+.. image:: https://beekeeper.herokuapp.com/projects/pybee/voc/shield
+    :target: https://beekeeper.herokuapp.com/projects/pybee/voc
 
 .. image:: https://badges.gitter.im/pybee/general.svg
     :target: https://gitter.im/pybee/general
@@ -48,8 +48,8 @@ with `the first tutorial`_.
 
 If you'd like to contribute to VOC development, we have a `guide for first time contributors`_.
 
-.. _Getting Started guide: https://voc.readthedocs.io/en/latest/intro/index.html
-.. _the first tutorial: https://voc.readthedocs.io/en/latest/tutorials/tutorial-0.html
+.. _Getting Started guide: https://voc.readthedocs.io/en/latest/index.html
+.. _the first tutorial: https://voc.readthedocs.io/en/latest/tutorial/tutorial-0.html
 
 .. _guide for first time contributors: http://pybee.org/contributing/how/first-time/what/voc/
 

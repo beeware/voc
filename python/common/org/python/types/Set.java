@@ -60,7 +60,7 @@ public class Set extends org.python.types.Object {
                         ((org.python.types.Tuple) args[0]).value
                 );
             } else {
-                org.python.Iterable iterator = org.Python.iter(args[0]);
+                org.python.Object iterator = org.Python.iter(args[0]);
                 java.util.Set<org.python.Object> generated = new java.util.HashSet<org.python.Object>();
                 try {
                     while (true) {
@@ -83,7 +83,7 @@ public class Set extends org.python.types.Object {
     // }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         // Representation of an empty set is different
@@ -106,7 +106,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "default object formatter"
     )
     public org.python.types.Str __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented");
@@ -125,7 +125,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -140,7 +140,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -155,7 +155,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -170,7 +170,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -185,7 +185,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -233,28 +233,28 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return new org.python.types.Set_Iterator(this);
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "x.__contains__(y) <==> y in x.",
             args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object other) {
@@ -273,18 +273,18 @@ public class Set extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        } else if (other instanceof org.python.types.Str) {
+        if ((other instanceof org.python.types.List) ||
+                (other instanceof org.python.types.Tuple) ||
+                (other instanceof org.python.types.Str) ||
+                (other instanceof org.python.types.ByteArray) ||
+                (other instanceof org.python.types.Bytes)) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
         }
         return super.__mul__(other);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self-value."
     )
     public org.python.Object __sub__(org.python.Object other) {
         java.util.Set set = ((org.python.types.Set) this.copy()).value;
@@ -299,7 +299,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self&value."
     )
     public org.python.Object __and__(org.python.Object other) {
         java.util.Set set = ((org.python.types.Set) this.copy()).value;
@@ -313,15 +313,30 @@ public class Set extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for &: '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public org.python.Object __xor__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__xor__() has not been implemented");
-    // }
+    @org.python.Method(
+            __doc__ = "Return self^value."
+    )
+    public org.python.Object __xor__(org.python.Object other) {
+        java.util.Set set = ((org.python.types.Set) this.copy()).value;
+        java.util.Set intersect_set = ((org.python.types.Set) this.copy()).value;
+        if (other instanceof org.python.types.Set) {
+            set.addAll(((org.python.types.Set) other).value);
+            intersect_set.retainAll(((org.python.types.Set) other).value);
+            // take away the intersection from the union for XOR
+            set.removeAll(intersect_set);
+            return new org.python.types.Set(set);
+        } else if (other instanceof org.python.types.FrozenSet) {
+            set.addAll(((org.python.types.FrozenSet) other).value);
+            intersect_set.retainAll(((org.python.types.FrozenSet) other).value);
+            // take away the intersection from the union for XOR
+            set.removeAll(intersect_set);
+            return new org.python.types.Set(set);
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^: '" + this.typeName() + "' and '" + other.typeName() + "'");
+    }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self|value."
     )
     public org.python.Object __or__(org.python.Object other) {
         java.util.Set set = ((org.python.types.Set) this.copy()).value;
@@ -366,33 +381,12 @@ public class Set extends org.python.types.Object {
     // @org.python.Method(
     //     __doc__ = ""
     // )
-    // public void __isub__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__isub__() has not been implemented");
-    // }
-
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public void __iand__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__iand__() has not been implemented");
-    // }
-
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
     // public void __ixor__(org.python.Object other) {
     //     throw new org.python.exceptions.NotImplementedError("__ixor__() has not been implemented");
     // }
 
-    // @org.python.Method(
-    //     __doc__ = ""
-    // )
-    // public void __ior__(org.python.Object other) {
-    //     throw new org.python.exceptions.NotImplementedError("__ior__() has not been implemented");
-    // }
-
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Add an element to a set.\n\nThis has no effect if the element is already present.",
             args = {"other"}
     )
     public org.python.Object add(org.python.Object other) {
@@ -401,7 +395,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Remove all elements from this set."
     )
     public org.python.Object clear() {
         this.value.clear();
@@ -449,13 +443,6 @@ public class Set extends org.python.types.Object {
     public org.python.Object discard(org.python.Object item) {
         this.value.remove(item);
         return org.python.types.NoneType.NONE;
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __iadd__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'set' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
@@ -552,7 +539,7 @@ public class Set extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Remove and return an arbitrary set element.\nRaises KeyError if the set is empty.",
             args = {}
     )
     public org.python.Object pop() {

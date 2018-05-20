@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -42,5 +44,55 @@ class GeneratorTests(TranspileTestCase):
                 yield 3
 
             for i in somegen():
+                print(i)
+            """)
+
+    def test_generator_method(self):
+        self.assertCodeExecution("""
+            class Interview:
+                def __init__(self, start, stop):
+                    self.start = start
+                    self.stop = stop
+
+                def fizz_buzz(self):
+                    for i in range(self.start, self.stop):
+                        found = False
+                        if i % 2 == 0:
+                            yield 'fizz'
+                            found = True
+                        if i % 3 == 0:
+                            yield 'buzz'
+                            found = True
+                        if not found:
+                            yield i
+
+            myinterview = Interview(1, 20)
+
+            for i in myinterview.fizz_buzz():
+                print(i)
+            """)
+    
+    def test_yield_from_not_used(self):
+        """Yield from is currently not implemented.
+        Unused yield from statements must not break 
+        the program compilation, but only ensue a warning."""
+        self.assertCodeExecution("""
+            
+            def unused():
+                yield from range(5)
+
+            print('Hello, world!')
+            """)
+    
+    @expectedFailure
+    def test_yield_from_used(self):
+        """Yield from is currently not implemented.
+        Yield from statements become NotImplementedErrors at runtime."""
+        self.assertCodeExecution("""
+            
+            def using_yieldfrom():
+                yield from range(5)
+            
+            for i in using_yieldfrom():
                 print(i)
             """)

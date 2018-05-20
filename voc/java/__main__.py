@@ -1,4 +1,6 @@
 import sys
+import argparse
+import voc
 
 from .klass import Class
 
@@ -8,11 +10,25 @@ def dump(filename):
         Class.read(infile, debug=sys.stdout)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: voc.java <path to .class file>")
-        print()
-        print('  e.g.: voc.java org/pybee/example.class')
-        sys.exit(1)
+def main():
+    parser = argparse.ArgumentParser(
+        prog='vod',
+        description='Debugging tool to decompile class files.'
+    )
 
-    dump(sys.argv[1])
+    parser.add_argument(
+        '--version', '-v',
+        action='version',
+        version='voc %s' % voc.__version__,
+    )
+
+    parser.add_argument(
+        'file',
+    )
+
+    args = parser.parse_args()
+    dump(vars(args)['file'])
+
+
+if __name__ == "__main__":
+    main()

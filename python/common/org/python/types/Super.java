@@ -136,7 +136,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "default object formatter",
             args = {"format_string"}
     )
     public org.python.Object __format__(org.python.Object format_string) {
@@ -144,7 +144,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -152,7 +152,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -160,7 +160,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -168,7 +168,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self!=value.",
             args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
@@ -182,7 +182,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -190,7 +190,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -198,7 +198,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return hash(self)."
     )
     public org.python.Object __hash__() {
         return new org.python.types.Int(this.hashCode());
@@ -239,7 +239,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return getattr(self, name).",
             args = {"name"}
     )
     public org.python.Object __getattribute__(org.python.Object name) {
@@ -289,7 +289,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return an attribute of instance, which is of type owner.",
             args = {"instance", "klass"}
     )
     public org.python.Object __get__(org.python.Object instance, org.python.Object klass) {
@@ -298,7 +298,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Implement setattr(self, name, value).",
             args = {"name", "value"}
     )
     public void __setattr__(org.python.Object name, org.python.Object value) {
@@ -332,7 +332,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Implement delattr(self, name).",
             args = {"attr"}
     )
     public void __delattr__(org.python.Object name) {
@@ -359,7 +359,7 @@ public class Super implements org.python.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.Object __dir__() {
         org.python.types.List names = new org.python.types.List(new java.util.ArrayList());
@@ -437,15 +437,22 @@ public class Super implements org.python.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         throw new org.python.exceptions.AttributeError(this, "__iter__");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __reversed__() {
+    public org.python.Object __reversed__() {
         throw new org.python.exceptions.AttributeError(this, "__reversed__");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __next__() {
+        throw new org.python.exceptions.AttributeError(this, "__next__");
     }
 
     @org.python.Method(
@@ -694,8 +701,7 @@ public class Super implements org.python.Object {
     )
     public org.python.Object __isub__(org.python.Object other) {
         try {
-            this.setValue(this.__sub__(other));
-            return this;
+            return this.__sub__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for -=: 'super()' and '" + other.typeName() + "'");
         }
@@ -811,8 +817,7 @@ public class Super implements org.python.Object {
     )
     public org.python.Object __iand__(org.python.Object other) {
         try {
-            this.setValue(this.__and__(other));
-            return this;
+            return this.__and__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for &=: 'super()' and '" + other.typeName() + "'");
         }
@@ -837,8 +842,7 @@ public class Super implements org.python.Object {
     )
     public org.python.Object __ior__(org.python.Object other) {
         try {
-            this.setValue(this.__or__(other));
-            return this;
+            return this.__or__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for |=: 'super()' and '" + other.typeName() + "'");
         }

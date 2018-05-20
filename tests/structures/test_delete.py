@@ -106,3 +106,44 @@ class DeleteTests(TranspileTestCase):
 
             print("Done.")
             """)
+
+    def test_delete_local(self):
+        self.assertCodeExecution("""
+            x = 123
+            print('x = ', x)
+
+            print('Deleting x...')
+            del x
+            try:
+                print('x = ', x)
+            except NameError:
+                print('x was successfully deleted')
+
+            def foo():
+                y = 456
+                print('y =', y)
+                print('Deleting y...')
+                del y
+                try:
+                    print('y =', y)
+                except UnboundLocalError:
+                    print('y was successfully deleted')
+
+            foo()
+            """)
+
+    def test_delete_tuple(self):
+        self.assertCodeExecution("""
+            d = {"uno": 1, "due": 2, "tre": 3, "quattro": 4}
+            print("keys before delete: ", sorted(d))
+            del (d["uno"], d["quattro"])
+            print("keys after delete: ", sorted(d))
+            """)
+
+    def test_delete_list(self):
+        self.assertCodeExecution("""
+            d = {"uno": 1, "due": 2, "tre": 3, "quattro": 4}
+            print("keys before delete: ", sorted(d))
+            del [d["uno"], d["quattro"]]
+            print("keys after delete: ", sorted(d))
+            """)

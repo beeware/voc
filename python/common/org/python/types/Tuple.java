@@ -62,7 +62,7 @@ public class Tuple extends org.python.types.Object {
     // }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("(");
@@ -83,7 +83,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "default object formatter"
     )
     public org.python.types.Str __format__(org.python.Object format_string) {
         throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
@@ -118,7 +118,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -152,7 +152,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -186,7 +186,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -198,7 +198,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -232,7 +232,7 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -271,59 +271,53 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
         throw new org.python.exceptions.NotImplementedError("__dir__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
         return new org.python.types.Int(this.value.size());
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self[key].",
+            args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
         try {
             if (index instanceof org.python.types.Slice) {
-                org.python.types.Slice slice = (org.python.types.Slice) index;
+                org.python.types.Slice.ValidatedValue val = ((org.python.types.Slice) index).validateValueTypes();
                 java.util.List<org.python.Object> sliced = new java.util.ArrayList<org.python.Object>();
-
-                if (slice.start == null && slice.stop == null && slice.step == null) {
+                if (val.start == null && val.stop == null && val.step == null) {
                     sliced.addAll(this.value);
                 } else {
-                    long start;
-                    if (slice.start != null) {
-                        start = slice.start.value;
-                    } else {
-                        start = 0;
-                    }
-
-                    long stop;
-                    if (slice.stop != null) {
-                        stop = slice.stop.value;
-                    } else {
-                        stop = this.value.size();
-                    }
-
-                    long step;
-                    if (slice.step != null) {
-                        step = slice.step.value;
-                    } else {
-                        step = 1;
-                    }
-
-                    for (long i = start; i < stop; i += step) {
+                    org.python.types.Slice slice = new org.python.types.Slice(val.start, val.stop, val.step);
+                    org.python.types.Tuple indices = slice.indices((org.python.types.Int) (this.__len__()));
+                    long start = ((org.python.types.Int) (indices.value.get(0))).value;
+                    long stop = ((org.python.types.Int) (indices.value.get(1))).value;
+                    long step = ((org.python.types.Int) (indices.value.get(2))).value;
+                    /* If step is negative, we need to stop the loop when i <= stop.
+                     * If step is positive, we need to stop the loop when i >= stop.
+                     * validateValueTypes() has already ensured that step != 0.
+                     */
+                    int cmp = step > 0 ? -1 : 1;
+                    for (long i = start; (i > stop ? 1 : i < stop ? -1 : 0) == cmp; i += step) {
                         sliced.add(this.value.get((int) i));
                     }
                 }
                 return new org.python.types.Tuple(sliced);
             } else {
-                int idx = (int) ((org.python.types.Int) index).value;
+                int idx;
+                if (index instanceof org.python.types.Bool) {
+                    idx = (int) ((org.python.types.Bool) index).__int__().value;
+                } else {
+                    idx = (int) ((org.python.types.Int) index).value;
+                }
                 if (idx < 0) {
                     if (-idx > this.value.size()) {
                         throw new org.python.exceptions.IndexError("tuple index out of range");
@@ -352,7 +346,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"index", "value"}
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
         throw new org.python.exceptions.TypeError(
@@ -361,28 +356,31 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"item"}
     )
     public void __delitem__(org.python.Object item) {
         throw new org.python.exceptions.TypeError("'tuple' object doesn't support item deletion");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Implement iter(self)."
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         return new org.python.types.Tuple_Iterator(this);
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return key in self.",
+            args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
         return new org.python.types.Bool(this.value.contains(item));
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self+value.",
+            args = {"other"}
     )
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
@@ -397,7 +395,8 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return self*value.n",
+            args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
@@ -419,30 +418,43 @@ public class Tuple extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+        if (other instanceof org.python.types.Int) {
+            long count = ((org.python.types.Int) other).value;
+            org.python.types.Tuple result = new org.python.types.Tuple();
+            for (long i = 0; i < count; i++) {
+                result.value.addAll(this.value);
+            }
+            return result;
+        } else if (other instanceof org.python.types.Bool) {
+            boolean bool = ((org.python.types.Bool) other).value;
+            if (bool) {
+                return this;
+            } else {
+                return new org.python.types.Tuple();
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + other.typeName() + "'");
+        }
+    }
+
+
+    @org.python.Method(
+            __doc__ = "Return self*value.",
+            args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
         throw new org.python.exceptions.NotImplementedError("__rmul__() has not been implemented.");
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "T.count(value) -> integer -- return number of occurrences of value"
     )
     public org.python.Object count() {
         return new org.python.types.Int(this.value.size());
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __iadd__(org.python.Object other) {
-        if (other instanceof org.python.types.Tuple) {
-            this.value.addAll(((org.python.types.Tuple) other).value);
-            return this;
-        } else {
-            throw new org.python.exceptions.TypeError(
-                    String.format("can only concatenate tuple (not \"%s\") to tuple", org.Python.typeName(other.getClass())));
-        }
     }
 
     @org.python.Method(

@@ -9,11 +9,14 @@ class BuiltinSetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["set"]
 
     not_implemented = [
-        'test_bytearray',
         'test_bytes',
-        'test_class',
-        'test_dict',
-        'test_frozenset',
         'test_str',
-        'test_tuple',
+    ]
+
+    not_implemented_versions = {
+             'test_tuple': (3.4, 3.5, 3.6)
+    }
+
+    is_flakey = [
+        'test_dict',
     ]

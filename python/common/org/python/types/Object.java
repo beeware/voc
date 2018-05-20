@@ -186,7 +186,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "default object formatter",
             args = {"format_string"}
     )
     public org.python.Object __format__(org.python.Object format_string) {
@@ -194,7 +194,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<value.",
             args = {"other"}
     )
     public org.python.Object __lt__(org.python.Object other) {
@@ -202,7 +202,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self<=value.",
             args = {"other"}
     )
     public org.python.Object __le__(org.python.Object other) {
@@ -210,7 +210,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self==value.",
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
@@ -222,7 +222,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self!=value.",
             args = {"other"}
     )
     public org.python.Object __ne__(org.python.Object other) {
@@ -236,7 +236,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>value.",
             args = {"other"}
     )
     public org.python.Object __gt__(org.python.Object other) {
@@ -244,7 +244,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return self>=value.",
             args = {"other"}
     )
     public org.python.Object __ge__(org.python.Object other) {
@@ -252,7 +252,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return hash(self)."
     )
     public org.python.Object __hash__() {
         return new org.python.types.Int(this.hashCode());
@@ -293,7 +293,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Return getattr(self, name).",
             args = {"name"}
     )
     public org.python.Object __getattribute__(org.python.Object name) {
@@ -352,7 +352,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Implement setattr(self, name, value).",
             args = {"name", "value"}
     )
     public void __setattr__(org.python.Object name, org.python.Object value) {
@@ -406,7 +406,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ = "Implement delattr(self, name).",
             args = {"attr"}
     )
     public void __delattr__(org.python.Object name) {
@@ -448,7 +448,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.Object __dir__() {
         org.python.types.List names = new org.python.types.List(new java.util.ArrayList(this.__dict__.keySet()));
@@ -526,15 +526,22 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __iter__() {
+    public org.python.Object __iter__() {
         throw new org.python.exceptions.AttributeError(this, "__iter__");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Iterable __reversed__() {
+    public org.python.Object __reversed__() {
         throw new org.python.exceptions.AttributeError(this, "__reversed__");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __next__() {
+        throw new org.python.exceptions.AttributeError(this, "__next__");
     }
 
     @org.python.Method(
@@ -605,7 +612,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't mod complex numbers.");
+        } else {
+            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        }
     }
 
     @org.python.Method(
@@ -774,10 +785,13 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __iadd__(org.python.Object other) {
         try {
-            this.setValue(this.__add__(other));
-            return this;
-        } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            return this.__add__(other);
+        } catch (org.python.exceptions.TypeError ae) {
+            if (ae.getMessage().startsWith("unsupported operand")) {
+                throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            } else {
+                throw ae;
+            }
         }
     }
 
@@ -787,8 +801,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __isub__(org.python.Object other) {
         try {
-            this.setValue(this.__sub__(other));
-            return this;
+            return this.__sub__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for -=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -800,8 +813,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __imul__(org.python.Object other) {
         try {
-            this.setValue(this.__mul__(other));
-            return this;
+            return this.__mul__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -813,8 +825,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __itruediv__(org.python.Object other) {
         try {
-            this.setValue(this.__truediv__(other));
-            return this;
+            return this.__truediv__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for /=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -826,8 +837,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __ifloordiv__(org.python.Object other) {
         try {
-            this.setValue(this.__floordiv__(other));
-            return this;
+            return this.__floordiv__(other);
         } catch (org.python.exceptions.TypeError e) {
             if (other instanceof org.python.types.Complex) {
                 throw new org.python.exceptions.TypeError("can't take floor of complex number.");
@@ -843,10 +853,13 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __imod__(org.python.Object other) {
         try {
-            this.setValue(this.__mod__(other));
-            return this;
+            return this.__mod__(other);
         } catch (org.python.exceptions.TypeError e) {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for %=: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            if (other instanceof org.python.types.Complex) {
+                throw new org.python.exceptions.TypeError("can't mod complex numbers.");
+            } else {
+                throw new org.python.exceptions.TypeError("unsupported operand type(s) for %=: '" + this.typeName() + "' and '" + other.typeName() + "'");
+            }
         }
     }
 
@@ -868,8 +881,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __ipow__(org.python.Object other) {
-        this.setValue(this.__pow__(other, null));
-        return this;
+        return this.__pow__(other, null);
     }
 
     @org.python.Method(
@@ -904,8 +916,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __iand__(org.python.Object other) {
         try {
-            this.setValue(this.__and__(other));
-            return this;
+            return this.__and__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for &=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -917,8 +928,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __ixor__(org.python.Object other) {
         try {
-            this.setValue(this.__xor__(other));
-            return this;
+            return this.__xor__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for ^=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -930,8 +940,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __ior__(org.python.Object other) {
         try {
-            this.setValue(this.__or__(other));
-            return this;
+            return this.__or__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for |=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -1105,7 +1114,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         org.python.Object comparator = x.__getattribute_null(methodName);
-        if (comparator == null) {
+        if (comparator == null || !(comparator instanceof org.python.types.Method)) {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
 
@@ -1113,4 +1122,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         args[0] = y;
         return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, null);
     }
+
+    public static boolean isSequence(org.python.Object other) {
+        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes ||
+                other instanceof org.python.types.List || other instanceof org.python.types.Str ||
+                other instanceof org.python.types.Tuple) {
+
+            return true;
+        }
+        return false;
+    }
+
 }

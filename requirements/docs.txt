@@ -1,0 +1,3 @@
+# Support for docs generation
+sphinx
+sphinx_rtd_theme

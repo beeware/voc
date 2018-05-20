@@ -39,13 +39,6 @@ public class NotImplementedType extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object __iadd__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for +=: 'NotImplementedType' and '" + other.typeName() + "'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
     public org.python.Object __neg__() {
         throw new org.python.exceptions.TypeError("bad operand type for unary -: 'NotImplementedType'");
     }
@@ -105,13 +98,32 @@ public class NotImplementedType extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple) {
+        if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple || other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NotImplementedType'");
         } else {
             throw new org.python.exceptions.TypeError(
                     String.format("unsupported operand type(s) for *: 'NotImplementedType' and '%s'",
                             other.typeName())
             );
+        }
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"other"}
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+        try {
+            return this.__mul__(other);
+        } catch (org.python.exceptions.TypeError e) {
+            if (other instanceof org.python.types.Str || other instanceof org.python.types.List || other instanceof org.python.types.Tuple || other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
+                throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'NotImplementedType'");
+            } else {
+                throw new org.python.exceptions.TypeError(
+                        String.format("unsupported operand type(s) for *=: 'NotImplementedType' and '%s'",
+                                other.typeName())
+                );
+            }
         }
     }
 

@@ -1,4 +1,11 @@
-from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
+from itertools import permutations
+from .. utils import (
+    BinaryOperationTestCase,
+    InplaceOperationTestCase,
+    SAMPLE_SUBSTITUTIONS,
+    TranspileTestCase,
+    UnaryOperationTestCase,
+)
 
 
 class ListTests(TranspileTestCase):
@@ -112,6 +119,118 @@ class ListTests(TranspileTestCase):
             print(x[4], x[5])
             """)
 
+    def extend_substitutions(self, prefix, suffix):
+        possible_vals = []
+        for perm in permutations(suffix):
+            possible_vals.append(repr(prefix + list(perm)))
+        return possible_vals
+
+    def test_extend(self):
+        # extend a list
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend([4, "hello"])
+            print(x)
+            """)
+
+        # extend a tuple
+        x = [1, 2, 3]
+        y = [5, "world", "hello"]
+        self.assertCodeExecution("""
+            x = %(x)s
+            x.extend(%(y)s)
+            print(x)
+            """ % {
+                'x': x,
+                'y': y,
+            },
+            substitutions={repr(x + y): self.extend_substitutions(x, y)})
+
+        # extend a frozenset
+        x = [1, 2, 3]
+        y = [8, "theta"]
+        self.assertCodeExecution("""
+            x = %(x)s
+            y = frozenset(%(y)s)
+            x.extend(y)
+            """ % {
+                'x': x,
+                'y': y,
+            },
+            substitutions={repr(x + y): self.extend_substitutions(x, y)})
+
+        # extend a set
+        x = [1, 2, 3]
+        y = ["beta", "alpha"]
+        self.assertCodeExecution("""
+            x = %(x)s
+            y = set(%(y)s)
+            x.extend(y)
+            """ % {
+                'x': x,
+                'y': y,
+            },
+            substitutions={repr(x + y): self.extend_substitutions(x, y)})
+
+        # extend a dict
+        x = [1, 2, 3]
+        y = {"alpha": 4, "theta": 6, "beta": 5}
+        keys = list(y.keys())
+        self.assertCodeExecution("""
+            x = %(x)s
+            y = %(y)s
+            x.extend(y)
+            """ % {
+                'x': x,
+                'y': y,
+            },
+            substitutions={repr(x + keys): self.extend_substitutions(x, keys)})
+
+        # extend an iterator
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(iter([4,5,6]))
+            print(x)
+            """)
+
+        # extend bytearray
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(bytearray(b'abc'))
+            print(x)
+            """)
+
+        # extend byte
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(b'def')
+            print(x)
+            """)
+
+        # extend str
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(b'string')
+            print(x)
+            """)
+
+        # extend range
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.extend(range(5))
+            print(x)
+            """)
+
+        # extend non-iterable
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            try:
+                x.extend(4)
+            except TypeError as err:
+                print(err)
+            print(x)
+            """)
+
     def test_remove(self):
         # Remove integer
         self.assertCodeExecution("""
@@ -141,6 +260,14 @@ class ListTests(TranspileTestCase):
                 x.remove(3)
             except ValueError as err:
                 print(err)
+            print(x)
+            """)
+
+    def test_reverse(self):
+        # New list
+        self.assertCodeExecution("""
+            x = [1, 2, 3, 4, 5]
+            x.reverse()
             print(x)
             """)
 
@@ -458,6 +585,52 @@ class ListTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_insert(self):
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.insert(0, 4)
+            print(x)
+            x.insert(1, 5)
+            print(x)
+            x.insert(len(x), 6)
+            print(x)
+            x.insert(200, 7)
+            print(x)
+            x.insert(-1, 8)
+            print(x)
+            x.insert(-len(x), 9)
+            print(x)
+            x.insert(-200, 10)
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.insert(0, "hello")
+            print(x)
+            """)
+
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            x.insert(0, [1, 2])
+            print(x)
+            """)
+
+        # cases for 'TypeError: wrong type'
+        self.assertCodeExecution("""
+            x = [1, 2, 3]
+            try:
+                print(x.insert('a', 4))
+            except TypeError as err:
+                print(err)
+
+            x = [1, 2, 3]
+            try:
+                print(x.insert([1,2,3], 4))
+            except TypeError as err:
+                print(err)
+            """)
+
     def test_lt_reflected(self):
         self.assertCodeExecution("""
             class A:
@@ -598,134 +771,30 @@ class UnaryListOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryListOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'list'
 
-    not_implemented = [
-        'test_add_class',
-        'test_add_frozenset',
-
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_direct_eq_bytes',
-        'test_direct_ge_bytes',
-        'test_direct_gt_bytes',
-        'test_direct_le_bytes',
-        'test_direct_lt_bytes',
-        'test_direct_ne_bytes',
-
-        'test_direct_ge_list',
-        'test_direct_gt_list',
-        'test_direct_le_list',
-        'test_direct_lt_list',
-
-        'test_direct_eq_frozenset',
-        'test_direct_ge_frozenset',
-        'test_direct_gt_frozenset',
-        'test_direct_le_frozenset',
-        'test_direct_lt_frozenset',
-        'test_direct_ne_frozenset',
-
-        'test_eq_class',
-        'test_eq_frozenset',
-
-        'test_ge_class',
-        'test_ge_frozenset',
-        'test_ge_list',
-
-        'test_gt_class',
-        'test_gt_frozenset',
-        'test_gt_list',
-
-        'test_le_class',
-        'test_le_frozenset',
-        'test_le_list',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_lt_class',
-        'test_lt_frozenset',
-        'test_lt_list',
-
-        'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_frozenset',
-
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_ne_class',
-        'test_ne_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subscr_bool',
-        'test_subscr_class',
-        'test_subscr_frozenset',
-        'test_subscr_slice',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
-    ]
-
 
 class InplaceListOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'list'
 
-    not_implemented = [
-        'test_add_bytearray',
-        'test_add_bytes',
-        'test_add_class',
-        'test_add_dict',
-        'test_add_frozenset',
-        'test_add_range',
-        'test_add_set',
-        'test_add_str',
+    # Several tests add a list to an iterable with a non-deterministic
+    # ordering. We define these substitutions here where the first part of the
+    # values are the list (in its original order) and the last part is the
+    # non-deterministic iterable.
+    substitutions = {}
+    for prefix in (
+        [],
+        ['a', 'b', 'c'],
+        [3, 4, 5],
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    ):
+        for suffix in (
+            [1, 2.3456, 7],
+            ['on', 'to', 'an'],
+            ['one', 'two', 'six'],
+            ['a', 'd', 'c'],
+        ):
+            from_vals = []
+            for perm in permutations(suffix):
+                from_vals.append(repr(prefix + list(perm)))
+            substitutions[repr(prefix + suffix)] = from_vals
 
-        'test_and_class',
-        'test_and_frozenset',
-
-        'test_floor_divide_class',
-        'test_floor_divide_complex',
-        'test_floor_divide_frozenset',
-
-        'test_lshift_class',
-        'test_lshift_frozenset',
-
-        'test_modulo_class',
-        'test_modulo_complex',
-        'test_modulo_frozenset',
-
-        'test_multiply_class',
-        'test_multiply_frozenset',
-
-        'test_or_class',
-        'test_or_frozenset',
-
-        'test_power_class',
-        'test_power_frozenset',
-
-        'test_rshift_class',
-        'test_rshift_frozenset',
-
-        'test_subtract_class',
-        'test_subtract_frozenset',
-
-        'test_true_divide_class',
-        'test_true_divide_frozenset',
-
-        'test_xor_class',
-        'test_xor_frozenset',
-    ]
+    substitutions.update(SAMPLE_SUBSTITUTIONS)
