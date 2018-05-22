@@ -277,3 +277,26 @@ class Str:
                 Java.New('org/python/types/Str'),
                 Java.Init('org/python/types/Str')
             )
+
+class Array:
+    class get_item:
+        def process(self, context):
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE(
+                    'org/python/Object',
+                    '__getitem__',
+                    args=['I'],
+                    returns='Lorg/python/Object;'
+                ),
+            )
+
+    class set_item:
+        def process(self, context):
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE(
+                    'org/python/Object',
+                    '__setitem__',
+                    args=['I', 'Lorg/python/Object;'],
+                    returns='V'
+                ),
+            )

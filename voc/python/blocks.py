@@ -156,20 +156,36 @@ class Block(Accumulator):
             index = value + 5 # index of this value in the smallints list
 
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', 'Lorg/python/types/List;'),
+                # Try to get this Int from the smallints array
+                JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', '[Lorg/python/types/Int;'),
                 JavaOpcodes.LDC_W(index),
-                python.Object.get_item(),
+                python.Array.get_item(),
+
+                # Store it in a local var
+                JavaOpcodes.DUP(),
+                ASTORE_name('#value'),
+
+                # If it hasn't been initialized
                 IF([], JavaOpcodes.IFNULL),
-                JavaOpcodes.LDC_W(index),
                 # Create and initialize this integer
                 java.New('org/python/types/Int'),
                 LCONST_val(value),
                 java.Init('org/python/types/Int', 'J'),
-                JavaOpcodes.DUP_X1(), # Keep the integer object below the parameters 
-                # Put the Int in smallints
-                python.Object.set_item(),
+                ASTORE_name('#value'),
+
+                # Store it in the smallints list
+                JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', '[Lorg/python/types/Int;'),
+                JavaOpcodes.LDC_W(index),
+                ALOAD_name('#value'),
+                python.Array.set_item(),
+
                 END_IF(),
+
+                # Put the Int on the stack
+                ALOAD_name('#value'),
                 JavaOpcodes.CHECKCAST('org/python/types/Int'),
+                free_name('#value'),
+
             )
         else:
             self.add_opcodes(
@@ -177,6 +193,7 @@ class Block(Accumulator):
                 LCONST_val(value),
                 java.Init('org/python/types/Int', 'J'),
             )
+
 
     def add_float(self, value):
         self.add_opcodes(

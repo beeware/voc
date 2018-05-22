@@ -5,7 +5,7 @@ public class Int extends org.python.types.Object {
 
     public static int nsmallposints = 257;
     public static int nsmallnegints = 5;
-    public static org.python.types.List smallints = new org.python.types.List();
+    public static org.python.types.Int[] smallints = new org.python.types.Int[nsmallnegints + nsmallposints];
 
     /**
      * A utility method to update the internal value of this object.
