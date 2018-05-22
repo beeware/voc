@@ -1847,17 +1847,14 @@ class Visitor(ast.NodeVisitor):
                     IF([], JavaOpcodes.IF_ACMPNE),
                 )
                 self.context.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        JavaOpcodes.ICONST_1(),
-                        java.Init('org/python/types/Bool', 'Z'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/Object;'),
                 )
                 self.context.add_opcodes(
                     ELSE(),
                 )
                 self.context.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        JavaOpcodes.ICONST_0(),
-                        java.Init('org/python/types/Bool', 'Z'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/Object;'),
+
                 )
                 self.context.add_opcodes(
                     END_IF(),
@@ -1868,17 +1865,13 @@ class Visitor(ast.NodeVisitor):
                     IF([], JavaOpcodes.IF_ACMPEQ),
                 )
                 self.context.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        JavaOpcodes.ICONST_1(),
-                        java.Init('org/python/types/Bool', 'Z'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/Object;'),
                 )
                 self.context.add_opcodes(
                     ELSE(),
                 )
                 self.context.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        JavaOpcodes.ICONST_0(),
-                        java.Init('org/python/types/Bool', 'Z'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/Object;'),
                 )
                 self.context.add_opcodes(
                     END_IF(),
@@ -2199,15 +2192,13 @@ class Visitor(ast.NodeVisitor):
             )
         elif node.value is True:
             self.context.add_opcodes(
-                java.New('org/python/types/Bool'),
-                JavaOpcodes.ICONST_1(),
-                java.Init('org/python/types/Bool', 'Z'),
+                JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/Object;'),
+
             )
         elif node.value is False:
             self.context.add_opcodes(
-                java.New('org/python/types/Bool'),
-                JavaOpcodes.ICONST_0(),
-                java.Init('org/python/types/Bool', 'Z'),
+                JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/Object;'),
+
             )
         else:
             raise NotImplementedError("Unknown named constant %s" % node.value)
