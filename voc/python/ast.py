@@ -1783,18 +1783,6 @@ class Visitor(ast.NodeVisitor):
         )
 
         self.context.delete_name('#yield-iter-%x' % id(node))
-        # expr value):
-        print(
-            '"yield from" statement not yet implemented. '
-            'Will throw a NotImplementedError at runtime'
-        )
-        self.context.add_opcodes(
-            java.THROW(
-                'org/python/exceptions/NotImplementedError',
-                ['Ljava/lang/String;',
-                 JavaOpcodes.LDC_W('"yield from" statement not yet implemented')]
-            )
-        )
 
     @node_visitor
     def visit_Compare(self, node):
