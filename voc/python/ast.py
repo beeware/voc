@@ -1712,7 +1712,8 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Yield(self, node):
-        self.visit(node.value)
+        if node.value:
+            self.visit(node.value)
         yield_point = len(self.context.yield_points) + 1
         self.context.add_opcodes(
             # Convert to a new value for return purposes
@@ -1747,18 +1748,39 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_YieldFrom(self, node):
-        # expr value):
-        print(
-            '"yield from" statement not yet implemented. '
-            'Will throw a NotImplementedError at runtime'
+        self.visit(node.value)  # pushes expression on stack
+        self.context.add_opcodes(
+            python.Object.iter()  # pops expression from stack then gets and pushes its iterator on stack
+        )
+        self.context.store_name('#yield-iter-%x' % id(node))
+
+        loop = START_LOOP()
+        self.context.add_opcodes(
+            loop,
         )
         self.context.add_opcodes(
-            java.THROW(
-                'org/python/exceptions/NotImplementedError',
-                ['Ljava/lang/String;',
-                 JavaOpcodes.LDC_W('"yield from" statement not yet implemented')]
-            )
+            TRY(),
         )
+        self.context.load_name('#yield-iter-%x' % id(node))
+        self.context.add_opcodes(
+            python.Iterable.next(),
+        )
+        self.context.add_opcodes(
+            CATCH('org/python/exceptions/StopIteration'),
+        )
+        self.context.add_opcodes(
+            JavaOpcodes.POP(),
+            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
+        )
+        self.context.add_opcodes(
+            END_TRY(),
+        )
+        self.visit(ast.Yield(None))
+        self.context.add_opcodes(
+            END_LOOP(),
+        )
+
+        self.context.delete_name('#yield-iter-%x' % id(node))
 
     @node_visitor
     def visit_Compare(self, node):
