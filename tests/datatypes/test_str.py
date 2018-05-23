@@ -814,11 +814,10 @@ class StrTests(TranspileTestCase):
         for test in tests:
             print(test.isprintable())
         """)
-    
-    @expectedFailure
+
     def test_isprintable_surrogate_cases(self):
         self.assertCodeExecution(r"""
-        tests = ['\ud800', '\udbff', '\udc00', '\udfff']
+        tests = ['\ud801', '\udbff', '\udc00', '\udfff']
         for test in tests:
             print(test.isprintable())
         """)
@@ -871,13 +870,12 @@ class StrTests(TranspileTestCase):
 
             s = '-.-42'
             print(s.zfill(6))
-        """)
 
-    @expectedFailure
-    def test_zfill_arg_handling(self):
-        self.assertCodeExecution("""
             s = "42"
-            s.zfill()
+            try:
+                s.zfill()
+            except TypeError as err:
+                print(err)
         """)
 
 

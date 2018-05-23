@@ -10,7 +10,7 @@ Setup
 This tutorial assumes you've read and followed the instructions in
 :doc:`/background/install`. If you've done this, you should have:
 
-* Java 6 (or higher) installed and available on your path,
+* Java 7 (or higher) installed and available on your path,
 * An ``env`` directory for your virtualenv
 * A ``tutorial`` directory with a VOC checkout,
 * An activated Python 3.4+ virtual environment,

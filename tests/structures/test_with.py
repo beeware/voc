@@ -75,3 +75,15 @@ class WithLoopTests(TranspileTestCase):
                 print('val', val)
                 print('val2', val2)
             """)
+
+    def test_with_tuple_variables(self):
+        self.assertCodeExecution("""
+            class CtxMgr:
+                def __enter__(self):
+                    return 1,2
+                def __exit__(self, *args):
+                    print("exiting....")
+            with CtxMgr() as (a,b):
+                print('a', a, 'b', b)
+
+            """)

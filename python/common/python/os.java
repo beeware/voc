@@ -422,10 +422,10 @@ public class os extends org.python.types.Module {
     public static org.python.Object confstr_names;
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return the number of CPUs in the system."
     )
     public static org.python.Object cpu_count() {
-        throw new org.python.exceptions.NotImplementedError("'cpu_count' has not been implemented");
+	return new org.python.types.Int(Runtime.getRuntime().availableProcessors());
     }
 
     @org.python.Method(
@@ -650,10 +650,10 @@ public class os extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "Return a string representing the current working directory."
     )
     public static org.python.Object getcwd() {
-        throw new org.python.exceptions.NotImplementedError("'getcwd' has not been implemented");
+        return new org.python.types.Str(System.getProperty("user.dir"));
     }
 
     @org.python.Method(

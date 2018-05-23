@@ -317,4 +317,12 @@ public class Slice extends org.python.types.Object {
     public org.python.Object __not__() {
         return new org.python.types.Bool(false);
     }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __hash__() {
+        throw new org.python.exceptions.AttributeError(this, "__hash__");
+    }
+
 }

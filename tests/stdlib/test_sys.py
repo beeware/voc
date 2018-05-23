@@ -552,7 +552,6 @@ class SysModuleTests(TranspileTestCase):
 
     ############################################################
     # maxsize
-    @expectedFailure
     def test_maxsize(self):
         self.assertCodeExecution("""
             import sys
