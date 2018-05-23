@@ -15,6 +15,7 @@ tests/temp
 tests/tmp*
 .cache/
 .env
+<<<<<<< HEAD
 /stdlib_tests/*.class
 /stdlib_tests/python
 .DS_Store
@@ -23,3 +24,7 @@ python/common/.idea
 launch cricket.bat
 check code style.bat
 voc/.idea
+=======
+
+.DS_Store
+>>>>>>> parent of 85efc187... Local environment setup
