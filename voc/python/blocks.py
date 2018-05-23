@@ -162,7 +162,8 @@ class Block(Accumulator):
             self.add_opcodes(
                 # Try to get this Int from the smallints array
                 JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', 'Lorg/python/types/List;'),
-                python.List.get_item_by_index(index=index),
+                JavaOpcodes.LDC_W(index),
+                python.List.get_item_by_index(),
                 JavaOpcodes.CHECKCAST('org/python/types/Int'),
                 free_name('#value'),
 
