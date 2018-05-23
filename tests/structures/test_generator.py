@@ -69,3 +69,43 @@ class GeneratorTests(TranspileTestCase):
             for i in myinterview.fizz_buzz():
                 print(i)
             """)
+
+    def test_simplest_yieldfrom(self):
+        self.assertCodeExecution("""
+            def gen1():
+                yield 1
+                yield 2
+                yield 3
+
+            def gen2():
+                yield from gen1()
+
+            for i in gen2():
+                print(i)
+        """)
+
+    def test_yieldfrom_list(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield from [1, 2, 3]
+
+            for i in gen():
+                print(i)
+        """)
+
+    def test_chainning_yieldfrom(self):
+        self.assertCodeExecution("""
+            def gen1():
+                yield 'a'
+                yield 'b'
+
+            def gen2():
+                yield from gen1()
+                yield 'gen2'
+
+            def gen3():
+                yield from gen2()
+
+            for i in gen3():
+                print(i)
+        """)
