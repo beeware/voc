@@ -31,7 +31,6 @@ _output_dir = ''
 
 def setUpSuite():
     """Configure the entire test suite.
-
     This only needs to be run once, prior to the first test.
     """
     global _output_dir
@@ -116,7 +115,7 @@ def adjust(text, run_in_function=False):
     return '\n'.join(final_lines)
 
 
-def runAsPython(test_dir, main_code, extra_code=None, args=None):
+def runAsPython(test_dir, main_code, extra_code=None, args=None, env=None):
     """Run a block of Python code with the Python interpreter."""
     # Output source code into test directory
     with open(os.path.join(test_dir, 'test.py'), 'w', encoding='utf-8') as py_source:
@@ -143,6 +142,7 @@ def runAsPython(test_dir, main_code, extra_code=None, args=None):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         cwd=test_dir,
+        env=env,
     )
     out = proc.communicate()
 
@@ -319,6 +319,7 @@ class TranspileTestCase(TestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             cwd=_output_dir,
+            env=dict(os.environ, PYTHONIOENCODING='utf-8'),
         )
 
     @classmethod
@@ -368,6 +369,7 @@ class TranspileTestCase(TestCase):
             args=None, substitutions=None):
         "Run code as native python, and under Java and check the output is identical"
         self.maxDiff = None
+        env = dict(os.environ, PYTHONIOENCODING='utf-8')
         # ==================================================
         # Pass 1 - run the code in the global context
         # ==================================================
@@ -377,8 +379,8 @@ class TranspileTestCase(TestCase):
                 # Run the code as Python and as Java.
                 adj_code = adjust(code, run_in_function=False)
                 adj_code += '\nprint("%s")\n' % END_OF_CODE_STRING
-                py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args)
-                java_out = self.runAsJava(adj_code, extra_code, args=args)
+                py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args, env=env)
+                java_out = self.runAsJava(adj_code, extra_code, args=args, env=env)
             except Exception as e:
                 self.fail(e)
             finally:
@@ -416,8 +418,8 @@ class TranspileTestCase(TestCase):
                 # Run the code as Python and as Java.
                 adj_code = adjust(code, run_in_function=True)
                 adj_code += '\nprint("%s")\n' % END_OF_CODE_STRING
-                py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args)
-                java_out = self.runAsJava(adj_code, extra_code, args=args)
+                py_out = runAsPython(self.temp_dir, adj_code, extra_code, args=args, env=env)
+                java_out = self.runAsJava(adj_code, extra_code, args=args, env=env)
             except Exception as e:
                 self.fail(e)
             finally:
@@ -534,7 +536,7 @@ class TranspileTestCase(TestCase):
         except FileExistsError:
             pass
 
-    def runAsJava(self, main_code, extra_code=None, args=None):
+    def runAsJava(self, main_code, extra_code=None, args=None, env=None):
         """Run a block of Python code as a Java program."""
         # Output source code into test directory
         transpiler = Transpiler(verbosity=0)
@@ -579,7 +581,8 @@ class TranspileTestCase(TestCase):
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                cwd=self.temp_dir
+                cwd=self.temp_dir,
+                env=env,
             )
             out = proc.communicate()[0].decode('utf8')
 
@@ -761,7 +764,6 @@ SAMPLE_SUBSTITUTIONS = {
     "{'an', 'to', 'on'}": _string_substitutions("{'an', 'to', 'on'}"),
     "{'one', 'two', 'six'}": _string_substitutions("{'one', 'two', 'six'}"),
     "{'a', 'b', 'c'}": _string_substitutions("{'a', 'b', 'c'}"),
-
 
     # Normalize list ordering
     "[1, 2.3456, 7]": _string_substitutions("[1, 2.3456, 7]"),

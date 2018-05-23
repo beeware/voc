@@ -15,5 +15,10 @@ tests/temp
 tests/tmp*
 .cache/
 .env
-
 .DS_Store
+python/common/common.iml
+python/common/.idea
+launch cricket.bat
+check code style.bat
+
+voc/.idea
