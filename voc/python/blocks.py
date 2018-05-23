@@ -7,7 +7,7 @@ from ..java import (
 from .structures import (
     ArgType, OpcodePosition,
     TRY, CATCH, END_TRY,
-    jump, resolve_jump, IF, END_IF
+    jump, resolve_jump
 )
 from .types import java, python
 from .types.primitives import (
@@ -157,32 +157,9 @@ class Block(Accumulator):
 
             self.add_opcodes(
                 # Try to get this Int from the smallints array
-                JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', '[Lorg/python/types/Int;'),
+                JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', 'Lorg/python/types/List;'),
                 JavaOpcodes.LDC_W(index),
-                python.Array.get_item(),
-
-                # Store it in a local var
-                JavaOpcodes.DUP(),
-                ASTORE_name('#value'),
-
-                # If it hasn't been initialized
-                IF([], JavaOpcodes.IFNULL),
-                # Create and initialize this integer
-                java.New('org/python/types/Int'),
-                LCONST_val(value),
-                java.Init('org/python/types/Int', 'J'),
-                ASTORE_name('#value'),
-
-                # Store it in the smallints list
-                JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', '[Lorg/python/types/Int;'),
-                JavaOpcodes.LDC_W(index),
-                ALOAD_name('#value'),
-                python.Array.set_item(),
-
-                END_IF(),
-
-                # Put the Int on the stack
-                ALOAD_name('#value'),
+                python.List.get_item_by_index(),
                 JavaOpcodes.CHECKCAST('org/python/types/Int'),
                 free_name('#value'),
 
@@ -235,12 +212,7 @@ class Block(Accumulator):
                     )
 
                 elif isinstance(value, int):
-                    self.add_opcodes(
-                        # TODO Check if small int, and generate a lookup if so.
-                        java.New('org/python/types/Int'),
-                        LCONST_val(value),
-                        java.Init('org/python/types/Int', 'J'),
-                    )
+                    self.add_int(value)
 
                 elif isinstance(value, float):
                     self.add_opcodes(

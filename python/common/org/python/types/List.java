@@ -344,6 +344,22 @@ public class List extends org.python.types.Object {
         return new org.python.types.Int(this.value.size());
     }
 
+    public org.python.Object getItemByIndex(int idx) {
+      if (idx < 0) {
+          if (-idx > this.value.size()) {
+              throw new org.python.exceptions.IndexError("list index out of range");
+          } else {
+              return this.value.get(this.value.size() + idx);
+          }
+      } else {
+          if (idx >= this.value.size()) {
+              throw new org.python.exceptions.IndexError("list index out of range");
+          } else {
+              return this.value.get(idx);
+          }
+      }
+    }
+
     @org.python.Method(
             __doc__ = "x.__getitem__(y) <==> x[y]",
             args = {"index"}
@@ -424,19 +440,7 @@ public class List extends org.python.types.Object {
                 } else {
                     idx = (int) ((org.python.types.Int) index).value;
                 }
-                if (idx < 0) {
-                    if (-idx > this.value.size()) {
-                        throw new org.python.exceptions.IndexError("list index out of range");
-                    } else {
-                        return this.value.get(this.value.size() + idx);
-                    }
-                } else {
-                    if (idx >= this.value.size()) {
-                        throw new org.python.exceptions.IndexError("list index out of range");
-                    } else {
-                        return this.value.get(idx);
-                    }
-                }
+                return this.getItemByIndex(idx);
             }
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 0x03050000) {
