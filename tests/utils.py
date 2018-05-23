@@ -15,6 +15,7 @@ from voc.python.blocks import Block as PyBlock
 from voc.python.modules import Module as PyModule
 from voc.java.constants import ConstantPool, Utf8
 from voc.java.klass import ClassFileReader, ClassFileWriter
+
 from voc.java.attributes import Code as JavaCode
 from voc.transpiler import Transpiler
 
@@ -203,6 +204,8 @@ JAVA_STACK = re.compile(
     re.MULTILINE
 )
 
+PYDEV_CONNECT = re.compile("pydev debugger: process \\d+ is connecting[\r|\n]+")
+
 PYTHON_EXCEPTION = re.compile(
     'Traceback \(most recent call last\):\r?\n(  File "(?P<file>.*)", line (?P<line>\d+), ' +
     'in .*\r?\n    .*\r?\n)+(?P<exception>[^:]*)(?::\s)?(?P<message>.*\n)$')
@@ -275,6 +278,8 @@ def cleanse_python(raw, substitutions):
         '### EXCEPTION ###{linesep}\\g<exception>: \\g<message>'.format(linesep=os.linesep),
         raw
     )
+
+    out = PYDEV_CONNECT.sub('', out)
 
     stack = PYTHON_STACK.findall(raw)
     out = '%s%s%s' % (
@@ -367,7 +372,7 @@ class TranspileTestCase(TestCase):
             extra_code=None,
             run_in_global=True, run_in_function=True, exits_early=False,
             args=None, substitutions=None):
-        "Run code as native python, and under Java and check the output is identical"
+        """"Run code as native python, and under Java and check the output is identical"""
         self.maxDiff = None
         env = dict(os.environ, PYTHONIOENCODING='utf-8')
         # ==================================================
@@ -385,7 +390,14 @@ class TranspileTestCase(TestCase):
                 self.fail(e)
             finally:
                 # Clean up the test directory where the class file was written.
-                shutil.rmtree(self.temp_dir)
+                # (we have to set ignore_errors for this to work on Windows)
+                # Ignoring all errors can be anxiety-inducing so we'll do one more
+                # check on the directory afterwards now.
+                shutil.rmtree(self.temp_dir, ignore_errors=True)
+
+                if os.path.exists(self.temp_dir):
+                    raise IsADirectoryError("{} was unsuccessfully deleted".format
+                                            (self.temp_dir))
                 # print(java_out)
 
             # Cleanse the Python and Java output, producing a simple
@@ -401,14 +413,16 @@ class TranspileTestCase(TestCase):
             self.assertEqual(java_out, py_out, context)
 
             # Confirm that both output strings end with the canary statement
-            substring_start = - (len(END_OF_CODE_STRING)+1)
             if exits_early:
-                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed to raise exception \n%s" % java_out)
+                if py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed to raise exception \n%s" % py_out)
             else:
-                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-
+                if not java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed prematurely \n%s" % java_out)
+                if not py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed prematurely \n%s" % py_out)
         # ==================================================
         # Pass 2 - run the code in a function's context
         # ==================================================
@@ -440,13 +454,16 @@ class TranspileTestCase(TestCase):
             self.assertEqual(java_out, py_out, context)
 
             # Confirm that both output strings end with the canary statement
-            substring_start = - (len(END_OF_CODE_STRING)+1)
             if exits_early:
-                self.assertNotEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertNotEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed to raise exception \n%s" % java_out)
+                if py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed to raise exception \n%s" % py_out)
             else:
-                self.assertEqual(java_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
-                self.assertEqual(py_out[substring_start:], END_OF_CODE_STRING_NEWLINE)
+                if not java_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Java test failed prematurely \n%s" % java_out)
+                if not py_out.endswith(END_OF_CODE_STRING_NEWLINE):
+                    self.fail("Python test failed prematurely \n%s" % py_out)
 
     def assertJavaExecution(
                 self, code, out,

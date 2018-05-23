@@ -339,7 +339,8 @@ public class sys extends org.python.types.Module {
     // last_type <class 'type'>
 
     // last_value <class 'SyntaxError'>
-    public static org.python.types.Int maxsize;
+    @org.python.Attribute
+    public static org.python.types.Int maxsize = new org.python.types.Int(Long.MAX_VALUE);
     public static org.python.types.Int maxunicode;
     public static org.python.types.List meta_path;
     public static org.python.types.Dict modules = new org.python.types.Dict();
