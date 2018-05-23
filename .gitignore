@@ -17,5 +17,9 @@ tests/tmp*
 .env
 /stdlib_tests/*.class
 /stdlib_tests/python
-
 .DS_Store
+python/common/common.iml
+python/common/.idea
+launch cricket.bat
+check code style.bat
+voc/.idea
