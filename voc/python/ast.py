@@ -1712,7 +1712,7 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Yield(self, node):
-        if node.value:
+        if hasattr(node, "lineno"):
             self.visit(node.value)
         yield_point = len(self.context.yield_points) + 1
         self.context.add_opcodes(
