@@ -1729,12 +1729,24 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Yield(self, node):
-        self.visit(node.value)
+        if node.value:
+            self.visit(node.value)
+            self.context.add_opcodes(
+                # Convert to a new value for return purposes
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
+            )
+        elif hasattr(node, "lineno"):  # a yield expression
+            # push NoneType object to stack
+            self.context.add_opcodes(
+                JavaOpcodes.GETSTATIC(
+                    'org/python/types/NoneType',
+                    'NONE',
+                    'Lorg/python/Object;'
+                )
+            )
+
         yield_point = len(self.context.yield_points) + 1
-        self.context.add_opcodes(
-            # Convert to a new value for return purposes
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
-        )
+
         # Save the current stack and yield index
         self.context.load_name('<generator>')
         self.context.add_opcodes(
