@@ -16,6 +16,10 @@ from .types.primitives import (
 
 # from .debug import DEBUG, DEBUG_value
 
+# The number of negative and positive small org/python/types/Int objects that are preallocated
+# [-NSMALLNEGINTS, NSMALLPOSINTS)
+NSMALLNEGINTS = 5
+NSMALLPOSINTS = 257
 
 class IgnoreBlock(Exception):
     """An escape hatch; enable a block to be flagged as ignorable"""
@@ -152,14 +156,13 @@ class Block(Accumulator):
         )
 
     def add_int(self, value):
-        if -5 <= value and value < 257:
-            index = value + 5 # index of this value in the smallints list
+        if -NSMALLNEGINTS <= value and value < NSMALLPOSINTS:
+            index = value + NSMALLNEGINTS
 
             self.add_opcodes(
                 # Try to get this Int from the smallints array
                 JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', 'Lorg/python/types/List;'),
-                JavaOpcodes.LDC_W(index),
-                python.List.get_item_by_index(),
+                python.List.get_item_by_index(index=index),
                 JavaOpcodes.CHECKCAST('org/python/types/Int'),
                 free_name('#value'),
 

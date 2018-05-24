@@ -261,8 +261,12 @@ class List:
             )
 
     class get_item_by_index:
+        def __init__(self, index):
+            self.index = index
+
         def process(self, context):
             context.add_opcodes(
+                JavaOpcodes.LDC_W(self.index),
                 JavaOpcodes.INVOKEVIRTUAL(
                     'org/python/types/List',
                     'getItemByIndex',
