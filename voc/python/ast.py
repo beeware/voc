@@ -326,9 +326,14 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Assign(self, node):
         # Evaluate the value
-        self.visit(node.value)
+        has_nested_yield = False
+        for descendant_node in ast.walk(node.value):
+            if isinstance(descendant_node, ast.Yield):
+                has_nested_yield = True
+                self.visit(descendant_node)
+                break
 
-        if isinstance(node.value, ast.Yield):
+        if has_nested_yield:
             self.context.load_name('<generator>')
             self.context.add_opcodes(
                 JavaOpcodes.GETFIELD('org/python/types/Generator', 'message', 'Lorg/python/Object;')
@@ -344,6 +349,8 @@ class Visitor(ast.NodeVisitor):
                     returns='V'
                 )
             )
+        else:
+            self.visit(node.value)
 
         if len(node.targets) > 1:
             for target in node.targets:
