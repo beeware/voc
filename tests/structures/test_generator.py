@@ -96,3 +96,64 @@ class GeneratorTests(TranspileTestCase):
             for i in using_yieldfrom():
                 print(i)
             """)
+            
+    def test_generator_send(self):
+        self.assertCodeExecution("""
+            def gen():
+                a = yield
+                print(a)
+                
+            g = gen()
+            next(g)
+            try:
+                g.send("Hello World")
+            except StopIteration:
+                pass
+            """)
+            
+    def test_generator_multi_send(self):
+        self.assertCodeExecution("""
+            def gen():
+                a = yield 1
+                print(a)
+                b = yield 2
+                print(b)
+                
+            g = gen()
+            next(g)
+            try:
+                print(g.send("a"))
+                print(g.send("b"))
+            except StopIteration:
+                pass
+            """)
+            
+    def test_generator_power_generator(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = yield 1
+                    yield x ** 2
+                
+            g = gen()
+            next(g)
+            print(g.send(6))
+            next(g)
+            print(g.send(-1))
+            """)
+            
+    def test_generator_send_loop(self):
+        self.assertCodeExecution("""
+            def gen():
+                for i in range(1, 5):
+                    a = yield i
+                    print("printing from generator " + str(a))
+            g = gen()
+            g.send(None)
+            try:
+                while True:
+                    b = g.send(1)
+                    print("printing from user " + str(b))
+            except StopIteration: 
+                pass
+            """)
