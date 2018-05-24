@@ -328,6 +328,23 @@ class Visitor(ast.NodeVisitor):
         # Evaluate the value
         self.visit(node.value)
 
+        if isinstance(node.value, ast.Yield):
+            self.context.load_name('<generator>')
+            self.context.add_opcodes(
+                JavaOpcodes.GETFIELD('org/python/types/Generator', 'message', 'Lorg/python/Object;')
+            )
+
+            # reset message to None after assignment
+            self.context.load_name('<generator>')
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Generator',
+                    'reset_message',
+                    args=[],
+                    returns='V'
+                )
+            )
+
         if len(node.targets) > 1:
             for target in node.targets:
                 # Assign the value to the target
@@ -1718,7 +1735,7 @@ class Visitor(ast.NodeVisitor):
             # Convert to a new value for return purposes
             JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
         )
-        # Save the current stack and yield inde
+        # Save the current stack and yield index
         self.context.load_name('<generator>')
         self.context.add_opcodes(
             ALOAD_name('#locals'),
