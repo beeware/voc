@@ -77,7 +77,6 @@ class GeneratorTests(TranspileTestCase):
         Unused yield from statements must not break
         the program compilation, but only ensue a warning."""
         self.assertCodeExecution("""
-
             def unused():
                 yield from range(5)
 
@@ -89,7 +88,6 @@ class GeneratorTests(TranspileTestCase):
         """Yield from is currently not implemented.
         Yield from statements become NotImplementedErrors at runtime."""
         self.assertCodeExecution("""
-
             def using_yieldfrom():
                 yield from range(5)
 
