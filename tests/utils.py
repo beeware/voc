@@ -534,7 +534,7 @@ class TranspileTestCase(TestCase):
         except FileExistsError:
             pass
 
-    def runAsJava(self, main_code, extra_code=None, args=None):
+    def runAsJava(self, main_code, extra_code=None, args=None, timed=False):
         """Run a block of Python code as a Java program."""
         # Output source code into test directory
         transpiler = Transpiler(verbosity=0)
@@ -542,11 +542,18 @@ class TranspileTestCase(TestCase):
         # Don't redirect stderr; we want to see any errors from the transpiler
         # as top level test failures.
         with capture_output(redirect_stderr=False):
+
+            t1_start = time.perf_counter()
+            t2_start = time.process_time()
+
             transpiler.transpile_string("test.py", main_code)
 
             if extra_code:
                 for name, code in extra_code.items():
                     transpiler.transpile_string("%s.py" % name.replace('.', os.path.sep), adjust(code))
+
+            t1_stop = time.perf_counter()
+            t2_stop = time.process_time()
 
         transpiler.write(self.temp_dir)
 
@@ -583,7 +590,15 @@ class TranspileTestCase(TestCase):
             )
             out = proc.communicate()[0].decode('utf8')
 
+        if timed:
+            print("  Elapsed time: ", (t1_stop-t1_start) * 1000, " ms")
+            print("  CPU process time: ", (t2_stop-t2_start) * 10000, " ms")
+
         return out
+
+    def runAndBenchAsJava(self, test_name, code):
+        print("Running", test_name, "...")
+        self.runAsJava(adjust(code), timed=True)
 
 
 class NotImplementedToExpectedFailure:
