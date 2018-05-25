@@ -325,21 +325,14 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Assign(self, node):
-        # Evaluate the value
-        has_nested_yield = False
-        for descendant_node in ast.walk(node.value):
-            if isinstance(descendant_node, ast.Yield):
-                has_nested_yield = True
-                self.visit(descendant_node)
-                break
-
-        if has_nested_yield:
+        def push_message(node):
+            # load message on stack
             self.context.load_name('<generator>')
             self.context.add_opcodes(
                 JavaOpcodes.GETFIELD('org/python/types/Generator', 'message', 'Lorg/python/Object;')
             )
 
-            # reset message to None after assignment
+            # reset message to None after pushing it on stack
             self.context.load_name('<generator>')
             self.context.add_opcodes(
                 JavaOpcodes.INVOKEVIRTUAL(
@@ -349,7 +342,61 @@ class Visitor(ast.NodeVisitor):
                     returns='V'
                 )
             )
-        else:
+
+        # walk subtree with node.value as root to find any yield node
+        nested_yield_node_found = False
+        for descendant_node in ast.walk(node.value):
+            if nested_yield_node_found:
+                break
+
+            if isinstance(descendant_node, ast.Yield):  # direct descendant, nothing much to process
+                # visit the Yield node
+                self.visit(descendant_node)
+                push_message(descendant_node)
+                nested_yield_node_found = True
+            else:
+                # go deeper into _fields of each descendant node
+                for field_name, value in ast.iter_fields(descendant_node):
+                    if isinstance(value, ast.Yield):
+                        # visit the Yield node
+                        nested_yield_node_found = True
+                        self.visit(value)
+                        push_message(value)
+
+                        # convert the Yield node to Name node for expression evaluation
+                        self.context.store_name('#msg-buffer-%x' % id(node))
+                        new_node = ast.Name(
+                            id='#msg-buffer-%x' % id(node),
+                            ctx=ast.Load(),
+                            lineno=value.lineno,
+                            col_offset=value.col_offset
+                        )
+                        setattr(descendant_node, field_name, new_node)
+                        break
+                    elif isinstance(value, list):  # args or kwargs list
+                        index = 0
+                        for arg_node in value:
+                            if isinstance(arg_node, ast.Yield):
+                                # visit the Yield node
+                                nested_yield_node_found = True
+                                self.visit(arg_node)
+                                push_message(arg_node)
+
+                                # convert the Yield node to Name node for expression evaluation
+                                # Use node.targets[0].id as temporary message storage
+                                self.context.store_name('#msg-buffer-%x' % id(node))
+                                new_node = ast.Name(
+                                    id='#msg-buffer-%x' % id(node),
+                                    ctx=ast.Load(),
+                                    lineno=arg_node.lineno,
+                                    col_offset=arg_node.col_offset
+                                )
+                                value[index] = new_node
+                            index += 1
+                        break
+
+        if not isinstance(node.value, ast.Yield):
+            # Evaluate the value
             self.visit(node.value)
 
         if len(node.targets) > 1:
