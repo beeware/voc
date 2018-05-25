@@ -126,20 +126,6 @@ class GeneratorTests(TranspileTestCase):
                 pass
             """)
 
-    def test_generator_power_generator(self):
-        self.assertCodeExecution("""
-            def gen():
-                while True:
-                    x = yield 1
-                    yield x ** 2
-
-            g = gen()
-            next(g)
-            print(g.send(6))
-            next(g)
-            print(g.send(-1))
-            """)
-
     def test_generator_send_loop(self):
         self.assertCodeExecution("""
             def gen():
@@ -157,7 +143,7 @@ class GeneratorTests(TranspileTestCase):
                 pass
             """)
 
-    def test_generator_yield_call(self):
+    def test_generator_yield_expr_call(self):
         self.assertCodeExecution("""
             def gen():
                 while True:
@@ -168,7 +154,7 @@ class GeneratorTests(TranspileTestCase):
             g.send("Hello World")
             """)
 
-    def test_generator_unary_op(self):
+    def test_generator_yield_expr_unary_op(self):
         self.assertCodeExecution("""
             def gen():
                 while True:
@@ -181,7 +167,7 @@ class GeneratorTests(TranspileTestCase):
             g.send(-1)
             """)
 
-    def test_generator_bool_op(self):
+    def test_generator_yield_expr_bool_op(self):
         self.assertCodeExecution("""
             def gen():
                 while True:
@@ -194,7 +180,7 @@ class GeneratorTests(TranspileTestCase):
             g.send(False)
             """)
 
-    def test_generator_binary_op(self):
+    def test_generator_yield_expr_binary_op(self):
         self.assertCodeExecution("""
             def gen():
                 while True:
@@ -226,3 +212,4 @@ class GeneratorTests(TranspileTestCase):
             g.send(2)
             g.send(0)
             """)
+            
