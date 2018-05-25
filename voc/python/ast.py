@@ -1817,22 +1817,14 @@ class Visitor(ast.NodeVisitor):
         loop = START_LOOP()
         self.context.add_opcodes(
             loop,
-        )
-        self.context.add_opcodes(
             TRY(),
         )
         self.context.load_name('#yield-iter-%x' % id(node))
         self.context.add_opcodes(
             python.Iterable.next(),
-        )
-        self.context.add_opcodes(
             CATCH('org/python/exceptions/StopIteration'),
-        )
-        self.context.add_opcodes(
             JavaOpcodes.POP(),
             jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
-        )
-        self.context.add_opcodes(
             END_TRY(),
         )
         self.visit(ast.Yield(None))
