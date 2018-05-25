@@ -1767,7 +1767,8 @@ class Visitor(ast.NodeVisitor):
                 JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
             )
         else:
-            # push NoneType object to stack
+            # push NoneType object to stack to support single yield statement (without operand)
+            # as the statment `yield` is equivalent to `yield None`
             self.context.add_opcodes(
                 JavaOpcodes.GETSTATIC(
                     'org/python/types/NoneType',
