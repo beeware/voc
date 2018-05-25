@@ -71,38 +71,38 @@ class GeneratorTests(TranspileTestCase):
             for i in myinterview.fizz_buzz():
                 print(i)
             """)
-    
+
     def test_yield_from_not_used(self):
         """Yield from is currently not implemented.
-        Unused yield from statements must not break 
+        Unused yield from statements must not break
         the program compilation, but only ensue a warning."""
         self.assertCodeExecution("""
-            
+
             def unused():
                 yield from range(5)
 
             print('Hello, world!')
             """)
-    
+
     @expectedFailure
     def test_yield_from_used(self):
         """Yield from is currently not implemented.
         Yield from statements become NotImplementedErrors at runtime."""
         self.assertCodeExecution("""
-            
+
             def using_yieldfrom():
                 yield from range(5)
-            
+
             for i in using_yieldfrom():
                 print(i)
             """)
-            
+
     def test_generator_send(self):
         self.assertCodeExecution("""
             def gen():
                 a = yield
                 print(a)
-                
+
             g = gen()
             next(g)
             try:
@@ -110,7 +110,7 @@ class GeneratorTests(TranspileTestCase):
             except StopIteration:
                 pass
             """)
-            
+
     def test_generator_multi_send(self):
         self.assertCodeExecution("""
             def gen():
@@ -118,7 +118,7 @@ class GeneratorTests(TranspileTestCase):
                 print(a)
                 b = yield 2
                 print(b)
-                
+
             g = gen()
             next(g)
             try:
@@ -127,35 +127,35 @@ class GeneratorTests(TranspileTestCase):
             except StopIteration:
                 pass
             """)
-            
+
     def test_generator_power_generator(self):
         self.assertCodeExecution("""
             def gen():
                 while True:
                     x = yield 1
                     yield x ** 2
-                
+
             g = gen()
             next(g)
             print(g.send(6))
             next(g)
             print(g.send(-1))
             """)
-            
+
     def test_generator_send_loop(self):
         self.assertCodeExecution("""
             def gen():
                 for i in range(1, 5):
                     a = yield i
                     print("printing from generator " + str(a))
-                    
+
             g = gen()
             g.send(None)
             try:
                 while True:
                     b = g.send(1)
                     print("printing from user " + str(b))
-            except StopIteration: 
+            except StopIteration:
                 pass
             """)
 
@@ -164,7 +164,7 @@ class GeneratorTests(TranspileTestCase):
             def gen():
                 while True:
                     x = print((yield))
-                
+
             g = gen()
             g.send(None)
             g.send("Hello World")
@@ -176,53 +176,53 @@ class GeneratorTests(TranspileTestCase):
                 while True:
                     x = -(yield)
                     yield x
-                
+
             g = gen()
             g.send(None)
             g.send(2)
             g.send(-1)
             """)
-            
+
     def test_generator_bool_op(self):
         self.assertCodeExecution("""
             def gen():
                 while True:
                     x = not (yield)
                     yield x
-                
+
             g = gen()
             g.send(None)
             g.send(True)
             g.send(False)
             """)
-            
+
     def test_generator_binary_op(self):
         self.assertCodeExecution("""
             def gen():
                 while True:
                     x = 2 + (yield)
                     yield x
-                    
+
             def gen2():
                 while True:
                     x = (yield) * 2
                     yield x
-                    
+
             def gen3():
                 while True:
                     x = (yield) ** 2
                     yield x
-                
+
             g = gen()
             g.send(None)
             g.send(2)
             g.send(-1)
-            
+
             g = gen2()
             g.send(None)
             g.send(100)
             g.send(20)
-            
+
             g = gen3()
             next(g)
             g.send(2)
