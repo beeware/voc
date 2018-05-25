@@ -148,6 +148,7 @@ class GeneratorTests(TranspileTestCase):
                 for i in range(1, 5):
                     a = yield i
                     print("printing from generator " + str(a))
+                    
             g = gen()
             g.send(None)
             try:
@@ -156,4 +157,74 @@ class GeneratorTests(TranspileTestCase):
                     print("printing from user " + str(b))
             except StopIteration: 
                 pass
+            """)
+
+    def test_generator_yield_call(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = print((yield))
+                
+            g = gen()
+            g.send(None)
+            g.send("Hello World")
+            """)
+
+    def test_generator_unary_op(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = -(yield)
+                    yield x
+                
+            g = gen()
+            g.send(None)
+            g.send(2)
+            g.send(-1)
+            """)
+            
+    def test_generator_bool_op(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = not (yield)
+                    yield x
+                
+            g = gen()
+            g.send(None)
+            g.send(True)
+            g.send(False)
+            """)
+            
+    def test_generator_binary_op(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = 2 + (yield)
+                    yield x
+                    
+            def gen2():
+                while True:
+                    x = (yield) * 2
+                    yield x
+                    
+            def gen3():
+                while True:
+                    x = (yield) ** 2
+                    yield x
+                
+            g = gen()
+            g.send(None)
+            g.send(2)
+            g.send(-1)
+            
+            g = gen2()
+            g.send(None)
+            g.send(100)
+            g.send(20)
+            
+            g = gen3()
+            next(g)
+            g.send(2)
+            g.send(0)
             """)
