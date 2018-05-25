@@ -212,4 +212,56 @@ class GeneratorTests(TranspileTestCase):
             g.send(2)
             g.send(0)
             """)
-            
+
+    def test_generator_yield_expr_aug_assign(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = 2
+                    x += (yield)
+                    yield x
+
+            g = gen()
+            g.send(None)
+            g.send(1)
+            g.send(2)
+            """)
+
+    def test_generator_yield_expr_compare(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = 1 <= (yield) < 5
+                    yield x
+
+            g = gen()
+            g.send(None)
+            g.send(1)
+            g.send(100)
+            """)
+
+    def test_generator_yield_expr_if(self):
+        self.assertCodeExecution("""
+            def gen():
+                if (yield):
+                    print("Hello world")
+
+            g = gen()
+            g.send(None)
+            try:
+                g.send(1)
+            except StopIteration:
+                pass
+            """)
+
+    @expectedFailure
+    def test_generator_yield_expr_return(self):
+        self.assertCodeExecution("""
+            def gen():
+                return (yield)
+
+            g = gen()
+            g.send(None)
+            g.send(1)  # for some reason the generator keeps returning value
+            g.send(100) # without raising StopIteration error
+            """)
