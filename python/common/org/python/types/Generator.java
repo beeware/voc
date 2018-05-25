@@ -39,7 +39,7 @@ public class Generator extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Implement send(message=None).",
+            __doc__ = "Implement send(message).",
             args = {"message"}
     )
     public org.python.Object send(org.python.Object message) {
