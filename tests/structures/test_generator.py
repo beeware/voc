@@ -95,7 +95,7 @@ class GeneratorTests(TranspileTestCase):
                 print(i)
         """)
 
-    def test_chainning_yieldfrom(self):
+    def test_chaining_yieldfrom(self):
         self.assertCodeExecution("""
             def gen1():
                 yield 'a'
