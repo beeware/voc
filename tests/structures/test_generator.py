@@ -81,7 +81,7 @@ class GeneratorTests(TranspileTestCase):
             def unused():
                 yield from range(5)
 
-            print('Hello, world!')
+                print('Hello, world!')
             """)
 
     @expectedFailure
