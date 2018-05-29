@@ -193,6 +193,8 @@ class Visitor(ast.NodeVisitor):
         self.pop_context()
 
     def parse_yield(self, node):
+        """parse yield appearing in expression before the expression is evaluated
+        """
         def get_message():
             # load message on stack
             self.context.load_name('<generator>')
@@ -221,6 +223,7 @@ class Visitor(ast.NodeVisitor):
                 lineno=_node.lineno,
                 col_offset=_node.col_offset
             )
+
         for field_name, value in ast.iter_fields(node):
             if isinstance(value, ast.Yield):
                 if isinstance(node, ast.Expr):
@@ -1806,6 +1809,17 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.ASTORE(index),
                 )
 
+        # attempt to throw exception
+        self.context.load_name('<generator>')
+        self.context.add_opcodes(
+            JavaOpcodes.INVOKEVIRTUAL(
+                'org/python/types/Generator',
+                'throw_exception',
+                args=[],
+                returns='V'
+            )
+        )
+
     @node_visitor
     def visit_YieldFrom(self, node):
         # expr value):
@@ -2203,6 +2217,11 @@ class Visitor(ast.NodeVisitor):
     def visit_Attribute(self, node, ctx=None):
         ctx = ctx or node.ctx
         self.visit(node.value)
+
+        # For generator `throw` method,
+        # quick fix for reserved keyword `throw` in Java
+        if node.attr == "throw":
+            node.attr = "_throw"  # refer org.python.types.Generator._throw
 
         if type(ctx) == ast.Load:
             self.context.add_opcodes(

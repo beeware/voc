@@ -1,5 +1,8 @@
 package org.python.types;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 public class Generator extends org.python.types.Object {
     java.lang.String name;
     java.lang.reflect.Method expression;
@@ -8,6 +11,7 @@ public class Generator extends org.python.types.Object {
 
     private boolean just_started = true;
     public org.python.Object message;
+    public org.python.Object exception;
 
     public int hashCode() {
         return this.expression.hashCode();
@@ -26,7 +30,7 @@ public class Generator extends org.python.types.Object {
         this.expression = expression;
         this.yield_point = 0;
         this.stack = stack;
-        this.message = new org.python.types.NoneType();
+        this.message = org.python.types.NoneType.NONE;
     }
 
     public void yield(java.util.Map<java.lang.String, org.python.Object> stack, int yield_point) {
@@ -52,6 +56,65 @@ public class Generator extends org.python.types.Object {
 
     public void reset_message() {
         this.message = org.python.types.NoneType.NONE;
+    }
+
+    @org.python.Method(
+        __doc__ = "Implement throw(type, value=None, traceback=None).",
+        args = {"type"},
+        default_args = {"value", "traceback"}
+    )
+    public org.python.Object _throw(org.python.Object type, org.python.Object value, org.python.Object traceback) {
+        if(value == null) {
+            value = org.python.types.NoneType.NONE;
+        }
+
+        if (traceback == null) {
+            traceback = org.python.types.NoneType.NONE;
+        } else {
+            throw new org.python.exceptions.NotImplementedError("traceback currently not supported");
+        }
+
+        String exception_name;
+
+        try {
+            exception_name = org.Python.typeName(((org.python.types.Type) type).klass);
+        } catch (ClassCastException e) {
+            throw new org.python.exceptions.TypeError(
+                "exceptions must be classes or instances deriving from BaseException, not " + type.typeName());
+        }
+
+        // TODO: check whether the klass inherits org.python.exception.BasseException
+
+        try {
+            Class exception_class = Class.forName("org.python.exceptions." + exception_name);
+            Constructor exception_constructor;
+            if (value instanceof org.python.types.NoneType) {
+                exception_constructor = exception_class.getConstructor();
+                this.exception = Type.toPython(exception_constructor.newInstance());
+            }
+            // TODO: parse for signature String msg and
+            // TODO: (org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs)
+        } catch (ClassNotFoundException e) {
+            throw new org.python.exceptions.NameError(exception_name);
+        } catch (NoSuchMethodException|InstantiationException|IllegalAccessException|InvocationTargetException e) {
+            throw new org.python.exceptions.RuntimeError(e.getMessage());
+        }
+
+        if (just_started) {
+            // TODO: close the generator before throwing exception
+            throw (org.python.exceptions.BaseException)this.exception;
+        }
+
+        return this.__next__();
+    }
+
+    public void throw_exception() {
+        if(this.exception != null) {
+            // TODO: close the generator before throwing exception
+            org.python.exceptions.BaseException exception = (org.python.exceptions.BaseException)this.exception;
+            this.exception = null;
+            throw exception;
+        }
     }
 
     @org.python.Method(
