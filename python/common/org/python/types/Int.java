@@ -3,9 +3,19 @@ package org.python.types;
 public class Int extends org.python.types.Object {
     public long value;
 
-    public static int nsmallposints = 257;
-    public static int nsmallnegints = 5;
-    public static org.python.types.Int[] smallints = new org.python.types.Int[nsmallnegints + nsmallposints];
+    public static int NSMALLPOSINTS = 257;
+    public static int NSMALLNEGINTS = 5;
+    /**
+     * Small integers are pre-allocated and pre-initialized in this list so that
+     * they can be shared. These are the integers [-NSMALLNEGINTS, NSMALLPOSINTS)
+     */
+    public static final org.python.types.List smallints = new org.python.types.List();
+    static {
+      for(int i = -NSMALLNEGINTS; i < NSMALLPOSINTS; i++) {
+        org.python.types.Int i_obj = new org.python.types.Int(i);
+        smallints.append(i_obj);
+      }
+    }
 
     /**
      * A utility method to update the internal value of this object.
@@ -742,15 +752,17 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __ilshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            this.value <<= (((org.python.types.Bool) other).value ? 1 : 0);
-            return new org.python.types.Int(this.value);
+            long val = this.value;
+            val <<= (((org.python.types.Bool) other).value ? 1 : 0);
+            return new org.python.types.Int(val);
         } else if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
             if (other_val < 0) {
                 throw new org.python.exceptions.ValueError("negative shift count");
             }
-            this.value <<= other_val;
-            return new org.python.types.Int(this.value);
+            long val = this.value;
+            val <<= other_val;
+            return new org.python.types.Int(val);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: 'int' and '" + other.typeName() + "'");
     }
@@ -808,15 +820,17 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __irshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            this.value >>= (((org.python.types.Bool) other).value ? 1 : 0);
-            return new org.python.types.Int(this.value);
+            long val = this.value;
+            val >>= (((org.python.types.Bool) other).value ? 1 : 0);
+            return new org.python.types.Int(val);
         } else if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
             if (other_val < 0) {
                 throw new org.python.exceptions.ValueError("negative shift count");
             }
-            this.value >>= other_val;
-            return new org.python.types.Int(this.value);
+            long val = this.value;
+            val >>= other_val;
+            return new org.python.types.Int(val);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: 'int' and '" + other.typeName() + "'");
     }
