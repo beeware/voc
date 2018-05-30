@@ -32,6 +32,7 @@ _output_dir = ''
 
 def setUpSuite():
     """Configure the entire test suite.
+
     This only needs to be run once, prior to the first test.
     """
     global _output_dir
@@ -543,17 +544,11 @@ class TranspileTestCase(TestCase):
         # as top level test failures.
         with capture_output(redirect_stderr=False):
 
-            t1_start = time.perf_counter()
-            t2_start = time.process_time()
-
             transpiler.transpile_string("test.py", main_code)
 
             if extra_code:
                 for name, code in extra_code.items():
                     transpiler.transpile_string("%s.py" % name.replace('.', os.path.sep), adjust(code))
-
-            t1_stop = time.perf_counter()
-            t2_stop = time.process_time()
 
         transpiler.write(self.temp_dir)
 
@@ -565,6 +560,9 @@ class TranspileTestCase(TestCase):
             self.jvm.stdin.write(("python.test\n").encode("utf-8"))
             self.jvm.stdin.flush()
 
+            t1_start = time.perf_counter()
+            t2_start = time.process_time()
+
             out = ""
             while True:
                 try:
@@ -575,12 +573,20 @@ class TranspileTestCase(TestCase):
                         out += line
                 except IOError as e:
                     continue
+
+            t1_stop = time.perf_counter()
+            t2_stop = time.process_time()
+
         else:
             classpath = os.pathsep.join([
                 os.path.join('..', 'dist', 'python-java-support.jar'),
                 os.path.join('..', 'java'),
                 os.curdir,
             ])
+
+            t1_start = time.perf_counter()
+            t2_start = time.process_time()
+
             proc = subprocess.Popen(
                 ["java", "-classpath", classpath, "python.test"] + args,
                 stdin=subprocess.PIPE,
@@ -588,6 +594,10 @@ class TranspileTestCase(TestCase):
                 stderr=subprocess.STDOUT,
                 cwd=self.temp_dir
             )
+
+            t1_stop = time.perf_counter()
+            t2_stop = time.process_time()
+
             out = proc.communicate()[0].decode('utf8')
 
         if timed:
@@ -595,10 +605,6 @@ class TranspileTestCase(TestCase):
             print("  CPU process time: ", (t2_stop-t2_start) * 10000, " ms")
 
         return out
-
-    def runAndBenchAsJava(self, test_name, code):
-        print("Running", test_name, "...")
-        self.runAsJava(adjust(code), timed=True)
 
 
 class NotImplementedToExpectedFailure:
