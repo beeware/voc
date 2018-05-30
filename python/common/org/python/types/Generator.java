@@ -59,12 +59,12 @@ public class Generator extends org.python.types.Object {
     }
 
     @org.python.Method(
-        __doc__ = "Implement throw(type, value=None, traceback=None).",
-        args = {"type"},
-        default_args = {"value", "traceback"}
+            __doc__ = "Implement throw(type, value=None, traceback=None).",
+            args = {"type"},
+            default_args = {"value", "traceback"}
     )
     public org.python.Object _throw(org.python.Object type, org.python.Object value, org.python.Object traceback) {
-        if(value == null) {
+        if (value == null) {
             value = org.python.types.NoneType.NONE;
         }
 
@@ -96,24 +96,65 @@ public class Generator extends org.python.types.Object {
             // TODO: (org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs)
         } catch (ClassNotFoundException e) {
             throw new org.python.exceptions.NameError(exception_name);
-        } catch (NoSuchMethodException|InstantiationException|IllegalAccessException|InvocationTargetException e) {
+        } catch (NoSuchMethodException |
+            InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new org.python.exceptions.RuntimeError(e.getMessage());
         }
 
         if (just_started) {
             // TODO: close the generator before throwing exception
-            throw (org.python.exceptions.BaseException)this.exception;
+            throw (org.python.exceptions.BaseException) this.exception;
         }
 
         return this.__next__();
     }
 
     public void throw_exception() {
-        if(this.exception != null) {
+        if (this.exception != null) {
             // TODO: close the generator before throwing exception
-            org.python.exceptions.BaseException exception = (org.python.exceptions.BaseException)this.exception;
+            org.python.exceptions.BaseException exception = (org.python.exceptions.BaseException) this.exception;
             this.exception = null;
             throw exception;
+        }
+    }
+
+    @org.python.Method(
+            __doc__ = "Implement close(self)."
+    )
+    public org.python.Object close() {
+        if (this.just_started) {
+            this.expression = null;
+        }
+
+        if (this.expression == null) {
+            // Do nothing if generator has already exited
+            return org.python.types.NoneType.NONE;
+        }
+
+        boolean has_exit_normally = false;
+        try {
+            this.exception = new org.python.exceptions.GeneratorExit();
+            this.__next__();
+        } catch (org.python.exceptions.GeneratorExit | org.python.exceptions.StopIteration e) {
+            has_exit_normally = true;
+        }
+        if (!has_exit_normally) {
+            // the generator yields value
+            throw new org.python.exceptions.RuntimeError("generator ignored GeneratorExit");
+        }
+
+        this.expression = null; // cleanup
+        return org.python.types.NoneType.NONE;
+    }
+
+    @org.python.Method(
+            __doc__ = "Return del(self)."
+    )
+    public void __del__() {
+        try {
+            this.close();
+        } catch (Exception e) {
+            //TODO: log error message in java equivalent of sys.stderr
         }
     }
 
@@ -136,6 +177,10 @@ public class Generator extends org.python.types.Object {
             __doc__ = "Implement next(self)."
     )
     public org.python.Object __next__() {
+        if (this.expression == null) {
+            // Generator has already exited
+            throw new org.python.exceptions.StopIteration();
+        }
         try {
             just_started = false;
             return (org.python.Object) this.expression.invoke(null, new java.lang.Object[]{this});
