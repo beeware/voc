@@ -265,3 +265,129 @@ class GeneratorTests(TranspileTestCase):
             g.send(1)  # for some reason the generator keeps returning value
             g.send(100) # without raising StopIteration error
             """)
+
+    def test_generator_throw_on_starting(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield "Hello World"
+
+            g = gen()
+            try:
+                g.throw(ZeroDivisionError)
+            except ZeroDivisionError:
+                pass
+            """)
+
+    def test_generator_throw_other_exception(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield
+                    print("Hello World")
+                except ZeroDivisionError:
+                    raise TypeError
+                    
+                print("") # temporary fix for no 'next_op'
+
+            g = gen()
+            next(g)
+            try:
+                g.throw(ZeroDivisionError)
+            except TypeError:
+                pass
+            """)
+
+    def test_generator_throw_complex(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield "from try block"
+                except TypeError:
+                    yield "from catch block"
+
+                yield "from outside try-except"
+                a = yield
+                print(a)
+
+            g = gen()
+            print(next(g))
+            print(g.throw(TypeError))
+            print(next(g))
+            print(g.send("message"))
+            """)
+
+    def test_generator_close(self):
+        self.assertCodeExecution("""
+            def gen():
+                print("Hello world")
+                try:
+                    yield
+                except TypeError:
+                    pass
+                except ZeroDivisionError:
+                    pass
+
+            g = gen()
+            print(g.close())
+            try:
+                print(next(g))
+            except StopIteration:
+                pass
+            """)
+
+    def test_generator_close_ignore_exit(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield
+                except TypeError:
+                    pass
+                except GeneratorExit:
+                    yield "exit ignored"
+
+            g = gen()
+            next(g)
+            try:
+                g.close()
+            except RuntimeError:
+                pass
+            """)
+
+    def test_generator_close_exception_propagation(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield
+                except GeneratorExit:
+                    raise OSError
+
+                print("") # temporary fix for no 'next_op'
+
+            g = gen()
+            next(g)
+            try:
+                g.close()
+            except OSError:
+                pass
+            """)
+
+    def test_generator_close_twice(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield 1
+                yield 2
+
+            g = gen()
+            print(g.close())
+            print(g.close())
+            """)
+
+    @expectedFailure
+    def test_generator_yield_no_next_op(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield
+                except:
+                    raise StopIteration
+            """)
