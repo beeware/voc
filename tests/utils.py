@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import traceback
 from unittest import TestCase
 from itertools import permutations
@@ -214,6 +215,9 @@ MEMORY_REFERENCE = re.compile('0x[\dABCDEFabcdef]{4,16}')
 END_OF_CODE_STRING = '===end of test==='
 END_OF_CODE_STRING_NEWLINE = END_OF_CODE_STRING + '\n'
 
+# Prevent floating point discrepancies in very low significant digits from being an issue
+FLOAT_PRECISION = re.compile('(\\.\d{5})\d+')
+
 
 def cleanse_java(raw, substitutions):
     matches = JAVA_EXCEPTION.search(raw)
@@ -252,6 +256,8 @@ def cleanse_java(raw, substitutions):
     )
 
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
+    # Replace high precision floats with abbreviated forms
+    out = FLOAT_PRECISION.sub('\\1...', out)
     out = out.replace(
         "'python.test'", '***EXECUTABLE***').replace(
         "'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
@@ -289,6 +295,9 @@ def cleanse_python(raw, substitutions):
     )
     # Normalize memory references from output
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
+
+    # Replace high precision floats with abbreviated forms
+    out = FLOAT_PRECISION.sub('\\1...', out)
 
     # Replace references to the test script with something generic
     out = out.replace("'test.py'", '***EXECUTABLE***')
