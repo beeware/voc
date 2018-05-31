@@ -267,6 +267,20 @@ class GeneratorTests(TranspileTestCase):
                 pass
             """)
 
+    @expectedFailure
+    def test_generator_yield_try_finally_special_case(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield 'Hello World'
+                finally:
+                    print('finally')
+            
+            # Output is 'finally' followed by 'Hello World'
+            # due to the way CPython do garbage collection
+            print(next(gen()))  
+            """)
+
     def test_generator_throw_on_starting(self):
         self.assertCodeExecution("""
             def gen():
@@ -306,13 +320,42 @@ class GeneratorTests(TranspileTestCase):
 
                 yield "from outside try-except"
                 a = yield
-                print(a)
 
             g = gen()
             print(next(g))
             print(g.throw(TypeError))
             print(next(g))
             print(g.send("message"))
+            """)
+
+    def test_generator_throw_on_close(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield "Hello World"
+
+            g = gen()
+            g.close()
+            try:
+                g.throw(ZeroDivisionError)
+            except ZeroDivisionError:
+                pass
+            """)
+
+    def test_generator_next_after_throw(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield 1
+                yield 2
+
+            g = gen()
+            print(next(g))
+            try:
+                g.throw(TypeError)
+            except TypeError:
+                try:
+                    print(next(g))
+                except StopIteration:
+                    pass
             """)
 
     def test_generator_close(self):

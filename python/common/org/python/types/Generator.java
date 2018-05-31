@@ -106,12 +106,16 @@ public class Generator extends org.python.types.Object {
             throw (org.python.exceptions.BaseException) this.exception;
         }
 
-        return this.__next__();
+        try {
+            return this.__next__();
+        } catch (org.python.exceptions.BaseException e) {
+            this.expression = null; // close this generator if it did not catch the exception
+            throw e; // re-throw exception after closing
+        }
     }
 
     public void throw_exception() {
         if (this.exception != null) {
-            // TODO: close the generator before throwing exception
             org.python.exceptions.BaseException exception = (org.python.exceptions.BaseException) this.exception;
             this.exception = null;
             throw exception;
@@ -139,7 +143,7 @@ public class Generator extends org.python.types.Object {
             has_exit_normally = true;
         }
         if (!has_exit_normally) {
-            // the generator yields value
+            // Generator caught GeneratorExit exception and yields
             throw new org.python.exceptions.RuntimeError("generator ignored GeneratorExit");
         }
 
