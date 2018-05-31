@@ -1086,12 +1086,14 @@ class GeneratorFunction(Function):
             )
 
     def visitor_teardown(self):
-        if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
-            self.add_opcodes(
-                java.New('org/python/exceptions/StopIteration'),
-                java.Init('org/python/exceptions/StopIteration'),
-                JavaOpcodes.ATHROW(),
-            )
+        # implicit return for generator
+        # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
+        # TODO: Optimize opcode space usage by differentiating between a “returning” raise and raise in try-catch suite
+        self.add_opcodes(
+            java.New('org/python/exceptions/StopIteration'),
+            java.Init('org/python/exceptions/StopIteration'),
+            JavaOpcodes.ATHROW(),
+        )
 
     def transpile_method(self):
         return [
@@ -1208,12 +1210,14 @@ class GeneratorMethod(Method):
             )
 
     def visitor_teardown(self):
-        if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
-            self.add_opcodes(
-                java.New('org/python/exceptions/StopIteration'),
-                java.Init('org/python/exceptions/StopIteration'),
-                JavaOpcodes.ATHROW(),
-            )
+        # implicit return for generator
+        # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
+        # TODO: Optimize opcode space usage by differentiating between a “returning” raise and raise in try-catch suite
+        self.add_opcodes(
+            java.New('org/python/exceptions/StopIteration'),
+            java.Init('org/python/exceptions/StopIteration'),
+            JavaOpcodes.ATHROW(),
+        )
 
     def transpile_method(self):
         return [

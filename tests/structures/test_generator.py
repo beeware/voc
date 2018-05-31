@@ -254,7 +254,6 @@ class GeneratorTests(TranspileTestCase):
                 pass
             """)
 
-    @expectedFailure
     def test_generator_yield_expr_return(self):
         self.assertCodeExecution("""
             def gen():
@@ -262,8 +261,10 @@ class GeneratorTests(TranspileTestCase):
 
             g = gen()
             g.send(None)
-            g.send(1)  # for some reason the generator keeps returning value
-            g.send(100) # without raising StopIteration error
+            try:
+                g.send(1)
+            except StopIteration:
+                pass
             """)
 
     def test_generator_throw_on_starting(self):
@@ -286,8 +287,6 @@ class GeneratorTests(TranspileTestCase):
                     print("Hello World")
                 except ZeroDivisionError:
                     raise TypeError
-                    
-                print("") # temporary fix for no 'next_op'
 
             g = gen()
             next(g)
@@ -361,8 +360,6 @@ class GeneratorTests(TranspileTestCase):
                 except GeneratorExit:
                     raise OSError
 
-                print("") # temporary fix for no 'next_op'
-
             g = gen()
             next(g)
             try:
@@ -380,14 +377,4 @@ class GeneratorTests(TranspileTestCase):
             g = gen()
             print(g.close())
             print(g.close())
-            """)
-
-    @expectedFailure
-    def test_generator_yield_no_next_op(self):
-        self.assertCodeExecution("""
-            def gen():
-                try:
-                    yield
-                except:
-                    raise StopIteration
             """)

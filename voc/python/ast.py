@@ -346,7 +346,15 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Return(self, node):
         # expr? value):
-        if node.value:
+        if self.context.generator:
+            # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
+            # TODO: StopIteration enhancement to include node.value
+            self.context.add_opcodes(
+                java.New('org/python/exceptions/StopIteration'),
+                java.Init('org/python/exceptions/StopIteration'),
+                JavaOpcodes.ATHROW(),
+            )
+        elif node.value:
             self.visit(node.value)
         else:
             self.context.add_opcodes(python.NONE())
