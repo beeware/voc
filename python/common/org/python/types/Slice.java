@@ -41,7 +41,7 @@ public class Slice extends org.python.types.Object {
             throw new org.python.exceptions.ValueError("length should not be negative");
         }
         if (this.step == org.python.types.NoneType.NONE) {
-            step = new org.python.types.Int(1);
+            step = org.python.types.Int.getInt(1);
         } else {
             step = (org.python.types.Int) this.step;
         }
@@ -91,8 +91,8 @@ public class Slice extends org.python.types.Object {
         }
 
         java.util.List<org.python.Object> tuple = new java.util.ArrayList<org.python.Object>();
-        tuple.add(new org.python.types.Int(start));
-        tuple.add(new org.python.types.Int(stop));
+        tuple.add(org.python.types.Int.getInt(start));
+        tuple.add(org.python.types.Int.getInt(stop));
         tuple.add(step);
         return new org.python.types.Tuple(tuple);
     }

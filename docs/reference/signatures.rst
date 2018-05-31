@@ -59,7 +59,7 @@ no arguments, there is no need to supply any of the named
         __doc__ = "Return 4, always and ever."
     )
     public org.python.Object constant_4() {
-        return new org.python.types.Int(4);
+        return org.python.types.Int.getInt(4);
     }
 
 
@@ -106,7 +106,7 @@ to either add ``1`` to the number, or the supplied argument.
     )
     public org.python.Object inc(org.python.Object num, org.python.Object delta) {
         if (delta == null) {
-            delta = new org.python.types.Int(1);
+            delta = org.python.types.Int.getInt(1);
         }
         // Left as exercise for the reader.
     }

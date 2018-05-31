@@ -83,7 +83,7 @@ public class sys extends org.python.types.Module {
 
         platform = python.platform.impl.getPlatform();
 
-        hexversion = new org.python.types.Int(org.Python.VERSION);
+        hexversion = org.python.types.Int.getInt(org.Python.VERSION);
 
         int major = org.Python.VERSION >> 24;
         int minor = (org.Python.VERSION >> 16) % 0x10;

@@ -70,7 +70,7 @@ public class Dict extends org.python.types.Object {
                             org.python.types.Str str = ((org.python.types.Str) next);
                             data = new java.util.ArrayList<org.python.Object>();
                             for (int i = 0; i < ((org.python.types.Int) str.__len__()).value; i++) {
-                                data.add(str.__getitem__(new org.python.types.Int(i)));
+                                data.add(str.__getitem__(org.python.types.Int.getInt(i)));
                             }
                         } else {
                             throw new org.python.exceptions.TypeError(
@@ -252,7 +252,7 @@ public class Dict extends org.python.types.Object {
             __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.size());
+        return org.python.types.Int.getInt(this.value.size());
     }
 
     @org.python.Method(

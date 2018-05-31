@@ -34,13 +34,6 @@ class IntTests(TranspileTestCase):
             int('q', 16)
             """)
 
-    def test_power_float(self):
-        self.assertCodeExecution("""
-            x = -5
-            y = 3-4j
-            x ** y
-            """)
-
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'int'

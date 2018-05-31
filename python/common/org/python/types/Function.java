@@ -35,7 +35,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         try {
             org.python.types.Tuple consts = (org.python.types.Tuple) this.code.co_consts;
             if (consts != null && ((org.python.types.Int) consts.count()).value != 0) {
-                doc = consts.__getitem__(new org.python.types.Int(0));
+                doc = consts.__getitem__(org.python.types.Int.getInt(0));
             } else {
                 doc = org.python.types.NoneType.NONE;
             }
@@ -63,6 +63,8 @@ public class Function extends org.python.types.Object implements org.python.Call
         this.origin = org.python.types.Type.Origin.BUILTIN;
         this.name = new org.python.types.Str(method.getName());
         this.method = method;
+
+        System.out.println("Function: " + this.name);
 
         // System.out.println("CREATE FUNCTION 1 " + this.name);
         // java.lang.Thread.currentThread().dumpStack();
@@ -101,8 +103,14 @@ public class Function extends org.python.types.Object implements org.python.Call
             varnames.add(new org.python.types.Str(kwargs_name));
         }
 
+        //org.python.types.Int.printSomething();
+
+        org.python.types.Int co_argcount = new org.python.types.Int(argcount);
+        //org.python.types.Int co_flags = org.python.types.Int.getInt(flags);
+        //org.python.types.Int co_kwonlyargcount = org.python.types.Int.getInt(flags);
+
         this.code = new org.python.types.Code(
-                new org.python.types.Int(argcount),  // co_argcount
+                co_argcount,  // co_argcount
                 new org.python.types.Tuple(),  // co_cellvars
                 null,  // new org.python.types.Bytes(),  // co_code
                 null,  // new org.python.types.Tuple(),  // co_consts
