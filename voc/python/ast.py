@@ -1713,6 +1713,10 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Yield(self, node):
         if hasattr(node, "lineno"):
+            # Check for programmatically defined yield node.
+            # A programmatically defined yield node does not has the attribute `lineno`
+            # Example: visit_YieldFrom function defined ast.Yield(None) after pushing value
+            # obtained from iterator onto stack, hence no need to visit node.value here
             self.visit(node.value)
         yield_point = len(self.context.yield_points) + 1
         self.context.add_opcodes(
