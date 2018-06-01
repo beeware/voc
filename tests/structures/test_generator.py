@@ -269,6 +269,8 @@ class GeneratorTests(TranspileTestCase):
 
     @expectedFailure
     def test_generator_yield_try_finally_special_case(self):
+        """Output is 'finally' followed by 'Hello World'
+        due to the way CPython handles garbage collection."""
         self.assertCodeExecution("""
             def gen():
                 try:
@@ -276,8 +278,6 @@ class GeneratorTests(TranspileTestCase):
                 finally:
                     print('finally')
             
-            # Output is 'finally' followed by 'Hello World'
-            # due to the way CPython do garbage collection
             print(next(gen()))  
             """)
 
