@@ -109,7 +109,7 @@ public class Generator extends org.python.types.Object {
         try {
             return this.__next__();
         } catch (org.python.exceptions.BaseException e) {
-            this.expression = null; // close this generator if it did not catch the exception
+            this.close(); // close this generator if it did not catch the exception
             throw e; // re-throw exception after closing
         }
     }
