@@ -555,13 +555,14 @@ class TranspileTestCase(TestCase):
         if args is None:
             args = []
 
+        t1_start = time.perf_counter()
+        t2_start = time.process_time()
+
         if len(args) == 0:
+
             # encode to turn str into bytes-like object
             self.jvm.stdin.write(("python.test\n").encode("utf-8"))
             self.jvm.stdin.flush()
-
-            t1_start = time.perf_counter()
-            t2_start = time.process_time()
 
             out = ""
             while True:
@@ -584,9 +585,6 @@ class TranspileTestCase(TestCase):
                 os.curdir,
             ])
 
-            t1_start = time.perf_counter()
-            t2_start = time.process_time()
-
             proc = subprocess.Popen(
                 ["java", "-classpath", classpath, "python.test"] + args,
                 stdin=subprocess.PIPE,
@@ -601,8 +599,8 @@ class TranspileTestCase(TestCase):
             out = proc.communicate()[0].decode('utf8')
 
         if timed:
-            print("  Elapsed time: ", (t1_stop-t1_start) * 1000, " ms")
-            print("  CPU process time: ", (t2_stop-t2_start) * 10000, " ms")
+            print("  Elapsed time: ", (t1_stop-t1_start), " sec")
+            print("  CPU process time: ", (t2_stop-t2_start), " sec")
 
         return out
 
