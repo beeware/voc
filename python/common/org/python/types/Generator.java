@@ -6,6 +6,9 @@ public class Generator extends org.python.types.Object {
     public int yield_point;
     public java.util.Map<java.lang.String, org.python.Object> stack;
 
+    private boolean just_started = true;
+    public org.python.Object message;
+
     public int hashCode() {
         return this.expression.hashCode();
     }
@@ -23,6 +26,7 @@ public class Generator extends org.python.types.Object {
         this.expression = expression;
         this.yield_point = 0;
         this.stack = stack;
+        this.message = new org.python.types.NoneType();
     }
 
     public void yield(java.util.Map<java.lang.String, org.python.Object> stack, int yield_point) {
@@ -32,6 +36,22 @@ public class Generator extends org.python.types.Object {
         // }
         this.yield_point = yield_point;
         this.stack = stack;
+    }
+
+    @org.python.Method(
+            __doc__ = "Implement send(message).",
+            args = {"message"}
+    )
+    public org.python.Object send(org.python.Object message) {
+        if (just_started && !(message instanceof org.python.types.NoneType)) {
+            throw new org.python.exceptions.TypeError("can't send non-None value to a just-started generator");
+        }
+        this.message = message;
+        return this.__next__();
+    }
+
+    public void reset_message() {
+        this.message = org.python.types.NoneType.NONE;
     }
 
     @org.python.Method(
@@ -54,6 +74,7 @@ public class Generator extends org.python.types.Object {
     )
     public org.python.Object __next__() {
         try {
+            just_started = false;
             return (org.python.Object) this.expression.invoke(null, new java.lang.Object[]{this});
         } catch (java.lang.IllegalAccessException e) {
             throw new org.python.exceptions.RuntimeError("Illegal access to Java method " + this.expression);

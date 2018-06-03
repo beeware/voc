@@ -157,6 +157,7 @@ class Visitor(ast.NodeVisitor):
 
     def visit(self, node):
         try:
+            self.parse_yield(node)
             super().visit(node)
         except Exception as e:
             print(
@@ -191,6 +192,54 @@ class Visitor(ast.NodeVisitor):
 
         self.pop_context()
 
+    def parse_yield(self, node):
+        def get_message():
+            # load message on stack
+            self.context.load_name('<generator>')
+            self.context.add_opcodes(
+                JavaOpcodes.GETFIELD('org/python/types/Generator', 'message', 'Lorg/python/Object;')
+            )
+
+            # reset message to None after pushing it on stack
+            self.context.load_name('<generator>')
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Generator',
+                    'reset_message',
+                    args=[],
+                    returns='V'
+                )
+            )
+
+        def convert_to_Name(_node):
+            # convert Yield node to Name node for expression evaluation
+            # expression operand is the message stored in generator
+            self.context.store_name('#msg-buffer-%x' % id(node))
+            return ast.Name(
+                id='#msg-buffer-%x' % id(node),
+                ctx=ast.Load(),
+                lineno=_node.lineno,
+                col_offset=_node.col_offset
+            )
+        for field_name, value in ast.iter_fields(node):
+            if isinstance(value, ast.Yield):
+                if isinstance(node, ast.Expr):
+                    # don't parse Expr(value=Yield), as it is regular yield statement
+                    return
+                self.visit_Yield(value)  # visit the Yield node
+                get_message()
+                setattr(node, field_name, convert_to_Name(value))
+                return
+            elif isinstance(value, list):  # args or kwargs list
+                index = 0
+                for arg_node in value:
+                    if isinstance(arg_node, ast.Yield):
+                        self.visit_Yield(arg_node)  # visit the Yield node
+                        get_message()
+                        value[index] = convert_to_Name(arg_node)
+                        return
+                    index += 1
+
     @node_visitor
     def visit_Interactive(self, node):
         # stmt* body):
@@ -223,9 +272,9 @@ class Visitor(ast.NodeVisitor):
 
         for child in node.body:
             self.visit(child)
-                
+
         self.pop_context()
-        
+
     @node_visitor
     def visit_ClassDef(self, node):
         # Construct a class.
@@ -325,7 +374,7 @@ class Visitor(ast.NodeVisitor):
 
     @node_visitor
     def visit_Assign(self, node):
-        # Evaluate the value
+        # evaluate the value
         self.visit(node.value)
 
         if len(node.targets) > 1:
@@ -344,7 +393,6 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_AugAssign(self, node):
         # expr target, operator op, expr value):
-
         # Evaluate the target
         if isinstance(node.target, ast.Subscript):
             self.visit_Subscript(node.target, ctx=ast.Load())
@@ -1713,17 +1761,35 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Yield(self, node):
         if hasattr(node, "lineno"):
-            # Check for programmatically defined yield node.
+            # Checks for programmatically defined yield node.
             # A programmatically defined yield node does not has the attribute `lineno`
             # Example: visit_YieldFrom function defined ast.Yield(None) after pushing value
             # obtained from iterator onto stack, hence no need to visit node.value here
-            self.visit(node.value)
+            if node.value:
+                self.visit(node.value)
+                self.context.add_opcodes(
+                    # Convert to a new value for return purposes
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
+                )
+            else:
+                # push NoneType object to stack to support single yield statement (without operand)
+                # as the statment `yield` is equivalent to `yield None`
+                self.context.add_opcodes(
+                    JavaOpcodes.GETSTATIC(
+                        'org/python/types/NoneType',
+                        'NONE',
+                        'Lorg/python/Object;'
+                    )
+                )
+        else:
+            # value is already pushed on stack, hence only need to convert to org.python.Object
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
+            )
+
         yield_point = len(self.context.yield_points) + 1
-        self.context.add_opcodes(
-            # Convert to a new value for return purposes
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
-        )
-        # Save the current stack and yield inde
+
+        # Save the current stack and yield index
         self.context.load_name('<generator>')
         self.context.add_opcodes(
             ALOAD_name('#locals'),

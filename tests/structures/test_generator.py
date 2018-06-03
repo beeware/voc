@@ -71,6 +71,177 @@ class GeneratorTests(TranspileTestCase):
             for i in myinterview.fizz_buzz():
                 print(i)
             """)
+
+    def test_generator_send(self):
+        self.assertCodeExecution("""
+            def gen():
+                a = yield
+                print(a)
+
+            g = gen()
+            next(g)
+            try:
+                g.send("Hello World")
+            except StopIteration:
+                pass
+            """)
+
+    def test_generator_multi_send(self):
+        self.assertCodeExecution("""
+            def gen():
+                a = yield 1
+                print(a)
+                b = yield 2
+                print(b)
+
+            g = gen()
+            next(g)
+            try:
+                print(g.send("a"))
+                print(g.send("b"))
+            except StopIteration:
+                pass
+            """)
+
+    def test_generator_send_loop(self):
+        self.assertCodeExecution("""
+            def gen():
+                for i in range(1, 5):
+                    a = yield i
+                    print("printing from generator " + str(a))
+
+            g = gen()
+            g.send(None)
+            try:
+                while True:
+                    b = g.send(1)
+                    print("printing from user " + str(b))
+            except StopIteration:
+                pass
+            """)
+
+    def test_generator_yield_expr_call(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = print((yield))
+
+            g = gen()
+            g.send(None)
+            g.send("Hello World")
+            """)
+
+    def test_generator_yield_expr_unary_op(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = -(yield)
+                    yield x
+
+            g = gen()
+            g.send(None)
+            g.send(2)
+            g.send(-1)
+            """)
+
+    def test_generator_yield_expr_bool_op(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = not (yield)
+                    yield x
+
+            g = gen()
+            g.send(None)
+            g.send(True)
+            g.send(False)
+            """)
+
+    def test_generator_yield_expr_binary_op(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = 2 + (yield)
+                    yield x
+
+            def gen2():
+                while True:
+                    x = (yield) * 2
+                    yield x
+
+            def gen3():
+                while True:
+                    x = (yield) ** 2
+                    yield x
+
+            g = gen()
+            g.send(None)
+            g.send(2)
+            g.send(-1)
+
+            g = gen2()
+            g.send(None)
+            g.send(100)
+            g.send(20)
+
+            g = gen3()
+            next(g)
+            g.send(2)
+            g.send(0)
+            """)
+
+    def test_generator_yield_expr_aug_assign(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = 2
+                    x += (yield)
+                    yield x
+
+            g = gen()
+            g.send(None)
+            g.send(1)
+            g.send(2)
+            """)
+
+    def test_generator_yield_expr_compare(self):
+        self.assertCodeExecution("""
+            def gen():
+                while True:
+                    x = 1 <= (yield) < 5
+                    yield x
+
+            g = gen()
+            g.send(None)
+            g.send(1)
+            g.send(100)
+            """)
+
+    def test_generator_yield_expr_if(self):
+        self.assertCodeExecution("""
+            def gen():
+                if (yield):
+                    print("Hello world")
+
+            g = gen()
+            g.send(None)
+            try:
+                g.send(1)
+            except StopIteration:
+                pass
+            """)
+
+    @expectedFailure
+    def test_generator_yield_expr_return(self):
+        self.assertCodeExecution("""
+            def gen():
+                return (yield)
+
+            g = gen()
+            g.send(None)
+            g.send(1)  # for some reason the generator keeps returning value
+            g.send(100) # without raising StopIteration error
+            """)
     
     def test_simplest_yieldfrom(self):
         self.assertCodeExecution("""
