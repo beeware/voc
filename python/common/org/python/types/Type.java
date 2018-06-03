@@ -178,7 +178,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
         } else {
             if (value.getClass() == java.lang.Boolean.TYPE
                     || value.getClass() == java.lang.Boolean.class) {
-                return new org.python.types.Bool((java.lang.Boolean) value);
+                return org.python.types.Bool.getBool((java.lang.Boolean) value);
             } else if (value.getClass() == java.lang.Byte.TYPE
                     || value.getClass() == java.lang.Byte.class) {
                 return new org.python.types.Int((java.lang.Byte) value);

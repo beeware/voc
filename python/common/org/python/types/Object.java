@@ -215,7 +215,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (this == other) {
-            return new org.python.types.Bool(true);
+            return org.python.types.Bool.getBool(true);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -232,7 +232,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         if (result instanceof org.python.types.NotImplementedType) {
             return result;
         }
-        return new org.python.types.Bool(!((org.python.types.Bool) result).value);
+        return org.python.types.Bool.getBool(!((org.python.types.Bool) result).value);
     }
 
     @org.python.Method(
@@ -978,7 +978,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __not__() {
-        return new org.python.types.Bool(!((org.python.types.Bool) this.__bool__()).value);
+        return org.python.types.Bool.getBool(!((org.python.types.Bool) this.__bool__()).value);
     }
 
     @org.python.Method(
@@ -1054,9 +1054,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // identity implies equality
         if (v == w) {
             if (op == org.python.types.Object.CMP_OP.EQ) {
-                return new org.python.types.Bool(true);
+                return org.python.types.Bool.getBool(true);
             } else if (op == org.python.types.Object.CMP_OP.NE) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.getBool(false);
             }
         }
         org.python.Object result = __cmp__(v, w, op.oper, op.operMethod, op.reflOperMethod);
@@ -1094,9 +1094,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         if (oper.equals("==")) {
-            return new org.python.types.Bool(v == w);
+            return org.python.types.Bool.getBool(v == w);
         } else if (oper.equals("!=")) {
-            return new org.python.types.Bool(v != w);
+            return org.python.types.Bool.getBool(v != w);
         }
 
         if (org.Python.VERSION < 0x03060000) {

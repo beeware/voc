@@ -5,6 +5,20 @@ public class Bool extends org.python.types.Object {
     public static org.python.Object TRUE = new org.python.types.Bool(true);
     public static org.python.Object FALSE = new org.python.types.Bool(false);
 
+    public static org.python.types.Bool getBool(boolean bool) {
+      if (bool) {
+        return (org.python.types.Bool) TRUE;
+      }
+      return (org.python.types.Bool) FALSE;
+    }
+
+    public static org.python.types.Bool getBool(long int_val) {
+      if (int_val != 0) {
+        return (org.python.types.Bool) TRUE;
+      }
+      return (org.python.types.Bool) FALSE;
+    }
+
     /**
      * A utility method to update the internal value of this object.
      *
@@ -20,23 +34,18 @@ public class Bool extends org.python.types.Object {
     }
 
     public org.python.Object byValue() {
-        return new org.python.types.Bool(this.value);
+        return org.python.types.Bool.getBool(this.value);
     }
 
     public int hashCode() {
         return new java.lang.Boolean(this.value).hashCode();
     }
 
-    public Bool(boolean bool) {
+    private Bool(boolean bool) {
         super();
         this.value = bool;
     }
-
-    public Bool(long int_val) {
-        super();
-        this.value = int_val != 0;
-    }
-
+    
     @org.python.Method(
             __doc__ = "bool(x) -> bool" +
                     "\n" +
@@ -91,9 +100,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) < ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) < ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) < (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) < (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -104,9 +113,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) <= ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) <= ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) <= (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) <= (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -117,9 +126,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) == ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) == ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) == (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) == (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -130,9 +139,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) > ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) > ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) > (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) > (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -143,9 +152,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) >= ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) >= ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) >= (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) >= (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -154,7 +163,7 @@ public class Bool extends org.python.types.Object {
             __doc__ = "self != 0"
     )
     public org.python.types.Bool __bool__() {
-        return new org.python.types.Bool(this.value);
+        return org.python.types.Bool.getBool(this.value);
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
@@ -302,7 +311,7 @@ public class Bool extends org.python.types.Object {
                 return new org.python.types.Int(0);
             } else {
                 if (org.Python.VERSION < 0x03060000) {
-                    return new org.python.types.Bool(false);
+                    return (org.python.types.Bool) FALSE;
                 } else {
                     return new org.python.types.Int(0);
                 }
@@ -315,13 +324,13 @@ public class Bool extends org.python.types.Object {
 
             if (!this.value) {
                 if (org.Python.VERSION < 0x03060000) {
-                    return new org.python.types.Bool(false);
+                    return (org.python.types.Bool) FALSE;
                 } else {
                     return new org.python.types.Int(0);
                 }
             } else if (other_val > 1) {
                 if (org.Python.VERSION < 0x03060000) {
-                    return new org.python.types.Bool(this.value);
+                    return org.python.types.Bool.getBool(this.value);
                 } else {
                     return new org.python.types.Int(1);
                 }
@@ -404,7 +413,7 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __and__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool(
+            return org.python.types.Bool.getBool(
                     (((org.python.types.Bool) this).value ? 1 : 0) &
                             (((org.python.types.Bool) other).value ? 1 : 0)
             );
@@ -426,7 +435,7 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __xor__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) ^ (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) ^ (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Int) {
             long operand1 = this.value ? 1L : 0L;
             long operand2 = ((org.python.types.Int) other).value;
@@ -441,7 +450,7 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __or__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool((((org.python.types.Bool) this).value ? 1 : 0) | (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) | (((org.python.types.Bool) other).value ? 1 : 0));
         }
         if (other instanceof org.python.types.Int) {
             return new org.python.types.Int((((org.python.types.Bool) this).value ? 1 : 0) | ((org.python.types.Int) other).value);

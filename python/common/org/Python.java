@@ -384,12 +384,12 @@ public class Python {
             while (true) {
                 org.python.Object next = iter.__next__();
                 if (!next.toBoolean()) {
-                    return new org.python.types.Bool(false);
+                    return org.python.types.Bool.getBool(false);
                 }
             }
         } catch (org.python.exceptions.StopIteration si) {
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.getBool(true);
     }
 
     @org.python.Method(
@@ -405,12 +405,12 @@ public class Python {
             while (true) {
                 org.python.Object next = iter.__next__();
                 if (next.toBoolean()) {
-                    return new org.python.types.Bool(true);
+                    return org.python.types.Bool.getBool(true);
                 }
             }
         } catch (org.python.exceptions.StopIteration si) {
         }
-        return new org.python.types.Bool(false);
+        return org.python.types.Bool.getBool(false);
     }
 
     @org.python.Method(
@@ -462,7 +462,7 @@ public class Python {
             args = {"object"}
     )
     public static org.python.types.Bool callable(org.python.Object object) {
-        return new org.python.types.Bool(org.python.Callable.class.isAssignableFrom(object.getClass()));
+        return org.python.types.Bool.getBool(org.python.Callable.class.isAssignableFrom(object.getClass()));
     }
 
     @org.python.Method(
@@ -777,9 +777,9 @@ public class Python {
         }
         try {
             object.__getattribute__(name);
-            return new org.python.types.Bool(true);
+            return org.python.types.Bool.getBool(true);
         } catch (org.python.exceptions.AttributeError ae) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.getBool(false);
         } catch (org.python.exceptions.TypeError te) {
             throw new org.python.exceptions.TypeError(te.getMessage().replace("__hasattribute__", "hasattr"));
         }
@@ -909,22 +909,22 @@ public class Python {
             java.util.List<org.python.Object> target_classes = ((org.python.types.Tuple) classinfo_or_tuple).value;
             for (org.python.Object target_klass: target_classes) {
                 if (org.Python.issubclass(klass, target_klass).toBoolean()) {
-                    return new org.python.types.Bool(true);
+                    return org.python.types.Bool.getBool(true);
                 }
             }
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.getBool(false);
         } else if (classinfo_or_tuple instanceof org.python.types.Type) {
             org.python.types.Type klass_obj = (org.python.types.Type) klass;
             if (klass == classinfo_or_tuple) {
-                return new org.python.types.Bool(true);
+                return org.python.types.Bool.getBool(true);
             } else if (klass_obj.__dict__.get("__bases__") != null) {
                 for (org.python.Object base: ((org.python.types.Tuple) klass_obj.__dict__.get("__bases__")).value) {
                     if (base == classinfo_or_tuple || org.Python.issubclass(base, classinfo_or_tuple).value) {
-                        return new org.python.types.Bool(true);
+                        return org.python.types.Bool.getBool(true);
                     }
                 }
             }
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.getBool(false);
         } else {
             throw new org.python.exceptions.TypeError("issubclass() arg 2 must be a class or tuple of classes");
         }
@@ -1617,7 +1617,7 @@ public class Python {
             return new org.python.types.List();
         } else {
             if (reverse == null) {
-                reverse = new org.python.types.Bool(false);
+                reverse = org.python.types.Bool.getBool(false);
             }
             org.python.Object iterator = org.Python.iter(iterable);
             java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();

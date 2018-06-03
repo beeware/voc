@@ -39,7 +39,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.getBool(true);
     }
 
     public org.python.Object invoke(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
