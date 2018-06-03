@@ -82,9 +82,15 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Int', 'I'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=[
+                    'Ljava/lang/Long;',
+                ],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == "long":
         accumulator.add_opcodes(
