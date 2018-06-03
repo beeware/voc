@@ -64,8 +64,6 @@ public class Function extends org.python.types.Object implements org.python.Call
         this.name = new org.python.types.Str(method.getName());
         this.method = method;
 
-        System.out.println("Function: " + this.name);
-
         // System.out.println("CREATE FUNCTION 1 " + this.name);
         // java.lang.Thread.currentThread().dumpStack();
 

@@ -106,39 +106,9 @@ public class Int extends org.python.types.Object {
 
     public static org.python.types.Int getInt(long value) {
 
-      /**
-      BufferedWriter bw = null;
-      FileWriter fw = null;
-      try {
-          fw = new FileWriter("filename.txt");
-          bw = new BufferedWriter(fw);
-          bw.write("Inside getInt");
-      } catch(IOException e) {
-          e.printStackTrace();
-      } finally {
-          try {
-              if (bw != null)
-                  bw.close();
-              if (fw != null)
-                  fw.close();
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
-      }
-
-      System.out.println("Inside getInt!");
-
-*/
-
-
-
-
       if (-NSMALLNEGINTS <= value && value < NSMALLPOSINTS) {
         int index = (int) value + NSMALLNEGINTS;
         return smallints.getIntItemByIndex(index);
-        //org.python.types.Int my_int = (org.python.types.Int) smallints.getItemByIndex(index);
-        //System.out.println("my_int: " + my_int.value);
-        //return my_int;
       } else {
         return new org.python.types.Int(value);
       }
