@@ -143,7 +143,7 @@ public class Range extends org.python.types.Object {
             __doc__ = "Implement __bool__(self)."
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(
+        return org.python.types.Bool.getBool(
                 ((org.python.types.Int) this.__len__()).value > 0
         );
     }
@@ -192,7 +192,7 @@ public class Range extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Range) {
             org.python.types.Range range2 = (org.python.types.Range) other;
-            return new org.python.types.Bool(
+            return org.python.types.Bool.getBool(
                 (this.start == range2.start) &&
                 (this.stop == range2.stop) &&
                 (this.step == range2.step)

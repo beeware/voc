@@ -156,7 +156,7 @@ public class List extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(!this.value.isEmpty());
+        return org.python.types.Bool.getBool(!this.value.isEmpty());
     }
 
     @org.python.Method(
@@ -212,7 +212,7 @@ public class List extends org.python.types.Object {
             }
 
             // all items were identical, break tie by size
-            return new org.python.types.Bool(size < otherSize);
+            return org.python.types.Bool.getBool(size < otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -246,7 +246,7 @@ public class List extends org.python.types.Object {
             }
 
             // all items were identical, break tie by size
-            return new org.python.types.Bool(size <= otherSize);
+            return org.python.types.Bool.getBool(size <= otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -259,7 +259,7 @@ public class List extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.List) {
             org.python.types.List otherList = (org.python.types.List) other;
-            return new org.python.types.Bool(this.value.equals(otherList.value));
+            return org.python.types.Bool.getBool(this.value.equals(otherList.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -292,7 +292,7 @@ public class List extends org.python.types.Object {
             }
 
             // all items were identical, break tie by size
-            return new org.python.types.Bool(size > otherSize);
+            return org.python.types.Bool.getBool(size > otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -326,7 +326,7 @@ public class List extends org.python.types.Object {
             }
 
             // all items were identical, break tie by size
-            return new org.python.types.Bool(size >= otherSize);
+            return org.python.types.Bool.getBool(size >= otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -559,7 +559,7 @@ public class List extends org.python.types.Object {
                 break;
             }
         }
-        return new org.python.types.Bool(found);
+        return org.python.types.Bool.getBool(found);
     }
 
     @org.python.Method(
