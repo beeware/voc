@@ -120,6 +120,22 @@ class GeneratorTests(TranspileTestCase):
                 pass
             """)
 
+    def test_generator_send_after_yield_stmt(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield "regular yield statement"
+                a = yield "yield expression"
+                print(a)
+
+            g = gen()
+            print(next(g))
+            print(g.send("Hello World"))
+            try:
+                print(next(g))  # a is None
+            except StopIteration:
+                pass
+            """)
+
     def test_generator_yield_expr_call(self):
         self.assertCodeExecution("""
             def gen():
@@ -254,8 +270,8 @@ class GeneratorTests(TranspileTestCase):
                     yield 'Hello World'
                 finally:
                     print('finally')
-            
-            print(next(gen()))  
+
+            print(next(gen()))
             """)
 
     def test_generator_throw_on_starting(self):
@@ -287,7 +303,7 @@ class GeneratorTests(TranspileTestCase):
                 pass
             """)
 
-    def test_generator_throw_complex(self):
+    def test_generator_throw_exception_handling(self):
         self.assertCodeExecution("""
             def gen():
                 try:

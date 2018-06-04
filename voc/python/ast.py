@@ -224,10 +224,16 @@ class Visitor(ast.NodeVisitor):
                 col_offset=_node.col_offset
             )
 
+        # The node is a regular yield statement
+        # Mark it as 'regular_yield' to flush the generator's message upon restored
+        if isinstance(node, ast.Yield):
+            setattr(node, "regular_yield", True)
+            return
+
         for field_name, value in ast.iter_fields(node):
             if isinstance(value, ast.Yield):
                 if isinstance(node, ast.Expr):
-                    # don't parse Expr(value=Yield), as it is regular yield statement
+                    # don't parse Expr(value=Yield)
                     return
                 self.visit_Yield(value)  # visit the Yield node
                 get_message()
@@ -1826,6 +1832,18 @@ class Visitor(ast.NodeVisitor):
                     java.Map.get(var),
                     JavaOpcodes.ASTORE(index),
                 )
+
+        if hasattr(node, "regular_yield"):
+            # reset message to None
+            self.context.load_name('<generator>')
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Generator',
+                    'reset_message',
+                    args=[],
+                    returns='V'
+                )
+            )
 
         # throw exception if there is one
         self.context.load_name('<generator>')
