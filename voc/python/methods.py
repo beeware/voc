@@ -51,9 +51,12 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Bool'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Bool', 'Z'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Bool',
+                'getBool',
+                args=['Ljava/lang/Long;'],
+                returns='Lorg/python/types/Bool;'),
         )
     elif annotation == "byte":
         accumulator.add_opcodes(
