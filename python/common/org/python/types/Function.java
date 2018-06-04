@@ -101,22 +101,16 @@ public class Function extends org.python.types.Object implements org.python.Call
             varnames.add(new org.python.types.Str(kwargs_name));
         }
 
-        //org.python.types.Int.printSomething();
-
-        org.python.types.Int co_argcount = new org.python.types.Int(argcount);
-        //org.python.types.Int co_flags = org.python.types.Int.getInt(flags);
-        //org.python.types.Int co_kwonlyargcount = org.python.types.Int.getInt(flags);
-
         this.code = new org.python.types.Code(
-                co_argcount,  // co_argcount
+                org.python.types.Int.getInt(argcount),  // co_argcount
                 new org.python.types.Tuple(),  // co_cellvars
                 null,  // new org.python.types.Bytes(),  // co_code
                 null,  // new org.python.types.Tuple(),  // co_consts
                 null,  // new org.python.types.Str(),  // co_filename
                 null,  // new org.python.types.Int(),  // co_firstlineno
-                new org.python.types.Int(flags),  // co_flags
+                org.python.types.Int.getInt(flags),  // co_flags
                 new org.python.types.Tuple(),  // co_freevars
-                new org.python.types.Int(kwonlyargs.length),  // co_kwonlyargcount
+                org.python.types.Int.getInt(kwonlyargs.length),  // co_kwonlyargcount
                 null,  // new org.python.types.Bytes(),  // co_lnotab
                 this.name,  // co_name
                 null,  // new org.python.types.Tuple(),  // co_names

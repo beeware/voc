@@ -156,24 +156,11 @@ class Block(Accumulator):
         )
 
     def add_int(self, value):
-        if -NSMALLNEGINTS <= value and value < NSMALLPOSINTS:
-            index = value + NSMALLNEGINTS
-
-            self.add_opcodes(
-                # Try to get this Int from the smallints array
-                JavaOpcodes.GETSTATIC('org/python/types/Int', 'smallints', 'Lorg/python/types/List;'),
-                JavaOpcodes.LDC_W(index),
-                python.List.get_item_by_index(),
-                JavaOpcodes.CHECKCAST('org/python/types/Int'),
-                free_name('#value'),
-
-            )
-        else:
-            self.add_opcodes(
-                java.New('org/python/types/Int'),
-                LCONST_val(value),
-                java.Init('org/python/types/Int', 'J'),
-            )
+        self.add_opcodes(
+            LCONST_val(value),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Int', 'getInt', args=['J'], returns='Lorg/python/types/Int;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Int'),
+        )
 
 
     def add_float(self, value):

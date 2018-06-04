@@ -13,6 +13,7 @@ from .types.primitives import (
     ALOAD_name, ASTORE_name, free_name,
     DLOAD_name, FLOAD_name,
     ICONST_val, ILOAD_name,
+    LLOAD_name,
 )
 # from .debug import DEBUG, DEBUG_value
 
@@ -81,14 +82,11 @@ def to_python(accumulator, annotation, var_name):
     elif annotation == "int":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-
-            ILOAD_name(var_name),
+            LLOAD_name(var_name),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Int',
                 'getInt',
-                args=[
-                    'Ljava/lang/Long;',
-                ],
+                args=['J'],
                 returns='Lorg/python/types/Int;'
             ),
         )

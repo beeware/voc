@@ -1,27 +1,20 @@
 package org.python.types;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class Int extends org.python.types.Object {
     public long value;
 
-    public static int NSMALLPOSINTS = 257;
-    public static int NSMALLNEGINTS = 5;
+    private static final int NSMALLPOSINTS = 257;
+    private static final int NSMALLNEGINTS = 5;
     /**
      * Small integers are pre-allocated and pre-initialized in this list so that
      * they can be shared. These are the integers [-NSMALLNEGINTS, NSMALLPOSINTS)
      */
-    public static final org.python.types.List smallints = new org.python.types.List();
+    private static final org.python.types.Int[] SMALLINTS = new org.python.types.Int[NSMALLNEGINTS + NSMALLPOSINTS];
     static {
       for(int i = -NSMALLNEGINTS; i < NSMALLPOSINTS; i++) {
-        org.python.types.Int i_obj = new org.python.types.Int(i);
-        smallints.append(i_obj);
+        int index = i + NSMALLNEGINTS;
+        SMALLINTS[index] = new org.python.types.Int(i);
       }
-    }
-
-    public static void printSomething() {
-      System.out.println("Running a static method!");
     }
 
     /**
@@ -46,20 +39,31 @@ public class Int extends org.python.types.Object {
         return new java.lang.Long(this.value).hashCode();
     }
 
-    public Int(byte value) {
-        this.value = (long) value;
+    public static org.python.types.Int getInt(byte value) {
+        return getInt((long) value);
     }
 
-    public Int(short value) {
-        this.value = (long) value;
+    public static org.python.types.Int getInt(short value) {
+        return getInt((long) value);
     }
 
-    public Int(int value) {
-        this.value = (long) value;
+    public static org.python.types.Int getInt(int value) {
+        return getInt((long) value);
     }
 
-    public Int(long value) {
-        this.value = value;
+    public static org.python.types.Int getInt(long value) {
+      if (-NSMALLNEGINTS <= value && value < NSMALLPOSINTS) {
+        int index = (int) value + NSMALLNEGINTS;
+        org.python.types.Int i_obj = SMALLINTS[index];
+        assert(i_obj != null); 
+        return i_obj;
+      } else {
+        return new org.python.types.Int(value);
+      }
+    }
+
+    private Int(long value) {
+      this.value = value;
     }
 
     @org.python.Method(
@@ -102,16 +106,6 @@ public class Int extends org.python.types.Object {
         } else if (args.length > 3) {
             throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
         }
-    }
-
-    public static org.python.types.Int getInt(long value) {
-
-      if (-NSMALLNEGINTS <= value && value < NSMALLPOSINTS) {
-        int index = (int) value + NSMALLNEGINTS;
-        return smallints.getIntItemByIndex(index);
-      } else {
-        return new org.python.types.Int(value);
-      }
     }
 
     // public org.python.Object __new__() {

@@ -1034,7 +1034,7 @@ public class Bytes extends org.python.types.Object {
             _sub = ((org.python.types.Bytes) sub).value;
         }
         if (_sub.length <= 0) {
-            return new Int(0);
+            return org.python.types.Int.getInt(0);
         }
         int pos = -1;
         for (int i = 0; _start < _end; _start++) {
@@ -1054,7 +1054,7 @@ public class Bytes extends org.python.types.Object {
                 pos = -1;
             }
         }
-        return new Int(pos);
+        return org.python.types.Int.getInt(pos);
     }
 
     @org.python.Method(
@@ -1071,7 +1071,7 @@ public class Bytes extends org.python.types.Object {
     )
     public org.python.types.Int index(org.python.Object sub, org.python.Object start, org.python.Object end) {
         Int pos = this.find(sub, start, end);
-        if (pos.equals(new Int(-1))) {
+        if (pos.equals(org.python.types.Int.getInt(-1))) {
             String message = "subsection not found";
             if (org.Python.VERSION < 0x03060000) {
                 message = "substring not found";

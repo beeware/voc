@@ -260,17 +260,6 @@ class List:
                 JavaOpcodes.POP()
             )
 
-    class get_item_by_index:
-        def process(self, context):
-            context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/List',
-                    'getItemByIndex',
-                    args=['I'],
-                    returns='Lorg/python/Object;'
-                ),
-            )
-
 
 class Str:
     def __init__(self, value=None):
