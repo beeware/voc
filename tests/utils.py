@@ -404,12 +404,15 @@ class TranspileTestCase(TestCase):
             py_out = cleanse_python(py_out, substitutions)
 
             # Confirm that the output of the Java code is the same as the Python code.
-            if message:
-                context = 'Global context: %s' % message
-            else:
-                context = 'Global context'
-            self.assertEqual(java_out, py_out, context)
-
+            try:
+                if message:
+                    context = 'Global context: %s' % message
+                else:
+                    context = 'Global context'
+                self.assertEqual(java_out, py_out, context)
+            except AssertionError as e:
+                self.fail(e)
+	
             # Confirm that both output strings end with the canary statement
             if exits_early:
                 if java_out.endswith(END_OF_CODE_STRING_NEWLINE):
