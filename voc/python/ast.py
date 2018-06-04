@@ -1827,7 +1827,7 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.ASTORE(index),
                 )
 
-        # attempt to throw exception
+        # throw exception if there is one
         self.context.load_name('<generator>')
         self.context.add_opcodes(
             JavaOpcodes.INVOKEVIRTUAL(
