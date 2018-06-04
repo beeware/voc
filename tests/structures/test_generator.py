@@ -414,17 +414,79 @@ class GeneratorTests(TranspileTestCase):
             print(g.close())
             print(g.close())
             """)
-    
+
+    def test_generator_yield_try_suite(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield "from try block"
+                except:
+                    yield "from except block"
+                else:
+                    yield "from else block"
+                finally:
+                    yield "from finally block"
+
+            g = gen()
+            print(next(g))
+            print(g.throw(TypeError))
+            print(next(g))
+
+            g = gen()
+            print(next(g))
+            print(next(g))
+            print(next(g))
+            try:
+                print(next(g))
+            except StopIteration:
+                pass
+            """)
+
+    def test_generator_yield_expr_try_suite(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield "from try block"
+                    a = yield 
+                except:
+                    yield "from except block"
+                    a = yield
+                else:
+                    a = yield "from else block"
+                finally:
+                    a = yield "from finally block"  
+                print(a)
+
+            g = gen()
+            print(next(g))
+            print(g.throw(TypeError))
+            print(next(g))
+            print(g.send("except"))
+            try:
+                print(g.send("finally"))
+            except StopIteration:
+                pass
+
+            g = gen()
+            print(next(g))
+            print(next(g))
+            print(g.send("try"))
+            try:
+                print(g.send("finally"))
+            except:
+                pass
+            """)
+
     def test_simplest_yieldfrom(self):
         self.assertCodeExecution("""
             def gen1():
                 yield 1
                 yield 2
                 yield 3
-                
+
             def gen2():
                 yield from gen1()
-                
+
             for i in gen2():
                 print(i)
         """)
@@ -433,7 +495,7 @@ class GeneratorTests(TranspileTestCase):
         self.assertCodeExecution("""
             def gen():
                 yield from [1, 2, 3]
-                
+
             for i in gen():
                 print(i)
         """)
@@ -443,14 +505,14 @@ class GeneratorTests(TranspileTestCase):
             def gen1():
                 yield 'a'
                 yield 'b'
-                
+
             def gen2():
                 yield from gen1()
                 yield 'gen2'
-                
+
             def gen3():
                 yield from gen2()
-                
+
             for i in gen3():
                 print(i)
         """)

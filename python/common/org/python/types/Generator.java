@@ -33,6 +33,11 @@ public class Generator extends org.python.types.Object {
         this.message = org.python.types.NoneType.NONE;
     }
 
+    protected void finalize() throws Throwable {
+        super.finalize();
+        this.__del__();
+    }
+
     public void yield(java.util.Map<java.lang.String, org.python.Object> stack, int yield_point) {
         // System.out.println("YIELD: " + yield_point);
         // for (org.python.Object obj: stack) {
@@ -102,16 +107,20 @@ public class Generator extends org.python.types.Object {
         }
 
         if (just_started) {
-            // TODO: close the generator before throwing exception
+            this.close();
             throw (org.python.exceptions.BaseException) this.exception;
         }
 
         try {
             return this.__next__();
         } catch (org.python.exceptions.BaseException e) {
-            this.close(); // close this generator if it did not catch the exception
-            throw e; // re-throw exception after closing
+            if (!(e instanceof org.python.exceptions.StopIteration)) {
+                this.cleanup(); // close this generator if it did not catch the exception
+                throw e; // re-throw exception after closing
+            }
         }
+
+        return org.python.types.NoneType.NONE;
     }
 
     public void throw_exception() {
@@ -147,8 +156,14 @@ public class Generator extends org.python.types.Object {
             throw new org.python.exceptions.RuntimeError("generator ignored GeneratorExit");
         }
 
-        this.expression = null; // cleanup
+        this.cleanup();
         return org.python.types.NoneType.NONE;
+    }
+
+    private void cleanup() {
+        this.expression = null;
+        this.message = null;
+        this.exception = null;
     }
 
     @org.python.Method(

@@ -1,4 +1,5 @@
 import ast
+import copy
 import sys
 import traceback
 
@@ -711,7 +712,7 @@ class Visitor(ast.NodeVisitor):
         # Finally content is duplicated at the end of the body
         # if it is defined.
         if node.finalbody:
-            for child in node.finalbody:
+            for child in copy.deepcopy(node.finalbody):
                 self.visit(child)
 
         for handler in node.handlers:
@@ -720,7 +721,7 @@ class Visitor(ast.NodeVisitor):
             # Finally content is duplicated at the end of the handler
             # if it is defined.
             if node.finalbody:
-                for child in node.finalbody:
+                for child in copy.deepcopy(node.finalbody):
                     self.visit(child)
 
         if node.finalbody:
@@ -729,7 +730,7 @@ class Visitor(ast.NodeVisitor):
                 ASTORE_name('#exception-%x' % id(node))
             )
 
-            for child in node.finalbody:
+            for child in copy.deepcopy(node.finalbody):
                 self.visit(child)
 
             self.context.add_opcodes(
@@ -1826,7 +1827,8 @@ class Visitor(ast.NodeVisitor):
         )
 
         for var, index in self.context.local_vars.items():
-            if index is not None and var not in ('<generator>', '#locals'):
+            if index is not None and var not in ('<generator>', '#locals') \
+                    and "#exception-" not in var:  # Don't load exception
                 self.context.add_opcodes(
                     ALOAD_name('#locals'),
                     java.Map.get(var),
