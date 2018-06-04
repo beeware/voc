@@ -29,11 +29,11 @@
 VOC
 ===
 
-VOC is a transpiler that takes Python 3.4+ source code, and compiles it into a Java
+VOC is a transpiler that takes Python 3.4 source code, and compiles it into a Java
 class file that can then be executed on a JVM, or run through a DEX tool to
 run on Android. It does this *at the bytecode level*, rather than the source code level.
 
-It honors Python 3.4+ syntax and conventions, but also provides the ability to
+It honors Python 3.4 syntax and conventions, but also provides the ability to
 reference objects and classes defined in Java code, and implement interfaces
 defined in Java code.
 

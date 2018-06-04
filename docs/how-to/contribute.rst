@@ -22,7 +22,7 @@ instead of using the official PyBee repository, you'll be using your own
 Github fork.
 
 As with the getting started guide, these instructions will assume that you
-have Python 3.4+, a Java >=7 JDK, and Apache ANT installed.
+have Python 3.4, a Java >=7 JDK, and Apache ANT installed.
 
 **Note:** If you are on Linux, you will need to install an extra package to be able to run the test suite.
  * **Ubuntu** 12.04 and 14.04: ``libpython3.4-testsuite`` This can be done by running ``apt-get install libpython3.4-testsuite``.

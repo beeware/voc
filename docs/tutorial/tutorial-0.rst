@@ -13,7 +13,7 @@ This tutorial assumes you've read and followed the instructions in
 * Java 7 (or higher) installed and available on your path,
 * An ``env`` directory for your virtualenv
 * A ``tutorial`` directory with a VOC checkout,
-* An activated Python 3.4+ virtual environment,
+* An activated Python 3.4 virtual environment,
 * VOC installed in that virtual environment,
 * A compiled VOC support library.
 
