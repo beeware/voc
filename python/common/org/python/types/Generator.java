@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
  * Possible states of a generator:
  * 1. yield_point == 0    : The generator is 'fresh' i.e. (just started)
  * 2. expression  == null : The generator is exhausted
- * 3. message     != null : The generator currently holds value sent from caller via send() method
+ * 3. message     != none : The generator currently holds value sent from caller via send() method
  * 4. exception   != null : The generator currently holds exception sent from caller via throw() method
  */
 public class Generator extends org.python.types.Object {
