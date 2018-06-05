@@ -64,11 +64,12 @@ public class Generator extends org.python.types.Object {
     }
 
     @org.python.Method(
+            name = "throw",
             __doc__ = "Implement throw(type, value=None, traceback=None).",
             args = {"type"},
             default_args = {"value", "traceback"}
     )
-    public org.python.Object _throw(org.python.Object type, org.python.Object value, org.python.Object traceback) {
+    public org.python.Object throw$(org.python.Object type, org.python.Object value, org.python.Object traceback) {
         if (value == null) {
             value = org.python.types.NoneType.NONE;
         }

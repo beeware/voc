@@ -2269,11 +2269,6 @@ class Visitor(ast.NodeVisitor):
         ctx = ctx or node.ctx
         self.visit(node.value)
 
-        # For generator `throw` method,
-        # quick fix for reserved keyword `throw` in Java
-        if node.attr == "throw":
-            node.attr = "_throw"  # refer org.python.types.Generator._throw
-
         if type(ctx) == ast.Load:
             self.context.add_opcodes(
                 python.Object.get_attribute(node.attr),
