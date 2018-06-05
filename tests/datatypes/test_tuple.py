@@ -274,20 +274,8 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
 
     substitutions = {
-        # all possible outputs
-        {1.2, 3, True}: [
-            {1.2, True, 3}
-        ],
-        {3, 1.2, True}: [
-            {1.2, True, 3}
-        ],
-        {3, True, 1.2}: [
-            {1.2, True, 3}
-        ],
-        {True, 3, 1.2}: [
-            {1.2, True, 3}
-        ],
-        {True, 1.2, 3}: [
-            {1.2, True, 3}
-        ],
+        # output, keyed to all possible inputs
+        "{1.2, True, 3}": [
+            "{1.2, 3, True}", "{True, 1.2, 3}", "{True, 3, 1.2}", "{3, 1.2, True}", "{3, True, 1.2}"
+        ]
     }
