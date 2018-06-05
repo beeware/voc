@@ -95,8 +95,6 @@ public class Generator extends org.python.types.Object {
                 "exceptions must be classes or instances deriving from BaseException, not " + type.typeName());
         }
 
-        // TODO: check whether the klass inherits org.python.exception.BasseException
-
         try {
             Class exception_class = Class.forName("org.python.exceptions." + exception_name);
             Constructor exception_constructor;
@@ -121,13 +119,9 @@ public class Generator extends org.python.types.Object {
         try {
             return this.__next__();
         } catch (org.python.exceptions.BaseException e) {
-            if (!(e instanceof org.python.exceptions.StopIteration)) {
-                this.cleanup(); // close this generator if it did not catch the exception
-                throw e; // re-throw exception after closing
-            }
+            this.cleanup(); // close this generator if it did not catch the exception
+            throw e; // re-throw exception after closing
         }
-
-        return org.python.types.NoneType.NONE;
     }
 
     /**
