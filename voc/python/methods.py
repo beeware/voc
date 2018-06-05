@@ -59,30 +59,48 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Int'),
+            #java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Int', 'B'),
+            #java.Init('org/python/types/Int', 'B'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['B'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == 'char':
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Str'),
+            #java.New('org/python/types/Str'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Str', 'C'),
+            #java.Init('org/python/types/Str', 'C'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['C'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == "short":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Int'),
+            #java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Int', 'S'),
+            #java.Init('org/python/types/Int', 'S'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['S'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == "int":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
-            LLOAD_name(var_name),
+            ILOAD_name(var_name),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Int',
                 'getInt',
@@ -94,9 +112,15 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Int'),
+            #java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Int', 'J'),
+            #java.Init('org/python/types/Int', 'J'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['J'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == "float":
         accumulator.add_opcodes(
