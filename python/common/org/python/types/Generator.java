@@ -173,7 +173,11 @@ public class Generator extends org.python.types.Object {
         try {
             this.close();
         } catch (Exception e) {
-            //TODO: log error message in java equivalent of sys.stderr
+            java.lang.String message = e.getCause().getMessage();
+            if (message == null) {
+                message = e.getCause().getClass().getName();
+            }
+            System.err.println(message);
         }
     }
 
