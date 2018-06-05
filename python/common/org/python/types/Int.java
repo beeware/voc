@@ -10,12 +10,6 @@ public class Int extends org.python.types.Object {
      * they can be shared. These are the integers [-NSMALLNEGINTS, NSMALLPOSINTS)
      */
     private static final org.python.types.Int[] SMALLINTS = new org.python.types.Int[NSMALLNEGINTS + NSMALLPOSINTS];
-    static {
-      for(int i = -NSMALLNEGINTS; i < NSMALLPOSINTS; i++) {
-        int index = i + NSMALLNEGINTS;
-        SMALLINTS[index] = new org.python.types.Int(i);
-      }
-    }
 
     /**
      * A utility method to update the internal value of this object.
@@ -55,7 +49,10 @@ public class Int extends org.python.types.Object {
       if (-NSMALLNEGINTS <= value && value < NSMALLPOSINTS) {
         int index = (int) value + NSMALLNEGINTS;
         org.python.types.Int i_obj = SMALLINTS[index];
-        assert(i_obj != null); 
+        if (i_obj == null) {
+          i_obj = new org.python.types.Int(value);
+          SMALLINTS[index] = i_obj;
+        }
         return i_obj;
       } else {
         return new org.python.types.Int(value);
