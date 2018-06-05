@@ -272,3 +272,7 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
+
+    substitutions = {
+        (1.2, True, 3)
+    }
