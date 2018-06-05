@@ -362,6 +362,46 @@ class GeneratorTests(TranspileTestCase):
                     print("StopIteration")
             """)
 
+    def test_generator_throw_args(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield 1
+
+            g = gen()
+            try:
+                g.throw(TypeError, "Hello World")
+                print("can't reach here")
+            except TypeError as e:
+                print(e.__str__())
+
+            g = gen()
+            try:
+                g.throw(ZeroDivisionError, 100)
+                print("can't reach here")
+            except ZeroDivisionError as e:
+                print(e.__str__())
+
+            g = gen()
+            try:
+                g.throw(TypeError, (1, 2, 3, "Hello", "World"))
+                print("can't reach here")
+            except TypeError as e:
+                print(e.args)
+            """)
+
+    @expectedFailure
+    def test_generator_throw_kwargs(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield 1
+            g = gen()
+            try:
+                g.throw(TypeError, {"Hello": 1, "World": 2})
+                print("can't reach here")
+            except TypeError as e:
+                print(e.args)
+            """)
+
     def test_generator_close(self):
         self.assertCodeExecution("""
             def gen():

@@ -73,11 +73,11 @@ public class Generator extends org.python.types.Object {
             name = "throw",
             __doc__ = "Implement throw(type, value=None, traceback=None).",
             args = {"type"},
-            default_args = {"value", "traceback"}
+            default_args = {"exception_args", "traceback"}
     )
-    public org.python.Object throw$(org.python.Object type, org.python.Object value, org.python.Object traceback) {
-        if (value == null) {
-            value = org.python.types.NoneType.NONE;
+    public org.python.Object throw$(org.python.Object type, org.python.Object exception_args, org.python.Object traceback) {
+        if (exception_args == null) {
+            exception_args = org.python.types.NoneType.NONE;
         }
 
         if (traceback == null) {
@@ -98,12 +98,35 @@ public class Generator extends org.python.types.Object {
         try {
             Class exception_class = Class.forName("org.python.exceptions." + exception_name);
             Constructor exception_constructor;
-            if (value instanceof org.python.types.NoneType) {
+            if (exception_args instanceof org.python.types.NoneType) {
+                // value = None
                 exception_constructor = exception_class.getConstructor();
                 this.exception = Type.toPython(exception_constructor.newInstance());
+            } else if (exception_args instanceof org.python.types.Tuple){
+                // value is variable arguments
+                exception_constructor = exception_class.getConstructor(org.python.Object[].class, java.util.Map.class);
+                int size = ((org.python.types.Tuple)exception_args).value.size();
+                org.python.Object[] vargs = new org.python.Object[size];
+                for (int i=0; i<size; i++) {
+                    vargs[i] = ((org.python.types.Tuple) exception_args).value.get(i);
+                }
+                this.exception = Type.toPython(exception_constructor.newInstance(vargs, null));
+//            } else if (exception_args instanceof org.python.types.Dict) {
+//                // value is keyword arguments
+//                exception_constructor = exception_class.getConstructor(org.python.Object[].class, java.util.Map.class);
+//                java.util.Map kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
+//                for (java.util.Map.Entry entry : ((org.python.types.Dict)exception_args).value.entrySet()) {
+//                    java.lang.String key = entry.getKey().toString();
+//                    org.python.Object item = (org.python.Object)entry.getValue();
+//                    kwargs.put(key, item);
+//                }
+//                this.exception = Type.toPython(exception_constructor.newInstance(null, kwargs));
+            } else {
+                // use value.__str__() as exception argument
+                exception_constructor = exception_class.getConstructor(String.class);
+                this.exception = Type.toPython(exception_constructor.newInstance(exception_args.toString()));
             }
-            // TODO: parse for signature String msg and
-            // TODO: (org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs)
+
         } catch (ClassNotFoundException e) {
             throw new org.python.exceptions.NameError(exception_name);
         } catch (NoSuchMethodException |
