@@ -82,8 +82,9 @@ class GeneratorTests(TranspileTestCase):
             next(g)
             try:
                 g.send("Hello World")
+                print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_multi_send(self):
@@ -99,8 +100,9 @@ class GeneratorTests(TranspileTestCase):
             try:
                 print(g.send("a"))
                 print(g.send("b"))
+                print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_send_loop(self):
@@ -116,8 +118,9 @@ class GeneratorTests(TranspileTestCase):
                 while True:
                     b = g.send(1)
                     print("printing from user " + str(b))
+                    print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_send_after_yield_stmt(self):
@@ -132,8 +135,9 @@ class GeneratorTests(TranspileTestCase):
             print(g.send("Hello World"))
             try:
                 print(next(g))  # a is None
+                print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_yield_expr_call(self):
@@ -243,8 +247,9 @@ class GeneratorTests(TranspileTestCase):
             g.send(None)
             try:
                 g.send(1)
+                print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_yield_expr_return(self):
@@ -256,8 +261,9 @@ class GeneratorTests(TranspileTestCase):
             g.send(None)
             try:
                 g.send(1)
+                print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     @expectedFailure
@@ -282,8 +288,9 @@ class GeneratorTests(TranspileTestCase):
             g = gen()
             try:
                 g.throw(ZeroDivisionError)
+                print("can't reach here")
             except ZeroDivisionError:
-                pass
+                print("ZeroDivisionError")
             """)
 
     def test_generator_throw_other_exception(self):
@@ -299,8 +306,9 @@ class GeneratorTests(TranspileTestCase):
             next(g)
             try:
                 g.throw(ZeroDivisionError)
+                print("can't reach here")
             except TypeError:
-                pass
+                print("TypeError")
             """)
 
     def test_generator_throw_exception_handling(self):
@@ -330,8 +338,9 @@ class GeneratorTests(TranspileTestCase):
             g.close()
             try:
                 g.throw(ZeroDivisionError)
+                print("can't reach here")
             except ZeroDivisionError:
-                pass
+                print("ZeroDivisionError")
             """)
 
     def test_generator_next_after_throw(self):
@@ -344,11 +353,13 @@ class GeneratorTests(TranspileTestCase):
             print(next(g))
             try:
                 g.throw(TypeError)
+                print("can't reach here")
             except TypeError:
                 try:
                     print(next(g))
+                    print("can't reach here")
                 except StopIteration:
-                    pass
+                    print("StopIteration")
             """)
 
     def test_generator_close(self):
@@ -366,8 +377,9 @@ class GeneratorTests(TranspileTestCase):
             print(g.close())
             try:
                 print(next(g))
+                print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_close_ignore_exit(self):
@@ -384,8 +396,9 @@ class GeneratorTests(TranspileTestCase):
             next(g)
             try:
                 g.close()
+                print("can't reach here")
             except RuntimeError:
-                pass
+                print(RuntimeError)
             """)
 
     def test_generator_close_exception_propagation(self):
@@ -438,8 +451,9 @@ class GeneratorTests(TranspileTestCase):
             print(next(g))
             try:
                 print(next(g))
+                print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_yield_expr_try_suite(self):
@@ -464,8 +478,9 @@ class GeneratorTests(TranspileTestCase):
             print(g.send("except"))
             try:
                 print(g.send("finally"))
+                print("can't reach here")
             except StopIteration:
-                pass
+                print("StopIteration")
 
             g = gen()
             print(next(g))
@@ -473,8 +488,9 @@ class GeneratorTests(TranspileTestCase):
             print(g.send("try"))
             try:
                 print(g.send("finally"))
-            except:
-                pass
+                print("can't reach here")
+            except StopIteration:
+                print("StopIteration")
             """)
 
     def test_simplest_yieldfrom(self):
