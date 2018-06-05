@@ -130,6 +130,10 @@ public class Generator extends org.python.types.Object {
         return org.python.types.NoneType.NONE;
     }
 
+    /**
+     * Called when generator is restored.
+     * NO-OP if this.exception == null
+     */
     public void throw_exception() {
         if (this.exception != null) {
             org.python.exceptions.BaseException exception = (org.python.exceptions.BaseException) this.exception;
