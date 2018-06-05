@@ -275,19 +275,19 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     substitutions = {
         # all possible outputs
-        "(1.2, 3, True)": [
-            "(1.2, True, 3)"
+        "{1.2, 3, True}": [
+            "{1.2, True, 3}"
         ],
-        "(3, 1.2, True)": [
-            "(1.2, True, 3)"
+        "{3, 1.2, True}": [
+            "{1.2, True, 3}"
         ],
-        "(3, True, 1.2)": [
-            "(1.2, True, 3)"
+        "{3, True, 1.2}": [
+            "{1.2, True, 3}"
         ],
-        "(True, 3, 1.2)": [
-            "(1.2, True, 3)"
+        "{True, 3, 1.2}": [
+            "{1.2, True, 3}"
         ],
-        "(True, 1.2, 3)": [
-            "(1.2, True, 3)"
+        "{True, 1.2, 3}": [
+            "{1.2, True, 3}"
         ],
     }
