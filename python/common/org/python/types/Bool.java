@@ -6,17 +6,17 @@ public class Bool extends org.python.types.Object {
     public static org.python.types.Bool FALSE = new org.python.types.Bool(false);
 
     public static org.python.types.Bool getBool(boolean bool) {
-      if (bool) {
-        return TRUE;
-      }
-      return FALSE;
+        if (bool) {
+            return TRUE;
+        }
+        return FALSE;
     }
 
     public static org.python.types.Bool getBool(long int_val) {
-      if (int_val != 0) {
-        return TRUE;
-      }
-      return FALSE;
+        if (int_val != 0) {
+            return TRUE;
+        }
+        return FALSE;
     }
 
     /**
