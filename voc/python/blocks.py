@@ -193,11 +193,11 @@ class Block(Accumulator):
                 if isinstance(value, bool):
                     if value is True:
                         self.add_opcodes(
-                            JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/Object;'),
+                            JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
                         )
                     else:
                         self.add_opcodes(
-                            JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/Object;'),
+                            JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
                         )
 
                 elif isinstance(value, int):

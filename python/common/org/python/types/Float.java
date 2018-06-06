@@ -674,9 +674,9 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object is_integer() {
         if (this.value == Math.floor(this.value) && !Double.isInfinite(this.value)) {
-            return org.python.types.Bool.getBool(true);
+            return org.python.types.Bool.TRUE;
         }
-        return org.python.types.Bool.getBool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(

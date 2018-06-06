@@ -346,9 +346,9 @@ public class FrozenSet extends org.python.types.Object {
             }
             org.python.types.FrozenSet temp = (org.python.types.FrozenSet) this.__and__(other);
             if (temp.__len__().value > 0) {
-                return org.python.types.Bool.getBool(false);
+                return org.python.types.Bool.FALSE;
             } else {
-                return org.python.types.Bool.getBool(true);
+                return org.python.types.Bool.TRUE;
             }
         } catch (org.python.exceptions.AttributeError e) {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");

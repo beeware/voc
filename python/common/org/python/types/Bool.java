@@ -2,21 +2,21 @@ package org.python.types;
 
 public class Bool extends org.python.types.Object {
     public boolean value;
-    public static org.python.Object TRUE = new org.python.types.Bool(true);
-    public static org.python.Object FALSE = new org.python.types.Bool(false);
+    public static org.python.types.Bool TRUE = new org.python.types.Bool(true);
+    public static org.python.types.Bool FALSE = new org.python.types.Bool(false);
 
     public static org.python.types.Bool getBool(boolean bool) {
       if (bool) {
-        return (org.python.types.Bool) TRUE;
+        return TRUE;
       }
-      return (org.python.types.Bool) FALSE;
+      return FALSE;
     }
 
     public static org.python.types.Bool getBool(long int_val) {
       if (int_val != 0) {
-        return (org.python.types.Bool) TRUE;
+        return TRUE;
       }
-      return (org.python.types.Bool) FALSE;
+      return FALSE;
     }
 
     /**
@@ -45,7 +45,7 @@ public class Bool extends org.python.types.Object {
         super();
         this.value = bool;
     }
-    
+
     @org.python.Method(
             __doc__ = "bool(x) -> bool" +
                     "\n" +

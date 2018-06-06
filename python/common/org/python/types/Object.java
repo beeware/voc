@@ -215,7 +215,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (this == other) {
-            return org.python.types.Bool.getBool(true);
+            return org.python.types.Bool.TRUE;
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -1054,9 +1054,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // identity implies equality
         if (v == w) {
             if (op == org.python.types.Object.CMP_OP.EQ) {
-                return org.python.types.Bool.getBool(true);
+                return org.python.types.Bool.TRUE;
             } else if (op == org.python.types.Object.CMP_OP.NE) {
-                return org.python.types.Bool.getBool(false);
+                return org.python.types.Bool.FALSE;
             }
         }
         org.python.Object result = __cmp__(v, w, op.oper, op.operMethod, op.reflOperMethod);

@@ -266,7 +266,7 @@ public class Bytes extends org.python.types.Object {
         int counter_slice = 0;
         for (int i = 0; i < this.value.length + 1; i++) {
             if (counter_slice == bslice.length) {
-                return org.python.types.Bool.getBool(true);
+                return org.python.types.Bool.TRUE;
             } else if (i == this.value.length) {
                 break;
             } else if (bslice[counter_slice] == this.value[i]) {
@@ -275,7 +275,7 @@ public class Bytes extends org.python.types.Object {
                 counter_slice = 0;
             }
         }
-        return org.python.types.Bool.getBool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(
@@ -925,15 +925,15 @@ public class Bytes extends org.python.types.Object {
                 }
                 boolean ok = ((org.python.types.Bool) this.endsOrStartsWith(item, null, null, direction)).value;
                 if (ok) {
-                    return org.python.types.Bool.getBool(true);
+                    return org.python.types.Bool.TRUE;
                 }
             }
-            return org.python.types.Bool.getBool(false);
+            return org.python.types.Bool.FALSE;
 
         } else if (substring instanceof Bytes) {
             byte[] substringValue = ((Bytes) substring).value;
             if (substringValue.length > this.value.length) {
-                return org.python.types.Bool.getBool(false);
+                return org.python.types.Bool.FALSE;
             }
 
             int startIndex;

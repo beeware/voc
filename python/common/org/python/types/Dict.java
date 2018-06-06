@@ -322,9 +322,9 @@ public class Dict extends org.python.types.Object {
         // allow unhashable type error to be percolated up.
         try {
             __getitem__(item);
-            return org.python.types.Bool.getBool(true);
+            return org.python.types.Bool.TRUE;
         } catch (org.python.exceptions.KeyError e) {
-            return org.python.types.Bool.getBool(false);
+            return org.python.types.Bool.FALSE;
         }
     }
 
@@ -336,9 +336,9 @@ public class Dict extends org.python.types.Object {
         // allow unhashable type error to be percolated up.
         try {
             __getitem__(item);
-            return org.python.types.Bool.getBool(false);
+            return org.python.types.Bool.FALSE;
         } catch (org.python.exceptions.KeyError e) {
-            return org.python.types.Bool.getBool(true);
+            return org.python.types.Bool.TRUE;
         }
     }
 

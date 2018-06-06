@@ -47,7 +47,7 @@ public class NotImplementedType extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.types.Bool __bool__() {
-        return org.python.types.Bool.getBool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -72,7 +72,7 @@ public class NotImplementedType extends org.python.types.Object {
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.NotImplementedType) {
-            return org.python.types.Bool.getBool(true);
+            return org.python.types.Bool.TRUE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
