@@ -355,10 +355,12 @@ class Visitor(ast.NodeVisitor):
         # expr? value):
         if self.context.generator:
             # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
-            # TODO: StopIteration enhancement to include node.value
             self.context.add_opcodes(
                 java.New('org/python/exceptions/StopIteration'),
-                java.Init('org/python/exceptions/StopIteration'),
+            )
+            self.visit(node.value)
+            self.context.add_opcodes(
+                java.Init('org/python/exceptions/StopIteration', 'Lorg/python/Object;'),
                 JavaOpcodes.ATHROW(),
             )
         elif node.value:
@@ -1876,16 +1878,19 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
             python.Iterable.next(),
             CATCH('org/python/exceptions/StopIteration'),
-            JavaOpcodes.POP(),
+            JavaOpcodes.GETFIELD('org/python/exceptions/StopIteration', 'value', 'Lorg/python/Object;'),
+            ASTORE_name("#exception-value-%x" % id(node)),
             jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
             END_TRY(),
         )
         self.visit(ast.Yield(None))
         self.context.add_opcodes(
             END_LOOP(),
+            ALOAD_name("#exception-value-%x" % id(node))
         )
 
         self.context.delete_name('#yield-iter-%x' % id(node))
+        self.context.delete_name("#exception-value-%x" % id(node))
 
     @node_visitor
     def visit_Compare(self, node):

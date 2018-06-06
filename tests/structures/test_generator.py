@@ -572,3 +572,32 @@ class GeneratorTests(TranspileTestCase):
             for i in gen3():
                 print(i)
         """)
+
+    def test_generator_stop_iteration_value(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield "Hello World"
+                return "return value"
+                
+            g = gen()
+            print(next(g))
+            try:
+                print(next(g))
+            except StopIteration as e:
+                print(e.value)
+                
+            def gen1():
+                yield "Hello World"
+                return "return value"
+                
+            def gen2():
+                v = yield from gen1()
+                print(v)
+                
+            g = gen2()
+            print(next(g))
+            try:
+                print(next(g))
+            except StopIteration:
+                print("StopIteration")
+            """)

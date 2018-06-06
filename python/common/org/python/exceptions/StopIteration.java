@@ -1,7 +1,8 @@
 package org.python.exceptions;
 
 public class StopIteration extends org.python.exceptions.Exception {
-    org.python.Object value;
+    @org.python.Attribute()
+    public org.python.Object value;
 
     public StopIteration() {
         super("");
