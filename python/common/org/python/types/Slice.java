@@ -315,7 +315,7 @@ public class Slice extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __not__() {
-        return org.python.types.Bool.getBool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(

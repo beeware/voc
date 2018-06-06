@@ -497,9 +497,9 @@ public class Set extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("'" + other.typeName() + "' object is not iterable");
         }
         if (intersection.size() == 0) {
-            return org.python.types.Bool.getBool(true);
+            return org.python.types.Bool.TRUE;
         }
-        return org.python.types.Bool.getBool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(

@@ -384,12 +384,12 @@ public class Python {
             while (true) {
                 org.python.Object next = iter.__next__();
                 if (!next.toBoolean()) {
-                    return org.python.types.Bool.getBool(false);
+                    return org.python.types.Bool.FALSE;
                 }
             }
         } catch (org.python.exceptions.StopIteration si) {
         }
-        return org.python.types.Bool.getBool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -405,12 +405,12 @@ public class Python {
             while (true) {
                 org.python.Object next = iter.__next__();
                 if (next.toBoolean()) {
-                    return org.python.types.Bool.getBool(true);
+                    return org.python.types.Bool.TRUE;
                 }
             }
         } catch (org.python.exceptions.StopIteration si) {
         }
-        return org.python.types.Bool.getBool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(
@@ -777,9 +777,9 @@ public class Python {
         }
         try {
             object.__getattribute__(name);
-            return org.python.types.Bool.getBool(true);
+            return org.python.types.Bool.TRUE;
         } catch (org.python.exceptions.AttributeError ae) {
-            return org.python.types.Bool.getBool(false);
+            return org.python.types.Bool.FALSE;
         } catch (org.python.exceptions.TypeError te) {
             throw new org.python.exceptions.TypeError(te.getMessage().replace("__hasattribute__", "hasattr"));
         }
@@ -909,22 +909,22 @@ public class Python {
             java.util.List<org.python.Object> target_classes = ((org.python.types.Tuple) classinfo_or_tuple).value;
             for (org.python.Object target_klass: target_classes) {
                 if (org.Python.issubclass(klass, target_klass).toBoolean()) {
-                    return org.python.types.Bool.getBool(true);
+                    return org.python.types.Bool.TRUE;
                 }
             }
-            return org.python.types.Bool.getBool(false);
+            return org.python.types.Bool.FALSE;
         } else if (classinfo_or_tuple instanceof org.python.types.Type) {
             org.python.types.Type klass_obj = (org.python.types.Type) klass;
             if (klass == classinfo_or_tuple) {
-                return org.python.types.Bool.getBool(true);
+                return org.python.types.Bool.TRUE;
             } else if (klass_obj.__dict__.get("__bases__") != null) {
                 for (org.python.Object base: ((org.python.types.Tuple) klass_obj.__dict__.get("__bases__")).value) {
                     if (base == classinfo_or_tuple || org.Python.issubclass(base, classinfo_or_tuple).value) {
-                        return org.python.types.Bool.getBool(true);
+                        return org.python.types.Bool.TRUE;
                     }
                 }
             }
-            return org.python.types.Bool.getBool(false);
+            return org.python.types.Bool.FALSE;
         } else {
             throw new org.python.exceptions.TypeError("issubclass() arg 2 must be a class or tuple of classes");
         }
@@ -1617,7 +1617,7 @@ public class Python {
             return new org.python.types.List();
         } else {
             if (reverse == null) {
-                reverse = org.python.types.Bool.getBool(false);
+                reverse = org.python.types.Bool.FALSE;
             }
             org.python.Object iterator = org.Python.iter(iterable);
             java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();

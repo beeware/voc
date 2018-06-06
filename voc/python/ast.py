@@ -1847,13 +1847,13 @@ class Visitor(ast.NodeVisitor):
                     IF([], JavaOpcodes.IF_ACMPNE),
                 )
                 self.context.add_opcodes(
-                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/Object;'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
                 )
                 self.context.add_opcodes(
                     ELSE(),
                 )
                 self.context.add_opcodes(
-                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/Object;'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
 
                 )
                 self.context.add_opcodes(
@@ -1865,13 +1865,13 @@ class Visitor(ast.NodeVisitor):
                     IF([], JavaOpcodes.IF_ACMPEQ),
                 )
                 self.context.add_opcodes(
-                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/Object;'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
                 )
                 self.context.add_opcodes(
                     ELSE(),
                 )
                 self.context.add_opcodes(
-                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/Object;'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
                 )
                 self.context.add_opcodes(
                     END_IF(),
@@ -2192,12 +2192,12 @@ class Visitor(ast.NodeVisitor):
             )
         elif node.value is True:
             self.context.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/Object;'),
+                JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
 
             )
         elif node.value is False:
             self.context.add_opcodes(
-                JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/Object;'),
+                JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
 
             )
         else:
