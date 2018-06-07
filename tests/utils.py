@@ -797,8 +797,6 @@ SAMPLE_SUBSTITUTIONS = {
                                         "{1, 2.3456, 7, 'on', 'an', 'to'}"),
     "{1, 2.3456, 7, 1, 2.3456, 7}": _string_substitutions(
                                         "{1, 2.3456, 7, 1, 2.3456, 7}"),
-    # Normalize precision error
-    "-3.14159": ["-3.1415900000000008"],
 }
 
 
