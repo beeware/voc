@@ -59,9 +59,7 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            #java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            #java.Init('org/python/types/Int', 'B'),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Int',
                 'getInt',
@@ -73,9 +71,7 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            #java.New('org/python/types/Str'),
             ILOAD_name(var_name),
-            #java.Init('org/python/types/Str', 'C'),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Int',
                 'getInt',
@@ -87,9 +83,7 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            #java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            #java.Init('org/python/types/Int', 'S'),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Int',
                 'getInt',
@@ -100,11 +94,12 @@ def to_python(accumulator, annotation, var_name):
     elif annotation == "int":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
+
             ILOAD_name(var_name),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Int',
                 'getInt',
-                args=['J'],
+                args=['I'],
                 returns='Lorg/python/types/Int;'
             ),
         )
@@ -112,9 +107,7 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            #java.New('org/python/types/Int'),
-            ILOAD_name(var_name),
-            #java.Init('org/python/types/Int', 'J'),
+            LLOAD_name(var_name),
             JavaOpcodes.INVOKESTATIC(
                 'org/python/types/Int',
                 'getInt',
