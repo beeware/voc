@@ -413,33 +413,33 @@ public class ByteArray extends org.python.types.Object {
             byte[] other_bytes = (byte[]) ((org.python.types.Bytes) other).value;
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] > other_bytes[i]) {
-                    return org.python.types.Bool.getBool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] < other_bytes[i]) {
-                    return org.python.types.Bool.getBool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length < other_bytes.length) {
-                return org.python.types.Bool.getBool(0);
+                return org.python.types.Bool.FALSE;
             }
-            return org.python.types.Bool.getBool(1);
+            return org.python.types.Bool.TRUE;
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_bytes = (byte[]) ((org.python.types.ByteArray) other).value;
             if (other_bytes == null) {
-                return org.python.types.Bool.getBool(1);
+                return org.python.types.Bool.TRUE;
             }
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] > other_bytes[i]) {
-                    return org.python.types.Bool.getBool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] < other_bytes[i]) {
-                    return org.python.types.Bool.getBool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length < other_bytes.length) {
-                return org.python.types.Bool.getBool(0);
+                return org.python.types.Bool.FALSE;
             }
-            return org.python.types.Bool.getBool(1);
+            return org.python.types.Bool.TRUE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -453,16 +453,16 @@ public class ByteArray extends org.python.types.Object {
             byte[] other_bytes = (byte[]) ((org.python.types.Bytes) other).value;
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] > other_bytes[i]) {
-                    return org.python.types.Bool.getBool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] < other_bytes[i]) {
-                    return org.python.types.Bool.getBool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length <= other_bytes.length) {
-                return org.python.types.Bool.getBool(0);
+                return org.python.types.Bool.FALSE;
             }
-            return org.python.types.Bool.getBool(1);
+            return org.python.types.Bool.TRUE;
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_bytes = (byte[]) ((org.python.types.ByteArray) other).value;
             if (other_bytes == null) {
@@ -470,16 +470,16 @@ public class ByteArray extends org.python.types.Object {
             }
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] > other_bytes[i]) {
-                    return org.python.types.Bool.getBool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] < other_bytes[i]) {
-                    return org.python.types.Bool.getBool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length <= other_bytes.length) {
-                return org.python.types.Bool.getBool(0);
+                return org.python.types.Bool.FALSE;
             }
-            return org.python.types.Bool.getBool(1);
+            return org.python.types.Bool.TRUE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -493,16 +493,16 @@ public class ByteArray extends org.python.types.Object {
             byte[] other_bytes = (byte[]) ((org.python.types.Bytes) other).value;
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] < other_bytes[i]) {
-                    return org.python.types.Bool.getBool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] > other_bytes[i]) {
-                    return org.python.types.Bool.getBool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length <= other_bytes.length) {
-                return org.python.types.Bool.getBool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return org.python.types.Bool.getBool(0);
+            return org.python.types.Bool.FALSE;
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_bytes = (byte[]) ((org.python.types.ByteArray) other).value;
             if (other_bytes == null) {
@@ -510,16 +510,16 @@ public class ByteArray extends org.python.types.Object {
             }
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] < other_bytes[i]) {
-                    return org.python.types.Bool.getBool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] > other_bytes[i]) {
-                    return org.python.types.Bool.getBool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length <= other_bytes.length) {
-                return org.python.types.Bool.getBool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return org.python.types.Bool.getBool(0);
+            return org.python.types.Bool.FALSE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -533,33 +533,33 @@ public class ByteArray extends org.python.types.Object {
             byte[] other_bytes = (byte[]) ((org.python.types.Bytes) other).value;
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] < other_bytes[i]) {
-                    return org.python.types.Bool.getBool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] > other_bytes[i]) {
-                    return org.python.types.Bool.getBool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length < other_bytes.length) {
-                return org.python.types.Bool.getBool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return org.python.types.Bool.getBool(0);
+            return org.python.types.Bool.FALSE;
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_bytes = (byte[]) ((org.python.types.ByteArray) other).value;
             if (other_bytes == null) {
-                return org.python.types.Bool.getBool(0);
+                return org.python.types.Bool.FALSE;
             }
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] < other_bytes[i]) {
-                    return org.python.types.Bool.getBool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] > other_bytes[i]) {
-                    return org.python.types.Bool.getBool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length < other_bytes.length) {
-                return org.python.types.Bool.getBool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return org.python.types.Bool.getBool(0);
+            return org.python.types.Bool.FALSE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }

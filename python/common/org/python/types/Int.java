@@ -170,12 +170,12 @@ public class Int extends org.python.types.Object {
         } else if (other instanceof org.python.types.Bool) {
             org.python.types.Bool temp = (org.python.types.Bool) other;
             if (this.value == 1 && temp.value) {
-                return org.python.types.Bool.getBool(1);
+                return org.python.types.Bool.TRUE;
             }
             if (this.value == 0 && !temp.value) {
-                return org.python.types.Bool.getBool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return org.python.types.Bool.getBool(0);
+            return org.python.types.Bool.FALSE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
