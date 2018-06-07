@@ -677,8 +677,8 @@ class JavaTests(TranspileTestCase):
             out="""
                 Hello from int method: 3
                 Result is 6
-                Hello from float method: 3.1415...
-                Result is 7.8539...
+                Hello from float method: 3.14159
+                Result is 7.85397...
                 Hello from boolean method: true
                 Result is False
                 Done.

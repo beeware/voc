@@ -7,7 +7,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import time
 import traceback
 from unittest import TestCase
 from itertools import permutations
@@ -216,7 +215,7 @@ END_OF_CODE_STRING = '===end of test==='
 END_OF_CODE_STRING_NEWLINE = END_OF_CODE_STRING + '\n'
 
 # Prevent floating point discrepancies in very low significant digits from being an issue
-FLOAT_PRECISION = re.compile('(\\.\d{4})\d+')
+FLOAT_PRECISION = re.compile('(\\.\d{5})\d+')
 
 
 def cleanse_java(raw, substitutions):
@@ -543,7 +542,7 @@ class TranspileTestCase(TestCase):
         except FileExistsError:
             pass
 
-    def runAsJava(self, main_code, extra_code=None, args=None, timed=False):
+    def runAsJava(self, main_code, extra_code=None, args=None):
         """Run a block of Python code as a Java program."""
         # Output source code into test directory
         transpiler = Transpiler(verbosity=0)
@@ -568,9 +567,6 @@ class TranspileTestCase(TestCase):
             self.jvm.stdin.write(("python.test\n").encode("utf-8"))
             self.jvm.stdin.flush()
 
-            t1_start = time.perf_counter()
-            t2_start = time.process_time()
-
             out = ""
             while True:
                 try:
@@ -582,18 +578,12 @@ class TranspileTestCase(TestCase):
                 except IOError as e:
                     continue
 
-            t1_stop = time.perf_counter()
-            t2_stop = time.process_time()
-
         else:
             classpath = os.pathsep.join([
                 os.path.join('..', 'dist', 'python-java-support.jar'),
                 os.path.join('..', 'java'),
                 os.curdir,
             ])
-
-            t1_start = time.perf_counter()
-            t2_start = time.process_time()
 
             proc = subprocess.Popen(
                 ["java", "-classpath", classpath, "python.test"] + args,
@@ -603,14 +593,7 @@ class TranspileTestCase(TestCase):
                 cwd=self.temp_dir
             )
 
-            t1_stop = time.perf_counter()
-            t2_stop = time.process_time()
-
             out = proc.communicate()[0].decode('utf8')
-
-        if timed:
-            print("  Elapsed time: ", (t1_stop-t1_start) * 1000, " ms")
-            print("  CPU process time: ", (t2_stop-t2_start) * 10000, " ms")
 
         return out
 

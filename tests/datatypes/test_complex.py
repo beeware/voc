@@ -228,7 +228,6 @@ class InplaceComplexOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_ne_str',
         'test_ne_tuple',
 
-        'test_power_complex',
         'test_power_none',
 
         'test_rshift_none',
