@@ -573,6 +573,59 @@ class GeneratorTests(TranspileTestCase):
                 print(i)
         """)
 
+    def test_generator_yieldfrom_generator_exit(self):
+        self.assertCodeExecution("""
+            def gen1():
+                return [1, 2, 3]
+                
+            def gen2():
+                v = yield from gen1()
+                yield 1
+                
+            g = gen2()
+            print(next(g))
+            try:
+                print(g.throw(GeneratorExit))
+            except GeneratorExit:
+                try:
+                    print(next(g))
+                except StopIteration:
+                    print("StopIteration")
+            """)
+            
+    def test_generator_yieldfrom_throw_propagation(self):
+        self.assertCodeExecution("""
+            def gen1():
+                try:
+                    yield 1
+                except TypeError:
+                    yield "TypeError"
+                
+            def gen2():
+                yield from gen1()
+                
+            g = gen2()
+            print(next(g))
+            print(g.throw(TypeError))
+            """)
+            
+    def test_generator_yieldfrom_send_propagation(self):
+        self.assertCodeExecution("""
+            def gen1():
+                a = yield "gen1"
+                print("value received: " + a)
+                
+            def gen2():
+                yield from gen1()
+                
+            g = gen2()
+            print(next(g))
+            try:
+                print(g.send("Hello World"))
+            except StopIteration:
+                print("StopIteration")
+            """)
+
     def test_generator_stop_iteration_value(self):
         self.assertCodeExecution("""
             def gen():
