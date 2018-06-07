@@ -255,8 +255,7 @@ def cleanse_java(raw, substitutions):
     )
 
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
-    # Replace high precision floats with abbreviated forms
-    out = FLOAT_PRECISION.sub('\\1...', out)
+
     out = out.replace(
         "'python.test'", '***EXECUTABLE***').replace(
         "'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
@@ -271,6 +270,10 @@ def cleanse_java(raw, substitutions):
                 out = out.replace(from_value, to_value)
 
     out = out.replace('\r\n', '\n')
+
+    # Replace high precision floats with abbreviated forms
+    out = FLOAT_PRECISION.sub('\\1...', out)
+
     return out
 
 
@@ -295,9 +298,6 @@ def cleanse_python(raw, substitutions):
     # Normalize memory references from output
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
 
-    # Replace high precision floats with abbreviated forms
-    out = FLOAT_PRECISION.sub('\\1...', out)
-
     # Replace references to the test script with something generic
     out = out.replace("'test.py'", '***EXECUTABLE***')
 
@@ -307,6 +307,10 @@ def cleanse_python(raw, substitutions):
                 out = out.replace(from_value, to_value)
 
     out = out.replace('\r\n', '\n')
+
+    # Replace high precision floats with abbreviated forms
+    out = FLOAT_PRECISION.sub('\\1...', out)
+    
     return out
 
 
@@ -797,6 +801,8 @@ SAMPLE_SUBSTITUTIONS = {
                                         "{1, 2.3456, 7, 'on', 'an', 'to'}"),
     "{1, 2.3456, 7, 1, 2.3456, 7}": _string_substitutions(
                                         "{1, 2.3456, 7, 1, 2.3456, 7}"),
+    # Normalize precision error
+    "-3.14159": ["-3.1415900000000008"],
 }
 
 
