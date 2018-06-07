@@ -7,7 +7,7 @@ from ..java import (
 from .structures import (
     ArgType, OpcodePosition,
     TRY, CATCH, END_TRY,
-    jump, resolve_jump
+    jump, resolve_jump,
 )
 from .types import java, python
 from .types.primitives import (

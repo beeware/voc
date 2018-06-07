@@ -216,7 +216,7 @@ END_OF_CODE_STRING = '===end of test==='
 END_OF_CODE_STRING_NEWLINE = END_OF_CODE_STRING + '\n'
 
 # Prevent floating point discrepancies in very low significant digits from being an issue
-FLOAT_PRECISION = re.compile('(\\.\d{5})\d+')
+FLOAT_PRECISION = re.compile('(\\.\d{4})\d+')
 
 
 def cleanse_java(raw, substitutions):

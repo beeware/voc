@@ -344,38 +344,6 @@ public class List extends org.python.types.Object {
         return org.python.types.Int.getInt(this.value.size());
     }
 
-    public org.python.types.Int getIntItemByIndex(int idx) {
-      if (idx < 0) {
-          if (-idx > this.value.size()) {
-              throw new org.python.exceptions.IndexError("list index out of range");
-          } else {
-              return (org.python.types.Int) this.value.get(this.value.size() + idx);
-          }
-      } else {
-          if (idx >= this.value.size()) {
-              throw new org.python.exceptions.IndexError("list index out of range");
-          } else {
-              return (org.python.types.Int) this.value.get(idx);
-          }
-      }
-    }
-
-    public org.python.Object getItemByIndex(int idx) {
-      if (idx < 0) {
-          if (-idx > this.value.size()) {
-              throw new org.python.exceptions.IndexError("list index out of range");
-          } else {
-              return this.value.get(this.value.size() + idx);
-          }
-      } else {
-          if (idx >= this.value.size()) {
-              throw new org.python.exceptions.IndexError("list index out of range");
-          } else {
-              return this.value.get(idx);
-          }
-      }
-    }
-
     @org.python.Method(
             __doc__ = "x.__getitem__(y) <==> x[y]",
             args = {"index"}
@@ -456,7 +424,19 @@ public class List extends org.python.types.Object {
                 } else {
                     idx = (int) ((org.python.types.Int) index).value;
                 }
-                return this.getItemByIndex(idx);
+                if (idx < 0) {
+                    if (-idx > this.value.size()) {
+                        throw new org.python.exceptions.IndexError("list index out of range");
+                    } else {
+                        return this.value.get(this.value.size() + idx);
+                    }
+                } else {
+                    if (idx >= this.value.size()) {
+                        throw new org.python.exceptions.IndexError("list index out of range");
+                    } else {
+                        return this.value.get(idx);
+                    }
+                }
             }
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 0x03050000) {
