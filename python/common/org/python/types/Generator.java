@@ -9,6 +9,9 @@ import java.lang.reflect.InvocationTargetException;
  * 2. expression  == null : The generator is exhausted
  * 3. message     != none : The generator currently holds value sent from caller via send() method
  * 4. exception   != null : The generator currently holds exception sent from caller via throw() method
+ *
+ * Notes: All states are mutually exclusive, (e.g if generator is in state 1 (yield_point == 0),
+ * expression must not be null, message must be none and exception must be null, similarly for states 2, 3 and 4)
  */
 public class Generator extends org.python.types.Object {
     java.lang.String name;
@@ -45,6 +48,8 @@ public class Generator extends org.python.types.Object {
     }
 
     /**
+     * API exposed primarily to handle `yield from`
+     *
      * Flow:
      * 1. this.exception == null
      *    1.1 Get next yield value via delegate_iterate
@@ -168,7 +173,7 @@ public class Generator extends org.python.types.Object {
         }
 
         try {
-            Class exception_class = Class.forName("org.python.exceptions." + exception_name);
+            Class<?> exception_class = Class.forName("org.python.exceptions." + exception_name);
             Constructor exception_constructor;
             if (exception_args instanceof org.python.types.NoneType) {
                 // value = None
