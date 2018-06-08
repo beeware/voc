@@ -78,7 +78,15 @@ public class Int extends org.python.types.Object {
                     );
                 }
             }
-        } else if (args.length > 3) {
+        } else if (args.length == 2) {
+            try {
+                org.python.types.Str argStr = (org.python.types.Str) args[0];
+                org.python.types.Int argInt = (org.python.types.Int) args[1];
+                this.value = java.lang.Integer.parseInt(argStr.value, (int) argInt.value);
+            } catch (Exception e) {
+                throw new org.python.exceptions.ValueError("invalid literal for int() with base " + args[1] + ": '" + args[0] + "'");
+            }
+        } else if (args.length > 2) {
             throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
         }
     }
