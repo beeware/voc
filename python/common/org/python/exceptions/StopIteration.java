@@ -6,6 +6,7 @@ public class StopIteration extends org.python.exceptions.Exception {
 
     public StopIteration() {
         super("");
+        this.value = org.python.types.NoneType.NONE;
     }
 
     public StopIteration(org.python.Object value) {

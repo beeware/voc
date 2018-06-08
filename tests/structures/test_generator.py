@@ -501,14 +501,14 @@ class GeneratorTests(TranspileTestCase):
             def gen():
                 try:
                     yield "from try block"
-                    a = yield 
+                    a = yield
                 except:
                     yield "from except block"
                     a = yield
                 else:
                     a = yield "from else block"
                 finally:
-                    a = yield "from finally block"  
+                    a = yield "from finally block"
                 print(a)
 
             g = gen()
@@ -577,11 +577,11 @@ class GeneratorTests(TranspileTestCase):
         self.assertCodeExecution("""
             def gen1():
                 return [1, 2, 3]
-                
+
             def gen2():
                 v = yield from gen1()
                 yield 1
-                
+
             g = gen2()
             print(next(g))
             try:
@@ -592,7 +592,7 @@ class GeneratorTests(TranspileTestCase):
                 except StopIteration:
                     print("StopIteration")
             """)
-            
+
     def test_generator_yieldfrom_throw_propagation(self):
         self.assertCodeExecution("""
             def gen1():
@@ -600,24 +600,24 @@ class GeneratorTests(TranspileTestCase):
                     yield 1
                 except TypeError:
                     yield "TypeError"
-                
+
             def gen2():
                 yield from gen1()
-                
+
             g = gen2()
             print(next(g))
             print(g.throw(TypeError))
             """)
-            
+
     def test_generator_yieldfrom_send_propagation(self):
         self.assertCodeExecution("""
             def gen1():
                 a = yield "gen1"
                 print("value received: " + a)
-                
+
             def gen2():
                 yield from gen1()
-                
+
             g = gen2()
             print(next(g))
             try:
@@ -631,22 +631,22 @@ class GeneratorTests(TranspileTestCase):
             def gen():
                 yield "Hello World"
                 return "return value"
-                
+
             g = gen()
             print(next(g))
             try:
                 print(next(g))
             except StopIteration as e:
                 print(e.value)
-                
+
             def gen1():
                 yield "Hello World"
                 return "return value"
-                
+
             def gen2():
                 v = yield from gen1()
                 print(v)
-                
+
             g = gen2()
             print(next(g))
             try:

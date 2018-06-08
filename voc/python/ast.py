@@ -1849,48 +1849,76 @@ class Visitor(ast.NodeVisitor):
                 )
             )
 
-        # throw exception if there is one
-        # NO-OP if generator.exception is null
-        self.context.load_name('<generator>')
-        self.context.add_opcodes(
-            JavaOpcodes.INVOKEVIRTUAL(
-                'org/python/types/Generator',
-                'throw_exception',
-                args=[],
-                returns='V'
+        if hasattr(node, "lineno"):
+            # throw exception if there is one
+            # NO-OP if generator.exception is null
+            self.context.load_name('<generator>')
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Generator',
+                    'throw_exception',
+                    args=[],
+                    returns='V'
+                )
             )
-        )
 
     @node_visitor
     def visit_YieldFrom(self, node):
         self.visit(node.value)  # pushes expression on stack
         self.context.add_opcodes(
-            python.Object.iter()  # pops expression from stack then gets and pushes its iterator on stack
+            python.Object.iter(),  # pops expression from stack then gets and pushes its iterator on stack
         )
-        self.context.store_name('#yield-iter-%x' % id(node))
 
+        # invokes __next()__ on the iterator, return if StopIteration
+        self.context.store_name('#yield-iter-%x' % id(node))
+        self.context.load_name('#yield-iter-%x' % id(node))
+        self.context.add_opcodes(
+            TRY(),
+            python.Iterable.next(),
+            ASTORE_name('#yield-value-%x' % id(node)),
+            CATCH('org/python/exceptions/StopIteration'),
+            JavaOpcodes.GETFIELD('org/python/exceptions/StopIteration', 'value', 'Lorg/python/Object;'),
+            JavaOpcodes.ARETURN(),
+            END_TRY()
+        )
+
+        # Yield the value and intercepts exception by invoking generator.intercept_exception
+        # If the method returns null, get RESULT field and break out of the loop
+        # If the method returns org.python.Object, store the value for next yield and continue loop
         loop = START_LOOP()
         self.context.add_opcodes(
             loop,
-            TRY(),
+            ALOAD_name('#yield-value-%x' % id(node))
         )
+        self.visit_Yield(ast.Yield(None))
+        self.context.load_name('<generator>')
         self.context.load_name('#yield-iter-%x' % id(node))
         self.context.add_opcodes(
-            python.Iterable.next(),
-            CATCH('org/python/exceptions/StopIteration'),
-            JavaOpcodes.GETFIELD('org/python/exceptions/StopIteration', 'value', 'Lorg/python/Object;'),
-            ASTORE_name("#exception-value-%x" % id(node)),
-            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
-            END_TRY(),
+            JavaOpcodes.INVOKEVIRTUAL(
+                'org/python/types/Generator',
+                'intercept_exception',
+                args=['Lorg/python/Object;'],
+                returns='Lorg/python/Object;'
+            ),
+            JavaOpcodes.DUP(),
+            ASTORE_name('#yield-value-%x' % id(node)),
+            IF([], JavaOpcodes.IFNONNULL),
         )
-        self.visit(ast.Yield(None))
+        self.context.load_name('<generator>')
         self.context.add_opcodes(
+            JavaOpcodes.DUP(),
+            python.Object.get_attribute('RESULT'),
+            JavaOpcodes.SWAP(),
+            python.Object.del_attr('RESULT'),
+            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),  # break from the loop
+            END_IF(),
+
+            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.START),  # continue
             END_LOOP(),
-            ALOAD_name("#exception-value-%x" % id(node))
         )
 
+        # cleanup
         self.context.delete_name('#yield-iter-%x' % id(node))
-        self.context.delete_name("#exception-value-%x" % id(node))
 
     @node_visitor
     def visit_Compare(self, node):

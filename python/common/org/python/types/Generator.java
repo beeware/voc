@@ -17,7 +17,7 @@ public class Generator extends org.python.types.Object {
     public java.util.Map<java.lang.String, org.python.Object> stack;
 
     public org.python.Object message;
-    public org.python.Object exception;
+    public org.python.exceptions.BaseException exception;
 
     public int hashCode() {
         return this.expression.hashCode();
@@ -42,6 +42,78 @@ public class Generator extends org.python.types.Object {
     protected void finalize() throws Throwable {
         super.finalize();
         this.__del__();
+    }
+
+    /**
+     * Flow:
+     * 1. this.exception == null
+     *    1.1 Get next yield value via delegate_iterate
+     *    1.2 If StopIteration, set 'RESULT' field to the exception's value then return null
+     *
+     * 2. this.exception != null, intercepts this.exception.
+     *    2.1 If this.exception is GeneratorExit, close the sub-generator
+     *    2.2 Otherwise throws the exception into sub-generator
+     *        2.2.1 If the sub-generator handles the exception and returns a value,
+     *              returns that value as next yield value.
+     *        2.2.2 If the sub-generator raises StopIteration, set 'RESULT' field to the
+     *              exception's value then return null
+     *
+     * Meaning of null return value: StopIteration is caught, its value is available in 'RESULT'
+     */
+    public org.python.Object intercept_exception(org.python.Object iterator) {
+        if (this.exception == null) {
+            org.python.Object msg = this.message;
+            this.reset_message();
+            try {
+                return delegate_iterate(iterator, msg);
+            } catch (org.python.exceptions.StopIteration e) {
+                this.__setattr__("RESULT", e.value);
+                return null;
+            }
+            //return null;
+        } else {
+            org.python.exceptions.BaseException exception = this.exception;
+            this.exception = null;
+            try {
+                throw exception;
+            } catch (org.python.exceptions.GeneratorExit _e) {
+                try {
+                    ((org.python.types.Generator) iterator).close();
+                } catch (java.lang.ClassCastException e) {
+                    // pass
+                }
+                throw _e;
+            } catch (org.python.exceptions.BaseException _e) {
+                try {
+                    return ((org.python.types.Generator) iterator).throw$(_e.type(), _e.args, null);
+                } catch (java.lang.ClassCastException e) {
+                    throw _e;
+                } catch (org.python.exceptions.StopIteration e) {
+                    System.out.println("setting result in base exception");
+                    this.__setattr__("RESULT", e.value);
+                    return null;
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the next item from iterator
+     *
+     * Invokes __next__() on iterator if message is None
+     * Invokes send() if message is not None, and if iterator is not a generator, raise AttributeError
+     */
+    private static org.python.Object delegate_iterate(org.python.Object iterator, org.python.Object message) {
+        if (message instanceof org.python.types.NoneType) {
+            return iterator.__next__();
+        } else {
+            try {
+                return ((org.python.types.Generator) iterator).send(message);
+            } catch (ClassCastException e) {
+                throw new org.python.exceptions.AttributeError(
+                    "'" + iterator.typeName() + "' object has no attribute 'send'");
+            }
+        }
     }
 
     public void yield(java.util.Map<java.lang.String, org.python.Object> stack, int yield_point) {
@@ -101,16 +173,18 @@ public class Generator extends org.python.types.Object {
             if (exception_args instanceof org.python.types.NoneType) {
                 // value = None
                 exception_constructor = exception_class.getConstructor();
-                this.exception = Type.toPython(exception_constructor.newInstance());
-            } else if (exception_args instanceof org.python.types.Tuple){
+                this.exception = (org.python.exceptions.BaseException)
+                    Type.toPython(exception_constructor.newInstance());
+            } else if (exception_args instanceof org.python.types.Tuple) {
                 // value is variable arguments
                 exception_constructor = exception_class.getConstructor(org.python.Object[].class, java.util.Map.class);
-                int size = ((org.python.types.Tuple)exception_args).value.size();
+                int size = ((org.python.types.Tuple) exception_args).value.size();
                 org.python.Object[] vargs = new org.python.Object[size];
-                for (int i=0; i<size; i++) {
+                for (int i = 0; i < size; i++) {
                     vargs[i] = ((org.python.types.Tuple) exception_args).value.get(i);
                 }
-                this.exception = Type.toPython(exception_constructor.newInstance(vargs, null));
+                this.exception = (org.python.exceptions.BaseException)
+                    Type.toPython(exception_constructor.newInstance(vargs, null));
 //            } else if (exception_args instanceof org.python.types.Dict) {
 //                // value is keyword arguments
 //                exception_constructor = exception_class.getConstructor(org.python.Object[].class, java.util.Map.class);
@@ -124,7 +198,8 @@ public class Generator extends org.python.types.Object {
             } else {
                 // use value.__str__() as exception argument
                 exception_constructor = exception_class.getConstructor(String.class);
-                this.exception = Type.toPython(exception_constructor.newInstance(exception_args.toString()));
+                this.exception = (org.python.exceptions.BaseException)
+                    Type.toPython(exception_constructor.newInstance(exception_args.toString()));
             }
 
         } catch (ClassNotFoundException e) {
@@ -136,7 +211,7 @@ public class Generator extends org.python.types.Object {
 
         if (this.yield_point == 0) {
             this.close();
-            throw (org.python.exceptions.BaseException) this.exception;
+            throw this.exception;
         }
 
         try {
@@ -153,7 +228,7 @@ public class Generator extends org.python.types.Object {
      */
     public void throw_exception() {
         if (this.exception != null) {
-            org.python.exceptions.BaseException exception = (org.python.exceptions.BaseException) this.exception;
+            org.python.exceptions.BaseException exception = this.exception;
             this.exception = null;
             throw exception;
         }
