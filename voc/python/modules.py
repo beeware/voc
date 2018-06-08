@@ -52,8 +52,6 @@ class Module(Block):
         self.parameters = [None]
         self.local_vars['self'] = 0
 
-        self.store_modules_dict_in_local_if_needed()
-
     @property
     def module(self):
         return self
@@ -80,8 +78,9 @@ class Module(Block):
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
-
-            ALOAD_name('#python/sys/modules'),
+        )
+        self.get_modules()
+        self.add_opcodes(
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -95,7 +94,9 @@ class Module(Block):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name('#value'),
-            ALOAD_name('#python/sys/modules'),
+        )
+        self.get_modules()
+        self.add_opcodes(
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -112,8 +113,8 @@ class Module(Block):
         self.store_global()
 
     def load_name(self, name):
+        self.get_modules()
         self.add_opcodes(
-            ALOAD_name('#python/sys/modules'),
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -122,8 +123,8 @@ class Module(Block):
         )
 
     def load_globals(self):
+        self.get_modules()
         self.add_opcodes(
-            ALOAD_name('#python/sys/modules'),
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -138,8 +139,8 @@ class Module(Block):
         self.load_globals()
 
     def delete_name(self, name):
+        self.get_modules()
         self.add_opcodes(
-            ALOAD_name('#python/sys/modules'),
             python.Str(self.full_name),
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
