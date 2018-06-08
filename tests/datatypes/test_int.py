@@ -28,12 +28,18 @@ class IntTests(TranspileTestCase):
                 print(err)
             """)
 
-    @expectedFailure
     def test_invalid_literal(self):
         self.assertCodeExecution("""
-            int('q', 16)
+            try:
+                print(int('q', 16))
+            except ValueError as err:
+                print(err)
             """)
 
+    def test_constructor_with_base(self):
+        self.assertCodeExecution("""
+            print(int('a', 16))
+            """)
 
 class UnaryIntOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'int'
