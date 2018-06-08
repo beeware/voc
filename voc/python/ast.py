@@ -358,7 +358,10 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 java.New('org/python/exceptions/StopIteration'),
             )
-            self.visit(node.value)
+            if node.value:
+                self.visit(node.value)
+            else:
+                self.context.add_opcodes(python.NONE())
             self.context.add_opcodes(
                 java.Init('org/python/exceptions/StopIteration', 'Lorg/python/Object;'),
                 JavaOpcodes.ATHROW(),
