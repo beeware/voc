@@ -194,58 +194,31 @@ class Visitor(ast.NodeVisitor):
         self.pop_context()
 
     def parse_yield(self, node):
-        """parse yield appearing in expression before the expression is evaluated
+        """parse yield appearing in expression before the expression is evaluated/visited
         """
-        def get_message():
-            # load message on stack
-            self.context.load_name('<generator>')
-            self.context.add_opcodes(
-                JavaOpcodes.GETFIELD('org/python/types/Generator', 'message', 'Lorg/python/Object;')
-            )
-
-            # reset message to None after pushing it on stack
-            self.context.load_name('<generator>')
-            self.context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/Generator',
-                    'reset_message',
-                    args=[],
-                    returns='V'
-                )
-            )
-
         def convert_to_Name(_node):
             # convert Yield node to Name node for expression evaluation
-            # expression operand is the message stored in generator
-            self.context.store_name('#msg-buffer-%x' % id(node))
+            # operand of expression is the message stored in generator
             return ast.Name(
-                id='#msg-buffer-%x' % id(node),
+                id='#msg-buffer-%x' % id(_node),
                 ctx=ast.Load(),
                 lineno=_node.lineno,
                 col_offset=_node.col_offset
             )
-
-        # The node is a regular yield statement
-        # Mark it as 'regular_yield' to flush the generator's message upon restored
-        if isinstance(node, ast.Yield):
-            setattr(node, "regular_yield", True)
-            return
 
         for field_name, value in ast.iter_fields(node):
             if isinstance(value, ast.Yield):
                 if isinstance(node, ast.Expr):
                     # don't parse Expr(value=Yield)
                     return
-                self.visit_Yield(value)  # visit the Yield node
-                get_message()
+                self.visit_Yield(value)
                 setattr(node, field_name, convert_to_Name(value))
                 return
             elif isinstance(value, list):  # args or kwargs list
                 index = 0
                 for arg_node in value:
                     if isinstance(arg_node, ast.Yield):
-                        self.visit_Yield(arg_node)  # visit the Yield node
-                        get_message()
+                        self.visit_Yield(arg_node)
                         value[index] = convert_to_Name(arg_node)
                         return
                     index += 1
@@ -1786,8 +1759,8 @@ class Visitor(ast.NodeVisitor):
         if hasattr(node, "lineno"):
             # Checks for programmatically defined yield node.
             # A programmatically defined yield node does not has the attribute `lineno`
-            # Example: visit_YieldFrom function defined ast.Yield(None) after pushing value
-            # obtained from iterator onto stack, hence no need to visit node.value here
+            # Example: currently only visit_YieldFrom function define yield node programmatically
+            # (defined as ast.Yield(None)) before pushing next yield value on stack
             if node.value:
                 self.visit(node.value)
                 self.context.add_opcodes(
@@ -1840,23 +1813,27 @@ class Visitor(ast.NodeVisitor):
                     JavaOpcodes.ASTORE(index),
                 )
 
-        if hasattr(node, "regular_yield"):
-            # reset message to None
+        # Manage messages and exception when generator is restored
+        if hasattr(node, "lineno"):
+            # Retrieve message from generator
             self.context.load_name('<generator>')
             self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.GETFIELD('org/python/types/Generator', 'message', 'Lorg/python/Object;'),
+            )
+            # Store the message in local variable for expression evaluation
+            self.context.store_name('#msg-buffer-%x' % id(node))
+            self.context.add_opcodes(
+                # Reset message to None after retrieval
                 JavaOpcodes.INVOKEVIRTUAL(
                     'org/python/types/Generator',
                     'reset_message',
                     args=[],
-                    returns='V'
-                )
-            )
-
-        if hasattr(node, "lineno"):
-            # throw exception if there is one
-            # NO-OP if generator.exception is null
-            self.context.load_name('<generator>')
-            self.context.add_opcodes(
+                    returns='V',
+                ),
+                # Throw exception if there is one
+                # NO-OP if generator.exception is null
                 JavaOpcodes.INVOKEVIRTUAL(
                     'org/python/types/Generator',
                     'throw_exception',
