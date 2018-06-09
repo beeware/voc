@@ -89,7 +89,7 @@ public class Int extends org.python.types.Object {
                 if (base == 0) {
                     base = 10;
                 } else if (base < 2 || base > 36) {
-                    if (org.Python.VERSION < 0x03060000) {
+                    if (org.Python.VERSION < 0x03060400) {
                         throw new org.python.exceptions.ValueError("int() base must be >= 2 and <= 36");
                     } else {
                         throw new org.python.exceptions.ValueError("int() base must be >= 2 and <= 36, or 0");
