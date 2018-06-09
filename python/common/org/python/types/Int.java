@@ -78,8 +78,29 @@ public class Int extends org.python.types.Object {
                     );
                 }
             }
-        } else if (args.length > 3) {
-            throw new org.python.exceptions.NotImplementedError("int() with a base is not implemented");
+        } else if (args.length == 2) {
+            try {
+                org.python.types.Str argStr = (org.python.types.Str) args[0];
+                if (args[1] instanceof org.python.types.NoneType) {
+                    throw new org.python.exceptions.TypeError("'NoneType' object cannot be interpreted as an integer");
+                }
+                org.python.types.Int argInt = (org.python.types.Int) args[1];
+                int base = (int) argInt.value;
+                if (base == 0) {
+                    base = 10;
+                } else if (base < 2 || base > 36) {
+                    if (org.Python.VERSION < 0x03060400) {
+                        throw new org.python.exceptions.ValueError("int() base must be >= 2 and <= 36");
+                    } else {
+                        throw new org.python.exceptions.ValueError("int() base must be >= 2 and <= 36, or 0");
+                    }
+                }
+                this.value = java.lang.Integer.parseInt(argStr.value, base);
+            } catch (java.lang.NumberFormatException e) {
+                throw new org.python.exceptions.ValueError("invalid literal for int() with base " + args[1] + ": '" + args[0] + "'");
+            }
+        } else if (args.length > 2) {
+            throw new org.python.exceptions.TypeError("int() takes at most 2 arguments (" + args.length + " given)");
         }
     }
 

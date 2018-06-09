@@ -22,10 +22,77 @@ class IntTests(TranspileTestCase):
                 print(err)
             """)
 
-    @expectedFailure
     def test_invalid_literal(self):
         self.assertCodeExecution("""
-            int('q', 16)
+            try:
+                print(int('q', 16))
+            except ValueError as err:
+                print(err)
+            """)
+
+    def test_none(self):
+        self.assertCodeExecution("""
+            try:
+                print(int(None))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_base_correct(self):
+        self.assertCodeExecution("""
+            print(int('a', 16))
+            print(int('22', 3))
+            print(int('5', 0))
+            """)
+
+    def test_base_none(self):
+        self.assertCodeExecution("""
+            try:
+                print(int('0', None))
+            except TypeError as err:
+                print(err)
+            """)
+
+    def test_base_too_small(self):
+        self.assertCodeExecution("""
+            try:
+                print(int('22', 1))
+            except ValueError as err:
+                print(err)
+            """)
+
+    def test_base_negative(self):
+        self.assertCodeExecution("""
+            try:
+                print(int('5', -10))
+            except ValueError as err:
+                print(err)
+            """)
+
+    def test_base_too_large(self):
+        self.assertCodeExecution("""
+            try:
+                print(int('5', 100))
+            except ValueError as err:
+                print(err)
+            """)
+
+    def test_no_arguments(self):
+        self.assertCodeExecution("""
+            print(int())
+            """)
+
+    @expectedFailure
+    def test_too_many_arguments(self):
+        self.assertCodeExecution("""
+            try:
+                print(int('1', 2, 3, 4))
+            except TypeError as err:
+                print(err)
+            try:
+                print(int('1', 2, 3, 4, 5))
+            except TypeError as err:
+                print(err)
             """)
 
 
