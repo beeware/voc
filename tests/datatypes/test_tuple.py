@@ -272,3 +272,10 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
+
+    substitutions = {
+        # output, keyed to all possible inputs
+        "{3, 1.2, True}": [
+            "{1.2, 3, True}", "{True, 1.2, 3}", "{True, 3, 1.2}", "{3, 1.2, True}", "{3, True, 1.2}", "{1.2, True, 3}",
+        ]
+    }
