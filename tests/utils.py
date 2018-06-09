@@ -412,7 +412,7 @@ class TranspileTestCase(TestCase):
                 self.assertEqual(java_out, py_out, context)
             except AssertionError as e:
                 self.fail(e)
-	
+
             # Confirm that both output strings end with the canary statement
             if exits_early:
                 if java_out.endswith(END_OF_CODE_STRING_NEWLINE):
