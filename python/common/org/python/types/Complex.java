@@ -219,12 +219,12 @@ public class Complex extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Complex) {
             org.python.types.Complex other_obj = (org.python.types.Complex) other;
-            return new org.python.types.Bool(
+            return org.python.types.Bool.getBool(
                     ((org.python.types.Bool) this.real.__eq__(other_obj.real)).value
                     && ((org.python.types.Bool) this.imag.__eq__(other_obj.imag)).value);
         } else if (other instanceof org.python.types.Float || other instanceof org.python.types.Int
                 || other instanceof org.python.types.Bool) {
-            return new org.python.types.Bool(
+            return org.python.types.Bool.getBool(
                     ((org.python.types.Bool) this.real.__eq__(other)).value
                     && ((org.python.types.Bool) this.imag.__eq__(new org.python.types.Int(0))).value);
         }
@@ -252,7 +252,7 @@ public class Complex extends org.python.types.Object {
     )
     public org.python.types.Bool __bool__() {
         // A complex number is "truthy" if either its real component or imaginary component are > 0
-        return new org.python.types.Bool((this.real.value != 0.0) || (this.imag.value != 0.0));
+        return org.python.types.Bool.getBool((this.real.value != 0.0) || (this.imag.value != 0.0));
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {

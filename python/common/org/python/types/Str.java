@@ -199,7 +199,7 @@ public class Str extends org.python.types.Object {
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
-            return new org.python.types.Bool(this.value.compareTo(value) < 0);
+            return org.python.types.Bool.getBool(this.value.compareTo(value) < 0);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -212,7 +212,7 @@ public class Str extends org.python.types.Object {
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
-            return new org.python.types.Bool(this.value.compareTo(value) <= 0);
+            return org.python.types.Bool.getBool(this.value.compareTo(value) <= 0);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -225,7 +225,7 @@ public class Str extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
-            return new org.python.types.Bool(this.value.equals(value));
+            return org.python.types.Bool.getBool(this.value.equals(value));
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -238,7 +238,7 @@ public class Str extends org.python.types.Object {
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
-            return new org.python.types.Bool(this.value.compareTo(value) > 0);
+            return org.python.types.Bool.getBool(this.value.compareTo(value) > 0);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -251,7 +251,7 @@ public class Str extends org.python.types.Object {
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Str) {
             java.lang.String value = ((org.python.types.Str) other).value;
-            return new org.python.types.Bool(this.value.compareTo(value) >= 0);
+            return org.python.types.Bool.getBool(this.value.compareTo(value) >= 0);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -512,7 +512,7 @@ public class Str extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(this.value.length() > 0);
+        return org.python.types.Bool.getBool(this.value.length() > 0);
     }
 
     @org.python.Method(
@@ -688,7 +688,7 @@ public class Str extends org.python.types.Object {
             }
             java.lang.String original = this.__getitem__(new org.python.types.Slice(start, end)).toString();
             boolean result = original.endsWith(((org.python.types.Str) suffix).toString());
-            return new org.python.types.Bool(result);
+            return org.python.types.Bool.getBool(result);
         }
         throw new org.python.exceptions.TypeError("endswith first arg must be str, not " + suffix.typeName());
     }
@@ -822,14 +822,14 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isalnum() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         }
         for (char c : this.value.toCharArray()) {
             if (!java.lang.Character.isLetter(c) && !java.lang.Character.isDigit(c)) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.FALSE;
             }
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -840,14 +840,14 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isalpha() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         }
         for (char ch : this.value.toCharArray()) {
             if (!(Character.isLetter(ch))) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.FALSE;
             }
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -858,14 +858,14 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isdecimal() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         }
         for (char c : this.value.toCharArray()) {
             if (!java.lang.Character.isDigit(c)) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.FALSE;
             }
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -876,14 +876,14 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isdigit() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         }
         for (char ch : this.value.toCharArray()) {
             if (!(Character.isDigit(ch))) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.FALSE;
             }
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -897,7 +897,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isidentifier() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         }
         boolean firstCheck = true;
         for (char ch : this.value.toCharArray()) {
@@ -907,16 +907,16 @@ public class Str extends org.python.types.Object {
             }
             if (firstCheck) {
                 if (!(Character.isUnicodeIdentifierStart(ch))) {
-                    return new org.python.types.Bool(false);
+                    return org.python.types.Bool.FALSE;
                 }
                 firstCheck = false;
             } else {
                 if (!(Character.isUnicodeIdentifierPart(ch))) {
-                    return new org.python.types.Bool(false);
+                    return org.python.types.Bool.FALSE;
                 }
             }
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -927,9 +927,9 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object islower() {
         if (!this.value.isEmpty() && this.value.toLowerCase().equals(this.value)) {
-            return new org.python.types.Bool(true);
+            return org.python.types.Bool.TRUE;
         }
-        return new org.python.types.Bool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(
@@ -940,14 +940,14 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isnumeric() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         }
         for (char ch : this.value.toCharArray()) {
             if (!(Character.isDigit(ch))) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.FALSE;
             }
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -959,10 +959,10 @@ public class Str extends org.python.types.Object {
     public org.python.Object isprintable() {
         for (char ch : this.value.toCharArray()) {
             if (!this.isCharPrintable(ch)) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.FALSE;
             }
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -973,14 +973,14 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isspace() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         }
         for (char ch : this.value.toCharArray()) {
             if (!isWhitespace(ch)) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.FALSE;
             }
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -993,18 +993,18 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object istitle() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         }
 
         if (this.value.equals(_title(this.value))) {
             for (int idx = 0; idx < this.value.length(); idx++) {
                 if (Character.isLetter(this.value.charAt(idx))) {
-                    return new org.python.types.Bool(true);
+                    return org.python.types.Bool.TRUE;
                 }
             }
         }
 
-        return new org.python.types.Bool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(
@@ -1015,9 +1015,9 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object isupper() {
         if (!this.value.isEmpty() && this.value.toUpperCase().equals(this.value)) {
-            return new org.python.types.Bool(true);
+            return org.python.types.Bool.TRUE;
         }
-        return new org.python.types.Bool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(
@@ -1616,7 +1616,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object splitlines(org.python.Object keepends) {
         if (keepends == null) {
-            keepends = new org.python.types.Bool(false);
+            keepends = org.python.types.Bool.FALSE;
         }
 
         org.python.types.List result = new org.python.types.List();
@@ -1685,7 +1685,7 @@ public class Str extends org.python.types.Object {
             }
             java.lang.String original = this.__getitem__(new org.python.types.Slice(start, end)).toString();
             boolean result = original.startsWith(((org.python.types.Str) suffix).toString());
-            return new org.python.types.Bool(result);
+            return org.python.types.Bool.getBool(result);
         }
         throw new org.python.exceptions.TypeError("startswith first arg must be str, not " + suffix.typeName());
     }
@@ -2581,4 +2581,3 @@ final class PythonFormatter {
     public static final char SIGN_NEGATIV = '+';
     public static final char SIGN_UNDEFINED = '\0';
 }
-

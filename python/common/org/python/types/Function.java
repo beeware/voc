@@ -176,7 +176,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     private void checkMissingArgs(int requiredArgs, int passedArgs, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> varnames, int first_arg) {

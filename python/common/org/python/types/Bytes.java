@@ -164,13 +164,13 @@ public class Bytes extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Bytes) {
             byte[] other_value = ((org.python.types.Bytes) other).value;
-            return new org.python.types.Bool(Arrays.equals(this.value, other_value));
+            return org.python.types.Bool.getBool(Arrays.equals(this.value, other_value));
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_value = ((org.python.types.ByteArray) other).value;
             if (other_value == null) {
                 other_value = new byte[0];
             }
-            return new org.python.types.Bool(Arrays.equals(this.value, other_value));
+            return org.python.types.Bool.getBool(Arrays.equals(this.value, other_value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -236,7 +236,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(this.value.length > 0);
+        return org.python.types.Bool.getBool(this.value.length > 0);
     }
 
     @org.python.Method(
@@ -266,7 +266,7 @@ public class Bytes extends org.python.types.Object {
         int counter_slice = 0;
         for (int i = 0; i < this.value.length + 1; i++) {
             if (counter_slice == bslice.length) {
-                return new org.python.types.Bool(true);
+                return org.python.types.Bool.TRUE;
             } else if (i == this.value.length) {
                 break;
             } else if (bslice[counter_slice] == this.value[i]) {
@@ -275,7 +275,7 @@ public class Bytes extends org.python.types.Object {
                 counter_slice = 0;
             }
         }
-        return new org.python.types.Bool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(
@@ -294,33 +294,33 @@ public class Bytes extends org.python.types.Object {
             byte[] other_bytes = (byte[]) ((org.python.types.Bytes) other).value;
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] > other_bytes[i]) {
-                    return new org.python.types.Bool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] < other_bytes[i]) {
-                    return new org.python.types.Bool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length < other_bytes.length) {
-                return new org.python.types.Bool(0);
+                return org.python.types.Bool.FALSE;
             }
-            return new org.python.types.Bool(1);
+            return org.python.types.Bool.TRUE;
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_bytes = (byte[]) ((org.python.types.ByteArray) other).value;
             if (other_bytes == null) {
-                return new org.python.types.Bool(1);
+                return org.python.types.Bool.TRUE;
             }
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] > other_bytes[i]) {
-                    return new org.python.types.Bool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] < other_bytes[i]) {
-                    return new org.python.types.Bool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length < other_bytes.length) {
-                return new org.python.types.Bool(0);
+                return org.python.types.Bool.FALSE;
             }
-            return new org.python.types.Bool(1);
+            return org.python.types.Bool.TRUE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -334,16 +334,16 @@ public class Bytes extends org.python.types.Object {
             byte[] other_bytes = (byte[]) ((org.python.types.Bytes) other).value;
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] > other_bytes[i]) {
-                    return new org.python.types.Bool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] < other_bytes[i]) {
-                    return new org.python.types.Bool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length <= other_bytes.length) {
-                return new org.python.types.Bool(0);
+                return org.python.types.Bool.FALSE;
             }
-            return new org.python.types.Bool(1);
+            return org.python.types.Bool.TRUE;
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_bytes = (byte[]) ((org.python.types.ByteArray) other).value;
             if (other_bytes == null) {
@@ -351,16 +351,16 @@ public class Bytes extends org.python.types.Object {
             }
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] > other_bytes[i]) {
-                    return new org.python.types.Bool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] < other_bytes[i]) {
-                    return new org.python.types.Bool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length <= other_bytes.length) {
-                return new org.python.types.Bool(0);
+                return org.python.types.Bool.FALSE;
             }
-            return new org.python.types.Bool(1);
+            return org.python.types.Bool.TRUE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -374,16 +374,16 @@ public class Bytes extends org.python.types.Object {
             byte[] other_bytes = (byte[]) ((org.python.types.Bytes) other).value;
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] < other_bytes[i]) {
-                    return new org.python.types.Bool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] > other_bytes[i]) {
-                    return new org.python.types.Bool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length <= other_bytes.length) {
-                return new org.python.types.Bool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return new org.python.types.Bool(0);
+            return org.python.types.Bool.FALSE;
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_bytes = (byte[]) ((org.python.types.ByteArray) other).value;
             if (other_bytes == null) {
@@ -391,16 +391,16 @@ public class Bytes extends org.python.types.Object {
             }
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] < other_bytes[i]) {
-                    return new org.python.types.Bool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] > other_bytes[i]) {
-                    return new org.python.types.Bool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length <= other_bytes.length) {
-                return new org.python.types.Bool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return new org.python.types.Bool(0);
+            return org.python.types.Bool.FALSE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -414,33 +414,33 @@ public class Bytes extends org.python.types.Object {
             byte[] other_bytes = (byte[]) ((org.python.types.Bytes) other).value;
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] < other_bytes[i]) {
-                    return new org.python.types.Bool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] > other_bytes[i]) {
-                    return new org.python.types.Bool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length < other_bytes.length) {
-                return new org.python.types.Bool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return new org.python.types.Bool(0);
+            return org.python.types.Bool.FALSE;
         } else if (other instanceof org.python.types.ByteArray) {
             byte[] other_bytes = (byte[]) ((org.python.types.ByteArray) other).value;
             if (other_bytes == null) {
-                return new org.python.types.Bool(0);
+                return org.python.types.Bool.FALSE;
             }
             for (int i = 0; i < Math.min(this.value.length, other_bytes.length); i++) {
                 if (this.value[i] < other_bytes[i]) {
-                    return new org.python.types.Bool(1);
+                    return org.python.types.Bool.TRUE;
                 }
                 if (this.value[i] > other_bytes[i]) {
-                    return new org.python.types.Bool(0);
+                    return org.python.types.Bool.FALSE;
                 }
             }
             if (this.value.length < other_bytes.length) {
-                return new org.python.types.Bool(1);
+                return org.python.types.Bool.TRUE;
             }
-            return new org.python.types.Bool(0);
+            return org.python.types.Bool.FALSE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -925,15 +925,15 @@ public class Bytes extends org.python.types.Object {
                 }
                 boolean ok = ((org.python.types.Bool) this.endsOrStartsWith(item, null, null, direction)).value;
                 if (ok) {
-                    return new org.python.types.Bool(true);
+                    return org.python.types.Bool.TRUE;
                 }
             }
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
 
         } else if (substring instanceof Bytes) {
             byte[] substringValue = ((Bytes) substring).value;
             if (substringValue.length > this.value.length) {
-                return new org.python.types.Bool(false);
+                return org.python.types.Bool.FALSE;
             }
 
             int startIndex;
@@ -949,7 +949,7 @@ public class Bytes extends org.python.types.Object {
 
             byte[] thisValuePart = Arrays.copyOfRange(this.value, startIndex, endIndex);
             boolean ok = Arrays.equals(thisValuePart, substringValue);
-            return new org.python.types.Bool(ok);
+            return org.python.types.Bool.getBool(ok);
         } else {
             String methodName;
             if (direction < 0) {
@@ -1101,7 +1101,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "B.isalnum() -> bool\n\nReturn True if all characters in B are alphanumeric\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalnum() {
-        return new Bool(_isalnum(this.value));
+        return org.python.types.Bool.getBool(_isalnum(this.value));
     }
 
     public static boolean _isalpha(byte[] input) {
@@ -1124,7 +1124,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "B.isalpha() -> bool\n\nReturn True if all characters in B are alphabetic\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isalpha() {
-        return new Bool(_isalpha(this.value));
+        return org.python.types.Bool.getBool(_isalpha(this.value));
     }
 
     public static boolean _isdigit(byte ch) {
@@ -1150,7 +1150,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "B.isdigit() -> bool\n\nReturn True if all characters in B are digits\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isdigit() {
-        return new Bool(_isdigit(this.value));
+        return org.python.types.Bool.getBool(_isdigit(this.value));
     }
 
     public static boolean _islower(byte[] input) {
@@ -1171,7 +1171,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "B.islower() -> bool\n\nReturn True if all cased characters in B are lowercase and there is\nat least one cased character in B, False otherwise."
     )
     public org.python.Object islower() {
-        return new Bool(_islower(this.value));
+        return org.python.types.Bool.getBool(_islower(this.value));
     }
 
     public static boolean _isspace(byte[] input) {
@@ -1191,7 +1191,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "B.isspace() -> bool\n\nReturn True if all characters in B are whitespace\nand there is at least one character in B, False otherwise."
     )
     public org.python.Object isspace() {
-        return new Bool(_isspace(this.value));
+        return org.python.types.Bool.getBool(_isspace(this.value));
     }
 
     public static boolean _istitle(byte[] input) {
@@ -1214,7 +1214,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "B.istitle() -> bool\n\nReturn True if B is a titlecased string and there is at least one\ncharacter in B, i.e. uppercase characters may only follow uncased\ncharacters and lowercase characters only cased ones. Return False\notherwise."
     )
     public org.python.Object istitle() {
-        return new org.python.types.Bool(_istitle(this.value));
+        return org.python.types.Bool.getBool(_istitle(this.value));
     }
 
     public static boolean _isupper(byte[] input) {
@@ -1235,7 +1235,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "B.isupper() -> bool\n\nReturn True if all cased characters in B are uppercase and there is\nat least one cased character in B, False otherwise."
     )
     public org.python.Object isupper() {
-        return new Bool(_isupper(this.value));
+        return org.python.types.Bool.getBool(_isupper(this.value));
     }
 
     @org.python.Method(
