@@ -1,4 +1,10 @@
-from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
+from .. utils import (
+    TranspileTestCase,
+    UnaryOperationTestCase,
+    BinaryOperationTestCase,
+    InplaceOperationTestCase,
+    SAMPLE_SUBSTITUTIONS
+)
 
 
 class TupleTests(TranspileTestCase):
@@ -279,3 +285,6 @@ class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
             "{1.2, 3, True}", "{True, 1.2, 3}", "{True, 3, 1.2}", "{3, 1.2, True}", "{3, True, 1.2}", "{1.2, True, 3}",
         ]
     }
+
+    substitutions.update(SAMPLE_SUBSTITUTIONS)
+
