@@ -30,11 +30,27 @@ class IntTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_none(self):
+        self.assertCodeExecution("""
+            try:
+                print(int(None))
+            except TypeError as err:
+                print(err)
+            """)
+
     def test_base_correct(self):
         self.assertCodeExecution("""
             print(int('a', 16))
             print(int('22', 3))
             print(int('5', 0))
+            """)
+
+    def test_base_none(self):
+        self.assertCodeExecution("""
+            try:
+                print(int('0', None))
+            except TypeError as err:
+                print(err)
             """)
 
     def test_base_too_small(self):
