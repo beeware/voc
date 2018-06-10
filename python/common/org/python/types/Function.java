@@ -107,15 +107,15 @@ public class Function extends org.python.types.Object implements org.python.Call
                 null,  // new org.python.types.Bytes(),  // co_code
                 null,  // new org.python.types.Tuple(),  // co_consts
                 null,  // new org.python.types.Str(),  // co_filename
-                null,  // new org.python.types.Int(),  // co_firstlineno
+                null,  // org.python.types.Int.getInt(),  // co_firstlineno
                 org.python.types.Int.getInt(flags),  // co_flags
                 new org.python.types.Tuple(),  // co_freevars
                 org.python.types.Int.getInt(kwonlyargs.length),  // co_kwonlyargcount
                 null,  // new org.python.types.Bytes(),  // co_lnotab
                 this.name,  // co_name
                 null,  // new org.python.types.Tuple(),  // co_names
-                null,  // new org.python.types.Int(),  // co_nlocals
-                null,  // new org.python.types.Int(),  // co_stacksize
+                null,  // org.python.types.Int.getInt(),  // co_nlocals
+                null,  // org.python.types.Int.getInt(),  // co_stacksize
                 new org.python.types.Tuple(varnames)  // co_varnames
         );
         populateAttrs();
