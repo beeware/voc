@@ -82,7 +82,7 @@ that caused the problem.
 What version of Python does VOC require?
 ----------------------------------------
 
-VOC runs under Python 3.4.
+VOC runs under Python 3.4+.
 
 What version of Java does VOC require?
 --------------------------------------

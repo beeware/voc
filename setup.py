@@ -24,7 +24,7 @@ setup(
     author_email='russell@keith-magee.com',
     url='http://pybee.org/voc',
     packages=find_packages(exclude=['docs', 'tests']),
-    python_requires='==3.4',
+    python_requires='>=3.4',
     entry_points={
         'console_scripts': [
             'voc = voc.__main__:main',
