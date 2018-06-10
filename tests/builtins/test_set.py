@@ -23,6 +23,23 @@ class BuiltinSetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     substitutions = {
         # output, keyed to all possible inputs
         "{3, 1.2, True}": [
-            "{1.2, 3, True}", "{True, 1.2, 3}", "{True, 3, 1.2}", "{3, True, 1.2}", "{1.2, True, 3}",
+            "{1.2, 3, True}", "{True, 1.2, 3}", "{True, 3, 1.2}", "{3, True, 1.2}", "{1.2, True, 3}"
+        ],
+        "{1, 2.3456, 'another'}": [
+            "{1, 'another', 2.3456}", "{'another', 1, 2.3456}", "{'another', 2.3456, 1}", "{2.3456, 'another', 1}",
+            "{2.3456, 1, 'another'}"
+        ],
+        "{'on', 'to', 'an'}": [
+            "{'on', 'an', 'to'}", "{'to', 'an', 'on'}", "{'to', 'on', 'an'}", "{'an', 'to', 'on'}", "{'an', 'on', 'to'}"
+        ],
+        "{'one', 'two', 'six'}": [
+            "{'one', 'six', 'two'},", "{'six', 'one', 'two'}", "{'six', 'two', 'one'}", "{'two', 'one', 'six'}",
+            "{'two', 'six', 'one'}"
+        ],
+        "{1, 2.3456, 7}": [
+            "{1, 7, 2.3456}", "{2.34556, 1, 7}", "{2.3456, 7, 1}", "{7, 2.3456, 1}", "{7, 1, 2.3456}"
+        ],
+        "{'a', 'b', 'c'}": [
+            "{'a', 'c', 'b'}", "{'b', 'a', 'c'}", "{'b', 'c', 'a'}", "{'c', 'a', 'b'}", "{'c', 'b', 'c'}"
         ]
     }
