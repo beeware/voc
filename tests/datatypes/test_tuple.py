@@ -272,4 +272,3 @@ class BinaryTupleOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceTupleOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'tuple'
-
