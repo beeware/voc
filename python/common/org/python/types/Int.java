@@ -54,9 +54,9 @@ public class Int extends org.python.types.Object {
                 SMALLINTS[index] = i_obj;
             }
             return i_obj;
-      } else {
-          return new org.python.types.Int(value);
-      }
+        } else {
+            return new org.python.types.Int(value);
+        }
     }
 
     private Int(long value) {
