@@ -33,8 +33,8 @@ class BuiltinSetFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
             "{'on', 'an', 'to'}", "{'to', 'an', 'on'}", "{'to', 'on', 'an'}", "{'an', 'to', 'on'}", "{'an', 'on', 'to'}"
         ],
         "{'one', 'two', 'six'}": [
-            "{'one', 'six', 'two'},", "{'six', 'one', 'two'}", "{'six', 'two', 'one'}", "{'two', 'one', 'six'}",
-            "{'two', 'six', 'one'}"
+            "{'one', 'six', 'two'}", "{'two', 'one', 'six'}", "{'two', 'six', 'one'}", "{'six', 'one', 'two'}",
+            "{'six', 'two', 'one'}"
         ],
         "{1, 2.3456, 7}": [
             "{1, 7, 2.3456}", "{2.34556, 1, 7}", "{2.3456, 7, 1}", "{7, 2.3456, 1}", "{7, 1, 2.3456}"
