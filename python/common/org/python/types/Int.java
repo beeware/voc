@@ -60,7 +60,7 @@ public class Int extends org.python.types.Object {
     }
 
     private Int(long value) {
-      this.value = value;
+        this.value = value;
     }
 
     @org.python.Method(
