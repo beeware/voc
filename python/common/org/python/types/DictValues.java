@@ -101,7 +101,7 @@ public class DictValues extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(!this.value.isEmpty());
+        return org.python.types.Bool.getBool(!this.value.isEmpty());
     }
 
     @org.python.Method(
@@ -168,7 +168,7 @@ public class DictValues extends org.python.types.Object {
             args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
-        return new org.python.types.Bool(this.value.contains(item));
+        return org.python.types.Bool.getBool(this.value.contains(item));
     }
 
     @org.python.Method(
@@ -176,6 +176,6 @@ public class DictValues extends org.python.types.Object {
             args = {"item"}
     )
     public org.python.Object __not_contains__(org.python.Object item) {
-        return new org.python.types.Bool(!this.value.contains(item));
+        return org.python.types.Bool.getBool(!this.value.contains(item));
     }
 }

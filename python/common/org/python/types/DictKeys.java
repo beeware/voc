@@ -221,7 +221,7 @@ public class DictKeys extends org.python.types.FrozenSet {
         } catch (org.python.exceptions.StopIteration si) {
         }
         generated.retainAll(this.value);
-        return new org.python.types.Bool(generated.size() > 0);
+        return org.python.types.Bool.getBool(generated.size() > 0);
     }
     /**
      * The following methods are not present in Python's dict_keys but are present in DictKeys (inherited from FrozenSet)
