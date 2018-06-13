@@ -14,7 +14,7 @@ from .types.primitives import (
     DLOAD_name, FLOAD_name,
     ICONST_val, ILOAD_name,
 )
-# from .debug import DEBUG, DEBUG_value
+from .debug import DEBUG, DEBUG_value
 
 
 CO_VARARGS = 0x0004
