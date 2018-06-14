@@ -425,7 +425,7 @@ public class os extends org.python.types.Module {
             __doc__ = "Return the number of CPUs in the system."
     )
     public static org.python.Object cpu_count() {
-	return org.python.types.Int.getInt(Runtime.getRuntime().availableProcessors());
+        return org.python.types.Int.getInt(Runtime.getRuntime().availableProcessors());
     }
 
     @org.python.Method(
