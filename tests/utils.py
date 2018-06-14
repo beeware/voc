@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import traceback
 from unittest import TestCase
 from itertools import permutations
@@ -551,7 +552,7 @@ class TranspileTestCase(TestCase):
         except FileExistsError:
             pass
 
-    def runAsJava(self, main_code, extra_code=None, args=None):
+    def runAsJava(self, main_code, extra_code=None, args=None, timed=False):
         """Run a block of Python code as a Java program."""
         # Output source code into test directory
         transpiler = Transpiler(verbosity=0)
@@ -559,6 +560,7 @@ class TranspileTestCase(TestCase):
         # Don't redirect stderr; we want to see any errors from the transpiler
         # as top level test failures.
         with capture_output(redirect_stderr=False):
+
             transpiler.transpile_string("test.py", main_code)
 
             if extra_code:
@@ -570,7 +572,11 @@ class TranspileTestCase(TestCase):
         if args is None:
             args = []
 
+        t1_start = time.perf_counter()
+        t2_start = time.process_time()
+
         if len(args) == 0:
+
             # encode to turn str into bytes-like object
             self.jvm.stdin.write(("python.test\n").encode("utf-8"))
             self.jvm.stdin.flush()
@@ -585,12 +591,17 @@ class TranspileTestCase(TestCase):
                         out += line
                 except IOError as e:
                     continue
+
+            t1_stop = time.perf_counter()
+            t2_stop = time.process_time()
+
         else:
             classpath = os.pathsep.join([
                 os.path.join('..', 'dist', 'python-java-support.jar'),
                 os.path.join('..', 'java'),
                 os.curdir,
             ])
+
             proc = subprocess.Popen(
                 ["java", "-classpath", classpath, "python.test"] + args,
                 stdin=subprocess.PIPE,
@@ -598,7 +609,15 @@ class TranspileTestCase(TestCase):
                 stderr=subprocess.STDOUT,
                 cwd=self.temp_dir
             )
+
+            t1_stop = time.perf_counter()
+            t2_stop = time.process_time()
+
             out = proc.communicate()[0].decode('utf8')
+
+        if timed:
+            print("  Elapsed time: ", (t1_stop-t1_start), " sec")
+            print("  CPU process time: ", (t2_stop-t2_start), " sec")
 
         return out
 
