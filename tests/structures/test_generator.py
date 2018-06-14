@@ -72,55 +72,6 @@ class GeneratorTests(TranspileTestCase):
                 print(i)
             """)
 
-    def test_simplest_yieldfrom(self):
-        self.assertCodeExecution("""
-            def gen1():
-                yield 1
-                yield 2
-                yield 3
-
-            def gen2():
-                yield from gen1()
-
-            for i in gen2():
-                print(i)
-        """)
-
-    def test_yieldfrom_list(self):
-        self.assertCodeExecution("""
-            def gen():
-                yield from [1, 2, 3]
-
-            for i in gen():
-                print(i)
-        """)
-
-    def test_chaining_yieldfrom(self):
-        self.assertCodeExecution("""
-            def gen1():
-                yield 'a'
-                yield 'b'
-
-            def gen2():
-                yield from gen1()
-                yield 'gen2'
-
-            def gen3():
-                yield from gen2()
-
-            for i in gen3():
-                print(i)
-        """)
-
-    def test_yield_from_used(self):
-        self.assertCodeExecution("""
-            def using_yieldfrom():
-                yield from range(5)
-
-            for i in using_yieldfrom():
-                print(i)
-            """)
-
     def test_generator_send(self):
         self.assertCodeExecution("""
             def gen():
@@ -291,3 +242,43 @@ class GeneratorTests(TranspileTestCase):
             g.send(1)  # for some reason the generator keeps returning value
             g.send(100) # without raising StopIteration error
             """)
+    
+    def test_simplest_yieldfrom(self):
+        self.assertCodeExecution("""
+            def gen1():
+                yield 1
+                yield 2
+                yield 3
+                
+            def gen2():
+                yield from gen1()
+                
+            for i in gen2():
+                print(i)
+        """)
+
+    def test_yieldfrom_list(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield from [1, 2, 3]
+                
+            for i in gen():
+                print(i)
+        """)
+
+    def test_chaining_yieldfrom(self):
+        self.assertCodeExecution("""
+            def gen1():
+                yield 'a'
+                yield 'b'
+                
+            def gen2():
+                yield from gen1()
+                yield 'gen2'
+                
+            def gen3():
+                yield from gen2()
+                
+            for i in gen3():
+                print(i)
+        """)
