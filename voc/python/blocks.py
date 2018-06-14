@@ -16,10 +16,6 @@ from .types.primitives import (
 
 # from .debug import DEBUG, DEBUG_value
 
-# The number of negative and positive small org/python/types/Int objects that are preallocated
-# [-NSMALLNEGINTS, NSMALLPOSINTS)
-NSMALLNEGINTS = 5
-NSMALLPOSINTS = 257
 
 class IgnoreBlock(Exception):
     """An escape hatch; enable a block to be flagged as ignorable"""
