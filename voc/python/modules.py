@@ -75,12 +75,26 @@ class Module(Block):
     def build_child_class_descriptor(self, child_name):
         return '/'.join([self.descriptor, child_name])
 
+    def get_name_string(self):
+        if '#full_name' not in self.local_vars:
+            self.add_opcodes(
+                python.Str(self.full_name),
+                JavaOpcodes.DUP(),
+                ASTORE_name('#full_name'),
+            )
+        else:
+            self.add_opcodes(
+                ALOAD_name('#full_name'),
+            )
+
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
 
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
+        )
+        self.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -94,7 +108,9 @@ class Module(Block):
         self.add_opcodes(
             ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
+        )
+        self.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -112,7 +128,9 @@ class Module(Block):
     def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
+        )
+        self.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -122,7 +140,9 @@ class Module(Block):
     def load_globals(self):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
+        )
+        self.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -138,7 +158,9 @@ class Module(Block):
     def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
+        )
+        self.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 

@@ -271,9 +271,9 @@ class Function(Block):
                 ASTORE_name('#value'),
 
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
+            ),
+            self.module.get_name_string()
+            self.add_opcodes(
                 python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -294,9 +294,9 @@ class Function(Block):
         else:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
+            )
+            self.module.get_name_string()
+            self.add_opcodes(
                 python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -306,8 +306,9 @@ class Function(Block):
     def load_globals(self):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-            python.Str(self.module.full_name),
+        )
+        self.module.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
 
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -331,9 +332,9 @@ class Function(Block):
         except NameError:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
+            )
+            self.module.get_name_string()
+            self.add_opcodes(
                 python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -627,9 +628,9 @@ class InitMethod(Function):
         else:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
+            )
+            self.module.get_name_string()
+            self.add_opcodes(
                 python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -859,7 +860,9 @@ class MainFunction(Function):
         self.add_opcodes(
             ASTORE_name('#value'),
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
+        )
+        self.module.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
@@ -882,7 +885,9 @@ class MainFunction(Function):
     def load_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
+        )
+        self.module.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
 
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -892,7 +897,9 @@ class MainFunction(Function):
     def delete_name(self, name):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
+        )
+        self.module.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
 
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
@@ -916,7 +923,9 @@ class MainFunction(Function):
 
                 # Register the module by it's full name
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                python.Str(self.module.full_name),
+        )
+        self.module.get_name_string()
+        self.add_opcodes(
                 ALOAD_name('#module'),
                 python.Object.set_item(),
 
@@ -1011,7 +1020,9 @@ class Closure(Function):
         else:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                python.Str(self.module.full_name),
+            )
+            self.module.get_name_string()
+            self.add_opcodes(
                 python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 

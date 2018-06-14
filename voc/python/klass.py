@@ -150,7 +150,6 @@ class Class(Block):
                 returns='Lorg/python/types/Module;'
             ),
             JavaOpcodes.POP(),
-
             # Set the module name
             python.Str(self.module.full_name),
         )
@@ -198,9 +197,9 @@ class Class(Block):
     def load_globals(self):
         self.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-            python.Str(self.module.full_name),
-
+        )
+        self.module.get_name_string()
+        self.add_opcodes(
             python.Object.get_item(),
             JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
