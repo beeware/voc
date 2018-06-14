@@ -56,6 +56,8 @@ class Class(Block):
 
         self._constructor = None
 
+        self.store_modules_dict_in_local_if_needed()
+
     @property
     def descriptor(self):
         return self._parent.build_child_class_descriptor(self.name)
@@ -197,7 +199,7 @@ class Class(Block):
 
     def load_globals(self):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+            ALOAD_name('#python/sys/modules'),
 
             python.Str(self.module.full_name),
 

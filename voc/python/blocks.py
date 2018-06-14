@@ -402,6 +402,15 @@ class Block(Accumulator):
             free_name('#EXCEPTION#')
         )
 
+    def store_modules_dict_in_local_if_needed(self):
+        if '#python/sys/modules' not in self.local_vars:
+            self.add_opcodes(
+            # Put the modules dict in the local vars
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+                JavaOpcodes.CHECKCAST('org/python/types/Dict'),
+                ASTORE_name('#python/sys/modules'),
+            )
+
     def visitor_setup(self):
         """Tweak the bytecode generated for this block."""
         pass
