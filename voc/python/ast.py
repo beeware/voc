@@ -1761,24 +1761,30 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Yield(self, node):
         if hasattr(node, "lineno"):
-            # Check for programmatically defined yield node.
+            # Checks for programmatically defined yield node.
             # A programmatically defined yield node does not has the attribute `lineno`
             # Example: visit_YieldFrom function defined ast.Yield(None) after pushing value
             # obtained from iterator onto stack, hence no need to visit node.value here
-            self.visit(node.value)
-            self.context.add_opcodes(
-                # Convert to a new value for return purposes
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
-            )
-        else:
-            # push NoneType object to stack to support single yield statement (without operand)
-            # as the statment `yield` is equivalent to `yield None`
-            self.context.add_opcodes(
-                JavaOpcodes.GETSTATIC(
-                    'org/python/types/NoneType',
-                    'NONE',
-                    'Lorg/python/Object;'
+            if node.value:
+                self.visit(node.value)
+                self.context.add_opcodes(
+                    # Convert to a new value for return purposes
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
                 )
+            else:
+                # push NoneType object to stack to support single yield statement (without operand)
+                # as the statment `yield` is equivalent to `yield None`
+                self.context.add_opcodes(
+                    JavaOpcodes.GETSTATIC(
+                        'org/python/types/NoneType',
+                        'NONE',
+                        'Lorg/python/Object;'
+                    )
+                )
+        else:
+            # value is already pushed on stack, hence only need to convert to org.python.Object
+            self.context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
             )
 
         yield_point = len(self.context.yield_points) + 1
