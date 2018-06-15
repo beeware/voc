@@ -27,7 +27,7 @@ public class Method extends org.python.types.Object implements org.python.Callab
         } else {
             return new org.python.types.Str(
                     String.format("<bound method %s.%s of %s>",
-                            this.im_class.__dict__.get("__name__"),
+                            this.im_class,
                             this.im_func.__dict__.get("__name__"),
                             this.im_self
                     )
