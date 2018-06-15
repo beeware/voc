@@ -614,7 +614,7 @@ public class Float extends org.python.types.Object {
             __doc__ = "int(self)"
     )
     public org.python.Object __int__() {
-        return new org.python.types.Int((int) this.value);
+        return org.python.types.Int.getInt((int) this.value);
     }
 
     @org.python.Method(
@@ -645,14 +645,14 @@ public class Float extends org.python.types.Object {
                 sign = -1;
             }
             if (Math.abs(fractionalPart) < 0.5) {
-                return new org.python.types.Int(sign * Math.abs(wholeNumber));
+                return org.python.types.Int.getInt(sign * Math.abs(wholeNumber));
             } else if (Math.abs(fractionalPart) > 0.5) {
-                return new org.python.types.Int(sign * (Math.abs(wholeNumber) + 1));
+                return org.python.types.Int.getInt(sign * (Math.abs(wholeNumber) + 1));
             } else {
                 if (wholeNumber % 2 == 0) {
-                    return new org.python.types.Int(sign * Math.abs(wholeNumber));
+                    return org.python.types.Int.getInt(sign * Math.abs(wholeNumber));
                 } else {
-                    return new org.python.types.Int(sign * (Math.abs(wholeNumber) + 1));
+                    return org.python.types.Int.getInt(sign * (Math.abs(wholeNumber) + 1));
                 }
             }
         } else {

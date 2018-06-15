@@ -341,7 +341,7 @@ public class List extends org.python.types.Object {
             __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.size());
+        return org.python.types.Int.getInt(this.value.size());
     }
 
     @org.python.Method(
@@ -669,7 +669,7 @@ public class List extends org.python.types.Object {
                 count++;
             }
         }
-        return new org.python.types.Int(count);
+        return org.python.types.Int.getInt(count);
     }
 
     @org.python.Method(
@@ -765,7 +765,7 @@ public class List extends org.python.types.Object {
         for (int i = iStart; i < Math.min(iEnd, this.value.size()); i++) {
             if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
                     item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
-                return new org.python.types.Int(i);
+                return org.python.types.Int.getInt(i);
             }
         }
         throw new org.python.exceptions.ValueError(String.format("%d is not in list", ((org.python.types.Int) item).value));

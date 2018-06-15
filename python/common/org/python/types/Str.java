@@ -159,7 +159,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object __int__() {
         try {
-            return new org.python.types.Int(Long.parseLong(this.value));
+            return org.python.types.Int.getInt(Long.parseLong(this.value));
         } catch (NumberFormatException e) {
             throw new org.python.exceptions.ValueError("invalid literal for int() with base 10: '" + this.value + "'");
         }
@@ -273,7 +273,7 @@ public class Str extends org.python.types.Object {
             __doc__ = "len(object)\n\nReturn the number of items of a sequence or collection."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.length());
+        return org.python.types.Int.getInt(this.value.length());
     }
 
     @org.python.Method(
@@ -413,7 +413,7 @@ public class Str extends org.python.types.Object {
                     }
                 }
             }
-            return new org.python.types.Int(substr_exists);
+            return org.python.types.Int.getInt(substr_exists);
         }
         if (org.Python.VERSION < 0x03060000) {
             throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
@@ -644,13 +644,13 @@ public class Str extends org.python.types.Object {
     public org.python.Object count(org.python.Object sub, org.python.Object start, org.python.Object end) {
         java.lang.String sub_str = ((org.python.types.Str) sub).value;
         if (start == null) {
-            start = new org.python.types.Int(0);
+            start = org.python.types.Int.getInt(0);
         }
         if (end == null) {
-            end = new org.python.types.Int(this.value.length());
+            end = org.python.types.Int.getInt(this.value.length());
         }
         java.lang.String original = this.__getitem__(new org.python.types.Slice(start, end)).toString();
-        return new org.python.types.Int((original.length() - original.replace(sub_str, "").length()) / sub_str.length());
+        return org.python.types.Int.getInt((original.length() - original.replace(sub_str, "").length()) / sub_str.length());
     }
 
     @org.python.Method(
@@ -681,10 +681,10 @@ public class Str extends org.python.types.Object {
     public org.python.Object endswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
         if (suffix instanceof org.python.types.Str) {
             if (start == null) {
-                start = new org.python.types.Int(0);
+                start = org.python.types.Int.getInt(0);
             }
             if (end == null) {
-                end = new org.python.types.Int(this.value.length());
+                end = org.python.types.Int.getInt(this.value.length());
             }
             java.lang.String original = this.__getitem__(new org.python.types.Slice(start, end)).toString();
             boolean result = original.endsWith(((org.python.types.Str) suffix).toString());
@@ -749,16 +749,16 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object find(org.python.Object item, org.python.Object start, org.python.Object end) {
         if (start == null) {
-            start = new org.python.types.Int(0);
+            start = org.python.types.Int.getInt(0);
         }
         if (end == null) {
-            end = new org.python.types.Int(this.value.length());
+            end = org.python.types.Int.getInt(this.value.length());
         }
         int foundAt = this.__getitem__(new Slice(start, end)).toString().indexOf(item.toString());
         if (foundAt >= 0) {
-            return new org.python.types.Int(foundAt + toPositiveIndex(((Int) start).value));
+            return org.python.types.Int.getInt(foundAt + toPositiveIndex(((Int) start).value));
         }
-        return new org.python.types.Int(foundAt);
+        return org.python.types.Int.getInt(foundAt);
     }
 
     @org.python.Method(
@@ -1240,12 +1240,12 @@ public class Str extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
         }
         if (start == null) {
-            start = new org.python.types.Int(0);
+            start = org.python.types.Int.getInt(0);
         }
         if (end == null) {
-            end = new org.python.types.Int(this.value.length());
+            end = org.python.types.Int.getInt(this.value.length());
         }
-        org.python.Object index = new org.python.types.Int(-1);
+        org.python.Object index = org.python.types.Int.getInt(-1);
         org.python.Object temp = (org.python.types.Int) index;
         while (((org.python.types.Bool) (temp.__lt__(end))).value) {
             temp = this.find(item, start, end);
@@ -1253,7 +1253,7 @@ public class Str extends org.python.types.Object {
                 break;
             }
             index = temp;
-            start = temp.__add__(new org.python.types.Int(1));
+            start = temp.__add__(org.python.types.Int.getInt(1));
         }
         return index;
     }
@@ -1431,7 +1431,7 @@ public class Str extends org.python.types.Object {
                             j--;
                         }
                         temp = j;
-                        result_list.insert(new org.python.types.Int(0), new org.python.types.Str(sb.toString()));
+                        result_list.insert(org.python.types.Int.getInt(0), new org.python.types.Str(sb.toString()));
                         break;
                     } else {
                         sb.insert(0, value.charAt(j));
@@ -1439,9 +1439,9 @@ public class Str extends org.python.types.Object {
                 }
             }
             if (j != 0) {
-                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, j + 1)));
+                result_list.insert(org.python.types.Int.getInt(0), new org.python.types.Str(value.substring(0, j + 1)));
             } else if (j == 0 && value.charAt(j) != ' ') {
-                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, 1)));
+                result_list.insert(org.python.types.Int.getInt(0), new org.python.types.Str(value.substring(0, 1)));
             }
         } else {  //handles non-whitespace and non-default whitespace delimiters (Ex. rsplit("e",12) rsplit(" ",2))
             int lastIndex = 0, count = 0, number = 0;
@@ -1453,7 +1453,7 @@ public class Str extends org.python.types.Object {
                 }
             }
             if (count == 0) {
-                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value));  //if no matches found, simply return array containing original string
+                result_list.insert(org.python.types.Int.getInt(0), new org.python.types.Str(value));  //if no matches found, simply return array containing original string
             } else {
                 int numEnd = 0;
                 if (java.lang.Integer.parseInt(maxsplit.toString()) >= 0) {
@@ -1469,18 +1469,18 @@ public class Str extends org.python.types.Object {
                     for (j = temp; j >= 0; j--) {
                         if (value.substring(j, temp).contains(sepStr)) {
                             if (i == 0) {   //prevent going over string bounds
-                                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(j + sepStr.length(), value.length())));
+                                result_list.insert(org.python.types.Int.getInt(0), new org.python.types.Str(value.substring(j + sepStr.length(), value.length())));
                                 temp = j;
                                 j--;
                             } else {
-                                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(j + sepStr.length(), temp)));
+                                result_list.insert(org.python.types.Int.getInt(0), new org.python.types.Str(value.substring(j + sepStr.length(), temp)));
                                 temp = j;
                             }
                             break;
                         }
                     }
                 }
-                result_list.insert(new org.python.types.Int(0), new org.python.types.Str(value.substring(0, j)));
+                result_list.insert(org.python.types.Int.getInt(0), new org.python.types.Str(value.substring(0, j)));
             }
         }
         return result_list;
@@ -1649,7 +1649,7 @@ public class Str extends org.python.types.Object {
                 if (keepends.toBoolean()) {
                     end++;
                 }
-                result.append(this.__getitem__(new org.python.types.Slice(new org.python.types.Int(start), new org.python.types.Int(end))));
+                result.append(this.__getitem__(new org.python.types.Slice(org.python.types.Int.getInt(start), org.python.types.Int.getInt(end))));
                 start = i + 1 + start_extra;
                 if (skip) {
                     skip = false;
@@ -1657,7 +1657,7 @@ public class Str extends org.python.types.Object {
                 }
             }
         }
-        org.python.types.Str last = (org.python.types.Str) this.__getitem__(new org.python.types.Slice(new org.python.types.Int(start), org.python.types.NoneType.NONE));
+        org.python.types.Str last = (org.python.types.Str) this.__getitem__(new org.python.types.Slice(org.python.types.Int.getInt(start), org.python.types.NoneType.NONE));
         if (last.value.length() > 0) {
             result.append(last);
         }
@@ -1678,10 +1678,10 @@ public class Str extends org.python.types.Object {
     public org.python.Object startswith(org.python.Object suffix, org.python.Object start, org.python.Object end) {
         if (suffix instanceof org.python.types.Str) {
             if (start == null) {
-                start = new org.python.types.Int(0);
+                start = org.python.types.Int.getInt(0);
             }
             if (end == null) {
-                end = new org.python.types.Int(this.value.length());
+                end = org.python.types.Int.getInt(this.value.length());
             }
             java.lang.String original = this.__getitem__(new org.python.types.Slice(start, end)).toString();
             boolean result = original.startsWith(((org.python.types.Str) suffix).toString());

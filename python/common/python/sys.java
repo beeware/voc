@@ -83,7 +83,7 @@ public class sys extends org.python.types.Module {
 
         platform = python.platform.impl.getPlatform();
 
-        hexversion = new org.python.types.Int(org.Python.VERSION);
+        hexversion = org.python.types.Int.getInt(org.Python.VERSION);
 
         int major = org.Python.VERSION >> 24;
         int minor = (org.Python.VERSION >> 16) % 0x10;
@@ -340,7 +340,7 @@ public class sys extends org.python.types.Module {
 
     // last_value <class 'SyntaxError'>
     @org.python.Attribute
-    public static org.python.types.Int maxsize = new org.python.types.Int(Long.MAX_VALUE);
+    public static org.python.types.Int maxsize = org.python.types.Int.getInt(Long.MAX_VALUE);
     public static org.python.types.Int maxunicode;
     public static org.python.types.List meta_path;
     public static org.python.types.Dict modules = new org.python.types.Dict();

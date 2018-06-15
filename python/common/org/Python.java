@@ -643,7 +643,7 @@ public class Python {
         if (items == null) {
             throw new org.python.exceptions.TypeError("Required argument 'iterable' (pos 1) not found");
         }
-        org.python.Object index = new org.python.types.Int(0);
+        org.python.Object index = org.python.types.Int.getInt(0);
         if (start != null) {
             try {
                 index = (org.python.types.Int) start; // will throw error if start can't be converted to Int
@@ -651,7 +651,7 @@ public class Python {
                 throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
             }
         }
-        org.python.Object increment = new org.python.types.Int(1);
+        org.python.Object increment = org.python.types.Int.getInt(1);
         java.util.List enumList = new java.util.ArrayList();
         try {
             org.python.Object iter = org.Python.iter(items);
@@ -840,7 +840,7 @@ public class Python {
             args = {"object"}
     )
     public static org.python.types.Int id(org.python.Object object) {
-        return new org.python.types.Int(System.identityHashCode(object));
+        return org.python.types.Int.getInt(System.identityHashCode(object));
     }
 
     @org.python.Method(
@@ -1335,7 +1335,7 @@ public class Python {
         try {
             int length = ((org.python.types.Str) c).value.length();
             if (length == 1) {
-                return new org.python.types.Int((int) (((org.python.types.Str) c.__str__()).value).charAt(0));
+                return org.python.types.Int.getInt((int) (((org.python.types.Str) c.__str__()).value).charAt(0));
             } else {
                 throw new org.python.exceptions.TypeError("ord() expected a character, but string of length " + length + " found");
             }
@@ -1502,7 +1502,7 @@ public class Python {
                 // There probably should be a better way to introspect for these
                 // methods without catually calling them, but this will do for now.
                 try {
-                    sequence.__getitem__(new org.python.types.Int(0));
+                    sequence.__getitem__(org.python.types.Int.getInt(0));
                 } catch (org.python.exceptions.IndexError e) {
                 }
 
@@ -1529,7 +1529,7 @@ public class Python {
     )
     public static org.python.Object round(org.python.Object number, org.python.Object ndigits) {
         if (ndigits == null) {
-            return number.__round__(new org.python.types.Int(0));
+            return number.__round__(org.python.types.Int.getInt(0));
         }
         return number.__round__(ndigits);
     }
@@ -1674,7 +1674,7 @@ public class Python {
         if (start != null) {
             value = start;
         } else {
-            value = new org.python.types.Int(0);
+            value = org.python.types.Int.getInt(0);
         }
 
         org.python.Object iterator = org.Python.iter(iterable);

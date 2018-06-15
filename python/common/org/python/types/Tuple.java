@@ -269,7 +269,7 @@ public class Tuple extends org.python.types.Object {
             __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.size());
+        return org.python.types.Int.getInt(this.value.size());
     }
 
     @org.python.Method(
@@ -442,7 +442,7 @@ public class Tuple extends org.python.types.Object {
             __doc__ = "T.count(value) -> integer -- return number of occurrences of value"
     )
     public org.python.Object count() {
-        return new org.python.types.Int(this.value.size());
+        return org.python.types.Int.getInt(this.value.size());
     }
 
     @org.python.Method(
@@ -475,7 +475,7 @@ public class Tuple extends org.python.types.Object {
         for (long i = st; i < en; i++) {
             try {
                 if (((org.python.types.Bool) ((value.get((int) i)).__eq__(item))).value) {
-                    return new org.python.types.Int(i);
+                    return org.python.types.Int.getInt(i);
                 }
             } catch (ClassCastException cce) {
                 throw new org.python.exceptions.ValueError("tuple.index(x): x not in tuple");

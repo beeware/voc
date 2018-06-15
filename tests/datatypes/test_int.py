@@ -4,6 +4,12 @@ from unittest import expectedFailure
 
 
 class IntTests(TranspileTestCase):
+    def test_int(self):
+        self.assertCodeExecution("""
+            for i in range(-500, 500):
+                print(i)
+            """)
+
     def test_setattr(self):
         self.assertCodeExecution("""
             x = 37

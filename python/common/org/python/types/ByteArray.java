@@ -383,14 +383,14 @@ public class ByteArray extends org.python.types.Object {
                 } else {
                     idx = this.value.length + idx;
                     // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int((long) this.value[idx] & 0xff);
+                    return org.python.types.Int.getInt((long) this.value[idx] & 0xff);
                 }
             } else {
                 if (idx >= this.value.length) {
                     throw new org.python.exceptions.IndexError("bytearray index out of range");
                 } else {
                     // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                    return new org.python.types.Int((long) this.value[idx] & 0xff);
+                    return org.python.types.Int.getInt((long) this.value[idx] & 0xff);
                 }
             }
         } else {
@@ -643,7 +643,7 @@ public class ByteArray extends org.python.types.Object {
     public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
         for (byte b: this.value) {
-            listOfBytes.add(new org.python.types.Int((long) b & 0xff));
+            listOfBytes.add(org.python.types.Int.getInt((long) b & 0xff));
         }
         return new org.python.types.List(listOfBytes).__iter__();
     }
@@ -652,7 +652,7 @@ public class ByteArray extends org.python.types.Object {
             __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.length);
+        return org.python.types.Int.getInt(this.value.length);
     }
 
     @org.python.Method(

@@ -226,7 +226,7 @@ public class Complex extends org.python.types.Object {
                 || other instanceof org.python.types.Bool) {
             return org.python.types.Bool.getBool(
                     ((org.python.types.Bool) this.real.__eq__(other)).value
-                    && ((org.python.types.Bool) this.imag.__eq__(new org.python.types.Int(0))).value);
+                    && ((org.python.types.Bool) this.imag.__eq__(org.python.types.Int.getInt(0))).value);
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }

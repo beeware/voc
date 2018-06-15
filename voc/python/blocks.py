@@ -153,10 +153,11 @@ class Block(Accumulator):
 
     def add_int(self, value):
         self.add_opcodes(
-            java.New('org/python/types/Int'),
             LCONST_val(value),
-            java.Init('org/python/types/Int', 'J'),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Int', 'getInt', args=['J'], returns='Lorg/python/types/Int;'),
+            JavaOpcodes.CHECKCAST('org/python/types/Int'),
         )
+
 
     def add_float(self, value):
         self.add_opcodes(
@@ -201,11 +202,7 @@ class Block(Accumulator):
                         )
 
                 elif isinstance(value, int):
-                    self.add_opcodes(
-                        java.New('org/python/types/Int'),
-                        LCONST_val(value),
-                        java.Init('org/python/types/Int', 'J'),
-                    )
+                    self.add_int(value)
 
                 elif isinstance(value, float):
                     self.add_opcodes(
