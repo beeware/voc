@@ -56,6 +56,9 @@ class Class(Block):
 
         self._constructor = None
 
+        # Store the Module object as a local variable
+        self.store_module()
+
     @property
     def descriptor(self):
         return self._parent.build_child_class_descriptor(self.name)
@@ -67,6 +70,20 @@ class Class(Block):
     @property
     def module(self):
         return self._parent.module
+
+    def store_module(self):
+        if ('#module') not in self.local_vars:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                # Store it as a local vairable
+                ASTORE_name('#module'),
+            )
 
     def build_child_class_descriptor(self, child_name):
         return '$'.join([self.descriptor, child_name])
@@ -197,13 +214,7 @@ class Class(Block):
 
     def load_globals(self):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-            python.Str(self.module.full_name),
-
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+            ALOAD_name('#module'),
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
         )
 

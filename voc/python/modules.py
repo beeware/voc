@@ -52,6 +52,8 @@ class Module(Block):
         self.parameters = [None]
         self.local_vars['self'] = 0
 
+        self.store_module()
+
     @property
     def module(self):
         return self
@@ -75,14 +77,25 @@ class Module(Block):
     def build_child_class_descriptor(self, child_name):
         return '/'.join([self.descriptor, child_name])
 
+    def store_module(self):
+        if ('#module') not in self.local_vars:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                # Store it as a local vairable
+                ASTORE_name('#module'),
+            )
+
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
 
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'),
 
             ALOAD_name('#value'),
             python.Object.set_attr(name),
@@ -93,10 +106,7 @@ class Module(Block):
     def store_dynamic(self):
         self.add_opcodes(
             ASTORE_name('#value'),
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'),
 
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
 
@@ -111,21 +121,13 @@ class Module(Block):
 
     def load_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+            ALOAD_name('#module'),
             python.Object.get_attribute(name),
         )
 
     def load_globals(self):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+            ALOAD_name('#module'),
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
         )
 
@@ -137,11 +139,7 @@ class Module(Block):
 
     def delete_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.full_name),
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+            ALOAD_name('#module'),
             python.Object.del_attr(name),
         )
 
