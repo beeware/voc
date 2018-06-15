@@ -290,6 +290,7 @@ class Function(Block):
             )
 
     def store_name(self, name, declare=False):
+        self.store_module()
         if declare or name in self.local_vars:
             self.add_opcodes(
                 # Store in a local variable
@@ -921,6 +922,10 @@ class MainFunction(Function):
                 ALOAD_name('#module'),
                 python.Object.set_item(),
 
+                # Keep the module object as a local variable
+                ALOAD_name('#module'),
+                ASTORE_name('#module'),
+
                 # Register the same module as __main__
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
                 python.Str('__main__'),
@@ -1171,7 +1176,7 @@ class GeneratorFunction(Function):
                 ]
             )
         ]
-        
+
     def store_name(self, name, declare=False):
         if declare or name in self.local_vars:
             self.add_opcodes(
