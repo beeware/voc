@@ -49,11 +49,31 @@ def test_booleans(test_case):
             y = (False != False) != False
         """), timed=True)
 
+def test_loads(test_case):
+    print("Running", "test_loads")
+    test_case.runAsJava(adjust("""
+        x = 1
+        y = 2
+
+        for i in range(100000):
+            print(x)
+            print(y)
+            print(x+y)
+            print(x-y)
+            print(x)
+            print(y)
+            print(x*y)
+            print(x/y)
+            print(x)
+            print(y)
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
     test_small_integers(test_case)
     test_booleans(test_case)
+    test_loads(test_case)
 
 if __name__== "__main__":
   main()
