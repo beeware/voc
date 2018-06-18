@@ -290,7 +290,6 @@ class Function(Block):
             )
 
     def store_name(self, name, declare=False):
-        self.store_module()
         if declare or name in self.local_vars:
             self.add_opcodes(
                 # Store in a local variable
@@ -514,7 +513,6 @@ class Function(Block):
             java.Map(),
             ASTORE_name('#locals')
         )
-        self.store_module()
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0:
@@ -922,10 +920,6 @@ class MainFunction(Function):
                 ALOAD_name('#module'),
                 python.Object.set_item(),
 
-                # Keep the module object as a local variable
-                ALOAD_name('#module'),
-                ASTORE_name('#module'),
-
                 # Register the same module as __main__
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
                 python.Str('__main__'),
@@ -1067,6 +1061,7 @@ class GeneratorFunction(Function):
             static=static,
         )
         self.generator = generator
+        self.store_module()
 
     @property
     def klass(self):
