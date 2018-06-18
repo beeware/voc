@@ -738,6 +738,47 @@ class Method(Function):
             return_descriptor
         )
 
+    def store_name(self, name, declare=False):
+        if declare or name in self.local_vars:
+            self.add_opcodes(
+                # Store in a local variable
+                ASTORE_name(name),
+            )
+            self.add_opcodes(
+                # Also store in the locals variable
+                ALOAD_name('#locals'),
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name(name),
+                java.Map.put(),
+            )
+        else:
+            self.add_opcodes(
+                ASTORE_name('#value'),
+
+                ALOAD_name('#module'),
+                ALOAD_name('#value'),
+
+                python.Object.set_attr(name),
+                free_name('#value')
+            )
+
+    def load_name(self, name):
+        if name in self.local_vars:
+            self.add_opcodes(
+                ALOAD_name(name)
+            )
+        else:
+            self.add_opcodes(
+                ALOAD_name('#module'),
+                python.Object.get_attribute(name),
+            )
+
+    def load_globals(self):
+        self.add_opcodes(
+            ALOAD_name('#module'),
+            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
+        )
+
     def transpile_wrapper(self):
         # The first register holds "self"; since the binding is only
         # invoked via a native call, wrap it in a Java Object - unless
