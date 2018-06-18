@@ -201,7 +201,7 @@ public class Super implements org.python.Object {
             __doc__ = "Return hash(self)."
     )
     public org.python.Object __hash__() {
-        return new org.python.types.Int(this.hashCode());
+        return org.python.types.Int.getInt(this.hashCode());
     }
 
     @org.python.Method(

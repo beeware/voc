@@ -218,6 +218,9 @@ MEMORY_REFERENCE = re.compile('0x[\dABCDEFabcdef]{4,16}')
 END_OF_CODE_STRING = '===end of test==='
 END_OF_CODE_STRING_NEWLINE = END_OF_CODE_STRING + '\n'
 
+# Prevent floating point discrepancies in very low significant digits from being an issue
+FLOAT_PRECISION = re.compile('(\\.\d{5})\d+')
+
 
 def cleanse_java(raw, substitutions):
     matches = JAVA_EXCEPTION.search(raw)
@@ -256,6 +259,7 @@ def cleanse_java(raw, substitutions):
     )
 
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
+
     out = out.replace(
         "'python.test'", '***EXECUTABLE***').replace(
         "'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
@@ -270,6 +274,10 @@ def cleanse_java(raw, substitutions):
                 out = out.replace(from_value, to_value)
 
     out = out.replace('\r\n', '\n')
+
+    # Replace high precision floats with abbreviated forms
+    out = FLOAT_PRECISION.sub('\\1...', out)
+
     return out
 
 
@@ -305,6 +313,10 @@ def cleanse_python(raw, substitutions):
                 out = out.replace(from_value, to_value)
 
     out = out.replace('\r\n', '\n')
+
+    # Replace high precision floats with abbreviated forms
+    out = FLOAT_PRECISION.sub('\\1...', out)
+    
     return out
 
 

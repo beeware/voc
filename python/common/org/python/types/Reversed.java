@@ -24,7 +24,7 @@ public class Reversed extends Object implements org.python.Object {
         if (this.index < 0) {
             throw new org.python.exceptions.StopIteration();
         }
-        org.python.Object item = this.sequence.__getitem__(new Int(this.index));
+        org.python.Object item = this.sequence.__getitem__(org.python.types.Int.getInt(this.index));
         this.index--;
         return item;
     }

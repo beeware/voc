@@ -565,14 +565,14 @@ public class Bytes extends org.python.types.Object {
             } else {
                 idx = this.value.length + idx;
                 // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                return new org.python.types.Int((long) this.value[idx] & 0xff);
+                return org.python.types.Int.getInt((long) this.value[idx] & 0xff);
             }
         } else {
             if (idx >= this.value.length) {
                 throw new org.python.exceptions.IndexError("index out of range");
             } else {
                 // return new Bytes(java.util.Arrays.copyOfRange(this.value, idx, idx));
-                return new org.python.types.Int((long) this.value[idx] & 0xff);
+                return org.python.types.Int.getInt((long) this.value[idx] & 0xff);
             }
         }
     }
@@ -629,7 +629,7 @@ public class Bytes extends org.python.types.Object {
     public org.python.Object __iter__() {
         java.util.List<org.python.Object> listOfBytes = new java.util.ArrayList<org.python.Object>();
         for (byte b: this.value) {
-            listOfBytes.add(new org.python.types.Int((long) b & 0xff));
+            listOfBytes.add(org.python.types.Int.getInt((long) b & 0xff));
         }
         return new org.python.types.List(listOfBytes).__iter__();
     }
@@ -638,7 +638,7 @@ public class Bytes extends org.python.types.Object {
             __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.length);
+        return org.python.types.Int.getInt(this.value.length);
     }
 
     @org.python.Method(
@@ -839,7 +839,7 @@ public class Bytes extends org.python.types.Object {
         }
         //If the sub string is longer than the value string a match cannot exist
         if (sub_array.length > this.value.length) {
-            return new org.python.types.Int(0);
+            return org.python.types.Int.getInt(0);
         }
         int istart = 0;
         int iend = this.value.length;
@@ -894,7 +894,7 @@ public class Bytes extends org.python.types.Object {
                 i += sub_array.length - 1;
             }
         }
-        return new org.python.types.Int(count);
+        return org.python.types.Int.getInt(count);
     }
 
     @org.python.Method(
@@ -919,7 +919,7 @@ public class Bytes extends org.python.types.Object {
             org.python.types.Tuple tuple = (org.python.types.Tuple) substring;
             int length = (int) tuple.__len__().value;
             for (int i = 0; i < length; i++) {
-                org.python.Object item = tuple.__getitem__(new org.python.types.Int(i));
+                org.python.Object item = tuple.__getitem__(org.python.types.Int.getInt(i));
                 if (item instanceof org.python.types.Tuple) {
                     throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + item.typeName() + "'");
                 }
@@ -1034,7 +1034,7 @@ public class Bytes extends org.python.types.Object {
             _sub = ((org.python.types.Bytes) sub).value;
         }
         if (_sub.length <= 0) {
-            return new Int(0);
+            return org.python.types.Int.getInt(0);
         }
         int pos = -1;
         for (int i = 0; _start < _end; _start++) {
@@ -1054,7 +1054,7 @@ public class Bytes extends org.python.types.Object {
                 pos = -1;
             }
         }
-        return new Int(pos);
+        return org.python.types.Int.getInt(pos);
     }
 
     @org.python.Method(
@@ -1071,7 +1071,7 @@ public class Bytes extends org.python.types.Object {
     )
     public org.python.types.Int index(org.python.Object sub, org.python.Object start, org.python.Object end) {
         Int pos = this.find(sub, start, end);
-        if (pos.equals(new Int(-1))) {
+        if (pos.equals(org.python.types.Int.getInt(-1))) {
             String message = "subsection not found";
             if (org.Python.VERSION < 0x03060000) {
                 message = "substring not found";
