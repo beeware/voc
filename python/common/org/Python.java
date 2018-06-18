@@ -1692,11 +1692,11 @@ public class Python {
     }
 
     @org.python.Method(
-        __doc__ = "tuple(iterable)" +
-            "tuple(iterable) -> tuple initialized from iterable's items\n" +
-            "If the argument is a tuple, the return value is the same object.\n",
-        args = {"iterable"}
-        )
+            __doc__ = "tuple(iterable)" +
+                "tuple(iterable) -> tuple initialized from iterable's items\n" +
+                "If the argument is a tuple, the return value is the same object.\n",
+            args = {"iterable"}
+    )
 
     public static org.python.Object tuple(org.python.Object iterable) {
         java.util.List result = new java.util.ArrayList();
