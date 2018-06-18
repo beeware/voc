@@ -1696,37 +1696,27 @@ public class Python {
             "tuple(iterable) -> tuple initialized from iterable's items\n" +
             "\n" +
             "If the argument is a tuple, the return value is the same object.\n",
-        args = {""},
-        default_args = {"iterable"}
-    )
+        args = {"iterable"}
+        )
 
     public static org.python.Object tuple(org.python.Object iterable) {
         java.util.List result = new java.util.ArrayList();
+        org.python.Object iterator = org.Python.iter(iterable);
 
-        if (iterable == null) {
-            return new org.python.types.Tuple(result);
-        } else {
-            // loop over iterable filling result
-            int count = 0;
-            boolean flag = false;
+        if (iterable != null) {
             while (true) {
+                org.python.Object next;
                 try {
-                    org.python.Object it = iterable.__next__();
-                    result.add(it);
-                    count++;
-                } catch (IndexOutOfBoundsException e) {
-                    flag = true;
-                    break;
-                } catch (org.python.exceptions.StopIteration e) {
-                    flag = true;
+                    next = iterator.__next__();
+                } catch (org.python.exceptions.StopIteration si) {
                     break;
                 }
-                if (flag) {
-                    break;
-                }
+                result.add(next);
             }
             return new org.python.types.Tuple(result);
         }
+
+        return new org.python.types.Tuple(result);
     }
 
     @org.python.Method(
