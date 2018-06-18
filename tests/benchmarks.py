@@ -50,7 +50,11 @@ def test_booleans(test_case):
         """), timed=True)
 
 def test_global_var_load(test_case):
+<<<<<<< HEAD:tests/benchmarks.py
     print("Running", "test_global_var_load")
+=======
+    print("Running", "test_loads")
+>>>>>>> optimize method loads:tests/bench_datatypes.py
     test_case.runAsJava(adjust("""
         x = 1
         y = 2
@@ -69,7 +73,11 @@ def test_global_var_load(test_case):
     """), timed=True)
 
 def test_class_var_load(test_case):
+<<<<<<< HEAD:tests/benchmarks.py
     print("Running", "test_class_var_load")
+=======
+    print("Running", "test_method_loads")
+>>>>>>> optimize method loads:tests/bench_datatypes.py
     test_case.runAsJava(adjust("""
         class Animal:
             def __init__(self, name, sound):
@@ -92,6 +100,7 @@ def test_class_var_load(test_case):
 
     """), timed=True)
 
+<<<<<<< HEAD:tests/benchmarks.py
 def test_function_var_load(test_case):
     print("Running", "test_function_var_load")
     test_case.runAsJava(adjust("""
@@ -113,6 +122,8 @@ def test_function_var_load(test_case):
             foo()
     """), timed=True)
 
+=======
+>>>>>>> optimize method loads:tests/bench_datatypes.py
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -120,7 +131,10 @@ def main():
     test_booleans(test_case)
     test_global_var_load(test_case)
     test_class_var_load(test_case)
+<<<<<<< HEAD:tests/benchmarks.py
     test_function_var_load(test_case)
+=======
+>>>>>>> optimize method loads:tests/bench_datatypes.py
 
 if __name__== "__main__":
   main()
