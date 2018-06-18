@@ -290,7 +290,6 @@ class Function(Block):
             )
 
     def store_name(self, name, declare=False):
-        self.store_module()
         if declare or name in self.local_vars:
             self.add_opcodes(
                 # Store in a local variable
@@ -535,7 +534,6 @@ class Function(Block):
             java.Map(),
             ASTORE_name('#locals')
         )
-        self.store_module()
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0:
@@ -892,7 +890,7 @@ class MainFunction(Function):
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
-            ALOAD_name('#module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
 
             ALOAD_name('#value'),
             python.Object.set_attr(name),
@@ -912,13 +910,13 @@ class MainFunction(Function):
 
     def load_name(self, name):
         self.add_opcodes(
-            ALOAD_name('#module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
             python.Object.get_attribute(name),
         )
 
     def delete_name(self, name):
         self.add_opcodes(
-            ALOAD_name('#module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
             python.Object.del_attr(name),
         )
 
@@ -942,10 +940,6 @@ class MainFunction(Function):
                 python.Str(self.module.full_name),
                 ALOAD_name('#module'),
                 python.Object.set_item(),
-
-                # Keep the module object as a local variable
-                ALOAD_name('#module'),
-                ASTORE_name('#module'),
 
                 # Register the same module as __main__
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
@@ -1088,6 +1082,7 @@ class GeneratorFunction(Function):
             static=static,
         )
         self.generator = generator
+        self.store_module()
 
     @property
     def klass(self):
