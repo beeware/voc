@@ -1692,9 +1692,8 @@ public class Python {
     }
 
     @org.python.Method(
-        __doc__ = "tuple() -> empty tuple\n" +
+        __doc__ = "tuple(iterable)" +
             "tuple(iterable) -> tuple initialized from iterable's items\n" +
-            "\n" +
             "If the argument is a tuple, the return value is the same object.\n",
         args = {"iterable"}
         )
