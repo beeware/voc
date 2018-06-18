@@ -1,10 +1,10 @@
 package org.python.types;
 
 public class DictItems extends org.python.types.Object {
-    java.util.Set<java.util.Map.Entry<org.python.Object,org.python.Object>> value;
+    java.util.Set<java.util.Map.Entry<org.python.Object, org.python.Object>> value;
 
     static {
-         org.python.types.Type.declarePythonType(DictItems.class,"dict_items",null,null);
+        org.python.types.Type.declarePythonType(DictItems.class, "dict_items", null, null);
     }
 
     /**
@@ -36,7 +36,7 @@ public class DictItems extends org.python.types.Object {
 
     private java.util.Set<org.python.Object> toTupleSet() {
         java.util.Set<org.python.Object> set = new java.util.HashSet<org.python.Object>();
-        for(java.util.Map.Entry<org.python.Object,org.python.Object> entry : this.value) {
+        for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : this.value) {
             java.util.List<org.python.Object> tmp = new java.util.ArrayList<org.python.Object>();
             tmp.add(entry.getKey());
             tmp.add(entry.getValue());
@@ -64,13 +64,13 @@ public class DictItems extends org.python.types.Object {
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("dict_items([");
         boolean first = true;
-        for(java.util.Map.Entry<org.python.Object,org.python.Object> entry : this.value) {
+        for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : this.value) {
             if (first) {
                 first = false;
             } else {
                 buffer.append(", ");
             }
-            buffer.append(String.format("(%s, %s)",entry.getKey().__repr__(),entry.getValue().__repr__()));
+            buffer.append(String.format("(%s, %s)", entry.getKey().__repr__(), entry.getValue().__repr__()));
         }
         buffer.append("])");
         return new org.python.types.Str(buffer.toString());

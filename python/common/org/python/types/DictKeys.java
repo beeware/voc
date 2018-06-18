@@ -2,7 +2,7 @@ package org.python.types;
 
 public class DictKeys extends org.python.types.FrozenSet {
     static {
-        org.python.types.Type.declarePythonType(DictKeys.class,"dict_keys",null,null);
+        org.python.types.Type.declarePythonType(DictKeys.class, "dict_keys", null, null);
     }
 
     /**
@@ -49,13 +49,13 @@ public class DictKeys extends org.python.types.FrozenSet {
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("dict_keys([");
         boolean first = true;
-        for(org.python.Object item : this.value) {
+        for (org.python.Object item : this.value) {
             if (first) {
                 first = false;
             } else {
                 buffer.append(", ");
             }
-            buffer.append(String.format("%s",item.__repr__()));
+            buffer.append(String.format("%s", item.__repr__()));
         }
         buffer.append("])");
         return new org.python.types.Str(buffer.toString());
@@ -229,26 +229,26 @@ public class DictKeys extends org.python.types.FrozenSet {
      * Hence, throw an AttributeError every time any of these methods is called
      */
     public org.python.Object issubset(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this,"issubset");
+        throw new org.python.exceptions.AttributeError(this, "issubset");
     }
 
     public org.python.Object issuperset(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this,"issuperset");
+        throw new org.python.exceptions.AttributeError(this, "issuperset");
     }
 
     public org.python.Object union(org.python.types.Tuple others) {
-        throw new org.python.exceptions.AttributeError(this,"union");
+        throw new org.python.exceptions.AttributeError(this, "union");
     }
 
     public org.python.Object intersection(org.python.types.Tuple others) {
-        throw new org.python.exceptions.AttributeError(this,"intersection");
+        throw new org.python.exceptions.AttributeError(this, "intersection");
     }
 
     public org.python.Object difference(org.python.types.Tuple others) {
-        throw new org.python.exceptions.AttributeError(this,"difference");
+        throw new org.python.exceptions.AttributeError(this, "difference");
     }
 
     public org.python.Object symmetric_difference(org.python.Object other) {
-        throw new org.python.exceptions.AttributeError(this,"issuperset");
+        throw new org.python.exceptions.AttributeError(this, "issuperset");
     }
 }
