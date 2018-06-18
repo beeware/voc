@@ -4,7 +4,7 @@ public class DictValues extends org.python.types.Object {
     public java.util.Collection<org.python.Object> value;
 
     static {
-        org.python.types.Type.declarePythonType(DictValues.class,"dict_values",null,null);
+        org.python.types.Type.declarePythonType(DictValues.class, "dict_values", null, null);
     }
 
     /**
@@ -40,13 +40,13 @@ public class DictValues extends org.python.types.Object {
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("dict_values([");
         boolean first = true;
-        for(org.python.Object item : this.value) {
+        for (org.python.Object item : this.value) {
             if (first) {
                 first = false;
             } else {
                 buffer.append(", ");
             }
-            buffer.append(String.format("%s",item.__repr__()));
+            buffer.append(String.format("%s", item.__repr__()));
         }
         buffer.append("])");
         return new org.python.types.Str(buffer.toString());
