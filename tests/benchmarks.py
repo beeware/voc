@@ -50,7 +50,7 @@ def test_booleans(test_case):
         """), timed=True)
 
 def test_global_var_load(test_case):
-    print("Running", "test_loads")
+    print("Running", "test_global_var_load")
     test_case.runAsJava(adjust("""
         x = 1
         y = 2
@@ -69,7 +69,7 @@ def test_global_var_load(test_case):
     """), timed=True)
 
 def test_class_var_load(test_case):
-    print("Running", "test_method_loads")
+    print("Running", "test_class_var_load")
     test_case.runAsJava(adjust("""
         class Animal:
             def __init__(self, name, sound):
@@ -92,13 +92,35 @@ def test_class_var_load(test_case):
 
     """), timed=True)
 
+def test_function_var_load(test_case):
+    print("Running", "test_function_var_load")
+    test_case.runAsJava(adjust("""
+        def foo():
+            x = 1
+            y = 2
+            print(x)
+            print(y)
+            print(x+y)
+            print(x-y)
+            print(x)
+            print(y)
+            print(x*y)
+            print(x/y)
+            print(x)
+            print(y)
+
+        for i in range(100000):
+            foo()
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
-    test_small_integers(test_case)
-    test_booleans(test_case)
-    test_global_var_load(test_case)
-    test_class_var_load(test_case)
+    #test_small_integers(test_case)
+    #test_booleans(test_case)
+    #test_global_var_load(test_case)
+    #test_class_var_load(test_case)
+    test_function_var_load(test_case)
 
 if __name__== "__main__":
   main()
