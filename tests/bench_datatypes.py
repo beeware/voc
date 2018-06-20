@@ -49,11 +49,30 @@ def test_booleans(test_case):
             y = (False != False) != False
         """), timed=True)
 
+def test_empty_calls(test_case):
+    print("Running", "test_empty_calls")
+    test_case.runAsJava(adjust("""
+        def foo():
+            print(1)
+            bar()
+
+        def bar():
+            print(2)
+            baz()
+
+        def baz():
+            print(3)
+
+        for i in range(100000):
+            foo()
+        """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
-    test_small_integers(test_case)
-    test_booleans(test_case)
+    #test_small_integers(test_case)
+    #test_booleans(test_case)
+    test_empty_calls(test_case)
 
 if __name__== "__main__":
   main()
