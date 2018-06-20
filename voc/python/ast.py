@@ -20,7 +20,7 @@ from .types.primitives import (
 from .types import java, python
 from .debug import (
     dump,
-    # DEBUG, DEBUG_name
+    DEBUG, DEBUG_name
 )
 
 
@@ -2076,7 +2076,7 @@ class Visitor(ast.NodeVisitor):
             # Create and populate the array of arguments to pass to invoke()
             num_args = len([arg for arg in node.args if not isinstance(arg, ast.Starred)])
 
-            if num_args is 0 and getattr(node, 'starargs', None) is not None:
+            if len(node.args) == 0:
                 self.context.add_opcodes(
                     JavaOpcodes.GETSTATIC('org/python/types/Object', 'emptyArgs', '[Lorg/python/Object;'),
                 )
@@ -2106,10 +2106,11 @@ class Visitor(ast.NodeVisitor):
                     self.visit(node.starargs)
 
                     self.context.add_opcodes(
+                        DEBUG('starargs not none!'),
                         AddToArgs(),
                     )
 
-            if len(node.keywords) is 0 and getattr(node, 'kwargs', None) is not None:
+            if len(node.keywords) == 0:
                 self.context.add_opcodes(
                     JavaOpcodes.GETSTATIC('org/python/types/Object', 'emptyKwargs', 'Ljava/util/Map;'),
                 )
