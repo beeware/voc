@@ -306,12 +306,7 @@ class Function(Block):
             self.add_opcodes(
                 ASTORE_name('#value'),
 
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                ALOAD_name('#module'),
 
                 ALOAD_name('#value'),
 
@@ -329,23 +324,13 @@ class Function(Block):
             )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                ALOAD_name('#module'),
                 python.Object.get_attribute(name),
             )
 
     def load_globals(self):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-            python.Str(self.module.full_name),
-
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'),
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
         )
 
@@ -364,13 +349,7 @@ class Function(Block):
             )
         except NameError:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+                ALOAD_name('#module'),
                 python.Object.del_attr(name),
             )
 
@@ -534,6 +513,7 @@ class Function(Block):
             java.Map(),
             ASTORE_name('#locals')
         )
+        self.store_module()
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0:
@@ -736,47 +716,6 @@ class Method(Function):
         return '(%s)%s' % (
             ''.join(descriptor(p['annotation']) for p in self.parameters[1:]),
             return_descriptor
-        )
-
-    def store_name(self, name, declare=False):
-        if declare or name in self.local_vars:
-            self.add_opcodes(
-                # Store in a local variable
-                ASTORE_name(name),
-            )
-            self.add_opcodes(
-                # Also store in the locals variable
-                ALOAD_name('#locals'),
-                JavaOpcodes.LDC_W(name),
-                ALOAD_name(name),
-                java.Map.put(),
-            )
-        else:
-            self.add_opcodes(
-                ASTORE_name('#value'),
-
-                ALOAD_name('#module'),
-                ALOAD_name('#value'),
-
-                python.Object.set_attr(name),
-                free_name('#value')
-            )
-
-    def load_name(self, name):
-        if name in self.local_vars:
-            self.add_opcodes(
-                ALOAD_name(name)
-            )
-        else:
-            self.add_opcodes(
-                ALOAD_name('#module'),
-                python.Object.get_attribute(name),
-            )
-
-    def load_globals(self):
-        self.add_opcodes(
-            ALOAD_name('#module'),
-            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
         )
 
     def transpile_wrapper(self):
@@ -1123,7 +1062,6 @@ class GeneratorFunction(Function):
             static=static,
         )
         self.generator = generator
-        self.store_module()
 
     @property
     def klass(self):
@@ -1233,7 +1171,78 @@ class GeneratorFunction(Function):
                 ]
             )
         ]
+    def store_name(self, name, declare=False):
+        if declare or name in self.local_vars:
+            self.add_opcodes(
+                # Store in a local variable
+                ASTORE_name(name),
+            )
+            self.add_opcodes(
+                # Also store in the locals variable
+                ALOAD_name('#locals'),
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name(name),
+                java.Map.put(),
+            )
+        else:
+            self.add_opcodes(
+                ASTORE_name('#value'),
 
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                ALOAD_name('#value'),
+
+                python.Object.set_attr(name),
+                free_name('#value')
+            )
+
+    def load_name(self, name):
+        if name in self.local_vars:
+            self.add_opcodes(
+                ALOAD_name(name)
+            )
+        else:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                python.Object.get_attribute(name),
+            )
+
+    def load_globals(self):
+        self.add_opcodes(
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+            python.Str(self.module.full_name),
+
+            python.Object.get_item(),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
+        )
+
+    def delete_name(self, name):
+        try:
+            self.add_opcodes(
+                free_name(name)
+            )
+        except NameError:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                python.Object.del_attr(name),
+            )
 
 class GeneratorMethod(Method):
     def __init__(self, klass, name, code, generator, parameters, returns=None, static=False):
