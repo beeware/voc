@@ -425,7 +425,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                                 arg_name = default_arg_names[a - arg_names.length];
                             }
 
-                            arg = kwargs.remove(arg_name);
+                            arg = (kwargs == null) ? null : kwargs.remove(arg_name);
                             if (arg == null && a < arg_names.length) {
                                 throw new org.python.exceptions.TypeError(
                                         this.PYTHON_TYPE_NAME + " constructor missing positional argument '" +
@@ -438,7 +438,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                         for (a = 0; a < n_args; a++) {
                             adjusted_args[a] = args[a];
                         }
-
+                        
                         for (a = n_args; a < args.length; a++) {
                             if (a < arg_names.length) {
                                 arg_name = arg_names[a];
@@ -457,7 +457,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 // }
                 // org.Python.debug("         adj kwargs: ", kwargs);
 
-                return (org.python.Object) this.constructor.newInstance(adjusted_args, kwargs);
+                return (org.python.Object) this.constructor.newInstance(adjusted_args, (kwargs != null) ? kwargs : new java.util.HashMap<java.lang.String, org.python.Object>());
             } else {
                 throw new org.python.exceptions.RuntimeError("No Python-compatible constructor for type " + this.klass);
             }
