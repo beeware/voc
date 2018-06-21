@@ -410,15 +410,15 @@ public class Type extends org.python.types.Object implements org.python.Callable
                     int n_args = arg_names.length + default_arg_names.length;
 
                     adjusted_args = new org.python.Object[arg_names.length + default_arg_names.length];
-
-                    if (args.length < n_args) {
+                    int n_provided_args = (args == null) ? 0 : args.length;
+                    if (n_provided_args < n_args) {
                         // Take as many positional arguments as have been literally provided
-                        for (a = 0; a < args.length; a++) {
+                        for (a = 0; a < n_provided_args; a++) {
                             adjusted_args[a] = args[a];
                         }
 
                         // Populate the rest from kwargs
-                        for (a = args.length; a < n_args; a++) {
+                        for (a = n_provided_args; a < n_args; a++) {
                             if (a < arg_names.length) {
                                 arg_name = arg_names[a];
                             } else {
@@ -438,8 +438,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
                         for (a = 0; a < n_args; a++) {
                             adjusted_args[a] = args[a];
                         }
-                        
-                        for (a = n_args; a < args.length; a++) {
+
+                        for (a = n_args; a < n_provided_args; a++) {
                             if (a < arg_names.length) {
                                 arg_name = arg_names[a];
                             } else {
@@ -449,7 +449,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                         }
                     }
                 } else {
-                    adjusted_args = args;
+                    adjusted_args = (args == null) ? new org.python.Object[0] : args;
                 }
 
                 // for (org.python.Object arg: adjusted_args) {
