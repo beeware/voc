@@ -333,10 +333,10 @@ public class Function extends org.python.types.Object implements org.python.Call
             // System.out.println("Handle varkwargs = " + kwargs);
             org.python.types.Dict kwargDict = new org.python.types.Dict();
             if (kwargs != null) {
-              for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : kwargs.entrySet()) {
-                  // System.out.println("Add KWARG" + entry.getKey());
-                  kwargDict.__setitem__(new org.python.types.Str(entry.getKey()), entry.getValue());
-              }
+                for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : kwargs.entrySet()) {
+                    // System.out.println("Add KWARG" + entry.getKey());
+                    kwargDict.__setitem__(new org.python.types.Str(entry.getKey()), entry.getValue());
+                }
             }
             adjusted[adjusted.length - 1] = kwargDict;
             // System.out.println("   fARG " + (adjusted.length - 1) + ": " + kwargDict);
