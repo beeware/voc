@@ -186,7 +186,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             // build list of actual missing args, checking if haven't been passed as kwargs
             for (int i = first_arg; i < n_missing_pos_args; i++) {
                 java.lang.String argname = ((String) varnames.get(i + passedArgs).toJava());
-                if (!kwargs.containsKey(argname)) {
+                if (kwargs == null || !kwargs.containsKey(argname)) {
                     missingArgs.add(argname);
                 }
             }
@@ -278,7 +278,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         // System.out.println("First arg = " + first_arg);
         // Populate the positional args.
         for (int i = 0; i < argcount - first_arg; i++) {
-            if (i < args.length) {
+            if (args != null && i < args.length) {
                 // System.out.println("   b" + (i + first_arg));
                 adjusted[i + first_arg] = args[i];
                 // System.out.println("   bARG " + (i + first_arg) + ": " + args[i]);
@@ -320,7 +320,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         for (int i = 0; i < kwonlyargcount; i++) {
             java.lang.String varname = ((org.python.types.Str) varnames.get(argcount + has_varargs + i)).value;
             // System.out.println("   e" + (argcount + has_varargs + i) + " " + varname);
-            org.python.Object value = kwargs.remove(varname);
+            org.python.Object value = (kwargs == null) ? null : kwargs.remove(varname);
             if (value == null) {
                 value = this.default_kwargs.get(varname);
             }
@@ -332,9 +332,11 @@ public class Function extends org.python.types.Object implements org.python.Call
         if ((flags & CO_VARKEYWORDS) != 0) {
             // System.out.println("Handle varkwargs = " + kwargs);
             org.python.types.Dict kwargDict = new org.python.types.Dict();
-            for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : kwargs.entrySet()) {
-                // System.out.println("Add KWARG" + entry.getKey());
-                kwargDict.__setitem__(new org.python.types.Str(entry.getKey()), entry.getValue());
+            if (kwargs != null) {
+              for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : kwargs.entrySet()) {
+                  // System.out.println("Add KWARG" + entry.getKey());
+                  kwargDict.__setitem__(new org.python.types.Str(entry.getKey()), entry.getValue());
+              }
             }
             adjusted[adjusted.length - 1] = kwargDict;
             // System.out.println("   fARG " + (adjusted.length - 1) + ": " + kwargDict);

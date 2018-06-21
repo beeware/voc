@@ -2078,6 +2078,7 @@ class Visitor(ast.NodeVisitor):
 
             if len(node.args) == 0:
                 self.context.add_opcodes(
+                    #JavaOpcodes.ACONST_NULL(),
                     JavaOpcodes.GETSTATIC('org/python/types/Object', 'emptyArgs', '[Lorg/python/Object;'),
                 )
             else:
@@ -2112,7 +2113,8 @@ class Visitor(ast.NodeVisitor):
 
             if len(node.keywords) == 0:
                 self.context.add_opcodes(
-                    JavaOpcodes.GETSTATIC('org/python/types/Object', 'emptyKwargs', 'Ljava/util/Map;'),
+                    JavaOpcodes.ACONST_NULL(),
+                    #JavaOpcodes.GETSTATIC('org/python/types/Object', 'emptyKwargs', 'Ljava/util/Map;'),
                 )
             else:
                 # Create and populate the map of kwargs to pass to invoke().
