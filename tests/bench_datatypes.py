@@ -52,19 +52,35 @@ def test_booleans(test_case):
 def test_empty_calls(test_case):
     print("Running", "test_empty_calls")
     test_case.runAsJava(adjust("""
+        x = 0
+
         def foo():
-            print(1)
-            bar()
+            print("foo")
+            if x:
+                bar()
+            else:
+                baz()
 
         def bar():
-            print(2)
-            baz()
+            print("bar")
+            if x:
+                buzz()
+            else:
+                baz()
 
         def baz():
-            print(3)
+            print("baz")
+            if x:
+                foo()
+            else:
+                buzz()
+
+        def buzz():
+            print("buzz")
 
         for i in range(100000):
             foo()
+            x = not x
         """), timed=True)
 
 def main():
