@@ -83,12 +83,20 @@ def test_empty_calls(test_case):
             x = not x
         """), timed=True)
 
+def test_empty_prints(test_case):
+    print("Running", "test_empty_prints")
+    test_case.runAsJava(adjust("""
+        for i in range(1000000):
+            print()
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
     #test_small_integers(test_case)
     #test_booleans(test_case)
-    test_empty_calls(test_case)
+    test_empty_prints(test_case)
+    #test_empty_calls(test_case)
 
 if __name__== "__main__":
   main()
