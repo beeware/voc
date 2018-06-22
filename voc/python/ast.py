@@ -20,7 +20,7 @@ from .types.primitives import (
 from .types import java, python
 from .debug import (
     dump,
-    DEBUG, DEBUG_name
+    # DEBUG, DEBUG_name
 )
 
 
@@ -2106,7 +2106,6 @@ class Visitor(ast.NodeVisitor):
                     self.visit(node.starargs)
 
                     self.context.add_opcodes(
-                        DEBUG('starargs not none!'),
                         AddToArgs(),
                     )
 
