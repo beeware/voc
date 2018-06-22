@@ -2076,7 +2076,7 @@ class Visitor(ast.NodeVisitor):
             # Create and populate the array of arguments to pass to invoke()
             num_args = len([arg for arg in node.args if not isinstance(arg, ast.Starred)])
 
-            if len(node.args) == 0:
+            if len(node.args) == 0 and getattr(node, 'starargs', None) is None:
                 self.context.add_opcodes(
                     JavaOpcodes.ACONST_NULL(),
                 )
@@ -2110,7 +2110,7 @@ class Visitor(ast.NodeVisitor):
                         AddToArgs(),
                     )
 
-            if len(node.keywords) == 0:
+            if len(node.keywords) == 0 and getattr(node, 'kwargs', None) is None:
                 self.context.add_opcodes(
                     JavaOpcodes.ACONST_NULL(),
                 )
