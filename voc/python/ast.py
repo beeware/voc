@@ -124,6 +124,8 @@ class Visitor(ast.NodeVisitor):
         self.symbol_namespace = {}
         self.code_objects = {}
 
+        self.resolved_yield_expression = {}  # holds generator's id and its message (value) for expression evaluation
+
     @property
     def context(self):
         return self._context[-1]
@@ -156,10 +158,44 @@ class Visitor(ast.NodeVisitor):
                 self.code_objects[(obj.co_firstlineno, obj.co_name)] = obj
                 self.extract_code_objects(obj)
 
+    def parse_yield(self, node):
+        """parse yield appearing in expression before the expression is evaluated/visited
+        """
+        def convert_to_Name(_node):
+            # convert Yield node to Name node for expression evaluation
+            # operand of expression is the message stored in generator
+            return ast.Name(
+                id='#msg-buffer-%x' % id(_node),
+                ctx=ast.Load(),
+                lineno=_node.lineno,
+                col_offset=_node.col_offset
+            )
+
+        for field_name, value in ast.iter_fields(node):
+            if isinstance(value, ast.Yield):
+                if isinstance(node, ast.Expr):
+                    # don't parse Expr(value=Yield)
+                    return
+                self.visit_Yield(value)
+                self.resolved_yield_expression[id(value)] = convert_to_Name(value)
+                return
+            elif isinstance(value, list):  # args or kwargs list
+                index = 0
+                for arg_node in value:
+                    if isinstance(arg_node, ast.Yield):
+                        self.visit_Yield(arg_node)
+                        self.resolved_yield_expression[id(arg_node)] = convert_to_Name(arg_node)
+                        return
+                    index += 1
+
     def visit(self, node):
         try:
             self.parse_yield(node)
-            super().visit(node)
+            if id(node) in self.resolved_yield_expression.keys():
+                super().visit(self.resolved_yield_expression[id(node)])
+                del self.resolved_yield_expression[id(node)]
+            else:
+                super().visit(node)
         except Exception as e:
             print(
                 "Problem occurred in " + str(self.filename)
@@ -192,36 +228,6 @@ class Visitor(ast.NodeVisitor):
         module.functions.append(main)
 
         self.pop_context()
-
-    def parse_yield(self, node):
-        """parse yield appearing in expression before the expression is evaluated/visited
-        """
-        def convert_to_Name(_node):
-            # convert Yield node to Name node for expression evaluation
-            # operand of expression is the message stored in generator
-            return ast.Name(
-                id='#msg-buffer-%x' % id(_node),
-                ctx=ast.Load(),
-                lineno=_node.lineno,
-                col_offset=_node.col_offset
-            )
-
-        for field_name, value in ast.iter_fields(node):
-            if isinstance(value, ast.Yield):
-                if isinstance(node, ast.Expr):
-                    # don't parse Expr(value=Yield)
-                    return
-                self.visit_Yield(value)
-                setattr(node, field_name, convert_to_Name(value))
-                return
-            elif isinstance(value, list):  # args or kwargs list
-                index = 0
-                for arg_node in value:
-                    if isinstance(arg_node, ast.Yield):
-                        self.visit_Yield(arg_node)
-                        value[index] = convert_to_Name(arg_node)
-                        return
-                    index += 1
 
     @node_visitor
     def visit_Interactive(self, node):
@@ -690,7 +696,7 @@ class Visitor(ast.NodeVisitor):
         # Finally content is duplicated at the end of the body
         # if it is defined.
         if node.finalbody:
-            for child in copy.deepcopy(node.finalbody):
+            for child in node.finalbody:
                 self.visit(child)
 
         for handler in node.handlers:
@@ -699,7 +705,7 @@ class Visitor(ast.NodeVisitor):
             # Finally content is duplicated at the end of the handler
             # if it is defined.
             if node.finalbody:
-                for child in copy.deepcopy(node.finalbody):
+                for child in node.finalbody:
                     self.visit(child)
 
         if node.finalbody:
@@ -708,7 +714,7 @@ class Visitor(ast.NodeVisitor):
                 ASTORE_name('#exception-%x' % id(node))
             )
 
-            for child in copy.deepcopy(node.finalbody):
+            for child in node.finalbody:
                 self.visit(child)
 
             self.context.add_opcodes(
@@ -1794,8 +1800,9 @@ class Visitor(ast.NodeVisitor):
 
         # On restore, the next instruction is the target
         # for the restore jump.
-        self.context.yield_points.append(node)
-        self.context.next_resolve_list.append((node, OpcodePosition.YIELD))
+        node_to_resolve = copy.deepcopy(node)  # deepcopy is required for multiple visits of finalbody from visitTry
+        self.context.yield_points.append(node_to_resolve)
+        self.context.next_resolve_list.append((node_to_resolve, OpcodePosition.YIELD))
 
         #  First thing to do is restore the state of the stack.
         self.context.load_name('<generator>')
