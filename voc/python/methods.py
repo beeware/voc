@@ -1217,17 +1217,6 @@ class GeneratorFunction(Function):
                 python.Object.get_attribute(name),
             )
 
-    def load_globals(self):
-        self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-            python.Str(self.module.full_name),
-
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-            JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
-        )
-
     def delete_name(self, name):
         try:
             self.add_opcodes(
