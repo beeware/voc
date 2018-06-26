@@ -1171,6 +1171,7 @@ class GeneratorFunction(Function):
                 ]
             )
         ]
+        
     def store_name(self, name, declare=False):
         if declare or name in self.local_vars:
             self.add_opcodes(
