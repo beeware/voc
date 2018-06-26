@@ -239,6 +239,9 @@ class Block(Accumulator):
                         JavaOpcodes.ACONST_NULL()
                     )
 
+                elif isinstance(value, frozenset):
+                    self.add_tuple(tuple(value))
+
                 else:
                     raise RuntimeError("Unknown constant type %s" % type(value))
 
