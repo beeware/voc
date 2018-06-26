@@ -93,10 +93,10 @@ def test_empty_prints(test_case):
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
-    #test_small_integers(test_case)
-    #test_booleans(test_case)
+    test_small_integers(test_case)
+    test_booleans(test_case)
     test_empty_prints(test_case)
-    #test_empty_calls(test_case)
+    test_empty_calls(test_case)
 
 if __name__== "__main__":
   main()
