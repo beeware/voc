@@ -52,50 +52,40 @@ def test_booleans(test_case):
 def test_empty_calls(test_case):
     print("Running", "test_empty_calls")
     test_case.runAsJava(adjust("""
-        x = 0
+        def main():
+            print("main")
+            for i in range(100):
+                print(i)
+                if i % 2 == 0:
+                    foo()
+                if i % 3 == 0:
+                    bar()
+                if i % 5 == 0:
+                    baz()
+                if i % 7 == 0:
+                    buzz()
 
         def foo():
             print("foo")
-            if x:
-                bar()
-            else:
-                baz()
 
         def bar():
             print("bar")
-            if x:
-                buzz()
-            else:
-                baz()
 
         def baz():
             print("baz")
-            if x:
-                foo()
-            else:
-                buzz()
 
         def buzz():
             print("buzz")
 
-        for i in range(100000):
-            foo()
-            x = not x
+        for i in range(10000):
+            main()
         """), timed=True)
-
-def test_empty_prints(test_case):
-    print("Running", "test_empty_prints")
-    test_case.runAsJava(adjust("""
-        for i in range(1000000):
-            print()
-    """), timed=True)
 
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
     test_small_integers(test_case)
     test_booleans(test_case)
-    test_empty_prints(test_case)
     test_empty_calls(test_case)
 
 if __name__== "__main__":
