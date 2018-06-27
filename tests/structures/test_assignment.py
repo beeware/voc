@@ -69,7 +69,15 @@ class AssignmentTests(TranspileTestCase):
             print(x)
             print(y)
             print(z)
-            """)
+        """)
+
+    def test_bad_list_assignment(self):
+        self.assertCodeExecution("""
+            try:
+                [x, y, z, a] = range(3)
+            except:
+                pass
+        """)
 
     def test_tuple_assignment(self):
         self.assertCodeExecution("""
@@ -79,6 +87,14 @@ class AssignmentTests(TranspileTestCase):
             print(z)
             """)
 
+    def test_bad_tuple_assignment(self):
+        self.assertCodeExecution("""
+            try:
+                (x, y, z, a) = range(3)
+            except:
+                pass
+        """)
+
     def test_implied_tuple_assignment(self):
         self.assertCodeExecution("""
             x, y, z = range(3)
@@ -86,6 +102,14 @@ class AssignmentTests(TranspileTestCase):
             print(y)
             print(z)
             """)
+
+    def test_bad_implied_tuple_assignment(self):
+        self.assertCodeExecution("""
+            try:
+                x, y, z, a = range(3)
+            except:
+                pass 
+        """)
 
     def test_increment_assignment(self):
         self.assertCodeExecution("""
