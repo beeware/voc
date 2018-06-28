@@ -452,6 +452,7 @@ class Function(Block):
                 code=code,
                 parameters=parameter_signatures,
                 returns=return_signature,
+                outer_scopes=[self]
             )
 
         klass.methods.append(closure)
@@ -957,7 +958,7 @@ class MainFunction(Function):
 
 
 class Closure(Function):
-    def __init__(self, klass, code, parameters, returns=None, static=False):
+    def __init__(self, klass, code, parameters, returns=None, static=False, outer_scopes=[]):
         super().__init__(
             klass,
             name='invoke',
@@ -966,6 +967,7 @@ class Closure(Function):
             returns=returns,
             static=static,
         )
+        self.outer_scopes = outer_scopes
 
     def __repr__(self):
         return '<Closure %s (%s parameters, %s closure variables)>' % (
