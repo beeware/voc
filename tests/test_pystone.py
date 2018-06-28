@@ -12,5 +12,6 @@ class PystoneTest(TranspileTestCase):
         file = open(__location__, "r")
 
         out = self.runAsJava(adjust(file.read()))
+        print(out)
 
         file.close()
