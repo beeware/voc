@@ -3,8 +3,8 @@ import os
 from .utils import *
 
 FILENAME = "pystone.py"
-THISDIR = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-LOCATION = os.path.join(__thisdir__, "tests/", __file__)
+THISDIR = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(FILENAME)))
+LOCATION = os.path.join(THISDIR, "tests/", FILENAME)
 
 class PystoneTest(TranspileTestCase):
 
