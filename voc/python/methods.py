@@ -1171,25 +1171,6 @@ class GeneratorFunction(Function):
                 ]
             )
         ]
-        
-    def store_name(self, name, declare=False):
-        if declare or name in self.local_vars:
-            self.add_opcodes(
-                # Store in a local variable
-                ASTORE_name(name),
-            )
-            self.add_opcodes(
-                # Also store in the locals variable
-                ALOAD_name('#locals'),
-                JavaOpcodes.LDC_W(name),
-                ALOAD_name(name),
-                java.Map.put(),
-            )
-        else:
-            self.add_opcodes(
-                ASTORE_name('#value'),
-
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
 
     def store_name(self, name, declare=False):
         if declare or name in self.local_vars:
