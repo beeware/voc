@@ -284,6 +284,21 @@ class Function(Block):
         raise NotImplementedError('Functions cannot dynamically store variables.')
 
     def load_name(self, name):
+        # Before loading name to stack, update outer scope variable if it is changed by inner scope's nonlocal
+        if hasattr(self, 'resolve_outer_names') and name in self.resolve_outer_names:
+            self.resolve_outer_names.pop(self.resolve_outer_names.index(name))
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+                python.Str(self.module.full_name),
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                JavaOpcodes.DUP(),
+                python.Object.get_attribute('#%s-%x' % (name, id(self))),
+                JavaOpcodes.SWAP(),
+                python.Object.del_attr('#%s-%x' % (name, id(self)))
+            )
+            self.store_name(name)
+
         if name in self.local_vars:
             self.add_opcodes(
                 ALOAD_name(name)
@@ -1016,6 +1031,42 @@ class Closure(Function):
 
                 python.Object.get_attribute(name),
             )
+
+    def store_name(self, name, declare=False):
+        # variable is from outer scope
+        if name not in self.local_vars and name in self.klass.closure_var_names:
+            # find which outer scope owns the name
+            for context in self.outer_scopes[::-1]:
+                if name in context.local_vars:
+                    if not hasattr(context, 'resolve_outer_names'):
+                        setattr(context, 'resolve_outer_names', [])
+                    context.resolve_outer_names.append(name)
+
+                    # save modified value temporarily in globals
+                    self.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+                        python.Str(self.module.full_name),
+                        python.Object.get_item(),
+                        JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                        JavaOpcodes.SWAP(),
+                        python.Object.set_attr('#%s-%x' % (name, id(context)))
+                    )
+                    break
+
+            # update closure_vars
+            self.add_opcodes(
+                ASTORE_name('#value'),
+                ALOAD_name('<closure>'),
+                JavaOpcodes.CHECKCAST('org/python/types/Closure'),
+                JavaOpcodes.GETFIELD('org/python/types/Closure', 'closure_vars', 'Ljava/util/Map;'),
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name('#value'),
+                java.Map.put(),
+                free_name('#value')
+            )
+        else:
+            super().store_name(name, declare)
 
 
 class ClosureInitMethod(InitMethod):
