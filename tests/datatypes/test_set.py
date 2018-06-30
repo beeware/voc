@@ -1,7 +1,18 @@
+from unittest import expectedFailure
+
 from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
 class SetTests(TranspileTestCase):
+    @expectedFailure
+    def test_complex_element(self):
+        self.assertCodeExecution("""
+            x = {1j, 2j}
+
+            for i in x:
+                print(i)
+            """)
+
     def test_setattr(self):
         self.assertCodeExecution("""
             x = {1, 2, 3}
