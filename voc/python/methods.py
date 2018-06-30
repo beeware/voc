@@ -209,6 +209,22 @@ class MethodCodeTooLarge(Exception):
     pass
 
 
+def resolve_outer_name(context, name):
+    if hasattr(context, 'resolve_outer_names') and name in context.resolve_outer_names:
+        context.resolve_outer_names.pop(context.resolve_outer_names.index(name))
+        context.add_opcodes(
+            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+            python.Str(context.module.full_name),
+            python.Object.get_item(),
+            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            JavaOpcodes.DUP(),
+            python.Object.get_attribute('#%s-%x' % (name, id(context))),
+            JavaOpcodes.SWAP(),
+            python.Object.del_attr('#%s-%x' % (name, id(context)))
+        )
+        context.store_name(name)
+
+
 class Function(Block):
     def __init__(self, parent, name, code, parameters, returns, static=False):
         super().__init__(parent=parent)
@@ -285,19 +301,7 @@ class Function(Block):
 
     def load_name(self, name):
         # Before loading name to stack, update outer scope variable if it is changed by inner scope's nonlocal
-        if hasattr(self, 'resolve_outer_names') and name in self.resolve_outer_names:
-            self.resolve_outer_names.pop(self.resolve_outer_names.index(name))
-            self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                python.Str(self.module.full_name),
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-                JavaOpcodes.DUP(),
-                python.Object.get_attribute('#%s-%x' % (name, id(self))),
-                JavaOpcodes.SWAP(),
-                python.Object.del_attr('#%s-%x' % (name, id(self)))
-            )
-            self.store_name(name)
+        resolve_outer_name(self, name)
 
         if name in self.local_vars:
             self.add_opcodes(
@@ -1010,6 +1014,9 @@ class Closure(Function):
         self.has_self = True
 
     def load_name(self, name):
+        # Before loading name to stack, update outer scope variable if it is changed by inner scope's nonlocal
+        resolve_outer_name(self, name)
+
         if name in self.local_vars:
             self.add_opcodes(
                 ALOAD_name(name)
