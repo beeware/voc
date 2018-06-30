@@ -351,5 +351,7 @@ class FunctionTests(TranspileTestCase):
                 for i in {1, 2, 3, 4, 5, 6}:
                     print(i)
 
+                print('a' in {1, 'a', False, 1.1, b'1', (2)})
+
             func()
         """)

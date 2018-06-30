@@ -181,6 +181,58 @@ class Block(Accumulator):
             java.Init('java/util/ArrayList'),
         )
 
+        def add_value(val):
+            if isinstance(val, bool):
+                if val is True:
+                    self.add_opcodes(
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
+                    )
+                else:
+                    self.add_opcodes(
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
+                    )
+
+            elif isinstance(val, int):
+                self.add_int(val)
+
+            elif isinstance(val, float):
+                self.add_opcodes(
+                    java.New('org/python/types/Float'),
+                    JavaOpcodes.LDC2_W(val),
+                    java.Init('org/python/types/Float', 'D'),
+                )
+
+            elif isinstance(val, str):
+                self.add_opcodes(
+                    python.Str(val),
+                )
+
+            elif isinstance(val, bytes):
+                self.add_opcodes(
+                    java.New('org/python/types/Bytes'),
+                    JavaOpcodes.LDC_W(val.decode('ISO-8859-1')),
+                    java.Init('org/python/types/Bytes', 'Ljava/lang/String;'),
+                )
+
+            elif isinstance(val, tuple):
+                self.add_tuple(val)
+
+            elif isinstance(val, complex):
+                self.add_opcodes(
+                    java.New('org/python/types/Complex'),
+                    DCONST_val(val.real),
+                    DCONST_val(val.imag),
+                    java.Init('org/python/types/Complex', 'D', 'D'),
+                )
+
+            elif isinstance(val, types.CodeType):
+                self.add_opcodes(
+                    JavaOpcodes.ACONST_NULL()
+                )
+
+            else:
+                raise RuntimeError("Unknown constant type %s" % type(val))
+
         for value in data:
             self.add_opcodes(
                 JavaOpcodes.DUP(),
@@ -190,60 +242,22 @@ class Block(Accumulator):
                 self.add_opcodes(
                     python.NONE()
                 )
+            elif isinstance(value, frozenset):
+                self.add_opcodes(
+                    python.Set(),
+                )
+                for elt in value:
+                    self.add_opcodes(
+                        JavaOpcodes.DUP()
+                    )
+
+                    add_value(elt)
+
+                    self.add_opcodes(
+                        python.Set.add()
+                    )
             else:
-                if isinstance(value, bool):
-                    if value is True:
-                        self.add_opcodes(
-                            JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
-                        )
-                    else:
-                        self.add_opcodes(
-                            JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
-                        )
-
-                elif isinstance(value, int):
-                    self.add_int(value)
-
-                elif isinstance(value, float):
-                    self.add_opcodes(
-                        java.New('org/python/types/Float'),
-                        JavaOpcodes.LDC2_W(value),
-                        java.Init('org/python/types/Float', 'D'),
-                    )
-
-                elif isinstance(value, str):
-                    self.add_opcodes(
-                        python.Str(value),
-                    )
-
-                elif isinstance(value, bytes):
-                    self.add_opcodes(
-                        java.New('org/python/types/Bytes'),
-                        JavaOpcodes.LDC_W(value.decode('ISO-8859-1')),
-                        java.Init('org/python/types/Bytes', 'Ljava/lang/String;'),
-                    )
-
-                elif isinstance(value, tuple):
-                    self.add_tuple(value)
-
-                elif isinstance(value, complex):
-                    self.add_opcodes(
-                        java.New('org/python/types/Complex'),
-                        DCONST_val(value.real),
-                        DCONST_val(value.imag),
-                        java.Init('org/python/types/Complex', 'D', 'D'),
-                    )
-
-                elif isinstance(value, types.CodeType):
-                    self.add_opcodes(
-                        JavaOpcodes.ACONST_NULL()
-                    )
-
-                elif isinstance(value, frozenset):
-                    self.add_tuple(tuple(value))
-
-                else:
-                    raise RuntimeError("Unknown constant type %s" % type(value))
+                add_value(value)
 
             self.add_opcodes(
                 java.List.add(),
