@@ -5,7 +5,7 @@ from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationT
 
 class SetTests(TranspileTestCase):
     @expectedFailure
-    def test_same_hash_different_datatypes(self):
+    def test_equal_value_different_datatypes(self):
         self.assertCodeExecution("""
             x = {1, 1.0, True}
 
