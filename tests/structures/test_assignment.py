@@ -99,7 +99,7 @@ class AssignmentTests(TranspileTestCase):
                 print(y)
                 print(z)
                 print(a)
-            except Exception as e:
+            except (StopIteration, ValueError) as e:
                 print("ValueError: not enough values to unpack (expected 4, got 3)")
         """)
 
@@ -137,7 +137,7 @@ class AssignmentTests(TranspileTestCase):
                 print(y)
                 print(z)
                 print(a)
-            except Exception as e:
+            except (StopIteration, ValueError) as e:
                 print("ValueError: not enough values to unpack (expected 4, got 3)")
         """)
 
@@ -175,7 +175,7 @@ class AssignmentTests(TranspileTestCase):
                 print(y)
                 print(z)
                 print(a)
-            except Exception as e:
+            except (StopIteration, ValueError) as e:
                 print("ValueError: not enough values to unpack (expected 4, got 3)")
         """)
 
