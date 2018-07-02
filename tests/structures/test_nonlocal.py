@@ -25,20 +25,20 @@ class NonlocalTests(TranspileTestCase):
             def func2():
                 a = 'a from outer'
                 b = 'b from outer'
-                def nested_func():
+                def nested_func2():
                     nonlocal a
                     print(a)
                     a = 'a from inner'
                     print(a)
-                    def nested_nested_func():
+                    def nested_nested_func2():
                         nonlocal b
                         print(b)
                         b = 'b from innest'
                         print(b)
 
-                    nested_nested_func()
+                    nested_nested_func2()
 
-                nested_func()
+                nested_func2()
                 print(a)
                 print(b)
 
