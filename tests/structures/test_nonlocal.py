@@ -21,6 +21,28 @@ class NonlocalTests(TranspileTestCase):
                 print(b)
                 
             func()
+
+            def func2():
+                a = 'a from outer'
+                b = 'b from outer'
+                def nested_func():
+                    nonlocal a
+                    print(a)
+                    a = 'a from inner'
+                    print(a)
+                    def nested_nested_func():
+                        nonlocal b
+                        print(b)
+                        b = 'b from innest'
+                        print(b)
+
+                    nested_nested_func()
+
+                nested_func()
+                print(a)
+                print(b)
+
+            func2()
         """)
 
     @expectedFailure

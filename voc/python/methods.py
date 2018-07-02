@@ -211,6 +211,7 @@ class MethodCodeTooLarge(Exception):
 
 def resolve_outer_name(context, name):
     if hasattr(context, 'resolve_outer_names') and name in context.resolve_outer_names:
+        print("resolving",context,name)
         context.resolve_outer_names.pop(context.resolve_outer_names.index(name))
         context.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
@@ -300,7 +301,7 @@ class Function(Block):
         raise NotImplementedError('Functions cannot dynamically store variables.')
 
     def load_name(self, name):
-        # Before loading name to stack, update outer scope variable if it is changed by inner scope's nonlocal
+        # Before loading name to stack, update current scope variable if it is changed by inner scope's nonlocal
         resolve_outer_name(self, name)
 
         if name in self.local_vars:
@@ -466,12 +467,16 @@ class Function(Block):
                 returns=return_signature,
             )
         else:
+            if isinstance(self, Closure):
+                outer_scopes = self.outer_scopes + [self]
+            else:
+                outer_scopes=[self]
             closure = Closure(
                 klass,
                 code=code,
                 parameters=parameter_signatures,
                 returns=return_signature,
-                outer_scopes=[self]
+                outer_scopes=outer_scopes
             )
 
         klass.methods.append(closure)
@@ -1014,20 +1019,20 @@ class Closure(Function):
         self.has_self = True
 
     def load_name(self, name):
-        # Before loading name to stack, update outer scope variable if it is changed by inner scope's nonlocal
+        # Before loading name to stack, update current scope variable if it is changed by inner scope's nonlocal
         resolve_outer_name(self, name)
 
-        if name in self.local_vars:
-            self.add_opcodes(
-                ALOAD_name(name)
-            )
-        elif name in self.klass.closure_var_names:
+        if name in self.klass.closure_var_names:
             self.add_opcodes(
                 ALOAD_name('<closure>'),
                 JavaOpcodes.CHECKCAST('org/python/types/Closure'),
                 JavaOpcodes.GETFIELD('org/python/types/Closure', 'closure_vars', 'Ljava/util/Map;'),
 
                 java.Map.get(name),
+            )
+        elif name in self.local_vars:
+            self.add_opcodes(
+                ALOAD_name(name)
             )
         else:
             self.add_opcodes(
@@ -1045,6 +1050,9 @@ class Closure(Function):
             # find which outer scope owns the name
             for context in self.outer_scopes[::-1]:
                 if name in context.local_vars:
+                    if isinstance(context, Closure) and name in context.klass.closure_var_names:
+                        continue
+
                     if not hasattr(context, 'resolve_outer_names'):
                         setattr(context, 'resolve_outer_names', [])
                     context.resolve_outer_names.append(name)
