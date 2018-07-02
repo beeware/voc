@@ -6,11 +6,11 @@ public class Range extends org.python.types.Object {
     private long step;
 
     public Range(org.python.Object stop) {
-        this(new org.python.types.Int(0), stop, new org.python.types.Int(1));
+        this(org.python.types.Int.getInt(0), stop, org.python.types.Int.getInt(1));
     }
 
     public Range(org.python.Object start, org.python.Object stop) {
-        this(start, stop, new org.python.types.Int(1));
+        this(start, stop, org.python.types.Int.getInt(1));
     }
 
     public Range(org.python.Object start, org.python.Object stop, org.python.Object step) {
@@ -84,9 +84,9 @@ public class Range extends org.python.types.Object {
                 org.python.types.Slice.ValidatedValue val = ((org.python.types.Slice) index).validateValueTypes();
                 org.python.types.Slice slice = new org.python.types.Slice(val.start, val.stop, val.step);
                 org.python.types.Tuple indices = slice.indices((org.python.types.Int) (this.__len__()));
-                org.python.Object start = indices.__getitem__(new org.python.types.Int(0));
-                org.python.Object stop = indices.__getitem__(new org.python.types.Int(1));
-                org.python.Object step = indices.__getitem__(new org.python.types.Int(2));
+                org.python.Object start = indices.__getitem__(org.python.types.Int.getInt(0));
+                org.python.Object stop = indices.__getitem__(org.python.types.Int.getInt(1));
+                org.python.Object step = indices.__getitem__(org.python.types.Int.getInt(2));
                 org.python.Object rstart = this.__dict__.get("start");
                 org.python.Object rstep = this.__dict__.get("step");
                 org.python.Object substep = step.__mul__(rstep);
@@ -109,7 +109,7 @@ public class Range extends org.python.types.Object {
                     throw new org.python.exceptions.IndexError("range object index out of range");
                 }
 
-                return new org.python.types.Int(this.start + idx * this.step);
+                return org.python.types.Int.getInt(this.start + idx * this.step);
             }
         } catch (ClassCastException e) {
             if (org.Python.VERSION < 0x03050000) {
@@ -127,15 +127,15 @@ public class Range extends org.python.types.Object {
     )
     public org.python.Object __len__() {
         if (this.step > 0 && this.start < this.stop) {
-            return new org.python.types.Int(
+            return org.python.types.Int.getInt(
                     1 + (this.stop - 1 - this.start) / this.step
             );
         } else if (this.step < 0 && this.start > this.stop) {
-            return new org.python.types.Int(
+            return org.python.types.Int.getInt(
                     1 + (this.start - 1 - this.stop) / (-this.step)
             );
         } else {
-            return new org.python.types.Int(0);
+            return org.python.types.Int.getInt(0);
         }
     }
 
@@ -143,7 +143,7 @@ public class Range extends org.python.types.Object {
             __doc__ = "Implement __bool__(self)."
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(
+        return org.python.types.Bool.getBool(
                 ((org.python.types.Int) this.__len__()).value > 0
         );
     }
@@ -192,7 +192,7 @@ public class Range extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Range) {
             org.python.types.Range range2 = (org.python.types.Range) other;
-            return new org.python.types.Bool(
+            return org.python.types.Bool.getBool(
                 (this.start == range2.start) &&
                 (this.stop == range2.stop) &&
                 (this.step == range2.step)
@@ -267,7 +267,7 @@ public class Range extends org.python.types.Object {
                 throw new org.python.exceptions.StopIteration();
             }
 
-            org.python.Object result = new org.python.types.Int(this.index);
+            org.python.Object result = org.python.types.Int.getInt(this.index);
             this.index += this.step;
             return result;
         }

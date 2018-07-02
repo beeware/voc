@@ -17,5 +17,6 @@ tests/tmp*
 .env
 /stdlib_tests/*.class
 /stdlib_tests/python
+/python/*.class
 
 .DS_Store

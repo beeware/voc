@@ -48,7 +48,7 @@ public class NoneType extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(
@@ -73,7 +73,7 @@ public class NoneType extends org.python.types.Object {
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.NoneType) {
-            return new org.python.types.Bool(true);
+            return org.python.types.Bool.TRUE;
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }

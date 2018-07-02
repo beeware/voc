@@ -35,7 +35,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         try {
             org.python.types.Tuple consts = (org.python.types.Tuple) this.code.co_consts;
             if (consts != null && ((org.python.types.Int) consts.count()).value != 0) {
-                doc = consts.__getitem__(new org.python.types.Int(0));
+                doc = consts.__getitem__(org.python.types.Int.getInt(0));
             } else {
                 doc = org.python.types.NoneType.NONE;
             }
@@ -102,20 +102,20 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
 
         this.code = new org.python.types.Code(
-                new org.python.types.Int(argcount),  // co_argcount
+                org.python.types.Int.getInt(argcount),  // co_argcount
                 new org.python.types.Tuple(),  // co_cellvars
                 null,  // new org.python.types.Bytes(),  // co_code
                 null,  // new org.python.types.Tuple(),  // co_consts
                 null,  // new org.python.types.Str(),  // co_filename
-                null,  // new org.python.types.Int(),  // co_firstlineno
-                new org.python.types.Int(flags),  // co_flags
+                null,  // org.python.types.Int.getInt(),  // co_firstlineno
+                org.python.types.Int.getInt(flags),  // co_flags
                 new org.python.types.Tuple(),  // co_freevars
-                new org.python.types.Int(kwonlyargs.length),  // co_kwonlyargcount
+                org.python.types.Int.getInt(kwonlyargs.length),  // co_kwonlyargcount
                 null,  // new org.python.types.Bytes(),  // co_lnotab
                 this.name,  // co_name
                 null,  // new org.python.types.Tuple(),  // co_names
-                null,  // new org.python.types.Int(),  // co_nlocals
-                null,  // new org.python.types.Int(),  // co_stacksize
+                null,  // org.python.types.Int.getInt(),  // co_nlocals
+                null,  // org.python.types.Int.getInt(),  // co_stacksize
                 new org.python.types.Tuple(varnames)  // co_varnames
         );
         populateAttrs();
@@ -176,7 +176,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     private void checkMissingArgs(int requiredArgs, int passedArgs, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> varnames, int first_arg) {

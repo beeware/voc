@@ -384,12 +384,12 @@ public class Python {
             while (true) {
                 org.python.Object next = iter.__next__();
                 if (!next.toBoolean()) {
-                    return new org.python.types.Bool(false);
+                    return org.python.types.Bool.FALSE;
                 }
             }
         } catch (org.python.exceptions.StopIteration si) {
         }
-        return new org.python.types.Bool(true);
+        return org.python.types.Bool.TRUE;
     }
 
     @org.python.Method(
@@ -405,12 +405,12 @@ public class Python {
             while (true) {
                 org.python.Object next = iter.__next__();
                 if (next.toBoolean()) {
-                    return new org.python.types.Bool(true);
+                    return org.python.types.Bool.TRUE;
                 }
             }
         } catch (org.python.exceptions.StopIteration si) {
         }
-        return new org.python.types.Bool(false);
+        return org.python.types.Bool.FALSE;
     }
 
     @org.python.Method(
@@ -462,7 +462,7 @@ public class Python {
             args = {"object"}
     )
     public static org.python.types.Bool callable(org.python.Object object) {
-        return new org.python.types.Bool(org.python.Callable.class.isAssignableFrom(object.getClass()));
+        return org.python.types.Bool.getBool(org.python.Callable.class.isAssignableFrom(object.getClass()));
     }
 
     @org.python.Method(
@@ -643,7 +643,7 @@ public class Python {
         if (items == null) {
             throw new org.python.exceptions.TypeError("Required argument 'iterable' (pos 1) not found");
         }
-        org.python.Object index = new org.python.types.Int(0);
+        org.python.Object index = org.python.types.Int.getInt(0);
         if (start != null) {
             try {
                 index = (org.python.types.Int) start; // will throw error if start can't be converted to Int
@@ -651,7 +651,7 @@ public class Python {
                 throw new org.python.exceptions.TypeError("'" + start.typeName() + "' object cannot be interpreted as an integer");
             }
         }
-        org.python.Object increment = new org.python.types.Int(1);
+        org.python.Object increment = org.python.types.Int.getInt(1);
         java.util.List enumList = new java.util.ArrayList();
         try {
             org.python.Object iter = org.Python.iter(items);
@@ -777,9 +777,9 @@ public class Python {
         }
         try {
             object.__getattribute__(name);
-            return new org.python.types.Bool(true);
+            return org.python.types.Bool.TRUE;
         } catch (org.python.exceptions.AttributeError ae) {
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         } catch (org.python.exceptions.TypeError te) {
             throw new org.python.exceptions.TypeError(te.getMessage().replace("__hasattribute__", "hasattr"));
         }
@@ -840,7 +840,7 @@ public class Python {
             args = {"object"}
     )
     public static org.python.types.Int id(org.python.Object object) {
-        return new org.python.types.Int(System.identityHashCode(object));
+        return org.python.types.Int.getInt(System.identityHashCode(object));
     }
 
     @org.python.Method(
@@ -909,22 +909,22 @@ public class Python {
             java.util.List<org.python.Object> target_classes = ((org.python.types.Tuple) classinfo_or_tuple).value;
             for (org.python.Object target_klass: target_classes) {
                 if (org.Python.issubclass(klass, target_klass).toBoolean()) {
-                    return new org.python.types.Bool(true);
+                    return org.python.types.Bool.TRUE;
                 }
             }
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         } else if (classinfo_or_tuple instanceof org.python.types.Type) {
             org.python.types.Type klass_obj = (org.python.types.Type) klass;
             if (klass == classinfo_or_tuple) {
-                return new org.python.types.Bool(true);
+                return org.python.types.Bool.TRUE;
             } else if (klass_obj.__dict__.get("__bases__") != null) {
                 for (org.python.Object base: ((org.python.types.Tuple) klass_obj.__dict__.get("__bases__")).value) {
                     if (base == classinfo_or_tuple || org.Python.issubclass(base, classinfo_or_tuple).value) {
-                        return new org.python.types.Bool(true);
+                        return org.python.types.Bool.TRUE;
                     }
                 }
             }
-            return new org.python.types.Bool(false);
+            return org.python.types.Bool.FALSE;
         } else {
             throw new org.python.exceptions.TypeError("issubclass() arg 2 must be a class or tuple of classes");
         }
@@ -1335,7 +1335,7 @@ public class Python {
         try {
             int length = ((org.python.types.Str) c).value.length();
             if (length == 1) {
-                return new org.python.types.Int((int) (((org.python.types.Str) c.__str__()).value).charAt(0));
+                return org.python.types.Int.getInt((int) (((org.python.types.Str) c.__str__()).value).charAt(0));
             } else {
                 throw new org.python.exceptions.TypeError("ord() expected a character, but string of length " + length + " found");
             }
@@ -1502,7 +1502,7 @@ public class Python {
                 // There probably should be a better way to introspect for these
                 // methods without catually calling them, but this will do for now.
                 try {
-                    sequence.__getitem__(new org.python.types.Int(0));
+                    sequence.__getitem__(org.python.types.Int.getInt(0));
                 } catch (org.python.exceptions.IndexError e) {
                 }
 
@@ -1529,7 +1529,7 @@ public class Python {
     )
     public static org.python.Object round(org.python.Object number, org.python.Object ndigits) {
         if (ndigits == null) {
-            return number.__round__(new org.python.types.Int(0));
+            return number.__round__(org.python.types.Int.getInt(0));
         }
         return number.__round__(ndigits);
     }
@@ -1617,7 +1617,7 @@ public class Python {
             return new org.python.types.List();
         } else {
             if (reverse == null) {
-                reverse = new org.python.types.Bool(false);
+                reverse = org.python.types.Bool.FALSE;
             }
             org.python.Object iterator = org.Python.iter(iterable);
             java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
@@ -1674,7 +1674,7 @@ public class Python {
         if (start != null) {
             value = start;
         } else {
-            value = new org.python.types.Int(0);
+            value = org.python.types.Int.getInt(0);
         }
 
         org.python.Object iterator = org.Python.iter(iterable);

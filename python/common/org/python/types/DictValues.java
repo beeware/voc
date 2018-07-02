@@ -4,7 +4,7 @@ public class DictValues extends org.python.types.Object {
     public java.util.Collection<org.python.Object> value;
 
     static {
-        org.python.types.Type.declarePythonType(DictValues.class,"dict_values",null,null);
+        org.python.types.Type.declarePythonType(DictValues.class, "dict_values", null, null);
     }
 
     /**
@@ -40,13 +40,13 @@ public class DictValues extends org.python.types.Object {
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("dict_values([");
         boolean first = true;
-        for(org.python.Object item : this.value) {
+        for (org.python.Object item : this.value) {
             if (first) {
                 first = false;
             } else {
                 buffer.append(", ");
             }
-            buffer.append(String.format("%s",item.__repr__()));
+            buffer.append(String.format("%s", item.__repr__()));
         }
         buffer.append("])");
         return new org.python.types.Str(buffer.toString());
@@ -101,7 +101,7 @@ public class DictValues extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(!this.value.isEmpty());
+        return org.python.types.Bool.getBool(!this.value.isEmpty());
     }
 
     @org.python.Method(
@@ -125,7 +125,7 @@ public class DictValues extends org.python.types.Object {
             __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.size());
+        return org.python.types.Int.getInt(this.value.size());
     }
 
     @org.python.Method(
@@ -168,7 +168,7 @@ public class DictValues extends org.python.types.Object {
             args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
-        return new org.python.types.Bool(this.value.contains(item));
+        return org.python.types.Bool.getBool(this.value.contains(item));
     }
 
     @org.python.Method(
@@ -176,6 +176,6 @@ public class DictValues extends org.python.types.Object {
             args = {"item"}
     )
     public org.python.Object __not_contains__(org.python.Object item) {
-        return new org.python.types.Bool(!this.value.contains(item));
+        return org.python.types.Bool.getBool(!this.value.contains(item));
     }
 }

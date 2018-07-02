@@ -178,22 +178,22 @@ public class Type extends org.python.types.Object implements org.python.Callable
         } else {
             if (value.getClass() == java.lang.Boolean.TYPE
                     || value.getClass() == java.lang.Boolean.class) {
-                return new org.python.types.Bool((java.lang.Boolean) value);
+                return org.python.types.Bool.getBool((java.lang.Boolean) value);
             } else if (value.getClass() == java.lang.Byte.TYPE
                     || value.getClass() == java.lang.Byte.class) {
-                return new org.python.types.Int((java.lang.Byte) value);
+                return org.python.types.Int.getInt((java.lang.Byte) value);
             } else if (value.getClass() == java.lang.Character.TYPE
                     || value.getClass() == java.lang.Character.class) {
                 return new org.python.types.Str((java.lang.Character) value);
             } else if (value.getClass() == java.lang.Short.TYPE
                     || value.getClass() == java.lang.Short.class) {
-                return new org.python.types.Int((java.lang.Short) value);
+                return org.python.types.Int.getInt((java.lang.Short) value);
             } else if (value.getClass() == java.lang.Integer.TYPE
                     || value.getClass() == java.lang.Integer.class) {
-                return new org.python.types.Int((java.lang.Integer) value);
+                return org.python.types.Int.getInt((java.lang.Integer) value);
             } else if (value.getClass() == java.lang.Long.TYPE
                     || value.getClass() == java.lang.Long.class) {
-                return new org.python.types.Int((java.lang.Long) value);
+                return org.python.types.Int.getInt((java.lang.Long) value);
             } else if (value.getClass() == java.lang.Float.TYPE
                     || value.getClass() == java.lang.Float.class) {
                 return new org.python.types.Float((java.lang.Float) value);
