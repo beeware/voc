@@ -235,7 +235,6 @@ class MethodCodeTooLarge(Exception):
 
 def resolve_outer_name(context, name):
     if hasattr(context, 'resolve_outer_names') and name in context.resolve_outer_names:
-        print("resolving",context,name)
         context.resolve_outer_names.pop(context.resolve_outer_names.index(name))
         context.add_opcodes(
             JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
