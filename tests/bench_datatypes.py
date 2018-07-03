@@ -86,8 +86,8 @@ def test_code(test_case):
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
-    #test_small_integers(test_case)
-    #test_booleans(test_case)
+    test_small_integers(test_case)
+    test_booleans(test_case)
     test_code(test_case)
 
 if __name__== "__main__":
