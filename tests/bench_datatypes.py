@@ -55,18 +55,16 @@ def test_empty_calls(test_case):
         import time
 
         def get_time():
-            n = time.clock()+ time.clock - time.clock 
+            n = time.clock()
             return n
 
         def get_random():
-            result = randomish() + randomish() - randomish()
+            result = get_time() + get_time() - get_time()
             return result
 
         result = 0
-        for i in range(10000000):
+        for i in range(1000000):
             result += get_random()
-
-        print(result)
         """), timed=True)
 
 def main():

@@ -1,14 +1,9 @@
 package org.python.types;
 
-import java.util.HashMap;
-
 public class Object extends java.lang.RuntimeException implements org.python.Object {
     public java.util.Map<java.lang.String, org.python.Object> __dict__;
     public org.python.types.Type __class__;
     public org.python.types.Type.Origin origin;
-
-    public static org.python.Object[] emptyArgs = new org.python.Object[0];
-    public static java.util.Map<java.lang.String, org.python.Object> emptyKwargs = new HashMap<java.lang.String, org.python.Object>();
 
     /**
      * A utility method to update the internal value of this object.
