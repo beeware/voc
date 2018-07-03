@@ -45,7 +45,6 @@ class NonlocalTests(TranspileTestCase):
             func2()
         """)
 
-    @expectedFailure
     def test_nonlocal_class(self):
         self.assertCodeExecution("""
             def func():
@@ -55,7 +54,9 @@ class NonlocalTests(TranspileTestCase):
                     nonlocal a
                     print(a)
                     a = 'a from inner'
+                    b = 'b from inner'
                     print(a)
+                    print(b)
                 Inner()
                 print(a)
                 print(b)

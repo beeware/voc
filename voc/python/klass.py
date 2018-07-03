@@ -13,7 +13,8 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import (
-    InitMethod, ClosureInitMethod, GeneratorMethod, Method, CO_GENERATOR
+    InitMethod, ClosureInitMethod, Closure,
+    GeneratorMethod, Method, CO_GENERATOR
 )
 from .types import java, python
 from .types.primitives import (
@@ -71,7 +72,7 @@ class Class(Block):
     def build_child_class_descriptor(self, child_name):
         return '$'.join([self.descriptor, child_name])
 
-    def add_class(self, class_name, extends, implements):
+    def add_class(self, class_name, extends, implements, co_freevars=None):
         klass = Class(
             self,
             name=class_name,
@@ -167,15 +168,54 @@ class Class(Block):
         # )
 
     def store_name(self, name, declare=False):
-        self.add_opcodes(
-            ASTORE_name('#value'),
-            python.Type.for_class(self.descriptor),
+        # variable is from outer scope
+        if hasattr(self, 'closure_vars') and name in self.closure_vars:
+            # Find which outer scope owns the name.
+            # `outer_scopes` is set via `set_attr` during setup in `Function.add_class`
+            # when the class is referring to a variable from outer scopes
+            for context in self.outer_scopes[::-1]:
+                if name in context.local_vars:
+                    if isinstance(context, Closure) and name in context.klass.closure_var_names:
+                        # this context is referring to `name` from outer scope as well,
+                        # i.e. it does not own the variable `name`, so keep looking outwards
+                        continue
 
-            ALOAD_name('#value'),
-            python.Object.set_attr(name),
+                    # mark this context with modified variable name to resolve later
+                    if not hasattr(context, 'resolve_outer_names'):
+                        setattr(context, 'resolve_outer_names', [])
+                    context.resolve_outer_names.append(name)
 
-            free_name('#value')
-        )
+                    # save modified value temporarily in globals
+                    self.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+                        python.Str(self.module.full_name),
+                        python.Object.get_item(),
+                        JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                        JavaOpcodes.SWAP(),
+                        python.Object.set_attr('#%s-%x' % (name, id(context)))
+                    )
+                    break
+
+            # update closure_vars
+            self.add_opcodes(
+                python.Type.for_class(self.descriptor),
+                python.Object.get_attribute('$closure_vars'),
+                JavaOpcodes.SWAP(),
+                python.Str(name),
+                JavaOpcodes.SWAP(),
+                python.Object.set_item(),
+            )
+        else:
+            self.add_opcodes(
+                ASTORE_name('#value'),
+                python.Type.for_class(self.descriptor),
+
+                ALOAD_name('#value'),
+                python.Object.set_attr(name),
+
+                free_name('#value')
+            )
 
     def store_dynamic(self):
         self.add_opcodes(
@@ -190,10 +230,19 @@ class Class(Block):
         )
 
     def load_name(self, name):
-        self.add_opcodes(
-            python.Type.for_class(self.descriptor),
-            python.Object.get_attribute(name),
-        )
+        # `name` is from outer scope, load its value from `closure_vars`
+        if hasattr(self, 'closure_vars') and name in self.closure_vars:
+            self.add_opcodes(
+                python.Type.for_class(self.descriptor),
+                python.Object.get_attribute('$closure_vars'),
+                python.Str(name),
+                python.Object.get_item(),
+            )
+        else:
+            self.add_opcodes(
+                python.Type.for_class(self.descriptor),
+                python.Object.get_attribute(name),
+            )
 
     def load_globals(self):
         self.add_opcodes(

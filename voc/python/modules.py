@@ -177,7 +177,7 @@ class Module(Block):
 
         return function
 
-    def add_class(self, class_name, extends, implements):
+    def add_class(self, class_name, extends, implements, co_freevars=None):
         from .klass import Class
 
         klass = Class(

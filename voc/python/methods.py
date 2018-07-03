@@ -412,7 +412,7 @@ class Function(Block):
     def class_descriptor(self):
         return self.module.class_descriptor
 
-    def add_class(self, class_name, extends, implements):
+    def add_class(self, class_name, extends, implements, co_freevars=None):
         from .klass import Class
 
         klass = Class(
@@ -458,6 +458,35 @@ class Function(Block):
 
         self.store_name(klass.name)
 
+        # resolve variables from outer scopes
+        if co_freevars:
+            if isinstance(self, Closure):
+                setattr(klass, 'outer_scopes', self.outer_scopes + [self])
+            else:
+                setattr(klass, 'outer_scopes', [self])
+
+            # store outer scope variables in a Python.Dict attribute `$closure_vars`
+            self.add_opcodes(
+                python.Dict(),
+            )
+            setattr(klass, 'closure_vars', [])  # used in `Class.load_name` and `Class.store_name`
+            for var_name in co_freevars:
+                klass.closure_vars.append(var_name)
+                self.add_opcodes(
+                    JavaOpcodes.DUP(),
+                    python.Str(var_name),
+                )
+                self.load_name(var_name)
+                self.add_opcodes(
+                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;'),
+                    python.Dict.set_item(),
+                )
+            self.add_opcodes(
+                python.Type.for_class(klass.descriptor),
+                JavaOpcodes.SWAP(),
+                python.Object.set_attr('$closure_vars')
+            )
+
         self.add_opcodes(
             JavaOpcodes.INVOKESTATIC(
                 klass.descriptor,
@@ -493,7 +522,7 @@ class Function(Block):
             if isinstance(self, Closure):
                 outer_scopes = self.outer_scopes + [self]
             else:
-                outer_scopes=[self]
+                outer_scopes = [self]
             closure = Closure(
                 klass,
                 code=code,
@@ -1074,8 +1103,11 @@ class Closure(Function):
             for context in self.outer_scopes[::-1]:
                 if name in context.local_vars:
                     if isinstance(context, Closure) and name in context.klass.closure_var_names:
+                        # this context is referring to `name` from outer scope as well,
+                        # i.e. it does not own the variable `name`, so keep looking outwards
                         continue
 
+                    # mark this context with modified variable name to resolve later
                     if not hasattr(context, 'resolve_outer_names'):
                         setattr(context, 'resolve_outer_names', [])
                     context.resolve_outer_names.append(name)
