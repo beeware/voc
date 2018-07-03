@@ -276,6 +276,7 @@ class Function(Block):
         pass
 
     def store_module(self):
+        # Stores the current module as a local variable 
         if ('#module') not in self.local_vars:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
@@ -285,7 +286,6 @@ class Function(Block):
                 python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-                # Store it as a local vairable
                 ASTORE_name('#module'),
             )
 
@@ -1186,6 +1186,8 @@ class GeneratorFunction(Function):
                 java.Map.put(),
             )
         else:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
             self.add_opcodes(
                 ASTORE_name('#value'),
 
@@ -1208,6 +1210,8 @@ class GeneratorFunction(Function):
                 ALOAD_name(name)
             )
         else:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
 
@@ -1224,6 +1228,8 @@ class GeneratorFunction(Function):
                 free_name(name)
             )
         except NameError:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
 

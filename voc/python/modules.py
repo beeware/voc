@@ -78,6 +78,7 @@ class Module(Block):
         return '/'.join([self.descriptor, child_name])
 
     def store_module(self):
+        # Stores the current module as a local variable 
         if ('#module') not in self.local_vars:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
@@ -87,7 +88,6 @@ class Module(Block):
                 python.Object.get_item(),
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
 
-                # Store it as a local vairable
                 ASTORE_name('#module'),
             )
 
