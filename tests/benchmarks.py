@@ -113,6 +113,21 @@ def test_function_var_load(test_case):
             foo()
     """), timed=True)
 
+def test_empty_calls(test_case):
+    print("Running", "test_empty_calls")
+    test_case.runAsJava(adjust("""
+        import time
+        def get_time():
+            n = time.clock()
+            return n
+        def get_random():
+            result = get_time() + get_time() - get_time()
+            return result
+        result = 0
+        for i in range(1000000):
+            result += get_random()
+        """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -121,6 +136,7 @@ def main():
     test_global_var_load(test_case)
     test_class_var_load(test_case)
     test_function_var_load(test_case)
+    test_empty_calls(test_case)
 
 if __name__== "__main__":
   main()
