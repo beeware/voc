@@ -14,7 +14,7 @@ from .types.primitives import (
     ICONST_val, LCONST_val, DCONST_val, ALOAD_index, ALOAD_name, ASTORE_index, ASTORE_name, free_name
 )
 
-# from .debug import DEBUG, DEBUG_value
+from .debug import DEBUG, DEBUG_value
 
 
 class IgnoreBlock(Exception):
@@ -171,10 +171,8 @@ class Block(Accumulator):
             java.Init('org/python/types/Complex', 'D'),
         )
 
-    def add_tuple(self, data):
+    def add_list(self, data):
         self.add_opcodes(
-            java.New('org/python/types/Tuple'),
-
             java.New('java/util/ArrayList'),
             java.Init('java/util/ArrayList'),
         )
@@ -244,6 +242,11 @@ class Block(Accumulator):
                 java.List.add(),
             )
 
+    def add_tuple(self, data):
+        self.add_opcodes(
+            java.New('org/python/types/Tuple'),
+        )
+        self.add_list(data)
         self.add_opcodes(
             java.Init('org/python/types/Tuple', 'Ljava/util/List;'),
         )
@@ -265,17 +268,17 @@ class Block(Accumulator):
         )
 
         self.add_int(function.code.co_argcount)
-        self.add_tuple(function.code.co_cellvars)
+        self.add_list(function.code.co_cellvars)
 
         self.add_opcodes(
                 JavaOpcodes.ACONST_NULL(),  # co_code
         )
 
-        self.add_tuple(function.code.co_consts)
+        self.add_list(function.code.co_consts)
         self.add_str(function.code.co_filename)
         self.add_int(function.code.co_firstlineno)
         self.add_int(function.code.co_flags)
-        self.add_tuple(function.code.co_freevars)
+        self.add_list(function.code.co_freevars)
         self.add_int(function.code.co_kwonlyargcount)
 
         self.add_opcodes(
@@ -283,31 +286,30 @@ class Block(Accumulator):
         )
 
         self.add_str(function.code.co_name)
-        self.add_tuple(function.code.co_names)
+        self.add_list(function.code.co_names)
         self.add_int(function.code.co_nlocals)
         self.add_int(function.code.co_stacksize)
-        self.add_tuple(function.code.co_varnames)
+        self.add_list(function.code.co_varnames)
 
         self.add_opcodes(
                 java.Init(
                     'org/python/types/Code',
                     'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
+                    'Ljava/util/List;',
                     'Lorg/python/types/Bytes;',
-                    'Lorg/python/types/Tuple;',
+                    'Ljava/util/List;',
                     'Lorg/python/types/Str;',
                     'Lorg/python/types/Int;',
                     'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
+                    'Ljava/util/List;',
                     'Lorg/python/types/Int;',
                     'Lorg/python/types/Bytes;',
                     'Lorg/python/types/Str;',
-                    'Lorg/python/types/Tuple;',
+                    'Ljava/util/List;',
                     'Lorg/python/types/Int;',
                     'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
+                    'Ljava/util/List;',
                 ),
-
                 # Get a Java Method representing the new function
                 JavaOpcodes.LDC_W(Classref(function.class_descriptor)),
                 JavaOpcodes.LDC_W(function.pyimpl_name),

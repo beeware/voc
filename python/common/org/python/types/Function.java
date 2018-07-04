@@ -33,9 +33,9 @@ public class Function extends org.python.types.Object implements org.python.Call
         this.__dict__.put("__code__", this.code);
         org.python.Object doc;
         try {
-            org.python.types.Tuple consts = (org.python.types.Tuple) this.code.co_consts;
-            if (consts != null && ((org.python.types.Int) consts.count()).value != 0) {
-                doc = consts.__getitem__(org.python.types.Int.getInt(0));
+            java.util.List<org.python.Object> consts = (java.util.List<org.python.Object>) this.code.co_consts;
+            if (consts != null && (consts.size() != 0)) {
+                doc = consts.get(0);
             } else {
                 doc = org.python.types.NoneType.NONE;
             }
@@ -103,20 +103,20 @@ public class Function extends org.python.types.Object implements org.python.Call
 
         this.code = new org.python.types.Code(
                 org.python.types.Int.getInt(argcount),  // co_argcount
-                new org.python.types.Tuple(),  // co_cellvars
+                new java.util.ArrayList<org.python.Object>(),  // co_cellvars
                 null,  // new org.python.types.Bytes(),  // co_code
                 null,  // new org.python.types.Tuple(),  // co_consts
                 null,  // new org.python.types.Str(),  // co_filename
                 null,  // org.python.types.Int.getInt(),  // co_firstlineno
                 org.python.types.Int.getInt(flags),  // co_flags
-                new org.python.types.Tuple(),  // co_freevars
+                new java.util.ArrayList<org.python.Object>(),  // co_freevars
                 org.python.types.Int.getInt(kwonlyargs.length),  // co_kwonlyargcount
                 null,  // new org.python.types.Bytes(),  // co_lnotab
                 this.name,  // co_name
                 null,  // new org.python.types.Tuple(),  // co_names
                 null,  // org.python.types.Int.getInt(),  // co_nlocals
                 null,  // org.python.types.Int.getInt(),  // co_stacksize
-                new org.python.types.Tuple(varnames)  // co_varnames
+                new java.util.ArrayList<org.python.Object>(varnames)  // co_varnames
         );
         populateAttrs();
     }
@@ -225,7 +225,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         int argcount = (int) this.code.co_argcount.value;
         int kwonlyargcount = (int) this.code.co_kwonlyargcount.value;
         int flags = (int) this.code.co_flags.value;
-        java.util.List<org.python.Object> varnames = this.code.co_varnames.value;
+        java.util.List<org.python.Object> varnames = this.code.co_varnames;
 
         int first_arg = 0;
         int has_varargs = 0;
