@@ -2,16 +2,12 @@ import os
 
 from .utils import *
 
-FILENAME = "pystone.py"
-THISDIR = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(FILENAME)))
-LOCATION = os.path.join(THISDIR, "tests/", FILENAME)
+TESTDIR = os.path.dirname(__file__)
 
 class PystoneTest(TranspileTestCase):
 
     def test_pystone(self):
-        file = open(LOCATION, "r")
+        with open(os.path.join(TESTDIR, "pystone.py")) as javafile:
+            out = self.runAsJava(adjust(javafile.read()), args=["10"])
 
-        out = self.runAsJava(adjust(file.read()))
-        print(out)
-
-        file.close()
+            self.assertEqual(out, 'something...')
