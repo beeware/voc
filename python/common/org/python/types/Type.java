@@ -14,6 +14,23 @@ public class Type extends org.python.types.Object implements org.python.Callable
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
+    private static org.python.Object[] emptyArgs;
+    private static java.util.Map<java.lang.String, org.python.Object> emptyKwargs;
+
+    private static org.python.Object[] getEmptyArgs() {
+        if (emptyArgs == null) {
+            emptyArgs = new org.python.Object[0];
+        }
+        return emptyArgs;
+    }
+
+    private static java.util.Map<java.lang.String, org.python.Object> getEmptyKwargs() {
+        if (emptyKwargs == null) {
+            emptyKwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
+        }
+        return emptyKwargs;
+    }
+
     /**
      * Factory method to obtain Python classes from their Java counterparts
      */
@@ -450,7 +467,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                         }
                     }
                 } else {
-                    adjusted_args = (args == null) ? new org.python.Object[0] : args;
+                    adjusted_args = args;
                 }
 
                 // for (org.python.Object arg: adjusted_args) {
@@ -458,7 +475,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                 // }
                 // org.Python.debug("         adj kwargs: ", kwargs);
 
-                return (org.python.Object) this.constructor.newInstance(adjusted_args, (kwargs != null) ? kwargs : new java.util.HashMap<java.lang.String, org.python.Object>());
+                return (org.python.Object) this.constructor.newInstance((adjusted_args != null) ? adjusted_args : getEmptyArgs(), (kwargs != null) ? kwargs : getEmptyKwargs());
             } else {
                 throw new org.python.exceptions.RuntimeError("No Python-compatible constructor for type " + this.klass);
             }

@@ -492,7 +492,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             // }
             // org.Python.debug("         kwargs: ", kwargs);
 
-            if (kwargs.size() > 0) {
+            if (kwargs != null && kwargs.size() > 0) {
                 // TODO: This doesn't have to be so - we *could* introspect argument names.
                 throw new org.python.exceptions.RuntimeError("Cannot use kwargs to invoke a native Java method.");
             }
