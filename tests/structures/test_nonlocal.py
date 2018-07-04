@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from ..utils import TranspileTestCase
 
 class NonlocalTests(TranspileTestCase):
@@ -19,7 +17,7 @@ class NonlocalTests(TranspileTestCase):
                 nested_func()
                 print(a)
                 print(b)
-                
+
             func()
 
             def func2():
@@ -57,9 +55,49 @@ class NonlocalTests(TranspileTestCase):
                     b = 'b from inner'
                     print(a)
                     print(b)
+
                 Inner()
                 print(a)
                 print(b)
-                
+
             func()
         """)
+
+    def test_nonlocal_method(self):
+        self.assertCodeExecution("""
+            def func():
+                a = 'a from outer'
+                b = 'b from outer'
+                class Klass:
+                    def method(self):
+                        nonlocal a
+                        print(a)
+                        a = 'a from inner'
+                        print(a)
+                        print(b)
+
+                Klass().method()
+                print(a)
+                print(b)
+
+            func()
+        """)
+
+    def test_nonlocal_generator(self):
+        self.assertCodeExecution("""
+            def func():
+                a = 'a from outer'
+                b = 'b from outer'
+                def gen():
+                    nonlocal a
+                    print(a)
+                    print(b)
+                    a = 'a from inner'
+                    yield a
+
+                print(next(gen()))
+                print(a)
+                print(b)
+
+            func()
+        """, run_in_function=False)  # TODO: remove this after generator nesting problem is solved

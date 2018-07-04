@@ -168,7 +168,7 @@ class Class(Block):
         # )
 
     def store_name(self, name, declare=False):
-        # variable is from outer scope
+        # variable is from outer scope except global
         if hasattr(self, 'closure_vars') and name in self.closure_vars:
             # Find which outer scope owns the name.
             # `outer_scopes` is set via `set_attr` during setup in `Function.add_class`
@@ -230,7 +230,7 @@ class Class(Block):
         )
 
     def load_name(self, name):
-        # `name` is from outer scope, load its value from `closure_vars`
+        # `name` is from outer scope except global, load its value from `closure_vars`
         if hasattr(self, 'closure_vars') and name in self.closure_vars:
             self.add_opcodes(
                 python.Type.for_class(self.descriptor),
@@ -283,6 +283,11 @@ class Class(Block):
         self._constructor = value
 
     def add_function(self, name, code, parameter_signatures, return_signature):
+        if hasattr(self, 'outer_scopes'):
+            outer_scopes = self.outer_scopes + [self]
+        else:
+            outer_scopes = [self]
+
         if code.co_flags & CO_GENERATOR:
             method = GeneratorMethod(
                 self,
@@ -292,6 +297,7 @@ class Class(Block):
                 parameters=parameter_signatures,
                 returns=return_signature,
                 static=True,
+                outer_scopes=outer_scopes
             )
 
         else:
@@ -302,11 +308,36 @@ class Class(Block):
                 parameters=parameter_signatures,
                 returns=return_signature,
                 static=True,
+                outer_scopes=outer_scopes
             )
 
         # Add the method to the list that need to be
         # transpiled into Java methods
         self.methods.append(method)
+
+        self.add_opcodes(
+            # store outer scope variables in a Python.Dict attribute `$closure_vars`
+            python.Dict()
+        )
+
+        setattr(method, "closure_vars", code.co_freevars)  # used in `Function.load_name` and `Function.store_name`
+
+        for var_name in code.co_freevars:
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+                python.Str(var_name),
+            )
+            self.load_name(var_name)
+            self.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;'),
+                python.Dict.set_item(),
+            )
+
+        self.add_opcodes(
+            python.Type.for_class(method.class_descriptor),
+            JavaOpcodes.SWAP(),
+            python.Object.set_attr('$%s_closure_vars' % method.name),  # use method's name as identification
+        )
 
         # Add a definition of the callable object
         self.add_callable(method)
