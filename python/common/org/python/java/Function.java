@@ -281,7 +281,7 @@ public class Function extends org.python.types.Object implements org.python.Call
                     arg_types[i] = args[i].toJava().getClass();
                 }
                 signature.append(Function.descriptor(arg_types[i]));
-          }
+            }
         }
 
         // org.Python.debug("Argument signature", signature);
