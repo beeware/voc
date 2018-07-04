@@ -2,17 +2,25 @@
 
 """
 "PYSTONE" Benchmark Program
-Version:        Python/1.1 (corresponds to C/1.1 plus 2 Pystone fixes)
+
+Version:        Python/1.2 (corresponds to C/1.1 plus 3 Pystone fixes)
+
 Author:         Reinhold P. Weicker,  CACM Vol 27, No 10, 10/84 pg. 1013.
+
                 Translated from ADA to C by Rick Richardson.
                 Every method to preserve ADA-likeness has been used,
                 at the expense of C-ness.
+
                 Translated from C to Python by Guido van Rossum.
+
 Version History:
+
                 Version 1.1 corrects two bugs in version 1.0:
+
                 First, it leaked memory: in Proc1(), NextRecord ends
                 up having a pointer to itself.  I have corrected this
                 by zapping NextRecord.PtrComp at the end of Proc1().
+
                 Second, Proc3() used the operator != to compare a
                 record to None.  This is rather inefficient and not
                 true to the intention of the original benchmark (where
@@ -21,13 +29,21 @@ Version History:
                 comparison of the record).  Version 1.1 runs 5-10
                 percent faster than version 1.0, so benchmark figures
                 of different versions can't be compared directly.
+
+                Version 1.2 changes the division to floor division.
+
+                Under Python 3 version 1.1 would use the normal division
+                operator, resulting in some of the operations mistakenly
+                yielding floats. Version 1.2 instead uses floor division
+                making the benchmark a integer benchmark again.
+
 """
 
 LOOPS = 50000
 
 from time import clock
 
-__version__ = "1.1"
+__version__ = "1.2"
 
 [Ident1, Ident2, Ident3, Ident4, Ident5] = range(1, 6)
 
@@ -60,8 +76,8 @@ def pystones(loops=LOOPS):
 
 IntGlob = 0
 BoolGlob = FALSE
-Char1Glob = '\\0'
-Char2Glob = '\\0'
+Char1Glob = '\0'
+Char2Glob = '\0'
 Array1Glob = [0]*51
 Array2Glob = [x[:] for x in [Array1Glob]*51]
 PtrGlb = None
@@ -114,7 +130,7 @@ def Proc0(loops=LOOPS):
                 EnumLoc = Proc6(Ident1)
             CharIndex = chr(ord(CharIndex)+1)
         IntLoc3 = IntLoc2 * IntLoc1
-        IntLoc2 = IntLoc3 / IntLoc1
+        IntLoc2 = IntLoc3 // IntLoc1
         IntLoc2 = 7 * (IntLoc3 - IntLoc2) - IntLoc1
         IntLoc1 = Proc2(IntLoc1)
 
