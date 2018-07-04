@@ -2076,55 +2076,65 @@ class Visitor(ast.NodeVisitor):
             # Create and populate the array of arguments to pass to invoke()
             num_args = len([arg for arg in node.args if not isinstance(arg, ast.Starred)])
 
-            self.context.add_opcodes(
-                java.Array(num_args),
-            )
+            if len(node.args) == 0 and getattr(node, 'starargs', None) is None:
+                self.context.add_opcodes(
+                    JavaOpcodes.ACONST_NULL(),
+                )
+            else:
+                self.context.add_opcodes(
+                    java.Array(num_args),
+                )
 
-            for i, arg in enumerate(node.args):
-                # This block implements *args in Python 3.5+
-                if isinstance(arg, ast.Starred):
+                for i, arg in enumerate(node.args):
+                    # This block implements *args in Python 3.5+
+                    if isinstance(arg, ast.Starred):
+                        self.visit(arg)
+                        continue
+
+                    self.context.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        ICONST_val(i),
+                    )
                     self.visit(arg)
-                    continue
+                    self.context.add_opcodes(
+                        JavaOpcodes.AASTORE(),
+                    )
 
+                # This block implements *args in Python 3.4
+                if getattr(node, 'starargs', None) is not None:
+                    # Evaluate the starargs
+                    self.visit(node.starargs)
+
+                    self.context.add_opcodes(
+                        AddToArgs(),
+                    )
+
+            if len(node.keywords) == 0 and getattr(node, 'kwargs', None) is None:
                 self.context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    ICONST_val(i),
+                    JavaOpcodes.ACONST_NULL(),
                 )
-                self.visit(arg)
+            else:
+                # Create and populate the map of kwargs to pass to invoke().
                 self.context.add_opcodes(
-                    JavaOpcodes.AASTORE(),
-                )
-
-            # This block implements *args in Python 3.4
-            if getattr(node, 'starargs', None) is not None:
-                # Evaluate the starargs
-                self.visit(node.starargs)
-
-                self.context.add_opcodes(
-                    AddToArgs(),
-                )
-
-            # Create and populate the map of kwargs to pass to invoke().
-            self.context.add_opcodes(
-                    java.Map(),
-            )
-
-            for keyword in node.keywords:
-                if keyword.arg is None:  # Python 3.5 **kwargs
-                    self.add_doublestarred_kwargs(node, keyword.value)
-                    continue
-
-                self.context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W(keyword.arg),
-                )
-                self.visit(keyword.value)
-                self.context.add_opcodes(
-                    java.Map.put()
+                        java.Map(),
                 )
 
-            if getattr(node, 'kwargs', None) is not None:  # Python 3.4 **kwargs
-                self.add_doublestarred_kwargs(node, node.kwargs)
+                for keyword in node.keywords:
+                    if keyword.arg is None:  # Python 3.5 **kwargs
+                        self.add_doublestarred_kwargs(node, keyword.value)
+                        continue
+
+                    self.context.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.LDC_W(keyword.arg),
+                    )
+                    self.visit(keyword.value)
+                    self.context.add_opcodes(
+                        java.Map.put()
+                    )
+
+                if getattr(node, 'kwargs', None) is not None:  # Python 3.4 **kwargs
+                    self.add_doublestarred_kwargs(node, node.kwargs)
 
             # Set up the stack and invoke the callable
             self.context.add_opcodes(

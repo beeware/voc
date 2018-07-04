@@ -42,19 +42,15 @@ public class Type extends org.python.types.Type {
 
         java.lang.reflect.Constructor constructor = null;
         java.lang.StringBuilder signature = new java.lang.StringBuilder();
-
-        java.lang.Class<?>[] arg_types = null;
-        if (n_args != 0) {
-            arg_types = new java.lang.Class<?>[n_args];
-            for (int i = 0; i < n_args; i++) {
-                if (args[i] == null) {
-                    arg_types[i] = null;
-                } else if (args[i].toJava() == null) {
-                    arg_types[i] = null;
-                } else {
-                    arg_types[i] = args[i].toJava().getClass();
-                }
-                signature.append(Function.descriptor(arg_types[i]));
+        int n_args = (args == null) ? 0 : args.length;
+        java.lang.Class<?>[] arg_types = new java.lang.Class<?>[n_args];
+        for (int i = 0; i < n_args; i++) {
+            if (args[i] == null) {
+                arg_types[i] = null;
+            } else if (args[i].toJava() == null) {
+                arg_types[i] = null;
+            } else {
+                arg_types[i] = args[i].toJava().getClass();
             }
         }
 
@@ -154,9 +150,10 @@ public class Type extends org.python.types.Type {
     }
 
     public java.lang.Object[] adjustArguments(java.lang.reflect.Constructor constructor, org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        java.lang.Object[] adjusted = new java.lang.Object[args.length];
+        int n_args = (args == null) ? 0 : args.length;
+        java.lang.Object[] adjusted = new java.lang.Object[n_args];
         java.lang.Class<?>[] param_types = constructor.getParameterTypes();
-        for (int i = 0; i < args.length; i++) {
+        for (int i = 0; i < n_args; i++) {
             adjusted[i] = org.python.types.Type.toJava(param_types[i], args[i]);
         }
         return adjusted;
