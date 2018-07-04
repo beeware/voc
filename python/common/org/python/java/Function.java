@@ -266,21 +266,24 @@ public class Function extends org.python.types.Object implements org.python.Call
      */
     public java.lang.reflect.Method selectMethod(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         // org.Python.debug("Method options: ", this.methods);
-
+        int n_args = (args == null) ? 0 : args.length;
         java.lang.reflect.Method method = null;
         java.lang.StringBuilder signature = new java.lang.StringBuilder();
-        java.lang.Class<?>[] arg_types = new java.lang.Class<?>[args.length];
-        int n_args = args.length;
-        for (int i = 0; i < n_args; i++) {
-            if (args[i] == null) {
-                arg_types[i] = null;
-            } else if (args[i].toJava() == null) {
-                arg_types[i] = null;
-            } else {
-                arg_types[i] = args[i].toJava().getClass();
-            }
-            signature.append(Function.descriptor(arg_types[i]));
+        java.lang.Class<?>[] arg_types = null;
+        if (n_args != 0) {
+            arg_types = new java.lang.Class<?>[n_args];
+            for (int i = 0; i < n_args; i++) {
+                if (args[i] == null) {
+                    arg_types[i] = null;
+                } else if (args[i].toJava() == null) {
+                    arg_types[i] = null;
+                } else {
+                    arg_types[i] = args[i].toJava().getClass();
+                }
+                signature.append(Function.descriptor(arg_types[i]));
+          }
         }
+
         // org.Python.debug("Argument signature", signature);
         method = this.methods.get(signature.toString());
 
@@ -497,8 +500,10 @@ public class Function extends org.python.types.Object implements org.python.Call
             java.lang.reflect.Method method = this.selectMethod(args, kwargs);
 
             // org.Python.debug("  Native method: ", method);
-
-            java.lang.Object[] adjusted_args = this.adjustArguments(method, args, kwargs);
+            java.lang.Object[] adjusted_args = null;
+            if (args != null || kwargs != null) {
+                adjusted_args = this.adjustArguments(method, args, kwargs);
+            }
 
             // if (adjusted_args != null) {
             //     for (java.lang.Object arg: adjusted_args) {
