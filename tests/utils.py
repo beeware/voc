@@ -316,7 +316,7 @@ def cleanse_python(raw, substitutions):
 
     # Replace high precision floats with abbreviated forms
     out = FLOAT_PRECISION.sub('\\1...', out)
-    
+
     return out
 
 
@@ -626,6 +626,13 @@ class TranspileTestCase(TestCase):
             t2_stop = time.process_time()
 
             out = proc.communicate()[0].decode('utf8')
+
+            if proc.returncode != 0:
+                raise Exception(
+                    "Java subprocess didn't exit cleanly (exit status %s)\n\n: %s" % (
+                        proc.returncode, out
+                    )
+                )
 
         if timed:
             print("  Elapsed time: ", (t1_stop-t1_start), " sec")

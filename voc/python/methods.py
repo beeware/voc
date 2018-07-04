@@ -291,6 +291,20 @@ class Function(Block):
     def add_self(self):
         pass
 
+    def store_module(self):
+        # Stores the current module as a local variable 
+        if ('#module') not in self.local_vars:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                ASTORE_name('#module'),
+            )
+
     def store_name(self, name, declare=False):
         # variable is from outer scope except global
         if hasattr(self, 'closure_vars') and name in self.closure_vars:
@@ -335,7 +349,8 @@ class Function(Block):
             self.add_opcodes(
                 # Store in a local variable
                 ASTORE_name(name),
-
+            )
+            self.add_opcodes(
                 # Also store in the locals variable
                 ALOAD_name('#locals'),
                 JavaOpcodes.LDC_W(name),
@@ -346,12 +361,7 @@ class Function(Block):
             self.add_opcodes(
                 ASTORE_name('#value'),
 
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                ALOAD_name('#module'),
 
                 ALOAD_name('#value'),
 
@@ -383,23 +393,13 @@ class Function(Block):
             )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                python.Str(self.module.full_name),
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+                ALOAD_name('#module'),
                 python.Object.get_attribute(name),
             )
 
     def load_globals(self):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-            python.Str(self.module.full_name),
-            python.Object.get_item(),
-
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+            ALOAD_name('#module'),
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
         )
 
@@ -418,13 +418,7 @@ class Function(Block):
             )
         except NameError:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+                ALOAD_name('#module'),
                 python.Object.del_attr(name),
             )
 
@@ -633,6 +627,7 @@ class Function(Block):
             java.Map(),
             ASTORE_name('#locals')
         )
+        self.store_module()
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0:
@@ -717,6 +712,9 @@ class InitMethod(Function):
         self.args = args if args else {}
         self.super_args = super_args if super_args else []
 
+        self.store_module()
+
+
     def __repr__(self):
         return '<Constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
 
@@ -759,13 +757,7 @@ class InitMethod(Function):
                 )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+                ALOAD_name('#module'),
                 python.Object.get_attribute(name),
             )
 
@@ -812,6 +804,8 @@ class Method(Function):
             static=static,
         )
         self.outer_scopes = outer_scopes
+
+        self.store_module()
 
     def __repr__(self):
         return '<Method %s.%s (%s parameters)>' % (self.klass.name, self.name, len(self.parameters))
@@ -992,10 +986,7 @@ class MainFunction(Function):
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
 
             ALOAD_name('#value'),
             python.Object.set_attr(name),
@@ -1015,21 +1006,13 @@ class MainFunction(Function):
 
     def load_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
-            python.Object.get_item(),
-
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
             python.Object.get_attribute(name),
         )
 
     def delete_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
-            python.Object.get_item(),
-
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
             python.Object.del_attr(name),
         )
 
@@ -1105,6 +1088,8 @@ class Closure(Function):
         )
         self.outer_scopes = outer_scopes
 
+        self.store_module()
+
     def __repr__(self):
         return '<Closure %s (%s parameters, %s closure variables)>' % (
             self.name, len(self.parameters), len(self.klass.closure_var_names)
@@ -1129,7 +1114,6 @@ class Closure(Function):
         # method.
         self.local_vars['<closure>'] = len(self.local_vars)
         self.has_self = True
-
 
 class ClosureInitMethod(InitMethod):
     def __init__(self, klass):
@@ -1286,6 +1270,61 @@ class GeneratorFunction(Function):
             )
         ]
 
+    def store_name(self, name, declare=False):
+        if declare or name in self.local_vars or (hasattr(self, 'closure_vars') and name in self.closure_vars):
+            super(GeneratorFunction, self).store_name(name, declare)
+        else:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
+            self.add_opcodes(
+                ASTORE_name('#value'),
+
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                ALOAD_name('#value'),
+
+                python.Object.set_attr(name),
+                free_name('#value')
+            )
+
+    def load_name(self, name):
+        if name in self.local_vars or (hasattr(self, 'closure_vars') and name in self.closure_vars):
+            super(GeneratorFunction, self).load_name(name)
+        else:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                python.Object.get_attribute(name),
+            )
+
+    def delete_name(self, name):
+        try:
+            self.add_opcodes(
+                free_name(name)
+            )
+        except NameError:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                python.Object.del_attr(name),
+            )
 
 class GeneratorMethod(Method):
     def __init__(self, klass, name, code, generator, parameters, returns=None, static=False, outer_scopes=[]):
