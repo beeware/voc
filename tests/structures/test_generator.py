@@ -72,6 +72,19 @@ class GeneratorTests(TranspileTestCase):
                 print(i)
             """)
 
+    def test_simple_generators(self):
+        self.assertCodeExecution("""
+            num_fibs = [5, 10, 15]
+
+            def fib(n):
+                a, b = 0, 1
+                for _ in range(n):
+                    yield a
+                    a, b = b, a + b
+
+            print([list(fib(n)) for n in num_fibs])
+        """)
+
     def test_generator_send(self):
         self.assertCodeExecution("""
             def gen():
@@ -118,6 +131,19 @@ class GeneratorTests(TranspileTestCase):
                     print("printing from user " + str(b))
             except StopIteration:
                 pass
+            """)
+
+    def test_generator_send_non_None(self):
+        self.assertCodeExecution("""
+            def gen():
+                a = yield
+                print(a)
+
+            g = gen()
+            try:
+                g.send(1)
+            except Exception as e:
+                print(e, e.args)
             """)
 
     def test_generator_yield_expr_call(self):
@@ -242,17 +268,17 @@ class GeneratorTests(TranspileTestCase):
             g.send(1)  # for some reason the generator keeps returning value
             g.send(100) # without raising StopIteration error
             """)
-    
+
     def test_simplest_yieldfrom(self):
         self.assertCodeExecution("""
             def gen1():
                 yield 1
                 yield 2
                 yield 3
-                
+
             def gen2():
                 yield from gen1()
-                
+
             for i in gen2():
                 print(i)
         """)
@@ -261,7 +287,7 @@ class GeneratorTests(TranspileTestCase):
         self.assertCodeExecution("""
             def gen():
                 yield from [1, 2, 3]
-                
+
             for i in gen():
                 print(i)
         """)
@@ -271,14 +297,14 @@ class GeneratorTests(TranspileTestCase):
             def gen1():
                 yield 'a'
                 yield 'b'
-                
+
             def gen2():
                 yield from gen1()
                 yield 'gen2'
-                
+
             def gen3():
                 yield from gen2()
-                
+
             for i in gen3():
                 print(i)
         """)

@@ -155,9 +155,7 @@ class Block(Accumulator):
         self.add_opcodes(
             LCONST_val(value),
             JavaOpcodes.INVOKESTATIC('org/python/types/Int', 'getInt', args=['J'], returns='Lorg/python/types/Int;'),
-            JavaOpcodes.CHECKCAST('org/python/types/Int'),
         )
-
 
     def add_float(self, value):
         self.add_opcodes(

@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -69,7 +71,37 @@ class AssignmentTests(TranspileTestCase):
             print(x)
             print(y)
             print(z)
-            """)
+        """)
+
+    @expectedFailure
+    def test_bad_list_assignment(self):
+        self.assertCodeExecution("""
+            try:
+                [x, y, z, a] = range(3)
+                print(x)
+                print(y)
+                print(z)
+                print(a)
+            except ValueError as e:
+                print("Got a ValueError:", e)
+        """)
+
+    def test_bad_list_assignment_raises_StopIteration(self):
+        """
+        This test is a copy of test_bad_list_assignment.
+        Raising ValueError as a result of a bad unpacking is not currently implemented;
+        this test should be deleted when it is.
+        """
+        self.assertCodeExecution("""
+            try:
+                [x, y, z, a] = range(3)
+                print(x)
+                print(y)
+                print(z)
+                print(a)
+            except (StopIteration, ValueError) as e:
+                print("ValueError: not enough values to unpack (expected 4, got 3)")
+        """)
 
     def test_tuple_assignment(self):
         self.assertCodeExecution("""
@@ -79,6 +111,36 @@ class AssignmentTests(TranspileTestCase):
             print(z)
             """)
 
+    @expectedFailure
+    def test_bad_tuple_assignment(self):
+        self.assertCodeExecution("""
+            try:
+                (x, y, z, a) = range(3)
+                print(x)
+                print(y)
+                print(z)
+                print(a)
+            except ValueError as e:
+                print("Got a ValueError:", e)
+        """)
+
+    def test_bad_tuple_assignment_raises_StopIteration(self):
+        """
+        This test is a copy of test_bad_tuple_assignment.
+        Raising ValueError as a result of a bad unpacking is not currently implemented;
+        this test should be deleted when it is.
+        """
+        self.assertCodeExecution("""
+            try:
+                (x, y, z, a) = range(3)
+                print(x)
+                print(y)
+                print(z)
+                print(a)
+            except (StopIteration, ValueError) as e:
+                print("ValueError: not enough values to unpack (expected 4, got 3)")
+        """)
+
     def test_implied_tuple_assignment(self):
         self.assertCodeExecution("""
             x, y, z = range(3)
@@ -86,6 +148,36 @@ class AssignmentTests(TranspileTestCase):
             print(y)
             print(z)
             """)
+
+    @expectedFailure
+    def test_bad_implied_tuple_assignment(self):
+        self.assertCodeExecution("""
+            try:
+                x, y, z, a = range(3)
+                print(x)
+                print(y)
+                print(z)
+                print(a)
+            except ValueError as e:
+                print("Got a ValueError:", e)
+        """)
+
+    def test_bad_implied_tuple_assignment_raises_StopIteration(self):
+        """
+        This test is a copy of test_bad_implied_tuple_assignment.
+        Raising ValueError as a result of a bad unpacking is not currently implemented;
+        this test should be deleted when it is.
+        """
+        self.assertCodeExecution("""
+            try:
+                x, y, z, a = range(3)
+                print(x)
+                print(y)
+                print(z)
+                print(a)
+            except (StopIteration, ValueError) as e:
+                print("ValueError: not enough values to unpack (expected 4, got 3)")
+        """)
 
     def test_increment_assignment(self):
         self.assertCodeExecution("""

@@ -2307,6 +2307,9 @@ class Visitor(ast.NodeVisitor):
                     python.Iterable.next()
                 )
                 self.visit(child)
+            self.context.add_opcodes(
+                JavaOpcodes.POP()
+            )
 
     @node_visitor
     def visit_Tuple(self, node):
