@@ -311,27 +311,28 @@ class Function(Block):
             # find which outer scope owns the name
             for context in self.outer_scopes[::-1]:
                 if name in context.local_vars:
-                    if isinstance(context, Closure) and name in context.klass.closure_var_names:
-                        # this context is referring to `name` from outer scope as well,
-                        # i.e. it does not own the variable `name`, so keep looking outwards
-                        continue
-
                     # mark this context with modified variable name to resolve later
                     if not hasattr(context, 'resolve_outer_names'):
                         setattr(context, 'resolve_outer_names', [])
                     context.resolve_outer_names.append(name)
 
-                    # save modified value temporarily in globals
-                    self.add_opcodes(
-                        JavaOpcodes.DUP(),
-                        JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                        python.Str(self.module.full_name),
-                        python.Object.get_item(),
-                        JavaOpcodes.CHECKCAST('org/python/types/Module'),
-                        JavaOpcodes.SWAP(),
-                        python.Object.set_attr('#%s-%x' % (name, id(context)))
-                    )
-                    break
+                    if isinstance(context, Closure) and name in context.klass.closure_var_names:
+                        # this context is referring to `name` from outer scope as well,
+                        # i.e. it does not own the variable `name`, so keep looking outwards
+                        continue
+                    else:
+                        break
+
+            # save modified value temporarily in globals
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+                python.Str(self.module.full_name),
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                JavaOpcodes.SWAP(),
+                python.Object.set_attr('#%s-%x' % (name, id(context)))
+            )
 
             # update closure_vars
             # method's class_descriptor is the same as the class it belongs to, hence need to save its
