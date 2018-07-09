@@ -3,6 +3,12 @@ package org.python.types;
 public class Module extends org.python.types.Object {
     public java.lang.Class klass;
 
+    // Keeps track of all closure variables in current module.
+    // Each variable name is identified by id of the context that owns the variable.
+    // Used as value lookup for loading and storing of Python `nonlocal` variables
+    // Also used by generator and method to access closure variables
+    public org.python.types.Dict closure_vars;
+
     public int hashCode() {
         return this.klass.hashCode();
     }
@@ -68,5 +74,16 @@ public class Module extends org.python.types.Object {
         if (!this.__delattr_null(name)) {
             throw new org.python.exceptions.NameError(name);
         }
+    }
+
+    public void set_closure_var(java.lang.String name, org.python.Object value) {
+        if (this.closure_vars == null) {
+            this.closure_vars = new org.python.types.Dict();
+        }
+        this.closure_vars.__setitem__(new org.python.types.Str(name), value);
+    }
+
+    public org.python.Object get_closure_var(java.lang.String name) {
+        return this.closure_vars.get(new org.python.types.Str(name), null);
     }
 }

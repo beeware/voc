@@ -865,6 +865,7 @@ class Visitor(ast.NodeVisitor):
     def visit_Nonlocal(self, node):
         # identifier* names):
         for name in node.names:
+            self.context.nonlocal_vars.append(name)
             self.context.local_vars.pop(name, None)
 
     @node_visitor
