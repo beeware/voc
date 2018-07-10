@@ -313,8 +313,9 @@ class Function(Block):
             if name in context.local_vars:
                 if isinstance(context, Closure) and name in context.klass.closure_var_names:
                     continue  # not the actual owner
-
                 return context
+
+        return None
 
     def store_name(self, name, declare=False):
         if declare or name in self.local_vars:
@@ -955,10 +956,7 @@ class Method(Function):
             # otherwise it will be treated as global variable and cause NameError
             context = self.get_enclosing_context(name)
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                python.Str(self.module.full_name),
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                ALOAD_name('#module'),
                 JavaOpcodes.LDC_W(name + '-%x' % id(context)),
                 JavaOpcodes.INVOKEVIRTUAL(
                     'org/python/types/Module',
@@ -1361,31 +1359,42 @@ class GeneratorFunction(Function):
 
     def load_name(self, name):
         if name in self.local_vars:
-            print('<local>', name)
             self.resolve_outer_name(name)
             self.add_opcodes(
                 ALOAD_name(name)
             )
-        elif name in self.nonlocal_vars or name in self.klass.closure_var_names:
+        elif name in self.nonlocal_vars or \
+                (hasattr(self.klass, 'closure_var_names') and name in self.klass.closure_var_names):
             # Besides nonlocal variable, closure variable is also loaded here,
             # otherwise it will be treated as global variable and cause NameError
-            print('<nonlocal>', name)
             context = self.get_enclosing_context(name)
-            self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                python.Str(self.module.full_name),
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-                JavaOpcodes.LDC_W(name + '-%x' % id(context)),
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/Module',
-                    'get_closure_var',
-                    args=['Ljava/lang/String;'],
-                    returns='Lorg/python/Object;'
-                ),
-            )
+
+            if context is None:
+                # Can't find owner of `name`, try to load it from global
+                self.add_opcodes(
+                    JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                    python.Str(self.module.full_name),
+
+                    python.Object.get_item(),
+                    JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                    python.Object.get_attribute(name),
+                )
+            else:
+                self.add_opcodes(
+                    JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+                    python.Str(self.module.full_name),
+                    python.Object.get_item(),
+                    JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                    JavaOpcodes.LDC_W(name + '-%x' % id(context)),
+                    JavaOpcodes.INVOKEVIRTUAL(
+                        'org/python/types/Module',
+                        'get_closure_var',
+                        args=['Ljava/lang/String;'],
+                        returns='Lorg/python/Object;'
+                    ),
+                )
         else:
-            print('<global>', name)
             # Unlike other Functions, GeneratorFunctions do not cache the current Module
             # locally, so it must be fetched on each use.
             self.add_opcodes(
@@ -1415,6 +1424,7 @@ class GeneratorFunction(Function):
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
                 python.Object.del_attr(name),
             )
+
 
 class GeneratorMethod(Method):
     def __init__(self, klass, name, code, generator, parameters, returns=None, static=False, outer_scopes=[]):
