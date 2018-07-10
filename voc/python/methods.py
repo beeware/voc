@@ -498,16 +498,12 @@ class Function(Block):
                 setattr(klass, 'outer_scopes', [self])
 
             for var_name in co_freevars:
-                print(var_name, self)
                 self.add_opcodes(
-                    JavaOpcodes.LDC_W(var_name),
+                    ALOAD_name('#module'),
+                    JavaOpcodes.LDC_W(var_name + '-%x' % id(self)),
                 )
                 self.load_name(var_name)
                 self.add_opcodes(
-                    ALOAD_name('#module'),
-                    JavaOpcodes.SWAP(),
-                    JavaOpcodes.LDC_W(var_name + '-%x' % id(self)),
-                    JavaOpcodes.SWAP(),
                     JavaOpcodes.INVOKEVIRTUAL(
                         'org/python/types/Module',
                         'set_closure_var',

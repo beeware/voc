@@ -14,7 +14,8 @@ from ..java import (
 from .blocks import Block, IgnoreBlock
 from .methods import (
     InitMethod, ClosureInitMethod, Closure,
-    GeneratorMethod, Method, CO_GENERATOR
+    GeneratorMethod, Method, CO_GENERATOR,
+    Function
 )
 from .types import java, python
 from .types.primitives import (
@@ -185,45 +186,25 @@ class Class(Block):
         # )
 
     def store_name(self, name, declare=False):
-        # variable is from outer scope except global
-        if hasattr(self, 'closure_vars') and name in self.closure_vars:
-            # Find which outer scope owns the name.
-            # `outer_scopes` is set via `set_attr` during setup in `Function.add_class`
-            # when the class is referring to a variable from outer scopes
-            for context in self.outer_scopes[::-1]:
-                if name in context.local_vars:
-                    # mark this context with modified variable name to resolve later
-                    if not hasattr(context, 'resolve_outer_names'):
-                        setattr(context, 'resolve_outer_names', [])
-                    context.resolve_outer_names.append(name)
-
-                    # save modified value temporarily in globals
-                    self.add_opcodes(
-                        JavaOpcodes.DUP(),
-                        JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                        python.Str(self.module.full_name),
-                        python.Object.get_item(),
-                        JavaOpcodes.CHECKCAST('org/python/types/Module'),
-                        JavaOpcodes.SWAP(),
-                        python.Object.set_attr('#%s-%x' % (name, id(context)))
-                    )
-
-                    if isinstance(context, Closure) and name in context.klass.closure_var_names:
-                        # this context is referring to `name` from outer scope as well,
-                        # i.e. it does not own the variable `name`, so keep looking outwards
-                        continue
-                    else:
-                        break
-
-            # update closure_vars
+        if name in self.nonlocal_vars:
+            context = Function.get_enclosing_context(self, name)
             self.add_opcodes(
-                python.Type.for_class(self.descriptor),
-                python.Object.get_attribute('$closure_vars'),
+                ALOAD_name('#module'),
                 JavaOpcodes.SWAP(),
-                python.Str(name),
+                JavaOpcodes.LDC_W(name + '-%x' % id(context)),
                 JavaOpcodes.SWAP(),
-                python.Object.set_item(),
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Module',
+                    'set_closure_var',
+                    args=['Ljava/lang/String;', 'Lorg/python/Object;'],
+                    returns='V'
+                ),
             )
+
+            if hasattr(context, 'resolve_outer_names'):
+                context.resolve_outer_names.append(name)
+            else:
+                setattr(context, 'resolve_outer_names', [name])
         else:
             self.add_opcodes(
                 ASTORE_name('#value'),
@@ -248,13 +229,17 @@ class Class(Block):
         )
 
     def load_name(self, name):
-        # `name` is from outer scope except global, load its value from `closure_vars`
-        if hasattr(self, 'closure_vars') and name in self.closure_vars:
+        if name in self.nonlocal_vars:
+            context = Function.get_enclosing_context(self, name)
             self.add_opcodes(
-                python.Type.for_class(self.descriptor),
-                python.Object.get_attribute('$closure_vars'),
-                python.Str(name),
-                python.Object.get_item(),
+                ALOAD_name('#module'),
+                JavaOpcodes.LDC_W(name + '-%x' % id(context)),
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Module',
+                    'get_closure_var',
+                    args=['Ljava/lang/String;'],
+                    returns='Lorg/python/Object;'
+                ),
             )
         else:
             self.add_opcodes(
@@ -327,37 +312,13 @@ class Class(Block):
         # transpiled into Java methods
         self.methods.append(method)
 
-        # store outer scope variables in a Python.Dict attribute `$[method.name]_closure_vars`
-        self.add_opcodes(
-            python.Dict()
-        )
-
-        setattr(method, "closure_vars", code.co_freevars)  # used in `Function.load_name` and `Function.store_name`
-
-        for var_name in code.co_freevars:
-            if var_name in ['__class__']:
-                continue
-            self.add_opcodes(
-                JavaOpcodes.DUP(),
-                python.Str(var_name),
-            )
-            self.load_name(var_name)
-            self.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;'),
-                python.Dict.set_item(),
-            )
-
-        self.add_opcodes(
-            python.Type.for_class(method.class_descriptor),
-            JavaOpcodes.SWAP(),
-            python.Object.set_attr('$%s_closure_vars' % method.name),  # use method's name as identification
-        )
-
         # Add a definition of the callable object
         self.add_callable(method)
 
         if method.name == '__init__':
             self.init_method = method
+        else:
+            setattr(self, 'closure_var_names', code.co_freevars)
 
         return method
 
