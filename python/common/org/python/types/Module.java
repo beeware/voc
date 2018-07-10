@@ -86,4 +86,20 @@ public class Module extends org.python.types.Object {
     public org.python.Object get_closure_var(java.lang.String name) {
         return this.closure_vars.get(new org.python.types.Str(name), null);
     }
+
+    public void cleanup_closure_vars(java.lang.String id) {
+        // cleanup closure variables owned by context with id `id` before it goes out of scope
+        if (this.closure_vars == null) {
+            return;
+        }
+        java.util.Iterator key_iterator = this.closure_vars.value.keySet().iterator();
+        while (key_iterator.hasNext()) {
+            String key = ((org.python.types.Str) key_iterator.next()).value;
+            String[] split_key = key.split("-");
+            if (split_key[split_key.length - 1].equals(id)) {
+                //System.out.println("removing " + key);
+                key_iterator.remove();
+            }
+        }
+    }
 }

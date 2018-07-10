@@ -618,6 +618,18 @@ class Function(Block):
         self.store_module()
 
     def visitor_teardown(self):
+        # cleanup closure variables
+        self.add_opcodes(
+            ALOAD_name('#module'),
+            JavaOpcodes.LDC_W('%x' % id(self)),
+            JavaOpcodes.INVOKEVIRTUAL(
+                'org/python/types/Module',
+                'cleanup_closure_vars',
+                args=['Ljava/lang/String;'],
+                returns='V'
+            )
+        )
+
         if len(self.opcodes) == 0:
             # If there is no content in this method, add a RETURN.
             return_required = True
