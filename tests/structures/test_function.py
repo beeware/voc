@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from ..utils import TranspileTestCase
 
 
@@ -240,7 +238,6 @@ class FunctionTests(TranspileTestCase):
             print("value =", myfunc(5))
             """)
 
-    @expectedFailure
     def test_redefine_nested_from_other_function(self):
         self.assertCodeExecution("""
             def func():

@@ -448,7 +448,7 @@ class Function(Block):
         from .klass import ClosureClass
         klass = ClosureClass(
             parent=self._parent,
-            name=name,
+            name=self.name + '$' + name,
             closure_var_names=code.co_freevars,
         )
         self.module.classes.append(klass)
