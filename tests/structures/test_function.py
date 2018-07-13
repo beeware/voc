@@ -362,3 +362,14 @@ class FunctionTests(TranspileTestCase):
 
             print(myfunc(10))
             """, exits_early=True)
+
+    def test_function_frozenset_constant(self):
+        self.assertCodeExecution("""
+            def func():
+                for i in {1, 2, 3, 4, 5, 6}:
+                    print(i)
+
+                print('a' in {1, 'a', False, 1.1, b'1', (2)})
+
+            func()
+        """)

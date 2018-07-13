@@ -31,6 +31,11 @@ public class FrozenSet extends org.python.types.Object {
         this.value = java.util.Collections.unmodifiableSet(frozenSet);
     }
 
+    public FrozenSet(org.python.types.Set set) {
+        super();
+        this.value = java.util.Collections.unmodifiableSet(set.value);
+    }
+
     @org.python.Method(
             __doc__ = "frozenset() -> empty frozenset object" +
                     "frozenset(iterable) -> frozenset object\n" +
