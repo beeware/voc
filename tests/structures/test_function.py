@@ -256,6 +256,20 @@ class FunctionTests(TranspileTestCase):
             func2()
             """)
 
+    def test_define_nested_generator(self):
+        self.assertCodeExecution("""
+            def wrapper():
+                def func():
+                    def gen():
+                        yield 'Hello World'
+
+                    print(next(gen()))
+
+                func()
+
+            wrapper()
+            """)
+
     def test_noarg_unexpected_extra_arg(self):
         self.assertCodeExecution("""
             def myfunc():

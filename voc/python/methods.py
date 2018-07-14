@@ -1119,7 +1119,7 @@ class GeneratorFunction(Function):
             JavaOpcodes.LDC_W(self.generator),
 
             # p2: The actual generator method
-            java.Class.forName(self.klass.class_name),
+            java.Class.forName(self.class_descriptor.replace('/', '.')),
 
             JavaOpcodes.LDC_W(self.method_name + "$generator"),
             java.Array(1, 'java/lang/Class'),
