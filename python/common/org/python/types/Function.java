@@ -19,6 +19,14 @@ public class Function extends org.python.types.Object implements org.python.Call
     java.util.Map<java.lang.String, org.python.Object> default_kwargs;
     org.python.types.Closure closure;
 
+    private static org.python.types.Tuple emptyVarArgs;
+    private static org.python.types.Tuple getEmptyVarArgs() {
+        if (emptyVarArgs == null) {
+            emptyVarArgs = new org.python.types.Tuple();
+        }
+        return emptyVarArgs;
+    }
+
     private void populateAttrs() {
         org.python.types.Str name = new org.python.types.Str(method.getName());
         this.__dict__.put("__name__", this.name);
@@ -316,7 +324,8 @@ public class Function extends org.python.types.Object implements org.python.Call
                 tuple = new org.python.types.Tuple(java.util.Arrays.asList(java.util.Arrays.copyOfRange(args, argcount - first_arg, n_provided_args)));
             } else {
                 // No varargs provided
-                tuple = new org.python.types.Tuple(java.util.Arrays.asList(new org.python.Object[0]));
+                tuple = getEmptyVarArgs();
+                //tuple = new org.python.types.Tuple(java.util.Arrays.asList(new org.python.Object[0]));
             }
 
             adjusted[argcount] = tuple;
