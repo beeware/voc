@@ -117,15 +117,38 @@ def test_empty_calls(test_case):
     print("Running", "test_empty_calls")
     test_case.runAsJava(adjust("""
         import time
+
         def get_time():
             n = time.clock()
             return n
+
         def get_random():
-            result = get_time() + get_time() - get_time()
+            result = 0
+            for i in range(30):
+                result += get_time()
+            return result/20
+
+        def main():
+            result = 0
+
+            for i in range(30):
+                result += get_random()
+            for i in range(30):
+                result -= get_random()
+            for i in range(30):
+                result += get_random()
+            for i in range(30):
+                result += get_random()
+            for i in range(30):
+                result -= get_random()
+            for i in range(30):
+                result += get_random()
+
             return result
-        result = 0
-        for i in range(1000000):
-            result += get_random()
+
+        for i in range(1000):
+            main()
+
         """), timed=True)
 
 def main():
