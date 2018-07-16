@@ -528,6 +528,10 @@ class Function(Block):
         # If a function is added to a function, it is added as an anonymous
         # inner class to the function/method's parent module/class.
         from .klass import ClosureClass
+        if not (isinstance(self, Closure) or isinstance(self, GeneratorClosure)):
+            # prepend name to first level nested function
+            name = self.name + '$' + name
+
         klass = ClosureClass(
             parent=self._parent,
             name=name,
@@ -1246,7 +1250,7 @@ class GeneratorFunction(Function):
             JavaOpcodes.LDC_W(self.generator),
 
             # p2: The actual generator method
-            java.Class.forName(self.klass.class_name),
+            java.Class.forName(self.class_descriptor.replace('/', '.')),
 
             JavaOpcodes.LDC_W(self.method_name + "$generator"),
             java.Array(1, 'java/lang/Class'),

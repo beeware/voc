@@ -1,5 +1,3 @@
-from unittest import expectedFailure
-
 from ..utils import TranspileTestCase
 
 
@@ -240,7 +238,6 @@ class FunctionTests(TranspileTestCase):
             print("value =", myfunc(5))
             """)
 
-    @expectedFailure
     def test_redefine_nested_from_other_function(self):
         self.assertCodeExecution("""
             def func():
@@ -257,6 +254,20 @@ class FunctionTests(TranspileTestCase):
 
             func()
             func2()
+            """)
+
+    def test_define_nested_generator(self):
+        self.assertCodeExecution("""
+            def wrapper():
+                def func():
+                    def gen():
+                        yield 'Hello World'
+
+                    print(next(gen()))
+
+                func()
+
+            wrapper()
             """)
 
     def test_noarg_unexpected_extra_arg(self):
@@ -365,3 +376,14 @@ class FunctionTests(TranspileTestCase):
 
             print(myfunc(10))
             """, exits_early=True)
+
+    def test_function_frozenset_constant(self):
+        self.assertCodeExecution("""
+            def func():
+                for i in {1, 2, 3, 4, 5, 6}:
+                    print(i)
+
+                print('a' in {1, 'a', False, 1.1, b'1', (2)})
+
+            func()
+        """)
