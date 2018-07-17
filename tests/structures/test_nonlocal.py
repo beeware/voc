@@ -100,4 +100,4 @@ class NonlocalTests(TranspileTestCase):
                 print(b)
 
             func()
-        """, run_in_function=False)  # TODO: remove this after generator nesting problem (issue #866) is solved
+        """)

@@ -33,7 +33,6 @@ class Accumulator:
         self.opcodes = []
 
         self.local_vars = local_vars if local_vars else {}
-        self.nonlocal_vars = []
         self.deleted_vars = set()
 
         self.next_resolve_list = []

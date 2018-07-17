@@ -14,6 +14,12 @@ public class Type extends org.python.types.Object implements org.python.Callable
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
+    // Keeps track of all closure variables in current module.
+    // Each variable name is identified by id of the context that owns the variable.
+    // Used as value lookup for loading and storing of Python `nonlocal` variables
+    // Also used by generator and method to access closure variables
+    public org.python.types.Dict closure_vars;
+
     /**
      * Factory method to obtain Python classes from their Java counterparts
      */
@@ -478,5 +484,16 @@ public class Type extends org.python.types.Object implements org.python.Callable
         // } finally {
             //     System.out.println("CONSTRUCTOR DONE");
         }
+    }
+
+    public void set_closure_var(java.lang.String name, org.python.Object value) {
+        if (this.closure_vars == null) {
+            this.closure_vars = new org.python.types.Dict();
+        }
+        this.closure_vars.__setitem__(new org.python.types.Str(name), value);
+    }
+
+    public org.python.Object get_closure_var(java.lang.String name) {
+        return this.closure_vars.get(new org.python.types.Str(name), null);
     }
 }
