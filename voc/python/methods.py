@@ -279,7 +279,7 @@ class Function(Block):
         pass
 
     def store_module(self):
-        # Stores the current module as a local variable
+        # Stores the current module as a local variable 
         if ('#module') not in self.local_vars:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
@@ -463,10 +463,7 @@ class Function(Block):
             # prepend name to first level nested function
             name = self.name + '$' + name
 
-        klass = ClosureClass(
-            parent=self._parent,
-            name=name,
-        )
+        klass = ClosureClass(parent=self._parent, name=name)
         self.module.classes.append(klass)
 
         klass.visitor_setup()
@@ -501,28 +498,14 @@ class Function(Block):
 
         klass.visitor_teardown()
 
+        # Store the closure instance as an accessible symbol.
         self.add_opcodes(
             java.New(klass.descriptor),
-            # Define the closure vars
-            java.Map(),
-        )
-
-        closure.closure_vars = code.co_freevars
-
-        for var_name in code.co_freevars:
-            self.add_opcodes(
-                JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(var_name),
-            )
-            self.load_name(var_name)
-            self.add_opcodes(
-                java.Map.put(),
-            )
-
-        self.add_opcodes(
-            java.Init(klass.descriptor, 'Ljava/util/Map;'),
+            java.Init(klass.descriptor),
             python.Type.for_name(klass.descriptor),
         )
+
+        add_closure_variables(self, closure, code.co_freevars)
 
         self.add_callable(closure)
 
@@ -1028,12 +1011,8 @@ class Closure(Function):
             super().store_name(name, declare)
 
     def load_name(self, name):
-        if name in self.closure_vars:
-            ALOAD_name('<closure>'),
-            JavaOpcodes.CHECKCAST('org/python/types/Closure'),
-            JavaOpcodes.GETFIELD('org/python/types/Closure', 'closure_vars', 'Ljava/util/Map;'),
-
-            java.Map.get(name),
+        if name in self.nonlocal_vars or name in self.closure_vars:
+            load_closure_var(self, name)
         else:
             super().load_name(name)
 
@@ -1060,33 +1039,18 @@ class Closure(Function):
 
 class ClosureInitMethod(InitMethod):
     def __init__(self, klass):
-        super().__init__(
-            klass,
-            parameters=[
-                {
-                    'name': 'self',
-                    'kind': ArgType.POSITIONAL_OR_KEYWORD,
-                    'annotation': 'org/python/Object'
-                },
-                {
-                    'name': 'kwargs',
-                    'kind': ArgType.VAR_KEYWORD,
-                    'annotation': 'java/util/Map'
-                }
-            ],
-        )
+        super().__init__(klass)
 
     def __repr__(self):
         return '<Closure constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
 
     @property
     def signature(self):
-        return '(Ljava/util/Map;)V'
+        return '()V'
 
     def visitor_teardown(self):
         self.add_opcodes(
-            JavaOpcodes.ALOAD_1(),
-            java.Init(self.klass.extends_descriptor, 'Ljava/util/Map;'),
+            java.Init(self.klass.extends_descriptor),
 
             JavaOpcodes.RETURN()
         )
