@@ -269,48 +269,8 @@ class Block(Accumulator):
     def add_tuple(self, data):
         self.add_opcodes(
             java.New('org/python/types/Tuple'),
-
-            java.New('java/util/ArrayList'),
-            java.Init('java/util/ArrayList'),
         )
-
-        for value in data:
-            self.add_opcodes(
-                JavaOpcodes.DUP(),
-            )
-
-            if value is None:
-                self.add_opcodes(
-                    python.NONE()
-                )
-            elif isinstance(value, frozenset):
-                self.add_opcodes(
-                    java.New('org/python/types/FrozenSet'),
-                    python.Set(),
-                )
-                for elt in value:
-                    self.add_opcodes(
-                        JavaOpcodes.DUP()
-                    )
-
-                    self._add_value(elt)
-
-                    self.add_opcodes(
-                        python.Set.add()
-                    )
-                self.add_opcodes(
-                    java.Init(
-                        'org/python/types/FrozenSet',
-                        'Lorg/python/types/Set;',
-                    )
-                )
-            else:
-                self._add_value(value)
-
-            self.add_opcodes(
-                java.List.add(),
-            )
-
+        self.add_list(data)
         self.add_opcodes(
             java.Init('org/python/types/Tuple', 'Ljava/util/List;'),
         )
