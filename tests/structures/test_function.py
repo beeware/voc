@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -386,4 +388,25 @@ class FunctionTests(TranspileTestCase):
                 print('a' in {1, 'a', False, 1.1, b'1', (2)})
 
             func()
+        """)
+
+    @expectedFailure
+    def test_function_has_code_attr(self):
+        self.assertCodeExecution("""
+            def func():
+                return 1
+
+            if func.__code__ is not None:
+                print("Code object exists")
+        """)
+
+    @expectedFailure
+    def test_function_code_attr(self):
+        self.assertCodeExecution("""
+            def func():
+                return 1
+
+            print("__code__:", func.__code__)
+            print("Function name:", func.__code__.co_name)
+            print("Arg count:", func.__code__.co_argcount)
         """)
