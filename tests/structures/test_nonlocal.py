@@ -100,4 +100,21 @@ class NonlocalTests(TranspileTestCase):
                 print(b)
 
             func()
+
+            def func2():
+                a = 'a from outer'
+                b = 'b from outer'
+                def gen():
+                    nonlocal a
+                    print(a)
+                    print(b)
+                    a = 'a from inner'
+                    yield a
+
+                print(next(gen()))
+                print(a)
+                print(b)
+                yield
+
+            next(func2())
         """)
