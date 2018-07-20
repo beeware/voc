@@ -28,7 +28,7 @@ def _get_enclosing_context(child_context, name):
                 continue  # not the actual owner
             return context
 
-    return None  # None may imply that `name` if found in globals
+    raise Exception('Enclosing context not found')
 
 
 def store_nonlocal(current_context, name):

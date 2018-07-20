@@ -58,8 +58,8 @@ class Class(Block):
 
         self._constructor = None
 
-        self.nonlocal_vars = []  # changes in variable will propagate up to parent context
-        self.closure_vars = []  # holds `read only` free variables from enclosing context
+        self.nonlocal_vars = []  # holds nonlocal variable names for `store_name`
+        self.closure_vars = []  # holds 'read-only' variable names from enclosing context
         self.outer_scopes = outer_scopes  # parent scopes of this class context, excluding global scope
 
         # Store the Module object as a local variable

@@ -733,8 +733,8 @@ class Method(Function):
             returns=returns,
             static=static,
         )
-        self.nonlocal_vars = []  # changes in variable will propagate up to parent context
-        self.closure_vars = []  # holds `read only` free variables from enclosing context
+        self.nonlocal_vars = []  # holds nonlocal variable names for `store_name`
+        self.closure_vars = []  # holds 'read-only' variable names from enclosing context
         self.outer_scopes = outer_scopes  # parent scopes of this closure, excluding global scope
 
         self.store_module()
@@ -1041,8 +1041,8 @@ class Closure(Function):
             returns=returns,
             static=static,
         )
-        self.nonlocal_vars = []  # changes in variable will propagate up to parent context
-        self.closure_vars = []  # holds `read only` free variables from enclosing context
+        self.nonlocal_vars = []  # holds nonlocal variable names for `store_name`
+        self.closure_vars = []  # holds 'read-only' variable names from enclosing context
         self.outer_scopes = outer_scopes  # parent scopes of this closure, excluding global scope
 
         self.store_module()
@@ -1479,8 +1479,8 @@ class GeneratorClosure(GeneratorFunction):
             returns=returns,
             static=static,
         )
-        self.nonlocal_vars = []  # changes in variable will propagate up to parent context
-        self.closure_vars = []  # holds `read only` free variables from enclosing context
+        self.nonlocal_vars = []  # holds nonlocal variable names for `store_name`
+        self.closure_vars = []  # holds 'read-only' variable names from enclosing context
         self.outer_scopes = outer_scopes  # parent scopes of this closure, excluding global scope
 
     def __repr__(self):

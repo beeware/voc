@@ -14,9 +14,9 @@ public class Type extends org.python.types.Object implements org.python.Callable
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
-    // Keeps track of modified `nonlocal` variables in current Function object.
-    // Used as value lookup for parent scope to update its variable when child context modified it
-    // via `nonlocal` access
+    // Keeps track of modified `nonlocal` variables for current scope
+    // Used as value lookup for current scope to update its local variable
+    // when child scope assigned a new value to it via `nonlocal`
     public org.python.types.Dict nonlocal_vars;
 
     /**
