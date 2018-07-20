@@ -12,13 +12,11 @@ from ..java import (
     opcodes as JavaOpcodes,
 )
 from .blocks import Block, IgnoreBlock
-from .closure_util import (
-    add_closure_variables, store_nonlocal, load_closure_var
-)
 from .methods import (
     InitMethod, ClosureInitMethod,
     GeneratorMethod, Method, CO_GENERATOR,
 )
+from .nonlocal_util import store_nonlocal
 from .types import java, python
 from .types.primitives import (
     ALOAD_name, ASTORE_name, free_name,
@@ -33,7 +31,7 @@ class Class(Block):
             self, parent, name,
             namespace=None, extends=None, implements=None,
             public=True, final=False, methods=None, fields=None, init=None,
-            verbosity=0, include_default_constructor=True):
+            verbosity=0, include_default_constructor=True, outer_scopes=None):
         super().__init__(parent=parent, verbosity=verbosity)
         self.name = name
         if namespace is None:
@@ -62,7 +60,7 @@ class Class(Block):
 
         self.nonlocal_vars = []  # changes in variable will propagate up to parent context
         self.closure_vars = []  # holds `read only` free variables from enclosing context
-        self.outer_scopes = []  # parent scopes of this class context, excluding global scope
+        self.outer_scopes = outer_scopes  # parent scopes of this class context, excluding global scope
 
         # Store the Module object as a local variable
         self.store_module()
@@ -193,6 +191,14 @@ class Class(Block):
 
     def store_name(self, name, declare=False):
         if name in self.nonlocal_vars:
+            # updates closure
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+                python.Type.for_class(self.descriptor),
+                JavaOpcodes.SWAP(),
+                python.Object.set_attr('$closure-' + name)
+            )
+            # stores a copy of updated variable in parent context
             store_nonlocal(self, name)
         else:
             self.add_opcodes(
@@ -218,8 +224,11 @@ class Class(Block):
         )
 
     def load_name(self, name):
-        if name in self.nonlocal_vars or name in self.closure_vars:
-            load_closure_var(self, name)
+        if name in self.closure_vars:
+            self.add_opcodes(
+                python.Type.for_class(self.descriptor),
+                python.Object.get_attribute('$closure-' + name)
+            )
         else:
             self.add_opcodes(
                 python.Type.for_class(self.descriptor),
@@ -296,8 +305,27 @@ class Class(Block):
 
         if method.name == '__init__':
             self.init_method = method
-        else:
-            add_closure_variables(self, method, code.co_freevars)
+        elif code.co_freevars:
+            method.closure_vars = code.co_freevars
+
+            # closure variables are stored as attribute of class prefixed with '$closure-'
+            self.add_opcodes(
+                python.Type.for_class(self.descriptor),
+            )
+            for var_name in code.co_freevars:
+                if var_name == '__class__':
+                    continue  # no need to add super class, voc will handle it during transpilation
+
+                self.add_opcodes(
+                    JavaOpcodes.DUP(),
+                )
+                self.load_name(var_name)
+                self.add_opcodes(
+                    python.Object.set_attr('$closure-' + var_name)
+                )
+            self.add_opcodes(
+                JavaOpcodes.POP()
+            )
 
         return method
 

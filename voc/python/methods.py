@@ -5,7 +5,7 @@ from ..java import (
 )
 from .blocks import Block, Accumulator, BlockCodeTooLarge
 from .nonlocal_util import (
-    add_closure_variables, resolve_nonlocal, store_nonlocal, load_closure_var
+    resolve_nonlocal, store_nonlocal
 )
 from .structures import (
     TRY, CATCH, END_TRY,
@@ -322,6 +322,8 @@ class Function(Block):
 
     def load_name(self, name):
         if name in self.local_vars:
+            # if name has been accessed and modified via nonlocal,
+            # resolve and update its value before putting on stack
             resolve_nonlocal(self, name)
             self.add_opcodes(
                 ALOAD_name(name)
@@ -392,11 +394,17 @@ class Function(Block):
     def add_class(self, class_name, extends, implements, co_freevars=None):
         from .klass import Class
 
+        if hasattr(self, "outer_scopes") and self.outer_scopes:
+            outer_scopes = self.outer_scopes + [self]
+        else:
+            outer_scopes = [self]
+
         klass = Class(
             self.module,
             name=class_name,
             extends=extends,
             implements=implements,
+            outer_scopes=outer_scopes
         )
 
         self.module.classes.append(klass)
@@ -437,12 +445,23 @@ class Function(Block):
 
         # Handle closure variables
         if co_freevars:
-            if isinstance(self, Closure) or isinstance(self, GeneratorClosure):
-                klass.outer_scopes = self.outer_scopes + [self]
-            else:
-                klass.outer_scopes = [self]
+            klass.closure_vars = co_freevars
 
-            add_closure_variables(self, klass, co_freevars)
+            # closure variables are stored as attribute of class prefixed with '$closure-'
+            self.add_opcodes(
+                python.Type.for_class(klass.descriptor),
+            )
+            for var_name in co_freevars:
+                self.add_opcodes(
+                    JavaOpcodes.DUP(),
+                )
+                self.load_name(var_name)
+                self.add_opcodes(
+                    python.Object.set_attr('$closure-' + var_name)
+                )
+            self.add_opcodes(
+                JavaOpcodes.POP()
+            )
 
         self.add_opcodes(
             JavaOpcodes.INVOKESTATIC(
@@ -471,7 +490,7 @@ class Function(Block):
 
         klass.visitor_setup()
 
-        if isinstance(self, Closure) or isinstance(self, GeneratorClosure):
+        if hasattr(self, "outer_scopes") and self.outer_scopes:
             outer_scopes = self.outer_scopes + [self]
         else:
             outer_scopes = [self]
@@ -705,7 +724,7 @@ class InitMethod(Function):
 
 
 class Method(Function):
-    def __init__(self, klass, name, code, parameters, returns=None, static=False, outer_scopes=[]):
+    def __init__(self, klass, name, code, parameters, returns=None, static=False, outer_scopes=None):
         super().__init__(
             klass,
             name=name,
@@ -863,13 +882,24 @@ class Method(Function):
 
     def store_name(self, name, declare=False):
         if name in self.nonlocal_vars:
+            # updates closure
+            self.add_opcodes(
+                JavaOpcodes.DUP(),
+                python.Type.for_class(self.class_descriptor),
+                JavaOpcodes.SWAP(),
+                python.Object.set_attr('$closure-' + name)
+            )
+            # stores a copy of updated variable in parent context
             store_nonlocal(self, name)
         else:
             super().store_name(name, declare)
 
     def load_name(self, name):
-        if name in self.nonlocal_vars or name in self.closure_vars:
-            load_closure_var(self, name)
+        if name in self.closure_vars:
+            self.add_opcodes(
+                python.Type.for_class(self.class_descriptor),
+                python.Object.get_attribute('$closure-' + name)
+            )
         else:
             super().load_name(name)
 
@@ -1002,7 +1032,7 @@ class MainFunction(Function):
 
 
 class Closure(Function):
-    def __init__(self, klass, code, parameters, returns=None, static=False, outer_scopes=[]):
+    def __init__(self, klass, code, parameters, returns=None, static=False, outer_scopes=None):
         super().__init__(
             klass,
             name='invoke',
@@ -1024,6 +1054,7 @@ class Closure(Function):
 
     def store_name(self, name, declare=False):
         if name in self.nonlocal_vars:
+            # updates closure
             self.add_opcodes(
                 JavaOpcodes.DUP(),
                 ALOAD_name('<closure>'),
@@ -1034,6 +1065,7 @@ class Closure(Function):
                 JavaOpcodes.SWAP(),
                 java.Map.put()
             )
+            # stores a copy of updated variable in parent context
             store_nonlocal(self, name)
         else:
             super().store_name(name, declare)
@@ -1314,7 +1346,7 @@ class GeneratorFunction(Function):
 
 
 class GeneratorMethod(Method):
-    def __init__(self, klass, name, code, generator, parameters, returns=None, static=False, outer_scopes=[]):
+    def __init__(self, klass, name, code, generator, parameters, returns=None, static=False, outer_scopes=None):
         super().__init__(
             klass,
             name=name,
@@ -1437,7 +1469,7 @@ class GeneratorMethod(Method):
 
 
 class GeneratorClosure(GeneratorFunction):
-    def __init__(self, module, code, generator, parameters, returns=None, static=False, outer_scopes=[]):
+    def __init__(self, module, code, generator, parameters, returns=None, static=False, outer_scopes=None):
         super().__init__(
             module,
             name='invoke',
@@ -1470,6 +1502,7 @@ class GeneratorClosure(GeneratorFunction):
 
     def store_name(self, name, declare=False):
         if name in self.nonlocal_vars:
+            # updates closure
             self.add_opcodes(
                 JavaOpcodes.DUP(),
                 ALOAD_name('<generator>'),
@@ -1480,6 +1513,7 @@ class GeneratorClosure(GeneratorFunction):
                 JavaOpcodes.SWAP(),
                 java.Map.put()
             )
+            # stores a copy of updated variable in parent context
             store_nonlocal(self, name)
         else:
             super().store_name(name, declare)

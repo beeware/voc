@@ -318,6 +318,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // org.Python.debug("SELF ", this.__repr__());
         // org.Python.debug("ATTRS ", this.__dict__);
 
+        // don't expose closure name to runtime
+        if (name.startsWith("$closure-")) {
+            return null;
+        }
+
         org.python.Object value = this.__dict__.get(name);
 
         if (value == null) {

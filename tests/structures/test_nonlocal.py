@@ -79,6 +79,10 @@ class NonlocalTests(TranspileTestCase):
                 Klass().method()
                 print(a)
                 print(b)
+                
+                # make sure closure variables are not exposed
+                print(hasattr(Klass(), '$closure-a'))
+                print(hasattr(Klass(), '$closure-b'))
 
             func()
         """)

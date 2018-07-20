@@ -1,6 +1,5 @@
 from ..java import opcodes as JavaOpcodes
-from .types import java, python
-from .types.primitives import ALOAD_name
+from .types import python
 
 
 def resolve_nonlocal(current_context, name):
@@ -35,6 +34,7 @@ def _get_enclosing_context(child_context, name):
 def store_nonlocal(current_context, name):
     # store in parent_context's nonlocal_vars
     context = _get_enclosing_context(current_context, name)
+
     current_context.add_opcodes(
         python.Type.for_name(context.class_descriptor),
         JavaOpcodes.SWAP(),
@@ -52,4 +52,3 @@ def store_nonlocal(current_context, name):
         context.nonlocal_resolve_list.append(name)
     else:
         setattr(context, 'nonlocal_resolve_list', [name])
-
