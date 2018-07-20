@@ -12,7 +12,11 @@ public class Function extends org.python.types.Object implements org.python.Call
     public static final int CO_NOFREE = 0x40;
     org.python.types.Type.Origin origin;
     org.python.types.Str name;
-    org.python.types.Code code;
+    int co_argcount;
+    int co_kwonlyargcount;
+    int co_flags;
+    org.python.types.Tuple co_consts;
+    java.util.List<org.python.Object> co_varnames;
     java.lang.reflect.Method method;
     java.util.Map<java.lang.String, org.python.Object> globals;
     java.util.List<org.python.Object> default_args;
@@ -26,16 +30,15 @@ public class Function extends org.python.types.Object implements org.python.Call
         if (this.name != null) {
             this.__dict__.put("__qualname__", this.name);
         } else {
-            org.python.Object co_name = this.code.__dict__.get("co_consts");
+            org.python.Object co_name = this.co_consts;
             this.__dict__.put("__qualname__", co_name);
         }
 
-        this.__dict__.put("__code__", this.code);
         org.python.Object doc;
+
         try {
-            org.python.types.Tuple consts = (org.python.types.Tuple) this.code.co_consts;
-            if (consts != null && ((org.python.types.Int) consts.count()).value != 0) {
-                doc = consts.__getitem__(org.python.types.Int.getInt(0));
+            if (this.co_consts != null && ((org.python.types.Int) this.co_consts.count()).value != 0) {
+                doc = this.co_consts.__getitem__(org.python.types.Int.getInt(0));
             } else {
                 doc = org.python.types.NoneType.NONE;
             }
@@ -101,23 +104,11 @@ public class Function extends org.python.types.Object implements org.python.Call
             varnames.add(new org.python.types.Str(kwargs_name));
         }
 
-        this.code = new org.python.types.Code(
-                org.python.types.Int.getInt(argcount),  // co_argcount
-                new org.python.types.Tuple(),  // co_cellvars
-                null,  // new org.python.types.Bytes(),  // co_code
-                null,  // new org.python.types.Tuple(),  // co_consts
-                null,  // new org.python.types.Str(),  // co_filename
-                null,  // org.python.types.Int.getInt(),  // co_firstlineno
-                org.python.types.Int.getInt(flags),  // co_flags
-                new org.python.types.Tuple(),  // co_freevars
-                org.python.types.Int.getInt(kwonlyargs.length),  // co_kwonlyargcount
-                null,  // new org.python.types.Bytes(),  // co_lnotab
-                this.name,  // co_name
-                null,  // new org.python.types.Tuple(),  // co_names
-                null,  // org.python.types.Int.getInt(),  // co_nlocals
-                null,  // org.python.types.Int.getInt(),  // co_stacksize
-                new org.python.types.Tuple(varnames)  // co_varnames
-        );
+        this.co_argcount = (int) argcount;
+        this.co_flags = (int) flags;
+        this.co_kwonlyargcount = kwonlyargs.length;
+        this.co_varnames = varnames;
+
         populateAttrs();
     }
 
@@ -126,7 +117,11 @@ public class Function extends org.python.types.Object implements org.python.Call
     // Constructor for normal Python functions
     public Function(
             org.python.types.Str name,
-            org.python.types.Code code,
+            int co_argcount,
+            int co_kwonlyargcount,
+            int co_flags,
+            org.python.types.Tuple co_consts,
+            java.util.List<org.python.Object> co_varnames,
             java.lang.reflect.Method method,
             java.util.Map<java.lang.String, org.python.Object> globals,
             java.util.List<org.python.Object> default_args,
@@ -140,7 +135,11 @@ public class Function extends org.python.types.Object implements org.python.Call
         this.origin = org.python.types.Type.Origin.PYTHON;
 
         this.name = name;
-        this.code = code;
+        this.co_argcount = co_argcount;
+        this.co_kwonlyargcount = co_kwonlyargcount;
+        this.co_flags = co_flags;
+        this.co_consts = co_consts;
+        this.co_varnames = co_varnames;
         this.method = method;
         this.globals = globals;
         this.default_args = default_args;
@@ -149,6 +148,7 @@ public class Function extends org.python.types.Object implements org.python.Call
 
         populateAttrs();
     }
+
 
     @org.python.Method(
             __doc__ = "Return repr(self)."
@@ -164,7 +164,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         // System.out.println("__GET__ on function " + this + " " + this.getClass() + " " + instance + " " + instance.getClass());
         if (instance != klass) {
             if (instance instanceof org.python.types.Closure) {
-                return new org.python.types.Function(this.name, this.code, this.method, this.globals, this.default_args, this.default_kwargs, (org.python.types.Closure) instance);
+                return new org.python.types.Function(this.name, this.co_argcount, this.co_kwonlyargcount, this.co_flags, this.co_consts, this.co_varnames, this.method, this.globals, this.default_args, this.default_kwargs, (org.python.types.Closure) instance);
             } else if (!(instance instanceof org.python.types.Module)) {
                 return new org.python.types.Method(instance, (org.python.types.Type) klass, this);
             }
@@ -222,10 +222,10 @@ public class Function extends org.python.types.Object implements org.python.Call
         //     // TODO: This doesn't have to be so - we *could* introspect argument names.
         //     throw new org.python.exceptions.RuntimeError("Cannot use kwargs to invoke a native Java method.");
         // }
-        int argcount = (int) this.code.co_argcount.value;
-        int kwonlyargcount = (int) this.code.co_kwonlyargcount.value;
-        int flags = (int) this.code.co_flags.value;
-        java.util.List<org.python.Object> varnames = this.code.co_varnames.value;
+        int argcount = this.co_argcount;
+        int kwonlyargcount = this.co_kwonlyargcount;
+        int flags = this.co_flags;
+        java.util.List<org.python.Object> varnames = this.co_varnames;
 
         int first_arg = 0;
         int has_varargs = 0;

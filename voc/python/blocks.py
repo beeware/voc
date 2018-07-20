@@ -223,10 +223,8 @@ class Block(Accumulator):
         else:
             raise RuntimeError("Unknown constant type %s" % type(val))
 
-    def add_tuple(self, data):
+    def add_list(self, data):
         self.add_opcodes(
-            java.New('org/python/types/Tuple'),
-
             java.New('java/util/ArrayList'),
             java.Init('java/util/ArrayList'),
         )
@@ -268,6 +266,11 @@ class Block(Accumulator):
                 java.List.add(),
             )
 
+    def add_tuple(self, data):
+        self.add_opcodes(
+            java.New('org/python/types/Tuple'),
+        )
+        self.add_list(data)
         self.add_opcodes(
             java.Init('org/python/types/Tuple', 'Ljava/util/List;'),
         )
@@ -282,56 +285,15 @@ class Block(Accumulator):
         )
 
         self.add_str(function.code.co_name)
-
-        # Add the code object
         self.add_opcodes(
-                java.New('org/python/types/Code'),
+            JavaOpcodes.LDC_W(function.code.co_argcount),
+            JavaOpcodes.LDC_W(function.code.co_kwonlyargcount),
+            JavaOpcodes.LDC_W(function.code.co_flags),
         )
-
-        self.add_int(function.code.co_argcount)
-        self.add_tuple(function.code.co_cellvars)
-
-        self.add_opcodes(
-                JavaOpcodes.ACONST_NULL(),  # co_code
-        )
-
         self.add_tuple(function.code.co_consts)
-        self.add_str(function.code.co_filename)
-        self.add_int(function.code.co_firstlineno)
-        self.add_int(function.code.co_flags)
-        self.add_tuple(function.code.co_freevars)
-        self.add_int(function.code.co_kwonlyargcount)
+        self.add_list(function.code.co_varnames)
 
         self.add_opcodes(
-                JavaOpcodes.ACONST_NULL(),  # co_lnotab
-        )
-
-        self.add_str(function.code.co_name)
-        self.add_tuple(function.code.co_names)
-        self.add_int(function.code.co_nlocals)
-        self.add_int(function.code.co_stacksize)
-        self.add_tuple(function.code.co_varnames)
-
-        self.add_opcodes(
-                java.Init(
-                    'org/python/types/Code',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
-                    'Lorg/python/types/Bytes;',
-                    'Lorg/python/types/Tuple;',
-                    'Lorg/python/types/Str;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Bytes;',
-                    'Lorg/python/types/Str;',
-                    'Lorg/python/types/Tuple;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
-                ),
-
                 # Get a Java Method representing the new function
                 JavaOpcodes.LDC_W(Classref(function.class_descriptor)),
                 JavaOpcodes.LDC_W(function.pyimpl_name),
@@ -396,7 +358,11 @@ class Block(Accumulator):
                 java.Init(
                     'org/python/types/Function',
                     'Lorg/python/types/Str;',
-                    'Lorg/python/types/Code;',
+                    'I',
+                    'I',
+                    'I',
+                    'Lorg/python/types/Tuple;',
+                    'Ljava/util/List;',
                     'Ljava/lang/reflect/Method;',
                     'Ljava/util/Map;',
                     'Ljava/util/List;',

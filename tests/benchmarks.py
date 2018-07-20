@@ -113,6 +113,31 @@ def test_function_var_load(test_case):
             foo()
     """), timed=True)
 
+def test_code(test_case):
+    print("Running", "test_code")
+    test_case.runAsJava(adjust("""
+        def main(n):
+            def foo(n):
+                return n + 1
+            def bar(n):
+                return n + 1
+            def baz(n):
+                return n + 1
+            def buzz(n):
+                return n + 1
+            def bizz(n):
+                return n + 1
+            def bozz(n):
+                return n + 1
+            def yam(n):
+                return n + 1
+            def yarn(n):
+                return n + 1
+            return foo(bar(baz(buzz(bizz(bozz(yam(yarn(n))))))))
+        for i in range(100000):
+            main(i)
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -121,6 +146,7 @@ def main():
     test_global_var_load(test_case)
     test_class_var_load(test_case)
     test_function_var_load(test_case)
+    test_code(test_case)
 
 if __name__== "__main__":
   main()
