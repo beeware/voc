@@ -1108,9 +1108,31 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
     }
 
+    private static org.python.Object resolveComparison(int cmpResult, String methodName) {
+        switch(methodName) {
+            case "__eq__":
+                return org.python.types.Bool.getBool(cmpResult == 0);
+            case "__lt__":
+                return org.python.types.Bool.getBool(cmpResult < 0);
+            case "__le__":
+                return org.python.types.Bool.getBool(cmpResult <= 0);
+            case "__gt__":
+                return org.python.types.Bool.getBool(cmpResult > 0);
+            case "__ge__":
+                return org.python.types.Bool.getBool(cmpResult >= 0);
+            default:
+                return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
+    }
+
     private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {
         if (methodName == null) {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        }
+
+        if (x instanceof org.python.types.Str && y instanceof org.python.types.Str) {
+            int res = ((org.python.types.Str) x).value.compareTo(((org.python.types.Str) y).value);
+            return resolveComparison(res, methodName);
         }
 
         org.python.Object comparator = x.__getattribute_null(methodName);
@@ -1121,6 +1143,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object[] args = new org.python.Object[1];
         args[0] = y;
         return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, null);
+
     }
 
     public static boolean isSequence(org.python.Object other) {
