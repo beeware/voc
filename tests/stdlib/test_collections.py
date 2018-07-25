@@ -130,3 +130,57 @@ class DefaultDictTests(TranspileTestCase):
             print(collections.defaultdict(int))
             print(collections.defaultdict(list, {'a': 1}))
             """)
+
+    def test_superclass_method(self):
+        self.assertCodeExecution("""
+            import collections
+            d = collections.defaultdict(int)
+            print(d.get("key"))
+            print(d.setdefault("default"))
+            print(d)
+            """)
+
+    def test_default_list(self):
+        self.assertCodeExecution("""
+            from collections import defaultdict
+
+            s = [('yellow', 1), ('blue', 2), ('yellow', 3), ('blue', 4), ('red', 1)]
+            d = defaultdict(list)
+            for k, v in s:
+                d[k].append(v)
+            print(sorted(d.items()))
+            """)
+
+    def test_default_int(self):
+        self.assertCodeExecution("""
+            from collections import defaultdict
+
+            s = 'mississippi'
+            d = defaultdict(int)
+            for k in s:
+                d[k] += 1
+            print(sorted(d.items()))
+            """)
+
+    @expectedFailure
+    def test_default_function_object(self):
+        self.assertCodeExecution("""
+            from collections import defaultdict
+
+            def constant_factory(value):
+                return lambda: value
+            d = defaultdict(constant_factory('<missing>'))
+            d.update(name='John', action='ran')
+            print('%(name)s %(action)s to %(object)s' % d)
+            """)
+
+    def test_default_set(self):
+        self.assertCodeExecution("""
+            from collections import defaultdict
+
+            s = [('red', 1), ('blue', 2), ('red', 3), ('blue', 4), ('red', 1), ('blue', 4)]
+            d = defaultdict(set)
+            for k, v in s:
+                d[k].add(v)
+            print(sorted(d.items()))
+            """)

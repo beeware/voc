@@ -267,13 +267,46 @@ public class Dict extends org.python.types.Object {
             org.python.Object hashcode = item.__hash__();
 
             org.python.Object value = this.value.get(item);
+
+            if (value == null) {
+                try {
+                    return this.__missing__(item);
+                } catch (org.python.exceptions.AttributeError ae) {
+                    throw new org.python.exceptions.KeyError(item);
+                }
+            }
+            return value;
+        } catch (org.python.exceptions.AttributeError ae) {
+            throw new org.python.exceptions.TypeError(
+                    String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
+        }
+    }
+
+    /**
+     * Private version of __getitem__ without call to __missing__
+     *
+     * Reason: collections.defaultdict overwrites the __missing__() method, and this method is only
+     *         used in dict.__getitem__(). To prevent other methods from calling __missing__()
+     *         indirectly, this private method should be used internally instead.
+     *
+     * Source: "Note that __missing__() is not called for any operations besides __getitem__().
+     *         This means that get() will, like normal dictionaries, return None as a default
+     *         rather than using default_factory."
+     *         (https://docs.python.org/3.6/library/collections.html#collections.defaultdict)
+     */
+    private org.python.Object _getitem(org.python.Object item) {
+        try {
+            org.python.Object hashcode = item.__hash__();
+
+            org.python.Object value = this.value.get(item);
+
             if (value == null) {
                 throw new org.python.exceptions.KeyError(item);
             }
             return value;
         } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError(
-                    String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
+                String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
         }
     }
 
@@ -321,7 +354,7 @@ public class Dict extends org.python.types.Object {
     public org.python.Object __contains__(org.python.Object item) {
         // allow unhashable type error to be percolated up.
         try {
-            __getitem__(item);
+            _getitem(item);
             return org.python.types.Bool.TRUE;
         } catch (org.python.exceptions.KeyError e) {
             return org.python.types.Bool.FALSE;
@@ -335,7 +368,7 @@ public class Dict extends org.python.types.Object {
     public org.python.Object __not_contains__(org.python.Object item) {
         // allow unhashable type error to be percolated up.
         try {
-            __getitem__(item);
+            _getitem(item);
             return org.python.types.Bool.FALSE;
         } catch (org.python.exceptions.KeyError e) {
             return org.python.types.Bool.TRUE;
@@ -385,7 +418,7 @@ public class Dict extends org.python.types.Object {
     )
     public org.python.Object get(org.python.Object k, org.python.Object d) {
         try {
-            return this.__getitem__(k);
+            return this._getitem(k);
         } catch (org.python.exceptions.KeyError e) { // allow unhashable type error to be percolated up.
             if (d == null) {
                 return org.python.types.NoneType.NONE;
@@ -449,7 +482,7 @@ public class Dict extends org.python.types.Object {
     )
     public org.python.Object setdefault(org.python.Object k, org.python.Object d) {
         try {
-            return this.__getitem__(k);
+            return this._getitem(k);
         } catch (org.python.exceptions.KeyError e) { // allow unhashable type error to be percolated up.
             if (d == null) {
                 d = org.python.types.NoneType.NONE;
@@ -474,7 +507,7 @@ public class Dict extends org.python.types.Object {
                 while (true) {
                     try {
                         org.python.Object key = iterator.__next__();
-                        org.python.Object value = kwargs.__getitem__(key);
+                        org.python.Object value = kwargs._getitem(key);
                         this.value.put(key, value);
                     } catch (org.python.exceptions.StopIteration si) {
                         break;
