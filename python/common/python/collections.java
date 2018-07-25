@@ -61,7 +61,7 @@ public class collections extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__= "Returns a new subclass of tuple with named fields.\n" +
+            __doc__ = "Returns a new subclass of tuple with named fields.\n" +
                      "\n",
             args = {"typename", "field_names"}
     )
@@ -70,7 +70,7 @@ public class collections extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__= "Dict subclass for counting hashable items.  Sometimes called a bag\n" +
+            __doc__ = "Dict subclass for counting hashable items.  Sometimes called a bag\n" +
                      "or multiset.  Elements are stored as dictionary keys and their counts\n" +
                      "are stored as dictionary values.\n" +
                      "\n" +
@@ -88,7 +88,7 @@ public class collections extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__= "A ChainMap groups multiple dicts (or other mappings) together\n" +
+            __doc__ = "A ChainMap groups multiple dicts (or other mappings) together\n" +
                      "to create a single, updateable view.\n" +
                      "\n" +
                      "The underlying mappings are stored in a list.  That list is public and can\n" +
@@ -105,17 +105,17 @@ public class collections extends org.python.types.Module {
     }
 
     @org.python.Method(
-        __doc__= "",
-        varargs = "args",
-        kwargs = "kwargs"
+            __doc__ = "",
+            varargs = "args",
+            kwargs = "kwargs"
     )
     public static org.python.Object UserDict(org.python.types.Tuple args, org.python.types.Dict kwargs) {
         throw new org.python.exceptions.NotImplementedError("UserDict has not been implemented");
     }
 
     @org.python.Method(
-        __doc__= "",
-        default_args = {"initlist"}
+            __doc__ = "",
+            default_args = {"initlist"}
     )
     public static org.python.Object UserList(org.python.Object initlist) {
         if (initlist == null) {
@@ -125,23 +125,23 @@ public class collections extends org.python.types.Module {
     }
 
     @org.python.Method(
-        __doc__= "",
-        args = {"seq"}
+            __doc__ = "",
+            args = {"seq"}
     )
     public static org.python.Object UserString(org.python.Object seq) {
         throw new org.python.exceptions.NotImplementedError("UserString has not been implemented");
     }
 
     @org.python.Method(
-        __doc__= "",
-        varargs = "args",
-        kwargs = "kwargs"
+            __doc__ = "",
+            varargs = "args",
+            kwargs = "kwargs"
     )
     public static org.python.Object defaultdict(org.python.types.Tuple args, org.python.types.Dict kwargs) {
         org.python.Object default_factory = org.python.types.NoneType.NONE;
         if (!args.value.isEmpty()) {
             default_factory = args.value.get(0);
-            args.value = new java.util.ArrayList<>(args.value); // convert Arrays$ArrayList to ArrayList to call `remove`
+            args.value = new java.util.ArrayList<>(args.value); // convert Arrays$ArrayList to ArrayList to use `remove`
             args.value.remove(0);
         }
 
@@ -163,8 +163,8 @@ public class collections extends org.python.types.Module {
     }
 
     @org.python.Method(
-        __doc__= "",
-        default_args = {"iterable", "maxlen"}
+            __doc__ = "",
+            default_args = {"iterable", "maxlen"}
     )
     public static org.python.Object deque(org.python.Object iterable, org.python.Object maxlen) {
         if (iterable == null) {
