@@ -7,6 +7,9 @@ class CollectionsModuleTests(TranspileTestCase):
 
     #######################################################
     # __doc__
+    @expectedFailure
+    # expected to fail in Python version 3.4 as __doc__ for collections
+    # is None until version 3.5
     def test___doc__(self):
         self.assertCodeExecution("""
             import collections
