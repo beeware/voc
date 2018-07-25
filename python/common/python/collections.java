@@ -14,7 +14,8 @@ package python;
                 "* defaultdict  dict subclass that calls a factory function to supply missing values\n" +
                 "* UserDict     wrapper around dictionary objects for easier dict subclassing\n" +
                 "* UserList     wrapper around list objects for easier list subclassing\n" +
-                "* UserString   wrapper around string objects for easier string subclassing\n"
+                "* UserString   wrapper around string objects for easier string subclassing\n" +
+                "\n"
 )
 public class collections extends org.python.types.Module {
     public collections() {
@@ -28,7 +29,7 @@ public class collections extends org.python.types.Module {
     @org.python.Attribute
     public static org.python.Object __name__ = new org.python.types.Str("collections");
     @org.python.Attribute
-    public static org.python.Object __package__ = new org.python.types.Str("");
+    public static org.python.Object __package__ = new org.python.types.Str("collections");
     @org.python.Attribute()
     public static org.python.Object __path__;
     @org.python.Attribute
@@ -55,10 +56,7 @@ public class collections extends org.python.types.Module {
             varargs = "args",
             kwargs = "kwargs"
     )
-    public static org.python.Object OrderedDict(
-        org.python.types.Tuple args,
-        org.python.types.Dict kwargs
-    ) {
+    public static org.python.Object OrderedDict(org.python.types.Tuple args, org.python.types.Dict kwargs) {
         throw new org.python.exceptions.NotImplementedError("OrderedDict has not been implemented");
     }
 
@@ -85,10 +83,7 @@ public class collections extends org.python.types.Module {
             varargs = "args",
             kwargs = "kwargs"
     )
-    public static org.python.Object Counter(
-        org.python.types.Tuple args,
-        org.python.types.Dict kwargs
-    ) {
+    public static org.python.Object Counter(org.python.types.Tuple args, org.python.types.Dict kwargs) {
         throw new org.python.exceptions.NotImplementedError("Counter has not been implemented");
     }
 
@@ -114,19 +109,15 @@ public class collections extends org.python.types.Module {
         varargs = "args",
         kwargs = "kwargs"
     )
-    public static org.python.Object UserDict(
-        org.python.types.Tuple args,
-        org.python.types.Dict kwargs
-    ) {
+    public static org.python.Object UserDict(org.python.types.Tuple args, org.python.types.Dict kwargs) {
         throw new org.python.exceptions.NotImplementedError("UserDict has not been implemented");
     }
 
     @org.python.Method(
         __doc__= "",
-        args = {"self"},
         default_args = {"initlist"}
     )
-    public static org.python.Object UserList(org.python.Object self, org.python.Object initlist) {
+    public static org.python.Object UserList(org.python.Object initlist) {
         if (initlist == null) {
             initlist = org.python.types.NoneType.NONE;
         }
@@ -135,27 +126,40 @@ public class collections extends org.python.types.Module {
 
     @org.python.Method(
         __doc__= "",
-        args = {"self", "seq"}
+        args = {"seq"}
     )
-    public static org.python.Object UserString(org.python.Object self, org.python.Object seq) {
+    public static org.python.Object UserString(org.python.Object seq) {
         throw new org.python.exceptions.NotImplementedError("UserString has not been implemented");
     }
 
     @org.python.Method(
         __doc__= "",
-        default_args = {"default_factory"},
         varargs = "args",
         kwargs = "kwargs"
     )
-    public static org.python.Object defaultdict(
-        org.python.Object default_factory,
-        org.python.types.Tuple args,
-        org.python.types.Dict kwargs
-    ) {
-        if (default_factory == null) {
-            default_factory = org.python.types.NoneType.NONE;
+    public static org.python.Object defaultdict(org.python.types.Tuple args, org.python.types.Dict kwargs) {
+        org.python.Object default_factory = org.python.types.NoneType.NONE;
+        if (!args.value.isEmpty()) {
+            default_factory = args.value.get(0);
+            args.value = new java.util.ArrayList<>(args.value); // convert Arrays$ArrayList to ArrayList to call `remove`
+            args.value.remove(0);
         }
-        throw new org.python.exceptions.NotImplementedError("defaultdict has not been implemented");
+
+        // convert parameter types
+        org.python.Object[] _args = new org.python.Object[1];
+        if (!args.value.isEmpty()) {
+            _args = args.value.toArray(new org.python.Object[args.value.size()]);
+        }
+
+        java.util.Map<String, org.python.Object> _kwargs = new java.util.HashMap<>();
+        if (!kwargs.value.isEmpty()) {
+            for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : kwargs.value.entrySet()) {
+                org.python.Object key = entry.getKey();
+                _kwargs.put(((org.python.types.Str) key).value, kwargs.value.get(key));
+            }
+        }
+
+        return new org.python.stdlib.collections.DefaultDict(default_factory, _args, _kwargs);
     }
 
     @org.python.Method(
