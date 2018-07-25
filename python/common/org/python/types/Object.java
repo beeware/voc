@@ -1120,6 +1120,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
                 return org.python.types.Bool.getBool(cmpResult > 0);
             case "__ge__":
                 return org.python.types.Bool.getBool(cmpResult >= 0);
+            case "__ne__":
+                return org.python.types.Bool.getBool(cmpResult != 0);
             default:
                 return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -1132,6 +1134,13 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (x instanceof org.python.types.Str && y instanceof org.python.types.Str) {
             int res = ((org.python.types.Str) x).value.compareTo(((org.python.types.Str) y).value);
+            return resolveComparison(res, methodName);
+        }
+
+        if (x instanceof org.python.types.Int && y instanceof org.python.types.Int) {
+            Long x_long = Long.valueOf(((org.python.types.Int) x).value);
+            Long y_long = Long.valueOf(((org.python.types.Int) y).value);
+            int res = x_long.compareTo(y_long);
             return resolveComparison(res, methodName);
         }
 
