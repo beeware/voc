@@ -1052,7 +1052,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
+                return result;
             }
         }
 
@@ -1065,6 +1065,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
+        }
+
+        // Now check reflection
+        if (!reflectedChecked) {
+          if (w instanceof org.python.types.Str) { // TODO all builtin types
+              result = w.__gt__(v);
+          } else {
+              result = invokeComparison(w, v, "__gt__");
+          }
+
+          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+          }
         }
 
         // Error case
@@ -1091,7 +1104,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
+                return result;
             }
         }
 
@@ -1100,6 +1113,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             result = v.__le__(w);
         } else {
             result = invokeComparison(v, w, "__le__");
+        }
+
+        // Now check reflection
+        if (!reflectedChecked) {
+          if (w instanceof org.python.types.Str) { // TODO all builtin types
+              result = w.__ge__(v);
+          } else {
+              result = invokeComparison(w, v, "__ge__");
+          }
+
+          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+          }
         }
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
@@ -1130,7 +1156,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
+                return result;
             }
         }
 
@@ -1143,6 +1169,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
+        }
+
+        // Now check reflection
+        if (!reflectedChecked) {
+          if (w instanceof org.python.types.Str) { // TODO all builtin types
+              result = w.__eq__(v);
+          } else {
+              result = invokeComparison(w, v, "__eq__");
+          }
+
+          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+          }
         }
 
         return org.python.types.Bool.getBool(v == w);
@@ -1162,7 +1201,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
+                return result;
             }
         }
 
@@ -1175,6 +1214,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
+        }
+
+        // Now check reflection
+        if (!reflectedChecked) {
+          if (w instanceof org.python.types.Str) { // TODO all builtin types
+              result = w.__ne__(v);
+          } else {
+              result = invokeComparison(w, v, "__ne__");
+          }
+
+          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+          }
         }
 
         return org.python.types.Bool.getBool(v != w);
@@ -1194,7 +1246,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
+                return result;
             }
         }
 
@@ -1207,6 +1259,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
+        }
+
+        // Now check reflection
+        if (!reflectedChecked) {
+          if (w instanceof org.python.types.Str) { // TODO all builtin types
+              result = w.__lt__(v);
+          } else {
+              result = invokeComparison(w, v, "__lt__");
+          }
+
+          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+          }
         }
 
         // Error case
@@ -1233,7 +1298,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
+                return result;
             }
         }
 
@@ -1246,6 +1311,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
+        }
+
+        // Now check reflection
+        if (!reflectedChecked) {
+          if (w instanceof org.python.types.Str) { // TODO all builtin types
+              result = w.__le__(v);
+          } else {
+              result = invokeComparison(w, v, "__le");
+          }
+
+          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+          }
         }
 
         // Error case
@@ -1273,7 +1351,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
+                return result;
             }
         }
 
@@ -1286,6 +1364,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
+        }
+
+        // Now check reflection
+        if (!reflectedChecked) {
+          if (w instanceof org.python.types.Str) { // TODO all builtin types
+              result = w.__contains__(v);
+          } else {
+              result = invokeComparison(w, v, "__contains__");
+          }
+
+          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+          }
         }
 
         // Error case
@@ -1312,7 +1403,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
+                return result;
             }
         }
 
@@ -1325,6 +1416,19 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
+        }
+
+        // Now check reflection
+        if (!reflectedChecked) {
+          if (w instanceof org.python.types.Str) { // TODO all builtin types
+              result = w.__not_contains__(v);
+          } else {
+              result = invokeComparison(w, v, "__not_contains__");
+          }
+
+          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+          }
         }
 
         // Error case
