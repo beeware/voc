@@ -143,6 +143,11 @@ public class collections extends org.python.types.Module {
             default_factory = args.value.get(0);
             args.value = new java.util.ArrayList<>(args.value); // convert Arrays$ArrayList to ArrayList to use `remove`
             args.value.remove(0);
+
+            if (!(default_factory instanceof org.python.Callable ||
+                    default_factory instanceof org.python.types.NoneType)) {
+                throw new org.python.exceptions.TypeError("first argument must be callable or None");
+            }
         }
 
         // convert parameter types

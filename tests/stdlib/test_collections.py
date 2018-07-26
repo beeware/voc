@@ -134,7 +134,16 @@ class DefaultDictTests(TranspileTestCase):
             print(collections.defaultdict(list, {'a': 1}))
             """)
 
-    def test_superclass_method(self):
+    def test_invalid_first_argument(self):
+        self.assertCodeExecution("""
+            import collections
+            try:
+                d = collections.defaultdict(123)
+            except TypeError as e:
+                print(e)
+            """)
+
+    def test_dict_method(self):
         self.assertCodeExecution("""
             import collections
             d = collections.defaultdict(int)
@@ -166,7 +175,7 @@ class DefaultDictTests(TranspileTestCase):
             """)
 
     @expectedFailure
-    def test_default_function_object(self):
+    def test_default_function(self):
         self.assertCodeExecution("""
             from collections import defaultdict
 
