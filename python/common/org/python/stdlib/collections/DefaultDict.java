@@ -31,8 +31,15 @@ public class DefaultDict extends org.python.types.Dict {
         }
 
         try {
-            java.lang.reflect.Constructor constructor = ((org.python.types.Type) this.default_factory).constructor;
-            org.python.Object value = (org.python.Object) constructor.newInstance(new org.python.Object[1], null);
+            org.python.Object value;
+            if (this.default_factory instanceof org.python.types.Function) {
+                // invoke function without argument
+                value = ((org.python.types.Function) this.default_factory).invoke(null, null);
+            } else {
+                // use default constructor to get default value
+                java.lang.reflect.Constructor constructor = ((org.python.types.Type) this.default_factory).constructor;
+                value = (org.python.Object) constructor.newInstance(new org.python.Object[1], null);
+            }
             this.__setitem__(key, value);
 
             return this.__getitem__(key);
