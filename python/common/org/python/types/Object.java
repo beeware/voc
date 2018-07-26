@@ -1038,14 +1038,27 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return (result instanceof org.python.types.Bool) ? result : result.__bool__();
     }
 
+    private static boolean isBuiltin(org.python.Object obj) {
+        return obj instanceof org.python.types.Int || obj instanceof org.python.types.Str ||
+                obj instanceof org.python.types.Bool || obj instanceof org.python.types.Float ||
+                obj instanceof org.python.types.List || obj instanceof org.python.types.Dict ||
+                obj instanceof org.python.types.Tuple || obj instanceof org.python.types.Set ||
+                obj instanceof org.python.types.Range || obj instanceof org.python.types.Slice || 
+                obj instanceof org.python.types.Bytes || obj instanceof org.python.types.Complex ||
+                obj instanceof org.python.types.ByteArray || obj instanceof org.python.types.FrozenSet ||
+                obj instanceof org.python.types.MemoryView;
+    }
+
     public static org.python.Object __lt__(org.python.Object v, org.python.Object w) {
         org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+        boolean v_builtin = isBuiltin(v);
+        boolean w_builtin = isBuiltin(w);
 
         // Reflective case
         if (reflectedChecked) {
-            if (w instanceof org.python.types.Str) { // TODO all builtin types
+            if (w_builtin) {
                 result = w.__gt__(v);
             } else {
                 result = invokeComparison(w, v, "__gt__");
@@ -1057,19 +1070,18 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         // Normal case
-        if (v instanceof org.python.types.Str) { // TODO all builtin types
+        if (v_builtin) {
             result = v.__lt__(w);
         } else {
             result = invokeComparison(v, w, "__lt__");
         }
-
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
         }
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w instanceof org.python.types.Str) { // TODO all builtin types
+          if (w_builtin) {
               result = w.__gt__(v);
           } else {
               result = invokeComparison(w, v, "__gt__");
@@ -1095,9 +1107,13 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
 
+        boolean v_builtin = isBuiltin(v);
+        boolean w_builtin = isBuiltin(w);
+
+
         // Reflective case
         if (reflectedChecked) {
-            if (w instanceof org.python.types.Str) { // TODO all builtin types
+            if (w_builtin) {
                 result = w.__ge__(v);
             } else {
                 result = invokeComparison(w, v, "__ge__");
@@ -1109,15 +1125,18 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         // Normal case
-        if (v instanceof org.python.types.Str) { // TODO all builtin types
+        if (v_builtin) {
             result = v.__le__(w);
         } else {
             result = invokeComparison(v, w, "__le__");
         }
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w instanceof org.python.types.Str) { // TODO all builtin types
+          if (w_builtin) {
               result = w.__ge__(v);
           } else {
               result = invokeComparison(w, v, "__ge__");
@@ -1126,10 +1145,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
           if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
               return result;
           }
-        }
-
-        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-            return result;
         }
 
         // Error case
@@ -1147,9 +1162,12 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
 
+        boolean v_builtin = isBuiltin(v);
+        boolean w_builtin = isBuiltin(w);
+
         // Reflective case
         if (reflectedChecked) {
-            if (w instanceof org.python.types.Str) { // TODO all builtin types
+            if (w_builtin) {
                 result = w.__eq__(v);
             } else {
                 result = invokeComparison(w, v, "__eq__");
@@ -1161,19 +1179,18 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         // Normal case
-        if (v instanceof org.python.types.Str) { // TODO all builtin types
+        if (v_builtin) {
             result = v.__eq__(w);
         } else {
             result = invokeComparison(v, w, "__eq__");
         }
-
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
         }
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w instanceof org.python.types.Str) { // TODO all builtin types
+          if (w_builtin) {
               result = w.__eq__(v);
           } else {
               result = invokeComparison(w, v, "__eq__");
@@ -1191,10 +1208,12 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+        boolean v_builtin = isBuiltin(v);
+        boolean w_builtin = isBuiltin(w);
 
         // Reflective case
         if (reflectedChecked) {
-            if (w instanceof org.python.types.Str) { // TODO all builtin types
+            if (w_builtin) {
                 result = w.__ne__(v);
             } else {
                 result = invokeComparison(w, v, "__ne__");
@@ -1206,7 +1225,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         // Normal case
-        if (v instanceof org.python.types.Str) { // TODO all builtin types
+        if (v_builtin) {
             result = v.__ne__(w);
         } else {
             result = invokeComparison(v, w, "__ne__");
@@ -1218,7 +1237,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w instanceof org.python.types.Str) { // TODO all builtin types
+          if (w_builtin) {
               result = w.__ne__(v);
           } else {
               result = invokeComparison(w, v, "__ne__");
@@ -1236,10 +1255,12 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+        boolean v_builtin = isBuiltin(v);
+        boolean w_builtin = isBuiltin(w);
 
         // Reflective case
         if (reflectedChecked) {
-            if (w instanceof org.python.types.Str) { // TODO all builtin types
+            if (w_builtin) {
                 result = w.__lt__(v);
             } else {
                 result = invokeComparison(w, v, "__lt__");
@@ -1251,7 +1272,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         // Normal case
-        if (v instanceof org.python.types.Str) { // TODO all builtin types
+        if (v_builtin) {
             result = v.__gt__(w);
         } else {
             result = invokeComparison(v, w, "__gt__");
@@ -1263,7 +1284,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w instanceof org.python.types.Str) { // TODO all builtin types
+          if (w_builtin) {
               result = w.__lt__(v);
           } else {
               result = invokeComparison(w, v, "__lt__");
@@ -1288,10 +1309,12 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+        boolean v_builtin = isBuiltin(v);
+        boolean w_builtin = isBuiltin(w);
 
         // Reflective case
         if (reflectedChecked) {
-            if (w instanceof org.python.types.Str) { // TODO all builtin types
+            if (w_builtin) {
                 result = w.__le__(v);
             } else {
                 result = invokeComparison(w, v, "__le__");
@@ -1303,7 +1326,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         // Normal case
-        if (v instanceof org.python.types.Str) { // TODO all builtin types
+        if (v_builtin) {
             result = v.__ge__(w);
         } else {
             result = invokeComparison(v, w, "__ge__");
@@ -1315,7 +1338,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w instanceof org.python.types.Str) { // TODO all builtin types
+          if (w_builtin) {
               result = w.__le__(v);
           } else {
               result = invokeComparison(w, v, "__le");
@@ -1341,10 +1364,12 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+        boolean v_builtin = isBuiltin(v);
+        boolean w_builtin = isBuiltin(w);
 
         // Reflective case
         if (reflectedChecked) {
-            if (w instanceof org.python.types.Str) { // TODO all builtin types
+            if (w_builtin) {
                 result = w.__contains__(v);
             } else {
                 result = invokeComparison(w, v, "__contains__");
@@ -1356,7 +1381,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         // Normal case
-        if (v instanceof org.python.types.Str) { // TODO all builtin types
+        if (v_builtin) {
             result = v.__contains__(w);
         } else {
             result = invokeComparison(v, w, "__contains__");
@@ -1368,7 +1393,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w instanceof org.python.types.Str) { // TODO all builtin types
+          if (w_builtin) {
               result = w.__contains__(v);
           } else {
               result = invokeComparison(w, v, "__contains__");
@@ -1393,10 +1418,12 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+        boolean v_builtin = isBuiltin(v);
+        boolean w_builtin = isBuiltin(w);
 
         // Reflective case
         if (reflectedChecked) {
-            if (w instanceof org.python.types.Str) { // TODO all builtin types
+            if (w_builtin) {
                 result = w.__not_contains__(v);
             } else {
                 result = invokeComparison(w, v, "__not_contains__");
@@ -1408,7 +1435,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
 
         // Normal case
-        if (v instanceof org.python.types.Str) { // TODO all builtin types
+        if (v_builtin) {
             result = v.__not_contains__(w);
         } else {
             result = invokeComparison(v, w, "__not_contains__");
@@ -1420,7 +1447,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w instanceof org.python.types.Str) { // TODO all builtin types
+          if (w_builtin) {
               result = w.__not_contains__(v);
           } else {
               result = invokeComparison(w, v, "__not_contains__");

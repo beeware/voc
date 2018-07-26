@@ -1897,7 +1897,7 @@ class Visitor(ast.NodeVisitor):
                     self.context.add_opcodes(
                         JavaOpcodes.INVOKESTATIC(
                             'org/python/types/Object',
-                            '__eq__',
+                            '__ne__',
                             args=['Lorg/python/Object;', 'Lorg/python/Object;'],
                             returns='Lorg/python/Object;'),
                     )
