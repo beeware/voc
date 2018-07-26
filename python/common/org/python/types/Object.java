@@ -1287,7 +1287,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             if (w_builtin) {
                 result = w.__lt__(v);
             } else {
-              result = invokeComparison(w, v, "__lt__");
+                result = invokeComparison(w, v, "__lt__");
             }
 
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
