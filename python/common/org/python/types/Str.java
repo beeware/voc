@@ -1891,22 +1891,13 @@ final class PythonFormatter {
         fillCharacterQueue();
     }
 
-//    private PythonFormatter(java.lang.String formatString, java.util.Map<org.python.Object, org.python.Object> kwargs) {
-//        this.formatString = formatString;
-//        this.args = new java.util.LinkedList<>();
-//        this.kwargs = kwargs;
-//        this.dict = null;
-//
-//        // necessary for certain edge cases
-//        this.args.add(new org.python.types.Dict(kwargs));
-//        fillCharacterQueue();
-//    }
-
     private PythonFormatter(java.lang.String formatString, org.python.types.Dict dict) {
         this.formatString = formatString;
         this.args = new java.util.LinkedList<>();
         this.dict = dict;
 
+        // necessary for certain edge cases
+        this.args.add(dict);
         fillCharacterQueue();
     }
 
