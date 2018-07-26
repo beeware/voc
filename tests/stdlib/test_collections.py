@@ -6,10 +6,9 @@ from ..utils import TranspileTestCase
 class CollectionsModuleTests(TranspileTestCase):
 
     #######################################################
+    # expected to fail in Python version 3.4 build because
+    # it was not documented in Python version <= 3.4
     # # __doc__
-    # @expectedFailure
-    # # expected to fail in Python version 3.4 as __doc__ for collections
-    # # is None until version 3.5
     # def test___doc__(self):
         # self.assertCodeExecution("""
             # import collections
