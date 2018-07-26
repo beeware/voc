@@ -1081,15 +1081,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w_builtin) {
-              result = w.__gt__(v);
-          } else {
-              result = invokeComparison(w, v, "__gt__");
-          }
+            if (w_builtin) {
+                result = w.__gt__(v);
+            } else {
+                result = invokeComparison(w, v, "__gt__");
+            }
 
-          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
-          }
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
         }
 
         // Error case
@@ -1136,15 +1136,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w_builtin) {
-              result = w.__ge__(v);
-          } else {
-              result = invokeComparison(w, v, "__ge__");
-          }
+            if (w_builtin) {
+                result = w.__ge__(v);
+            } else {
+                result = invokeComparison(w, v, "__ge__");
+            }
 
-          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
-          }
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
         }
 
         // Error case
@@ -1190,15 +1190,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w_builtin) {
-              result = w.__eq__(v);
-          } else {
-              result = invokeComparison(w, v, "__eq__");
-          }
+            if (w_builtin) {
+                result = w.__eq__(v);
+            } else {
+                result = invokeComparison(w, v, "__eq__");
+            }
 
-          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
-          }
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
         }
 
         return org.python.types.Bool.getBool(v == w);
@@ -1237,15 +1237,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w_builtin) {
-              result = w.__ne__(v);
-          } else {
-              result = invokeComparison(w, v, "__ne__");
-          }
+            if (w_builtin) {
+                result = w.__ne__(v);
+            } else {
+                result = invokeComparison(w, v, "__ne__");
+            }
 
-          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
-          }
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
         }
 
         return org.python.types.Bool.getBool(v != w);
@@ -1284,15 +1284,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w_builtin) {
-              result = w.__lt__(v);
-          } else {
+            if (w_builtin) {
+                result = w.__lt__(v);
+            } else {
               result = invokeComparison(w, v, "__lt__");
-          }
+            }
 
-          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
-          }
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
         }
 
         // Error case
@@ -1338,15 +1338,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w_builtin) {
-              result = w.__le__(v);
-          } else {
-              result = invokeComparison(w, v, "__le");
-          }
+            if (w_builtin) {
+                result = w.__le__(v);
+            } else {
+                result = invokeComparison(w, v, "__le");
+            }
 
-          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
-          }
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
         }
 
         // Error case
@@ -1393,15 +1393,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w_builtin) {
-              result = w.__contains__(v);
-          } else {
-              result = invokeComparison(w, v, "__contains__");
-          }
+            if (w_builtin) {
+                result = w.__contains__(v);
+            } else {
+                result = invokeComparison(w, v, "__contains__");
+            }
 
-          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
-          }
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
         }
 
         // Error case
@@ -1447,15 +1447,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         // Now check reflection
         if (!reflectedChecked) {
-          if (w_builtin) {
-              result = w.__not_contains__(v);
-          } else {
-              result = invokeComparison(w, v, "__not_contains__");
-          }
+            if (w_builtin) {
+                result = w.__not_contains__(v);
+            } else {
+                result = invokeComparison(w, v, "__not_contains__");
+            }
 
-          if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-              return result;
-          }
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+                return result;
+            }
         }
 
         // Error case

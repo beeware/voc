@@ -139,7 +139,7 @@ def test_code(test_case):
     """), timed=True)
 
 def test_cmp(test_case):
-    print("Running", "string comparison")
+    print("Running", "test_cmp")
     test_case.runAsJava(adjust("""
         x = None
         s = "mary had a little lamb"
