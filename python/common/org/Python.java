@@ -1066,11 +1066,7 @@ public class Python {
     }
 
     private static boolean compareKeys(org.python.Object first, org.python.Object second) {
-        return org.python.types.Object.__cmp__(
-                    first,
-                    second,
-                    org.python.types.Object.CMP_OP.GT
-                ).toBoolean();
+        return org.python.types.Object.__gt__(first, second).toBoolean();
     }
 
     @org.python.Method(
@@ -1584,11 +1580,11 @@ public class Python {
         public int compare(org.python.Object o1, org.python.Object o2) {
             o1 = applyKey(o1, key);
             o2 = applyKey(o2, key);
-            org.python.Object result = org.python.types.Object.__cmp_bool__(o1, o2, org.python.types.Object.CMP_OP.LT);
+            org.python.Object result = org.python.types.Object.__lt__(o1, o2);
             if (result.toBoolean()) {
                 return reverse ? 1 : -1;
             }
-            result = org.python.types.Object.__cmp_bool__(o2, o1, org.python.types.Object.CMP_OP.LT);
+            result = org.python.types.Object.__lt__(o2, o1);
             if (result.toBoolean()) {
                 return reverse ? -1 : 1;
             }

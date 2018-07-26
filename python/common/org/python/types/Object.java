@@ -105,7 +105,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
      */
     public boolean equals(java.lang.Object other) {
         if (other instanceof org.python.Object) {
-            org.python.Object result = org.python.types.Object.__cmp_bool__(this, (org.python.Object) other, org.python.types.Object.CMP_OP.EQ);
+            org.python.Object result = org.python.types.Object.__cmp_eq__(this, (org.python.Object) other);
             return ((org.python.types.Bool) result).value;
         } else {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
@@ -1018,130 +1018,328 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         throw new org.python.exceptions.AttributeError(this, "__round__");
     }
 
-    // Need to implement Is __eq__ Is Not __ne__
-    // In __contains__ (reversed operands) Not In __not_contains__ (reversed operands)
-    //
-    // for Is and Is Not, falls through to here only when either side is a constant in python
-    // which ends up as org.python.types.[Int|Float|Complex], otherwise it's dealt with
-    // by object reference comparison IF_ACMEQ. so we fall through to __eq__!
-    public enum CMP_OP {
-        GE(">=", "__ge__", "__le__"),
-        GT(">", "__gt__", "__lt__"),
-        EQ("==", "__eq__", "__eq__"),
-        NE("!=", "__ne__", "__ne__"),
-        LE("<=", "__le__", "__ge__"),
-        LT("<", "__lt__", "__gt__");
-
-        public final String oper;
-        public final String operMethod;
-        public final String reflOperMethod;
-        CMP_OP(java.lang.String oper, java.lang.String operMethod, java.lang.String reflOperMethod) {
-            this.oper = oper;
-            this.operMethod = operMethod;
-            this.reflOperMethod = reflOperMethod;
+    /* This method is used from standard library container datatypes */ // FIXME provide more useful comment?
+    public static org.python.Object __cmp_eq__(org.python.Object v, org.python.Object w) {
+        // identity implies equality
+        if (v == w) {
+            return org.python.types.Bool.TRUE;
         }
-    }
-
-    /* This method is used from standard library datatypes, etc */
-    public static org.python.Object __cmp__(org.python.Object v, org.python.Object w,
-            org.python.types.Object.CMP_OP op) {
-        return __cmp__(v, w, op.oper, op.operMethod, op.reflOperMethod);
+        org.python.Object result = __eq__(v, w);
+        return (result instanceof org.python.types.Bool) ? result : result.__bool__();
     }
 
     /* This method is used from standard library container datatypes */
-    public static org.python.Object __cmp_bool__(org.python.Object v, org.python.Object w,
-            org.python.types.Object.CMP_OP op) {
+    public static org.python.Object __cmp_ne__(org.python.Object v, org.python.Object w) {
         // identity implies equality
-        if (v == w) {
-            if (op == org.python.types.Object.CMP_OP.EQ) {
-                return org.python.types.Bool.TRUE;
-            } else if (op == org.python.types.Object.CMP_OP.NE) {
-                return org.python.types.Bool.FALSE;
-            }
+        if (v != w) {
+            return org.python.types.Bool.TRUE;
         }
-        org.python.Object result = __cmp__(v, w, op.oper, op.operMethod, op.reflOperMethod);
-        if (result instanceof org.python.types.Bool) {
-            return result;
-        } else {
-            return result.__bool__();
-        }
+        org.python.Object result = __ne__(v, w);
+        return (result instanceof org.python.types.Bool) ? result : result.__bool__();
     }
 
-    /* This method is invoked from the AST for Compare nodes */
-    public static org.python.Object __cmp__(org.python.Object v, org.python.Object w, java.lang.String oper,
-            java.lang.String operMethod, java.lang.String reflOperMethod) {
+    public static org.python.Object __lt__(org.python.Object v, org.python.Object w) {
         org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         boolean reflectedChecked = v.type() != w.type()
                 && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
 
+        // Reflective case
         if (reflectedChecked) {
-            result = invokeComparison(w, v, reflOperMethod);
+            if (w instanceof org.python.types.Str) { // TODO all builtin types
+                result = w.__gt__(v);
+            } else {
+                result = invokeComparison(w, v, "__gt__");
+            }
+
             if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-                return result;
+              return result;
             }
         }
 
-        result = invokeComparison(v, w, operMethod);
+        // Normal case
+        if (v instanceof org.python.types.Str) { // TODO all builtin types
+            result = v.__lt__(w);
+        } else {
+            result = invokeComparison(v, w, "__lt__");
+        }
+
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
         }
 
-        if (!reflectedChecked) {
-            result = invokeComparison(w, v, reflOperMethod);
-            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-                return result;
-            }
-        }
-
-        if (oper.equals("==")) {
-            return org.python.types.Bool.getBool(v == w);
-        } else if (oper.equals("!=")) {
-            return org.python.types.Bool.getBool(v != w);
-        }
-
+        // Error case
         if (org.Python.VERSION < 0x03060000) {
             throw new org.python.exceptions.TypeError(String.format(
-                "unorderable types: %s() %s %s()", v.typeName(), oper, w.typeName()));
+                "unorderable types: %s() %s %s()", v.typeName(), "<", w.typeName()));
         } else {
             throw new org.python.exceptions.TypeError(String.format(
-                "'%s' not supported between instances of '%s' and '%s'", oper, v.typeName(), w.typeName()));
+                "'%s' not supported between instances of '%s' and '%s'", "<", v.typeName(), w.typeName()));
         }
     }
 
-    private static org.python.Object resolveComparison(int cmpResult, String methodName) {
-        switch(methodName) {
-            case "__eq__":
-                return org.python.types.Bool.getBool(cmpResult == 0);
-            case "__lt__":
-                return org.python.types.Bool.getBool(cmpResult < 0);
-            case "__le__":
-                return org.python.types.Bool.getBool(cmpResult <= 0);
-            case "__gt__":
-                return org.python.types.Bool.getBool(cmpResult > 0);
-            case "__ge__":
-                return org.python.types.Bool.getBool(cmpResult >= 0);
-            case "__ne__":
-                return org.python.types.Bool.getBool(cmpResult != 0);
-            default:
-                return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+    public static org.python.Object __le__(org.python.Object v, org.python.Object w) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        // Reflective case
+        if (reflectedChecked) {
+            if (w instanceof org.python.types.Str) { // TODO all builtin types
+                result = w.__ge__(v);
+            } else {
+                result = invokeComparison(w, v, "__ge__");
+            }
+
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+            }
+        }
+
+        // Normal case
+        if (v instanceof org.python.types.Str) { // TODO all builtin types
+            result = v.__le__(w);
+        } else {
+            result = invokeComparison(v, w, "__le__");
+        }
+
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        // Error case
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unorderable types: %s() %s %s()", v.typeName(), "<=", w.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", "<=", v.typeName(), w.typeName()));
+        }
+    }
+
+    public static org.python.Object __eq__(org.python.Object v, org.python.Object w) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        // Reflective case
+        if (reflectedChecked) {
+            if (w instanceof org.python.types.Str) { // TODO all builtin types
+                result = w.__eq__(v);
+            } else {
+                result = invokeComparison(w, v, "__eq__");
+            }
+
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+            }
+        }
+
+        // Normal case
+        if (v instanceof org.python.types.Str) { // TODO all builtin types
+            result = v.__eq__(w);
+        } else {
+            result = invokeComparison(v, w, "__eq__");
+        }
+
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        return org.python.types.Bool.getBool(v == w);
+    }
+
+    public static org.python.Object __ne__(org.python.Object v, org.python.Object w) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        // Reflective case
+        if (reflectedChecked) {
+            if (w instanceof org.python.types.Str) { // TODO all builtin types
+                result = w.__ne__(v);
+            } else {
+                result = invokeComparison(w, v, "__ne__");
+            }
+
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+            }
+        }
+
+        // Normal case
+        if (v instanceof org.python.types.Str) { // TODO all builtin types
+            result = v.__ne__(w);
+        } else {
+            result = invokeComparison(v, w, "__ne__");
+        }
+
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        return org.python.types.Bool.getBool(v != w);
+    }
+
+    public static org.python.Object __gt__(org.python.Object v, org.python.Object w) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        // Reflective case
+        if (reflectedChecked) {
+            if (w instanceof org.python.types.Str) { // TODO all builtin types
+                result = w.__lt__(v);
+            } else {
+                result = invokeComparison(w, v, "__lt__");
+            }
+
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+            }
+        }
+
+        // Normal case
+        if (v instanceof org.python.types.Str) { // TODO all builtin types
+            result = v.__gt__(w);
+        } else {
+            result = invokeComparison(v, w, "__gt__");
+        }
+
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        // Error case
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unorderable types: %s() %s %s()", v.typeName(), ">", w.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", ">", v.typeName(), w.typeName()));
+        }
+    }
+
+    public static org.python.Object __ge__(org.python.Object v, org.python.Object w) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        // Reflective case
+        if (reflectedChecked) {
+            if (w instanceof org.python.types.Str) { // TODO all builtin types
+                result = w.__le__(v);
+            } else {
+                result = invokeComparison(w, v, "__le__");
+            }
+
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+            }
+        }
+
+        // Normal case
+        if (v instanceof org.python.types.Str) { // TODO all builtin types
+            result = v.__ge__(w);
+        } else {
+            result = invokeComparison(v, w, "__ge__");
+        }
+
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        // Error case
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unorderable types: %s() %s %s()", v.typeName(), ">=", w.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", ">=", v.typeName(), w.typeName()));
+        }
+    }
+
+    // FIXME how can __contains__/in be reflective?
+    public static org.python.Object __contains__(org.python.Object v, org.python.Object w) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        // Reflective case
+        if (reflectedChecked) {
+            if (w instanceof org.python.types.Str) { // TODO all builtin types
+                result = w.__contains__(v);
+            } else {
+                result = invokeComparison(w, v, "__contains__");
+            }
+
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+            }
+        }
+
+        // Normal case
+        if (v instanceof org.python.types.Str) { // TODO all builtin types
+            result = v.__contains__(w);
+        } else {
+            result = invokeComparison(v, w, "__contains__");
+        }
+
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        // Error case
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unorderable types: %s() %s %s()", v.typeName(), "in", w.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", "in", v.typeName(), w.typeName()));
+        }
+    }
+
+    public static org.python.Object __not_contains__(org.python.Object v, org.python.Object w) {
+        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
+        boolean reflectedChecked = v.type() != w.type()
+                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
+
+        // Reflective case
+        if (reflectedChecked) {
+            if (w instanceof org.python.types.Str) { // TODO all builtin types
+                result = w.__not_contains__(v);
+            } else {
+                result = invokeComparison(w, v, "__not_contains__");
+            }
+
+            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+              return result;
+            }
+        }
+
+        // Normal case
+        if (v instanceof org.python.types.Str) { // TODO all builtin types
+            result = v.__not_contains__(w);
+        } else {
+            result = invokeComparison(v, w, "__not_contains__");
+        }
+
+        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            return result;
+        }
+
+        // Error case
+        if (org.Python.VERSION < 0x03060000) {
+            throw new org.python.exceptions.TypeError(String.format(
+                "unorderable types: %s() %s %s()", v.typeName(), "not in", w.typeName()));
+        } else {
+            throw new org.python.exceptions.TypeError(String.format(
+                "'%s' not supported between instances of '%s' and '%s'", "not in", v.typeName(), w.typeName()));
         }
     }
 
     private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {
         if (methodName == null) {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
-        }
-
-        if (x instanceof org.python.types.Str && y instanceof org.python.types.Str) {
-            int res = ((org.python.types.Str) x).value.compareTo(((org.python.types.Str) y).value);
-            return resolveComparison(res, methodName);
-        }
-
-        if (x instanceof org.python.types.Int && y instanceof org.python.types.Int) {
-            Long x_long = Long.valueOf(((org.python.types.Int) x).value);
-            Long y_long = Long.valueOf(((org.python.types.Int) y).value);
-            int res = x_long.compareTo(y_long);
-            return resolveComparison(res, methodName);
         }
 
         org.python.Object comparator = x.__getattribute_null(methodName);
@@ -1152,7 +1350,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object[] args = new org.python.Object[1];
         args[0] = y;
         return (org.python.Object) ((org.python.types.Method) comparator).invoke(args, null);
-
     }
 
     public static boolean isSequence(org.python.Object other) {
