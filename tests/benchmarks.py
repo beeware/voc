@@ -138,37 +138,35 @@ def test_code(test_case):
             main(i)
     """), timed=True)
 
-def test_str_comp(test_case):
+def test_cmp(test_case):
     print("Running", "string comparison")
     test_case.runAsJava(adjust("""
+        x = None
         s = "mary had a little lamb"
         t = "humpty dumpty sat on a wall"
 
         for i in range(1000):
-            for j in range(100):
-                print(s < t)
-                print(s <= t)
-                print(s == t)
-                print(s >= t)
-                print(s > t)
+            for j in range(1000):
+                x = s < t
+                x = s <= t
+                x = s == t
+                x = s != t
+                x = s > t
+                x = s >= t
 
-                print(s < t)
-                print(s <= t)
-                print(s == t)
-                print(s >= t)
-                print(s > t)
+                x = 3 < 5
+                x = 3 <= 5
+                x = 3 == 5
+                x = 3 != 5
+                x = 3 > 5
+                x = 3 >= 5
 
-                print(s < t)
-                print(s <= t)
-                print(s == t)
-                print(s >= t)
-                print(s > t)
-
-                print(s < t)
-                print(s <= t)
-                print(s == t)
-                print(s >= t)
-                print(s > t)
+                x = 3 < True
+                x = 3.0 <= 5
+                x = None == 5
+                x = [3] != 5.0
+                x = [3] > [5]
+                x = [3.0] > [5.0]
     """), timed=True)
 
 def main():
@@ -180,7 +178,7 @@ def main():
     test_class_var_load(test_case)
     test_function_var_load(test_case)
     test_code(test_case)
-    test_str_comp(test_case)
+    test_cmp(test_case)
 
 if __name__== "__main__":
   main()

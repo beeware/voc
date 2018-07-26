@@ -1043,7 +1043,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
                 obj instanceof org.python.types.Bool || obj instanceof org.python.types.Float ||
                 obj instanceof org.python.types.List || obj instanceof org.python.types.Dict ||
                 obj instanceof org.python.types.Tuple || obj instanceof org.python.types.Set ||
-                obj instanceof org.python.types.Range || obj instanceof org.python.types.Slice || 
+                obj instanceof org.python.types.Range || obj instanceof org.python.types.Slice ||
                 obj instanceof org.python.types.Bytes || obj instanceof org.python.types.Complex ||
                 obj instanceof org.python.types.ByteArray || obj instanceof org.python.types.FrozenSet ||
                 obj instanceof org.python.types.MemoryView;
