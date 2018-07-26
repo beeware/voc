@@ -198,7 +198,6 @@ public class Int extends org.python.types.Object {
             }
             return org.python.types.Bool.FALSE;
         }
-        
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
 
