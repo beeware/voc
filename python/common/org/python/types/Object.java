@@ -1359,28 +1359,10 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
     }
 
-    // FIXME how can __contains__/in be reflective?
     public static org.python.Object __contains__(org.python.Object v, org.python.Object w) {
-        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
-        boolean reflectedChecked = v.type() != w.type()
-                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
         boolean v_builtin = isBuiltin(v);
-        boolean w_builtin = isBuiltin(w);
+        org.python.Object result = null;
 
-        // Reflective case
-        if (reflectedChecked) {
-            if (w_builtin) {
-                result = w.__contains__(v);
-            } else {
-                result = invokeComparison(w, v, "__contains__");
-            }
-
-            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-                return result;
-            }
-        }
-
-        // Normal case
         if (v_builtin) {
             result = v.__contains__(w);
         } else {
@@ -1389,19 +1371,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
-        }
-
-        // Now check reflection
-        if (!reflectedChecked) {
-            if (w_builtin) {
-                result = w.__contains__(v);
-            } else {
-                result = invokeComparison(w, v, "__contains__");
-            }
-
-            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-                return result;
-            }
         }
 
         // Error case
@@ -1415,25 +1384,8 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     public static org.python.Object __not_contains__(org.python.Object v, org.python.Object w) {
-        org.python.Object result = org.python.types.NotImplementedType.NOT_IMPLEMENTED;
-        boolean reflectedChecked = v.type() != w.type()
-                && ((org.python.types.Bool) org.Python.isinstance(w, v.type())).value;
         boolean v_builtin = isBuiltin(v);
-        boolean w_builtin = isBuiltin(w);
-
-        // Reflective case
-        if (reflectedChecked) {
-            if (w_builtin) {
-                result = w.__not_contains__(v);
-            } else {
-                result = invokeComparison(w, v, "__not_contains__");
-            }
-
-            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-                return result;
-            }
-        }
-
+        org.python.Object result = null;
         // Normal case
         if (v_builtin) {
             result = v.__not_contains__(w);
@@ -1443,19 +1395,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
         if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
             return result;
-        }
-
-        // Now check reflection
-        if (!reflectedChecked) {
-            if (w_builtin) {
-                result = w.__not_contains__(v);
-            } else {
-                result = invokeComparison(w, v, "__not_contains__");
-            }
-
-            if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-                return result;
-            }
         }
 
         // Error case
