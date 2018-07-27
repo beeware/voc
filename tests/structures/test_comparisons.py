@@ -587,7 +587,6 @@ class ComparisonTests(TranspileTestCase):
     @expectedFailure
     def test_bad_in(self):
         self.assertCodeExecution("""
-            print('abc' in 'abc')
             print(0 in 0)
             print(0 not in 0)
             print('abc' not in 'abc')

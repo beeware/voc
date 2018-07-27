@@ -391,7 +391,7 @@ public class Str extends org.python.types.Object {
             __doc__ = "Return key in self.",
             args = {"item"}
     )
-    public org.python.types.Int __contains__(org.python.Object item) {
+    public org.python.Object __contains__(org.python.Object item) {
         if (item instanceof org.python.types.Str) {
 
             int substr_exists = 0;
@@ -399,6 +399,8 @@ public class Str extends org.python.types.Object {
 
             if (this.value.length() == 0 && item_str.value.length() == 0) {
                 substr_exists = 1;
+            } else if (this.value == item_str.value) {
+                substr_exists = 1; 
             } else {
                 for (int i = 0; i < this.value.length() - item_str.value.length(); i++) {
                     boolean mismatch = false;
@@ -413,7 +415,7 @@ public class Str extends org.python.types.Object {
                     }
                 }
             }
-            return org.python.types.Int.getInt(substr_exists);
+            return org.python.types.Bool.getBool(substr_exists);
         }
         if (org.Python.VERSION < 0x03060000) {
             throw new org.python.exceptions.TypeError("Can't convert '" + item.typeName() + "' object to str implicitly");
