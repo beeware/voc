@@ -589,5 +589,4 @@ class ComparisonTests(TranspileTestCase):
         self.assertCodeExecution("""
             print(0 in 0)
             print(0 not in 0)
-            print('abc' not in 'abc')
         """)

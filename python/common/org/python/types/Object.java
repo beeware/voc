@@ -557,7 +557,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"item"}
     )
     public org.python.Object __not_contains__(org.python.Object item) {
-        throw new org.python.exceptions.AttributeError(this, "__not_contains__");
+        try {
+            return org.python.types.Bool.getBool(!((org.python.types.Bool) this.__contains__(item)).value);
+        } catch (org.python.exceptions.AttributeError e) {
+            throw new org.python.exceptions.AttributeError(this, "__not_contains__");
+        }
     }
 
     /**

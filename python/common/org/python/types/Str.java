@@ -400,7 +400,7 @@ public class Str extends org.python.types.Object {
             if (this.value.length() == 0 && item_str.value.length() == 0) {
                 substr_exists = 1;
             } else if (this.value == item_str.value) {
-                substr_exists = 1; 
+                substr_exists = 1;
             } else {
                 for (int i = 0; i < this.value.length() - item_str.value.length(); i++) {
                     boolean mismatch = false;

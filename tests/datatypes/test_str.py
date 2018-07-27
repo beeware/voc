@@ -884,6 +884,11 @@ class StrTests(TranspileTestCase):
             print('a' in 'abc')
             print('a' in '')
             print('' in 'a')
+
+            print('abc' not in 'abc')
+            print('a' not in 'abc')
+            print('a' not in '')
+            print('' in 'a')
         """)
 
 
