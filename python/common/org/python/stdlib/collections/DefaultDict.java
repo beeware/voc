@@ -22,7 +22,11 @@ public class DefaultDict extends org.python.types.Dict {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ =
+                "__missing__(key) # Called by __getitem__ for missing key; pseudo-code:\n" +
+                "  if self.default_factory is None: raise KeyError((key,))\n" +
+                "  self[key] = value = self.default_factory()\n" +
+                "  return value",
             args = {"key"}
     )
     public org.python.Object __missing__(org.python.Object key) {

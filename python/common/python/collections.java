@@ -133,7 +133,16 @@ public class collections extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = "",
+            __doc__ =
+                "defaultdict(default_factory[, ...]) --> dict with default factory\n" +
+                "\n" +
+                "The default factory is called without arguments to produce\n" +
+                "a new value when a key is not present, in __getitem__ only.\n" +
+                "A defaultdict compares equal to a dict with the same items.\n" +
+                "All remaining arguments are treated the same as if they were\n" +
+                "passed to the dict constructor, including keyword arguments.\n" +
+                "\n" +
+                "\n",
             varargs = "args",
             kwargs = "kwargs"
     )
