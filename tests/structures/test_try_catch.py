@@ -23,6 +23,16 @@ class TryExceptTests(TranspileTestCase):
             print('Done.')
             """)
 
+        # Test expression statement
+        self.assertCodeExecution("""
+            try:
+                [1, 2, 3]
+                "abc" == "def"
+            except:
+                print("Got an error")
+            print('Done.')
+            """)
+
     def test_try_except_unnamed(self):
         # No exception
         self.assertCodeExecution("""

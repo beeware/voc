@@ -17,6 +17,14 @@ class IfElifElseTests(TranspileTestCase):
                 print('Small x')
             """)
 
+        # Test expression statement
+        self.assertCodeExecution("""
+            x = 1
+            if x < 5:
+                [1, 2, 3]
+                x == 1
+            """)
+
     def test_if_else(self):
         self.assertCodeExecution("""
             x = 1
