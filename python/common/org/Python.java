@@ -803,6 +803,7 @@ public class Python {
     )
     public static org.python.Object help(org.python.Object object) {
         throw new org.python.exceptions.NotImplementedError("Builtin function 'help' not implemented");
+        
     }
 
     @org.python.Method(
