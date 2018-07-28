@@ -138,6 +138,37 @@ def test_code(test_case):
             main(i)
     """), timed=True)
 
+def test_cmp(test_case):
+    print("Running", "test_cmp")
+    test_case.runAsJava(adjust("""
+        x = None
+        s = "mary had a little lamb"
+        t = "humpty dumpty sat on a wall"
+
+        for i in range(1000):
+            for j in range(1000):
+                x = s < t
+                x = s <= t
+                x = s == t
+                x = s != t
+                x = s > t
+                x = s >= t
+
+                x = 3 < 5
+                x = 3 <= 5
+                x = 3 == 5
+                x = 3 != 5
+                x = 3 > 5
+                x = 3 >= 5
+
+                x = 3 < True
+                x = 3.0 <= 5
+                x = None == 5
+                x = [3] != 5.0
+                x = [3] > [5]
+                x = [3.0] > [5.0]
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -147,6 +178,7 @@ def main():
     test_class_var_load(test_case)
     test_function_var_load(test_case)
     test_code(test_case)
+    test_cmp(test_case)
 
 if __name__== "__main__":
   main()

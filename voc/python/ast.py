@@ -1884,65 +1884,79 @@ class Visitor(ast.NodeVisitor):
                 )
 
             else:
-                if isinstance(arg, (ast.In, ast.NotIn)):
+                if isinstance(arg, (ast.Eq, ast.Is)):
                     self.context.add_opcodes(
-                        JavaOpcodes.SWAP()
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__eq__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
                     )
 
-                oper = {
-                        ast.Eq: '__eq__',
-                        ast.Gt: '__gt__',
-                        ast.GtE: '__ge__',
-                        ast.Lt: '__lt__',
-                        ast.LtE: '__le__',
-                        ast.In: '__contains__',
-                        ast.Is: '__eq__',
-                        ast.IsNot: '__ne__',
-                        ast.NotEq: '__ne__',
-                        ast.NotIn: '__not_contains__',
-                }[type(arg)]
-                oper_symbol = {
-                        ast.Eq: '==',
-                        ast.Gt: '>',
-                        ast.GtE: '>=',
-                        ast.Lt: '<',
-                        ast.LtE: '<=',
-                        ast.In: 'in',
-                        ast.Is: 'is',
-                        ast.IsNot: 'is not',
-                        ast.NotEq: '!=',
-                        ast.NotIn: 'not in',
-                }[type(arg)]
-                reflect_oper = {
-                        ast.Eq: '__eq__',
-                        ast.Gt: '__lt__',
-                        ast.GtE: '__le__',
-                        ast.Lt: '__gt__',
-                        ast.LtE: '__ge__',
-                        ast.In: '__contains__',
-                        ast.Is: '__eq__',
-                        ast.IsNot: '__ne__',
-                        ast.NotEq: '__ne__',
-                        ast.NotIn: '__not_contains__',
-                }[type(arg)]
+                if isinstance(arg, (ast.NotEq, ast.IsNot)):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__ne__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
 
-                self.context.add_opcodes(
-                    JavaOpcodes.LDC_W(oper_symbol),
-                    JavaOpcodes.LDC_W(oper),
-                    JavaOpcodes.LDC_W(reflect_oper),
-                    JavaOpcodes.INVOKESTATIC(
-                        'org/python/types/Object',
-                        '__cmp__',
-                        args=[
-                            'Lorg/python/Object;',
-                            'Lorg/python/Object;',
-                            'Ljava/lang/String;',
-                            'Ljava/lang/String;',
-                            'Ljava/lang/String;',
-                        ],
-                        returns='Lorg/python/Object;',
-                    ),
-                )
+                if isinstance(arg, ast.Lt):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__lt__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.LtE):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__le__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.Gt):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__gt__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.GtE):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__ge__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.In):
+                    self.context.add_opcodes(
+                        JavaOpcodes.SWAP(),
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__contains__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.NotIn):
+                    self.context.add_opcodes(
+                        JavaOpcodes.SWAP(),
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__not_contains__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
 
         self.visit(node.left)
         left = node.left
