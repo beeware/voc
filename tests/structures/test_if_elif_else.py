@@ -22,7 +22,7 @@ class IfElifElseTests(TranspileTestCase):
             x = 1
             if x < 5:
                 [1, 2, 3]
-                x == 1
+                "abc" == "def"
             """)
 
     def test_if_else(self):

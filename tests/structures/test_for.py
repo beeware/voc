@@ -40,6 +40,7 @@ class ForLoopTests(TranspileTestCase):
         # Test expression statement
         self.assertCodeExecution("""
             for i in range(10):
+                [1, 2, 3]
                 "abc" == "def"
             """)
 
