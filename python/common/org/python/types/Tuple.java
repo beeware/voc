@@ -119,8 +119,8 @@ public class Tuple extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherTuple.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -128,8 +128,7 @@ public class Tuple extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
-                        org.python.types.Object.CMP_OP.LT);
+                return org.python.types.Object.__lt__(this.value.get(i), otherTuple.value.get(i));
             }
 
             // all items were identical, break tie by size
@@ -153,8 +152,8 @@ public class Tuple extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherTuple.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -162,8 +161,7 @@ public class Tuple extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
-                        org.python.types.Object.CMP_OP.LE);
+                return org.python.types.Object.__le__(this.value.get(i), otherTuple.value.get(i));
             }
 
             // all items were identical, break tie by size
@@ -199,8 +197,8 @@ public class Tuple extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherTuple.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -208,8 +206,7 @@ public class Tuple extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
-                        org.python.types.Object.CMP_OP.GT);
+                return org.python.types.Object.__gt__(this.value.get(i), otherTuple.value.get(i));
             }
 
             // all items were identical, break tie by size
@@ -233,8 +230,8 @@ public class Tuple extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherTuple.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -242,8 +239,7 @@ public class Tuple extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
-                        org.python.types.Object.CMP_OP.GE);
+                return org.python.types.Object.__ge__(this.value.get(i), otherTuple.value.get(i));
             }
 
             // all items were identical, break tie by size
