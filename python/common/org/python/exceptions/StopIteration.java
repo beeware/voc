@@ -3,7 +3,9 @@ package org.python.exceptions;
 public class StopIteration extends org.python.exceptions.Exception {
     org.python.Object value;
 
-    public StopIteration() {
+    public static final org.python.exceptions.StopIteration STOPITERATION = new org.python.exceptions.StopIteration();
+
+    private StopIteration() {
         super("");
     }
 

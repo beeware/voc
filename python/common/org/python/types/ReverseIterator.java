@@ -39,7 +39,7 @@ class ReverseIterator extends org.python.types.Object implements org.python.Obje
         try {
             return this.iterator.previous();
         } catch (java.util.NoSuchElementException e) {
-            throw new org.python.exceptions.StopIteration();
+            throw org.python.exceptions.StopIteration.STOPITERATION;
         }
     }
 
