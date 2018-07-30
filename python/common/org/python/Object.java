@@ -170,7 +170,6 @@ public interface Object extends Comparable {
     public org.python.Object __invert__();
 
     public org.python.Object __not__();
-    public org.python.Object __not_contains__(org.python.Object item);
 
     public org.python.Object __complex__(org.python.Object real, org.python.Object imag);
     public org.python.Object __int__();

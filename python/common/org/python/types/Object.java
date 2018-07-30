@@ -552,18 +552,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         throw new org.python.exceptions.AttributeError(this, "__contains__");
     }
 
-    @org.python.Method(
-            __doc__ = "",
-            args = {"item"}
-    )
-    public org.python.Object __not_contains__(org.python.Object item) {
-        try {
-            return org.python.types.Bool.getBool(!((org.python.types.Bool) this.__contains__(item)).value);
-        } catch (org.python.exceptions.AttributeError e) {
-            throw new org.python.exceptions.AttributeError(this, "__not_contains__");
-        }
-    }
-
     /**
      * Section 3.3.7 - Emulating numeric types
      */

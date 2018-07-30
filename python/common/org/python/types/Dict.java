@@ -329,20 +329,6 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
-            args = {"item"}
-    )
-    public org.python.Object __not_contains__(org.python.Object item) {
-        // allow unhashable type error to be percolated up.
-        try {
-            __getitem__(item);
-            return org.python.types.Bool.FALSE;
-        } catch (org.python.exceptions.KeyError e) {
-            return org.python.types.Bool.TRUE;
-        }
-    }
-
-    @org.python.Method(
             __doc__ = "D.clear() -> None.  Remove all items from D."
     )
     public org.python.Object clear() {
