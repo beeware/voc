@@ -606,8 +606,24 @@ class ComparisonTests(TranspileTestCase):
                 print(e)
         """)
 
-    @expectedFailure
-    def test_bad_in(self):
+    def test_bad_not_contains(self):
         self.assertCodeExecution("""
-            print(0 not in 0)
+            try:
+                print(0 not in 0)
+            except TypeError as e:
+                print(e)
+
+            try:
+                print(0 not in True)
+            except TypeError as e:
+                print(e)
+
+            class MyClass():
+                value = "I am not iterable!"
+            x = MyClass()
+
+            try:
+                print(0 not in x)
+            except TypeError as e:
+                print(e)
         """)
