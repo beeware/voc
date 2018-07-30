@@ -181,7 +181,7 @@ public class DictItems extends org.python.types.Object {
         org.python.types.Set set = new org.python.types.Set(this.toTupleSet());
         return set.__contains__(item);
     }
-    
+
     @org.python.Method(
             __doc__ = "Return self<value.",
             args = {"other"}
