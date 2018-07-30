@@ -3,14 +3,32 @@ package org.python.stdlib.collections;
 public class DefaultDict extends org.python.types.Dict {
     private org.python.Object default_factory;
 
-    public DefaultDict(
-            org.python.Object default_factory,
-            org.python.Object[] args,
-            java.util.Map<java.lang.String, org.python.Object> kwargs
-    ) {
-        super(args, kwargs);
+    @org.python.Method(
+            __doc__ =
+                "defaultdict(default_factory[, ...]) --> dict with default factory\n" +
+                    "\n" +
+                    "The default factory is called without arguments to produce\n" +
+                    "a new value when a key is not present, in __getitem__ only.\n" +
+                    "A defaultdict compares equal to a dict with the same items.\n" +
+                    "All remaining arguments are treated the same as if they were\n" +
+                    "passed to the dict constructor, including keyword arguments.\n" +
+                    "\n" +
+                    "\n",
+            default_args = {"default_factory", "iterable"}
+    )
+    public DefaultDict(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super(new org.python.Object[]{args[1]}, kwargs);
 
-        this.default_factory = default_factory;
+        if (args[0] != null) {
+            this.default_factory = args[0];
+
+            if (!(this.default_factory instanceof org.python.Callable ||
+                    this.default_factory instanceof org.python.types.NoneType)) {
+                throw new org.python.exceptions.TypeError("first argument must be callable or None");
+            }
+        } else {
+            this.default_factory = org.python.types.NoneType.NONE;
+        }
     }
 
     @org.python.Method(
