@@ -584,9 +584,30 @@ class ComparisonTests(TranspileTestCase):
             print(x == (50 + 50) > 2000)
             """)
 
+    def test_bad_contains(self):
+        self.assertCodeExecution("""
+            try:
+                print(0 in 0)
+            except TypeError as e:
+                print(e)
+
+            try:
+                print(0 in True)
+            except TypeError as e:
+                print(e)
+
+            class MyClass():
+                value = "I am not iterable!"
+            x = MyClass()
+
+            try:
+                print(0 in x)
+            except TypeError as e:
+                print(e)
+        """)
+
     @expectedFailure
     def test_bad_in(self):
         self.assertCodeExecution("""
-            print(0 in 0)
             print(0 not in 0)
         """)

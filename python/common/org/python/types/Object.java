@@ -1368,22 +1368,29 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object result = null;
 
         if (v_builtin) {
-            result = v.__contains__(w);
-        } else {
-            result = invokeComparison(v, w, "__contains__");
-        }
-
-        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            try {
+                result = v.__contains__(w);
+            } catch (org.python.exceptions.AttributeError e) {
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError(String.format(
+                        "unorderable types: %s() %s %s()", v.typeName(), "in", w.typeName()));
+                } else {
+                    throw new org.python.exceptions.TypeError(String.format("argument of type '%s' is not iterable", v.typeName()));
+                }
+            }
             return result;
-        }
-
-        // Error case
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError(String.format(
-                "unorderable types: %s() %s %s()", v.typeName(), "in", w.typeName()));
         } else {
-            throw new org.python.exceptions.TypeError(String.format(
-                "'%s' not supported between instances of '%s' and '%s'", "in", v.typeName(), w.typeName()));
+            try {
+                result = invokeComparison(v, w, "__contains__");
+            } catch (org.python.exceptions.AttributeError e) {
+                if (org.Python.VERSION < 0x03060000) {
+                    throw new org.python.exceptions.TypeError(String.format(
+                        "unorderable types: %s() %s %s()", v.typeName(), "in", w.typeName()));
+                } else {
+                    throw new org.python.exceptions.TypeError(String.format("argument of type '%s' is not iterable", v.typeName()));
+                }
+            }
+            return result;
         }
     }
 
