@@ -138,6 +138,16 @@ def test_code(test_case):
             main(i)
     """), timed=True)
 
+def test_loops(test_case):
+    print("Running", "test_loops")
+    test_case.runAsJava(adjust("""
+        for a in range(100):
+            for b in range(100):
+                for c in range(100):
+                    for d in range(100):
+                        pass
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -147,6 +157,7 @@ def main():
     test_class_var_load(test_case)
     test_function_var_load(test_case)
     test_code(test_case)
+    test_loops(test_case)
 
 if __name__== "__main__":
   main()
