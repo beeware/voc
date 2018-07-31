@@ -186,7 +186,7 @@ public class Function extends org.python.types.Object implements org.python.Call
             // build list of actual missing args, checking if haven't been passed as kwargs
             for (int i = first_arg; i < n_missing_pos_args; i++) {
                 java.lang.String argname = ((String) varnames.get(i + passedArgs).toJava());
-                if (!kwargs.containsKey(argname)) {
+                if (kwargs == null || !kwargs.containsKey(argname)) {
                     missingArgs.add(argname);
                 }
             }
@@ -237,6 +237,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         // System.out.println("argcount = " + argcount);
         // System.out.println("kwonlyargcount = " + kwonlyargcount);
 
+        int n_provided_args = (args == null) ? 0 : args.length;
         int n_args = argcount + kwonlyargcount;
         if ((flags & CO_VARARGS) != 0) {
             // System.out.println("HAS VARARGS");
@@ -253,8 +254,8 @@ public class Function extends org.python.types.Object implements org.python.Call
         // System.out.println("nargs = " + n_args);
         // System.out.println("first default = " + required_args);
 
-        if (0 == has_varargs && args != null && args.length > n_args) {
-            throwUnexpectedPositionalArgumentsError(n_args, args.length);
+        if (0 == has_varargs && args != null && n_provided_args > n_args) {
+            throwUnexpectedPositionalArgumentsError(n_args, n_provided_args);
         }
 
         // If there are genuinely *no* arguments - not even self - return null;
@@ -273,12 +274,12 @@ public class Function extends org.python.types.Object implements org.python.Call
             // System.out.println("   aARG 0: " + instance);
         }
 
-        checkMissingArgs(required_args, (args == null ? 0 : args.length), kwargs, varnames, first_arg);
+        checkMissingArgs(required_args, n_provided_args, kwargs, varnames, first_arg);
 
         // System.out.println("First arg = " + first_arg);
         // Populate the positional args.
         for (int i = 0; i < argcount - first_arg; i++) {
-            if (i < args.length) {
+            if (i < n_provided_args) {
                 // System.out.println("   b" + (i + first_arg));
                 adjusted[i + first_arg] = args[i];
                 // System.out.println("   bARG " + (i + first_arg) + ": " + args[i]);
@@ -306,11 +307,17 @@ public class Function extends org.python.types.Object implements org.python.Call
         }
 
         // Create a tuple for the varargs
+        org.python.types.Tuple tuple = null;
         if ((flags & CO_VARARGS) != 0) {
             // System.out.println("Handle varargs");
             // Construct Python tuple object
-            org.python.types.Tuple tuple = new org.python.types.Tuple(
-                    java.util.Arrays.asList(java.util.Arrays.copyOfRange(args, argcount - first_arg, args.length)));
+
+            if (args != null) {
+                tuple = new org.python.types.Tuple(java.util.Arrays.asList(java.util.Arrays.copyOfRange(args, argcount - first_arg, n_provided_args)));
+            } else {
+                // No varargs provided
+                tuple = new org.python.types.Tuple();
+            }
 
             adjusted[argcount] = tuple;
             // System.out.println("   dARG " + argcount + ": " + tuple);
@@ -320,7 +327,7 @@ public class Function extends org.python.types.Object implements org.python.Call
         for (int i = 0; i < kwonlyargcount; i++) {
             java.lang.String varname = ((org.python.types.Str) varnames.get(argcount + has_varargs + i)).value;
             // System.out.println("   e" + (argcount + has_varargs + i) + " " + varname);
-            org.python.Object value = kwargs.remove(varname);
+            org.python.Object value = (kwargs == null) ? null : kwargs.remove(varname);
             if (value == null) {
                 value = this.default_kwargs.get(varname);
             }
@@ -332,9 +339,11 @@ public class Function extends org.python.types.Object implements org.python.Call
         if ((flags & CO_VARKEYWORDS) != 0) {
             // System.out.println("Handle varkwargs = " + kwargs);
             org.python.types.Dict kwargDict = new org.python.types.Dict();
-            for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : kwargs.entrySet()) {
-                // System.out.println("Add KWARG" + entry.getKey());
-                kwargDict.__setitem__(new org.python.types.Str(entry.getKey()), entry.getValue());
+            if (kwargs != null) {
+                for (java.util.Map.Entry<java.lang.String, org.python.Object> entry : kwargs.entrySet()) {
+                    // System.out.println("Add KWARG" + entry.getKey());
+                    kwargDict.__setitem__(new org.python.types.Str(entry.getKey()), entry.getValue());
+                }
             }
             adjusted[adjusted.length - 1] = kwargDict;
             // System.out.println("   fARG " + (adjusted.length - 1) + ": " + kwargDict);

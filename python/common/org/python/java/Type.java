@@ -38,21 +38,26 @@ public class Type extends org.python.types.Type {
      */
     public java.lang.reflect.Constructor selectConstructor(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         // org.Python.debug("Constructor options: ", this.constructors);
+        int n_args = (args == null) ? 0 : args.length;
 
         java.lang.reflect.Constructor constructor = null;
         java.lang.StringBuilder signature = new java.lang.StringBuilder();
-        java.lang.Class<?>[] arg_types = new java.lang.Class<?>[args.length];
-        int n_args = args.length;
-        for (int i = 0; i < n_args; i++) {
-            if (args[i] == null) {
-                arg_types[i] = null;
-            } else if (args[i].toJava() == null) {
-                arg_types[i] = null;
-            } else {
-                arg_types[i] = args[i].toJava().getClass();
+
+        java.lang.Class<?>[] arg_types = null;
+        if (n_args != 0) {
+            arg_types = new java.lang.Class<?>[n_args];
+            for (int i = 0; i < n_args; i++) {
+                if (args[i] == null) {
+                    arg_types[i] = null;
+                } else if (args[i].toJava() == null) {
+                    arg_types[i] = null;
+                } else {
+                    arg_types[i] = args[i].toJava().getClass();
+                }
+                signature.append(Function.descriptor(arg_types[i]));
             }
-            signature.append(Function.descriptor(arg_types[i]));
         }
+
         // org.Python.debug("Argument signature", signature);
         constructor = this.constructors.get(signature.toString());
 
@@ -258,7 +263,10 @@ public class Type extends org.python.types.Type {
                 }
             } else {
                 constructor = this.selectConstructor(args, kwargs);
-                java.lang.Object[] adjusted_args = this.adjustArguments(constructor, args, kwargs);
+                java.lang.Object[] adjusted_args = null;
+                if (args != null || kwargs != null) {
+                    adjusted_args = this.adjustArguments(constructor, args, kwargs);
+                }
 
                 return new org.python.java.Object(constructor.newInstance(adjusted_args));
             }
