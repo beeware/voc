@@ -1,7 +1,7 @@
 package org.python.types;
 
-class Iterator extends org.python.types.Object implements org.python.Object {
-    java.util.Iterator<org.python.Object> iterator;
+public class Iterator extends org.python.types.Object implements org.python.Object {
+    protected java.util.Iterator<org.python.Object> iterator;
 
     public int hashCode() {
         return this.iterator.hashCode();
