@@ -168,14 +168,14 @@ def test_cmp(test_case):
                 x = [3] > [5]
                 x = [3.0] > [5.0]
     """), timed=True)
-    
+
 def test_loops(test_case):
     print("Running", "test_loops")
     test_case.runAsJava(adjust("""
-        for a in range(100):
-            for b in range(100):
-                for c in range(100):
-                    for d in range(100):
+        for x in range(100):
+            for y in range(100):
+                for z in range(100):
+                    for a in range(100):
                         pass
 
 def main():
