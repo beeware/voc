@@ -177,6 +177,7 @@ def test_loops(test_case):
                 for z in range(100):
                     for a in range(100):
                         pass
+    """), timed=True)
 
 def main():
     test_case = TranspileTestCase()
