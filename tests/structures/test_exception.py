@@ -24,6 +24,29 @@ class ExceptionTests(TranspileTestCase):
             print('Done.')
         """, exits_early=True)
 
+    @expectedFailure
+    def test_raise_existing_error(self):
+        self.assertCodeExecution("""
+            error1 = ValueError
+            error2 = ValueError()
+            error3 = ValueError("This is the name")
+
+            try:
+                raise error1
+            except ValueError:
+                print("Done")
+
+            try:
+                raise error2
+            except ValueError:
+                print("Done")
+
+            try:
+                raise error3
+            except ValueError:
+                print("Done")
+        """)
+
     def test_raise_catch(self):
         self.assertCodeExecution("""
             try:
