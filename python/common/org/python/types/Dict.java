@@ -507,7 +507,7 @@ public class Dict extends org.python.types.Object {
                 while (true) {
                     try {
                         org.python.Object key = iterator.__next__();
-                        org.python.Object value = kwargs._getitem(key);
+                        org.python.Object value = kwargs.value.get(key);
                         this.value.put(key, value);
                     } catch (org.python.exceptions.StopIteration si) {
                         break;
