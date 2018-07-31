@@ -123,6 +123,16 @@ public class Range extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "",
+            args = {"index", "value"}
+    )
+    public void __setitem__(org.python.Object index, org.python.Object value) {
+        throw new org.python.exceptions.TypeError(
+                "'range' object does not support item assignment"
+        );
+    }
+
+    @org.python.Method(
             __doc__ = "Implement __len__(self)."
     )
     public org.python.Object __len__() {

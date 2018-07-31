@@ -80,6 +80,15 @@ class RangeTests(TranspileTestCase):
             print(r)
         """)
 
+    def test_setitem(self):
+        self.assertCodeExecution("""
+            r = range(10)
+            try:
+                r[0] = "abc"
+            except TypeError as e:
+                print(e)
+        """)
+
 
 class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
