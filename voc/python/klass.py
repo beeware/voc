@@ -16,7 +16,6 @@ from .methods import (
     InitMethod, ClosureInitMethod,
     GeneratorMethod, Method, CO_GENERATOR,
 )
-from .nonlocal_util import store_nonlocal
 from .types import java, python
 from .types.primitives import (
     ALOAD_name, ASTORE_name, free_name,
@@ -31,7 +30,7 @@ class Class(Block):
             self, parent, name,
             namespace=None, extends=None, implements=None,
             public=True, final=False, methods=None, fields=None, init=None,
-            verbosity=0, include_default_constructor=True, outer_scopes=None):
+            verbosity=0, include_default_constructor=True):
         super().__init__(parent=parent, verbosity=verbosity)
         self.name = name
         if namespace is None:
@@ -57,10 +56,6 @@ class Class(Block):
         self.fields["__VOC__"] = "Lorg/python/Object;"
 
         self._constructor = None
-
-        self.nonlocal_vars = []  # holds nonlocal variable names for `store_name`
-        self.closure_vars = []  # holds 'read-only' variable names from enclosing context
-        self.outer_scopes = outer_scopes  # parent scopes of this class context, excluding global scope
 
         # Store the Module object as a local variable
         self.store_module()
@@ -94,7 +89,7 @@ class Class(Block):
     def build_child_class_descriptor(self, child_name):
         return '$'.join([self.descriptor, child_name])
 
-    def add_class(self, class_name, extends, implements, co_freevars=None):
+    def add_class(self, class_name, extends, implements):
         klass = Class(
             self,
             name=class_name,
@@ -190,26 +185,15 @@ class Class(Block):
         # )
 
     def store_name(self, name, declare=False):
-        if name in self.nonlocal_vars:
-            # updates closure
-            self.add_opcodes(
-                JavaOpcodes.DUP(),
-                python.Type.for_class(self.descriptor),
-                JavaOpcodes.SWAP(),
-                python.Object.set_attr('$closure-' + name)
-            )
-            # stores a copy of updated variable in parent context
-            store_nonlocal(self, name)
-        else:
-            self.add_opcodes(
-                ASTORE_name('#value'),
-                python.Type.for_class(self.descriptor),
+        self.add_opcodes(
+            ASTORE_name('#value'),
+            python.Type.for_class(self.descriptor),
 
-                ALOAD_name('#value'),
-                python.Object.set_attr(name),
+            ALOAD_name('#value'),
+            python.Object.set_attr(name),
 
-                free_name('#value')
-            )
+            free_name('#value')
+        )
 
     def store_dynamic(self):
         self.add_opcodes(
@@ -224,16 +208,10 @@ class Class(Block):
         )
 
     def load_name(self, name):
-        if name in self.closure_vars:
-            self.add_opcodes(
-                python.Type.for_class(self.descriptor),
-                python.Object.get_attribute('$closure-' + name)
-            )
-        else:
-            self.add_opcodes(
-                python.Type.for_class(self.descriptor),
-                python.Object.get_attribute(name),
-            )
+        self.add_opcodes(
+            python.Type.for_class(self.descriptor),
+            python.Object.get_attribute(name),
+        )
 
     def load_globals(self):
         self.add_opcodes(
@@ -268,11 +246,6 @@ class Class(Block):
         self._constructor = value
 
     def add_function(self, name, code, parameter_signatures, return_signature):
-        if self.outer_scopes:
-            outer_scopes = self.outer_scopes + [self]
-        else:
-            outer_scopes = [self]
-
         if code.co_flags & CO_GENERATOR:
             method = GeneratorMethod(
                 self,
@@ -281,8 +254,7 @@ class Class(Block):
                 generator=code.co_name,
                 parameters=parameter_signatures,
                 returns=return_signature,
-                static=True,
-                outer_scopes=outer_scopes
+                static=True
             )
 
         else:
@@ -292,8 +264,7 @@ class Class(Block):
                 code=code,
                 parameters=parameter_signatures,
                 returns=return_signature,
-                static=True,
-                outer_scopes=outer_scopes
+                static=True
             )
 
         # Add the method to the list that need to be
@@ -305,27 +276,6 @@ class Class(Block):
 
         if method.name == '__init__':
             self.init_method = method
-        elif code.co_freevars:
-            method.closure_vars = code.co_freevars
-
-            # closure variables are stored as attribute of class prefixed with '$closure-'
-            self.add_opcodes(
-                python.Type.for_class(self.descriptor),
-            )
-            for var_name in code.co_freevars:
-                if var_name == '__class__':
-                    continue  # no need to add super class, voc will handle it during transpilation
-
-                self.add_opcodes(
-                    JavaOpcodes.DUP(),
-                )
-                self.load_name(var_name)
-                self.add_opcodes(
-                    python.Object.set_attr('$closure-' + var_name)
-                )
-            self.add_opcodes(
-                JavaOpcodes.POP()
-            )
 
         return method
 

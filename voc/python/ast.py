@@ -331,8 +331,7 @@ class Visitor(ast.NodeVisitor):
                 java.List.add(),
             )
 
-        co_freevars = self.code_objects[(node.lineno, node.name)].co_freevars
-        klass = self.context.add_class(class_name, extends, implements, co_freevars=co_freevars)
+        klass = self.context.add_class(class_name, extends, implements)
 
         self.push_context(klass)
         for child in node.body:
