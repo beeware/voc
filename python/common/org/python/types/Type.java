@@ -14,10 +14,22 @@ public class Type extends org.python.types.Object implements org.python.Callable
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
-    // Keeps track of modified `nonlocal` variables for current scope
-    // Used as value lookup for current scope to update its local variable
-    // when child scope assigned a new value to it via `nonlocal`
-    public org.python.types.Dict nonlocal_vars;
+    private static org.python.Object[] emptyArgs;
+    private static java.util.Map<java.lang.String, org.python.Object> emptyKwargs;
+
+    private static org.python.Object[] getEmptyArgs() {
+        if (emptyArgs == null) {
+            emptyArgs = new org.python.Object[0];
+        }
+        return emptyArgs;
+    }
+
+    private static java.util.Map<java.lang.String, org.python.Object> getEmptyKwargs() {
+        if (emptyKwargs == null) {
+            emptyKwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
+        }
+        return emptyKwargs;
+    }
 
     /**
      * Factory method to obtain Python classes from their Java counterparts
@@ -483,16 +495,5 @@ public class Type extends org.python.types.Object implements org.python.Callable
         // } finally {
             //     System.out.println("CONSTRUCTOR DONE");
         }
-    }
-
-    public void set_nonlocal_var(java.lang.String name, org.python.Object value) {
-        if (this.nonlocal_vars == null) {
-            this.nonlocal_vars = new org.python.types.Dict();
-        }
-        this.nonlocal_vars.__setitem__(new org.python.types.Str(name), value);
-    }
-
-    public org.python.Object get_nonlocal_var(java.lang.String name) {
-        return this.nonlocal_vars.get(new org.python.types.Str(name), null);
     }
 }
