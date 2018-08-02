@@ -1,5 +1,7 @@
 from ..utils import TranspileTestCase
 
+from unittest import expectedFailure
+
 
 class WithLoopTests(TranspileTestCase):
     def test_with(self):
@@ -36,6 +38,23 @@ class WithLoopTests(TranspileTestCase):
             with CtxMgr():
                 raise KeyError('ola')
             """, exits_early=True)
+
+    @expectedFailure
+    def test_with_suppresses_exception(self):
+        self.assertCodeExecution("""
+            class CtxMgr:
+                def __enter__(self):
+                    print('entering CtxMgr')
+                def __exit__(self, exc_type, exc_value, traceback):
+                    print('exiting CtxMgr')
+                    print('exc_value', exc_value)
+                    return True
+
+            with CtxMgr():
+                raise KeyError('ola')
+
+            print('Done')
+        """)
 
     def test_with_noexit(self):
         self.assertCodeExecution("""
