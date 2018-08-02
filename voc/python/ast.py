@@ -249,9 +249,9 @@ class Visitor(ast.NodeVisitor):
     def visit_Expr(self, node):
         self.generic_visit(node)
 
-        # If the expression is a call, we need to ignore
-        # any return value from the function.
-        if isinstance(node.value, (ast.Call, ast.Attribute, ast.Str)):
+        # If the expression is not yield/yield from expression,
+        # we need to ignore expression value by popping it off from stack.
+        if not isinstance(node.value, (ast.Yield, ast.YieldFrom)):
             self.context.add_opcodes(
                 JavaOpcodes.POP()
             )
