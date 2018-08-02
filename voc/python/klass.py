@@ -73,7 +73,7 @@ class Class(Block):
         return self._parent.module
 
     def store_module(self):
-        # Stores the current module as a local variable 
+        # Stores the current module as a local variable
         if ('#module') not in self.local_vars:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),

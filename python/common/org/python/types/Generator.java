@@ -32,10 +32,10 @@ public class Generator extends org.python.types.Object {
     }
 
     public Generator(
-        java.lang.String name,
-        java.lang.reflect.Method expression,
-        java.util.Map<java.lang.String, org.python.Object> stack,
-        org.python.types.Closure closure
+            java.lang.String name,
+            java.lang.reflect.Method expression,
+            java.util.Map<java.lang.String, org.python.Object> stack,
+            org.python.types.Closure closure
     ) {
         // System.out.println("GENERATOR: " + expression);
         // for (org.python.Object obj: stack) {

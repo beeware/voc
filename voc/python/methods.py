@@ -912,7 +912,7 @@ class MainFunction(Function):
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
-            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
+            ALOAD_name('#module'),  # #module is available as a local var after visitor_setup has been called
 
             ALOAD_name('#value'),
             python.Object.set_attr(name),
@@ -932,13 +932,13 @@ class MainFunction(Function):
 
     def load_name(self, name):
         self.add_opcodes(
-            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
+            ALOAD_name('#module'),  # #module is available as a local var after visitor_setup has been called
             python.Object.get_attribute(name),
         )
 
     def delete_name(self, name):
         self.add_opcodes(
-            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
+            ALOAD_name('#module'),  # #module is available as a local var after visitor_setup has been called
             python.Object.del_attr(name),
         )
 

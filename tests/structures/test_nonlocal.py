@@ -2,6 +2,7 @@ from unittest import expectedFailure
 
 from ..utils import TranspileTestCase
 
+
 class NonlocalTests(TranspileTestCase):
     def test_nonlocal_func(self):
         self.assertCodeExecution("""
@@ -52,10 +53,10 @@ class NonlocalTests(TranspileTestCase):
                     nonlocal a
                     a = 'changed by nested'
                     print(a)
-                
+
                 def nested2():
                     print(a)
-                
+
                 return (nested, nested2)
 
             nested, nested2 = func()
@@ -102,7 +103,7 @@ class NonlocalTests(TranspileTestCase):
                 Klass().method()
                 print(a)
                 print(b)
-                
+
                 # make sure closure variables are not exposed
                 print(hasattr(Klass(), '$closure-a'))
                 print(hasattr(Klass(), '$closure-b'))
