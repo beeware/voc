@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -52,3 +54,12 @@ class IteratorTests(TranspileTestCase):
             for i in myinterview:
                 print(i)
             """)
+
+    @expectedFailure
+    def test_bad_iter(self):
+        self.assertCodeExecution("""
+            try:
+                x = iter()
+            except TypeError as err:
+                print(err)
+        """)
