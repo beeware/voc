@@ -5,7 +5,7 @@ public class Generator extends org.python.types.Object {
     java.lang.reflect.Method expression;
     public int yield_point;
     public java.util.Map<java.lang.String, org.python.Object> stack;
-    public java.util.Map<java.lang.String, org.python.Object> closure_vars; // null for non-closure Generator
+    public org.python.types.Closure closure; // null for non-closure Generator
 
     private boolean just_started = true;
     public org.python.Object message;
@@ -28,7 +28,7 @@ public class Generator extends org.python.types.Object {
         this.yield_point = 0;
         this.stack = stack;
         this.message = new org.python.types.NoneType();
-        this.closure_vars = null;
+        this.closure = null;
     }
 
     public Generator(
@@ -46,7 +46,7 @@ public class Generator extends org.python.types.Object {
         this.yield_point = 0;
         this.stack = stack;
         this.message = new org.python.types.NoneType();
-        this.closure_vars = closure.closure_vars;
+        this.closure = closure;
     }
 
     public void yield(java.util.Map<java.lang.String, org.python.Object> stack, int yield_point) {
