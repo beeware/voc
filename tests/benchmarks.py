@@ -169,6 +169,16 @@ def test_cmp(test_case):
                 x = [3.0] > [5.0]
     """), timed=True)
 
+def test_loops(test_case):
+    print("Running", "test_loops")
+    test_case.runAsJava(adjust("""
+        for x in range(100):
+            for y in range(100):
+                for z in range(100):
+                    for a in range(100):
+                        pass
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -178,6 +188,7 @@ def main():
     test_class_var_load(test_case)
     test_function_var_load(test_case)
     test_code(test_case)
+    test_loops(test_case)
     test_cmp(test_case)
 
 if __name__== "__main__":

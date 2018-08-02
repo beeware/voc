@@ -135,3 +135,20 @@ class ExceptionTests(TranspileTestCase):
 
                     """
             })
+
+    @expectedFailure
+    def test_stopiteration_equality(self):
+        # This is kwown and StopIteration is a singleton by design.
+        # See org/python/exceptions/StopIteration
+        self.assertCodeExecution("""
+            x = iter([])
+            y = iter([])
+
+            try:
+                next(x)
+            except StopIteration as e1:
+                try:
+                    next(y)
+                except StopIteration as e2:
+                    print(e1 == e2)
+        """)

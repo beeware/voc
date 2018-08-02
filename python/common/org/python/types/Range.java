@@ -272,9 +272,11 @@ public class Range extends org.python.types.Object {
         )
         public org.python.Object __next__() {
             if (this.step > 0 && this.index >= this.stop) {
-                throw new org.python.exceptions.StopIteration();
+                // StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+                throw org.python.exceptions.StopIteration.STOPITERATION;
             } else if (this.step < 0 && this.index <= this.stop) {
-                throw new org.python.exceptions.StopIteration();
+                // StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+                throw org.python.exceptions.StopIteration.STOPITERATION;
             }
 
             org.python.Object result = org.python.types.Int.getInt(this.index);
