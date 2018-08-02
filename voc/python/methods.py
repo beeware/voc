@@ -1093,9 +1093,8 @@ class GeneratorFunction(Function):
     def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
             self.add_opcodes(
+                # StopIteration is a singleton by design, see org/python/exceptions/StopIteration 
                 JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
-                #java.New('org/python/exceptions/StopIteration'),
-                #java.Init('org/python/exceptions/StopIteration'),
                 JavaOpcodes.ATHROW(),
             )
 
@@ -1283,9 +1282,8 @@ class GeneratorMethod(Method):
     def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
             self.add_opcodes(
+                # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
                 JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
-                #java.New('org/python/exceptions/StopIteration'),
-                #java.Init('org/python/exceptions/StopIteration'),
                 JavaOpcodes.ATHROW(),
             )
 

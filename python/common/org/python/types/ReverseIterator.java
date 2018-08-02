@@ -39,6 +39,7 @@ class ReverseIterator extends org.python.types.Object implements org.python.Obje
         try {
             return this.iterator.previous();
         } catch (java.util.NoSuchElementException e) {
+            // StopIteration is a singleton by design, see org/python/exceptions/StopIteration 
             throw org.python.exceptions.StopIteration.STOPITERATION;
         }
     }
