@@ -43,6 +43,15 @@ class TupleTests(TranspileTestCase):
             print(x)
             """)
 
+    def test_setitem(self):
+        self.assertCodeExecution("""
+            x = (1, 2, 3, 4, 5)
+            try:
+                x[0] = "a"
+            except TypeError as err:
+                print(err)
+        """)
+
     def test_getitem(self):
         # Simple positive index
         self.assertCodeExecution("""

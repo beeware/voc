@@ -377,6 +377,16 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "",
+            args = {"index", "value"}
+    )
+    public void __setitem__(org.python.Object index, org.python.Object value) {
+        throw new org.python.exceptions.TypeError(
+                "'str' object does not support item assignment"
+        );
+    }
+
+    @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {

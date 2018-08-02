@@ -28,6 +28,15 @@ class IntTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_setitem(self):
+        self.assertCodeExecution("""
+            x = 37
+            try:
+                x[0] = 1
+            except TypeError as err:
+                print(err)
+        """)
+
     def test_invalid_literal(self):
         self.assertCodeExecution("""
             try:
