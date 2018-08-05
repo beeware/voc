@@ -310,7 +310,7 @@ public class Generator extends org.python.types.Object {
     public org.python.Object __next__() {
         if (this.expression == null) {
             // Generator has already exited
-            throw new org.python.exceptions.StopIteration();
+            throw org.python.exceptions.StopIteration.STOPITERATION;
         }
         try {
             return (org.python.Object) this.expression.invoke(null, new java.lang.Object[]{this});
