@@ -1,10 +1,10 @@
 package org.python.types;
 
 public class DictItems extends org.python.types.Object {
-    java.util.Set<java.util.Map.Entry<org.python.Object,org.python.Object>> value;
+    java.util.Set<java.util.Map.Entry<org.python.Object, org.python.Object>> value;
 
     static {
-         org.python.types.Type.declarePythonType(DictItems.class,"dict_items",null,null);
+        org.python.types.Type.declarePythonType(DictItems.class, "dict_items", null, null);
     }
 
     /**
@@ -36,7 +36,7 @@ public class DictItems extends org.python.types.Object {
 
     private java.util.Set<org.python.Object> toTupleSet() {
         java.util.Set<org.python.Object> set = new java.util.HashSet<org.python.Object>();
-        for(java.util.Map.Entry<org.python.Object,org.python.Object> entry : this.value) {
+        for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : this.value) {
             java.util.List<org.python.Object> tmp = new java.util.ArrayList<org.python.Object>();
             tmp.add(entry.getKey());
             tmp.add(entry.getValue());
@@ -64,13 +64,13 @@ public class DictItems extends org.python.types.Object {
     public org.python.types.Str __repr__() {
         java.lang.StringBuilder buffer = new java.lang.StringBuilder("dict_items([");
         boolean first = true;
-        for(java.util.Map.Entry<org.python.Object,org.python.Object> entry : this.value) {
+        for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : this.value) {
             if (first) {
                 first = false;
             } else {
                 buffer.append(", ");
             }
-            buffer.append(String.format("(%s, %s)",entry.getKey().__repr__(),entry.getValue().__repr__()));
+            buffer.append(String.format("(%s, %s)", entry.getKey().__repr__(), entry.getValue().__repr__()));
         }
         buffer.append("])");
         return new org.python.types.Str(buffer.toString());
@@ -111,7 +111,7 @@ public class DictItems extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(!this.value.isEmpty());
+        return org.python.types.Bool.getBool(!this.value.isEmpty());
     }
 
     @org.python.Method(
@@ -135,7 +135,7 @@ public class DictItems extends org.python.types.Object {
             __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.size());
+        return org.python.types.Int.getInt(this.value.size());
     }
 
     @org.python.Method(
@@ -198,7 +198,7 @@ public class DictItems extends org.python.types.Object {
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.DictItems) {
             org.python.types.DictItems otherItems = (org.python.types.DictItems) other;
-            return new org.python.types.Bool(otherItems.value.containsAll(this.value) && !this.value.equals(otherItems.value));
+            return org.python.types.Bool.getBool(otherItems.value.containsAll(this.value) && !this.value.equals(otherItems.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -210,7 +210,7 @@ public class DictItems extends org.python.types.Object {
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.DictItems) {
             org.python.types.DictItems otherItems = (org.python.types.DictItems) other;
-            return new org.python.types.Bool(otherItems.value.containsAll(this.value));
+            return org.python.types.Bool.getBool(otherItems.value.containsAll(this.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -222,7 +222,7 @@ public class DictItems extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.DictItems) {
             org.python.types.DictItems otherItems = (org.python.types.DictItems) other;
-            return new org.python.types.Bool(this.value.equals(otherItems.value));
+            return org.python.types.Bool.getBool(this.value.equals(otherItems.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -234,7 +234,7 @@ public class DictItems extends org.python.types.Object {
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.DictItems) {
             org.python.types.DictItems otherItems = (org.python.types.DictItems) other;
-            return new org.python.types.Bool(this.value.containsAll(otherItems.value) && !this.value.equals(otherItems.value));
+            return org.python.types.Bool.getBool(this.value.containsAll(otherItems.value) && !this.value.equals(otherItems.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -246,7 +246,7 @@ public class DictItems extends org.python.types.Object {
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.DictItems) {
             org.python.types.DictItems otherItems = (org.python.types.DictItems) other;
-            return new org.python.types.Bool(this.value.containsAll(otherItems.value));
+            return org.python.types.Bool.getBool(this.value.containsAll(otherItems.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -331,6 +331,6 @@ public class DictItems extends org.python.types.Object {
     public org.python.Object isdisjoint(org.python.Object other) {
         java.util.Set<org.python.Object> generated = this.fromIter(other);
         generated.retainAll(this.value);
-        return new org.python.types.Bool(generated.size() > 0);
+        return org.python.types.Bool.getBool(generated.size() > 0);
     }
 }

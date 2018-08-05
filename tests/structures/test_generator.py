@@ -72,6 +72,19 @@ class GeneratorTests(TranspileTestCase):
                 print(i)
             """)
 
+    def test_simple_generators(self):
+        self.assertCodeExecution("""
+            num_fibs = [5, 10, 15]
+
+            def fib(n):
+                a, b = 0, 1
+                for _ in range(n):
+                    yield a
+                    a, b = b, a + b
+
+            print([list(fib(n)) for n in num_fibs])
+        """)
+
     def test_generator_send(self):
         self.assertCodeExecution("""
             def gen():
@@ -138,6 +151,19 @@ class GeneratorTests(TranspileTestCase):
                 print("can't reach here")
             except StopIteration:
                 print("StopIteration")
+            """)
+
+    def test_generator_send_non_None(self):
+        self.assertCodeExecution("""
+            def gen():
+                a = yield
+                print(a)
+
+            g = gen()
+            try:
+                g.send(1)
+            except Exception as e:
+                print(e, e.args)
             """)
 
     def test_generator_yield_expr_call(self):

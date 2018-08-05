@@ -238,9 +238,9 @@ class Visitor(ast.NodeVisitor):
     def visit_Expr(self, node):
         self.generic_visit(node)
 
-        # If the expression is a call, we need to ignore
-        # any return value from the function.
-        if isinstance(node.value, (ast.Call, ast.Attribute, ast.Str)):
+        # If the expression is not yield/yield from expression,
+        # we need to ignore expression value by popping it off from stack.
+        if not isinstance(node.value, (ast.Yield, ast.YieldFrom)):
             self.context.add_opcodes(
                 JavaOpcodes.POP()
             )
@@ -1916,17 +1916,14 @@ class Visitor(ast.NodeVisitor):
                     IF([], JavaOpcodes.IF_ACMPNE),
                 )
                 self.context.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        JavaOpcodes.ICONST_1(),
-                        java.Init('org/python/types/Bool', 'Z'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
                 )
                 self.context.add_opcodes(
                     ELSE(),
                 )
                 self.context.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        JavaOpcodes.ICONST_0(),
-                        java.Init('org/python/types/Bool', 'Z'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
+
                 )
                 self.context.add_opcodes(
                     END_IF(),
@@ -1937,82 +1934,92 @@ class Visitor(ast.NodeVisitor):
                     IF([], JavaOpcodes.IF_ACMPEQ),
                 )
                 self.context.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        JavaOpcodes.ICONST_1(),
-                        java.Init('org/python/types/Bool', 'Z'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
                 )
                 self.context.add_opcodes(
                     ELSE(),
                 )
                 self.context.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        JavaOpcodes.ICONST_0(),
-                        java.Init('org/python/types/Bool', 'Z'),
+                        JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
                 )
                 self.context.add_opcodes(
                     END_IF(),
                 )
 
             else:
-                if isinstance(arg, (ast.In, ast.NotIn)):
+                if isinstance(arg, (ast.Eq, ast.Is)):
                     self.context.add_opcodes(
-                        JavaOpcodes.SWAP()
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__eq__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
                     )
 
-                oper = {
-                        ast.Eq: '__eq__',
-                        ast.Gt: '__gt__',
-                        ast.GtE: '__ge__',
-                        ast.Lt: '__lt__',
-                        ast.LtE: '__le__',
-                        ast.In: '__contains__',
-                        ast.Is: '__eq__',
-                        ast.IsNot: '__ne__',
-                        ast.NotEq: '__ne__',
-                        ast.NotIn: '__not_contains__',
-                }[type(arg)]
-                oper_symbol = {
-                        ast.Eq: '==',
-                        ast.Gt: '>',
-                        ast.GtE: '>=',
-                        ast.Lt: '<',
-                        ast.LtE: '<=',
-                        ast.In: 'in',
-                        ast.Is: 'is',
-                        ast.IsNot: 'is not',
-                        ast.NotEq: '!=',
-                        ast.NotIn: 'not in',
-                }[type(arg)]
-                reflect_oper = {
-                        ast.Eq: '__eq__',
-                        ast.Gt: '__lt__',
-                        ast.GtE: '__le__',
-                        ast.Lt: '__gt__',
-                        ast.LtE: '__ge__',
-                        ast.In: '__contains__',
-                        ast.Is: '__eq__',
-                        ast.IsNot: '__ne__',
-                        ast.NotEq: '__ne__',
-                        ast.NotIn: '__not_contains__',
-                }[type(arg)]
+                if isinstance(arg, (ast.NotEq, ast.IsNot)):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__ne__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
 
-                self.context.add_opcodes(
-                    JavaOpcodes.LDC_W(oper_symbol),
-                    JavaOpcodes.LDC_W(oper),
-                    JavaOpcodes.LDC_W(reflect_oper),
-                    JavaOpcodes.INVOKESTATIC(
-                        'org/python/types/Object',
-                        '__cmp__',
-                        args=[
-                            'Lorg/python/Object;',
-                            'Lorg/python/Object;',
-                            'Ljava/lang/String;',
-                            'Ljava/lang/String;',
-                            'Ljava/lang/String;',
-                        ],
-                        returns='Lorg/python/Object;',
-                    ),
-                )
+                if isinstance(arg, ast.Lt):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__lt__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.LtE):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__le__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.Gt):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__gt__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.GtE):
+                    self.context.add_opcodes(
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__ge__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.In):
+                    self.context.add_opcodes(
+                        JavaOpcodes.SWAP(),
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__contains__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
+
+                if isinstance(arg, ast.NotIn):
+                    self.context.add_opcodes(
+                        JavaOpcodes.SWAP(),
+                        JavaOpcodes.INVOKESTATIC(
+                            'org/python/types/Object',
+                            '__not_contains__',
+                            args=['Lorg/python/Object;', 'Lorg/python/Object;'],
+                            returns='Lorg/python/Object;'),
+                    )
 
         self.visit(node.left)
         left = node.left
@@ -2146,55 +2153,65 @@ class Visitor(ast.NodeVisitor):
             # Create and populate the array of arguments to pass to invoke()
             num_args = len([arg for arg in node.args if not isinstance(arg, ast.Starred)])
 
-            self.context.add_opcodes(
-                java.Array(num_args),
-            )
+            if len(node.args) == 0 and getattr(node, 'starargs', None) is None:
+                self.context.add_opcodes(
+                    JavaOpcodes.ACONST_NULL(),
+                )
+            else:
+                self.context.add_opcodes(
+                    java.Array(num_args),
+                )
 
-            for i, arg in enumerate(node.args):
-                # This block implements *args in Python 3.5+
-                if isinstance(arg, ast.Starred):
+                for i, arg in enumerate(node.args):
+                    # This block implements *args in Python 3.5+
+                    if isinstance(arg, ast.Starred):
+                        self.visit(arg)
+                        continue
+
+                    self.context.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        ICONST_val(i),
+                    )
                     self.visit(arg)
-                    continue
+                    self.context.add_opcodes(
+                        JavaOpcodes.AASTORE(),
+                    )
 
+                # This block implements *args in Python 3.4
+                if getattr(node, 'starargs', None) is not None:
+                    # Evaluate the starargs
+                    self.visit(node.starargs)
+
+                    self.context.add_opcodes(
+                        AddToArgs(),
+                    )
+
+            if len(node.keywords) == 0 and getattr(node, 'kwargs', None) is None:
                 self.context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    ICONST_val(i),
+                    JavaOpcodes.ACONST_NULL(),
                 )
-                self.visit(arg)
+            else:
+                # Create and populate the map of kwargs to pass to invoke().
                 self.context.add_opcodes(
-                    JavaOpcodes.AASTORE(),
-                )
-
-            # This block implements *args in Python 3.4
-            if getattr(node, 'starargs', None) is not None:
-                # Evaluate the starargs
-                self.visit(node.starargs)
-
-                self.context.add_opcodes(
-                    AddToArgs(),
-                )
-
-            # Create and populate the map of kwargs to pass to invoke().
-            self.context.add_opcodes(
                     java.Map(),
-            )
-
-            for keyword in node.keywords:
-                if keyword.arg is None:  # Python 3.5 **kwargs
-                    self.add_doublestarred_kwargs(node, keyword.value)
-                    continue
-
-                self.context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    JavaOpcodes.LDC_W(keyword.arg),
-                )
-                self.visit(keyword.value)
-                self.context.add_opcodes(
-                    java.Map.put()
                 )
 
-            if getattr(node, 'kwargs', None) is not None:  # Python 3.4 **kwargs
-                self.add_doublestarred_kwargs(node, node.kwargs)
+                for keyword in node.keywords:
+                    if keyword.arg is None:  # Python 3.5 **kwargs
+                        self.add_doublestarred_kwargs(node, keyword.value)
+                        continue
+
+                    self.context.add_opcodes(
+                        JavaOpcodes.DUP(),
+                        JavaOpcodes.LDC_W(keyword.arg),
+                    )
+                    self.visit(keyword.value)
+                    self.context.add_opcodes(
+                        java.Map.put()
+                    )
+
+                if getattr(node, 'kwargs', None) is not None:  # Python 3.4 **kwargs
+                    self.add_doublestarred_kwargs(node, node.kwargs)
 
             # Set up the stack and invoke the callable
             self.context.add_opcodes(
@@ -2268,15 +2285,13 @@ class Visitor(ast.NodeVisitor):
             )
         elif node.value is True:
             self.context.add_opcodes(
-                java.New('org/python/types/Bool'),
-                JavaOpcodes.ICONST_1(),
-                java.Init('org/python/types/Bool', 'Z'),
+                JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
+
             )
         elif node.value is False:
             self.context.add_opcodes(
-                java.New('org/python/types/Bool'),
-                JavaOpcodes.ICONST_0(),
-                java.Init('org/python/types/Bool', 'Z'),
+                JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
+
             )
         else:
             raise NotImplementedError("Unknown named constant %s" % node.value)
@@ -2379,6 +2394,9 @@ class Visitor(ast.NodeVisitor):
                     python.Iterable.next()
                 )
                 self.visit(child)
+            self.context.add_opcodes(
+                JavaOpcodes.POP()
+            )
 
     @node_visitor
     def visit_Tuple(self, node):

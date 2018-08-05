@@ -9,9 +9,9 @@ public class VersionInfo extends org.python.types.Object {
     public static final java.lang.String PYTHON_TYPE_NAME = "sys.version_info";
 
     public VersionInfo(int major, int minor, int micro, int releaselevel, int serial) {
-        this.major = new org.python.types.Int(major);
-        this.minor = new org.python.types.Int(minor);
-        this.micro = new org.python.types.Int(micro);
+        this.major = org.python.types.Int.getInt(major);
+        this.minor = org.python.types.Int.getInt(minor);
+        this.micro = org.python.types.Int.getInt(micro);
         switch (releaselevel) {
             case 0x0a:
                 this.releaselevel = new org.python.types.Str("alpha");
@@ -29,7 +29,7 @@ public class VersionInfo extends org.python.types.Object {
                 this.releaselevel = new org.python.types.Str("unknown");
                 break;
         }
-        this.serial = new org.python.types.Int(serial);
+        this.serial = org.python.types.Int.getInt(serial);
     }
 
     @org.python.Method(

@@ -161,6 +161,13 @@ class ClassTests(TranspileTestCase):
             print(inst2.x)
             """, run_in_function=False)
 
+    def test_class_with_method_with_type_hints(self):
+        self.assertCodeExecution("""
+            class MyClass():
+                def foo(self, index: int) -> int:
+                    return index
+        """)
+
 
 class ClassMethodTests(TranspileTestCase):
     @expectedFailure

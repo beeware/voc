@@ -37,6 +37,13 @@ class ForLoopTests(TranspileTestCase):
                 print(i, total)
             """)
 
+        # Test expression statement
+        self.assertCodeExecution("""
+            for i in range(10):
+                [1, 2, 3]
+                "abc" == "def"
+            """)
+
     def test_for_over_iterable(self):
         self.assertCodeExecution("""
             total = 0

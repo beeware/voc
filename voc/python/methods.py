@@ -13,6 +13,7 @@ from .types.primitives import (
     ALOAD_name, ASTORE_name, free_name,
     DLOAD_name, FLOAD_name,
     ICONST_val, ILOAD_name,
+    LLOAD_name,
 )
 # from .debug import DEBUG, DEBUG_value
 
@@ -50,49 +51,72 @@ def to_python(accumulator, annotation, var_name):
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Bool'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Bool', 'Z'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Bool',
+                'getBool',
+                args=['Ljava/lang/Long;'],
+                returns='Lorg/python/types/Bool;'),
         )
     elif annotation == "byte":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Int', 'B'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['B'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == 'char':
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Str'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Str', 'C'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['C'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == "short":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Int', 'S'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['S'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == "int":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Int'),
             ILOAD_name(var_name),
-            java.Init('org/python/types/Int', 'I'),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['I'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == "long":
         accumulator.add_opcodes(
             # DEBUG("INPUT %s TRANSFORM %s" % (i, annotation)),
 
-            java.New('org/python/types/Int'),
-            ILOAD_name(var_name),
-            java.Init('org/python/types/Int', 'J'),
+            LLOAD_name(var_name),
+            JavaOpcodes.INVOKESTATIC(
+                'org/python/types/Int',
+                'getInt',
+                args=['J'],
+                returns='Lorg/python/types/Int;'
+            ),
         )
     elif annotation == "float":
         accumulator.add_opcodes(
@@ -251,12 +275,27 @@ class Function(Block):
     def add_self(self):
         pass
 
+    def store_module(self):
+        # Stores the current module as a local variable
+        if ('#module') not in self.local_vars:
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                ASTORE_name('#module'),
+            )
+
     def store_name(self, name, declare=False):
         if declare or name in self.local_vars:
             self.add_opcodes(
                 # Store in a local variable
                 ASTORE_name(name),
-
+            )
+            self.add_opcodes(
                 # Also store in the locals variable
                 ALOAD_name('#locals'),
                 JavaOpcodes.LDC_W(name),
@@ -267,12 +306,7 @@ class Function(Block):
             self.add_opcodes(
                 ASTORE_name('#value'),
 
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                ALOAD_name('#module'),
 
                 ALOAD_name('#value'),
 
@@ -290,25 +324,13 @@ class Function(Block):
             )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+                ALOAD_name('#module'),
                 python.Object.get_attribute(name),
             )
 
     def load_globals(self):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-            python.Str(self.module.full_name),
-            python.Object.get_item(),
-
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+            ALOAD_name('#module'),
             JavaOpcodes.GETFIELD('org/python/types/Module', '__dict__', 'Ljava/util/Map;'),
         )
 
@@ -327,13 +349,7 @@ class Function(Block):
             )
         except NameError:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+                ALOAD_name('#module'),
                 python.Object.del_attr(name),
             )
 
@@ -430,6 +446,10 @@ class Function(Block):
         # If a function is added to a function, it is added as an anonymous
         # inner class to the function/method's parent module/class.
         from .klass import ClosureClass
+        if not (isinstance(self, Closure) or isinstance(self, GeneratorClosure)):
+            # prepend name to first level nested function
+            name = self.name + '$' + name
+
         klass = ClosureClass(
             parent=self._parent,
             name=name,
@@ -497,6 +517,7 @@ class Function(Block):
             java.Map(),
             ASTORE_name('#locals')
         )
+        self.store_module()
 
     def visitor_teardown(self):
         if len(self.opcodes) == 0:
@@ -581,6 +602,9 @@ class InitMethod(Function):
         self.args = args if args else {}
         self.super_args = super_args if super_args else []
 
+        self.store_module()
+
+
     def __repr__(self):
         return '<Constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
 
@@ -623,13 +647,7 @@ class InitMethod(Function):
                 )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-
-                python.Str(self.module.full_name),
-
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+                ALOAD_name('#module'),
                 python.Object.get_attribute(name),
             )
 
@@ -675,6 +693,7 @@ class Method(Function):
             returns=returns,
             static=static,
         )
+        self.store_module()
 
     def __repr__(self):
         return '<Method %s.%s (%s parameters)>' % (self.klass.name, self.name, len(self.parameters))
@@ -855,10 +874,7 @@ class MainFunction(Function):
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
-            python.Object.get_item(),
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
 
             ALOAD_name('#value'),
             python.Object.set_attr(name),
@@ -878,21 +894,13 @@ class MainFunction(Function):
 
     def load_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
-            python.Object.get_item(),
-
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
             python.Object.get_attribute(name),
         )
 
     def delete_name(self, name):
         self.add_opcodes(
-            JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-            python.Str(self.module.full_name),
-            python.Object.get_item(),
-
-            JavaOpcodes.CHECKCAST('org/python/types/Module'),
+            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
             python.Object.del_attr(name),
         )
 
@@ -966,6 +974,7 @@ class Closure(Function):
             returns=returns,
             static=static,
         )
+        self.store_module()
 
     def __repr__(self):
         return '<Closure %s (%s parameters, %s closure variables)>' % (
@@ -1007,11 +1016,7 @@ class Closure(Function):
             )
         else:
             self.add_opcodes(
-                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
-                python.Str(self.module.full_name),
-                python.Object.get_item(),
-                JavaOpcodes.CHECKCAST('org/python/types/Module'),
-
+                ALOAD_name('#module'),
                 python.Object.get_attribute(name),
             )
 
@@ -1088,10 +1093,9 @@ class GeneratorFunction(Function):
     def visitor_teardown(self):
         # implicit return for generator
         # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
-        # TODO: Optimize opcode space usage by differentiating between a “returning” raise and raise in try-catch suite
         self.add_opcodes(
-            java.New('org/python/exceptions/StopIteration'),
-            java.Init('org/python/exceptions/StopIteration'),
+            # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+            JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
             JavaOpcodes.ATHROW(),
         )
 
@@ -1116,7 +1120,7 @@ class GeneratorFunction(Function):
             JavaOpcodes.LDC_W(self.generator),
 
             # p2: The actual generator method
-            java.Class.forName(self.klass.class_name),
+            java.Class.forName(self.class_descriptor.replace('/', '.')),
 
             JavaOpcodes.LDC_W(self.method_name + "$generator"),
             java.Array(1, 'java/lang/Class'),
@@ -1173,6 +1177,73 @@ class GeneratorFunction(Function):
             )
         ]
 
+    def store_name(self, name, declare=False):
+        if declare or name in self.local_vars:
+            self.add_opcodes(
+                # Store in a local variable
+                ASTORE_name(name),
+            )
+            self.add_opcodes(
+                # Also store in the locals variable
+                ALOAD_name('#locals'),
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name(name),
+                java.Map.put(),
+            )
+        else:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
+            self.add_opcodes(
+                ASTORE_name('#value'),
+
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                ALOAD_name('#value'),
+
+                python.Object.set_attr(name),
+                free_name('#value')
+            )
+
+    def load_name(self, name):
+        if name in self.local_vars:
+            self.add_opcodes(
+                ALOAD_name(name)
+            )
+        else:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                python.Object.get_attribute(name),
+            )
+
+    def delete_name(self, name):
+        try:
+            self.add_opcodes(
+                free_name(name)
+            )
+        except NameError:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                python.Object.del_attr(name),
+            )
 
 class GeneratorMethod(Method):
     def __init__(self, klass, name, code, generator, parameters, returns=None, static=False):
@@ -1212,10 +1283,9 @@ class GeneratorMethod(Method):
     def visitor_teardown(self):
         # implicit return for generator
         # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
-        # TODO: Optimize opcode space usage by differentiating between a “returning” raise and raise in try-catch suite
         self.add_opcodes(
-            java.New('org/python/exceptions/StopIteration'),
-            java.Init('org/python/exceptions/StopIteration'),
+            # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+            JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
             JavaOpcodes.ATHROW(),
         )
 

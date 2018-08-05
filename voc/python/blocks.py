@@ -153,9 +153,8 @@ class Block(Accumulator):
 
     def add_int(self, value):
         self.add_opcodes(
-            java.New('org/python/types/Int'),
             LCONST_val(value),
-            java.Init('org/python/types/Int', 'J'),
+            JavaOpcodes.INVOKESTATIC('org/python/types/Int', 'getInt', args=['J'], returns='Lorg/python/types/Int;'),
         )
 
     def add_float(self, value):
@@ -172,10 +171,60 @@ class Block(Accumulator):
             java.Init('org/python/types/Complex', 'D'),
         )
 
-    def add_tuple(self, data):
-        self.add_opcodes(
-            java.New('org/python/types/Tuple'),
+    def _add_value(self, val):
+        if isinstance(val, bool):
+            if val is True:
+                self.add_opcodes(
+                    JavaOpcodes.GETSTATIC('org/python/types/Bool', 'TRUE', 'Lorg/python/types/Bool;'),
+                )
+            else:
+                self.add_opcodes(
+                    JavaOpcodes.GETSTATIC('org/python/types/Bool', 'FALSE', 'Lorg/python/types/Bool;'),
+                )
 
+        elif isinstance(val, int):
+            self.add_int(val)
+
+        elif isinstance(val, float):
+            self.add_opcodes(
+                java.New('org/python/types/Float'),
+                JavaOpcodes.LDC2_W(val),
+                java.Init('org/python/types/Float', 'D'),
+            )
+
+        elif isinstance(val, str):
+            self.add_opcodes(
+                python.Str(val),
+            )
+
+        elif isinstance(val, bytes):
+            self.add_opcodes(
+                java.New('org/python/types/Bytes'),
+                JavaOpcodes.LDC_W(val.decode('ISO-8859-1')),
+                java.Init('org/python/types/Bytes', 'Ljava/lang/String;'),
+            )
+
+        elif isinstance(val, tuple):
+            self.add_tuple(val)
+
+        elif isinstance(val, complex):
+            self.add_opcodes(
+                java.New('org/python/types/Complex'),
+                DCONST_val(val.real),
+                DCONST_val(val.imag),
+                java.Init('org/python/types/Complex', 'D', 'D'),
+            )
+
+        elif isinstance(val, types.CodeType):
+            self.add_opcodes(
+                JavaOpcodes.ACONST_NULL()
+            )
+
+        else:
+            raise RuntimeError("Unknown constant type %s" % type(val))
+
+    def add_list(self, data):
+        self.add_opcodes(
             java.New('java/util/ArrayList'),
             java.Init('java/util/ArrayList'),
         )
@@ -189,63 +238,39 @@ class Block(Accumulator):
                 self.add_opcodes(
                     python.NONE()
                 )
+            elif isinstance(value, frozenset):
+                self.add_opcodes(
+                    java.New('org/python/types/FrozenSet'),
+                    python.Set(),
+                )
+                for elt in value:
+                    self.add_opcodes(
+                        JavaOpcodes.DUP()
+                    )
+
+                    self._add_value(elt)
+
+                    self.add_opcodes(
+                        python.Set.add()
+                    )
+                self.add_opcodes(
+                    java.Init(
+                        'org/python/types/FrozenSet',
+                        'Lorg/python/types/Set;',
+                    )
+                )
             else:
-                if isinstance(value, bool):
-                    self.add_opcodes(
-                        java.New('org/python/types/Bool'),
-                        ICONST_val(value),
-                        java.Init('org/python/types/Bool', 'Z'),
-                    )
-
-                elif isinstance(value, int):
-                    self.add_opcodes(
-                        java.New('org/python/types/Int'),
-                        LCONST_val(value),
-                        java.Init('org/python/types/Int', 'J'),
-                    )
-
-                elif isinstance(value, float):
-                    self.add_opcodes(
-                        java.New('org/python/types/Float'),
-                        JavaOpcodes.LDC2_W(value),
-                        java.Init('org/python/types/Float', 'D'),
-                    )
-
-                elif isinstance(value, str):
-                    self.add_opcodes(
-                        python.Str(value),
-                    )
-
-                elif isinstance(value, bytes):
-                    self.add_opcodes(
-                        java.New('org/python/types/Bytes'),
-                        JavaOpcodes.LDC_W(value.decode('ISO-8859-1')),
-                        java.Init('org/python/types/Bytes', 'Ljava/lang/String;'),
-                    )
-
-                elif isinstance(value, tuple):
-                    self.add_tuple(value)
-
-                elif isinstance(value, complex):
-                    self.add_opcodes(
-                        java.New('org/python/types/Complex'),
-                        DCONST_val(value.real),
-                        DCONST_val(value.imag),
-                        java.Init('org/python/types/Complex', 'D', 'D'),
-                    )
-
-                elif isinstance(value, types.CodeType):
-                    self.add_opcodes(
-                        JavaOpcodes.ACONST_NULL()
-                    )
-
-                else:
-                    raise RuntimeError("Unknown constant type %s" % type(value))
+                self._add_value(value)
 
             self.add_opcodes(
                 java.List.add(),
             )
 
+    def add_tuple(self, data):
+        self.add_opcodes(
+            java.New('org/python/types/Tuple'),
+        )
+        self.add_list(data)
         self.add_opcodes(
             java.Init('org/python/types/Tuple', 'Ljava/util/List;'),
         )
@@ -260,56 +285,15 @@ class Block(Accumulator):
         )
 
         self.add_str(function.code.co_name)
-
-        # Add the code object
         self.add_opcodes(
-                java.New('org/python/types/Code'),
+            JavaOpcodes.LDC_W(function.code.co_argcount),
+            JavaOpcodes.LDC_W(function.code.co_kwonlyargcount),
+            JavaOpcodes.LDC_W(function.code.co_flags),
         )
-
-        self.add_int(function.code.co_argcount)
-        self.add_tuple(function.code.co_cellvars)
-
-        self.add_opcodes(
-                JavaOpcodes.ACONST_NULL(),  # co_code
-        )
-
         self.add_tuple(function.code.co_consts)
-        self.add_str(function.code.co_filename)
-        self.add_int(function.code.co_firstlineno)
-        self.add_int(function.code.co_flags)
-        self.add_tuple(function.code.co_freevars)
-        self.add_int(function.code.co_kwonlyargcount)
+        self.add_list(function.code.co_varnames)
 
         self.add_opcodes(
-                JavaOpcodes.ACONST_NULL(),  # co_lnotab
-        )
-
-        self.add_str(function.code.co_name)
-        self.add_tuple(function.code.co_names)
-        self.add_int(function.code.co_nlocals)
-        self.add_int(function.code.co_stacksize)
-        self.add_tuple(function.code.co_varnames)
-
-        self.add_opcodes(
-                java.Init(
-                    'org/python/types/Code',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
-                    'Lorg/python/types/Bytes;',
-                    'Lorg/python/types/Tuple;',
-                    'Lorg/python/types/Str;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Bytes;',
-                    'Lorg/python/types/Str;',
-                    'Lorg/python/types/Tuple;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Int;',
-                    'Lorg/python/types/Tuple;',
-                ),
-
                 # Get a Java Method representing the new function
                 JavaOpcodes.LDC_W(Classref(function.class_descriptor)),
                 JavaOpcodes.LDC_W(function.pyimpl_name),
@@ -374,7 +358,11 @@ class Block(Accumulator):
                 java.Init(
                     'org/python/types/Function',
                     'Lorg/python/types/Str;',
-                    'Lorg/python/types/Code;',
+                    'I',
+                    'I',
+                    'I',
+                    'Lorg/python/types/Tuple;',
+                    'Ljava/util/List;',
                     'Ljava/lang/reflect/Method;',
                     'Ljava/util/Map;',
                     'Ljava/util/List;',

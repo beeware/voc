@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import traceback
 from unittest import TestCase
 from itertools import permutations
@@ -217,6 +218,9 @@ MEMORY_REFERENCE = re.compile('0x[\dABCDEFabcdef]{4,16}')
 END_OF_CODE_STRING = '===end of test==='
 END_OF_CODE_STRING_NEWLINE = END_OF_CODE_STRING + '\n'
 
+# Prevent floating point discrepancies in very low significant digits from being an issue
+FLOAT_PRECISION = re.compile('(\\.\d{5})\d+')
+
 
 def cleanse_java(raw, substitutions):
     matches = JAVA_EXCEPTION.search(raw)
@@ -255,6 +259,7 @@ def cleanse_java(raw, substitutions):
     )
 
     out = MEMORY_REFERENCE.sub("0xXXXXXXXX", out)
+
     out = out.replace(
         "'python.test'", '***EXECUTABLE***').replace(
         "'python.testdaemon.TestDaemon'", '***EXECUTABLE***')
@@ -269,6 +274,10 @@ def cleanse_java(raw, substitutions):
                 out = out.replace(from_value, to_value)
 
     out = out.replace('\r\n', '\n')
+
+    # Replace high precision floats with abbreviated forms
+    out = FLOAT_PRECISION.sub('\\1...', out)
+
     return out
 
 
@@ -304,6 +313,10 @@ def cleanse_python(raw, substitutions):
                 out = out.replace(from_value, to_value)
 
     out = out.replace('\r\n', '\n')
+
+    # Replace high precision floats with abbreviated forms
+    out = FLOAT_PRECISION.sub('\\1...', out)
+
     return out
 
 
@@ -551,7 +564,7 @@ class TranspileTestCase(TestCase):
         except FileExistsError:
             pass
 
-    def runAsJava(self, main_code, extra_code=None, args=None):
+    def runAsJava(self, main_code, extra_code=None, args=None, timed=False):
         """Run a block of Python code as a Java program."""
         # Output source code into test directory
         transpiler = Transpiler(verbosity=0)
@@ -559,6 +572,7 @@ class TranspileTestCase(TestCase):
         # Don't redirect stderr; we want to see any errors from the transpiler
         # as top level test failures.
         with capture_output(redirect_stderr=False):
+
             transpiler.transpile_string("test.py", main_code)
 
             if extra_code:
@@ -570,7 +584,11 @@ class TranspileTestCase(TestCase):
         if args is None:
             args = []
 
+        t1_start = time.perf_counter()
+        t2_start = time.process_time()
+
         if len(args) == 0:
+
             # encode to turn str into bytes-like object
             self.jvm.stdin.write(("python.test\n").encode("utf-8"))
             self.jvm.stdin.flush()
@@ -585,12 +603,17 @@ class TranspileTestCase(TestCase):
                         out += line
                 except IOError as e:
                     continue
+
+            t1_stop = time.perf_counter()
+            t2_stop = time.process_time()
+
         else:
             classpath = os.pathsep.join([
                 os.path.join('..', 'dist', 'python-java-support.jar'),
                 os.path.join('..', 'java'),
                 os.curdir,
             ])
+
             proc = subprocess.Popen(
                 ["java", "-classpath", classpath, "python.test"] + args,
                 stdin=subprocess.PIPE,
@@ -598,7 +621,22 @@ class TranspileTestCase(TestCase):
                 stderr=subprocess.STDOUT,
                 cwd=self.temp_dir
             )
+
+            t1_stop = time.perf_counter()
+            t2_stop = time.process_time()
+
             out = proc.communicate()[0].decode('utf8')
+
+            if proc.returncode != 0:
+                raise Exception(
+                    "Java subprocess didn't exit cleanly (exit status %s)\n\n: %s" % (
+                        proc.returncode, out
+                    )
+                )
+
+        if timed:
+            print("  Elapsed time: ", (t1_stop-t1_start), " sec")
+            print("  CPU process time: ", (t2_stop-t2_start), " sec")
 
         return out
 

@@ -145,6 +145,15 @@ class FrozensetTests(TranspileTestCase):
 
             """)
 
+    def test_setitem(self):
+        self.assertCodeExecution("""
+            x = frozenset("hello world")
+            try:
+                x[0] = "goodbye"
+            except TypeError as err:
+                print(err)
+        """)
+
     def test_isdisjoint(self):
         self.assertCodeExecution("""
             x = frozenset("hello world")

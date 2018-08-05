@@ -71,7 +71,7 @@ class DEBUG_name:
     def process(self, context):
         context.add_opcodes(
             JavaOpcodes.LDC_W(self.name),
-            ALOAD_name(context, self.name),
+            ALOAD_name(self.name),
             JavaOpcodes.INVOKESTATIC(
                 'org/Python',
                 'debug',

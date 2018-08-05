@@ -102,7 +102,7 @@ public class Tuple extends org.python.types.Object {
             __doc__ = ""
     )
     public org.python.Object __bool__() {
-        return new org.python.types.Bool(!this.value.isEmpty());
+        return org.python.types.Bool.getBool(!this.value.isEmpty());
     }
 
     @org.python.Method(
@@ -119,8 +119,8 @@ public class Tuple extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherTuple.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -128,12 +128,11 @@ public class Tuple extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
-                        org.python.types.Object.CMP_OP.LT);
+                return org.python.types.Object.__lt__(this.value.get(i), otherTuple.value.get(i));
             }
 
             // all items were identical, break tie by size
-            return new org.python.types.Bool(size < otherSize);
+            return org.python.types.Bool.getBool(size < otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -153,8 +152,8 @@ public class Tuple extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherTuple.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -162,12 +161,11 @@ public class Tuple extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
-                        org.python.types.Object.CMP_OP.LE);
+                return org.python.types.Object.__le__(this.value.get(i), otherTuple.value.get(i));
             }
 
             // all items were identical, break tie by size
-            return new org.python.types.Bool(size <= otherSize);
+            return org.python.types.Bool.getBool(size <= otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -180,7 +178,7 @@ public class Tuple extends org.python.types.Object {
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Tuple) {
             org.python.types.Tuple otherTuple = (org.python.types.Tuple) other;
-            return new org.python.types.Bool(this.value.equals(otherTuple.value));
+            return org.python.types.Bool.getBool(this.value.equals(otherTuple.value));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -199,8 +197,8 @@ public class Tuple extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherTuple.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -208,12 +206,11 @@ public class Tuple extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
-                        org.python.types.Object.CMP_OP.GT);
+                return org.python.types.Object.__gt__(this.value.get(i), otherTuple.value.get(i));
             }
 
             // all items were identical, break tie by size
-            return new org.python.types.Bool(size > otherSize);
+            return org.python.types.Bool.getBool(size > otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -233,8 +230,8 @@ public class Tuple extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherTuple.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherTuple.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -242,12 +239,11 @@ public class Tuple extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherTuple.value.get(i),
-                        org.python.types.Object.CMP_OP.GE);
+                return org.python.types.Object.__ge__(this.value.get(i), otherTuple.value.get(i));
             }
 
             // all items were identical, break tie by size
-            return new org.python.types.Bool(size >= otherSize);
+            return org.python.types.Bool.getBool(size >= otherSize);
         } else {
             return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
         }
@@ -269,7 +265,7 @@ public class Tuple extends org.python.types.Object {
             __doc__ = "Return len(self)."
     )
     public org.python.types.Int __len__() {
-        return new org.python.types.Int(this.value.size());
+        return org.python.types.Int.getInt(this.value.size());
     }
 
     @org.python.Method(
@@ -363,7 +359,7 @@ public class Tuple extends org.python.types.Object {
             args = {"item"}
     )
     public org.python.Object __contains__(org.python.Object item) {
-        return new org.python.types.Bool(this.value.contains(item));
+        return org.python.types.Bool.getBool(this.value.contains(item));
     }
 
     @org.python.Method(
@@ -442,7 +438,7 @@ public class Tuple extends org.python.types.Object {
             __doc__ = "T.count(value) -> integer -- return number of occurrences of value"
     )
     public org.python.Object count() {
-        return new org.python.types.Int(this.value.size());
+        return org.python.types.Int.getInt(this.value.size());
     }
 
     @org.python.Method(
@@ -475,7 +471,7 @@ public class Tuple extends org.python.types.Object {
         for (long i = st; i < en; i++) {
             try {
                 if (((org.python.types.Bool) ((value.get((int) i)).__eq__(item))).value) {
-                    return new org.python.types.Int(i);
+                    return org.python.types.Int.getInt(i);
                 }
             } catch (ClassCastException cce) {
                 throw new org.python.exceptions.ValueError("tuple.index(x): x not in tuple");

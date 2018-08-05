@@ -60,7 +60,7 @@ public class Super implements org.python.Object {
      */
     public boolean equals(java.lang.Object other) {
         if (other instanceof org.python.Object) {
-            org.python.Object result = org.python.types.Object.__cmp_bool__(this, (org.python.Object) other, org.python.types.Object.CMP_OP.EQ);
+            org.python.Object result = org.python.types.Object.__eq__(this, (org.python.Object) other);
             return ((org.python.types.Bool) result).value;
         } else {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
@@ -164,7 +164,7 @@ public class Super implements org.python.Object {
             args = {"other"}
     )
     public org.python.Object __eq__(org.python.Object other) {
-        return new org.python.types.Bool(System.identityHashCode(this) == System.identityHashCode(other));
+        return org.python.types.Bool.getBool(System.identityHashCode(this) == System.identityHashCode(other));
     }
 
     @org.python.Method(
@@ -178,7 +178,7 @@ public class Super implements org.python.Object {
         if (result instanceof org.python.types.NotImplementedType) {
             return result;
         }
-        return new org.python.types.Bool(!((org.python.types.Bool) result).value);
+        return org.python.types.Bool.getBool(!((org.python.types.Bool) result).value);
     }
 
     @org.python.Method(
@@ -201,7 +201,7 @@ public class Super implements org.python.Object {
             __doc__ = "Return hash(self)."
     )
     public org.python.Object __hash__() {
-        return new org.python.types.Int(this.hashCode());
+        return org.python.types.Int.getInt(this.hashCode());
     }
 
     @org.python.Method(
@@ -880,7 +880,7 @@ public class Super implements org.python.Object {
             __doc__ = ""
     )
     public org.python.Object __not__() {
-        return new org.python.types.Bool(!((org.python.types.Bool) this.__bool__()).value);
+        return org.python.types.Bool.getBool(!((org.python.types.Bool) this.__bool__()).value);
     }
 
     @org.python.Method(
