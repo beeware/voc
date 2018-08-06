@@ -24,7 +24,6 @@ public class Function extends org.python.types.Object implements org.python.Call
     org.python.types.Closure closure;
 
     private void populateAttrs() {
-        org.python.types.Str name = new org.python.types.Str(method.getName());
         this.__dict__.put("__name__", this.name);
 
         if (this.name != null) {
