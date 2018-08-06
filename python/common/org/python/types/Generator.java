@@ -1,11 +1,8 @@
 package org.python.types;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * Possible states of a generator:
- * 1. yield_point == 0    : The generator is 'fresh' i.e. (just started)
+ * 1. yield_point == 0    : The generator has just started
  * 2. expression  == null : The generator is exhausted
  * 3. message     != none : The generator currently holds value sent from caller via send() method
  * 4. exception   != null : The generator currently holds exception sent from caller via throw() method
@@ -157,9 +154,7 @@ public class Generator extends org.python.types.Object {
             exception_args = org.python.types.NoneType.NONE;
         }
 
-        if (traceback == null) {
-            traceback = org.python.types.NoneType.NONE;
-        } else {
+        if (traceback != null) {
             throw new org.python.exceptions.NotImplementedError("traceback currently not supported");
         }
 
@@ -174,7 +169,7 @@ public class Generator extends org.python.types.Object {
 
         try {
             Class<?> exception_class = Class.forName("org.python.exceptions." + exception_name);
-            Constructor exception_constructor;
+            java.lang.reflect.Constructor exception_constructor;
             if (exception_args instanceof org.python.types.NoneType) {
                 // value = None
                 exception_constructor = exception_class.getConstructor();
@@ -191,7 +186,7 @@ public class Generator extends org.python.types.Object {
                 this.exception = (org.python.exceptions.BaseException)
                     Type.toPython(exception_constructor.newInstance(vargs, null));
 //            } else if (exception_args instanceof org.python.types.Dict) {
-//                // value is keyword arguments
+//                // TODO: Test/modify this when custom exception that supports kwargs is implemented
 //                exception_constructor = exception_class.getConstructor(org.python.Object[].class, java.util.Map.class);
 //                java.util.Map kwargs = new java.util.HashMap<java.lang.String, org.python.Object>();
 //                for (java.util.Map.Entry entry : ((org.python.types.Dict)exception_args).value.entrySet()) {
@@ -206,11 +201,10 @@ public class Generator extends org.python.types.Object {
                 this.exception = (org.python.exceptions.BaseException)
                     Type.toPython(exception_constructor.newInstance(exception_args.toString()));
             }
-
         } catch (ClassNotFoundException e) {
             throw new org.python.exceptions.NameError(exception_name);
         } catch (NoSuchMethodException |
-            InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            InstantiationException | IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
             throw new org.python.exceptions.RuntimeError(e.getMessage());
         }
 
