@@ -1,5 +1,6 @@
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
+from unittest import expectedFailure
 
 class LocalsTests(TranspileTestCase):
     def test_simple(self):
@@ -51,6 +52,26 @@ class LocalsTests(TranspileTestCase):
             print('y', y)
 
             print('Done')
+        """, run_in_function=False)
+
+    @expectedFailure
+    def test_preloaded_locals(self):
+        self.assertCodeExecution("""
+            lcls = locals
+            x = 1
+            y = 'z'
+
+            print("There are %s locals" % len(lcls()))
+
+            def method():
+                print("In method: there are %s locals" % len(lcls()))
+
+                x = 1
+                y = 'z'
+
+                print("In method: there are %s locals" % len(lcls()))
+
+            method()
         """, run_in_function=False)
 
 
