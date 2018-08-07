@@ -1093,6 +1093,10 @@ class GeneratorFunction(Function):
     def visitor_teardown(self):
         # implicit return for generator
         # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
+        # if not isinstance(self.opcodes[-1], (JavaOpcodes.ATHROW, JavaOpcodes.ARETURN)):
+        # TODO: Uncomment the condition above once the issue described is resolved:
+        # TODO: Currently need to throw StopIteration at the end of generator even when ATHROW/ARETURN is the last
+        # TODO: instruction, to fix "'TRY' object has no attribute 'next_op'" error during transpilation
         self.add_opcodes(
             # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
             JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
@@ -1284,6 +1288,10 @@ class GeneratorMethod(Method):
     def visitor_teardown(self):
         # implicit return for generator
         # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
+        # if not isinstance(self.opcodes[-1], (JavaOpcodes.ATHROW, JavaOpcodes.ARETURN)):
+        # TODO: Uncomment the condition above once the issue described is resolved:
+        # TODO: Currently need to throw StopIteration at the end of generator even when ATHROW/ARETURN is the last
+        # TODO: instruction, to fix "'TRY' object has no attribute 'next_op'" error during transpilation
         self.add_opcodes(
             # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
             JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
