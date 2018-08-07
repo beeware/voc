@@ -110,9 +110,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __lt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) < ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) < ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) < (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) < (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -123,9 +123,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __le__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) <= ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) <= ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) <= (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) <= (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -136,9 +136,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __eq__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) == ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) == ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return org.python.types.Bool.getBool(((org.python.types.Bool) this).value == ((org.python.types.Bool) other).value);
+            return org.python.types.Bool.getBool(this.value == ((org.python.types.Bool) other).value);
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -149,9 +149,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __gt__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) > ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) > ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) > (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) > (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -162,9 +162,9 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __ge__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) >= ((org.python.types.Int) other).value);
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) >= ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return org.python.types.Bool.getBool((((org.python.types.Bool) this).value ? 1 : 0) >= (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Bool.getBool((this.value ? 1 : 0) >= (((org.python.types.Bool) other).value ? 1 : 0));
         }
         return org.python.types.NotImplementedType.NOT_IMPLEMENTED;
     }
@@ -195,15 +195,14 @@ public class Bool extends org.python.types.Object {
 
     public org.python.Object __add__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) + (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Int.getInt((this.value ? 1 : 0) + (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Int) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Int) other).value);
+            return org.python.types.Int.getInt((this.value ? 1 : 0) + ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Float((((org.python.types.Bool) this).value ? 1 : 0) + ((org.python.types.Float) other).value);
+            return new org.python.types.Float((this.value ? 1 : 0) + ((org.python.types.Float) other).value);
         } else if (other instanceof org.python.types.Complex) {
-            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
             org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
-            return new org.python.types.Complex(cmplx.real.value + other_cmplx.real.value, other_cmplx.imag.value);
+            return new org.python.types.Complex((this.value ? 1 : 0) + other_cmplx.real.value, other_cmplx.imag.value);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for +: 'bool' and '" + other.typeName() + "'");
     }
@@ -214,15 +213,14 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __sub__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) - ((org.python.types.Int) other).value);
+            return org.python.types.Int.getInt((this.value ? 1 : 0) - ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) - (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Int.getInt((this.value ? 1 : 0) - (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0) - (((org.python.types.Float) other).value));
+            return new org.python.types.Float((this.value ? 1.0 : 0.0) - (((org.python.types.Float) other).value));
         } else if (other instanceof org.python.types.Complex) {
-            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
             org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
-            return cmplx.__sub__(other_cmplx);
+            return new org.python.types.Complex((this.value ? 1 : 0) - other_cmplx.real.value, 0.0 - other_cmplx.imag.value);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'bool' and '" + other.typeName() + "'");
     }
@@ -233,17 +231,17 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (other instanceof org.python.types.Int) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) * ((org.python.types.Int) other).value);
+            return org.python.types.Int.getInt((this.value ? 1 : 0) * ((org.python.types.Int) other).value);
         } else if (other instanceof org.python.types.Bool) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) * (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Int.getInt((this.value ? 1 : 0) * (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Float) {
-            return new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0) * (((org.python.types.Float) other).value));
+            return new org.python.types.Float((this.value ? 1.0 : 0.0) * (((org.python.types.Float) other).value));
         } else if (other instanceof org.python.types.Complex) {
-            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex cmplx = new org.python.types.Complex(this.value ? 1 : 0, 0);
             org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
             return cmplx.__mul__(other_cmplx);
         } else if (other instanceof org.python.types.Str) {
-            if (((org.python.types.Bool) this).value) {
+            if (this.value) {
                 return new org.python.types.Str(((org.python.types.Str) other).value);
             } else {
                 return new org.python.types.Str("");
@@ -272,7 +270,7 @@ public class Bool extends org.python.types.Object {
             if (other_value.value == 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("division by zero");
             } else {
-                org.python.types.Float value = new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0));
+                org.python.types.Float value = new org.python.types.Float(this.value ? 1.0 : 0.0);
                 return value.__truediv__(other);
             }
         } else if (other instanceof org.python.types.Float) {
@@ -280,11 +278,11 @@ public class Bool extends org.python.types.Object {
             if (other_value.value == 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("float division by zero");
             } else {
-                org.python.types.Float value = new org.python.types.Float((((org.python.types.Bool) this).value ? 1.0 : 0.0));
+                org.python.types.Float value = new org.python.types.Float(this.value ? 1.0 : 0.0);
                 return value.__truediv__(other);
             }
         } else if (other instanceof org.python.types.Complex) {
-            org.python.types.Complex cmplx = new org.python.types.Complex(((org.python.types.Bool) this).value ? 1 : 0, 0);
+            org.python.types.Complex cmplx = new org.python.types.Complex(this.value ? 1 : 0, 0);
             org.python.types.Complex other_cmplx = (org.python.types.Complex) other;
             return cmplx.__truediv__(other_cmplx);
         }
@@ -389,13 +387,13 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __lshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) << (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Int.getInt((this.value ? 1 : 0) << (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
             if (other_val < 0) {
                 throw new org.python.exceptions.ValueError("negative shift count");
             }
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) << other_val);
+            return org.python.types.Int.getInt((this.value ? 1 : 0) << other_val);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<: 'bool' and '" + other.typeName() + "'");
     }
@@ -406,13 +404,13 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __rshift__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) >> (((org.python.types.Bool) other).value ? 1 : 0));
+            return org.python.types.Int.getInt((this.value ? 1 : 0) >> (((org.python.types.Bool) other).value ? 1 : 0));
         } else if (other instanceof org.python.types.Int) {
             long other_val = ((org.python.types.Int) other).value;
             if (other_val < 0) {
                 throw new org.python.exceptions.ValueError("negative shift count");
             }
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) >> other_val);
+            return org.python.types.Int.getInt((this.value ? 1 : 0) >> other_val);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>: 'bool' and '" + other.typeName() + "'");
     }
@@ -424,14 +422,14 @@ public class Bool extends org.python.types.Object {
     public org.python.Object __and__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
             return org.python.types.Bool.getBool(
-                    (((org.python.types.Bool) this).value ? 1 : 0) &
+                    (this.value ? 1 : 0) &
                             (((org.python.types.Bool) other).value ? 1 : 0)
             );
         }
 
         if (other instanceof org.python.types.Int) {
             return org.python.types.Int.getInt(
-                    (((org.python.types.Bool) this).value ? 1 : 0) &
+                    (this.value ? 1 : 0) &
                             ((org.python.types.Int) other).value
             );
         }
@@ -445,7 +443,7 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __xor__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return org.python.types.Bool.getBool(((org.python.types.Bool) this).value ^ ((org.python.types.Bool) other).value);
+            return org.python.types.Bool.getBool(this.value ^ ((org.python.types.Bool) other).value);
         } else if (other instanceof org.python.types.Int) {
             long operand1 = this.value ? 1L : 0L;
             long operand2 = ((org.python.types.Int) other).value;
@@ -460,10 +458,10 @@ public class Bool extends org.python.types.Object {
     )
     public org.python.Object __or__(org.python.Object other) {
         if (other instanceof org.python.types.Bool) {
-            return org.python.types.Bool.getBool(((org.python.types.Bool) this).value | ((org.python.types.Bool) other).value);
+            return org.python.types.Bool.getBool(this.value | ((org.python.types.Bool) other).value);
         }
         if (other instanceof org.python.types.Int) {
-            return org.python.types.Int.getInt((((org.python.types.Bool) this).value ? 1 : 0) | ((org.python.types.Int) other).value);
+            return org.python.types.Int.getInt((this.value ? 1 : 0) | ((org.python.types.Int) other).value);
         }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for |: 'bool' and '" + other.typeName() + "'");
     }
@@ -578,7 +576,7 @@ public class Bool extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __ilshift__(org.python.Object other) {
-        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        int this_val = this.value ? 1 : 0;
         if (other instanceof org.python.types.Bool) {
             this_val <<= (((org.python.types.Bool) other).value ? 1 : 0);
             return org.python.types.Int.getInt(this_val);
@@ -598,7 +596,7 @@ public class Bool extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __irshift__(org.python.Object other) {
-        int this_val = (((org.python.types.Bool) this).value ? 1 : 0);
+        int this_val = this.value ? 1 : 0;
         if (other instanceof org.python.types.Bool) {
             this_val >>= (((org.python.types.Bool) other).value ? 1 : 0);
             return org.python.types.Int.getInt(this_val);
