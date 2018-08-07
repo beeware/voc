@@ -50,17 +50,15 @@ public class Generator extends org.python.types.Object {
      * Flow:
      * 1. this.exception == null
      *    1.1 Get next yield value via delegate_iterate
-     *    1.2 If StopIteration, set 'RESULT' field to the exception's value then return null
+     *    1.2 If StopIteration, re-throw that exception
      *
      * 2. this.exception != null, intercepts this.exception.
      *    2.1 If this.exception is GeneratorExit, close the sub-generator
      *    2.2 Otherwise throws the exception into sub-generator
      *        2.2.1 If the sub-generator handles the exception and returns a value,
      *              returns that value as next yield value.
-     *        2.2.2 If the sub-generator raises StopIteration, set 'RESULT' field to the
-     *              exception's value then return null
+     *        2.2.2 If the sub-generator raises StopIteration, re-throw that exception
      *
-     * Meaning of null return value: StopIteration is caught, its value is available in 'RESULT'
      */
     public org.python.Object intercept_exception(org.python.Object iterator) {
         if (this.exception == null) {
@@ -68,9 +66,8 @@ public class Generator extends org.python.types.Object {
             this.reset_message();
             try {
                 return delegate_iterate(iterator, msg);
-            } catch (org.python.exceptions.StopIteration e) {
-                this.__setattr__("RESULT", e.value);
-                return null;
+            } catch (org.python.exceptions.StopIteration stopIteration) {
+                throw stopIteration;
             }
             //return null;
         } else {
@@ -78,22 +75,22 @@ public class Generator extends org.python.types.Object {
             this.exception = null;
             try {
                 throw exception;
-            } catch (org.python.exceptions.GeneratorExit _e) {
+            } catch (org.python.exceptions.GeneratorExit generatorExit) {
                 try {
                     ((org.python.types.Generator) iterator).close();
                 } catch (java.lang.ClassCastException e) {
                     // pass
                 }
-                throw _e;
-            } catch (org.python.exceptions.BaseException _e) {
+                throw generatorExit;
+            } catch (org.python.exceptions.BaseException baseException) {
                 try {
-                    return ((org.python.types.Generator) iterator).throw$(_e.type(), _e.args, null);
+                    // pass baseException into sub-generator
+                    return ((org.python.types.Generator) iterator).throw$(baseException.type(), baseException.args, null);
                 } catch (java.lang.ClassCastException e) {
-                    throw _e;
-                } catch (org.python.exceptions.StopIteration e) {
-                    System.out.println("setting result in base exception");
-                    this.__setattr__("RESULT", e.value);
-                    return null;
+                    // if iterator is not a generator, just throw the baseException
+                    throw baseException;
+                } catch (org.python.exceptions.StopIteration stopIteration) {
+                    throw stopIteration;
                 }
             }
         }

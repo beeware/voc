@@ -1870,7 +1870,7 @@ class Visitor(ast.NodeVisitor):
         )
 
         # Yield the value and intercepts exception by invoking generator.intercept_exception
-        # If the method returns null, get RESULT field and break out of the loop
+        # If the method throws StopIteration, get its value and break out of the loop
         # If the method returns org.python.Object, store the value for next yield and continue loop
         loop = START_LOOP()
         self.context.add_opcodes(
@@ -1881,25 +1881,19 @@ class Visitor(ast.NodeVisitor):
         self.context.load_name('<generator>')
         self.context.load_name('#yield-iter-%x' % id(node))
         self.context.add_opcodes(
+            TRY(),
             JavaOpcodes.INVOKEVIRTUAL(
                 'org/python/types/Generator',
                 'intercept_exception',
                 args=['Lorg/python/Object;'],
                 returns='Lorg/python/Object;'
             ),
-            JavaOpcodes.DUP(),
-            ASTORE_name('#yield-value-%x' % id(node)),
-            IF([], JavaOpcodes.IFNONNULL),
-        )
-        self.context.load_name('<generator>')
-        self.context.add_opcodes(
-            JavaOpcodes.DUP(),
-            python.Object.get_attribute('RESULT'),
-            JavaOpcodes.SWAP(),
-            python.Object.del_attr('RESULT'),
+            CATCH('org/python/exceptions/StopIteration'),
+            python.Object.get_attribute('value'),
             jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),  # break from the loop
-            END_IF(),
+            END_TRY(),
 
+            ASTORE_name('#yield-value-%x' % id(node)),
             jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.START),  # continue
             END_LOOP(),
         )
