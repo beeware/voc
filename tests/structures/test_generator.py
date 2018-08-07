@@ -95,7 +95,7 @@ class GeneratorTests(TranspileTestCase):
             next(g)
             try:
                 g.send("Hello World")
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -113,7 +113,7 @@ class GeneratorTests(TranspileTestCase):
             try:
                 print(g.send("a"))
                 print(g.send("b"))
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -131,7 +131,7 @@ class GeneratorTests(TranspileTestCase):
                 while True:
                     b = g.send(1)
                     print("printing from user " + str(b))
-                    print("can't reach here")
+                    print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -148,7 +148,7 @@ class GeneratorTests(TranspileTestCase):
             print(g.send("Hello World"))
             try:
                 print(next(g))  # a is None
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -162,6 +162,7 @@ class GeneratorTests(TranspileTestCase):
             g = gen()
             try:
                 g.send(1)
+                print("should not print this")
             except Exception as e:
                 print(e, e.args)
             """)
@@ -273,7 +274,7 @@ class GeneratorTests(TranspileTestCase):
             g.send(None)
             try:
                 g.send(1)
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -287,7 +288,7 @@ class GeneratorTests(TranspileTestCase):
             g.send(None)
             try:
                 g.send(1)
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -314,7 +315,7 @@ class GeneratorTests(TranspileTestCase):
             g = gen()
             try:
                 g.throw(ZeroDivisionError)
-                print("can't reach here")
+                print("should not print this")
             except ZeroDivisionError:
                 print("ZeroDivisionError")
             """)
@@ -332,7 +333,7 @@ class GeneratorTests(TranspileTestCase):
             next(g)
             try:
                 g.throw(ZeroDivisionError)
-                print("can't reach here")
+                print("should not print this")
             except TypeError:
                 print("TypeError")
             """)
@@ -364,7 +365,7 @@ class GeneratorTests(TranspileTestCase):
             g.close()
             try:
                 g.throw(ZeroDivisionError)
-                print("can't reach here")
+                print("should not print this")
             except ZeroDivisionError:
                 print("ZeroDivisionError")
             """)
@@ -379,11 +380,11 @@ class GeneratorTests(TranspileTestCase):
             print(next(g))
             try:
                 g.throw(TypeError)
-                print("can't reach here")
+                print("should not print this")
             except TypeError:
                 try:
                     print(next(g))
-                    print("can't reach here")
+                    print("should not print this")
                 except StopIteration:
                     print("StopIteration")
             """)
@@ -396,21 +397,21 @@ class GeneratorTests(TranspileTestCase):
             g = gen()
             try:
                 g.throw(TypeError, "Hello World")
-                print("can't reach here")
+                print("should not print this")
             except TypeError as e:
                 print(e.__str__())
 
             g = gen()
             try:
                 g.throw(ZeroDivisionError, 100)
-                print("can't reach here")
+                print("should not print this")
             except ZeroDivisionError as e:
                 print(e.__str__())
 
             g = gen()
             try:
                 g.throw(TypeError, (1, 2, 3, "Hello", "World"))
-                print("can't reach here")
+                print("should not print this")
             except TypeError as e:
                 print(e.args)
             """)
@@ -423,7 +424,7 @@ class GeneratorTests(TranspileTestCase):
             g = gen()
             try:
                 g.throw(TypeError, {"Hello": 1, "World": 2})
-                print("can't reach here")
+                print("should not print this")
             except TypeError as e:
                 print(e.args)
             """)
@@ -443,7 +444,7 @@ class GeneratorTests(TranspileTestCase):
             print(g.close())
             try:
                 print(next(g))
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -462,7 +463,7 @@ class GeneratorTests(TranspileTestCase):
             next(g)
             try:
                 g.close()
-                print("can't reach here")
+                print("should not print this")
             except RuntimeError:
                 print(RuntimeError)
             """)
@@ -479,6 +480,7 @@ class GeneratorTests(TranspileTestCase):
             next(g)
             try:
                 g.close()
+                print("should not print this")
             except OSError:
                 pass
             """)
@@ -517,7 +519,7 @@ class GeneratorTests(TranspileTestCase):
             print(next(g))
             try:
                 print(next(g))
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -544,7 +546,7 @@ class GeneratorTests(TranspileTestCase):
             print(g.send("except"))
             try:
                 print(g.send("finally"))
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
 
@@ -554,7 +556,7 @@ class GeneratorTests(TranspileTestCase):
             print(g.send("try"))
             try:
                 print(g.send("finally"))
-                print("can't reach here")
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
             """)
@@ -612,9 +614,11 @@ class GeneratorTests(TranspileTestCase):
             print(next(g))
             try:
                 print(g.throw(GeneratorExit))
+                print("should not print this")
             except GeneratorExit:
                 try:
                     print(next(g))
+                    print("should not print this")
                 except StopIteration:
                     print("StopIteration")
             """)
@@ -648,8 +652,25 @@ class GeneratorTests(TranspileTestCase):
             print(next(g))
             try:
                 print(g.send("Hello World"))
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
+            """)
+
+    def test_generator_yieldfrom_return(self):
+        self.assertCodeExecution("""
+            def gen():
+                return (yield from [1, 2, 3])
+                return "impossible return"
+
+            g = gen()
+            for i in g:
+                print(i)
+            try:
+                print(next(g))
+                print("should not print this")
+            except StopIteration as e:
+                print(e)
             """)
 
     def test_generator_stop_iteration_value(self):
@@ -662,6 +683,7 @@ class GeneratorTests(TranspileTestCase):
             print(next(g))
             try:
                 print(next(g))
+                print("should not print this")
             except StopIteration as e:
                 print(e.value)
 
@@ -677,6 +699,30 @@ class GeneratorTests(TranspileTestCase):
             print(next(g))
             try:
                 print(next(g))
+                print("should not print this")
             except StopIteration:
                 print("StopIteration")
+
+            def gen3():
+                yield 1
+                yield 2
+                return 10
+
+            g1 = gen3()
+            print(next(g1))
+            print(next(g1))
+            try:
+                print(next(g1))
+                print("should not print this")
+            except StopIteration as e:
+                print(e.value)
+
+            g2 = gen3()
+            for i in g2:
+                print(i)
+            try:
+                print(next(g2))
+                print("should not print this")
+            except StopIteration as e:
+                print(e.value)
             """)

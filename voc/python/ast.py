@@ -334,22 +334,39 @@ class Visitor(ast.NodeVisitor):
         # expr? value):
         if self.context.generator:
             # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
-            self.context.add_opcodes(
-                java.New('org/python/exceptions/StopIteration'),
-            )
+            if not isinstance(node.value, ast.YieldFrom):
+                # Don't close the generator if node.value is ast.YieldFrom,
+                # the generator will be closed automatically when node.value is exhausted (raised StopIteration)
+                self.context.add_opcodes(
+                    ALOAD_name('<generator>'),
+                    JavaOpcodes.INVOKEVIRTUAL(
+                        'org/python/types/Generator',
+                        'close',
+                        args=[],
+                        returns='Lorg/python/Object;',
+                    ),
+                    JavaOpcodes.POP(),
+                )
+
             if node.value:
                 self.visit(node.value)
             else:
                 self.context.add_opcodes(python.NONE())
+
             self.context.add_opcodes(
+                ASTORE_name('#value'),
+                java.New('org/python/exceptions/StopIteration'),
+                ALOAD_name('#value'),
                 java.Init('org/python/exceptions/StopIteration', 'Lorg/python/Object;'),
                 JavaOpcodes.ATHROW(),
             )
         elif node.value:
             self.visit(node.value)
+            self.context.add_opcodes(JavaOpcodes.ARETURN())
         else:
             self.context.add_opcodes(python.NONE())
-        self.context.add_opcodes(JavaOpcodes.ARETURN())
+            self.context.add_opcodes(JavaOpcodes.ARETURN())
+
         # Record how deep we were when this return was added.
         self.context.opcodes[-1].needs_implicit_return = \
             self.context.has_nested_structure
@@ -1897,9 +1914,6 @@ class Visitor(ast.NodeVisitor):
             jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.START),  # continue
             END_LOOP(),
         )
-
-        # cleanup
-        self.context.delete_name('#yield-iter-%x' % id(node))
 
     @node_visitor
     def visit_Compare(self, node):
