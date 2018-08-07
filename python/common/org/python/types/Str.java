@@ -144,7 +144,7 @@ public class Str extends org.python.types.Object {
             __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
-        return new org.python.types.Str(this.value);
+        return this;
     }
 
     @org.python.Method(
