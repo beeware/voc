@@ -863,7 +863,9 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Nonlocal(self, node):
         # identifier* names):
-        raise NotImplementedError('No handler for Nonlocal')
+        for name in node.names:
+            self.context.nonlocal_vars.append(name)
+            self.context.local_vars.pop(name, None)
 
     @node_visitor
     def visit_Pass(self, node):
