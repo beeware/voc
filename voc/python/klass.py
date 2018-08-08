@@ -13,7 +13,8 @@ from ..java import (
 )
 from .blocks import Block, IgnoreBlock
 from .methods import (
-    InitMethod, ClosureInitMethod, GeneratorMethod, Method, CO_GENERATOR
+    InitMethod, ClosureInitMethod,
+    GeneratorMethod, Method, CO_GENERATOR,
 )
 from .types import java, python
 from .types.primitives import (
@@ -72,7 +73,7 @@ class Class(Block):
         return self._parent.module
 
     def store_module(self):
-        # Stores the current module as a local variable 
+        # Stores the current module as a local variable
         if ('#module') not in self.local_vars:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
@@ -253,7 +254,7 @@ class Class(Block):
                 generator=code.co_name,
                 parameters=parameter_signatures,
                 returns=return_signature,
-                static=True,
+                static=True
             )
 
         else:
@@ -263,7 +264,7 @@ class Class(Block):
                 code=code,
                 parameters=parameter_signatures,
                 returns=return_signature,
-                static=True,
+                static=True
             )
 
         # Add the method to the list that need to be
@@ -368,7 +369,7 @@ class Class(Block):
 class ClosureClass(Class):
     CONSTRUCTOR = ClosureInitMethod
 
-    def __init__(self, parent, name, closure_var_names, verbosity=0):
+    def __init__(self, parent, name, verbosity=0):
         super().__init__(
             parent=parent,
             name=name,
@@ -377,4 +378,3 @@ class ClosureClass(Class):
             verbosity=verbosity,
             include_default_constructor=False,
         )
-        self.closure_var_names = closure_var_names

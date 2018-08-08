@@ -13,6 +13,15 @@ class WhileLoopTests(TranspileTestCase):
                 print(i, total)
             """)
 
+        # Test expression statement
+        self.assertCodeExecution("""
+            x = True
+            while x:
+                [1, 2, 3]
+                "abc" == "def"
+                x = False
+            """)
+
     def test_break(self):
         self.assertCodeExecution("""
             i = 0

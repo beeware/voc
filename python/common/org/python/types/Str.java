@@ -144,7 +144,7 @@ public class Str extends org.python.types.Object {
             __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
-        return new org.python.types.Str(this.value);
+        return this;
     }
 
     @org.python.Method(
@@ -374,6 +374,16 @@ public class Str extends org.python.types.Object {
         } catch (ClassCastException e) {
             throw new org.python.exceptions.TypeError("string indices must be integers");
         }
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index", "value"}
+    )
+    public void __setitem__(org.python.Object index, org.python.Object value) {
+        throw new org.python.exceptions.TypeError(
+                "'str' object does not support item assignment"
+        );
     }
 
     @org.python.Method(

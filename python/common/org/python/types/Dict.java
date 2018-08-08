@@ -255,47 +255,11 @@ public class Dict extends org.python.types.Object {
         return org.python.types.Int.getInt(this.value.size());
     }
 
-    @org.python.Method(
-            __doc__ = "x.__getitem__(y) <==> x[y]",
-            args = {"item"}
-    )
-    public org.python.Object __getitem__(org.python.Object item) {
+    private org.python.Object _getitem(org.python.Object item) {
         try {
             // While hashcode is not used, it is not a redundant line.
             // We are determining if the item is hashable by seeing if an
             // exception is thrown.
-            org.python.Object hashcode = item.__hash__();
-
-            org.python.Object value = this.value.get(item);
-
-            if (value == null) {
-                try {
-                    return this.__missing__(item);
-                } catch (org.python.exceptions.AttributeError ae) {
-                    throw new org.python.exceptions.KeyError(item);
-                }
-            }
-            return value;
-        } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError(
-                    String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
-        }
-    }
-
-    /**
-     * Private version of __getitem__ without call to __missing__
-     *
-     * Reason: collections.defaultdict overwrites the __missing__() method, and this method is only
-     *         used in dict.__getitem__(). To prevent other methods from calling __missing__()
-     *         indirectly, this private method should be used internally instead.
-     *
-     * Source: "Note that __missing__() is not called for any operations besides __getitem__().
-     *         This means that get() will, like normal dictionaries, return None as a default
-     *         rather than using default_factory."
-     *         (https://docs.python.org/3.6/library/collections.html#collections.defaultdict)
-     */
-    private org.python.Object _getitem(org.python.Object item) {
-        try {
             org.python.Object hashcode = item.__hash__();
 
             org.python.Object value = this.value.get(item);
@@ -307,6 +271,22 @@ public class Dict extends org.python.types.Object {
         } catch (org.python.exceptions.AttributeError ae) {
             throw new org.python.exceptions.TypeError(
                 String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
+        }
+    }
+
+    @org.python.Method(
+            __doc__ = "x.__getitem__(y) <==> x[y]",
+            args = {"item"}
+    )
+    public org.python.Object __getitem__(org.python.Object item) {
+        try {
+            return _getitem(item);
+        } catch (org.python.exceptions.KeyError e) {
+            try {
+                return this.__missing__(item);
+            } catch (org.python.exceptions.AttributeError ae) {
+                throw new org.python.exceptions.KeyError(item);
+            }
         }
     }
 
@@ -507,7 +487,7 @@ public class Dict extends org.python.types.Object {
                 while (true) {
                     try {
                         org.python.Object key = iterator.__next__();
-                        org.python.Object value = kwargs._getitem(key);
+                        org.python.Object value = kwargs.value.get(key);
                         this.value.put(key, value);
                     } catch (org.python.exceptions.StopIteration si) {
                         break;
@@ -519,7 +499,7 @@ public class Dict extends org.python.types.Object {
             while (true) {
                 try {
                     org.python.Object key = iterator.__next__();
-                    org.python.Object value = iterable.__getitem__(key);
+                    org.python.Object value = ((org.python.types.Dict) iterable)._getitem(key);
                     this.value.put(key, value);
                 } catch (org.python.exceptions.StopIteration si) {
                     break;

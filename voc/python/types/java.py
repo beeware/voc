@@ -119,6 +119,18 @@ class List:
                 JavaOpcodes.POP(),
             )
 
+    class addAll:
+        def process(self, context):
+            context.add_opcodes(
+                JavaOpcodes.INVOKEINTERFACE(
+                    'java/util/List',
+                    'addAll',
+                    args=['Ljava/util/Collection;'],
+                    returns='Z'
+                ),
+                JavaOpcodes.POP(),
+            )
+
 
 class Map:
     def process(self, context):
@@ -164,6 +176,22 @@ class Map:
                     args=['Ljava/util/Map;'],
                     returns='V'
                 ),
+            )
+
+    class remove:
+        def __init__(self, key):
+            self.key = key
+
+        def process(self, context):
+            context.add_opcodes(
+                JavaOpcodes.LDC_W(self.key),
+                JavaOpcodes.INVOKEINTERFACE(
+                    'java/util/Map',
+                    'remove',
+                    args=['Ljava/lang/Object;'],
+                    returns='Ljava/lang/Object;'
+                ),
+                JavaOpcodes.POP()
             )
 
 

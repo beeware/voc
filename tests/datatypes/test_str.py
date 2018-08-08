@@ -238,6 +238,16 @@ class StrTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_setitem(self):
+        # Strings are immutable and do not allow item assignment
+        self.assertCodeExecution("""
+            x = "BeeWare"
+            try:
+                x[0] = "A"
+            except TypeError as err:
+                print(err)
+        """)
+
     def test_slice(self):
         # Full slice
         self.assertCodeExecution("""
