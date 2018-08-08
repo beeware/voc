@@ -258,6 +258,10 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return org.python.types.Int.getInt(this.hashCode());
     }
 
+    public boolean isHashable() {
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = ""
     )
