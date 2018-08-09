@@ -179,6 +179,19 @@ def test_loops(test_case):
                         pass
     """), timed=True)
 
+def test_dict_get(test_case):
+    print("Running", "test_dictionary_get")
+    test_case.runAsJava(adjust("""
+        dict = {1 : 2, "a" : "b"}
+        for i in range(1000000):
+            dict.get(i)
+            dict.get(1)
+            dict.get("a")
+            dict.get(i)
+            dict.get(1)
+            dict.get("a")
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -190,6 +203,7 @@ def main():
     test_code(test_case)
     test_loops(test_case)
     test_cmp(test_case)
+    test_dict_get(test_case)
 
 if __name__== "__main__":
   main()

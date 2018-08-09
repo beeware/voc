@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
@@ -36,6 +38,16 @@ class GlobalsTests(TranspileTestCase):
             print('Done')
         """, run_in_function=False)
 
+    @expectedFailure
+    def test_preloaded_globals(self):
+        self.assertCodeExecution("""
+            glbs = globals
+            x = 1
+            y = 2
+
+            for i in range(10):
+                print(glbs())
+        """)
 
 class BuiltinGlobalsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["globals"]

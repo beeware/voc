@@ -204,6 +204,10 @@ public class Super implements org.python.Object {
         return org.python.types.Int.getInt(this.hashCode());
     }
 
+    public boolean isHashable() {
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = ""
     )
@@ -461,14 +465,6 @@ public class Super implements org.python.Object {
     )
     public org.python.Object __contains__(org.python.Object item) {
         throw new org.python.exceptions.AttributeError(this, "__contains__");
-    }
-
-    @org.python.Method(
-            __doc__ = "",
-            args = {"item"}
-    )
-    public org.python.Object __not_contains__(org.python.Object item) {
-        throw new org.python.exceptions.AttributeError(this, "__not_contains__");
     }
 
     /**

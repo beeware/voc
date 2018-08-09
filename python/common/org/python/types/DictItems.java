@@ -30,6 +30,11 @@ public class DictItems extends org.python.types.Object {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
+    @Override
+    public boolean isHashable() {
+        return false;
+    }
+
     public DictItems(org.python.types.Dict dict) {
         this.value = dict.value.entrySet();
     }
@@ -180,15 +185,6 @@ public class DictItems extends org.python.types.Object {
     public org.python.Object __contains__(org.python.Object item) {
         org.python.types.Set set = new org.python.types.Set(this.toTupleSet());
         return set.__contains__(item);
-    }
-
-    @org.python.Method(
-            __doc__ = "",
-            args = {"item"}
-    )
-    public org.python.Object __not_contains__(org.python.Object other) {
-        org.python.types.Set set = new org.python.types.Set(this.toTupleSet());
-        return set.__not_contains__(other);
     }
 
     @org.python.Method(

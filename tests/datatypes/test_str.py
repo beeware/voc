@@ -888,6 +888,19 @@ class StrTests(TranspileTestCase):
                 print(err)
         """)
 
+    def test_contains(self):
+        self.assertCodeExecution("""
+            print('abc' in 'abc')
+            print('a' in 'abc')
+            print('a' in '')
+            print('' in 'a')
+
+            print('abc' not in 'abc')
+            print('a' not in 'abc')
+            print('a' not in '')
+            print('' in 'a')
+        """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

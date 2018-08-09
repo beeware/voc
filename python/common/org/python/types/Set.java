@@ -26,6 +26,11 @@ public class Set extends org.python.types.Object {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
+    @Override
+    public boolean isHashable() {
+        return false;
+    }
+
     public Set() {
         super();
         this.value = new java.util.HashSet<org.python.Object>();
@@ -259,14 +264,6 @@ public class Set extends org.python.types.Object {
     )
     public org.python.Object __contains__(org.python.Object other) {
         return org.python.types.Bool.getBool(this.value.contains(other));
-    }
-
-    @org.python.Method(
-            __doc__ = "",
-            args = {"item"}
-    )
-    public org.python.Object __not_contains__(org.python.Object other) {
-        return org.python.types.Bool.getBool(!this.value.contains(other));
     }
 
     @org.python.Method(

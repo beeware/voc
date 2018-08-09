@@ -258,6 +258,10 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         return org.python.types.Int.getInt(this.hashCode());
     }
 
+    public boolean isHashable() {
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = ""
     )
@@ -550,14 +554,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __contains__(org.python.Object item) {
         throw new org.python.exceptions.AttributeError(this, "__contains__");
-    }
-
-    @org.python.Method(
-            __doc__ = "",
-            args = {"item"}
-    )
-    public org.python.Object __not_contains__(org.python.Object item) {
-        throw new org.python.exceptions.AttributeError(this, "__not_contains__");
     }
 
     /**
@@ -1364,47 +1360,25 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         org.python.Object result = null;
 
         if (v_builtin) {
-            result = v.__contains__(w);
-        } else {
-            result = invokeComparison(v, w, "__contains__");
-        }
-
-        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
+            try {
+                result = v.__contains__(w);
+            } catch (org.python.exceptions.AttributeError e) {
+                throw new org.python.exceptions.TypeError(String.format("argument of type '%s' is not iterable", v.typeName()));
+            }
             return result;
-        }
-
-        // Error case
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError(String.format(
-                "unorderable types: %s() %s %s()", v.typeName(), "in", w.typeName()));
         } else {
-            throw new org.python.exceptions.TypeError(String.format(
-                "'%s' not supported between instances of '%s' and '%s'", "in", v.typeName(), w.typeName()));
+            try {
+                result = invokeComparison(v, w, "__contains__");
+            } catch (org.python.exceptions.AttributeError e) {
+                throw new org.python.exceptions.TypeError(String.format("argument of type '%s' is not iterable", v.typeName()));
+            }
+            return result;
         }
     }
 
     public static org.python.Object __not_contains__(org.python.Object v, org.python.Object w) {
-        boolean v_builtin = isBuiltin(v);
-        org.python.Object result = null;
-        // Normal case
-        if (v_builtin) {
-            result = v.__not_contains__(w);
-        } else {
-            result = invokeComparison(v, w, "__not_contains__");
-        }
-
-        if (result != org.python.types.NotImplementedType.NOT_IMPLEMENTED) {
-            return result;
-        }
-
-        // Error case
-        if (org.Python.VERSION < 0x03060000) {
-            throw new org.python.exceptions.TypeError(String.format(
-                "unorderable types: %s() %s %s()", v.typeName(), "not in", w.typeName()));
-        } else {
-            throw new org.python.exceptions.TypeError(String.format(
-                "'%s' not supported between instances of '%s' and '%s'", "not in", v.typeName(), w.typeName()));
-        }
+        org.python.Object containsObj = org.python.types.Object.__contains__(v, w);
+        return org.python.types.Bool.getBool(!((org.python.types.Bool) containsObj).value);
     }
 
     private static org.python.Object invokeComparison(org.python.Object x, org.python.Object y, String methodName) {

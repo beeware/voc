@@ -203,30 +203,45 @@ class DictTests(TranspileTestCase):
             print(x.get(1))
             print(x.get(2))
             print(x.get(3,4))
+
+            class MyClass:
+                pass
+
+            obj = MyClass()
+            print(x.get(obj))
             """)
 
         # check for unhashable type errors
         self.assertCodeExecution("""
             x = {1: 2}
-            try:
-                print(x.get([]))
-            except TypeError as err:
-                print(err)
-            try:
-                print(x.get([], 1))
-            except TypeError as err:
-                print(err)
-            """)
 
-        # check for unhashable type errors
-        self.assertCodeExecution("""
-            x = {1: 2}
             try:
                 print(x.get([]))
             except TypeError as err:
                 print(err)
+
             try:
                 print(x.get([], 1))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(x.get(list([1])))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(x.get(set([1, 2, 3])))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(x.get(iter([1, 2, 3])))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(x.get(slice(3)))
             except TypeError as err:
                 print(err)
             """)

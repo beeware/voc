@@ -39,6 +39,25 @@ class VarsTests(TranspileTestCase):
             print('Done')
         """, run_in_function=False)
 
+    @expectedFailure
+    def test_preloaded_vars(self):
+        self.assertCodeExecution("""
+            v = vars
+            print("There are %s vars" % len(v()))
+
+            x = 1
+            y = 'z'
+            print("There are %s vars" % len(v()))
+
+            def method():
+                print("There are %s vars" % len(v()))
+                x = 1
+                y = 'z'
+                print("There are %s vars" % len(v()))
+
+            method()
+        """, run_in_function=False)
+
 
 class BuiltinVarsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["vars"]
