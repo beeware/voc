@@ -226,7 +226,6 @@ public class Python {
                     kwargs_name = cls_annotation.kwargs();
                 }
 
-
                 attrs.put(
                         method_name,
                         new org.python.types.Function(

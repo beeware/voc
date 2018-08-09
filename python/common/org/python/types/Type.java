@@ -14,7 +14,9 @@ public class Type extends org.python.types.Object implements org.python.Callable
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
-    private java.util.Map<java.lang.String, java.lang.reflect.Method> __orgpythontypesmethods__;
+    // A map of methods defined on this object. If this class is in org/python/types
+    // or org/python/stdlib, this will be populated when declarePythonType is invoked. 
+    private java.util.Map<java.lang.String, java.lang.reflect.Method> python_methods;
 
     private static org.python.Object[] emptyArgs;
     private static java.util.Map<java.lang.String, org.python.Object> emptyKwargs;
@@ -130,8 +132,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                     || java_class.getName().startsWith("org.python.stdlib")) {
                 // System.out.println("    BUILTIN");
                 python_type = new org.python.types.Type(Origin.BUILTIN, java_class);
-                python_type.__orgpythontypesmethods__ = org.Python.loadModule(java_class);
-                //org.Python.initializeModule(java_class, python_type.__dict__);
+                python_type.python_methods = org.Python.loadModule(java_class);
             } else {
                 // System.out.println("    PYTHON");
                 python_type = new org.python.types.Type(Origin.PYTHON, java_class);
@@ -327,10 +328,10 @@ public class Type extends org.python.types.Object implements org.python.Callable
         org.python.Object value = this.__dict__.get(name);
 
         if (value == null) {
-            // Check to see if we're asking for a org.python.types method
-            if (this.__orgpythontypesmethods__ != null && this.__orgpythontypesmethods__.containsKey(name)) {
+            // Check to see if we're asking for a org.python.types method that hasn't been loaded into __dict__ yet
+            if (this.python_methods != null && this.python_methods.containsKey(name)) {
                 // It's an org/python/types method.
-                java.lang.reflect.Method method = this.__orgpythontypesmethods__.get(name);
+                java.lang.reflect.Method method = this.python_methods.get(name);
                 org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
 
                 if (cls_annotation != null) {
@@ -357,14 +358,17 @@ public class Type extends org.python.types.Object implements org.python.Callable
                             cls_annotation.kwonlyargs(),
                             kwargs_name
                     );
+                    // Keep it in __dict__ for next use
                     this.__dict__.put(name, function);
                     value = function;
                 }
             }
         }
 
+        // Differentiate between "doesn't exist in the __dict__ or python_methods", and
+        // exists, but has a value of null
         if (value == null && !this.__dict__.containsKey(name) &&
-                (this.__orgpythontypesmethods__ == null || !this.__orgpythontypesmethods__.containsKey(name))) {
+                (this.python_methods == null || !this.python_methods.containsKey(name))) {
             // The class attributes didn't contain a value for the attribute
             // name. Introspect on the object class to see if a field
             // with the given name exists, caching either the Field instance,
