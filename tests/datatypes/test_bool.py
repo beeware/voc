@@ -21,6 +21,15 @@ class BoolTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_setitem(self):
+        self.assertCodeExecution("""
+            x = True
+            try:
+                x[0] = 1
+            except TypeError as err:
+                print(err)
+        """)
+
 
 class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bool'

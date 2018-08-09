@@ -66,7 +66,7 @@ public interface Object extends Comparable {
     public org.python.Object __ge__(org.python.Object other);
 
     public org.python.Object __hash__();
-
+    public boolean isHashable();
     public org.python.Object __bool__();
 
     /**

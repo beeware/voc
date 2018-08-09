@@ -30,6 +30,11 @@ public class DictValues extends org.python.types.Object {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
+    @Override
+    public boolean isHashable() {
+        return false;
+    }
+
     DictValues(org.python.types.Dict dict) {
         this.value = dict.value.values();
     }

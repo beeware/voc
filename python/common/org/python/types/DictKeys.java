@@ -20,6 +20,11 @@ public class DictKeys extends org.python.types.FrozenSet {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
+    @Override
+    public boolean isHashable() {
+        return false;
+    }
+
     public DictKeys(org.python.types.Dict dict) {
         this.value = dict.value.keySet();
     }

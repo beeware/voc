@@ -204,6 +204,10 @@ public class Super implements org.python.Object {
         return org.python.types.Int.getInt(this.hashCode());
     }
 
+    public boolean isHashable() {
+        return true;
+    }
+
     @org.python.Method(
             __doc__ = ""
     )

@@ -144,7 +144,7 @@ public class Str extends org.python.types.Object {
             __doc__ = "Return str(self)."
     )
     public org.python.Object __str__() {
-        return new org.python.types.Str(this.value);
+        return this;
     }
 
     @org.python.Method(
@@ -374,6 +374,16 @@ public class Str extends org.python.types.Object {
         } catch (ClassCastException e) {
             throw new org.python.exceptions.TypeError("string indices must be integers");
         }
+    }
+
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index", "value"}
+    )
+    public void __setitem__(org.python.Object index, org.python.Object value) {
+        throw new org.python.exceptions.TypeError(
+                "'str' object does not support item assignment"
+        );
     }
 
     @org.python.Method(
@@ -1849,7 +1859,7 @@ final class PythonFormatter {
      *                                                in args.
      *
      * @throws org.python.exceptions.TypeError     Various errors. Seriously, almost anything that could go wrong throws TypeError.
-     * @throws org.python.exceptions.KeyError      if a predicted key could not be found in the given kwargs dict.
+     * @throws org.python.exceptions.KeyError      if a predicted key could not be found in the given dict.
      * @throws org.python.exceptions.OverflowError if a character conversion exceeds unicode range.
      * @throws org.python.exceptions.ValueError    if a conversion character is unknown. See Python's documentation.
      * @throws java.lang.NullPointerException      if null passed to method in any argument.
@@ -1867,7 +1877,7 @@ final class PythonFormatter {
         if (arg instanceof org.python.types.Tuple) {
             return new PythonFormatter(formatString.value, ((org.python.types.Tuple) arg).value)._format();
         } else if (arg instanceof org.python.types.Dict) {
-            return new PythonFormatter(formatString.value, ((org.python.types.Dict) arg).value)._format();
+            return new PythonFormatter(formatString.value, (org.python.types.Dict) arg)._format();
         } else {
             return new PythonFormatter(formatString.value, arg)._format();
         }
@@ -1888,25 +1898,25 @@ final class PythonFormatter {
     private PythonFormatter(java.lang.String formatString, java.util.List<org.python.Object> args) {
         this.formatString = formatString;
         this.args = args;
-        this.kwargs = null;
+        this.dict = null;
 
         fillCharacterQueue();
     }
 
-    private PythonFormatter(java.lang.String formatString, java.util.Map<org.python.Object, org.python.Object> kwargs) {
+    private PythonFormatter(java.lang.String formatString, org.python.types.Dict dict) {
         this.formatString = formatString;
         this.args = new java.util.LinkedList<>();
-        this.kwargs = kwargs;
+        this.dict = dict;
 
         // necessary for certain edge cases
-        this.args.add(new org.python.types.Dict(kwargs));
+        this.args.add(dict);
         fillCharacterQueue();
     }
 
     private PythonFormatter(java.lang.String formatString, org.python.Object arg) {
         this.formatString = formatString;
         this.args = new java.util.LinkedList<>();
-        this.kwargs = null;
+        this.dict = null;
 
         this.singleValueIsAllowed = arg instanceof org.python.types.Bytes
                                  || arg instanceof org.python.types.ByteArray
@@ -1953,10 +1963,6 @@ final class PythonFormatter {
 
         org.python.types.Str key = new org.python.types.Str(keyBuilder.toString());
 
-        if (!kwargs.containsKey(key)) {
-            throw new org.python.exceptions.KeyError(key);
-        }
-
         // This is really not intuitive. But apparently Python behaves
         // similar. Consider the following valid python code:
         //
@@ -1967,7 +1973,7 @@ final class PythonFormatter {
         // arglist as one would expect. Instead if the value for key 'C'
         // is of type str "TypeError: * wants int" will be raised.
         // Anyway, this works.
-        args.add(currentArgumentIndex, kwargs.get(key));
+        args.add(currentArgumentIndex, dict.__getitem__(key));
     }
 
     private java.util.Map<java.lang.Character, java.lang.Boolean> parseConversionFlags() {
@@ -2345,7 +2351,7 @@ final class PythonFormatter {
      * @throws org.python.exceptions.TypeError if not all arguments were converted during string formatting
      */
     private void ensureNoArgumentsAreLeft() throws org.python.exceptions.TypeError {
-        if (!singleValueIsAllowed && kwargs == null && currentArgumentIndex < args.size()) {
+        if (!singleValueIsAllowed && dict == null && currentArgumentIndex < args.size()) {
             throw new org.python.exceptions.TypeError(
                 "not all arguments converted during string formatting");
         }
@@ -2370,7 +2376,7 @@ final class PythonFormatter {
             }
         }
 
-        if (kwargs == null) {
+        if (dict == null) {
             throw new org.python.exceptions.TypeError("format requires a mapping");
         }
     }
@@ -2566,7 +2572,7 @@ final class PythonFormatter {
     // set by Constructor
     private final java.lang.String formatString;
     private final java.util.List<org.python.Object> args;
-    private final java.util.Map<org.python.Object, org.python.Object> kwargs;
+    private final org.python.types.Dict dict;
 
     // have default values
     private final java.lang.StringBuilder buffer = new StringBuilder();

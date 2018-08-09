@@ -123,6 +123,16 @@ public class Range extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "",
+            args = {"index", "value"}
+    )
+    public void __setitem__(org.python.Object index, org.python.Object value) {
+        throw new org.python.exceptions.TypeError(
+                "'range' object does not support item assignment"
+        );
+    }
+
+    @org.python.Method(
             __doc__ = "Implement __len__(self)."
     )
     public org.python.Object __len__() {
@@ -262,9 +272,11 @@ public class Range extends org.python.types.Object {
         )
         public org.python.Object __next__() {
             if (this.step > 0 && this.index >= this.stop) {
-                throw new org.python.exceptions.StopIteration();
+                // StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+                throw org.python.exceptions.StopIteration.STOPITERATION;
             } else if (this.step < 0 && this.index <= this.stop) {
-                throw new org.python.exceptions.StopIteration();
+                // StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+                throw org.python.exceptions.StopIteration.STOPITERATION;
             }
 
             org.python.Object result = org.python.types.Int.getInt(this.index);

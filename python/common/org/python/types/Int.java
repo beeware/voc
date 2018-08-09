@@ -156,6 +156,16 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "",
+            args = {"index", "value"}
+    )
+    public void __setitem__(org.python.Object index, org.python.Object value) {
+        throw new org.python.exceptions.TypeError(
+                "'int' object does not support item assignment"
+        );
+    }
+
+    @org.python.Method(
             __doc__ = "Return self<value.",
             args = {"other"}
     )

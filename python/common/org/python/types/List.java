@@ -31,6 +31,11 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
+    @Override
+    public boolean isHashable() {
+        return false;
+    }
+
     public List() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();

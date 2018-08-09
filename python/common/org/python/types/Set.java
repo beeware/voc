@@ -26,6 +26,11 @@ public class Set extends org.python.types.Object {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
+    @Override
+    public boolean isHashable() {
+        return false;
+    }
+
     public Set() {
         super();
         this.value = new java.util.HashSet<org.python.Object>();
