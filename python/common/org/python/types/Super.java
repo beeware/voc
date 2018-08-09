@@ -60,7 +60,7 @@ public class Super implements org.python.Object {
      */
     public boolean equals(java.lang.Object other) {
         if (other instanceof org.python.Object) {
-            org.python.Object result = org.python.types.Object.__cmp_bool__(this, (org.python.Object) other, org.python.types.Object.CMP_OP.EQ);
+            org.python.Object result = org.python.types.Object.__eq__(this, (org.python.Object) other);
             return ((org.python.types.Bool) result).value;
         } else {
             throw new org.python.exceptions.RuntimeError("Can't compare a Python object with non-Python object.");
@@ -202,6 +202,10 @@ public class Super implements org.python.Object {
     )
     public org.python.Object __hash__() {
         return org.python.types.Int.getInt(this.hashCode());
+    }
+
+    public boolean isHashable() {
+        return true;
     }
 
     @org.python.Method(

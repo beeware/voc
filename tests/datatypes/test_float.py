@@ -26,6 +26,15 @@ class FloatTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_setitem(self):
+        self.assertCodeExecution("""
+            x = 3.14159
+            try:
+                x[0] = 2
+            except TypeError as err:
+                print(err)
+        """)
+
     def test_repr(self):
         self.assertCodeExecution("""
             x = 350000000000000000.0

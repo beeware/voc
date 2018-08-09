@@ -47,6 +47,25 @@ class NonlocalTests(TranspileTestCase):
             func2()
         """)
 
+        self.assertCodeExecution("""
+            def func():
+                a = None
+                def nested():
+                    nonlocal a
+                    a = 'changed by nested'
+                    print(a)
+
+                def nested2():
+                    print(a)
+
+                return (nested, nested2)
+
+            nested, nested2 = func()
+            nested2()
+            nested()
+            nested2()
+        """)
+
     @expectedFailure
     def test_nonlocal_class(self):
         self.assertCodeExecution("""
@@ -89,7 +108,6 @@ class NonlocalTests(TranspileTestCase):
             func()
         """)
 
-    @expectedFailure
     def test_nonlocal_generator(self):
         self.assertCodeExecution("""
             def func():

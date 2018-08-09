@@ -6,7 +6,7 @@ from ..java import (
 from .blocks import Block, Accumulator, BlockCodeTooLarge
 from .structures import (
     TRY, CATCH, END_TRY,
-    ArgType,
+    ArgType, IF, END_IF
 )
 from .types import java, python
 from .types.primitives import (
@@ -276,7 +276,7 @@ class Function(Block):
         pass
 
     def store_module(self):
-        # Stores the current module as a local variable 
+        # Stores the current module as a local variable
         if ('#module') not in self.local_vars:
             self.add_opcodes(
                 JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
@@ -320,7 +320,15 @@ class Function(Block):
     def load_name(self, name):
         if name in self.local_vars:
             self.add_opcodes(
-                ALOAD_name(name)
+                ALOAD_name('#locals'),
+                java.Map.get(name),
+                JavaOpcodes.DUP(),
+                IF([], JavaOpcodes.IFNONNULL),
+                java.THROW(
+                    'org/python/exceptions/UnboundLocalError',
+                    ['Ljava/lang/String;', JavaOpcodes.LDC_W(name)]
+                ),
+                END_IF(),
             )
         else:
             self.add_opcodes(
@@ -345,7 +353,9 @@ class Function(Block):
     def delete_name(self, name):
         try:
             self.add_opcodes(
-                free_name(name)
+                free_name(name),
+                ALOAD_name('#locals'),
+                java.Map.remove(name)
             )
         except NameError:
             self.add_opcodes(
@@ -392,7 +402,7 @@ class Function(Block):
             self.module,
             name=class_name,
             extends=extends,
-            implements=implements,
+            implements=implements
         )
 
         self.module.classes.append(klass)
@@ -453,11 +463,16 @@ class Function(Block):
         klass = ClosureClass(
             parent=self._parent,
             name=name,
-            closure_var_names=code.co_freevars,
         )
         self.module.classes.append(klass)
 
         klass.visitor_setup()
+
+        if hasattr(self, "outer_contexts") and self.outer_contexts:
+            outer_contexts = self.outer_contexts + [self]
+        else:
+            outer_contexts = [self]
+
         if code.co_flags & CO_GENERATOR:
             closure = GeneratorClosure(
                 klass,
@@ -465,6 +480,7 @@ class Function(Block):
                 generator=code.co_name,
                 parameters=parameter_signatures,
                 returns=return_signature,
+                outer_contexts=outer_contexts
             )
         else:
             closure = Closure(
@@ -472,6 +488,7 @@ class Function(Block):
                 code=code,
                 parameters=parameter_signatures,
                 returns=return_signature,
+                outer_contexts=outer_contexts
             )
 
         klass.methods.append(closure)
@@ -481,28 +498,39 @@ class Function(Block):
 
         klass.visitor_teardown()
 
+        # closure has reference to outer context's local variables by maintaining a list of #locals
         self.add_opcodes(
             java.New(klass.descriptor),
-            # Define the closure vars
-            java.Map(),
+            java.List(),
+            JavaOpcodes.DUP(),
+            ALOAD_name('#locals'),
+            java.List.add(),
         )
 
-        for var_name in code.co_freevars:
+        if isinstance(self, Closure):
             self.add_opcodes(
                 JavaOpcodes.DUP(),
-                JavaOpcodes.LDC_W(var_name),
+                ALOAD_name('<closure>'),
+                JavaOpcodes.CHECKCAST('org/python/types/Closure'),
+                JavaOpcodes.GETFIELD('org/python/types/Closure', 'locals_list', 'Ljava/util/List;'),
+                java.List.addAll(),
             )
-            self.load_name(var_name)
+        elif isinstance(self, GeneratorClosure):
             self.add_opcodes(
-                java.Map.put(),
+                JavaOpcodes.DUP(),
+                ALOAD_name('<generator>'),
+                JavaOpcodes.CHECKCAST('org/python/types/Generator'),
+                JavaOpcodes.GETFIELD('org/python/types/Generator', 'closure', 'Lorg/python/types/Closure;'),
+                JavaOpcodes.GETFIELD('org/python/types/Closure', 'locals_list', 'Ljava/util/List;'),
+                java.List.addAll(),
             )
 
         self.add_opcodes(
-            java.Init(klass.descriptor, 'Ljava/util/Map;'),
+            java.Init(klass.descriptor, 'Ljava/util/List;'),
+
             python.Type.for_name(klass.descriptor),
         )
 
-        # Store the closure instance as an accessible symbol.
         self.add_callable(closure)
 
         self.add_opcodes(
@@ -517,6 +545,16 @@ class Function(Block):
             java.Map(),
             ASTORE_name('#locals')
         )
+
+        # stores parameters in #locals
+        for param in self.parameters:
+            self.add_opcodes(
+                ALOAD_name('#locals'),
+                JavaOpcodes.LDC_W(param['name']),
+                ALOAD_name(param['name']),
+                java.Map.put(),
+            )
+
         self.store_module()
 
     def visitor_teardown(self):
@@ -603,7 +641,6 @@ class InitMethod(Function):
         self.super_args = super_args if super_args else []
 
         self.store_module()
-
 
     def __repr__(self):
         return '<Constructor %s (%s parameters)>' % (self.klass.name, len(self.parameters))
@@ -693,6 +730,7 @@ class Method(Function):
             returns=returns,
             static=static,
         )
+
         self.store_module()
 
     def __repr__(self):
@@ -874,7 +912,7 @@ class MainFunction(Function):
     def store_name(self, name, declare=False):
         self.add_opcodes(
             ASTORE_name('#value'),
-            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
+            ALOAD_name('#module'),  # #module is available as a local var after visitor_setup has been called
 
             ALOAD_name('#value'),
             python.Object.set_attr(name),
@@ -894,13 +932,13 @@ class MainFunction(Function):
 
     def load_name(self, name):
         self.add_opcodes(
-            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
+            ALOAD_name('#module'),  # #module is available as a local var after visitor_setup has been called
             python.Object.get_attribute(name),
         )
 
     def delete_name(self, name):
         self.add_opcodes(
-            ALOAD_name('#module'), # #module is available as a local var after visitor_setup has been called
+            ALOAD_name('#module'),  # #module is available as a local var after visitor_setup has been called
             python.Object.del_attr(name),
         )
 
@@ -964,8 +1002,23 @@ class MainFunction(Function):
         return []
 
 
+def _get_enclosing_context_level(child_context, name):
+    # returns level of enclosing context that defined the variable `name`
+    # i.e. level = 2 means `name` is found two levels up from the nested `child_context`
+    if name in child_context.local_vars:
+        return None
+    else:
+        level = 0
+        for context in child_context.outer_contexts[::-1]:
+            level += 1
+            if name in context.local_vars and context.local_vars[name] is not None:
+                return level
+
+    return None
+
+
 class Closure(Function):
-    def __init__(self, klass, code, parameters, returns=None, static=False):
+    def __init__(self, klass, code, parameters, returns=None, static=False, outer_contexts=None):
         super().__init__(
             klass,
             name='invoke',
@@ -974,12 +1027,52 @@ class Closure(Function):
             returns=returns,
             static=static,
         )
+        self.nonlocal_vars = []  # holds nonlocal variable names for `store_name`
+        self.outer_contexts = outer_contexts  # parent scopes of this closure, excluding global scope
+
         self.store_module()
 
     def __repr__(self):
-        return '<Closure %s (%s parameters, %s closure variables)>' % (
-            self.name, len(self.parameters), len(self.klass.closure_var_names)
-        )
+        return '<Closure %s (%s parameters)>' % (self.name, len(self.parameters))
+
+    def store_name(self, name, declare=False):
+        if name in self.nonlocal_vars:
+            # updates closure
+            self.add_opcodes(
+                ALOAD_name('<closure>'),
+                JavaOpcodes.CHECKCAST('org/python/types/Closure'),
+                ICONST_val(_get_enclosing_context_level(self, name)),
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Closure',
+                    'get_locals',
+                    args=['I'],
+                    returns='Ljava/util/Map;'
+                ),
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.LDC_W(name),
+                JavaOpcodes.SWAP(),
+                java.Map.put()
+            )
+        else:
+            super().store_name(name, declare)
+
+    def load_name(self, name):
+        parent_level = _get_enclosing_context_level(self, name)
+        if parent_level:
+            self.add_opcodes(
+                ALOAD_name('<closure>'),
+                JavaOpcodes.CHECKCAST('org/python/types/Closure'),
+                ICONST_val(parent_level),
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Closure',
+                    'get_locals',
+                    args=['I'],
+                    returns='Ljava/util/Map;'
+                ),
+                java.Map.get(name),
+            )
+        else:
+            super().load_name(name)
 
     @property
     def klass(self):
@@ -1000,25 +1093,6 @@ class Closure(Function):
         # method.
         self.local_vars['<closure>'] = len(self.local_vars)
         self.has_self = True
-
-    def load_name(self, name):
-        if name in self.local_vars:
-            self.add_opcodes(
-                ALOAD_name(name)
-            )
-        elif name in self.klass.closure_var_names:
-            self.add_opcodes(
-                ALOAD_name('<closure>'),
-                JavaOpcodes.CHECKCAST('org/python/types/Closure'),
-                JavaOpcodes.GETFIELD('org/python/types/Closure', 'closure_vars', 'Ljava/util/Map;'),
-
-                java.Map.get(name),
-            )
-        else:
-            self.add_opcodes(
-                ALOAD_name('#module'),
-                python.Object.get_attribute(name),
-            )
 
 
 class ClosureInitMethod(InitMethod):
@@ -1044,12 +1118,12 @@ class ClosureInitMethod(InitMethod):
 
     @property
     def signature(self):
-        return '(Ljava/util/Map;)V'
+        return '(Ljava/util/List;)V'
 
     def visitor_teardown(self):
         self.add_opcodes(
             JavaOpcodes.ALOAD_1(),
-            java.Init(self.klass.extends_descriptor, 'Ljava/util/Map;'),
+            java.Init(self.klass.extends_descriptor, 'Ljava/util/List;'),
 
             JavaOpcodes.RETURN()
         )
@@ -1093,8 +1167,8 @@ class GeneratorFunction(Function):
     def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
             self.add_opcodes(
-                java.New('org/python/exceptions/StopIteration'),
-                java.Init('org/python/exceptions/StopIteration'),
+                # StopIteration is a singleton by design, see org/python/exceptions/StopIteration 
+                JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
                 JavaOpcodes.ATHROW(),
             )
 
@@ -1150,16 +1224,33 @@ class GeneratorFunction(Function):
                 java.Map.put(),
             )
 
-        # Construct and return the generator object.
-        wrapper.add_opcodes(
-            java.Init(
-                'org/python/types/Generator',
-                'Ljava/lang/String;',
-                'Ljava/lang/reflect/Method;',
-                'Ljava/util/Map;',
-            ),
-            JavaOpcodes.ARETURN(),
-        )
+        if isinstance(self, GeneratorClosure):
+            # stores a copy of closure variables
+            wrapper.add_opcodes(
+                JavaOpcodes.ALOAD_0(),  # first register contains initialized Closure object reference
+                JavaOpcodes.CHECKCAST('org/python/types/Closure')
+            )
+            wrapper.add_opcodes(
+                java.Init(
+                    'org/python/types/Generator',
+                    'Ljava/lang/String;',
+                    'Ljava/lang/reflect/Method;',
+                    'Ljava/util/Map;',
+                    'Lorg/python/types/Closure;'
+                ),
+                JavaOpcodes.ARETURN(),
+            )
+        else:
+            # Construct and return the generator object.
+            wrapper.add_opcodes(
+                java.Init(
+                    'org/python/types/Generator',
+                    'Ljava/lang/String;',
+                    'Ljava/lang/reflect/Method;',
+                    'Ljava/util/Map;'
+                ),
+                JavaOpcodes.ARETURN(),
+            )
 
         return [
             JavaMethod(
@@ -1209,9 +1300,14 @@ class GeneratorFunction(Function):
             )
 
     def load_name(self, name):
-        if name in self.local_vars:
+        if name == '<generator>':  # `<generator>` is not included in #locals
             self.add_opcodes(
                 ALOAD_name(name)
+            )
+        elif name in self.local_vars:
+            self.add_opcodes(
+                ALOAD_name('#locals'),
+                java.Map.get(name),
             )
         else:
             # Unlike other Functions, GeneratorFunctions do not cache the current Module
@@ -1229,7 +1325,9 @@ class GeneratorFunction(Function):
     def delete_name(self, name):
         try:
             self.add_opcodes(
-                free_name(name)
+                free_name(name),
+                ALOAD_name('#locals'),
+                java.Map.remove(name)
             )
         except NameError:
             # Unlike other Functions, GeneratorFunctions do not cache the current Module
@@ -1243,6 +1341,7 @@ class GeneratorFunction(Function):
                 JavaOpcodes.CHECKCAST('org/python/types/Module'),
                 python.Object.del_attr(name),
             )
+
 
 class GeneratorMethod(Method):
     def __init__(self, klass, name, code, generator, parameters, returns=None, static=False):
@@ -1282,8 +1381,8 @@ class GeneratorMethod(Method):
     def visitor_teardown(self):
         if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
             self.add_opcodes(
-                java.New('org/python/exceptions/StopIteration'),
-                java.Init('org/python/exceptions/StopIteration'),
+                # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+                JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
                 JavaOpcodes.ATHROW(),
             )
 
@@ -1365,9 +1464,17 @@ class GeneratorMethod(Method):
             )
         ]
 
+    def load_name(self, name):
+        if name == '<generator>':  # `<generator>` is not included in #locals
+            self.add_opcodes(
+                ALOAD_name(name)
+            )
+        else:
+            super().load_name(name)
+
 
 class GeneratorClosure(GeneratorFunction):
-    def __init__(self, module, code, generator, parameters, returns=None, static=False):
+    def __init__(self, module, code, generator, parameters, returns=None, static=False, outer_contexts=None):
         super().__init__(
             module,
             name='invoke',
@@ -1377,6 +1484,8 @@ class GeneratorClosure(GeneratorFunction):
             returns=returns,
             static=static,
         )
+        self.nonlocal_vars = []  # holds nonlocal variable names for `store_name`
+        self.outer_contexts = outer_contexts  # parent scopes of this closure, excluding global scope
 
     def __repr__(self):
         return '<GeneratorClosure %s (%s parameters)>' % (
@@ -1394,3 +1503,45 @@ class GeneratorClosure(GeneratorFunction):
     @property
     def class_descriptor(self):
         return self.klass.descriptor
+
+    def store_name(self, name, declare=False):
+        if name in self.nonlocal_vars:
+            # updates closure
+            self.add_opcodes(
+                ALOAD_name('<generator>'),
+                JavaOpcodes.CHECKCAST('org/python/types/Generator'),
+                JavaOpcodes.GETFIELD('org/python/types/Generator', 'closure', 'Lorg/python/types/Closure;'),
+                ICONST_val(_get_enclosing_context_level(self, name)),
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Closure',
+                    'get_locals',
+                    args=['I'],
+                    returns='Ljava/util/Map;'
+                ),
+                JavaOpcodes.SWAP(),
+                JavaOpcodes.LDC_W(name),
+                JavaOpcodes.SWAP(),
+                java.Map.put()
+            )
+        else:
+            super().store_name(name, declare)
+
+    def load_name(self, name):
+        parent_level = _get_enclosing_context_level(self, name)
+
+        if parent_level:
+            self.add_opcodes(
+                ALOAD_name('<generator>'),
+                JavaOpcodes.CHECKCAST('org/python/types/Generator'),
+                JavaOpcodes.GETFIELD('org/python/types/Generator', 'closure', 'Lorg/python/types/Closure;'),
+                ICONST_val(parent_level),
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Closure',
+                    'get_locals',
+                    args=['I'],
+                    returns='Ljava/util/Map;'
+                ),
+                java.Map.get(name),
+            )
+        else:
+            super().load_name(name)

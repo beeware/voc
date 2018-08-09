@@ -31,6 +31,11 @@ public class List extends org.python.types.Object {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
+    @Override
+    public boolean isHashable() {
+        return false;
+    }
+
     public List() {
         super();
         this.value = new java.util.ArrayList<org.python.Object>();
@@ -198,8 +203,8 @@ public class List extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherList.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherList.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -207,8 +212,7 @@ public class List extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherList.value.get(i),
-                        org.python.types.Object.CMP_OP.LT);
+                return org.python.types.Object.__lt__(this.value.get(i), otherList.value.get(i));
             }
 
             // all items were identical, break tie by size
@@ -232,8 +236,8 @@ public class List extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherList.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherList.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -241,8 +245,7 @@ public class List extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherList.value.get(i),
-                        org.python.types.Object.CMP_OP.LE);
+                return org.python.types.Object.__le__(this.value.get(i), otherList.value.get(i));
             }
 
             // all items were identical, break tie by size
@@ -278,8 +281,8 @@ public class List extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherList.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherList.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -287,8 +290,7 @@ public class List extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherList.value.get(i),
-                        org.python.types.Object.CMP_OP.GT);
+                return org.python.types.Object.__gt__(this.value.get(i), otherList.value.get(i));
             }
 
             // all items were identical, break tie by size
@@ -312,8 +314,8 @@ public class List extends org.python.types.Object {
             // check how many items are identical on the lists
             int i = 0;
             for (i = 0; i < count; i++) {
-                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                        this.value.get(i), otherList.value.get(i), org.python.types.Object.CMP_OP.EQ);
+                org.python.types.Bool result = (org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                        this.value.get(i), otherList.value.get(i));
                 if (!result.value) {
                     break;
                 }
@@ -321,8 +323,7 @@ public class List extends org.python.types.Object {
 
             // not all items were identical, result is that of the first non-identical item
             if (i < count) {
-                return org.python.types.Object.__cmp_bool__(this.value.get(i), otherList.value.get(i),
-                        org.python.types.Object.CMP_OP.GE);
+                return org.python.types.Object.__ge__(this.value.get(i), otherList.value.get(i));
             }
 
             // all items were identical, break tie by size
@@ -553,8 +554,8 @@ public class List extends org.python.types.Object {
     public org.python.Object __contains__(org.python.Object item) {
         boolean found = false;
         for (int i = 0; i < this.value.size(); i++) {
-            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                    item, this.value.get(i))).value) {
                 found = true;
                 break;
             }
@@ -664,8 +665,8 @@ public class List extends org.python.types.Object {
     public org.python.Object count(org.python.Object other) {
         int count = 0;
         for (int i = 0; i < this.value.size(); i++) {
-            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                    other, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                    other, this.value.get(i))).value) {
                 count++;
             }
         }
@@ -763,8 +764,8 @@ public class List extends org.python.types.Object {
         }
 
         for (int i = iStart; i < Math.min(iEnd, this.value.size()); i++) {
-            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                    item, this.value.get(i))).value) {
                 return org.python.types.Int.getInt(i);
             }
         }
@@ -818,8 +819,8 @@ public class List extends org.python.types.Object {
     )
     public org.python.Object remove(org.python.Object item) {
         for (int i = 0; i < this.value.size(); i++) {
-            if (((org.python.types.Bool) org.python.types.Object.__cmp_bool__(
-                    item, this.value.get(i), org.python.types.Object.CMP_OP.EQ)).value) {
+            if (((org.python.types.Bool) org.python.types.Object.__cmp_eq__(
+                    item, this.value.get(i))).value) {
                 this.value.remove(i);
                 return org.python.types.NoneType.NONE;
             }

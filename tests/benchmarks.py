@@ -138,6 +138,60 @@ def test_code(test_case):
             main(i)
     """), timed=True)
 
+def test_cmp(test_case):
+    print("Running", "test_cmp")
+    test_case.runAsJava(adjust("""
+        x = None
+        s = "mary had a little lamb"
+        t = "humpty dumpty sat on a wall"
+
+        for i in range(1000):
+            for j in range(1000):
+                x = s < t
+                x = s <= t
+                x = s == t
+                x = s != t
+                x = s > t
+                x = s >= t
+
+                x = 3 < 5
+                x = 3 <= 5
+                x = 3 == 5
+                x = 3 != 5
+                x = 3 > 5
+                x = 3 >= 5
+
+                x = 3 < True
+                x = 3.0 <= 5
+                x = None == 5
+                x = [3] != 5.0
+                x = [3] > [5]
+                x = [3.0] > [5.0]
+    """), timed=True)
+
+def test_loops(test_case):
+    print("Running", "test_loops")
+    test_case.runAsJava(adjust("""
+        for x in range(100):
+            for y in range(100):
+                for z in range(100):
+                    for a in range(100):
+                        pass
+    """), timed=True)
+
+def test_dict_get(test_case):
+    print("Running", "test_dictionary_get")
+    test_case.runAsJava(adjust("""
+        dict = {1 : 2, "a" : "b"}
+        for i in range(1000000):
+            dict.get(i)
+            dict.get(1)
+            dict.get("a")
+            dict.get(i)
+            dict.get(1)
+            dict.get("a")
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -147,6 +201,9 @@ def main():
     test_class_var_load(test_case)
     test_function_var_load(test_case)
     test_code(test_case)
+    test_loops(test_case)
+    test_cmp(test_case)
+    test_dict_get(test_case)
 
 if __name__== "__main__":
   main()
