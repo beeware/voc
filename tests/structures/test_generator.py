@@ -308,3 +308,16 @@ class GeneratorTests(TranspileTestCase):
             for i in gen3():
                 print(i)
         """)
+
+    @expectedFailure
+    def test_generator_in_function(self):
+        self.assertCodeExecution("""
+            def fun(lst):
+                def gen():
+                    for x in lst:
+                        yield x
+
+                return list(gen())
+
+            fun([1, 2, 3, 4])
+        """)
