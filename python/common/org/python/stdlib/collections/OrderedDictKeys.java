@@ -13,6 +13,10 @@ public class OrderedDictKeys extends org.python.types.DictKeys {
         __doc__ = ""
     )
     public org.python.Object __reversed__() {
+        if (org.Python.VERSION < 0x03050000) {
+            throw new org.python.exceptions.TypeError("argument to reversed() must be a sequence");
+        }
+
         return org.python.stdlib.collections.OrderedDict_Iterator.get_reverse_keyIterator(this.value);
     }
 }

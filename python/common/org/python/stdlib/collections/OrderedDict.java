@@ -1,5 +1,14 @@
 package org.python.stdlib.collections;
 
+// NOTE: The following methods has different implementation/representation in Python 3.4 and older version:
+//       1. __iter__     (implemented as generator object in Python 3.4 and older version)
+//       2. __reversed__ (implemented as generator object in Python 3.4 and older version)
+//       3. keys         (implemented as KeysView object in Python 3.4, and as a list in Python 2.7)
+//       4. values       (implemented as ValuesView object in Python 3.4, and as a list in Python 2.7)
+//       5. items        (implemented as ItemsView object in Python 3.4, and as a list in Python 2.7)
+// TODO: When the methods above are implemented to produce the same output as Python 3.4,
+// TODO: uncomment and remove this line from `test_collections.py`: "Different type prior to Python 3.5"
+
 public class OrderedDict extends org.python.types.Dict {
 
     private OrderedDict() {

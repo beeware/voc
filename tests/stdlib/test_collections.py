@@ -186,7 +186,7 @@ class OrderedDictTests(TranspileTestCase):
         self.assertCodeExecution("""
             import collections
             od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
-            print(iter(od))
+            # print(iter(od)) Different type prior to Python 3.5
             for i in od:
                 print(i)
             for i in iter(od):
@@ -198,7 +198,7 @@ class OrderedDictTests(TranspileTestCase):
             import collections
             od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
             iter = reversed(od)
-            print(iter)
+            # print(iter) Different type prior to Python 3.5
             for i in iter:
                 print(i)
             """)
@@ -281,29 +281,35 @@ class OrderedDictTests(TranspileTestCase):
             od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
             items = od.items()
 
-            print(items)
+            # print(items) Different type prior to Python 3.5
+            print(list(items))
             print(len(items))
             for i, j in items:
                 print(i, j)
 
             od['aa'] = 11
             print(od)
-            print(items)
+            # print(items) Different type prior to Python 3.5
+            print(list(items))
             """)
 
     def test_items_reversed(self):
         self.assertCodeExecution("""
             import collections
             od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
-            items = reversed(od.items())
+            try:
+                items = reversed(od.items())
 
-            # print(items) Not a odict_iterator type prior to Python 3.5
-            for i, j in items:
-                print(i, j)
+                print(items)
+                for i, j in items:
+                    print(i, j)
 
-            od['aa'] = 11
-            print(od)
-            print(items)
+                od['aa'] = 11
+                print(od)
+                print(items)
+            except TypeError as e:
+                # not implemented in Python version < 3.5
+                print(e)
             """)
 
     def test_keys(self):
@@ -312,29 +318,35 @@ class OrderedDictTests(TranspileTestCase):
             od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
             keys = od.keys()
 
-            # print(keys) Not a odict_iterator type prior to Python 3.5
+            # print(keys) Different type prior to Python 3.5
+            print(list(keys))
             print(len(keys))
             for i in keys:
                 print(i)
 
             od['aa'] = 11
             print(od)
-            print(keys)
+            # print(keys) Different type prior to Python 3.5
+            print(list(keys))
             """)
 
     def test_keys_reversed(self):
         self.assertCodeExecution("""
             import collections
             od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
-            keys = reversed(od.keys())
+            try:
+                keys = reversed(od.keys())
 
-            print(keys)
-            for i in keys:
-                print(i)
+                print(keys)
+                for i in keys:
+                    print(i)
 
-            od['aa'] = 11
-            print(od)
-            print(keys)
+                od['aa'] = 11
+                print(od)
+                print(keys)
+            except TypeError as e:
+                # not implemented in Python version < 3.5
+                print(e)
             """)
 
     def test_values(self):
@@ -343,29 +355,35 @@ class OrderedDictTests(TranspileTestCase):
             od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
             values = od.values()
 
-            print(values)
+            # print(values) Different type prior to Python 3.5
+            print(list(values))
             print(len(values))
             for i in values:
                 print(i)
 
             od['aa'] = 11
             print(od)
-            print(values)
+            # print(values) Different type prior to Python 3.5
+            print(list(values))
             """)
 
     def test_values_reversed(self):
         self.assertCodeExecution("""
             import collections
             od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
-            values = reversed(od.values())
+            try:
+                values = reversed(od.values())
 
-            # print(values) Not a odict_iterator type prior to Python 3.5
-            for i in values:
-                print(i)
+                print(values)
+                for i in values:
+                    print(i)
 
-            od['aa'] = 11
-            print(od)
-            print(values)
+                od['aa'] = 11
+                print(od)
+                print(values)
+            except TypeError as e:
+                # not implemented in Python version < 3.5
+                print(e)
             """)
 
     def test_pop(self):
