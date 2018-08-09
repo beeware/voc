@@ -1173,7 +1173,9 @@ class GeneratorFunction(Function):
         # TODO: instruction, to fix "'TRY' object has no attribute 'next_op'" error during transpilation
         self.add_opcodes(
             # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
-            JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
+            JavaOpcodes.GETSTATIC(
+                'org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'
+            ),
             JavaOpcodes.ATHROW(),
         )
 
@@ -1392,7 +1394,9 @@ class GeneratorMethod(Method):
         # TODO: instruction, to fix "'TRY' object has no attribute 'next_op'" error during transpilation
         self.add_opcodes(
             # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
-            JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
+            JavaOpcodes.GETSTATIC(
+                'org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'
+            ),
             JavaOpcodes.ATHROW(),
         )
 

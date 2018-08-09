@@ -42,10 +42,10 @@ public class Generator extends org.python.types.Object {
     }
 
     public Generator(
-        java.lang.String name,
-        java.lang.reflect.Method expression,
-        java.util.Map<java.lang.String, org.python.Object> stack,
-        org.python.types.Closure closure
+            java.lang.String name,
+            java.lang.reflect.Method expression,
+            java.util.Map<java.lang.String, org.python.Object> stack,
+            org.python.types.Closure closure
     ) {
         // System.out.println("GENERATOR: " + expression);
         // for (org.python.Object obj: stack) {
@@ -66,15 +66,18 @@ public class Generator extends org.python.types.Object {
 
     /**
      * API exposed primarily to handle `yield from`
+     * Intercepts exception and decide whether to yield next value from `iterator` (via send or __next__)
+     * or throw exception into `iterator` if `iterator` is a generator
      *
      * Flow:
      * 1. this.exception == null
-     *    1.1 Get next yield value via delegate_iterate
+     *    1.1 Get next yield value via `get_next_yield_value`
      *    1.2 If StopIteration, re-throw that exception
      *
      * 2. this.exception != null, intercepts this.exception.
-     *    2.1 If this.exception is GeneratorExit, close the sub-generator
-     *    2.2 Otherwise throws the exception into sub-generator
+     *    2.1 If `iterator` is not a generator, the exception is thrown back to caller.
+     *    2.2 If this.exception is GeneratorExit, close the sub-generator
+     *    2.3 Otherwise throws the exception into sub-generator
      *        2.2.1 If the sub-generator handles the exception and returns a value,
      *              returns that value as next yield value.
      *        2.2.2 If the sub-generator raises StopIteration, re-throw that exception
@@ -85,7 +88,7 @@ public class Generator extends org.python.types.Object {
             org.python.Object msg = this.message;
             this.reset_message();
             try {
-                return delegate_iterate(iterator, msg);
+                return get_next_yield_value(iterator, msg);
             } catch (org.python.exceptions.StopIteration stopIteration) {
                 throw stopIteration;
             }
@@ -122,7 +125,7 @@ public class Generator extends org.python.types.Object {
      * Invokes __next__() on iterator if message is None
      * Invokes send() if message is not None, and if iterator is not a generator, raise AttributeError
      */
-    private static org.python.Object delegate_iterate(org.python.Object iterator, org.python.Object message) {
+    private static org.python.Object get_next_yield_value(org.python.Object iterator, org.python.Object message) {
         if (message instanceof org.python.types.NoneType) {
             return iterator.__next__();
         } else {
@@ -160,6 +163,10 @@ public class Generator extends org.python.types.Object {
         this.message = org.python.types.NoneType.NONE;
     }
 
+    /**
+     * Construct an exception and store it in `this.exception` then call __next__() on this generator.
+     * `this.exception` will then be thrown by `this.throw_exception` when the generator resumes.
+     */
     @org.python.Method(
             name = "throw",
             __doc__ = "Implement throw(type, value=None, traceback=None).",
@@ -240,6 +247,7 @@ public class Generator extends org.python.types.Object {
 
     /**
      * Called when generator is restored.
+     * The exception stored in `this.exception` is thrown here
      * NO-OP if this.exception == null
      */
     public void throw_exception() {

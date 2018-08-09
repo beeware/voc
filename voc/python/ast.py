@@ -124,7 +124,7 @@ class Visitor(ast.NodeVisitor):
         self.symbol_namespace = {}
         self.code_objects = {}
 
-        self.resolved_yield_expression = {}  # holds generator's id and its message (value) for expression evaluation
+        self.resolved_yield_expression = {}  # store converted yield expression node identified by generator's id
 
     @property
     def context(self):
@@ -192,8 +192,9 @@ class Visitor(ast.NodeVisitor):
         try:
             self.parse_yield(node)
             if id(node) in self.resolved_yield_expression.keys():
+                # skip the yield node and visit the converted node (a Name node) instead
                 super().visit(self.resolved_yield_expression[id(node)])
-                del self.resolved_yield_expression[id(node)]
+                del self.resolved_yield_expression[id(node)]  # delete entry after visited
             else:
                 super().visit(node)
         except Exception as e:
