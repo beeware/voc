@@ -4,7 +4,6 @@ from ..utils import TranspileTestCase
 
 
 class NonlocalTests(TranspileTestCase):
-    @expectedFailure
     def test_nonlocal_func(self):
         self.assertCodeExecution("""
             def func():

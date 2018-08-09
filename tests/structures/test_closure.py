@@ -15,7 +15,6 @@ class ClosureTests(TranspileTestCase):
             level3()
             """, run_in_function=False)
 
-    @expectedFailure
     def test_rebind_closure_var_before_closure_construction(self):
         self.assertCodeExecution("""
             def func():
@@ -23,11 +22,10 @@ class ClosureTests(TranspileTestCase):
                 def nested():
                     print(closure_var)
                 closure_var = 'after nested is defined'
-                nested() 
+                nested()
             func()
             """)
 
-    @expectedFailure
     def test_generator_closure(self):
         self.assertCodeExecution("""
             def func():
@@ -37,7 +35,7 @@ class ClosureTests(TranspileTestCase):
                     yield
                 next(gen())
             func()
-            
+
             def gen():
                 closure_var = 'hello world'
                 def func():
