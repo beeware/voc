@@ -192,18 +192,65 @@ def test_dict_get(test_case):
             dict.get("a")
     """), timed=True)
 
+def test_init(test_case):
+    print("Running" , "test_init")
+    test_case.runAsJava(adjust("""
+        for i in range(10000):
+            class A:
+                pass
+
+            class B:
+                pass
+
+            class C:
+                pass
+
+            class D:
+                pass
+
+            class E:
+                pass
+
+            class F:
+                pass
+
+            class G:
+                pass
+
+            class H:
+                pass
+
+            a = "a"
+            b = 1
+            c = [1]
+            d = {10 : "ten"}
+            e = list([1])
+            f = True
+            g = 3.0
+            h = abs
+            i = (1, 2)
+            j = 0j
+            k = b"abc"
+            l = set(c)
+            m = slice(1, 2)
+            n = None
+            o = iter([1])
+            p = range(1)
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
-    test_small_integers(test_case)
-    test_booleans(test_case)
-    test_global_var_load(test_case)
-    test_class_var_load(test_case)
-    test_function_var_load(test_case)
-    test_code(test_case)
-    test_loops(test_case)
-    test_cmp(test_case)
-    test_dict_get(test_case)
+    #test_small_integers(test_case)
+    #test_booleans(test_case)
+    #test_global_var_load(test_case)
+    #test_class_var_load(test_case)
+    #test_function_var_load(test_case)
+    #test_code(test_case)
+    #test_loops(test_case)
+    #test_cmp(test_case)
+    #test_dict_get(test_case)
+    test_init(test_case)
 
 if __name__== "__main__":
   main()
