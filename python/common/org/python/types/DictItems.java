@@ -188,15 +188,6 @@ public class DictItems extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
-            args = {"item"}
-    )
-    public org.python.Object __not_contains__(org.python.Object other) {
-        org.python.types.Set set = new org.python.types.Set(this.toTupleSet());
-        return set.__not_contains__(other);
-    }
-
-    @org.python.Method(
             __doc__ = "Return self<value.",
             args = {"other"}
     )
