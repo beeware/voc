@@ -179,7 +179,6 @@ public class Python {
                 } else {
                     method_name = cls_annotation.name();
                 }
-                
                 methods.put(method_name, method);
             }
         }
