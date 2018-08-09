@@ -26,6 +26,11 @@ public class Dict extends org.python.types.Object {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
     }
 
+    @Override
+    public boolean isHashable() {
+        return false;
+    }
+
     public Dict() {
         super();
         this.value = new java.util.HashMap<org.python.Object, org.python.Object>();
@@ -256,19 +261,14 @@ public class Dict extends org.python.types.Object {
     }
 
     private org.python.Object _getitem(org.python.Object item) {
-        try {
-            // While hashcode is not used, it is not a redundant line.
-            // We are determining if the item is hashable by seeing if an
-            // exception is thrown.
-            org.python.Object hashcode = item.__hash__();
-
+        if (item.isHashable()) {
             org.python.Object value = this.value.get(item);
 
             if (value == null) {
                 throw new org.python.exceptions.KeyError(item);
             }
             return value;
-        } catch (org.python.exceptions.AttributeError ae) {
+        } else {
             throw new org.python.exceptions.TypeError(
                 String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
         }
