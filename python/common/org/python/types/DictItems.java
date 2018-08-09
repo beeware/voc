@@ -36,6 +36,7 @@ public class DictItems extends org.python.types.Object {
     }
 
     public DictItems(org.python.types.Dict dict) {
+        super();
         this.value = dict.value.entrySet();
     }
 

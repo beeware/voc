@@ -60,6 +60,7 @@ public class Int extends org.python.types.Object {
     }
 
     private Int(long value) {
+        super(false);
         this.value = value;
     }
 
@@ -83,6 +84,7 @@ public class Int extends org.python.types.Object {
             default_args = {"x", "base"}
     )
     public Int(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super(false);
         if (args[0] == null) {
             this.value = 0;
         } else if (args[1] == null) {

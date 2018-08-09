@@ -37,6 +37,7 @@ public class Dict extends org.python.types.Object {
     }
 
     public Dict(java.util.Map<org.python.Object, org.python.Object> dict) {
+        super();
         this.value = dict;
     }
 

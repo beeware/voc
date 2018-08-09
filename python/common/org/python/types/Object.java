@@ -64,10 +64,13 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
      * the object; when wrapping Java objects, the native class of the object
      * is used.
      */
-    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass, java.lang.String msg) {
+    protected Object(org.python.types.Type.Origin origin, java.lang.Class klass, java.lang.String msg, boolean shouldCreateDict) {
         super(msg);
         this.origin = origin;
-        this.__dict__ = new java.util.HashMap<java.lang.String, org.python.Object>();
+        if (shouldCreateDict) {
+            this.__dict__ = new java.util.HashMap<java.lang.String, org.python.Object>();
+        }
+
         if (origin != org.python.types.Type.Origin.PLACEHOLDER) {
             if (klass == null) {
                 klass = this.getClass();
@@ -77,15 +80,20 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     protected Object(org.python.types.Type.Origin origin, java.lang.Class klass) {
-        this(origin, klass, "");
+        this(origin, klass, "", true);
+    }
+
+    /** This constructor allows to construct an org.python.types.Object without __dict__. */
+    public Object(boolean shouldCreateDict) {
+        this(org.python.types.Type.Origin.PYTHON, null, "", shouldCreateDict);
     }
 
     public Object() {
-        this(org.python.types.Type.Origin.PYTHON, null);
+        this(true);
     }
 
     public Object(java.lang.String msg) {
-        this(org.python.types.Type.Origin.PYTHON, null, msg);
+        this(org.python.types.Type.Origin.PYTHON, null, msg, true);
     }
 
     @org.python.Method(
@@ -322,7 +330,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // org.Python.debug("SELF ", this.__repr__());
         // org.Python.debug("ATTRS ", this.__dict__);
 
-        org.python.Object value = this.__dict__.get(name);
+        org.python.Object value = (this.__dict__ != null) ? this.__dict__.get(name) : null;
 
         if (value == null) {
             // Look to the class for an attribute

@@ -9,9 +9,10 @@ def test_small_integers(test_case):
     test_case.runAsJava(adjust("""
         for i in range(100):
             for j in range(100):
-                x = -5
-                for k in range(-5, 257):
-                    x = x + 1
+                for l in range(100):
+                    x = -5
+                    for k in range(-5, 257):
+                        x = x + 1
         """), timed=True)
 
 def test_booleans(test_case):

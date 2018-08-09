@@ -5,6 +5,7 @@ public class NotImplementedType extends org.python.types.Object {
     public static final java.lang.String PYTHON_TYPE_NAME = "NotImplementedType";
 
     NotImplementedType() {
+        super(false);
     }
 
     public java.lang.Object toJava() {

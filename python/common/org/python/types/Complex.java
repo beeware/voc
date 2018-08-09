@@ -27,16 +27,19 @@ public class Complex extends org.python.types.Object {
     }
 
     public Complex(org.python.types.Float real_val, org.python.types.Float imag_val) {
+        super(false);
         this.real = real_val;
         this.imag = imag_val;
     }
 
     public Complex(double real, double imag) {
+        super(false);
         this.real = new org.python.types.Float(real);
         this.imag = new org.python.types.Float(imag);
     }
 
     public Complex(double imag) {
+        super(false);
         this.real = new org.python.types.Float(0);
         this.imag = new org.python.types.Float(imag);
     }

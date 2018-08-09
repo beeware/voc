@@ -27,14 +27,17 @@ public class Str extends org.python.types.Object {
     }
 
     public Str() {
+        super(false);
         this.value = "";
     }
 
     public Str(java.lang.String str) {
+        super(false);
         this.value = str;
     }
 
     public Str(char chr) {
+        super(false);
         this.value = new java.lang.String(new char[]{chr});
     }
 
@@ -52,6 +55,7 @@ public class Str extends org.python.types.Object {
             default_args = {"object"}
     )
     public Str(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super(false);
         if (args[0] == null) {
             this.value = "";
         } else {

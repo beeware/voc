@@ -20,14 +20,17 @@ public class ByteArray extends org.python.types.Object {
     }
 
     public ByteArray() {
+        super();
         this.value = new byte[0];
     }
 
     public ByteArray(int length) {
+        super();
         this.value = new byte[length];
     }
 
     public ByteArray(byte[] value) {
+        super();
         this.value = Arrays.copyOf(value, value.length);
     }
 

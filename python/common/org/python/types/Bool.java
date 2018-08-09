@@ -42,7 +42,7 @@ public class Bool extends org.python.types.Object {
     }
 
     private Bool(boolean bool) {
-        super();
+        super(false);
         this.value = bool;
     }
 
@@ -55,6 +55,7 @@ public class Bool extends org.python.types.Object {
             default_args = {"x"}
     )
     public Bool(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super(false);
         if (args[0] == null) {
             this.value = false;
         } else {

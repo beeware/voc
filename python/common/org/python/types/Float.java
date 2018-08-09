@@ -29,12 +29,12 @@ public class Float extends org.python.types.Object {
     }
 
     public Float(float value) {
-        super();
+        super(false);
         this.value = (double) value;
     }
 
     public Float(double value) {
-        super();
+        super(false);
         this.value = value;
     }
 
@@ -46,6 +46,7 @@ public class Float extends org.python.types.Object {
             args = {"x"}
     )
     public Float(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
+        super(false);
         try {
             this.value = ((org.python.types.Float) args[0].__float__()).value;
         } catch (org.python.exceptions.AttributeError ae) {
