@@ -1,6 +1,6 @@
 package org.python.stdlib.collections;
 
-public class OrderedDictValues extends org.python.types.DictValues{
+public class OrderedDictValues extends org.python.types.DictValues {
     static {
         org.python.types.Type.declarePythonType(OrderedDictValues.class, "odict_values", null, null);
     }
@@ -10,7 +10,7 @@ public class OrderedDictValues extends org.python.types.DictValues{
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __reversed__() {
         if (org.Python.VERSION < 0x03050000) {

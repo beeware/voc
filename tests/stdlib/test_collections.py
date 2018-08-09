@@ -146,7 +146,7 @@ class OrderedDictTests(TranspileTestCase):
                 print("should not print this")
             except ValueError as e:
                 print(e)
-                
+
             try:
                 od = collections.OrderedDict([(1, )])
                 print("should not print this")
@@ -220,7 +220,7 @@ class OrderedDictTests(TranspileTestCase):
             od2 = collections.OrderedDict([('a', 1), ('aa', 3), ('b',2)])
             print(od2)
             print(od == od2)
-            
+
             d = {'aa': 3, 'a': 1, 'b': 2}
             print(od == d)
             """)
@@ -249,13 +249,13 @@ class OrderedDictTests(TranspileTestCase):
 
             od = collections.OrderedDict.fromkeys(['c', 'b', 'a'], 0)
             print(od)
-            
+
             try:
                 od = collections.OrderedDict.fromkeys(123)
                 print("should not print this")
             except TypeError as e:
                 print(e)
-                
+
             try:
                 od = collections.OrderedDict([1, 2, 3])
                 print("should not print this")
@@ -267,7 +267,7 @@ class OrderedDictTests(TranspileTestCase):
                 print("should not print this")
             except ValueError as e:
                 print(e)
-                
+
             try:
                 od = collections.OrderedDict([(1, )])
                 print("should not print this")
@@ -426,7 +426,7 @@ class OrderedDictTests(TranspileTestCase):
         self.assertCodeExecution("""
             import collections
 
-            od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)]) 
+            od = collections.OrderedDict([('c', 3), ('b', 2), ('a', 1)])
             od.update()
             print(od)
             od.update({'a': 0})

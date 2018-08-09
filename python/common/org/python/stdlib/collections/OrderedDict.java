@@ -17,8 +17,8 @@ public class OrderedDict extends org.python.types.Dict {
     }
 
     @org.python.Method(
-        __doc__ = "Dictionary that remembers insertion order",
-        default_args = {"iterable"}
+            __doc__ = "Dictionary that remembers insertion order",
+            default_args = {"iterable"}
     )
     public OrderedDict(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
@@ -89,11 +89,11 @@ public class OrderedDict extends org.python.types.Dict {
                 org.python.Object val = this.value.get(key);
                 if (val.toJava() instanceof org.python.internals.Scope) {
                     buffer.append(
-                        String.format("(%s, {...})", key.__repr__())
+                            String.format("(%s, {...})", key.__repr__())
                     );
                 } else {
                     buffer.append(
-                        String.format("(%s, %s)", key.__repr__(), val.__repr__())
+                            String.format("(%s, %s)", key.__repr__(), val.__repr__())
                     );
                 }
             }
@@ -169,21 +169,21 @@ public class OrderedDict extends org.python.types.Dict {
     }
 
     @org.python.Method(
-          __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object items() {
         return new org.python.stdlib.collections.OrderedDictItems(this);
     }
 
     @org.python.Method(
-          __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object keys() {
         return new org.python.stdlib.collections.OrderedDictKeys(this);
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object values() {
         return new org.python.stdlib.collections.OrderedDictValues(this);

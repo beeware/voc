@@ -10,7 +10,7 @@ public class OrderedDictKeys extends org.python.types.DictKeys {
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __reversed__() {
         if (org.Python.VERSION < 0x03050000) {

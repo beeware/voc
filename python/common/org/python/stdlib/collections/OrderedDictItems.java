@@ -1,6 +1,6 @@
 package org.python.stdlib.collections;
 
-public class OrderedDictItems extends org.python.types.DictItems{
+public class OrderedDictItems extends org.python.types.DictItems {
     static {
         org.python.types.Type.declarePythonType(OrderedDictItems.class, "odict_items", null, null);
     }
@@ -10,7 +10,7 @@ public class OrderedDictItems extends org.python.types.DictItems{
     }
 
     @org.python.Method(
-        __doc__ = ""
+            __doc__ = ""
     )
     public org.python.Object __reversed__() {
         if (org.Python.VERSION < 0x03050000) {
