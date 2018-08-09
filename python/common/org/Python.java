@@ -165,6 +165,27 @@ public class Python {
         }
     }
 
+    public static java.util.Map<java.lang.String, java.lang.reflect.Method> loadModule(java.lang.Class cls) {
+        java.util.Map<java.lang.String, java.lang.reflect.Method> methods = new java.util.HashMap<java.lang.String, java.lang.reflect.Method>();
+        org.python.Module mod_annotation = (org.python.Module) cls.getAnnotation(org.python.Module.class);
+
+        for (java.lang.reflect.Method method : cls.getMethods()) {
+            org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
+            if (cls_annotation != null) {
+                java.lang.String method_name;
+
+                if (cls_annotation.name().equals("")) {
+                    method_name = method.getName();
+                } else {
+                    method_name = cls_annotation.name();
+                }
+                
+                methods.put(method_name, method);
+            }
+        }
+        return methods;
+    }
+
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
         // Get the class annotation and add any properties.
         org.python.Module mod_annotation = (org.python.Module) cls.getAnnotation(org.python.Module.class);
@@ -205,6 +226,7 @@ public class Python {
                 } else {
                     kwargs_name = cls_annotation.kwargs();
                 }
+
 
                 attrs.put(
                         method_name,

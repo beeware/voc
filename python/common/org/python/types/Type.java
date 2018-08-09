@@ -14,6 +14,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
+    private java.util.Map<java.lang.String, java.lang.reflect.Method> __orgpythontypesmethods__;
+
     private static org.python.Object[] emptyArgs;
     private static java.util.Map<java.lang.String, org.python.Object> emptyKwargs;
 
@@ -128,7 +130,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
                     || java_class.getName().startsWith("org.python.stdlib")) {
                 // System.out.println("    BUILTIN");
                 python_type = new org.python.types.Type(Origin.BUILTIN, java_class);
-                org.Python.initializeModule(java_class, python_type.__dict__);
+                python_type.__orgpythontypesmethods__ = org.Python.loadModule(java_class);
+                //org.Python.initializeModule(java_class, python_type.__dict__);
             } else {
                 // System.out.println("    PYTHON");
                 python_type = new org.python.types.Type(Origin.PYTHON, java_class);
@@ -322,31 +325,66 @@ public class Type extends org.python.types.Object implements org.python.Callable
         // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name + " " + this.origin);
         // System.out.println("CLASS ATTRS " + this.__dict__);
         org.python.Object value = this.__dict__.get(name);
-        if (value == null) {
-            // We need to differentiate between "doesn't exist in the __dict__", and
-            // exists, but has a value of null.
-            if (!this.__dict__.containsKey(name)) {
-                // The class attributes didn't contain a value for the attribute
-                // name. Introspect on the object class to see if a field
-                // with the given name exists, caching either the Field instance,
-                // or an AttributeError representation of the NoSuchFieldException.
-                try {
-                    java.lang.reflect.Field field = this.klass.getDeclaredField(name);
 
-                    // A field exists. Check that the attribute
-                    // should be exposed to the Python namespace.
-                    org.python.Attribute annotation =
-                            (org.python.Attribute) field.getAnnotation(org.python.Attribute.class);
-                    if (annotation != null) {
-                        value = new org.python.java.Field(field);
+        if (value == null) {
+            // Check to see if we're asking for a org.python.types method
+            if (this.__orgpythontypesmethods__ != null && this.__orgpythontypesmethods__.containsKey(name)) {
+                // It's an org/python/types method.
+                java.lang.reflect.Method method = this.__orgpythontypesmethods__.get(name);
+                org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
+
+                if (cls_annotation != null) {
+                    java.lang.String varargs_name;
+                    java.lang.String kwargs_name;
+
+                    if (cls_annotation.varargs().equals("")) {
+                        varargs_name = null;
                     } else {
-                        value = null;
+                        varargs_name = cls_annotation.varargs();
                     }
-                } catch (java.lang.NoSuchFieldException e) {
+
+                    if (cls_annotation.kwargs().equals("")) {
+                        kwargs_name = null;
+                    } else {
+                        kwargs_name = cls_annotation.kwargs();
+                    }
+
+                    org.python.types.Function function = new org.python.types.Function(
+                            method,
+                            cls_annotation.args(),
+                            cls_annotation.default_args(),
+                            varargs_name,
+                            cls_annotation.kwonlyargs(),
+                            kwargs_name
+                    );
+                    this.__dict__.put(name, function);
+                    value = function;
+                }
+            }
+        }
+
+        if (value == null && !this.__dict__.containsKey(name) &&
+                (this.__orgpythontypesmethods__ == null || !this.__orgpythontypesmethods__.containsKey(name))) {
+            // The class attributes didn't contain a value for the attribute
+            // name. Introspect on the object class to see if a field
+            // with the given name exists, caching either the Field instance,
+            // or an AttributeError representation of the NoSuchFieldException.
+            try {
+                java.lang.reflect.Field field = this.klass.getDeclaredField(name);
+
+                // A field exists. Check that the attribute
+                // should be exposed to the Python namespace.
+                org.python.Attribute annotation =
+                        (org.python.Attribute) field.getAnnotation(org.python.Attribute.class);
+                if (annotation != null) {
+                    value = new org.python.java.Field(field);
+                } else {
                     value = null;
                 }
-                this.__dict__.put(name, value);
+            } catch (java.lang.NoSuchFieldException e) {
+                value = null;
             }
+            this.__dict__.put(name, value);
         }
 
         // If the result of the lookup is an AttributeError, there's
