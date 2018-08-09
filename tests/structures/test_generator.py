@@ -673,6 +673,19 @@ class GeneratorTests(TranspileTestCase):
                 print(e)
             """)
 
+    def test_generator_yieldfrom_in_loop(self):
+        self.assertCodeExecution("""
+            def gen():
+                a = [1, 2, 3]
+                while len(a):
+                    yield from a
+                    a = []
+
+            g = gen()
+            for i in g:
+                print(i)
+            """)
+
     def test_generator_stop_iteration_value(self):
         self.assertCodeExecution("""
             def gen():
