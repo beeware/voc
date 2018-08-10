@@ -14,7 +14,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
     public java.lang.reflect.Constructor constructor;
     public java.lang.Class klass;
 
-    // A map of methods defined on this object. If this class is in org/python/types
+    // A map of methods defined on this class. If this class is in org/python/types
     // or org/python/stdlib, this will be populated when declarePythonType is invoked.
     private java.util.Map<java.lang.String, java.lang.reflect.Method> python_methods;
 
