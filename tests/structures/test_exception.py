@@ -102,6 +102,19 @@ class ExceptionTests(TranspileTestCase):
             print('Done.')
             """)
 
+    @expectedFailure
+    def test_raise_custom_exception_with_arg(self):
+        self.assertCodeExecution("""
+            class MyException(Exception):
+                pass
+
+            try:
+                raise MyException("This is string argument")
+            except MyException:
+                print("Got a custom exception")
+            print('Done.')
+            """)
+
     def test_raising_exceptions_multiple_args(self):
         self.assertCodeExecution("""
             for exc in [KeyError, ValueError, TypeError]:
@@ -116,6 +129,65 @@ class ExceptionTests(TranspileTestCase):
         """)
 
     @expectedFailure
+    def test_raise_nested_custom_exception(self):
+        self.assertCodeExecution(
+            """
+            from example import *
+
+            try:
+                raise Parent.MyException()
+            except Parent.MyException:
+                print("Got a custom exception")
+            print('Done.')
+            """,
+            extra_code={
+                'example':
+                    """
+                    class Parent():
+                        class MyException(Exception):
+                            pass
+                    """
+            }, run_in_function=False)
+            
+        self.assertCodeExecution(
+            """
+            import example
+
+            try:
+                raise example.Parent.MyException()
+            except example.Parent.MyException:
+                print("example is not defined")
+            print('Done.')
+            """,
+            extra_code={
+                'example':
+                    """
+                    class Parent():
+                        class MyException(Exception):
+                            pass
+                    """
+            }, run_in_function=False)
+
+        self.assertCodeExecution(
+            """
+            import example as custom
+
+            try:
+                raise custom.Parent.MyException()
+            except custom.Parent.MyException:
+                print("example is not defined")
+            print('Done.')
+            """,
+            extra_code={
+                'example':
+                    """
+                    class Parent():
+                        class MyException(Exception):
+                            pass
+                    """
+            }, run_in_function=False)
+
+    @expectedFailure
     def test_raise_custom_exception_import_from(self):
         self.assertCodeExecution(
             """
@@ -125,6 +197,45 @@ class ExceptionTests(TranspileTestCase):
                 raise MyException("This is the exception")
             except MyException:
                 print("Got a custom exception")
+            print('Done.')
+            """,
+            extra_code={
+                'example':
+                    """
+                    class MyException(Exception):
+                        pass
+
+                    """
+            }, run_in_function=False)
+
+    def test_import_namespace(self):
+        self.assertCodeExecution(
+            """
+            from example import *
+
+            try:
+                raise example.MyException()
+            except:
+                print("example is not defined")
+            print('Done.')
+            """,
+            extra_code={
+                'example':
+                    """
+                    class MyException(Exception):
+                        pass
+
+                    """
+            }, run_in_function=False)
+
+        self.assertCodeExecution(
+            """
+            import example
+
+            try:
+                raise MyException()
+            except:
+                print("MyException is not defined")
             print('Done.')
             """,
             extra_code={
