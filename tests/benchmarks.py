@@ -192,45 +192,6 @@ def test_dict_get(test_case):
             dict.get("a")
     """), timed=True)
 
-def test_class_init(test_case):
-    print("Running" , "test_class_init")
-    test_case.runAsJava(adjust("""
-        class A: pass
-        class B: pass
-        class C: pass
-        class D: pass
-        class E: pass
-        class F: pass
-        class G: pass
-        class H: pass
-        class I: pass
-        class J: pass
-        class K: pass
-        class L: pass
-        class M: pass
-        class N: pass
-        class O: pass
-        class P: pass
-        class Q: pass
-        class R: pass
-        class S: pass
-        class T: pass
-        class U: pass
-        class V: pass
-        class W: pass
-        class X: pass
-        class Y: pass
-        class Z: pass
-
-        a = "a"
-        b = 1
-        c = [1]
-        d = {1 : 1}
-        e = list([1])
-        f = True
-        g = 3.0
-    """), timed=True)
-
 def test_method(test_case):
     print("Running, test_method")
     test_case.runAsJava(adjust("""
@@ -265,7 +226,6 @@ def main():
     test_loops(test_case)
     test_cmp(test_case)
     test_dict_get(test_case)
-    test_class_init(test_case)
     test_method(test_case)
 
 if __name__== "__main__":
