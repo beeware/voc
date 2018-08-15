@@ -34,7 +34,7 @@ public class Bool extends org.python.types.Object {
     }
 
     public org.python.Object byValue() {
-        return org.python.types.Bool.getBool(this.value);
+        return this;
     }
 
     public int hashCode() {
@@ -173,7 +173,7 @@ public class Bool extends org.python.types.Object {
             __doc__ = "self != 0"
     )
     public org.python.types.Bool __bool__() {
-        return org.python.types.Bool.getBool(this.value);
+        return this;
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
@@ -338,7 +338,7 @@ public class Bool extends org.python.types.Object {
                 }
             } else if (other_val > 1) {
                 if (org.Python.VERSION < 0x03060000) {
-                    return org.python.types.Bool.getBool(this.value);
+                    return this;
                 } else {
                     return org.python.types.Int.getInt(1);
                 }

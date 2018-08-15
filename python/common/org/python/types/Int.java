@@ -26,7 +26,7 @@ public class Int extends org.python.types.Object {
     }
 
     public org.python.Object byValue() {
-        return getInt(this.value);
+        return this;
     }
 
     public int hashCode() {
@@ -384,7 +384,7 @@ public class Int extends org.python.types.Object {
             return new org.python.types.Float(Math.floor(this.value / ((org.python.types.Float) other).value));
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
-                return getInt(this.value);
+                return this;
             } else {
                 throw new org.python.exceptions.ZeroDivisionError("integer division or modulo by zero");
             }
@@ -557,7 +557,7 @@ public class Int extends org.python.types.Object {
             return cmplx_obj.__pow__(other_cmplx_obj, null);
         } else if (other instanceof org.python.types.Bool) {
             if (((org.python.types.Bool) other).value) {
-                return getInt(this.value);
+                return this;
             } else {
                 return getInt(1);
             }
@@ -888,7 +888,7 @@ public class Int extends org.python.types.Object {
             __doc__ = "+self"
     )
     public org.python.Object __pos__() {
-        return getInt(this.value);
+        return this;
     }
 
     @org.python.Method(
@@ -909,7 +909,7 @@ public class Int extends org.python.types.Object {
             __doc__ = "int(self)"
     )
     public org.python.Object __int__() {
-        return getInt(this.value);
+        return this;
     }
 
     @org.python.Method(
@@ -924,7 +924,7 @@ public class Int extends org.python.types.Object {
     )
     public org.python.Object __round__(org.python.Object ndigits) {
         if (ndigits instanceof org.python.types.Int) {
-            return getInt(this.value);
+            return this;
         }
         throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
     }
