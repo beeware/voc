@@ -88,13 +88,6 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.types.Str __getitem__(org.python.Object format_string) {
-        throw new org.python.exceptions.TypeError("'bool' object is not subscriptable");
-    }
-
-    @org.python.Method(
             __doc__ = "",
             args = {"index", "value"}
     )

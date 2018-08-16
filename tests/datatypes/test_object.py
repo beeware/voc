@@ -236,6 +236,4 @@ class InplaceObjectOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_list',
         'test_multiply_bytes',
         'test_multiply_bytearray',
-        'test_modulo_obj',
-        'test_floor_divide_obj',
     ]

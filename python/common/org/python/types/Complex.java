@@ -315,14 +315,6 @@ public class Complex extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "",
-            args = {"other"}
-    )
-    public org.python.Object __getitem__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("'complex' object is not subscriptable");
-    }
-
-    @org.python.Method(
             __doc__ = "Return self*value.",
             args = {"other"}
     )
@@ -421,10 +413,27 @@ public class Complex extends org.python.types.Object {
     }
 
     @org.python.Method(
+            __doc__ = "Return self//=value.",
+            args = {"other"}
+    )
+    public org.python.Object __ifloordiv__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("can't take floor of complex number.");
+    }
+
+    @org.python.Method(
             __doc__ = "Return self%value.",
             args = {"other"}
     )
     public org.python.Object __mod__(org.python.Object other) {
+        throw new org.python.exceptions.TypeError("can't mod complex numbers.");
+    }
+
+
+    @org.python.Method(
+            __doc__ = "Return self%=value ",
+            args = {"other"}
+    )
+    public org.python.Object __imod__(org.python.Object other) {
         throw new org.python.exceptions.TypeError("can't mod complex numbers.");
     }
 

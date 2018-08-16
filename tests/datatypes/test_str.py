@@ -919,4 +919,5 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_modulo_class',
+        'test_modulo_obj',
     ]

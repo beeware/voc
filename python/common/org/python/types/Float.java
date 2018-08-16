@@ -735,15 +735,7 @@ public class Float extends org.python.types.Object {
         }
         return new org.python.types.Str(result);
     }
-
-    @org.python.Method(
-            __doc__ = "",
-            args = {"other"}
-    )
-    public org.python.Object __getitem__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("'float' object is not subscriptable");
-    }
-
+    
     @org.python.Method(
             __doc__ = "",
             args = {"other", "value"}

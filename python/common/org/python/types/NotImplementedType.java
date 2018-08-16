@@ -126,12 +126,4 @@ public class NotImplementedType extends org.python.types.Object {
             }
         }
     }
-
-    @org.python.Method(
-            __doc__ = "",
-            args = {"other"}
-    )
-    public org.python.Object __getitem__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("'NotImplementedType' object is not subscriptable");
-    }
 }

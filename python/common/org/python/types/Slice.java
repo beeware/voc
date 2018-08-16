@@ -243,14 +243,6 @@ public class Slice extends org.python.types.Object {
 
     @org.python.Method(
             __doc__ = "",
-            args = {"index"}
-    )
-    public org.python.Object __getitem__(org.python.Object index) {
-        throw new org.python.exceptions.TypeError("'slice' object is not subscriptable");
-    }
-
-    @org.python.Method(
-            __doc__ = "",
             args = {"index", "value"}
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {

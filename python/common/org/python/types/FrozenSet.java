@@ -134,6 +134,17 @@ public class FrozenSet extends org.python.types.Object {
         return new org.python.types.Str(buffer.toString());
     }
 
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index"}
+    )
+    public org.python.Object __getitem__(org.python.Object index) {
+        if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
+            throw new org.python.exceptions.TypeError("'frozenset' object does not support indexing");
+        } else {
+            throw new org.python.exceptions.TypeError("'frozenset' object is not subscriptable");
+        }
+    }
 
     @org.python.Method(
             __doc__ = "Return len(self)."

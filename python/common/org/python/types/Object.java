@@ -500,7 +500,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
-        throw new org.python.exceptions.TypeError("'type' object is not subscriptable");
+        throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object is not subscriptable");
     }
 
     @org.python.Method(
