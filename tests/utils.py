@@ -798,6 +798,9 @@ SAMPLE_DATA = {
     'NotImplemented': [
             'NotImplemented',
         ],
+    'obj': [
+            'object',
+        ],
 }
 
 

@@ -397,6 +397,9 @@ public class Function extends org.python.types.Object implements org.python.Call
             } else if (this.closure != null) {
                 return org.python.types.Type.toPython(this.method.invoke(this.closure, adjusted_args));
             } else {
+                if (instance == null) {
+                    throw new org.python.exceptions.TypeError("expected 1 arguments, got 0");
+                }
                 return org.python.types.Type.toPython(this.method.invoke(instance, adjusted_args));
             }
         } catch (java.lang.IllegalAccessException iae) {

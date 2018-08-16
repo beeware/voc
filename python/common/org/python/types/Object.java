@@ -500,7 +500,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
-        throw new org.python.exceptions.AttributeError(this, "__getitem__");
+        throw new org.python.exceptions.TypeError("'type' object is not subscriptable");
     }
 
     @org.python.Method(
@@ -580,7 +580,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.typeName() + "' and '" + other.typeName() + "'");
+        if (org.python.types.Object.isSequence(other)) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'type'");
+        }
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'type' and '" + other.typeName() + "'");
+
     }
 
     @org.python.Method(
@@ -811,6 +815,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         try {
             return this.__mul__(other);
         } catch (org.python.exceptions.TypeError e) {
+            if (org.python.types.Object.isSequence(other)) {
+                throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'type'");
+            }
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
@@ -946,14 +953,14 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.AttributeError(this, "__neg__");
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'type'");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.AttributeError(this, "__pos__");
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'type'");
     }
 
     @org.python.Method(
@@ -967,7 +974,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.AttributeError(this, "__invert__");
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'type'");
     }
 
     @org.python.Method(
@@ -1397,13 +1404,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     public static boolean isSequence(org.python.Object other) {
-        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes ||
-                other instanceof org.python.types.List || other instanceof org.python.types.Str ||
-                other instanceof org.python.types.Tuple) {
-
-            return true;
-        }
-        return false;
+        return other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes ||
+            other instanceof org.python.types.List || other instanceof org.python.types.Str ||
+            other instanceof org.python.types.Tuple;
     }
 
 }

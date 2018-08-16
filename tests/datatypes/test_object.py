@@ -1,6 +1,6 @@
 from unittest import expectedFailure
 
-from .. utils import TranspileTestCase
+from .. utils import TranspileTestCase, UnaryOperationTestCase, BinaryOperationTestCase, InplaceOperationTestCase
 
 
 class ObjectTests(TranspileTestCase):
@@ -208,3 +208,24 @@ class ObjectTests(TranspileTestCase):
             obj2 = MyClass1()
             print(obj1 > obj2)
         """)
+
+
+class UnaryObjectOperationTests(UnaryOperationTestCase, TranspileTestCase):
+    data_type = 'obj'
+
+    not_implemented = [
+        'test_unary_not'
+    ]
+
+
+class BinaryObjectOperationTests(BinaryOperationTestCase, TranspileTestCase):
+    data_type = 'obj'
+
+    not_implemented = [
+        'test_ne_class',
+        'test_eq_class',
+    ]
+
+
+class InplaceObjectOperationTests(InplaceOperationTestCase, TranspileTestCase):
+    data_type = 'obj'
