@@ -909,16 +909,22 @@ class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
+    not_implemented_versions = {
+        'test_modulo_obj': (3.4, 3.6),
+    }
+
     not_implemented = [
         'test_modulo_class',
-        'test_modulo_obj',
     ]
 
 
 class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
+    not_implemented_versions = {
+        'test_modulo_obj': (3.4, 3.6),
+    }
+
     not_implemented = [
         'test_modulo_class',
-        'test_modulo_obj',
     ]
