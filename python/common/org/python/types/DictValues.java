@@ -7,16 +7,6 @@ public class DictValues extends org.python.types.Object {
         org.python.types.Type.declarePythonType(DictValues.class, "dict_values", null, null);
     }
 
-    /**
-     * A utility method to update the internal value of this object.
-     * <p>
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.DictValues
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.DictValues) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
     }

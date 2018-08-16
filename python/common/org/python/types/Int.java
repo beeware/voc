@@ -11,16 +11,6 @@ public class Int extends org.python.types.Object {
      */
     private static final org.python.types.Int[] SMALLINTS = new org.python.types.Int[NSMALLNEGINTS + NSMALLPOSINTS];
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Int
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Int) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
     }

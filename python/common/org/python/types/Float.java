@@ -6,16 +6,6 @@ public class Float extends org.python.types.Object {
     private static final long NEGATIVE_ZERO_RAW_BITS = Double.doubleToRawLongBits(-0.0);
     public double value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Float
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Float) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
     }
