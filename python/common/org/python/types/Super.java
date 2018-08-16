@@ -906,7 +906,7 @@ public class Super implements org.python.Object {
             args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.AttributeError(this, "__round__");
+        throw new org.python.exceptions.TypeError("type " + this.typeName() + " doesn't define __round__ method");
     }
 
     @org.python.Method(

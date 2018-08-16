@@ -44,4 +44,5 @@ class BuiltinGetattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
     not_implemented = [
         'test_class_str',
+        'test_obj',
     ]

@@ -42,20 +42,11 @@ class BuiltinRoundTwoargFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTe
         'slice',
         'str',
         'tuple',
+        'obj',
     ]
 
     not_implemented_types = [
-        'test_bytearray',
-        'test_bytes',
-        'test_class',
-        'test_complex',
-        'test_dict',
         'test_float',
-        'test_frozenset',
-        'test_NotImplemented',
-        'test_range',
-        'test_set',
-        'test_slice',
     ]
 
     not_implemented = [

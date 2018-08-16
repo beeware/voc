@@ -358,6 +358,9 @@ public class Bool extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __divmod__(org.python.Object other) {
+        if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
+        }
         try {
             java.util.List<org.python.Object> data = new java.util.ArrayList<org.python.Object>();
             data.add(this.__floordiv__(other));

@@ -433,7 +433,6 @@ public class Complex extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __divmod__(org.python.Object other) {
-
         throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
     }
 

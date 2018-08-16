@@ -59,4 +59,5 @@ class BuiltinDelattrFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCa
 
     not_implemented = [
         'test_class_str',
+        'test_obj_str',
     ]

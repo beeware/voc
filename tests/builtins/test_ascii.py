@@ -26,4 +26,5 @@ class BuiltinAsciiFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_slice',
         'test_str',
         'test_tuple',
+        'test_obj',
     ]
