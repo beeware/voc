@@ -620,7 +620,7 @@ public class Str extends org.python.types.Object {
                 return new org.python.types.Str(returnString.toString());
             }
         } else if (width instanceof org.python.types.Bool) {
-            return new org.python.types.Str(this.value);
+            return this;
         }
 
         throw new org.python.exceptions.TypeError("Length must be of type Integer or Bool");
@@ -1076,7 +1076,7 @@ public class Str extends org.python.types.Object {
 
         int w = (int) ((org.python.types.Int) width).value;
         if (w < this.value.length()) {
-            return new org.python.types.Str(this.value);
+            return this;
         }
         java.lang.StringBuffer str = new java.lang.StringBuffer(w);
         str.append(this.value);
@@ -1296,7 +1296,7 @@ public class Str extends org.python.types.Object {
             }
             int w = (int) ((org.python.types.Int) width).value;
             if (w < this.value.length()) {
-                return new org.python.types.Str(this.value);
+                return this;
             }
             java.lang.StringBuffer str = new java.lang.StringBuffer(w);
             int balance = w - this.value.length();
@@ -1346,7 +1346,7 @@ public class Str extends org.python.types.Object {
         }
         tuple.add(new org.python.types.Str(""));
         tuple.add(new org.python.types.Str(""));
-        tuple.add(new org.python.types.Str(this.value));
+        tuple.add(this);
         return new org.python.types.Tuple(tuple);
     }
 
@@ -1710,7 +1710,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object swapcase() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Str(this.value);
+            return this;
         }
         java.lang.StringBuffer swapcase = new java.lang.StringBuffer();
         for (int c = 0; c < this.value.length(); c++) {
@@ -1797,7 +1797,7 @@ public class Str extends org.python.types.Object {
         int w = (int) ((org.python.types.Int) width).value;
 
         if (this.value.length() >= w) {
-            return new org.python.types.Str(this.value);
+            return this;
         }
 
         int fill = w - this.value.length();
