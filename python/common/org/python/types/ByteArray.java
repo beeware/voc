@@ -188,27 +188,6 @@ public class ByteArray extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object __pos__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary +: '" + this.typeName() + "'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __neg__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary -: '" + this.typeName() + "'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: '" + this.typeName() + "'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
     public org.python.Object __bool__() {
         return org.python.types.Bool.getBool(this.value.length > 0);
     }

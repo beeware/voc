@@ -953,14 +953,14 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'type'");
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'type'");
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
@@ -974,7 +974,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'type'");
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: '" + this.typeName() + "'");
     }
 
     @org.python.Method(

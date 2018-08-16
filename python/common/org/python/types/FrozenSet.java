@@ -77,31 +77,10 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'frozenset'");
-    }
-
-    @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {
         return new org.python.types.Set_Iterator(this);
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __pos__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'frozenset'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __neg__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'frozenset'");
     }
 
     @org.python.Method(

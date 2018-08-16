@@ -689,13 +689,6 @@ public class Complex extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'complex'");
-    }
-
-    @org.python.Method(
             __doc__ = "int(self)"
     )
     public org.python.Object __int__() {

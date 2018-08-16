@@ -662,14 +662,7 @@ public class Float extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for round(): 'float' and '" + ndigits.typeName() + "'");
         }
     }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'float'");
-    }
-
+    
     @org.python.Method(
             __doc__ = "F.is_integer() -> bool\n" +
                     "\n" +
