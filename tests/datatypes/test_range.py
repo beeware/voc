@@ -97,23 +97,6 @@ class UnaryRangeOperationTests(UnaryOperationTestCase, TranspileTestCase):
 class BinaryRangeOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'range'
 
-    not_implemented_versions = {
-        'test_subscr_None': (3.4,),
-        'test_subscr_NotImplemented': (3.4,),
-        'test_subscr_bytearray': (3.4,),
-        'test_subscr_bytes': (3.4,),
-        'test_subscr_class': (3.4,),
-        'test_subscr_complex': (3.4,),
-        'test_subscr_dict': (3.4,),
-        'test_subscr_float': (3.4,),
-        'test_subscr_frozenset': (3.4,),
-        'test_subscr_list': (3.4,),
-        'test_subscr_range': (3.4,),
-        'test_subscr_set': (3.4,),
-        'test_subscr_str': (3.4,),
-        'test_subscr_tuple': (3.4,),
-    }
-
 
 class InplaceRangeOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'range'

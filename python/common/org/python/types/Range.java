@@ -112,13 +112,7 @@ public class Range extends org.python.types.Object {
                 return org.python.types.Int.getInt(this.start + idx * this.step);
             }
         } catch (ClassCastException e) {
-            if (org.Python.VERSION < 0x03050000) {
-                throw new org.python.exceptions.TypeError("range indices must be integers");
-            } else {
-                throw new org.python.exceptions.TypeError(
-                        "range indices must be integers or slices, not " + index.typeName()
-                );
-            }
+            throw new org.python.exceptions.TypeError("range indices must be integers or slices, not " + index.typeName());
         }
     }
 

@@ -229,3 +229,13 @@ class BinaryObjectOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
 class InplaceObjectOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'obj'
+
+    not_implemented = [
+        'test_multiply_tuple',
+        'test_multiply_str',
+        'test_multiply_list',
+        'test_multiply_bytes',
+        'test_multiply_bytearray',
+        'test_modulo_obj',
+        'test_floor_divide_obj',
+    ]
