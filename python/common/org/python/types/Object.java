@@ -581,9 +581,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __mul__(org.python.Object other) {
         if (org.python.types.Object.isSequence(other)) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'type'");
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'type' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.typeName() + "' and '" + other.typeName() + "'");
 
     }
 
@@ -818,9 +818,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         try {
             return this.__mul__(other);
         } catch (org.python.exceptions.TypeError e) {
-            if (org.python.types.Object.isSequence(other)) {
-                throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type 'type'");
-            }
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for *=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
     }
