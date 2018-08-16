@@ -18,10 +18,6 @@ public class Complex extends org.python.types.Object {
         return this;
     }
 
-    public org.python.Object byValue() {
-        throw new org.python.exceptions.AttributeError("type object 'complex' has no attribute 'byValue'");
-    }
-
     public int hashCode() {
         return this.hashCode();
     }

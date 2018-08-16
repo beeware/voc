@@ -20,10 +20,6 @@ public class Float extends org.python.types.Object {
         return this.value;
     }
 
-    public org.python.Object byValue() {
-        return this;
-    }
-
     public int hashCode() {
         return new java.lang.Double(this.value).hashCode();
     }

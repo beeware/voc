@@ -1695,9 +1695,6 @@ class Visitor(ast.NodeVisitor):
 
         yield_point = len(self.context.yield_points) + 1
         self.context.add_opcodes(
-            # Convert to a new value for return purposes
-            JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;'),
-
             # Save the current stack and yield index
             ALOAD_name('<generator>'),
             ALOAD_name('#locals'),
@@ -1769,10 +1766,6 @@ class Visitor(ast.NodeVisitor):
             # obtained from iterator onto stack, hence no need to visit node.value here
             if node.value:
                 self.visit(node.value)
-                self.context.add_opcodes(
-                    # Convert to a new value for return purposes
-                    JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
-                )
             else:
                 # push NoneType object to stack to support single yield statement (without operand)
                 # as the statment `yield` is equivalent to `yield None`
@@ -1783,12 +1776,7 @@ class Visitor(ast.NodeVisitor):
                         'Lorg/python/Object;'
                     )
                 )
-        else:
-            # value is already pushed on stack, hence only need to convert to org.python.Object
-            self.context.add_opcodes(
-                JavaOpcodes.INVOKEINTERFACE('org/python/Object', 'byValue', args=[], returns='Lorg/python/Object;')
-            )
-
+                
         yield_point = len(self.context.yield_points) + 1
 
         # Save the current stack and yield index

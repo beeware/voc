@@ -27,10 +27,6 @@ public class Super implements org.python.Object {
         return true;
     }
 
-    public org.python.Object byValue() {
-        return this;
-    }
-
     public org.python.types.Type type() {
         return null;
     }

@@ -18,10 +18,6 @@ public class Str extends org.python.types.Object {
         return this.value;
     }
 
-    public org.python.Object byValue() {
-        return new org.python.types.Str(this.value);
-    }
-
     public int hashCode() {
         return this.value.hashCode();
     }

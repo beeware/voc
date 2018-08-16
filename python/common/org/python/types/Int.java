@@ -25,10 +25,6 @@ public class Int extends org.python.types.Object {
         return this.value;
     }
 
-    public org.python.Object byValue() {
-        return this;
-    }
-
     public int hashCode() {
         return new java.lang.Long(this.value).hashCode();
     }

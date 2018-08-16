@@ -36,10 +36,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         }
     }
 
-    public org.python.Object byValue() {
-        return this;
-    }
-
     /**
      * Return the Python type for this object.
      */
