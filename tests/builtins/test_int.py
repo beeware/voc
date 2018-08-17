@@ -2,7 +2,19 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class IntTests(TranspileTestCase):
-    pass
+
+    def test_bad_int(self):
+        self.assertCodeExecution("""
+            try:
+                print(int(1, 2, 3))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(int([1, 2, 3]))
+            except TypeError as err:
+                print(err)
+        """)
 
 
 class BuiltinIntFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

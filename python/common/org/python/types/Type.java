@@ -452,7 +452,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                             }
                             adjusted_args[a] = arg;
                         }
-                    } else {
+                    } else if (n_provided_args == n_args) {
                         for (a = 0; a < n_args; a++) {
                             adjusted_args[a] = args[a];
                         }
@@ -464,6 +464,15 @@ public class Type extends org.python.types.Object implements org.python.Callable
                                 arg_name = default_arg_names[a - arg_names.length];
                             }
                             kwargs.put(arg_name, args[a]);
+                        }
+                    } else {
+                        java.lang.String name = org.Python.typeName(this.klass);
+                        if (n_args == 0) {
+                            throw new org.python.exceptions.TypeError(name + "() takes no arguments (" + n_provided_args + " given)");
+                        } else if (n_args == 1) {
+                            throw new org.python.exceptions.TypeError(name + "() takes at most 1 argument (" + n_provided_args + " given)");
+                        } else {
+                            throw new org.python.exceptions.TypeError(name + "() takes at most " + n_args + " arguments (" + n_provided_args + " given)");
                         }
                     }
                 } else {

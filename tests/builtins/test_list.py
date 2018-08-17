@@ -2,7 +2,14 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase, SAMPLE_SUBSTITU
 
 
 class ListTests(TranspileTestCase):
-    pass
+
+    def test_bad_list(self):
+        self.assertCodeExecution("""
+            try:
+                print(list(1, 2, 3))
+            except TypeError as err:
+                print(err)
+        """)
 
 
 class BuiltinListFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
