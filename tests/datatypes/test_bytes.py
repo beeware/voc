@@ -643,7 +643,7 @@ class BinaryBytesOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_slice': (3.5, 3.6),
         'test_modulo_str': (3.5, 3.6),
         'test_modulo_tuple': (3.5, 3.6),
-        'test_module_obj': (3.5, 3.6),
+        'test_modulo_obj': (3.5, 3.6),
     }
 
 
