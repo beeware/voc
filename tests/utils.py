@@ -695,7 +695,7 @@ class NotImplementedToExpectedFailure:
 SAMPLE_DATA = {
     'obj': [
             'object',
-            'object()'
+            'object()',
         ],
     'bool': [
             'True',
@@ -717,7 +717,7 @@ SAMPLE_DATA = {
             'type(1)',
             'type("a")',
             'type(object())',
-            'type("Reggie", (object,), {})',
+            'type("MyClass", (object,), {})',
         ],
     'complex': [
             '1j',
