@@ -223,8 +223,12 @@ class BinaryObjectOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_ne_class',
+    ]
+
+    is_flakey = [
         'test_eq_class',
     ]
+
 
 
 class InplaceObjectOperationTests(InplaceOperationTestCase, TranspileTestCase):
