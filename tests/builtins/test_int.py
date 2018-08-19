@@ -4,6 +4,7 @@ from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 class IntTests(TranspileTestCase):
     pass
 
+
 class BuiltinIntFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["int"]
 

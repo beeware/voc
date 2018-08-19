@@ -53,7 +53,7 @@ public class Bytes extends org.python.types.Object {
         org.python.Object errors = args[2];
 
         if (args.length > 3) {
-          `throw new org.python.exceptions.TypeError("bytes() takes at most 3 arguments (" + args.length + " given)");
+            throw new org.python.exceptions.TypeError("bytes() takes at most 3 arguments (" + args.length + " given)");
         }
 
         if (encoding != null && !(encoding instanceof org.python.types.Str)) {
