@@ -35,10 +35,34 @@ public class Tuple extends org.python.types.Object {
             __doc__ = "tuple() -> empty tuple" +
                     "tuple(iterable) -> tuple initialized from iterable's items\n" +
                     "\n" +
-                    "If the argument is a tuple, the return value is the same object.\n"
+                    "If the argument is a tuple, the return value is the same object.\n",
+            default_args = {"iterable"}
     )
     public Tuple(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        throw new org.python.exceptions.NotImplementedError("Builtin function 'tuple' not implemented");
+        if (args[0] == null) {
+            this.value = new java.util.ArrayList<org.python.Object>();
+        } else if (args.length == 1) {
+            if (args[0] instanceof org.python.types.List) {
+                this.value = new java.util.ArrayList<org.python.Object>(((org.python.types.List) args[0]).value);
+            } else if (args[0] instanceof org.python.types.Set) {
+                this.value = new java.util.ArrayList<org.python.Object>(((org.python.types.Set) args[0]).value);
+            } else if (args[0] instanceof org.python.types.Tuple) {
+                throw new org.python.exceptions.NotImplementedError("tuple() has not been implemented for tuple argument");
+            } else {
+                org.python.Object iterator = org.Python.iter(args[0]);
+                java.util.List<org.python.Object> generated = new java.util.ArrayList<org.python.Object>();
+                try {
+                    while (true) {
+                        org.python.Object next = iterator.__next__();
+                        generated.add(next);
+                    }
+                } catch (org.python.exceptions.StopIteration si) {
+                }
+                this.value = generated;
+            }
+        } else {
+            throw new org.python.exceptions.TypeError("tuple() takes at most 1 argument (" + args.length + " given)");
+        }
     }
 
     // public org.python.Object __new__() {
