@@ -43,15 +43,21 @@ public class Float extends org.python.types.Object {
             __doc__ = "float(x) -> floating point number" +
                     "\n" +
                     "Convert a string or number to a floating point number, if possible.\n",
-            args = {"x"}
+            default_args = {"x"}
     )
     public Float(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
-        try {
-            this.value = ((org.python.types.Float) args[0].__float__()).value;
-        } catch (org.python.exceptions.AttributeError ae) {
-            throw new org.python.exceptions.TypeError(
-                    "float() argument must be a string or a number, not '" + args[0].typeName() + "'"
-            );
+        if (args[0] == null) {
+            this.value = 0.0;
+        } else if (args.length == 1) {
+            try {
+                this.value = ((org.python.types.Float) args[0].__float__()).value;
+            } catch (org.python.exceptions.AttributeError ae) {
+                throw new org.python.exceptions.TypeError(
+                      "float() argument must be a string or a number, not '" + args[0].typeName() + "'"
+                );
+          }
+        } else {
+            throw new org.python.exceptions.TypeError("float() takes at most 1 argument (" + args.length + " given)");
         }
     }
 

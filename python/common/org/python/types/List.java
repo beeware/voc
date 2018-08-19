@@ -55,7 +55,7 @@ public class List extends org.python.types.Object {
         super();
         if (args[0] == null) {
             this.value = new java.util.ArrayList<org.python.Object>();
-        } else {
+        } else if (args.length == 1) {
             if (args[0] instanceof org.python.types.List) {
                 this.value = new java.util.ArrayList<org.python.Object>(
                         ((org.python.types.List) args[0]).value
@@ -80,6 +80,8 @@ public class List extends org.python.types.Object {
                 }
                 this.value = generated;
             }
+        } else {
+            throw new org.python.exceptions.TypeError("list() takes at most 1 argument (" + args.length + " given)");
         }
     }
 

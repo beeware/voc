@@ -466,14 +466,8 @@ public class Type extends org.python.types.Object implements org.python.Callable
                             kwargs.put(arg_name, args[a]);
                         }
                     } else {
-                        java.lang.String name = org.Python.typeName(this.klass);
-                        if (n_args == 0) {
-                            throw new org.python.exceptions.TypeError(name + "() takes no arguments (" + n_provided_args + " given)");
-                        } else if (n_args == 1) {
-                            throw new org.python.exceptions.TypeError(name + "() takes at most 1 argument (" + n_provided_args + " given)");
-                        } else {
-                            throw new org.python.exceptions.TypeError(name + "() takes at most " + n_args + " arguments (" + n_provided_args + " given)");
-                        }
+                        // More arguments than expected, call the constructor anyway to handle too many arguments
+                        adjusted_args = args;
                     }
                 } else {
                     adjusted_args = args;

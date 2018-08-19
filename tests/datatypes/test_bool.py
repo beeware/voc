@@ -30,6 +30,14 @@ class BoolTests(TranspileTestCase):
                 print(err)
         """)
 
+    def test_too_many_arguments(self):
+        self.assertCodeExecution("""
+            try:
+                print(bool(1, 2))
+            except TypeError as err:
+                print(err)
+        """)
+
 
 class UnaryBoolOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bool'

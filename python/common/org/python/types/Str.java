@@ -54,8 +54,14 @@ public class Str extends org.python.types.Object {
     public Str(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
             this.value = "";
-        } else {
+        } else if (args.length == 1) {
             this.value = ((org.python.types.Str) args[0].__str__()).value;
+        } else if (args.length == 2) {
+            throw new org.python.exceptions.NotImplementedError("Builtin function 'str(object=b'', encoding='utf-8', errors='strict')' not implemented");
+        } else if (args.length == 3) {
+            throw new org.python.exceptions.NotImplementedError("Builtin function 'str(object=b'', encoding='utf-8', errors='strict')' not implemented");
+        } else if (args.length > 3) {
+            throw new org.python.exceptions.TypeError("str() takes at most 3 arguments (" + args.length + " given)");
         }
     }
 
