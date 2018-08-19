@@ -121,7 +121,10 @@ class FloatTests(TranspileTestCase):
 
     def test_none(self):
         self.assertCodeExecution("""
-            print(float(None))
+            try:
+                print(float(None))
+            except TypeError as err:
+                print(err)
         """)
 
     def test_no_arguments(self):
