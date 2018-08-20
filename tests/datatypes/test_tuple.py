@@ -284,46 +284,13 @@ class TupleTests(TranspileTestCase):
                 print(tuple(0, 1))
             except TypeError as err:
                 print(err)
+        """)
 
+    def test_wrong_argument(self):
+        self.assertCodeExecution("""
             try:
                 print(tuple(0))
             except TypeError as err:
-                print(err)
-        """)
-
-    def test_tuple_from_range(self):
-        self.assertCodeExecution("""
-            x = tuple(range(3))
-            print(x)
-        """)
-
-    def test_tuple_from_list(self):
-        self.assertCodeExecution("""
-            x = tuple([0, 1, 2, 3])
-            print(x)
-        """)
-
-    def test_tuple_from_dict(self):
-        self.assertCodeExecution("""
-            x = tuple({'a' : 1, 'b' : 2})
-            print(x)
-
-            x = tuple(dict([('c', 3), ('d', 4)]))
-            print(x)
-        """)
-
-    def test_tuple_from_string(self):
-        self.assertCodeExecution("""
-            x = tuple('abc')
-            print(x)
-        """)
-
-    @expectedFailure
-    def test_tuple_from_tuple(self):
-        self.assertCodeExecution("""
-            try:
-                tuple((1, 2))
-            except NotImplementedError as err:
                 print(err)
         """)
 
