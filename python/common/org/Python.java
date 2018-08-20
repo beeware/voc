@@ -165,24 +165,76 @@ public class Python {
         }
     }
 
-    public static java.util.Map<java.lang.String, java.lang.reflect.Method> loadModule(java.lang.Class cls) {
-        java.util.Map<java.lang.String, java.lang.reflect.Method> methods = new java.util.HashMap<java.lang.String, java.lang.reflect.Method>();
+    public static org.python.types.Function getPythonFunction(java.lang.String name, java.lang.Class cls) {
+        for (java.lang.reflect.Method method : cls.getMethods()) {
+            org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
+            if (cls_annotation != null) {
+                java.lang.String nameToCheck;
+
+                if (cls_annotation.name().equals("")) {
+                    nameToCheck = method.getName();
+                } else {
+                    nameToCheck = cls_annotation.name();
+                }
+
+                if (name == nameToCheck) {
+                    java.lang.String varargs_name;
+                    java.lang.String kwargs_name;
+
+                    if (cls_annotation.varargs().equals("")) {
+                        varargs_name = null;
+                    } else {
+                        varargs_name = cls_annotation.varargs();
+                    }
+
+                    if (cls_annotation.kwargs().equals("")) {
+                        kwargs_name = null;
+                    } else {
+                        kwargs_name = cls_annotation.kwargs();
+                    }
+
+                    return new org.python.types.Function(
+                            method,
+                            cls_annotation.args(),
+                            cls_annotation.default_args(),
+                            varargs_name,
+                            cls_annotation.kwonlyargs(),
+                            kwargs_name
+                    );
+                }
+            }
+        }
+        // Failed.
+        return null;
+    }
+
+    public static void loadModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
+        // Get the class annotation and add any properties.
         org.python.Module mod_annotation = (org.python.Module) cls.getAnnotation(org.python.Module.class);
+        if (mod_annotation != null) {
+            java.lang.String __doc__ = mod_annotation.__doc__();
+            if (__doc__.equals("[undocumented]")) {
+                attrs.put("__doc__", org.python.types.NoneType.NONE);
+            } else {
+                attrs.put("__doc__", new org.python.types.Str(__doc__));
+            }
+        }
 
         for (java.lang.reflect.Method method : cls.getMethods()) {
             org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
             if (cls_annotation != null) {
                 java.lang.String method_name;
 
+                // Check for any explicitly set names
                 if (cls_annotation.name().equals("")) {
                     method_name = method.getName();
                 } else {
                     method_name = cls_annotation.name();
                 }
-                methods.put(method_name, method);
+
+                attrs.put(method_name, null);
             }
         }
-        return methods;
     }
 
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
