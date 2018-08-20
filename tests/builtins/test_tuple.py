@@ -21,6 +21,9 @@ class BuiltinTupleFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         ],
         "(1, 2.3456, 7)": [
             "(2.3456, 1, 7)", "(7, 1, 2.3456)", "(1, 7, 2.3456)", "(2.3456, 7, 1)", "(7, 2.3456, 1)"
+        ],
+        "('a', 'c', 'd')": [
+            "('c', 'a', 'd')", "('d', 'a', 'c')", "('a', 'd', 'c')", "('c', 'd', 'a')", "('d', 'c', 'a')"
         ]
     }
 
