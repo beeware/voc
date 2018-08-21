@@ -1,7 +1,8 @@
 package org.python.exceptions;
 
 public class StopIteration extends org.python.exceptions.Exception {
-    org.python.Object value;
+    @org.python.Attribute()
+    public org.python.Object value;
 
     /**
      * StopIteration is a singleton instance for performance reasons, introduced in
@@ -13,6 +14,7 @@ public class StopIteration extends org.python.exceptions.Exception {
 
     private StopIteration() {
         super("");
+        this.value = org.python.types.NoneType.NONE;
     }
 
     public StopIteration(org.python.Object value) {

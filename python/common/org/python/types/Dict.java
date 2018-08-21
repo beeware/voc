@@ -285,14 +285,9 @@ public class Dict extends org.python.types.Object {
             args = {"item", "value"}
     )
     public void __setitem__(org.python.Object item, org.python.Object value) {
-        try {
-            // While hashcode is not used, it is not a redundant line.
-            // We are determining if the item is hashable by seeing if an
-            // exception is thrown.
-            org.python.Object hashcode = item.__hash__();
-
+        if (item.isHashable()) {
             this.value.put(item, value);
-        } catch (org.python.exceptions.AttributeError ae) {
+        } else {
             throw new org.python.exceptions.TypeError(
                     String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
         }
