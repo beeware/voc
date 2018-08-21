@@ -1,8 +1,23 @@
+from unittest import expectedFailure
+
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
 
 class TupleTests(TranspileTestCase):
-    pass
+
+    @expectedFailure
+    def test_bad_tuple(self):
+        self.assertCodeExecution("""
+            try:
+                print(tuple(0, 1))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(tuple(0))
+            except TypeError as err:
+                print(err)
+        """)
 
 
 class BuiltinTupleFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):

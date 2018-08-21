@@ -192,6 +192,19 @@ def test_dict_get(test_case):
             dict.get("a")
     """), timed=True)
 
+def test_dict_set(test_case):
+    print("Running", "test_dictionary_set")
+    test_case.runAsJava(adjust("""
+        dict = {}
+        for i in range(1000000):
+            dict["moo"] = 1
+            dict["quack"] = 2
+            dict["woof"] = 3
+            dict["meow"] = 4
+            dict["cockadoodledoo"] = 5
+            dict["hiss"] = 6
+    """, timed=True)
+
 def test_class_init(test_case):
     print("Running" , "test_class_init")
     test_case.runAsJava(adjust("""
@@ -243,6 +256,7 @@ def main():
     test_loops(test_case)
     test_cmp(test_case)
     test_dict_get(test_case)
+    test_dict_set(test_case)
     test_class_init(test_case)
 
 if __name__== "__main__":

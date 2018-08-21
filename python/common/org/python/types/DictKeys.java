@@ -52,7 +52,7 @@ public class DictKeys extends org.python.types.FrozenSet {
             __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
-        java.lang.StringBuilder buffer = new java.lang.StringBuilder("dict_keys([");
+        java.lang.StringBuilder buffer = new java.lang.StringBuilder(this.typeName() + "([");
         boolean first = true;
         for (org.python.Object item : this.value) {
             if (first) {
@@ -70,14 +70,14 @@ public class DictKeys extends org.python.types.FrozenSet {
             __doc__ = "default object formatter"
     )
     public org.python.types.Str __format__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict_keys.__format__() has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError(this.typeName() + ".__format__() has not been implemented.");
     }
 
     @org.python.Method(
             __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {
-        throw new org.python.exceptions.NotImplementedError("dict_keys.__dir__() has not been implemented.");
+        throw new org.python.exceptions.NotImplementedError(this.typeName() + ".__dir__() has not been implemented.");
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
@@ -96,9 +96,9 @@ public class DictKeys extends org.python.types.FrozenSet {
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
-            throw new org.python.exceptions.TypeError("'dict_keys' object does not support indexing");
+            throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object does not support indexing");
         } else {
-            throw new org.python.exceptions.TypeError("'dict_keys' object is not subscriptable");
+            throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object is not subscriptable");
         }
     }
 
@@ -107,7 +107,7 @@ public class DictKeys extends org.python.types.FrozenSet {
             args = {"index", "value"}
     )
     public void __setitem__(org.python.Object item, org.python.Object value) {
-        throw new org.python.exceptions.TypeError("'dict_keys' object does not support item assignment");
+        throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object does not support item assignment");
     }
 
     @org.python.Method(
@@ -115,28 +115,28 @@ public class DictKeys extends org.python.types.FrozenSet {
             args = {"index"}
     )
     public void __delitem__(org.python.Object item) {
-        throw new org.python.exceptions.TypeError("'dict_keys' object doesn't support item deletion");
+        throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object doesn't support item deletion");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'dict_keys'");
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'dict_keys'");
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'dict_keys'");
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
