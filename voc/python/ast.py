@@ -1,4 +1,5 @@
 import ast
+import copy
 import sys
 import traceback
 
@@ -123,6 +124,8 @@ class Visitor(ast.NodeVisitor):
         self.symbol_namespace = {}
         self.code_objects = {}
 
+        self.resolved_yield_expression = {}  # store converted yield expression node identified by generator's id
+
     @property
     def context(self):
         return self._context[-1]
@@ -155,10 +158,45 @@ class Visitor(ast.NodeVisitor):
                 self.code_objects[(obj.co_firstlineno, obj.co_name)] = obj
                 self.extract_code_objects(obj)
 
+    def parse_yield(self, node):
+        """parse yield appearing in expression before the expression is evaluated/visited
+        """
+        def convert_to_Name(_node):
+            # convert Yield node to Name node for expression evaluation
+            # operand of expression is the message stored in generator
+            return ast.Name(
+                id='#msg-buffer-%x' % id(_node),
+                ctx=ast.Load(),
+                lineno=_node.lineno,
+                col_offset=_node.col_offset
+            )
+
+        for field_name, value in ast.iter_fields(node):
+            if isinstance(value, ast.Yield):
+                if isinstance(node, ast.Expr):
+                    # don't parse Expr(value=Yield)
+                    return
+                self.visit_Yield(value)
+                self.resolved_yield_expression[id(value)] = convert_to_Name(value)
+                return
+            elif isinstance(value, list):  # args or kwargs list
+                index = 0
+                for arg_node in value:
+                    if isinstance(arg_node, ast.Yield):
+                        self.visit_Yield(arg_node)
+                        self.resolved_yield_expression[id(arg_node)] = convert_to_Name(arg_node)
+                        return
+                    index += 1
+
     def visit(self, node):
         try:
             self.parse_yield(node)
-            super().visit(node)
+            if id(node) in self.resolved_yield_expression.keys():
+                # skip the yield node and visit the converted node (a Name node) instead
+                super().visit(self.resolved_yield_expression[id(node)])
+                del self.resolved_yield_expression[id(node)]  # delete entry after visited
+            else:
+                super().visit(node)
         except Exception as e:
             print(
                 "Problem occurred in " + str(self.filename)
@@ -192,54 +230,6 @@ class Visitor(ast.NodeVisitor):
 
         self.pop_context()
 
-    def parse_yield(self, node):
-        def get_message():
-            # load message on stack
-            self.context.load_name('<generator>')
-            self.context.add_opcodes(
-                JavaOpcodes.GETFIELD('org/python/types/Generator', 'message', 'Lorg/python/Object;')
-            )
-
-            # reset message to None after pushing it on stack
-            self.context.load_name('<generator>')
-            self.context.add_opcodes(
-                JavaOpcodes.INVOKEVIRTUAL(
-                    'org/python/types/Generator',
-                    'reset_message',
-                    args=[],
-                    returns='V'
-                )
-            )
-
-        def convert_to_Name(_node):
-            # convert Yield node to Name node for expression evaluation
-            # expression operand is the message stored in generator
-            self.context.store_name('#msg-buffer-%x' % id(node))
-            return ast.Name(
-                id='#msg-buffer-%x' % id(node),
-                ctx=ast.Load(),
-                lineno=_node.lineno,
-                col_offset=_node.col_offset
-            )
-        for field_name, value in ast.iter_fields(node):
-            if isinstance(value, ast.Yield):
-                if isinstance(node, ast.Expr):
-                    # don't parse Expr(value=Yield), as it is regular yield statement
-                    return
-                self.visit_Yield(value)  # visit the Yield node
-                get_message()
-                setattr(node, field_name, convert_to_Name(value))
-                return
-            elif isinstance(value, list):  # args or kwargs list
-                index = 0
-                for arg_node in value:
-                    if isinstance(arg_node, ast.Yield):
-                        self.visit_Yield(arg_node)  # visit the Yield node
-                        get_message()
-                        value[index] = convert_to_Name(arg_node)
-                        return
-                    index += 1
-
     @node_visitor
     def visit_Interactive(self, node):
         # stmt* body):
@@ -249,9 +239,9 @@ class Visitor(ast.NodeVisitor):
     def visit_Expr(self, node):
         self.generic_visit(node)
 
-        # If the expression is not yield/yield from expression,
+        # If the expression is not yield expression,
         # we need to ignore expression value by popping it off from stack.
-        if not isinstance(node.value, (ast.Yield, ast.YieldFrom)):
+        if not isinstance(node.value, ast.Yield):
             self.context.add_opcodes(
                 JavaOpcodes.POP()
             )
@@ -343,11 +333,41 @@ class Visitor(ast.NodeVisitor):
     @node_visitor
     def visit_Return(self, node):
         # expr? value):
-        if node.value:
+        if self.context.generator:
+            # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
+            if not isinstance(node.value, ast.YieldFrom):
+                # Don't close the generator if node.value is ast.YieldFrom,
+                # the generator will be closed automatically when node.value is exhausted (raised StopIteration)
+                self.context.add_opcodes(
+                    ALOAD_name('<generator>'),
+                    JavaOpcodes.INVOKEVIRTUAL(
+                        'org/python/types/Generator',
+                        'close',
+                        args=[],
+                        returns='Lorg/python/Object;',
+                    ),
+                    JavaOpcodes.POP(),
+                )
+
+            if node.value:
+                self.visit(node.value)
+            else:
+                self.context.add_opcodes(python.NONE())
+
+            self.context.add_opcodes(
+                ASTORE_name('#value'),
+                java.New('org/python/exceptions/StopIteration'),
+                ALOAD_name('#value'),
+                java.Init('org/python/exceptions/StopIteration', 'Lorg/python/Object;'),
+                JavaOpcodes.ATHROW(),
+            )
+        elif node.value:
             self.visit(node.value)
+            self.context.add_opcodes(JavaOpcodes.ARETURN())
         else:
             self.context.add_opcodes(python.NONE())
-        self.context.add_opcodes(JavaOpcodes.ARETURN())
+            self.context.add_opcodes(JavaOpcodes.ARETURN())
+
         # Record how deep we were when this return was added.
         self.context.opcodes[-1].needs_implicit_return = \
             self.context.has_nested_structure
@@ -1765,8 +1785,8 @@ class Visitor(ast.NodeVisitor):
         if hasattr(node, "lineno"):
             # Checks for programmatically defined yield node.
             # A programmatically defined yield node does not has the attribute `lineno`
-            # Example: visit_YieldFrom function defined ast.Yield(None) after pushing value
-            # obtained from iterator onto stack, hence no need to visit node.value here
+            # Example: currently only visit_YieldFrom function define yield node programmatically
+            # (defined as ast.Yield(None)) before pushing next yield value on stack
             if node.value:
                 self.visit(node.value)
                 self.context.add_opcodes(
@@ -1800,8 +1820,9 @@ class Visitor(ast.NodeVisitor):
 
         # On restore, the next instruction is the target
         # for the restore jump.
-        self.context.yield_points.append(node)
-        self.context.next_resolve_list.append((node, OpcodePosition.YIELD))
+        node_to_resolve = copy.deepcopy(node)  # deepcopy is required for multiple visits of finalbody from visitTry
+        self.context.yield_points.append(node_to_resolve)
+        self.context.next_resolve_list.append((node_to_resolve, OpcodePosition.YIELD))
 
         #  First thing to do is restore the state of the stack.
         self.context.load_name('<generator>')
@@ -1811,40 +1832,91 @@ class Visitor(ast.NodeVisitor):
         )
 
         for var, index in self.context.local_vars.items():
-            if index is not None and var not in ('<generator>', '#locals'):
+            if index is not None and var not in ('<generator>', '#locals') \
+                    and "#exception-" not in var:  # Don't load exception
                 self.context.add_opcodes(
                     ALOAD_name('#locals'),
                     java.Map.get(var),
                     JavaOpcodes.ASTORE(index),
                 )
 
+        # Manage messages and exception when generator is restored
+        if hasattr(node, "lineno"):
+            # Retrieve message from generator
+            self.context.load_name('<generator>')
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                JavaOpcodes.DUP(),
+                JavaOpcodes.GETFIELD('org/python/types/Generator', 'message', 'Lorg/python/Object;'),
+            )
+            # Store the message in local variable for expression evaluation
+            self.context.store_name('#msg-buffer-%x' % id(node))
+            self.context.add_opcodes(
+                # Reset message to None after retrieval
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Generator',
+                    'reset_message',
+                    args=[],
+                    returns='V',
+                ),
+                # Throw exception if there is one
+                # NO-OP if generator.exception is null
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/Generator',
+                    'throw_exception',
+                    args=[],
+                    returns='V'
+                )
+            )
+
     @node_visitor
     def visit_YieldFrom(self, node):
         self.visit(node.value)  # pushes expression on stack
         self.context.add_opcodes(
-            python.Object.iter()  # pops expression from stack then gets and pushes its iterator on stack
+            python.Object.iter(),  # pops expression from stack then gets and pushes its iterator on stack
         )
-        self.context.store_name('#yield-iter-%x' % id(node))
 
+        # invokes __next()__ on the iterator, return if StopIteration
+        self.context.store_name('#yield-iter-%x' % id(node))
+        self.context.load_name('#yield-iter-%x' % id(node))
+        self.context.add_opcodes(
+            TRY(),
+            python.Iterable.next(),
+            ASTORE_name('#yield-value-%x' % id(node)),
+            CATCH('org/python/exceptions/StopIteration'),
+            JavaOpcodes.GETFIELD('org/python/exceptions/StopIteration', 'value', 'Lorg/python/Object;'),
+            JavaOpcodes.ARETURN(),
+            END_TRY()
+        )
+
+        # Yield the value and intercepts exception by invoking generator.intercept_exception
+        # If the method throws StopIteration, get its value and break out of the loop
+        # If the method returns org.python.Object, store the value for next yield and continue loop
         loop = START_LOOP()
         self.context.add_opcodes(
             loop,
-            TRY(),
+            ALOAD_name('#yield-value-%x' % id(node))
         )
+        self.visit_Yield(ast.Yield(None))
+        self.context.load_name('<generator>')
         self.context.load_name('#yield-iter-%x' % id(node))
         self.context.add_opcodes(
-            python.Iterable.next(),
+            TRY(),
+            JavaOpcodes.INVOKEVIRTUAL(
+                'org/python/types/Generator',
+                'intercept_exception',
+                args=['Lorg/python/Object;'],
+                returns='Lorg/python/Object;'
+            ),
             CATCH('org/python/exceptions/StopIteration'),
-            JavaOpcodes.POP(),
-            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),
+            python.Object.get_attribute('value'),
+            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.NEXT),  # break from the loop
             END_TRY(),
-        )
-        self.visit(ast.Yield(None))
-        self.context.add_opcodes(
+
+            ASTORE_name('#yield-value-%x' % id(node)),
+            jump(JavaOpcodes.GOTO(0), self.context, loop, OpcodePosition.START),  # continue
             END_LOOP(),
         )
-
-        self.context.delete_name('#yield-iter-%x' % id(node))
 
     @node_visitor
     def visit_Compare(self, node):

@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -451,6 +453,23 @@ class TryExceptTests(TranspileTestCase):
             except:
                 print("Got an anonymous error")
             print('Done.')
+            """)
+
+    @expectedFailure
+    def test_nested_try_catch_same_error(self):
+        self.assertCodeExecution("""
+            try:
+                try:
+                    raise TypeError
+                except TypeError as e:
+                    print("handled by first except")
+
+                try:
+                    raise TypeError
+                except TypeError as e:
+                    print("handled by second except")
+            except TypeError as e:
+                print("handled by outer except")
             """)
 
     def test_try_catch_in_loop(self):

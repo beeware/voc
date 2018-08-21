@@ -95,8 +95,9 @@ class GeneratorTests(TranspileTestCase):
             next(g)
             try:
                 g.send("Hello World")
+                print("should not print this")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_multi_send(self):
@@ -112,8 +113,9 @@ class GeneratorTests(TranspileTestCase):
             try:
                 print(g.send("a"))
                 print(g.send("b"))
+                print("should not print this")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
     def test_generator_send_loop(self):
@@ -129,8 +131,26 @@ class GeneratorTests(TranspileTestCase):
                 while True:
                     b = g.send(1)
                     print("printing from user " + str(b))
+                    print("should not print this")
             except StopIteration:
-                pass
+                print("StopIteration")
+            """)
+
+    def test_generator_send_after_yield_stmt(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield "regular yield statement"
+                a = yield "yield expression"
+                print(a)
+
+            g = gen()
+            print(next(g))
+            print(g.send("Hello World"))
+            try:
+                print(next(g))  # a is None
+                print("should not print this")
+            except StopIteration:
+                print("StopIteration")
             """)
 
     def test_generator_send_non_None(self):
@@ -142,6 +162,7 @@ class GeneratorTests(TranspileTestCase):
             g = gen()
             try:
                 g.send(1)
+                print("should not print this")
             except Exception as e:
                 print(e, e.args)
             """)
@@ -253,11 +274,11 @@ class GeneratorTests(TranspileTestCase):
             g.send(None)
             try:
                 g.send(1)
+                print("should not print this")
             except StopIteration:
-                pass
+                print("StopIteration")
             """)
 
-    @expectedFailure
     def test_generator_yield_expr_return(self):
         self.assertCodeExecution("""
             def gen():
@@ -265,8 +286,279 @@ class GeneratorTests(TranspileTestCase):
 
             g = gen()
             g.send(None)
-            g.send(1)  # for some reason the generator keeps returning value
-            g.send(100) # without raising StopIteration error
+            try:
+                g.send(1)
+                print("should not print this")
+            except StopIteration:
+                print("StopIteration")
+            """)
+
+    @expectedFailure
+    def test_generator_yield_try_finally_special_case(self):
+        """Output is 'finally' followed by 'Hello World'
+        due to the way CPython handles garbage collection."""
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield 'Hello World'
+                finally:
+                    print('finally')
+
+            print(next(gen()))
+            """)
+
+    def test_generator_throw_on_starting(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield "Hello World"
+
+            g = gen()
+            try:
+                g.throw(ZeroDivisionError)
+                print("should not print this")
+            except ZeroDivisionError:
+                print("ZeroDivisionError")
+            """)
+
+    def test_generator_throw_other_exception(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield
+                    print("Hello World")
+                except ZeroDivisionError:
+                    raise TypeError
+
+            g = gen()
+            next(g)
+            try:
+                g.throw(ZeroDivisionError)
+                print("should not print this")
+            except TypeError:
+                print("TypeError")
+            """)
+
+    def test_generator_throw_exception_handling(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield "from try block"
+                except TypeError:
+                    yield "from catch block"
+
+                yield "from outside try-except"
+                a = yield
+
+            g = gen()
+            print(next(g))
+            print(g.throw(TypeError))
+            print(next(g))
+            print(g.send("message"))
+            """)
+
+    def test_generator_throw_on_close(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield "Hello World"
+
+            g = gen()
+            g.close()
+            try:
+                g.throw(ZeroDivisionError)
+                print("should not print this")
+            except ZeroDivisionError:
+                print("ZeroDivisionError")
+            """)
+
+    def test_generator_next_after_throw(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield 1
+                yield 2
+
+            g = gen()
+            print(next(g))
+            try:
+                g.throw(TypeError)
+                print("should not print this")
+            except TypeError:
+                try:
+                    print(next(g))
+                    print("should not print this")
+                except StopIteration:
+                    print("StopIteration")
+            """)
+
+    def test_generator_throw_args(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield 1
+
+            g = gen()
+            try:
+                g.throw(TypeError, "Hello World")
+                print("should not print this")
+            except TypeError as e:
+                print(e.__str__())
+
+            g = gen()
+            try:
+                g.throw(ZeroDivisionError, 100)
+                print("should not print this")
+            except ZeroDivisionError as e:
+                print(e.__str__())
+
+            g = gen()
+            try:
+                g.throw(TypeError, (1, 2, 3, "Hello", "World"))
+                print("should not print this")
+            except TypeError as e:
+                print(e.args)
+            """)
+
+    @expectedFailure
+    def test_generator_throw_kwargs(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield 1
+            g = gen()
+            try:
+                g.throw(TypeError, {"Hello": 1, "World": 2})
+                print("should not print this")
+            except TypeError as e:
+                print(e.args)
+            """)
+
+    def test_generator_close(self):
+        self.assertCodeExecution("""
+            def gen():
+                print("Hello world")
+                try:
+                    yield
+                except TypeError:
+                    pass
+                except ZeroDivisionError:
+                    pass
+
+            g = gen()
+            print(g.close())
+            try:
+                print(next(g))
+                print("should not print this")
+            except StopIteration:
+                print("StopIteration")
+            """)
+
+    def test_generator_close_ignore_exit(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield
+                except TypeError:
+                    pass
+                except GeneratorExit:
+                    yield "exit ignored"
+
+            g = gen()
+            next(g)
+            try:
+                g.close()
+                print("should not print this")
+            except RuntimeError:
+                print(RuntimeError)
+            """)
+
+    def test_generator_close_exception_propagation(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield
+                except GeneratorExit:
+                    raise OSError
+
+            g = gen()
+            next(g)
+            try:
+                g.close()
+                print("should not print this")
+            except OSError:
+                pass
+            """)
+
+    def test_generator_close_twice(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield 1
+                yield 2
+
+            g = gen()
+            print(g.close())
+            print(g.close())
+            """)
+
+    def test_generator_yield_try_suite(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield "from try block"
+                except:
+                    yield "from except block"
+                else:
+                    yield "from else block"
+                finally:
+                    yield "from finally block"
+
+            g = gen()
+            print(next(g))
+            print(g.throw(TypeError))
+            print(next(g))
+
+            g = gen()
+            print(next(g))
+            print(next(g))
+            print(next(g))
+            try:
+                print(next(g))
+                print("should not print this")
+            except StopIteration:
+                print("StopIteration")
+            """)
+
+    def test_generator_yield_expr_try_suite(self):
+        self.assertCodeExecution("""
+            def gen():
+                try:
+                    yield "from try block"
+                    a = yield
+                except:
+                    yield "from except block"
+                    a = yield
+                else:
+                    a = yield "from else block"
+                finally:
+                    a = yield "from finally block"
+                print(a)
+
+            g = gen()
+            print(next(g))
+            print(g.throw(TypeError))
+            print(next(g))
+            print(g.send("except"))
+            try:
+                print(g.send("finally"))
+                print("should not print this")
+            except StopIteration:
+                print("StopIteration")
+
+            g = gen()
+            print(next(g))
+            print(next(g))
+            print(g.send("try"))
+            try:
+                print(g.send("finally"))
+                print("should not print this")
+            except StopIteration:
+                print("StopIteration")
             """)
 
     def test_simplest_yieldfrom(self):
@@ -308,3 +600,142 @@ class GeneratorTests(TranspileTestCase):
             for i in gen3():
                 print(i)
         """)
+
+    def test_generator_yieldfrom_generator_exit(self):
+        self.assertCodeExecution("""
+            def gen1():
+                return [1, 2, 3]
+
+            def gen2():
+                v = yield from gen1()
+                yield 1
+
+            g = gen2()
+            print(next(g))
+            try:
+                print(g.throw(GeneratorExit))
+                print("should not print this")
+            except GeneratorExit:
+                try:
+                    print(next(g))
+                    print("should not print this")
+                except StopIteration:
+                    print("StopIteration")
+            """)
+
+    def test_generator_yieldfrom_throw_propagation(self):
+        self.assertCodeExecution("""
+            def gen1():
+                try:
+                    yield 1
+                except TypeError:
+                    yield "TypeError"
+
+            def gen2():
+                yield from gen1()
+
+            g = gen2()
+            print(next(g))
+            print(g.throw(TypeError))
+            """)
+
+    def test_generator_yieldfrom_send_propagation(self):
+        self.assertCodeExecution("""
+            def gen1():
+                a = yield "gen1"
+                print("value received: " + a)
+
+            def gen2():
+                yield from gen1()
+
+            g = gen2()
+            print(next(g))
+            try:
+                print(g.send("Hello World"))
+                print("should not print this")
+            except StopIteration:
+                print("StopIteration")
+            """)
+
+    def test_generator_yieldfrom_return(self):
+        self.assertCodeExecution("""
+            def gen():
+                return (yield from [1, 2, 3])
+                return "impossible return"
+
+            g = gen()
+            for i in g:
+                print(i)
+            try:
+                print(next(g))
+                print("should not print this")
+            except StopIteration as e:
+                print(e)
+            """)
+
+    def test_generator_yieldfrom_in_loop(self):
+        self.assertCodeExecution("""
+            def gen():
+                a = [1, 2, 3]
+                while len(a):
+                    yield from a
+                    a = []
+
+            g = gen()
+            for i in g:
+                print(i)
+            """)
+
+    def test_generator_stop_iteration_value(self):
+        self.assertCodeExecution("""
+            def gen():
+                yield "Hello World"
+                return "return value"
+
+            g = gen()
+            print(next(g))
+            try:
+                print(next(g))
+                print("should not print this")
+            except StopIteration as e:
+                print(e.value)
+
+            def gen1():
+                yield "Hello World"
+                return "return value"
+
+            def gen2():
+                v = yield from gen1()
+                print(v)
+
+            g = gen2()
+            print(next(g))
+            try:
+                print(next(g))
+                print("should not print this")
+            except StopIteration:
+                print("StopIteration")
+
+            def gen3():
+                yield 1
+                yield 2
+                return 10
+
+            g1 = gen3()
+            print(next(g1))
+            print(next(g1))
+            try:
+                print(next(g1))
+                print("should not print this")
+            except StopIteration as e:
+                print(e.value)
+
+            g2 = gen3()
+            for i in g2:
+                print(i)
+            try:
+                print(next(g2))
+                print("should not print this")
+            except StopIteration as e:
+                print(e.value)
+            """)
