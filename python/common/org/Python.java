@@ -173,11 +173,12 @@ public class Python {
 
                 if (cls_annotation.name().equals("")) {
                     nameToCheck = method.getName();
+
                 } else {
                     nameToCheck = cls_annotation.name();
                 }
 
-                if (name == nameToCheck) {
+                if (name.equals(nameToCheck)) {
                     java.lang.String varargs_name;
                     java.lang.String kwargs_name;
 
