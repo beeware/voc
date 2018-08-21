@@ -695,7 +695,6 @@ class NotImplementedToExpectedFailure:
 SAMPLE_DATA = {
     'obj': [
             'object',
-            'object()',
         ],
     'bool': [
             'True',
