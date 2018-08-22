@@ -41,7 +41,7 @@ public class Float extends org.python.types.Object {
                 throw new org.python.exceptions.TypeError(
                       "float() argument must be a string or a number, not '" + args[0].typeName() + "'"
                 );
-          }
+            }
         } else {
             throw new org.python.exceptions.TypeError("float() takes at most 1 argument (" + args.length + " given)");
         }
@@ -654,7 +654,7 @@ public class Float extends org.python.types.Object {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for round(): 'float' and '" + ndigits.typeName() + "'");
         }
     }
-    
+
     @org.python.Method(
             __doc__ = "F.is_integer() -> bool\n" +
                     "\n" +
