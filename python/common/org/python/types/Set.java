@@ -3,16 +3,6 @@ package org.python.types;
 public class Set extends org.python.types.Object {
     public java.util.Set<org.python.Object> value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Set
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Set) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
     }
@@ -51,7 +41,7 @@ public class Set extends org.python.types.Object {
     public Set(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
             this.value = new java.util.HashSet<org.python.Object>();
-        } else {
+        } else if (args.length == 1) {
             if (args[0] instanceof org.python.types.Set) {
                 this.value = new java.util.HashSet<org.python.Object>(
                         ((org.python.types.Set) args[0]).value
@@ -76,6 +66,8 @@ public class Set extends org.python.types.Object {
                 }
                 this.value = generated;
             }
+        } else {
+            throw new org.python.exceptions.TypeError("set expected at most 1 arguments, got " + args.length);
         }
     }
 

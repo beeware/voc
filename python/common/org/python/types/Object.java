@@ -5,17 +5,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     public org.python.types.Type __class__;
     public org.python.types.Type.Origin origin;
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * On a base object, it will always fail. Subclasses should override
-     * to provide the relevant assignment info.
-     */
-    void setValue(org.python.Object obj) {
-        throw new org.python.exceptions.RuntimeError("'" + this.typeName() + "' object cannot be updated.");
-    }
-
     public java.lang.Object toJava() {
         return this;
     }
@@ -34,10 +23,6 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
                 return true;
             }
         }
-    }
-
-    public org.python.Object byValue() {
-        return this;
     }
 
     /**
@@ -870,8 +855,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __idivmod__(org.python.Object other) {
         try {
-            this.setValue(this.__divmod__(other));
-            return this;
+            return this.__divmod__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for //=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -891,8 +875,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __ilshift__(org.python.Object other) {
         try {
-            this.setValue(this.__lshift__(other));
-            return this;
+            return this.__lshift__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for <<=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
@@ -904,8 +887,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public org.python.Object __irshift__(org.python.Object other) {
         try {
-            this.setValue(this.__rshift__(other));
-            return this;
+            return this.__rshift__(other);
         } catch (org.python.exceptions.TypeError e) {
             throw new org.python.exceptions.TypeError("unsupported operand type(s) for >>=: '" + this.typeName() + "' and '" + other.typeName() + "'");
         }
