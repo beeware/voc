@@ -661,12 +661,9 @@ public class Float extends org.python.types.Object {
                     "Return True if the float instance is finite with integral value, and False otherwise.\n"
     )
     public org.python.Object is_integer() {
-        if (this.value == Math.floor(this.value) && !Double.isInfinite(this.value)) {
-            return org.python.types.Bool.TRUE;
-        }
-        return org.python.types.Bool.FALSE;
+        return org.python.types.Bool.getBool(this.value == Math.floor(this.value) && !Double.isInfinite(this.value));
     }
-
+    
     @org.python.Method(
             __doc__ = "float.hex() -> string\n\nReturn a hexadecimal representation of a floating-point number.\n>>> (-0.1).hex()\n'-0x1.999999999999ap-4'\n>>> 3.14159.hex()\n'0x1.921f9f01b866ep+1'"
     )
