@@ -97,7 +97,6 @@ class IntTests(TranspileTestCase):
             print(int())
             """)
 
-    @expectedFailure
     def test_too_many_arguments(self):
         self.assertCodeExecution("""
             try:

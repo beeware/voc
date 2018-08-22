@@ -1,44 +1,30 @@
-from unittest import expectedFailure
-
-from .. utils import TranspileTestCase, BuiltinFunctionTestCase
+from .. utils import TranspileTestCase, BuiltinFunctionTestCase, SAMPLE_SUBSTITUTIONS
 
 
 class TupleTests(TranspileTestCase):
-
-    @expectedFailure
-    def test_bad_tuple(self):
-        self.assertCodeExecution("""
-            try:
-                print(tuple(0, 1))
-            except TypeError as err:
-                print(err)
-
-            try:
-                print(tuple(0))
-            except TypeError as err:
-                print(err)
-        """)
+    pass
 
 
 class BuiltinTupleFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["tuple"]
 
     not_implemented = [
-        'test_bool',
-        'test_bytearray',
-        'test_bytes',
-        'test_class',
-        'test_complex',
-        'test_dict',
-        'test_float',
-        'test_frozenset',
-        'test_int',
-        'test_list',
-        'test_None',
-        'test_NotImplemented',
-        'test_range',
-        'test_set',
-        'test_slice',
-        'test_str',
         'test_tuple',
     ]
+
+    substitutions = {
+        "('one', 'two', 'six')": [
+            "('two', 'one', 'six')", "('six', 'one', 'two')", "('one', 'six', 'two')", "('two', 'six', 'one')", "('six', 'two', 'one')"
+        ],
+        "('on', 'to', 'an')": [
+            "('to', 'on', 'an')", "('an', 'on', 'to')", "('on', 'an', 'to')", "('to', 'an', 'on')", "('an', 'to', 'on')"
+        ],
+        "(1, 2.3456, 7)": [
+            "(2.3456, 1, 7)", "(7, 1, 2.3456)", "(1, 7, 2.3456)", "(2.3456, 7, 1)", "(7, 2.3456, 1)"
+        ],
+        "('a', 'c', 'd')": [
+            "('c', 'a', 'd')", "('d', 'a', 'c')", "('a', 'd', 'c')", "('c', 'd', 'a')", "('d', 'c', 'a')"
+        ]
+    }
+
+    substitutions.update(SAMPLE_SUBSTITUTIONS)
