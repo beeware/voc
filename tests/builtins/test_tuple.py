@@ -10,7 +10,6 @@ class BuiltinTupleFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_tuple',
-        'test_obj',
     ]
 
     substitutions = {
