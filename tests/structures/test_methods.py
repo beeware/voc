@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -221,6 +223,7 @@ class MethodTests(TranspileTestCase):
 
     @expectedFailure
     def test_method_caching_not_visible_in_dict(self):
+        # Method caching is a performance optimization that should not affect __dict__ inspection
         self.assertCodeExecution("""
             class TestObj:
                 def myfunc(self):
