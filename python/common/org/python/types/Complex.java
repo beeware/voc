@@ -18,10 +18,6 @@ public class Complex extends org.python.types.Object {
         return this;
     }
 
-    public org.python.Object byValue() {
-        throw new org.python.exceptions.AttributeError("type object 'complex' has no attribute 'byValue'");
-    }
-
     public int hashCode() {
         return this.hashCode();
     }
@@ -367,7 +363,7 @@ public class Complex extends org.python.types.Object {
             if (!((Bool) other).value) {
                 throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
             }
-            return new org.python.types.Complex(this.real, this.imag);
+            return this;
         } else if (other instanceof org.python.types.Float) {
             if (((Float) other).value == 0.0) {
                 throw new org.python.exceptions.ZeroDivisionError("complex division by zero");
@@ -676,7 +672,7 @@ public class Complex extends org.python.types.Object {
             __doc__ = "+self"
     )
     public org.python.Object __pos__() {
-        return new org.python.types.Complex(this.real, this.imag);
+        return this;
     }
 
     @org.python.Method(

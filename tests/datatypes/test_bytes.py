@@ -593,6 +593,14 @@ class BytesTests(TranspileTestCase):
             print(b.join([b'12']))
         """)
 
+    def test_too_many_arguments(self):
+        self.assertCodeExecution("""
+            try:
+                print(bytes(1, 2, 3, 4))
+            except TypeError as err:
+                print(err)
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'

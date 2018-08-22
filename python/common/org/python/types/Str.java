@@ -3,23 +3,8 @@ package org.python.types;
 public class Str extends org.python.types.Object {
     public java.lang.String value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Str
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Str) obj).value;
-
-    }
-
     public java.lang.Object toJava() {
         return this.value;
-    }
-
-    public org.python.Object byValue() {
-        return new org.python.types.Str(this.value);
     }
 
     public int hashCode() {
@@ -54,8 +39,14 @@ public class Str extends org.python.types.Object {
     public Str(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
             this.value = "";
-        } else {
+        } else if (args.length == 1) {
             this.value = ((org.python.types.Str) args[0].__str__()).value;
+        } else if (args.length == 2) {
+            throw new org.python.exceptions.NotImplementedError("Builtin function 'str(object=b'', encoding='utf-8', errors='strict')' not implemented");
+        } else if (args.length == 3) {
+            throw new org.python.exceptions.NotImplementedError("Builtin function 'str(object=b'', encoding='utf-8', errors='strict')' not implemented");
+        } else if (args.length > 3) {
+            throw new org.python.exceptions.TypeError("str() takes at most 3 arguments (" + args.length + " given)");
         }
     }
 
@@ -495,8 +486,7 @@ public class Str extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __ipow__(org.python.Object other) {
-        this.setValue(this.__pow__(other, null));
-        return this;
+        return this.__pow__(other, null);
     }
 
     @org.python.Method(
@@ -527,8 +517,7 @@ public class Str extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __imul__(org.python.Object other) {
-        this.setValue(this.__mul__(other));
-        return this;
+        return this.__mul__(other);
     }
 
     @org.python.Method(
@@ -536,8 +525,7 @@ public class Str extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __imod__(org.python.Object other) {
-        this.setValue(this.__mod__(other));
-        return this;
+        return this.__mod__(other);
     }
 
     @org.python.Method(
@@ -617,7 +605,7 @@ public class Str extends org.python.types.Object {
                 return new org.python.types.Str(returnString.toString());
             }
         } else if (width instanceof org.python.types.Bool) {
-            return new org.python.types.Str(this.value);
+            return this;
         }
 
         throw new org.python.exceptions.TypeError("Length must be of type Integer or Bool");
@@ -1073,7 +1061,7 @@ public class Str extends org.python.types.Object {
 
         int w = (int) ((org.python.types.Int) width).value;
         if (w < this.value.length()) {
-            return new org.python.types.Str(this.value);
+            return this;
         }
         java.lang.StringBuffer str = new java.lang.StringBuffer(w);
         str.append(this.value);
@@ -1293,7 +1281,7 @@ public class Str extends org.python.types.Object {
             }
             int w = (int) ((org.python.types.Int) width).value;
             if (w < this.value.length()) {
-                return new org.python.types.Str(this.value);
+                return this;
             }
             java.lang.StringBuffer str = new java.lang.StringBuffer(w);
             int balance = w - this.value.length();
@@ -1343,7 +1331,7 @@ public class Str extends org.python.types.Object {
         }
         tuple.add(new org.python.types.Str(""));
         tuple.add(new org.python.types.Str(""));
-        tuple.add(new org.python.types.Str(this.value));
+        tuple.add(this);
         return new org.python.types.Tuple(tuple);
     }
 
@@ -1707,7 +1695,7 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object swapcase() {
         if (this.value.isEmpty()) {
-            return new org.python.types.Str(this.value);
+            return this;
         }
         java.lang.StringBuffer swapcase = new java.lang.StringBuffer();
         for (int c = 0; c < this.value.length(); c++) {
@@ -1794,7 +1782,7 @@ public class Str extends org.python.types.Object {
         int w = (int) ((org.python.types.Int) width).value;
 
         if (this.value.length() >= w) {
-            return new org.python.types.Str(this.value);
+            return this;
         }
 
         int fill = w - this.value.length();

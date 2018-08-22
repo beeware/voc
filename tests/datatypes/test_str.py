@@ -901,6 +901,20 @@ class StrTests(TranspileTestCase):
             print('' in 'a')
         """)
 
+    def test_too_many_arguments(self):
+        self.assertCodeExecution("""
+            try:
+                print(str(1, 2, 3, 4, 5))
+            except TypeError as err:
+                print(err)
+
+            try:
+                print(str("1", "2", "3", "4", "5"))
+            except TypeError as err:
+                print(err)
+
+        """)
+
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'

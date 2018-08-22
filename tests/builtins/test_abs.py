@@ -1,5 +1,7 @@
 from .. utils import TranspileTestCase, BuiltinFunctionTestCase
 
+from unittest import expectedFailure
+
 
 class AbsTests(TranspileTestCase):
     def test_abs_not_implemented(self):
@@ -11,6 +13,13 @@ class AbsTests(TranspileTestCase):
                 print(abs(x))
             except TypeError as err:
                 print(err)
+            """)
+
+    @expectedFailure
+    def test_incorrect_abs_call(self):
+        self.assertCodeExecution("""
+            x = 1
+            print(x.abs())
             """)
 
 

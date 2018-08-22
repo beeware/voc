@@ -1165,12 +1165,19 @@ class GeneratorFunction(Function):
             )
 
     def visitor_teardown(self):
-        if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
-            self.add_opcodes(
-                # StopIteration is a singleton by design, see org/python/exceptions/StopIteration 
-                JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
-                JavaOpcodes.ATHROW(),
-            )
+        # implicit return for generator
+        # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
+        # if not isinstance(self.opcodes[-1], (JavaOpcodes.ATHROW, JavaOpcodes.ARETURN)):
+        # TODO: Uncomment the condition above once the issue described is resolved:
+        # TODO: Currently need to throw StopIteration at the end of generator even when ATHROW/ARETURN is the last
+        # TODO: instruction, to fix "'TRY' object has no attribute 'next_op'" error during transpilation
+        self.add_opcodes(
+            # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+            JavaOpcodes.GETSTATIC(
+                'org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'
+            ),
+            JavaOpcodes.ATHROW(),
+        )
 
     def transpile_method(self):
         return [
@@ -1379,12 +1386,19 @@ class GeneratorMethod(Method):
             )
 
     def visitor_teardown(self):
-        if len(self.opcodes) == 0 or not isinstance(self.opcodes[-1], JavaOpcodes.ATHROW):
-            self.add_opcodes(
-                # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
-                JavaOpcodes.GETSTATIC('org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'),
-                JavaOpcodes.ATHROW(),
-            )
+        # implicit return for generator
+        # PEP 380: return statement in generator is equivalent to raise StopIteration(value)
+        # if not isinstance(self.opcodes[-1], (JavaOpcodes.ATHROW, JavaOpcodes.ARETURN)):
+        # TODO: Uncomment the condition above once the issue described is resolved:
+        # TODO: Currently need to throw StopIteration at the end of generator even when ATHROW/ARETURN is the last
+        # TODO: instruction, to fix "'TRY' object has no attribute 'next_op'" error during transpilation
+        self.add_opcodes(
+            # StopIteration is a singleton by design, see org/python/exceptions/StopIteration
+            JavaOpcodes.GETSTATIC(
+                'org/python/exceptions/StopIteration', 'STOPITERATION', 'Lorg/python/exceptions/StopIteration;'
+            ),
+            JavaOpcodes.ATHROW(),
+        )
 
     def transpile_method(self):
         return [
@@ -1464,6 +1478,38 @@ class GeneratorMethod(Method):
             )
         ]
 
+    def store_name(self, name, declare=False):
+        if declare or name in self.local_vars:
+            self.add_opcodes(
+                # Store in a local variable
+                ASTORE_name(name),
+            )
+            self.add_opcodes(
+                # Also store in the locals variable
+                ALOAD_name('#locals'),
+                JavaOpcodes.LDC_W(name),
+                ALOAD_name(name),
+                java.Map.put(),
+            )
+        else:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
+            self.add_opcodes(
+                ASTORE_name('#value'),
+
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+
+                ALOAD_name('#value'),
+
+                python.Object.set_attr(name),
+                free_name('#value')
+            )
+
     def load_name(self, name):
         if name == '<generator>':  # `<generator>` is not included in #locals
             self.add_opcodes(
@@ -1471,6 +1517,24 @@ class GeneratorMethod(Method):
             )
         else:
             super().load_name(name)
+
+    def delete_name(self, name):
+        try:
+            self.add_opcodes(
+                free_name(name)
+            )
+        except NameError:
+            # Unlike other Functions, GeneratorFunctions do not cache the current Module
+            # locally, so it must be fetched on each use.
+            self.add_opcodes(
+                JavaOpcodes.GETSTATIC('python/sys', 'modules', 'Lorg/python/types/Dict;'),
+
+                python.Str(self.module.full_name),
+
+                python.Object.get_item(),
+                JavaOpcodes.CHECKCAST('org/python/types/Module'),
+                python.Object.del_attr(name),
+            )
 
 
 class GeneratorClosure(GeneratorFunction):

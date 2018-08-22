@@ -3,16 +3,6 @@ package org.python.types;
 public class Dict extends org.python.types.Object {
     public java.util.Map<org.python.Object, org.python.Object> value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     * <p>
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Dict
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Dict) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
     }
@@ -265,14 +255,9 @@ public class Dict extends org.python.types.Object {
             args = {"item", "value"}
     )
     public void __setitem__(org.python.Object item, org.python.Object value) {
-        try {
-            // While hashcode is not used, it is not a redundant line.
-            // We are determining if the item is hashable by seeing if an
-            // exception is thrown.
-            org.python.Object hashcode = item.__hash__();
-
+        if (item.isHashable()) {
             this.value.put(item, value);
-        } catch (org.python.exceptions.AttributeError ae) {
+        } else {
             throw new org.python.exceptions.TypeError(
                     String.format("unhashable type: '%s'", org.Python.typeName(item.getClass())));
         }

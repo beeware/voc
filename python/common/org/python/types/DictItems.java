@@ -1,20 +1,10 @@
 package org.python.types;
 
 public class DictItems extends org.python.types.Object {
-    java.util.Set<java.util.Map.Entry<org.python.Object, org.python.Object>> value;
+    protected java.util.Set<java.util.Map.Entry<org.python.Object, org.python.Object>> value;
 
     static {
         org.python.types.Type.declarePythonType(DictItems.class, "dict_items", null, null);
-    }
-
-    /**
-     * A utility method to update the internal value of this object.
-     * <p>
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.DictItems
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.DictItems) obj).value;
     }
 
     public java.lang.Object toJava() {
@@ -67,7 +57,7 @@ public class DictItems extends org.python.types.Object {
             __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
-        java.lang.StringBuilder buffer = new java.lang.StringBuilder("dict_items([");
+        java.lang.StringBuilder buffer = new java.lang.StringBuilder(this.typeName() + "([");
         boolean first = true;
         for (java.util.Map.Entry<org.python.Object, org.python.Object> entry : this.value) {
             if (first) {
@@ -89,6 +79,27 @@ public class DictItems extends org.python.types.Object {
     public boolean __delattr_null(java.lang.String name) {
         // Can't delete attributes of Builtin types
         return false;
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __pos__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: '" + this.typeName() + "'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __neg__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: '" + this.typeName() + "'");
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public org.python.Object __invert__() {
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
@@ -135,9 +146,9 @@ public class DictItems extends org.python.types.Object {
     )
     public org.python.Object __getitem__(org.python.Object index) {
         if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
-            throw new org.python.exceptions.TypeError("'dict_items' object does not support indexing");
+            throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object does not support indexing");
         } else {
-            throw new org.python.exceptions.TypeError("'dict_items' object is not subscriptable");
+            throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object is not subscriptable");
         }
     }
 
@@ -146,7 +157,7 @@ public class DictItems extends org.python.types.Object {
             args = {"index", "value"}
     )
     public void __setitem__(org.python.Object item, org.python.Object value) {
-        throw new org.python.exceptions.TypeError("'dict_items' object does not support item assignment");
+        throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object does not support item assignment");
     }
 
     @org.python.Method(
@@ -154,7 +165,7 @@ public class DictItems extends org.python.types.Object {
             args = {"index"}
     )
     public void __delitem__(org.python.Object item) {
-        throw new org.python.exceptions.TypeError("'dict_items' object doesn't support item deletion");
+        throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object doesn't support item deletion");
     }
 
     @org.python.Method(

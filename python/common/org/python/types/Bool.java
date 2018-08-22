@@ -19,22 +19,8 @@ public class Bool extends org.python.types.Object {
         return org.python.types.Bool.FALSE;
     }
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Bool
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Bool) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
-    }
-
-    public org.python.Object byValue() {
-        return org.python.types.Bool.getBool(this.value);
     }
 
     public int hashCode() {
@@ -57,8 +43,10 @@ public class Bool extends org.python.types.Object {
     public Bool(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
             this.value = false;
-        } else {
+        } else if (args.length == 1) {
             this.value = args[0].toBoolean();
+        } else {
+            throw new org.python.exceptions.TypeError("bool() takes at most 1 argument (" + args.length + " given)");
         }
     }
     // public org.python.Object __new__() {
@@ -166,7 +154,7 @@ public class Bool extends org.python.types.Object {
             __doc__ = "self != 0"
     )
     public org.python.types.Bool __bool__() {
-        return org.python.types.Bool.getBool(this.value);
+        return this;
     }
 
     public boolean __setattr_null(java.lang.String name, org.python.Object value) {
@@ -331,7 +319,7 @@ public class Bool extends org.python.types.Object {
                 }
             } else if (other_val > 1) {
                 if (org.Python.VERSION < 0x03060000) {
-                    return org.python.types.Bool.getBool(this.value);
+                    return this;
                 } else {
                     return org.python.types.Int.getInt(1);
                 }

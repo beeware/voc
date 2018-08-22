@@ -23,7 +23,7 @@ public class collections extends org.python.types.Module {
     }
 
     static {
-        // OrderedDict = org.python.types.Type.pythonType(org.python.stdlib.collections.OrderedDict.class);
+        OrderedDict = org.python.types.Type.pythonType(org.python.stdlib.collections.OrderedDict.class);
         // Counter = org.python.types.Type.pythonTypeorg.python.stdlib.collections.Counter.class);
         // ChainMap = org.python.types.Type.pythonTypeorg.python.stdlib.collections.ChainMap.class);
         // UserDict = org.python.types.Type.pythonTypeorg.python.stdlib.collections.UserDict.class);
@@ -33,8 +33,8 @@ public class collections extends org.python.types.Module {
         // deque = org.python.stdlib.collections.Deque.class;
     }
 
-    // @org.python.Attribute
-    // public static org.python.Object OrderedDict;
+    @org.python.Attribute
+    public static org.python.Object OrderedDict;
     // @org.python.Attribute
     // public static org.python.Object Counter;
     // @org.python.Attribute
