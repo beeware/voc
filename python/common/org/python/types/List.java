@@ -8,16 +8,6 @@ import java.util.Comparator;
 public class List extends org.python.types.Object {
     public java.util.List<org.python.Object> value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     * <p>
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.List
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.List) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
     }

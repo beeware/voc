@@ -3,16 +3,6 @@ package org.python.types;
 public class Dict extends org.python.types.Object {
     public java.util.Map<org.python.Object, org.python.Object> value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     * <p>
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Dict
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Dict) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
     }

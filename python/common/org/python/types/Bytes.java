@@ -7,16 +7,6 @@ import java.util.List;
 public class Bytes extends org.python.types.Object {
     public byte[] value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Bytes
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Bytes) obj).value;
-    }
-
     public int hashCode() {
         return this.value.hashCode();
     }
