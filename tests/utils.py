@@ -637,7 +637,7 @@ class TranspileTestCase(TestCase):
         if timed:
             print("  Elapsed time: ", (t1_stop-t1_start), " sec")
             print("  CPU process time: ", (t2_stop-t2_start), " sec")
-
+            
         return out
 
 
@@ -695,6 +695,7 @@ class NotImplementedToExpectedFailure:
 SAMPLE_DATA = {
     'obj': [
             'object',
+            'object()',
         ],
     'bool': [
             'True',
@@ -717,6 +718,8 @@ SAMPLE_DATA = {
             'type("a")',
             'type(object())',
             'type("MyClass", (object,), {})',
+            # This datatype is here and must be here in order to "clear" the state set by type("MyClass", (object,), {})
+            'type("object", (object,), {})'
         ],
     'complex': [
             '1j',
