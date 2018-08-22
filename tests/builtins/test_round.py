@@ -41,6 +41,7 @@ class BuiltinRoundTwoargFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTe
         'test_bool_int',
         'test_int_bool',
         'test_int_int',
+        'test_obj_class',
     ]
 
     not_implemented_versions = {

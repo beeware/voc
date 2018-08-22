@@ -182,4 +182,6 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_obj_dict',
         'test_obj_bytearray',
         'test_obj_bytes',
+
+        'test_class_obj',
     ]
