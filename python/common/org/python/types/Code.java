@@ -46,31 +46,6 @@ public class Code extends org.python.types.Object {
     @org.python.Attribute
     org.python.types.Tuple co_varnames;
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Class
-     */
-    void setValue(org.python.Object obj) {
-        org.python.types.Object object = (org.python.types.Object) obj;
-        this.co_argcount = (org.python.types.Int) object.__getattribute__("co_argcount");
-        this.co_cellvars = (org.python.types.Tuple) object.__getattribute__("co_cellvars");
-        this.co_code = (org.python.types.Bytes) object.__getattribute__("co_code");
-        this.co_consts = (org.python.types.Tuple) object.__getattribute__("co_consts");
-        this.co_filename = (org.python.types.Str) object.__getattribute__("co_filename");
-        this.co_firstlineno = (org.python.types.Int) object.__getattribute__("co_firstlineno");
-        this.co_flags = (org.python.types.Int) object.__getattribute__("co_flags");
-        this.co_freevars = (org.python.types.Tuple) object.__getattribute__("co_freevars");
-        this.co_kwonlyargcount = (org.python.types.Int) object.__getattribute__("co_kwonlyargcount");
-        this.co_lnotab = (org.python.types.Bytes) object.__getattribute__("co_lnotab");
-        this.co_name = (org.python.types.Str) object.__getattribute__("co_name");
-        this.co_names = (org.python.types.Tuple) object.__getattribute__("co_names");
-        this.co_nlocals = (org.python.types.Int) object.__getattribute__("co_nlocals");
-        this.co_stacksize = (org.python.types.Int) object.__getattribute__("co_stacksize");
-        this.co_varnames = (org.python.types.Tuple) object.__getattribute__("co_varnames");
-    }
-
     public Code(
             org.python.types.Int co_argcount,
             org.python.types.Tuple co_cellvars,
