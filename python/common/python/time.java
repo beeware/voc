@@ -137,7 +137,10 @@ public class time extends org.python.types.Module {
             // TODO: complete this when more clock types are implemented
             throw new org.python.exceptions.ValueError("unknown clock");
         } catch (java.lang.ClassCastException e) {
-            throw new org.python.exceptions.TypeError("get_clock_info() argument 1 must be str, not int");
+            if (org.Python.VERSION < 0x03050000) {
+                throw new org.python.exceptions.TypeError("must be str, not " + name.typeName());
+            }
+            throw new org.python.exceptions.TypeError("get_clock_info() argument 1 must be str, not " + name.typeName());
         }
 
     }
