@@ -43,8 +43,10 @@ public class Bool extends org.python.types.Object {
     public Bool(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
             this.value = false;
-        } else {
+        } else if (args.length == 1) {
             this.value = args[0].toBoolean();
+        } else {
+            throw new org.python.exceptions.TypeError("bool() takes at most 1 argument (" + args.length + " given)");
         }
     }
     // public org.python.Object __new__() {

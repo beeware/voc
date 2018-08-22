@@ -119,6 +119,27 @@ class FloatTests(TranspileTestCase):
                 print(e)
             """)
 
+    def test_none(self):
+        self.assertCodeExecution("""
+            try:
+                print(float(None))
+            except TypeError as err:
+                print(err)
+        """)
+
+    def test_no_arguments(self):
+        self.assertCodeExecution("""
+            print(float())
+        """)
+
+    def test_too_many_arguments(self):
+        self.assertCodeExecution("""
+            try:
+                print(float(1, 2))
+            except TypeError as err:
+                print(err)
+        """)
+
 
 class UnaryFloatOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'float'

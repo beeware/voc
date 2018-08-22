@@ -41,7 +41,7 @@ public class Set extends org.python.types.Object {
     public Set(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         if (args[0] == null) {
             this.value = new java.util.HashSet<org.python.Object>();
-        } else {
+        } else if (args.length == 1) {
             if (args[0] instanceof org.python.types.Set) {
                 this.value = new java.util.HashSet<org.python.Object>(
                         ((org.python.types.Set) args[0]).value
@@ -66,6 +66,8 @@ public class Set extends org.python.types.Object {
                 }
                 this.value = generated;
             }
+        } else {
+            throw new org.python.exceptions.TypeError("set expected at most 1 arguments, got " + args.length);
         }
     }
 

@@ -442,7 +442,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                             }
                             adjusted_args[a] = arg;
                         }
-                    } else {
+                    } else if (n_provided_args == n_args) {
                         for (a = 0; a < n_args; a++) {
                             adjusted_args[a] = args[a];
                         }
@@ -455,6 +455,9 @@ public class Type extends org.python.types.Object implements org.python.Callable
                             }
                             kwargs.put(arg_name, args[a]);
                         }
+                    } else {
+                        // More arguments than expected, call the constructor anyway to handle too many arguments
+                        adjusted_args = args;
                     }
                 } else {
                     adjusted_args = args;

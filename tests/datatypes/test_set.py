@@ -372,6 +372,14 @@ class SetTests(TranspileTestCase):
                 print(err)
             """)
 
+    def test_too_many_arguments(self):
+        self.assertCodeExecution("""
+            try:
+                print(set(1, 2))
+            except TypeError as err:
+                print(err)
+        """)
+
 
 class UnarySetOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'set'
