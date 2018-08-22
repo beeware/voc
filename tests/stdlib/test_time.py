@@ -180,11 +180,34 @@ class TimeModuleTests(NotImplementedToExpectedFailure, TranspileTestCase):
 
     #######################################################
     # get_clock_info
+    def test_get_clock_info_monotonic(self):
+        self.assertCodeExecution("""
+            import time
+
+            mono_info = time.get_clock_info('monotonic')
+            print(mono_info.adjustable)
+            # monotonic clock is implemented using System.nanoTime() in Java
+            # print(mono_info.implementation)
+            print(mono_info.monotonic)
+            # java implementation has much higher resolution due to
+            # JVM's high-resolution time source
+            # print(mono_info.resolution)
+
+            try:
+                time.get_clock_info(123)
+            except TypeError as e:
+                print(e)
+            """)
+
     @expectedFailure
     def test_get_clock_info(self):
         self.assertCodeExecution("""
             import time
-            print(time.get_clock_info())
+
+            print(time.get_clock_info('clock'))
+            print(time.get_clock_info('perf_counter'))
+            print(time.get_clock_info('process_time'))
+            print(time.get_clock_info('time'))
             """)
 
     #######################################################
@@ -216,11 +239,21 @@ class TimeModuleTests(NotImplementedToExpectedFailure, TranspileTestCase):
 
     #######################################################
     # monotonic
-    @expectedFailure
     def test_monotonic(self):
+        # test to make sure that time elapsed between two consecutive
+        # monotonic clockticks is within the range of
+        # [monotonic resolution - ε, monotonic resolution + ε], where ε = 0.001
         self.assertCodeExecution("""
             import time
-            print(time.monotonic())
+
+            now = time.monotonic()
+            prev = now
+            while now == prev:
+                now = time.monotonic()
+
+            diff = now-prev
+            delta = abs(diff- time.get_clock_info('monotonic').resolution)
+            print(delta < 0.001)
             """)
 
     #######################################################

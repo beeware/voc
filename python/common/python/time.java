@@ -122,10 +122,24 @@ public class time extends org.python.types.Module {
     public static org.python.types.Int daylight;
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "get_clock_info(name: str) -> dict\n" +
+                      "\n" +
+                      "Get information of the specified clock.",
+            args = {"name"}
     )
-    public static org.python.Object get_clock_info() {
-        throw new org.python.exceptions.NotImplementedError("time.get_clock_info() has not been implemented.");
+    public static org.python.Object get_clock_info(org.python.Object name) {
+        try {
+            if (((org.python.types.Str) name).value.equals("monotonic")) {
+                return new org.python.stdlib.time.Namespace(
+                    false, "java.lang.System.nanoTime()", true, compute_nanoTime_resolution()
+                );
+            }
+            // TODO: complete this when more clock types are implemented
+            throw new org.python.exceptions.ValueError("unknown clock");
+        } catch (java.lang.ClassCastException e) {
+            throw new org.python.exceptions.TypeError("get_clock_info() argument 1 must be str, not int");
+        }
+
     }
 
     @org.python.Method(
@@ -150,10 +164,44 @@ public class time extends org.python.types.Module {
     }
 
     @org.python.Method(
-            __doc__ = ""
+            __doc__ = "monotonic() -> float\n" +
+                      "\n" +
+                      "Monotonic clock, cannot go backward."
     )
     public static org.python.Object monotonic() {
-        throw new org.python.exceptions.NotImplementedError("time.monotonic() has not been implemented.");
+        return new org.python.types.Float(System.nanoTime() / 1000000000.0);
+    }
+
+    /**
+     * Computes resolution of nanoTime in worst case scenario
+     *
+     * According to https://docs.oracle.com/javase/7/docs/api/java/lang/System.html#nanoTime(),
+     * resolution of nanoTime is at least as good as that of currentTimeMillis()
+     *
+     * The algorithm to compute currentTimeMillis() resolution is adopted from
+     * https://www.javaworld.com/article/2077327/core-java/my-kingdom-for-a-good-timer.html
+     */
+    private static double compute_nanoTime_resolution() {
+        // JIT/hotspot warmup:
+        for (int r = 0; r < 3000; ++r) {
+            System.currentTimeMillis();
+        }
+
+        long time = System.currentTimeMillis();
+        long time_prev = time;
+        long total_delta = 0;
+        int iteration = 5;
+
+        for (int i = 0; i < iteration; ++i) {
+            // Busy wait until system time changes:
+            while (time == time_prev) {
+                time = System.currentTimeMillis();
+            }
+            total_delta += (time - time_prev);
+            time_prev = time;
+        }
+
+        return (total_delta / iteration) / 1000.0; // returns resolution in seconds
     }
 
     @org.python.Method(
