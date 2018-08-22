@@ -8,16 +8,6 @@ import java.util.Comparator;
 public class List extends org.python.types.Object {
     public java.util.List<org.python.Object> value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     * <p>
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.List
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.List) obj).value;
-    }
-
     public java.lang.Object toJava() {
         return this.value;
     }
@@ -55,7 +45,7 @@ public class List extends org.python.types.Object {
         super();
         if (args[0] == null) {
             this.value = new java.util.ArrayList<org.python.Object>();
-        } else {
+        } else if (args.length == 1) {
             if (args[0] instanceof org.python.types.List) {
                 this.value = new java.util.ArrayList<org.python.Object>(
                         ((org.python.types.List) args[0]).value
@@ -80,6 +70,8 @@ public class List extends org.python.types.Object {
                 }
                 this.value = generated;
             }
+        } else {
+            throw new org.python.exceptions.TypeError("list() takes at most 1 argument (" + args.length + " given)");
         }
     }
 

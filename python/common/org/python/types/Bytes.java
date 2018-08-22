@@ -7,16 +7,6 @@ import java.util.List;
 public class Bytes extends org.python.types.Object {
     public byte[] value;
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.Bytes
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.Bytes) obj).value;
-    }
-
     public int hashCode() {
         return this.value.hashCode();
     }
@@ -51,6 +41,10 @@ public class Bytes extends org.python.types.Object {
         org.python.Object source = args[0];
         org.python.Object encoding = args[1];
         org.python.Object errors = args[2];
+
+        if (args.length > 3) {
+            throw new org.python.exceptions.TypeError("bytes() takes at most 3 arguments (" + args.length + " given)");
+        }
 
         if (encoding != null && !(encoding instanceof org.python.types.Str)) {
             throw new org.python.exceptions.TypeError("bytes() argument 2 must be str, not " + encoding.typeName());

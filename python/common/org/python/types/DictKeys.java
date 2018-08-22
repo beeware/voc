@@ -5,16 +5,6 @@ public class DictKeys extends org.python.types.FrozenSet {
         org.python.types.Type.declarePythonType(DictKeys.class, "dict_keys", null, null);
     }
 
-    /**
-     * A utility method to update the internal value of this object.
-     *
-     * Used by __i*__ operations to do an in-place operation.
-     * obj must be of type org.python.types.FrozenSet
-     */
-    void setValue(org.python.Object obj) {
-        this.value = ((org.python.types.DictKeys) obj).value;
-    }
-
     @Override
     public org.python.Object __hash__() {
         throw new org.python.exceptions.AttributeError(this, "__hash__");
