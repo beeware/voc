@@ -218,3 +218,19 @@ class MethodTests(TranspileTestCase):
             values_tuple = (1, 2, 3, 4)
             print("values count =", obj.myfunc(*values_tuple))
             """, run_in_function=False)
+
+    @expectedFailure
+    def test_method_caching_not_visible_in_dict(self):
+        self.assertCodeExecution("""
+            class TestObj:
+                def myfunc(self):
+                    print(0)
+
+            obj = TestObj()
+            obj.myfunc()
+
+            try:
+                print(obj.__dict__)
+            except AttributeError as err:
+                print(err)
+        """, run_in_function=False)
