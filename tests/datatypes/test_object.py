@@ -222,11 +222,28 @@ class BinaryObjectOperationTests(BinaryOperationTestCase, TranspileTestCase):
     data_type = 'obj'
 
     not_implemented = [
-        'test_ne_class',
+        'test_xor_class',
+        'test_true_divide_class',
+        'test_subtract_class',
+        'test_subscr_class',
+        'test_lshift_class',
+        'test_rshift_class',
+        'test_power_class',
+        'test_or_class',
+        'test_multiply_class',
+        'test_modulo_class',
+        'test_lt_class',
+        'test_gt_class',
+        'test_ge_class',
+        'test_le_class',
+        'test_add_class',
+        'test_and_class',
+        'test_floor_divide_class'
     ]
 
     is_flakey = [
         'test_eq_class',
+        'test_ne_class',
     ]
 
 
@@ -240,4 +257,17 @@ class InplaceObjectOperationTests(InplaceOperationTestCase, TranspileTestCase):
         'test_multiply_list',
         'test_multiply_bytes',
         'test_multiply_bytearray',
+
+        'test_xor_class',
+        'test_true_divide_class',
+        'test_subtract_class',
+        'test_rshift_class',
+        'test_power_class',
+        'test_or_class',
+        'test_multiply_class',
+        'test_modulo_class',
+        'test_lshift_class',
+        'test_floor_divide_class',
+        'test_and_class',
+        'test_add_class',
     ]

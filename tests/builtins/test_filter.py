@@ -172,4 +172,14 @@ class BuiltinFilterFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCas
         'test_tuple_set',
         'test_tuple_str',
         'test_tuple_tuple',
+
+        'test_obj_tuple',
+        'test_obj_str',
+        'test_obj_set',
+        'test_obj_range',
+        'test_obj_list',
+        'test_obj_frozenset',
+        'test_obj_dict',
+        'test_obj_bytearray',
+        'test_obj_bytes',
     ]

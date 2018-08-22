@@ -32,3 +32,8 @@ class BuiltinDivmodFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
 
 class BuiltinTwoargDivmodFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
     functions = ["divmod"]
+
+    not_implemented = [
+        'test_obj_class',
+        'test_class_obj'
+    ]

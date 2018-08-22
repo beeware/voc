@@ -911,6 +911,9 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_modulo_class',
+    ]
+
+    is_flakey = [
         'test_modulo_obj'
     ]
 
@@ -920,5 +923,8 @@ class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
 
     not_implemented = [
         'test_modulo_class',
-        'test_modulo_obj',
+    ]
+
+    is_flakey = [
+        'test_modulo_obj'
     ]
