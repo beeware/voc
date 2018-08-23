@@ -1,3 +1,5 @@
+from unittest import expectedFailure
+
 from ..utils import TranspileTestCase
 
 
@@ -218,3 +220,20 @@ class MethodTests(TranspileTestCase):
             values_tuple = (1, 2, 3, 4)
             print("values count =", obj.myfunc(*values_tuple))
             """, run_in_function=False)
+
+    @expectedFailure
+    def test_method_caching_not_visible_in_dict(self):
+        # Method caching is a performance optimization that should not affect __dict__ inspection
+        self.assertCodeExecution("""
+            class TestObj:
+                def myfunc(self):
+                    print(0)
+
+            obj = TestObj()
+            obj.myfunc()
+
+            try:
+                print(obj.__dict__)
+            except AttributeError as err:
+                print(err)
+        """, run_in_function=False)

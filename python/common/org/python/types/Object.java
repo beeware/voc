@@ -328,7 +328,12 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
         // org.Python.debug(String.format("GETATTRIBUTE %s = ", name), value);
         // Post-process the value retrieved.
 
-        return value.__get__(this, this.__class__);
+        org.python.Object val = value.__get__(this, this.__class__);
+        if (val instanceof org.python.types.Method) {
+            // Methods can't change at runtime
+            this.__dict__.put(name, val);
+        }
+        return val;
     }
 
     @org.python.Method(

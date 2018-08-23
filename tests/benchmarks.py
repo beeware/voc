@@ -205,6 +205,28 @@ def test_dict_set(test_case):
             dict["hiss"] = 6
     """), timed=True)
 
+def test_method(test_case):
+    print("Running, test_method")
+    test_case.runAsJava(adjust("""
+        class MyClass:
+
+            def A(self):
+                print("A!")
+
+            def B(self):
+                print("B!")
+
+            def C(self):
+                print("C!")
+
+        obj = MyClass()
+
+        for i in range(1000000):
+            obj.A()
+            obj.B()
+            obj.C()
+    """), timed=True)
+
 def main():
     test_case = TranspileTestCase()
     test_case.setUpClass()
@@ -218,6 +240,7 @@ def main():
     test_cmp(test_case)
     test_dict_get(test_case)
     test_dict_set(test_case)
+    test_method(test_case)
 
 if __name__== "__main__":
   main()
