@@ -8,6 +8,8 @@ class SimpleNamespaceTests(TranspileTestCase):
 
             s = types.SimpleNamespace(a=1, b=2)
             print(s)
+            print(s.a)
+            print(s.b)
 
             try:
                 s = types.SimpleNamespace(1, b=2)
