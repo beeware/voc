@@ -18,7 +18,7 @@ public class types extends org.python.types.Module {
         // MemberDescriptorType = org.python.types.Type.pythonType(org.python.types.MemberDescriptor.class);
         MethodType = org.python.types.Type.pythonType(org.python.types.Method.class);
         ModuleType = org.python.types.Type.pythonType(org.python.types.Module.class);
-        // SimpleNamespace = org.python.types.Type.pythonType(org.python.types.SimpleNames.class);
+        SimpleNamespace = org.python.types.Type.pythonType(org.python.types.SimpleNamespace.class);
         // TracebackType = org.python.types.Type.pythonType(org.python.types.Traceback.class);
     }
 
@@ -58,8 +58,8 @@ public class types extends org.python.types.Module {
     @org.python.Attribute
     public static org.python.Object ModuleType;
 
-    // @org.python.Attribute
-    // public static org.python.Object SimpleNamespace;
+    @org.python.Attribute
+    public static org.python.Object SimpleNamespace;
 
     // @org.python.Attribute
     // public static org.python.Object TracebackType;
