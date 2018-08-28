@@ -1688,6 +1688,33 @@ public class Python {
     }
 
     @org.python.Method(
+            __doc__ = "tuple(iterable)" +
+                "tuple(iterable) -> tuple initialized from iterable's items\n" +
+                "If the argument is a tuple, the return value is the same object.\n",
+            args = {"iterable"}
+    )
+
+    public static org.python.Object tuple(org.python.Object iterable) {
+        java.util.List result = new java.util.ArrayList();
+        org.python.Object iterator = org.Python.iter(iterable);
+
+        if (iterable != null) {
+            while (true) {
+                org.python.Object next;
+                try {
+                    next = iterator.__next__();
+                } catch (org.python.exceptions.StopIteration si) {
+                    break;
+                }
+                result.add(next);
+            }
+            return new org.python.types.Tuple(result);
+        }
+
+        return new org.python.types.Tuple(result);
+    }
+
+    @org.python.Method(
             __doc__ = "type(object_or_name, bases, dict)" +
                     "type(object) -> the object's type\n" +
                     "type(name, bases, dict) -> a new type\n",
