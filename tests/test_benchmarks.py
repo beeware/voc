@@ -5,8 +5,8 @@ from .utils import adjust, TranspileTestCase
 
 TESTDIR = os.path.dirname(__file__)
 
-class BenchmarkTests(TranspileTestCase):
 
+class BenchmarkTests(TranspileTestCase):
     def test_binary_trees(self):
         with open(os.path.join(TESTDIR + "/benchmarks/", "binary-trees.py")) as javafile:
             out = self.runAsJava(adjust(javafile.read()), args=["5", "5"], timed=True)
