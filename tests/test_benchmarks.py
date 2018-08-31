@@ -1,6 +1,7 @@
 import os
 
-from .utils import *
+from .utils import adjust, TranspileTestCase
+
 
 TESTDIR = os.path.dirname(__file__)
 
@@ -21,7 +22,7 @@ class BenchmarkTests(TranspileTestCase):
     def test_unpack_sequence(self):
         with open(os.path.join(TESTDIR + "/benchmarks/", "unpack_sequence.py")) as javafile:
             out = self.runAsJava(adjust(javafile.read()), args=["10"])
-            
+
             self.assertIn("Time elapsed: ", out)
 
     def test_pystone(self):

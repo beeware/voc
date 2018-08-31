@@ -7,6 +7,7 @@
 
 import sys
 
+
 def make_tree(i, d):
 
     if d > 0:
@@ -58,7 +59,7 @@ def main(n, min_depth=4):
     for d in range(min_depth, stretch_depth, 2):
         i = 2 ** (mmd - d)
         cs = 0
-        for argchunk in get_argchunks(i,d):
+        for argchunk in get_argchunks(i, d):
             cs += sum(map(make_check, argchunk))
         print('%d\t trees of depth %d\t check: %d' % (i * 2, d, cs))
 

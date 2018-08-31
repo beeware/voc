@@ -9,6 +9,7 @@ kwargs, and do not use tuple unpacking.
 # Python imports
 import time
 
+
 def foo(a, b, c, d):
     # 20 calls
     bar(a, b, c)

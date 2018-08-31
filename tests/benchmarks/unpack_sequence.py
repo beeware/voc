@@ -435,6 +435,7 @@ def test_all(iterations):
 
     return [x + y for (x, y) in zip(tuple_data, list_data)]
 
+
 if __name__ == "__main__":
     import sys
     loops = int(sys.argv[1])
