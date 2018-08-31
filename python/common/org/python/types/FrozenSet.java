@@ -67,31 +67,10 @@ public class FrozenSet extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'frozenset'");
-    }
-
-    @org.python.Method(
             __doc__ = "Implement iter(self)."
     )
     public org.python.Object __iter__() {
         return new org.python.types.Set_Iterator(this);
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __pos__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'frozenset'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __neg__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'frozenset'");
     }
 
     @org.python.Method(
@@ -124,6 +103,17 @@ public class FrozenSet extends org.python.types.Object {
         return new org.python.types.Str(buffer.toString());
     }
 
+    @org.python.Method(
+            __doc__ = "",
+            args = {"index"}
+    )
+    public org.python.Object __getitem__(org.python.Object index) {
+        if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
+            throw new org.python.exceptions.TypeError("'frozenset' object does not support indexing");
+        } else {
+            throw new org.python.exceptions.TypeError("'frozenset' object is not subscriptable");
+        }
+    }
 
     @org.python.Method(
             __doc__ = "Return len(self)."

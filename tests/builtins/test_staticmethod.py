@@ -26,4 +26,5 @@ class BuiltinStaticmethodFunctionTests(BuiltinFunctionTestCase, TranspileTestCas
         'test_slice',
         'test_str',
         'test_tuple',
+        'test_obj',
     ]

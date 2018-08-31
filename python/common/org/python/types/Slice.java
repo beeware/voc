@@ -243,14 +243,6 @@ public class Slice extends org.python.types.Object {
 
     @org.python.Method(
             __doc__ = "",
-            args = {"index"}
-    )
-    public org.python.Object __getitem__(org.python.Object index) {
-        throw new org.python.exceptions.TypeError("'slice' object is not subscriptable");
-    }
-
-    @org.python.Method(
-            __doc__ = "",
             args = {"index", "value"}
     )
     public void __setitem__(org.python.Object index, org.python.Object value) {
@@ -287,28 +279,6 @@ public class Slice extends org.python.types.Object {
         } else {
             return super.__imul__(other);
         }
-    }
-
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __pos__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'slice'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __neg__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'slice'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'slice'");
     }
 
     @org.python.Method(

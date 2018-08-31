@@ -41,7 +41,7 @@ public class Float extends org.python.types.Object {
                 throw new org.python.exceptions.TypeError(
                       "float() argument must be a string or a number, not '" + args[0].typeName() + "'"
                 );
-          }
+            }
         } else {
             throw new org.python.exceptions.TypeError("float() takes at most 1 argument (" + args.length + " given)");
         }
@@ -440,6 +440,9 @@ public class Float extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __divmod__(org.python.Object other) {
+        if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
+        }
         try {
             java.util.List<org.python.Object> data = new java.util.ArrayList<org.python.Object>();
             data.add(this.__floordiv__(other));
@@ -653,13 +656,6 @@ public class Float extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'float'");
-    }
-
-    @org.python.Method(
             __doc__ = "F.is_integer() -> bool\n" +
                     "\n" +
                     "Return True if the float instance is finite with integral value, and False otherwise.\n"
@@ -723,14 +719,6 @@ public class Float extends org.python.types.Object {
             result = buffer.toString();
         }
         return new org.python.types.Str(result);
-    }
-
-    @org.python.Method(
-            __doc__ = "",
-            args = {"other"}
-    )
-    public org.python.Object __getitem__(org.python.Object other) {
-        throw new org.python.exceptions.TypeError("'float' object is not subscriptable");
     }
 
     @org.python.Method(

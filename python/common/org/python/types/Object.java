@@ -490,7 +490,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
-        throw new org.python.exceptions.AttributeError(this, "__getitem__");
+        throw new org.python.exceptions.TypeError("'" + this.typeName() + "' object is not subscriptable");
     }
 
     @org.python.Method(
@@ -570,7 +570,11 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
+        if (org.python.types.Object.isSequence(other)) {
+            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
+        }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: '" + this.typeName() + "' and '" + other.typeName() + "'");
+
     }
 
     @org.python.Method(
@@ -610,6 +614,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"other"}
     )
     public org.python.Object __divmod__(org.python.Object other) {
+        if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
+        }
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for divmod(): '" + this.typeName() + "' and '" + other.typeName() + "'");
     }
 
@@ -933,14 +940,14 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __neg__() {
-        throw new org.python.exceptions.AttributeError(this, "__neg__");
+        throw new org.python.exceptions.TypeError("bad operand type for unary -: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __pos__() {
-        throw new org.python.exceptions.AttributeError(this, "__pos__");
+        throw new org.python.exceptions.TypeError("bad operand type for unary +: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
@@ -954,7 +961,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             __doc__ = ""
     )
     public org.python.Object __invert__() {
-        throw new org.python.exceptions.AttributeError(this, "__invert__");
+        throw new org.python.exceptions.TypeError("bad operand type for unary ~: '" + this.typeName() + "'");
     }
 
     @org.python.Method(
@@ -998,7 +1005,7 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
             args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        throw new org.python.exceptions.AttributeError(this, "__round__");
+        throw new org.python.exceptions.TypeError("type " + this.typeName() + " doesn't define __round__ method");
     }
 
     /* This method is used from standard library container datatypes */ // FIXME provide more useful comment?
@@ -1384,13 +1391,9 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     }
 
     public static boolean isSequence(org.python.Object other) {
-        if (other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes ||
-                other instanceof org.python.types.List || other instanceof org.python.types.Str ||
-                other instanceof org.python.types.Tuple) {
-
-            return true;
-        }
-        return false;
+        return other instanceof org.python.types.ByteArray || other instanceof org.python.types.Bytes ||
+            other instanceof org.python.types.List || other instanceof org.python.types.Str ||
+            other instanceof org.python.types.Tuple;
     }
 
 }

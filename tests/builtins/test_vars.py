@@ -80,4 +80,5 @@ class BuiltinVarsFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
         'test_tuple',
         'test_range',
         'test_slice',
+        'test_obj',
     ]

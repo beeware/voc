@@ -165,6 +165,66 @@ public class Python {
         }
     }
 
+    // This function gets a method defined on the class by name and creates an org.python.types.Function wrapper for it
+    // If no method is found, returns null
+    public static org.python.types.Function getPythonFunction(java.lang.String name, java.lang.Class cls) {
+        for (java.lang.reflect.Method method : cls.getMethods()) {
+            org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
+            if (cls_annotation != null) {
+                java.lang.String nameToCheck;
+
+                if (cls_annotation.name().equals("")) {
+                    nameToCheck = method.getName();
+
+                } else {
+                    nameToCheck = cls_annotation.name();
+                }
+
+                if (name.equals(nameToCheck)) {
+                    return org.Python.createFunction(cls_annotation, method);
+                }
+            }
+        }
+        // Failed.
+        return null;
+    }
+
+    // This function performs the following initialization work:
+    //     1. Puts the __doc__ property on the given dictionary (a __dict__)
+    //     2. Puts the names of all Python methods defined on the class into the dictionary,
+    //        but does not create a function wrapper for the method, i.e. (method_name, null)
+    public static void loadModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
+        // Get the class annotation and add any properties.
+        org.python.Module mod_annotation = (org.python.Module) cls.getAnnotation(org.python.Module.class);
+        if (mod_annotation != null) {
+            java.lang.String __doc__ = mod_annotation.__doc__();
+            if (__doc__.equals("[undocumented]")) {
+                attrs.put("__doc__", org.python.types.NoneType.NONE);
+            } else {
+                attrs.put("__doc__", new org.python.types.Str(__doc__));
+            }
+        }
+
+        for (java.lang.reflect.Method method : cls.getMethods()) {
+            org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
+            if (cls_annotation != null) {
+                java.lang.String method_name;
+
+                // Check for any explicitly set names
+                if (cls_annotation.name().equals("")) {
+                    method_name = method.getName();
+                } else {
+                    method_name = cls_annotation.name();
+                }
+
+                attrs.put(method_name, null);
+            }
+        }
+    }
+
+    // This function performs the following initialization work:
+    //     1. Puts the __doc__ property on the given dictionary (a __dict__)
+    //     2. Puts all Python methods defined on the class into the dictionary i.e. (method_name, function)
     public static void initializeModule(java.lang.Class cls, java.util.Map<java.lang.String, org.python.Object> attrs) {
         // Get the class annotation and add any properties.
         org.python.Module mod_annotation = (org.python.Module) cls.getAnnotation(org.python.Module.class);
@@ -184,8 +244,6 @@ public class Python {
             org.python.Method cls_annotation = method.getAnnotation(org.python.Method.class);
             if (cls_annotation != null) {
                 java.lang.String method_name;
-                java.lang.String varargs_name;
-                java.lang.String kwargs_name;
 
                 // Check for any explicitly set names
                 if (cls_annotation.name().equals("")) {
@@ -194,31 +252,34 @@ public class Python {
                     method_name = cls_annotation.name();
                 }
 
-                if (cls_annotation.varargs().equals("")) {
-                    varargs_name = null;
-                } else {
-                    varargs_name = cls_annotation.varargs();
-                }
-
-                if (cls_annotation.kwargs().equals("")) {
-                    kwargs_name = null;
-                } else {
-                    kwargs_name = cls_annotation.kwargs();
-                }
-
-                attrs.put(
-                        method_name,
-                        new org.python.types.Function(
-                                method,
-                                cls_annotation.args(),
-                                cls_annotation.default_args(),
-                                varargs_name,
-                                cls_annotation.kwonlyargs(),
-                                kwargs_name
-                        )
-                );
+                attrs.put(method_name, org.Python.createFunction(cls_annotation, method));
             }
         }
+    }
+
+    private static org.python.types.Function createFunction(org.python.Method cls_annotation, java.lang.reflect.Method method) {
+        java.lang.String varargs_name;
+        java.lang.String kwargs_name;
+
+        if (cls_annotation.varargs().equals("")) {
+            varargs_name = null;
+        } else {
+            varargs_name = cls_annotation.varargs();
+        }
+
+        if (cls_annotation.kwargs().equals("")) {
+            kwargs_name = null;
+        } else {
+            kwargs_name = cls_annotation.kwargs();
+        }
+
+        return new org.python.types.Function(
+                method,
+                cls_annotation.args(),
+                cls_annotation.default_args(),
+                varargs_name,
+                cls_annotation.kwonlyargs(),
+                kwargs_name);
     }
 
     public static java.lang.String typeName(java.lang.Class cls) {

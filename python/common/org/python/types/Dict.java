@@ -145,27 +145,6 @@ public class Dict extends org.python.types.Object {
     @org.python.Method(
             __doc__ = ""
     )
-    public org.python.Object __pos__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'dict'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __neg__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'dict'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'dict'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
     public org.python.Object __bool__() {
         return org.python.types.Bool.getBool(!this.value.isEmpty());
     }
@@ -219,15 +198,6 @@ public class Dict extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
-        if (other instanceof org.python.types.List) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        } else if (other instanceof org.python.types.Tuple) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        } else if (other instanceof org.python.types.Str) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        } else if (other instanceof org.python.types.Bytes) {
-            throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
-        }
         return super.__mul__(other);
     }
 
