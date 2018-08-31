@@ -7,3 +7,6 @@ class ObjectTests(TranspileTestCase):
 
 class BuiltinObjectFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["object"]
+
+    not_implemented = [
+    ]

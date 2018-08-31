@@ -112,13 +112,7 @@ public class Range extends org.python.types.Object {
                 return org.python.types.Int.getInt(this.start + idx * this.step);
             }
         } catch (ClassCastException e) {
-            if (org.Python.VERSION < 0x03050000) {
-                throw new org.python.exceptions.TypeError("range indices must be integers");
-            } else {
-                throw new org.python.exceptions.TypeError(
-                        "range indices must be integers or slices, not " + index.typeName()
-                );
-            }
+            throw new org.python.exceptions.TypeError("range indices must be integers or slices, not " + index.typeName());
         }
     }
 
@@ -156,27 +150,6 @@ public class Range extends org.python.types.Object {
         return org.python.types.Bool.getBool(
                 ((org.python.types.Int) this.__len__()).value > 0
         );
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __invert__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'range'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __neg__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary -: 'range'");
-    }
-
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.Object __pos__() {
-        throw new org.python.exceptions.TypeError("bad operand type for unary +: 'range'");
     }
 
     @org.python.Method(
@@ -282,27 +255,6 @@ public class Range extends org.python.types.Object {
             org.python.Object result = org.python.types.Int.getInt(this.index);
             this.index += this.step;
             return result;
-        }
-
-        @org.python.Method(
-                __doc__ = ""
-        )
-        public org.python.Object __invert__() {
-            throw new org.python.exceptions.TypeError("bad operand type for unary ~: 'range'");
-        }
-
-        @org.python.Method(
-                __doc__ = ""
-        )
-        public org.python.Object __neg__() {
-            throw new org.python.exceptions.TypeError("bad operand type for unary -: 'range'");
-        }
-
-        @org.python.Method(
-                __doc__ = ""
-        )
-        public org.python.Object __pos__() {
-            throw new org.python.exceptions.TypeError("bad operand type for unary +: 'range'");
         }
     }
 }

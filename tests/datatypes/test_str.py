@@ -927,10 +927,18 @@ class BinaryStrOperationTests(BinaryOperationTestCase, TranspileTestCase):
         'test_modulo_class',
     ]
 
+    is_flakey = [
+        'test_modulo_obj'
+    ]
+
 
 class InplaceStrOperationTests(InplaceOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
     not_implemented = [
         'test_modulo_class',
+    ]
+
+    is_flakey = [
+        'test_modulo_obj'
     ]

@@ -8,19 +8,6 @@ class RoundTests(TranspileTestCase):
 class BuiltinRoundFunctionTests(BuiltinFunctionTestCase, TranspileTestCase):
     functions = ["round"]
 
-    not_implemented = [
-        'test_bytearray',
-        'test_bytes',
-        'test_class',
-        'test_complex',
-        'test_dict',
-        'test_frozenset',
-        'test_NotImplemented',
-        'test_range',
-        'test_set',
-        'test_slice',
-    ]
-
 
 class BuiltinRoundTwoargFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
     functions = ["round"]
@@ -42,20 +29,11 @@ class BuiltinRoundTwoargFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTe
         'slice',
         'str',
         'tuple',
+        'obj',
     ]
 
     not_implemented_types = [
-        'test_bytearray',
-        'test_bytes',
-        'test_class',
-        'test_complex',
-        'test_dict',
         'test_float',
-        'test_frozenset',
-        'test_NotImplemented',
-        'test_range',
-        'test_set',
-        'test_slice',
     ]
 
     not_implemented = [
@@ -63,6 +41,7 @@ class BuiltinRoundTwoargFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTe
         'test_bool_int',
         'test_int_bool',
         'test_int_int',
+        'test_obj_class',
     ]
 
     not_implemented_versions = {

@@ -135,13 +135,6 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
-    )
-    public org.python.types.Str __getitem__(org.python.Object format_str) {
-        throw new org.python.exceptions.TypeError("'int' object is not subscriptable");
-    }
-
-    @org.python.Method(
             __doc__ = "",
             args = {"index", "value"}
     )
@@ -442,6 +435,9 @@ public class Int extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __divmod__(org.python.Object other) {
+        if (other instanceof org.python.types.Complex) {
+            throw new org.python.exceptions.TypeError("can't take floor or mod of complex number.");
+        }
         try {
             java.util.List<org.python.Object> data = new java.util.ArrayList<org.python.Object>();
             data.add(this.__floordiv__(other));

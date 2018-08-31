@@ -32,3 +32,7 @@ class MapTests(TranspileTestCase):
 
 class BuiltinMapFunctionTests(BuiltinTwoargFunctionTestCase, TranspileTestCase):
     functions = ["map"]
+
+    not_implemented = [
+        'test_class_obj'
+    ]
