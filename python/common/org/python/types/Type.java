@@ -128,7 +128,7 @@ public class Type extends org.python.types.Object implements org.python.Callable
                     || java_class.getName().startsWith("org.python.stdlib")) {
                 // System.out.println("    BUILTIN");
                 python_type = new org.python.types.Type(Origin.BUILTIN, java_class);
-                org.Python.initializeModule(java_class, python_type.__dict__);
+                org.Python.loadModule(java_class, python_type.__dict__);
             } else {
                 // System.out.println("    PYTHON");
                 python_type = new org.python.types.Type(Origin.PYTHON, java_class);
@@ -312,6 +312,15 @@ public class Type extends org.python.types.Object implements org.python.Callable
         // System.out.println("GETATTRIBUTE CLASS " + this.klass.getName() + " " + name + " " + this.origin);
         // System.out.println("CLASS ATTRS " + this.__dict__);
         org.python.Object value = this.__dict__.get(name);
+
+        // It's an org.python.types Method that hasn't been initialized into __dict__ yet
+        if (value == null) {
+            value = org.Python.getPythonFunction(name, klass);
+            if (value != null) {
+                this.__dict__.put(name, value);
+            }
+        }
+
         if (value == null) {
             // We need to differentiate between "doesn't exist in the __dict__", and
             // exists, but has a value of null.
