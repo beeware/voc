@@ -1,4 +1,5 @@
 import os
+import sys
 from unittest import expectedFailure
 
 from ..utils import TranspileTestCase
@@ -18,10 +19,43 @@ class TimeModuleTests(TranspileTestCase):
     #######################################################
     # __doc__
     def test___doc__(self):
-        self.assertCodeExecution("""
+        if sys.hexversion > 0x03060400:
+            # Docstring was truncated in Python 3.6.4
+            substitutions = {
+                '': [
+                    "\n" +
+                    "Variables:\n" +
+                    "\n" +
+                    "timezone -- difference in seconds between UTC and local standard time\n" +
+                    "altzone -- difference in  seconds between UTC and local DST time\n" +
+                    "daylight -- whether local time should reflect DST\n" +
+                    "tzname -- tuple of (standard time zone name, DST time zone name)\n" +
+                    "\n" +
+                    "Functions:\n" +
+                    "\n" +
+                    "time() -- return current time in seconds since the Epoch as a float\n" +
+                    "clock() -- return CPU time since process start as a float\n" +
+                    "sleep() -- delay for a number of seconds given as a float\n" +
+                    "gmtime() -- convert seconds since Epoch to UTC tuple\n" +
+                    "localtime() -- convert seconds since Epoch to local time tuple\n" +
+                    "asctime() -- convert time tuple to string\n" +
+                    "ctime() -- convert time in seconds to string\n" +
+                    "mktime() -- convert local time tuple to seconds since Epoch\n" +
+                    "strftime() -- convert time tuple to string according to format specification\n" +
+                    "strptime() -- parse string to time tuple according to format specification\n" +
+                    "tzset() -- change the local timezone"
+                ]
+            }
+        else:
+            substitutions = None
+
+        self.assertCodeExecution(
+            """
             import time
             print(time.__doc__)
-            """)
+            """,
+            substitutions=substitutions
+        )
 
     #######################################################
     # __file__
