@@ -460,7 +460,10 @@ public class Float extends org.python.types.Object {
     )
     public org.python.Object __pow__(org.python.Object other, org.python.Object modulo) {
         if (modulo != null) {
-            throw new org.python.exceptions.NotImplementedError("float.__pow__() with modulo has not been implemented");
+            //throw new org.python.exceptions.NotImplementedError("float.__pow__() with modulo has not been implemented");
+            if (other instanceof org.python.types.Float) {
+                throw new org.python.exceptions.TypeError("pow() 3rd argument not allowed unless all arguments are integers");
+
         }
 
         if (other instanceof org.python.types.Int) {
