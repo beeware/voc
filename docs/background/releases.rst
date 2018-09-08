@@ -1,6 +1,14 @@
 Release History
 ===============
 
+0.1.6
+-----
+
+* Major speed improvements in generated code
+* Improvements to generator handling
+* Improvements to exception handling
+* Added support for `yield from`
+
 0.1.5
 -----
 
