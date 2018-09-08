@@ -25,7 +25,7 @@ others can benefit from the changes that have been made recently.
 
 3. Make release related changes
 
-  * **Release history** in ``docs/internals/releases.rst``
+  * **Release history** in ``docs/background/releases.rst``
   * **Build number** in ``build.xml``
   * **Version number** in ``voc/__init__.py``
 
