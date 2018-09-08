@@ -23,6 +23,7 @@ KNOWN_PROBLEM_MODULES = set([
     'aifc',
     'argparse',
     'asyncio',
+    'ast',
     'base64',
     'binhex',
     'bz2',
