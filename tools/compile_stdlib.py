@@ -11,7 +11,7 @@ import traceback
 
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-KNOWN_PROBLEM_MODULES = set([
+KNOWN_PROBLEM_MODULES = {
     '_collections_abc',
     '_markupbase',
     '_pyio',
@@ -110,7 +110,27 @@ KNOWN_PROBLEM_MODULES = set([
     'xml',
     'xmlrpc',
     'zipfile',
-])
+}
+
+# Add in modules that superficially compile with VOC, but fail to DEX on Android.
+KNOWN_PROBLEM_MODULES.update({
+    '__phello__.foo',
+    '_compat_pickle',
+    '_sre',
+    'asyncore',
+    'calendar',
+    'configparser',
+    'copyreg',
+    'csv',
+    'hmac',
+    'locale',
+    'nntplib',
+    'pipes',
+    'ssl',
+    'symtable',
+    'threading',
+})
+
 
 IGNORE_MODULES = set([
     '__builtins__',
