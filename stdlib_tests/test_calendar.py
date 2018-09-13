@@ -1,5 +1,5 @@
 import calendar
 
-print(calendar.isleap(2020))
-print(calendar.isleap(2018))
-print(calendar.isleap(2008))
+print(calendar.leapdays(2015,2018))
+print(calendar.leapdays(2017,2018))
+print(calendar.leapdays(2001,2012))
