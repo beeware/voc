@@ -203,7 +203,7 @@ def test_dict_set(test_case):
             dict["meow"] = 4
             dict["cockadoodledoo"] = 5
             dict["hiss"] = 6
-    """, timed=True)
+    """), timed=True)
 
 def test_class_init(test_case):
     print("Running" , "test_class_init")
