@@ -206,7 +206,7 @@ def test_dict_set(test_case):
     """), timed=True)
 
 def test_class_init(test_case):
-    print("Running" , "test_class_init")
+    print("Running", "test_class_init")
     test_case.runAsJava(adjust("""
         class A: pass
         class B: pass
@@ -245,7 +245,7 @@ def test_class_init(test_case):
     """), timed=True)
 
 def test_method(test_case):
-    print("Running, test_method")
+    print("Running", "test_method")
     test_case.runAsJava(adjust("""
         class MyClass:
 
