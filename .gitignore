@@ -18,5 +18,5 @@ tests/tmp*
 /stdlib_tests/*.class
 /stdlib_tests/python
 /python/*.class
-
+*.class
 .DS_Store

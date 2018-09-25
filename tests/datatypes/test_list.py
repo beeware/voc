@@ -9,6 +9,59 @@ from .. utils import (
 
 
 class ListTests(TranspileTestCase):
+    def test_large_number(self):
+        self.assertCodeExecution("""
+            x = [999999999, 42382, 34830, 4, 121290]
+            print(x)
+            """)
+
+    def test_different_types(self):
+        self.assertCodeExecution("""
+        x = ["respects numbers", 1121212]
+        """)
+
+    def test_different_types(self):
+        self.assertCodeExecution("""
+        x = ["respects numbers", 1121212]
+        """)
+
+    def test_concat_lists(self):
+        self.assertCodeExecution("""
+        x = ["a", "b", "c"]
+        y = ["d", "e", "f"]
+        print(x + y)
+        """)
+
+    def test_concat_with_different_types(self):
+        self.assertCodeExecution("""
+        x = ["a", 42, "c"]
+        y = ["d", "e", 8989, [222]]
+        print(x + y)
+        """)
+
+    def test_pop(self):
+        self.assertCodeExecution("""
+        x = [12, 13, 14, 15]
+        x.pop()
+        print(x)
+        """)
+
+    def test_reverse(self):
+        self.assertCodeExecution("""
+        x = [1, 3, 4, 76]
+        x.reverse()
+        print(x)
+        """)
+
+    def test_sort(self):
+        self.assertCodeExecution("""
+        x = [89, 133, 14222, 15]
+        x.sort()
+        print(x)
+        """)
+
+
+
     def test_setattr(self):
         self.assertCodeExecution("""
             x = [1, 2, 3]

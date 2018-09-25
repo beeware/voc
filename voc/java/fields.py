@@ -1,3 +1,4 @@
+# coding=utf-8
 from .attributes import Attribute
 from .constants import Utf8
 

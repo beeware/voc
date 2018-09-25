@@ -1,4 +1,4 @@
-from .. utils import TranspileTestCase, BuiltinFunctionTestCase
+from ../tests/utils import TranspileTestCase, BuiltinFunctionTestCase
 
 from unittest import expectedFailure
 

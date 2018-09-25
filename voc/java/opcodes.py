@@ -1,3 +1,4 @@
+# coding=utf-8
 from .constants import (
     Classref, Constant, Double, Fieldref, Float, Integer, InterfaceMethodref,
     Long, Methodref, String,
