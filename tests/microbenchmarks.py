@@ -203,7 +203,7 @@ def test_dict_set(test_case):
             dict["meow"] = 4
             dict["cockadoodledoo"] = 5
             dict["hiss"] = 6
-    """, timed=True)
+    """), timed=True)
 
 def test_class_init(test_case):
     print("Running" , "test_class_init")
@@ -244,7 +244,7 @@ def test_class_init(test_case):
         g = 3.0
     """), timed=True)
 
-def test_method(test_case):
+    def test_method(test_case):
     print("Running, test_method")
     test_case.runAsJava(adjust("""
         class MyClass:
@@ -284,3 +284,11 @@ def main():
 
 if __name__== "__main__":
   main()
+
+
+
+
+
+
+
+
