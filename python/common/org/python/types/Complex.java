@@ -315,6 +315,18 @@ public class Complex extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __mul__(org.python.Object other) {
+        return multiply(other, "*");
+    }
+
+    @org.python.Method(
+            __doc__ = "Return self*=value.",
+            args = {"other"}
+    )
+    public org.python.Object __imul__(org.python.Object other) {
+        return multiply(other, "*=");
+    }
+
+    private org.python.Object multiply(org.python.Object other, String operationName) throws org.python.exceptions.TypeError {
         if (other instanceof org.python.types.List || other instanceof org.python.types.Str || other instanceof org.python.types.Tuple || other instanceof org.python.types.Bytes || other instanceof org.python.types.ByteArray) {
             throw new org.python.exceptions.TypeError("can't multiply sequence by non-int of type '" + this.typeName() + "'");
         } else if (other instanceof org.python.types.Bool) {
@@ -344,7 +356,7 @@ public class Complex extends org.python.types.Object {
             org.python.types.Float imag = (org.python.types.Float) this.real.__mul__(other_obj.imag).__add__(this.imag.__mul__(other_obj.real));
             return new org.python.types.Complex(real, imag);
         }
-        throw new org.python.exceptions.TypeError("unsupported operand type(s) for *: 'complex' and '" + other.typeName() + "'");
+        throw new org.python.exceptions.TypeError("unsupported operand type(s) for " + operationName + ": 'complex' and '" + other.typeName() + "'");
     }
 
     @org.python.Method(
