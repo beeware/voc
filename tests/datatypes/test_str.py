@@ -926,7 +926,7 @@ class StrTests(TranspileTestCase):
             print(x)
             """)
 
-            
+
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
 
