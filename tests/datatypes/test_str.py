@@ -925,6 +925,7 @@ class StrTests(TranspileTestCase):
             x = "{},{}!".format("hello","world")
             print(x)
             """)
+            
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
