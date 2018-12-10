@@ -915,6 +915,16 @@ class StrTests(TranspileTestCase):
 
         """)
 
+    @expectedFailure
+    def test_format(self):
+        self.assertCodeExecution("""
+            x = "{1},{2}".format("hello","world")
+            print(x)
+            """)
+        self.assertCodeExecution("""
+            x = "{},{}!".format("hello","world")
+            print(x)
+            """)
 
 class UnaryStrOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'str'
