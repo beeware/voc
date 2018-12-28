@@ -19,7 +19,10 @@ public class Complex extends org.python.types.Object {
     }
 
     public int hashCode() {
-        return this.hashCode();
+        java.util.ArrayList<org.python.types.Float> pair = new java.util.ArrayList<org.python.types.Float>();
+        pair.add(real);
+        pair.add(imag);
+        return pair.hashCode();
     }
 
     public Complex(org.python.types.Float real_val, org.python.types.Float imag_val) {
