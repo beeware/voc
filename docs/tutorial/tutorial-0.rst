@@ -31,6 +31,7 @@ So that your directory structure looks like::
 
     tutorial
     ├── env
+    ├── ouroboros
     ├── tutorial0
     └── voc
 
