@@ -13,7 +13,7 @@ To check if you have Python installed, run ``python --version`` at the command l
 
 .. code-block:: bash
 
-    $ python --version
+    $ python3 --version
     Python 3.4.4
 
 If you do not have Python 3.4 or newer `install Python <https://www.python.org/downloads/>`_  and check again.
