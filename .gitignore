@@ -21,3 +21,4 @@ tests/tmp*
 
 .DS_Store
 .idea/
+.vscode
