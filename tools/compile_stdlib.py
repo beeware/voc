@@ -115,6 +115,7 @@ KNOWN_PROBLEM_MODULES = set([
 IGNORE_MODULES = set([
     '__builtins__',
     '__init__',
+    '__phello__.foo',
     'plat-aix4',
     'plat-darwin',
     'plat-freebsd4',
