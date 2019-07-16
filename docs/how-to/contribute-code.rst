@@ -8,14 +8,14 @@ worry - we're more than happy to fill in the gaps. At this point, we don’t kno
 what you don’t know!
 
 This tutorial is also going to focus on code contributions. If your interests
-and skills are in documentation, `we have a separate contributors guide
-<contribute-docs>`__ just for you.
+and skills are in documentation, :doc:`we have a separate contributors guide
+<contribute-docs>` just for you.
 
 Do the tutorial first!
 ----------------------
 
 Before you make your first contribution, take VOC for a spin. The
-instructions in the `getting started guide </tutorial/tutorial-0>`__ *should*
+instructions in the :doc:`getting started guide </tutorial/tutorial-0>` *should*
 be enough to get going. If you get stuck, that points to your first
 contribution - work out what instructions would have made you *not* get stuck,
 and contribute an update to the README.
@@ -23,8 +23,8 @@ and contribute an update to the README.
 Set up your development environment
 -----------------------------------
 
-Having run the tutorial, you need to `set up your environment for VOC
-development <development-env>`__. The VOC development environment is very
+Having run the tutorial, you need to :doc:`set up your environment for VOC
+development <development-env>`. The VOC development environment is very
 similar to the tutorial environment, but you'll be using your own fork of
 VOC's source code, rather than the official repository.
 
