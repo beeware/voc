@@ -3,7 +3,7 @@ Setting up your development environment
 
 The process of setting up a development environment is very similar to
 the :doc:`/background/install` process. The biggest difference is that
-instead of using the official PyBee repository, you'll be using your own
+instead of using the official BeeWare repository, you'll be using your own
 Github fork.
 
 As with the getting started guide, these instructions will assume that you

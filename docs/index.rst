@@ -86,12 +86,12 @@ VOC is part of the `BeeWare suite`_. You can talk to the community through:
 
  * `@pybeeware on Twitter`_
 
- * `pybee/general on Gitter`_
+ * `beeware/general on Gitter`_
 
-.. _BeeWare suite: http://pybee.org
+.. _BeeWare suite: https://beeware.org
 .. _Read The Docs: https://voc.readthedocs.io
 .. _@pybeeware on Twitter: https://twitter.com/pybeeware
-.. _pybee/general on Gitter: https://gitter.im/pybee/general
+.. _beeware/general on Gitter: https://gitter.im/beeware/general
 
 
 .. toctree::
