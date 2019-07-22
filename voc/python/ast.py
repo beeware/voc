@@ -2367,18 +2367,67 @@ class Visitor(ast.NodeVisitor):
             raise NotImplementedError("Unknown context %s" % node.ctx)
 
     def unpack_iterable(self, node):
+        starred_indexes = [i for i, v in enumerate(node.elts) if type(v) == ast.Starred]
+        if len(starred_indexes) > 1:
+            raise SyntaxError('two starred expressions in assignment')
+        elif len(starred_indexes) == 1:
+            starred_index = starred_indexes[0]
+        else:
+            starred_index = None
+
+        # initialize python list from iterable
         self.context.add_opcodes(
-            python.Object.iter()
+            ASTORE_name('#value'),
+            java.New('org/python/types/List'),
+            java.Array(1),
+            JavaOpcodes.DUP(),
+            ICONST_val(0),
+            ALOAD_name('#value'),
+            JavaOpcodes.AASTORE(),
+            JavaOpcodes.ACONST_NULL(),
+            java.Init('org/python/types/List', '[Lorg/python/Object;', 'Ljava/util/Map;'),
+            free_name('#value')
         )
-        for child in node.elts:
+
+        self.context.add_int(0)
+
+        # unpack values preceding starred expression
+        elts = node.elts if starred_index is None else node.elts[:starred_index]
+        for child in elts:
             self.context.add_opcodes(
-                JavaOpcodes.DUP(),
-                python.Iterable.next()
+                JavaOpcodes.DUP2(),
+                python.List.pop()
             )
             self.visit(child)
+
         self.context.add_opcodes(
             JavaOpcodes.POP(),
         )
+
+        if starred_index is not None:
+            self.context.add_opcodes(
+                JavaOpcodes.ACONST_NULL()
+            )
+
+            # unpack values following starred expression
+            for child in node.elts[:starred_index:-1]:
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP2(),
+                    python.List.pop()
+                )
+                self.visit(child)
+
+            self.context.add_opcodes(
+                JavaOpcodes.POP()
+            )
+
+            # assign remaining list to starred expression
+            self.visit(node.elts[starred_index].value)
+        else:
+            # pop list off of the stack
+            self.context.add_opcodes(
+                JavaOpcodes.POP(),
+            )
 
     @node_visitor
     def visit_List(self, node):

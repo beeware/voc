@@ -73,6 +73,27 @@ class AssignmentTests(TranspileTestCase):
             print(z)
         """)
 
+    def test_list_assignment_starred_0(self):
+        self.assertCodeExecution("""
+            [*x, y, z] = range(2)
+            print(x)
+            print(y)
+            print(z)
+        """)
+
+    def test_list_assignment_starred_1(self):
+        self.assertCodeExecution("""
+            [*x, y] = range(2)
+            print(x)
+            print(y)
+        """)
+
+    def test_list_assignment_starred_2(self):
+        self.assertCodeExecution("""
+            [*x] = range(2)
+            print(x)
+        """)
+
     @expectedFailure
     def test_bad_list_assignment(self):
         self.assertCodeExecution("""
@@ -111,6 +132,27 @@ class AssignmentTests(TranspileTestCase):
             print(z)
             """)
 
+    def test_tuple_assignment_starred_0(self):
+        self.assertCodeExecution("""
+            (*x, y, z) = range(2)
+            print(x)
+            print(y)
+            print(z)
+            """)
+
+    def test_tuple_assignment_starred_1(self):
+        self.assertCodeExecution("""
+            (*x, y) = range(2)
+            print(x)
+            print(y)
+            """)
+
+    def test_tuple_assignment_starred_2(self):
+        self.assertCodeExecution("""
+            (*x,) = range(2)
+            print(x)
+            """)
+
     @expectedFailure
     def test_bad_tuple_assignment(self):
         self.assertCodeExecution("""
@@ -147,6 +189,27 @@ class AssignmentTests(TranspileTestCase):
             print(x)
             print(y)
             print(z)
+            """)
+
+    def test_implied_tuple_assignment_starred_0(self):
+        self.assertCodeExecution("""
+            *x, y, z = range(2)
+            print(x)
+            print(y)
+            print(z)
+            """)
+
+    def test_implied_tuple_assignment_starred_1(self):
+        self.assertCodeExecution("""
+            *x, y = range(2)
+            print(x)
+            print(y)
+            """)
+
+    def test_implied_tuple_assignment_starred_2(self):
+        self.assertCodeExecution("""
+            *x, = range(2)
+            print(x)
             """)
 
     @expectedFailure
