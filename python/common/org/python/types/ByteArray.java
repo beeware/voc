@@ -77,7 +77,12 @@ public class ByteArray extends org.python.types.Object {
                 while (true) {
                     org.python.Object item = iter.__next__();
                     if (!(item instanceof org.python.types.Int || item instanceof org.python.types.Bool)) {
-                        throw new org.python.exceptions.TypeError("an integer is required");
+                        if (org.Python.VERSION < 0x03060800 || (org.Python.VERSION >= 0x03070000 && org.Python.VERSION < 0x03070200)) {
+                            throw new org.python.exceptions.TypeError("an integer is required");
+                        } else {
+                            throw new org.python.exceptions.TypeError("'" + item.typeName() +
+                                "' object cannot be interpreted as an integer");
+                        }
                     }
                     long b = ((org.python.types.Int) item.__int__()).value;
                     if (b < 0 || b > 255) {
