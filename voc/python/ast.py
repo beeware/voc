@@ -2389,6 +2389,19 @@ class Visitor(ast.NodeVisitor):
             free_name('#value')
         )
 
+        # check list for valid number of values to unpack
+        self.context.add_opcodes(
+            JavaOpcodes.DUP(),
+            ICONST_val(len(node.elts)),
+            ICONST_val(len(starred_indexes)),
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'checkUnpackValues',
+                args=['Lorg/python/types/List;', 'I', 'I'],
+                returns='V'
+            )
+        )
+
         self.context.add_int(0)
 
         # unpack values preceding starred expression
