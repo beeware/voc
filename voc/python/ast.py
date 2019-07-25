@@ -2366,6 +2366,20 @@ class Visitor(ast.NodeVisitor):
         else:
             raise NotImplementedError("Unknown context %s" % node.ctx)
 
+    def unpack_iterable(self, node):
+        self.context.add_opcodes(
+            python.Object.iter()
+        )
+        for child in node.elts:
+            self.context.add_opcodes(
+                JavaOpcodes.DUP(),
+                python.Iterable.next()
+            )
+            self.visit(child)
+        self.context.add_opcodes(
+            JavaOpcodes.POP(),
+        )
+
     @node_visitor
     def visit_List(self, node):
         if isinstance(node.ctx, ast.Load):
@@ -2385,18 +2399,7 @@ class Visitor(ast.NodeVisitor):
                 )
 
         elif isinstance(node.ctx, ast.Store):
-            self.context.add_opcodes(
-                python.Object.iter()
-            )
-            for child in node.elts:
-                self.context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    python.Iterable.next()
-                )
-                self.visit(child)
-            self.context.add_opcodes(
-                JavaOpcodes.POP()
-            )
+            self.unpack_iterable(node)
 
     @node_visitor
     def visit_Tuple(self, node):
@@ -2423,18 +2426,7 @@ class Visitor(ast.NodeVisitor):
             )
 
         elif isinstance(node.ctx, ast.Store):
-            self.context.add_opcodes(
-                python.Object.iter()
-            )
-            for child in node.elts:
-                self.context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    python.Iterable.next()
-                )
-                self.visit(child)
-            self.context.add_opcodes(
-                JavaOpcodes.POP(),
-            )
+            self.unpack_iterable(node)
 
     @node_visitor
     def visit_Slice(self, node):
