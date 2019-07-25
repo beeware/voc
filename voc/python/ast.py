@@ -2407,11 +2407,28 @@ class Visitor(ast.NodeVisitor):
         # unpack values preceding starred expression
         elts = node.elts if starred_index is None else node.elts[:starred_index]
         for child in elts:
-            self.context.add_opcodes(
-                JavaOpcodes.DUP2(),
-                python.List.pop()
-            )
-            self.visit(child)
+            # save/restore the stack when visiting an iterable child
+            if type(child) in (ast.Tuple, ast.List) or \
+                    (type(child) == ast.Starred and type(child.value) in (ast.Tuple, ast.List)):
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP2(),
+                    ASTORE_name('#unpack-index-%x' % id(node)),
+                    ASTORE_name('#unpack-list-%x' % id(node)),
+                    python.List.pop()
+                )
+                self.visit(child)
+                self.context.add_opcodes(
+                    ALOAD_name('#unpack-list-%x' % id(node)),
+                    free_name('#unpack-list-%x' % id(node)),
+                    ALOAD_name('#unpack-index-%x' % id(node)),
+                    free_name('#unpack-index-%x' % id(node)),
+                )
+            else:
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP2(),
+                    python.List.pop()
+                )
+                self.visit(child)
 
         self.context.add_opcodes(
             JavaOpcodes.POP(),
@@ -2424,11 +2441,27 @@ class Visitor(ast.NodeVisitor):
 
             # unpack values following starred expression
             for child in node.elts[:starred_index:-1]:
-                self.context.add_opcodes(
-                    JavaOpcodes.DUP2(),
-                    python.List.pop()
-                )
-                self.visit(child)
+                # save/restore the stack when visiting an iterable child
+                if type(child) in (ast.Tuple, ast.List) or \
+                        (type(child) == ast.Starred and type(child.value) in (ast.Tuple, ast.List)):
+                    self.context.add_opcodes(
+                        JavaOpcodes.SWAP(),
+                        JavaOpcodes.DUP_X1(),
+                        ASTORE_name('#unpack-list-%x' % id(node)),
+                        python.List.pop()
+                    )
+                    self.visit(child)
+                    self.context.add_opcodes(
+                        ALOAD_name('#unpack-list-%x' % id(node)),
+                        free_name('#unpack-list-%x' % id(node)),
+                        JavaOpcodes.ACONST_NULL()
+                    )
+                else:
+                    self.context.add_opcodes(
+                        JavaOpcodes.DUP2(),
+                        python.List.pop()
+                    )
+                    self.visit(child)
 
             self.context.add_opcodes(
                 JavaOpcodes.POP()

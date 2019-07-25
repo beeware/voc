@@ -73,6 +73,14 @@ class AssignmentTests(TranspileTestCase):
             print(z)
         """)
 
+    def test_list_assignment_nested(self):
+        self.assertCodeExecution("""
+            [x, [y, z]] = 1, (2, 3)
+            print(x)
+            print(y)
+            print(z)
+        """)
+
     def test_list_assignment_starred_0(self):
         self.assertCodeExecution("""
             [*x, y, z] = range(2)
@@ -137,6 +145,14 @@ class AssignmentTests(TranspileTestCase):
             print(z)
             """)
 
+    def test_tuple_assignment_nested(self):
+        self.assertCodeExecution("""
+            (x, (y, z)) = 1, (2, 3)
+            print(x)
+            print(y)
+            print(z)
+        """)
+
     def test_tuple_assignment_starred_0(self):
         self.assertCodeExecution("""
             (*x, y, z) = range(2)
@@ -200,6 +216,14 @@ class AssignmentTests(TranspileTestCase):
             print(y)
             print(z)
             """)
+
+    def test_implied_tuple_assignment_nested(self):
+        self.assertCodeExecution("""
+            x, (y, z) = 1, (2, 3)
+            print(x)
+            print(y)
+            print(z)
+        """)
 
     def test_implied_tuple_assignment_starred_0(self):
         self.assertCodeExecution("""
