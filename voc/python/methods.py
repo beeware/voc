@@ -760,12 +760,13 @@ class Method(Function):
             return_descriptor
         )
 
-    def transpile_wrapper(self):
+    def transpile_wrapper(self, local_vars=None):
         # The first register holds "self"; since the binding is only
         # invoked via a native call, wrap it in a Java Object - unless
         # the object is an extension type, in which case the wrapper
         # object should already exist.
-        binding = Accumulator(self.local_vars)
+        binding = Accumulator(local_vars if local_vars is not None
+                              else self.local_vars)
 
         binding.add_opcodes(
             # DEBUG("BINDING FOR " + self.name + self.signature),
@@ -1443,14 +1444,15 @@ class GeneratorMethod(Method):
             java.Map(),
         )
 
-        for i, param in enumerate(self.parameters):
+        for i, param in enumerate(self.parameters, 0 if self.static else 1):
             wrapper.add_opcodes(
                 JavaOpcodes.DUP(),
                 JavaOpcodes.LDC_W(param['name']),
 
-                JavaOpcodes.ALOAD(i + (0 if self.static else 1)),
+                JavaOpcodes.ALOAD(i),
                 java.Map.put(),
             )
+            wrapper.local_vars[param['name']] = i
 
         # Construct and return the generator object.
         wrapper.add_opcodes(
@@ -1463,7 +1465,7 @@ class GeneratorMethod(Method):
             JavaOpcodes.ARETURN(),
         )
 
-        return super().transpile_wrapper() + [
+        return super().transpile_wrapper(wrapper.local_vars) + [
             JavaMethod(
                 self.pyimpl_name,
                 self.signature,
