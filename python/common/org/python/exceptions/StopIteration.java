@@ -6,7 +6,7 @@ public class StopIteration extends org.python.exceptions.Exception {
 
     /**
      * StopIteration is a singleton instance for performance reasons, introduced in
-     * PR #881 (https://github.com/pybee/voc/pull/881/). This results in a non-trivial
+     * PR #881 (https://github.com/beeware/voc/pull/881/). This results in a non-trivial
      * performance improvement for nested loops. However, this also means that the equality
      * comparison between StopIteration instances will always be true.
      */

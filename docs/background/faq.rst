@@ -125,5 +125,5 @@ You can see `here an example TicTacToe app that does that <https://github.com/el
 
 
 .. _Vereenigde Oostindische Compagnie (VOC): https://en.wikipedia.org/wiki/Dutch_East_India_Company
-.. _toga: https://github.com/pybee/toga
-.. _toga-android: https://github.com/pybee/toga-android
+.. _toga: https://github.com/beeware/toga
+.. _toga-android: https://github.com/beeware/toga-android

@@ -15,13 +15,13 @@ VOC
     :target: https://pypi.python.org/pypi/voc
 
 .. image:: https://img.shields.io/pypi/l/voc.svg
-    :target: https://github.com/pybee/voc/blob/master/LICENSE
+    :target: https://github.com/beeware/voc/blob/master/LICENSE
 
 .. image:: https://beekeeper.herokuapp.com/projects/pybee/voc/shield
     :target: https://beekeeper.herokuapp.com/projects/pybee/voc
 
-.. image:: https://badges.gitter.im/pybee/general.svg
-    :target: https://gitter.im/pybee/general
+.. image:: https://badges.gitter.im/beeware/general.svg
+    :target: https://gitter.im/beeware/general
 
 A transpiler that converts Python code into Java bytecode.
 
@@ -85,7 +85,7 @@ VOC is part of the `BeeWare suite`_. You can talk to the community through:
 
 * `@pybeeware on Twitter`_
 
-* The `pybee/general`_ channel on Gitter.
+* The `beeware/general`_ channel on Gitter.
 
 We foster a welcoming and respectful community as described in our
 `BeeWare Community Code of Conduct`_.
@@ -98,12 +98,12 @@ To get started with contributing to VOC, head over to our `First Timers Guide`_.
 If you experience problems with VOC, `log them on GitHub`_. If you
 want to contribute code, please `fork the code`_ and `submit a pull request`_.
 
-.. _BeeWare suite: http://pybee.org
+.. _BeeWare suite: https://beeware.org
 .. _Read The Docs: https://voc.readthedocs.io
 .. _@pybeeware on Twitter: https://twitter.com/pybeeware
-.. _pybee/general: https://gitter.im/pybee/general
+.. _beeware/general: https://gitter.im/beeware/general
 .. _BeeWare Community Code of Conduct: https://beeware.org/community/behavior/
 .. _First Timers Guide: https://beeware.org/contributing/how/first-time/what/voc/
-.. _log them on Github: https://github.com/pybee/voc/issues
-.. _fork the code: https://github.com/pybee/voc
-.. _submit a pull request: https://github.com/pybee/voc/pulls
+.. _log them on Github: https://github.com/beeware/voc/issues
+.. _fork the code: https://github.com/beeware/voc
+.. _submit a pull request: https://github.com/beeware/voc/pulls

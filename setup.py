@@ -22,7 +22,7 @@ setup(
     long_description=long_description,
     author='Russell Keith-Magee',
     author_email='russell@keith-magee.com',
-    url='http://pybee.org/voc',
+    url='https://beeware.org/voc',
     packages=find_packages(exclude=['docs', 'tests']),
     python_requires='>=3.4',
     entry_points={
@@ -44,10 +44,10 @@ setup(
         'Topic :: Utilities',
     ],
     test_suite='tests',
-    package_urls={
-        'Funding': 'https://pybee.org/contributing/membership/',
+    project_urls={
+        'Funding': 'https://beeware.org/contributing/membership/',
         'Documentation': 'https://voc.readthedocs.io/en/latest/',
-        'Tracker': 'https://github.com/pybee/voc/issues',
-        'Source': 'https://github.com/pybee/voc',
+        'Tracker': 'https://github.com/beeware/voc/issues',
+        'Source': 'https://github.com/beeware/voc',
     },
 )

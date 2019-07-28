@@ -33,7 +33,7 @@ others can benefit from the changes that have been made recently.
 
 5. When CI passes, merge.
 
-6. Update your checkout of the main ``pybee/voc`` repository
+6. Update your checkout of the main ``beeware/voc`` repository
 
 7. Tag the release. There is a version tag for VOC, plus tags for each
    of the support libraries that will be released::

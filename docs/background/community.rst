@@ -9,7 +9,7 @@ VOC is part of the `BeeWare suite`_. You can talk to the community through:
 
 * `@pybeeware on Twitter`_
 
-* `Our Gitter channel`_ for discussion about development and general help around this project or anything under the Beeware suite of projects. 
+* `Our Gitter channel`_ for discussion about development and general help around this project or anything under the BeeWare suite of projects.
 
 Code of Conduct
 ---------------
@@ -24,14 +24,14 @@ Contributing
 If you experience problems with VOC, `log them on GitHub`_. If you
 want to contribute code, please `fork the code`_ and `submit a pull request`_.
 
-.. _BeeWare suite: http://pybee.org
+.. _BeeWare suite: https://beeware.org
 .. _Read The Docs: https://voc.readthedocs.io
 .. _@pybeeware on Twitter: https://twitter.com/pybeeware
-.. _Our Gitter channel: https://gitter.im/pybee/general
-.. _log them on Github: https://github.com/pybee/voc/issues
-.. _fork the code: https://github.com/pybee/voc
-.. _submit a pull request: https://github.com/pybee/voc/pulls
+.. _Our Gitter channel: https://gitter.im/beeware/general
+.. _log them on Github: https://github.com/beeware/voc/issues
+.. _fork the code: https://github.com/beeware/voc
+.. _submit a pull request: https://github.com/beeware/voc/pulls
 
-.. _Code of Conduct: https://pybee.org/community/behavior/code-of-conduct/
+.. _Code of Conduct: https://beeware.org/community/behavior/code-of-conduct/
 .. _Russell Keith-Magee: mailto:russell@keith-magee.com
-.. _First Timers Guide: http://pybee.org/contributing/how/first-time/what/voc/
+.. _First Timers Guide: https://voc.readthedocs.io/en/latest/how-to/contribute-code.html

@@ -45,7 +45,7 @@ The first step is to create a project directory, and clone VOC:
 
     $ mkdir tutorial
     $ cd tutorial
-    $ git clone https://github.com/pybee/voc.git
+    $ git clone https://github.com/beeware/voc.git
 
 Then create a virtual environment and install VOC into it:
 

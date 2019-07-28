@@ -191,7 +191,7 @@ def update_repo():
     try:
         if repo_folder is None:
             print('Cloning Ouroboros...')
-            git_cmd = ['git', 'clone', 'https://github.com/pybee/ouroboros.git']
+            git_cmd = ['git', 'clone', 'https://github.com/beeware/ouroboros.git']
             subprocess.Popen(
                 git_cmd,
                 cwd=os.path.dirname(REPO_ROOT)
