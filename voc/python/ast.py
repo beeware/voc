@@ -2260,7 +2260,7 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
             java.New('org/python/types/Bytes'),
 
-            JavaOpcodes.BIPUSH(len(node.s)),
+            ICONST_val(len(node.s)),
             JavaOpcodes.NEWARRAY(JavaOpcodes.NEWARRAY.T_BYTE),
         )
 
@@ -2268,7 +2268,8 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 JavaOpcodes.DUP(),
                 ICONST_val(i),
-                JavaOpcodes.BIPUSH(node.s[i]),
+                # 'bytes' values are unsigned, but BIPUSH needs signed values
+                JavaOpcodes.BIPUSH(b if b <= 127 else b - 256),
                 JavaOpcodes.BASTORE(),
             )
 

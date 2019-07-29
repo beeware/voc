@@ -601,6 +601,14 @@ class BytesTests(TranspileTestCase):
                 print(err)
         """)
 
+    def test_long_literal(self):
+        self.assertCodeExecution("""
+            b = b'''00000000001111111111222222222233333333334444444444
+            55555555556666666666777777777888888888899999999990000000000
+            11111111112222222222'''
+            print(b)
+        """)
+
 
 class UnaryBytesOperationTests(UnaryOperationTestCase, TranspileTestCase):
     data_type = 'bytes'

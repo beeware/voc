@@ -399,6 +399,8 @@ def ICONST_val(value):
             return JavaOpcodes.ICONST_5()
         elif value == -1:
             return JavaOpcodes.ICONST_M1()
+        elif -128 <= value <= 127:
+            return JavaOpcodes.BIPUSH(value)
         elif -32768 <= value <= 32767:
             return JavaOpcodes.SIPUSH(value)
         elif -2147483648 <= value <= 2147483647:

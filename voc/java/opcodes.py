@@ -463,11 +463,11 @@ class BIPUSH(Opcode):
 
     @classmethod
     def read_extra(cls, reader, dump=None):
-        const = reader.read_u1()
+        const = reader.read_s1()
         return cls(const)
 
     def write_extra(self, writer):
-        writer.write_u1(self.const)
+        writer.write_s1(self.const)
 
     @property
     def produce_count(self):
