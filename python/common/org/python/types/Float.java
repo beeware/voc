@@ -44,8 +44,10 @@ public class Float extends org.python.types.Object {
                       "float() argument must be a string or a number, not '" + args[0].typeName() + "'"
                 );
             }
-        } else {
+        } else if (org.Python.VERSION < 0x03070000) {
             throw new org.python.exceptions.TypeError("float() takes at most 1 argument (" + args.length + " given)");
+        } else {
+            throw new org.python.exceptions.TypeError("float expected at most 1 arguments, got " + args.length);
         }
     }
 

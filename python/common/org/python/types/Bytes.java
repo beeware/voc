@@ -804,11 +804,13 @@ public class Bytes extends org.python.types.Object {
         } else if (sub instanceof org.python.types.Bytes) {
             sub_array = ((org.python.types.Bytes) sub).value;
         } else {
-            String error_message = "a bytes-like object is required, not '" + sub.typeName() + "'\n";
             if (org.Python.VERSION < 0x03050000) {
-                error_message = "'" + sub.typeName() + "' does not support the buffer interface\n";
+                throw new org.python.exceptions.TypeError("'" + sub.typeName() + "' does not support the buffer interface");
+            } else if (org.Python.VERSION < 0x03070000) {
+                throw new org.python.exceptions.TypeError("a bytes-like object is required, not '" + sub.typeName() + "'");
+            } else {
+                throw new org.python.exceptions.TypeError("argument should be integer or bytes-like object, not '" + sub.typeName() + "'");
             }
-            throw new org.python.exceptions.TypeError(error_message);
         }
         //If the sub string is longer than the value string a match cannot exist
         if (sub_array.length > this.value.length) {

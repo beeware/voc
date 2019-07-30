@@ -45,8 +45,10 @@ public class Bool extends org.python.types.Object {
             this.value = false;
         } else if (args.length == 1) {
             this.value = args[0].toBoolean();
-        } else {
+        } else if (org.Python.VERSION < 0x03070000) {
             throw new org.python.exceptions.TypeError("bool() takes at most 1 argument (" + args.length + " given)");
+        } else {
+            throw new org.python.exceptions.TypeError("bool expected at most 1 arguments, got " + args.length);
         }
     }
     // public org.python.Object __new__() {

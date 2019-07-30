@@ -702,7 +702,11 @@ public class Python {
     )
     public static org.python.Object enumerate(org.python.Object items, org.python.Object start) {
         if (items == null) {
-            throw new org.python.exceptions.TypeError("Required argument 'iterable' (pos 1) not found");
+            if (org.Python.VERSION < 0x03070000) {
+                throw new org.python.exceptions.TypeError("Required argument 'iterable' (pos 1) not found");
+            } else {
+                throw new org.python.exceptions.TypeError("enumerate() missing required argument 'iterable' (pos 1)");
+            }
         }
         org.python.Object index = org.python.types.Int.getInt(0);
         if (start != null) {
