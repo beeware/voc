@@ -902,11 +902,30 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Rounding an Integral returns itself.\nRounding with an ndigits argument also returns an integer."
+            __doc__ = "Rounding an Integral returns itself.\nRounding with an ndigits argument also returns an integer.",
+            default_args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        if (ndigits instanceof org.python.types.Int) {
+        if (ndigits == null || ndigits instanceof org.python.types.Bool) {
             return this;
+        } else if (ndigits instanceof org.python.types.Int) {
+            long _ndigits = ((org.python.types.Int) ndigits).value;
+            if (_ndigits >= 0) {
+                return this;
+            } else {
+                long half_pow = 5;
+                for (long i = 1; i < -_ndigits; i++)
+                    half_pow *= 10;
+                long remainder = this.value % (half_pow * 4);
+
+                if (remainder >= half_pow * 3) {
+                    return getInt(this.value - remainder + half_pow * 4);
+                } else if (remainder > half_pow) {
+                    return getInt(this.value - remainder + half_pow * 2);
+                } else {
+                    return getInt(this.value - remainder);
+                }
+            }
         }
         throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
     }

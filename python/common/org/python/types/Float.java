@@ -1,6 +1,8 @@
 package org.python.types;
 
 import java.util.Locale;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Float extends org.python.types.Object {
     private static final long NEGATIVE_ZERO_RAW_BITS = Double.doubleToRawLongBits(-0.0);
@@ -621,38 +623,30 @@ public class Float extends org.python.types.Object {
 
     @org.python.Method(
             __doc__ = "Return the Integral closest to x, rounding half toward even.\nWhen an argument is passed, work like built-in round(x, ndigits).",
-            args = {"ndigits"}
+            default_args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        if (ndigits instanceof org.python.types.Int) {
-            long wholeNumber;
-            double fractionalPart;
-            if (((org.python.types.Int) ndigits).value != 0) {
-                throw new org.python.exceptions.NotImplementedError("float.__round__() with ndigits has not been implemented");
-            } else {
-                wholeNumber = (long) this.value;
-                fractionalPart = this.value - wholeNumber;
+        if (ndigits == null ||
+                (org.Python.VERSION >= 0x03050000 && ndigits instanceof org.python.types.NoneType)) {
+            long wholeNumber = (long) this.value;
+            double fractionalPart = Math.abs(this.value - wholeNumber);
+            boolean away = (fractionalPart < 0.5) ? false :
+                           (fractionalPart > 0.5) ? true :
+                           (wholeNumber % 2 != 0);
+            if (away) {
+                wholeNumber += (this.value >= 0) ? 1 : -1;
             }
-            int sign;
-            if (wholeNumber >= 0) {
-                sign = 1;
-            } else {
-                sign = -1;
+            return org.python.types.Int.getInt(wholeNumber);
+        } else if (ndigits instanceof org.python.types.Int || ndigits instanceof org.python.types.Bool) {
+            int _ndigits = (int) ((org.python.types.Int) ndigits.__int__()).value;
+            BigDecimal bd = BigDecimal.valueOf(this.value);
+            double rounded = bd.setScale(_ndigits, RoundingMode.HALF_EVEN).doubleValue();
+            if (this.value < 0 && rounded == 0) {
+                rounded = -0.0;
             }
-            if (Math.abs(fractionalPart) < 0.5) {
-                return org.python.types.Int.getInt(sign * Math.abs(wholeNumber));
-            } else if (Math.abs(fractionalPart) > 0.5) {
-                return org.python.types.Int.getInt(sign * (Math.abs(wholeNumber) + 1));
-            } else {
-                if (wholeNumber % 2 == 0) {
-                    return org.python.types.Int.getInt(sign * Math.abs(wholeNumber));
-                } else {
-                    return org.python.types.Int.getInt(sign * (Math.abs(wholeNumber) + 1));
-                }
-            }
-        } else {
-            throw new org.python.exceptions.TypeError("unsupported operand type(s) for round(): 'float' and '" + ndigits.typeName() + "'");
+            return new org.python.types.Float(rounded);
         }
+        throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
     }
 
     @org.python.Method(
