@@ -1,6 +1,3 @@
-.. image:: https://beeware.org/project/projects/bridges/voc/voc.png
-    :width: 72px
-    :target: https://beeware.org/project/projects/bridges/voc/
 
 VOC
 ===
@@ -61,22 +58,36 @@ Documentation for VOC can be found on `Read The Docs`_.
 Why "VOC"?
 ----------
 
-The `Vereenigde Oostindische Compagnie (VOC)`_, or Dutch East India Company,
-is often considered to be the world's first multinational corporation. It was
-also the first company to issue shares, and facilitate the trading of those
-shares. It was granted a 21 year monopoly to carry out trade activities in
-Asia, primarily the Spice Islands - the Dutch East Indies. They established a
-major trading port at Batavia - now Jakarta, on the island of Java (now part
-of Indonesia). As a result of their monopoly, the VOC became an incredibly
-valuable company, issuing an 18% annual dividend for almost 200 years.
-
-VOC was... the world's first Enterprise using Java. (rimshot!)
-
-VOC is also a backronym for "Vestigial Output Compiler". Or "Vexing Obtuse
+VOC is a backronym for "Vestigial Output Compiler". Or "Vexing Obtuse
 Compiler". Or "Valuable Obscure Compiler". Or "Varigated Ocelot Calibrator".
 It's your choice.
 
+Historically, VOC was the `Vereenigde Oostindische Compagnie (VOC)`_, or Dutch
+East India Company, often considered the be the world's first multinational
+corporation. It was also the first company to issue shares, and facilitate the
+trading of those shares. It was granted a 21 year monopoly to carry out trade
+activities in Asia, primarily the Spice Islands - the Dutch East Indies. They
+established a major trading port at Batavia - now Jakarta - on the island of
+Java (now part of Indonesia).
+
+While VOC was a very profitable business for it's shareholders, it operated as
+a colonial power. Modern historians have `expressed criticism of their business
+practices`_, which included exploitation of indigenous populations (including
+use of slave labour), slave trade, use of violence, and environmental
+destruction (including deforestation).
+
+VOC also played a role in the European discovery of Australia, and there are
+many VOC shipwrecks on the coast of Western Australia.
+
+The name VOC was chosen by the project because the project founder is from
+Western Australia, and VOC has a strong non-colonial presence in that state's
+history. It was also a convenient pun, as VOC was an enterprise Java company.
+
+It should not be considered an endorsement or glorification of the
+exploitative business practices of the company.
+
 .. _Vereenigde Oostindische Compagnie (VOC): https://en.wikipedia.org/wiki/Dutch_East_India_Company
+.. _expressed criticism of their business practices: https://en.wikipedia.org/wiki/Dutch_East_India_Company#Criticism
 
 Community
 ---------
