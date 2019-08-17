@@ -638,11 +638,15 @@ public class Bool extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "Rounding an Integral returns itself.\nRounding with an ndigits argument also returns an integer."
+            __doc__ = "Rounding an Integral returns itself.\nRounding with an ndigits argument also returns an integer.",
+            default_args = {"ndigits"}
     )
     public org.python.Object __round__(org.python.Object ndigits) {
-        if (ndigits instanceof org.python.types.Int) {
+        if (ndigits == null || ndigits instanceof org.python.types.Bool) {
             return org.python.types.Int.getInt(this.value ? 1 : 0);
+        } else if (ndigits instanceof org.python.types.Int) {
+            long _ndigits = ((org.python.types.Int) ndigits).value;
+            return org.python.types.Int.getInt(this.value && (_ndigits >= 0) ? 1 : 0);
         }
         throw new org.python.exceptions.TypeError("'" + ndigits.typeName() + "' object cannot be interpreted as an integer");
     }

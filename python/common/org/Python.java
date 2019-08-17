@@ -1585,8 +1585,8 @@ public class Python {
             default_args = {"ndigits"}
     )
     public static org.python.Object round(org.python.Object number, org.python.Object ndigits) {
-        if (ndigits == null) {
-            return number.__round__(org.python.types.Int.getInt(0));
+        if (org.Python.VERSION >= 0x03050000 && ndigits == org.python.types.NoneType.NONE) {
+            return number.__round__(null);
         }
         return number.__round__(ndigits);
     }
