@@ -35,9 +35,14 @@ def setUpSuite():
     """Configure the entire test suite.
 
     This only needs to be run once, prior to the first test.
+
+    Part of the setup is to compile the support library;
+    this step can be skipped by exporting PRECOMPILE=false
+    into the test environment.
     """
     global _output_dir
     global _suite_configured
+
     if _suite_configured:
         return
 
@@ -54,6 +59,14 @@ def setUpSuite():
 
     os.environ['VOC_BUILD_DIR'] = os.path.join(_output_dir, 'build')
     os.environ['VOC_DIST_DIR'] = os.path.join(_output_dir, 'dist')
+
+    # If the code has been precompiled, we don't have to
+    # compile it as part of the test suite setup.
+    precompile = os.environ.get('PRECOMPILE', 'true').lower() == 'true'
+    if not precompile:
+        _suite_configured = True
+        return
+
     proc = subprocess.Popen(
         "ant java",
         stdin=subprocess.PIPE,
@@ -177,8 +190,8 @@ def compileJava(java_dir, java):
             sources.append(class_file)
 
     classpath = os.pathsep.join([
-        os.path.join('..', 'dist', 'python-java-support.jar'),
-        os.curdir,
+        os.path.abspath(os.path.join('dist', 'python-java-support.jar')),
+        os.path.abspath(java_dir),
     ])
     proc = subprocess.Popen(
         ["javac", "-classpath", classpath] + sources,
@@ -328,8 +341,8 @@ class TranspileTestCase(TestCase):
         setUpSuite()
         cls.temp_dir = os.path.join(_output_dir, 'temp')
         classpath = os.pathsep.join([
-            os.path.join('dist', 'python-java-testdaemon.jar'),
-            os.path.join('dist', 'python-java-support.jar'),
+            os.path.abspath(os.path.join('dist', 'python-java-testdaemon.jar')),
+            os.path.abspath(os.path.join('dist', 'python-java-support.jar')),
         ])
         cls.jvm = subprocess.Popen(
             ["java", "-classpath", classpath, "python.testdaemon.TestDaemon"],
@@ -609,9 +622,9 @@ class TranspileTestCase(TestCase):
 
         else:
             classpath = os.pathsep.join([
-                os.path.join('..', 'dist', 'python-java-support.jar'),
-                os.path.join('..', 'java'),
-                os.curdir,
+                os.path.abspath(os.path.join('dist', 'python-java-support.jar')),
+                os.path.abspath(os.path.join('java')),
+                os.path.abspath(self.temp_dir),
             ])
 
             proc = subprocess.Popen(
@@ -637,7 +650,7 @@ class TranspileTestCase(TestCase):
         if timed:
             print("  Elapsed time: ", (t1_stop-t1_start), " sec")
             print("  CPU process time: ", (t2_stop-t2_start), " sec")
-            
+
         return out
 
 

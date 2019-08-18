@@ -38,7 +38,7 @@ public class VersionInfo extends org.python.types.Object {
     public org.python.Object __repr__() {
         return new org.python.types.Str(
                 java.lang.String.format(
-                        "sys.version_info(major=%x, minor=%x, micro=%x, releaselevel='%s', serial=%x)",
+                        "sys.version_info(major=%d, minor=%d, micro=%d, releaselevel='%s', serial=%d)",
                         ((org.python.types.Int) (this.major)).value,
                         ((org.python.types.Int) (this.minor)).value,
                         ((org.python.types.Int) (this.micro)).value,
