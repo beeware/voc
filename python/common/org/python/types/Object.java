@@ -78,10 +78,12 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
     )
     public Object(org.python.Object[] args, java.util.Map<java.lang.String, org.python.Object> kwargs) {
         this(org.python.types.Type.Origin.PYTHON, null);
-        if (args != null && args.length > 0) {
-            throw new org.python.exceptions.TypeError("object() takes no parameters");
-        } else if (kwargs != null && kwargs.size() > 0) {
-            throw new org.python.exceptions.TypeError("object() takes no parameters");
+        if ((args != null && args.length > 0) || (kwargs != null && kwargs.size() > 0)) {
+            if (org.Python.VERSION < 0x03070000) {
+                throw new org.python.exceptions.TypeError("object() takes no parameters");
+            } else {
+                throw new org.python.exceptions.TypeError("object() takes no arguments");
+            }
         }
     }
 

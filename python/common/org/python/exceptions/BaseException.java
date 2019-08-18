@@ -29,7 +29,11 @@ public class BaseException extends org.python.types.Object {
             __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
-        return new org.python.types.Str(this.getClass().getSimpleName() + this.args.toString());
+        if (org.Python.VERSION < 0x03070000 || this.args.value.size() != 1) {
+            return new org.python.types.Str(this.getClass().getSimpleName() + this.args.toString());
+        } else {
+            return new org.python.types.Str(this.getClass().getSimpleName() + "(" + this.args.value.get(0).__repr__() + ")");
+        }
     }
 
     @org.python.Method(

@@ -20,6 +20,9 @@ pull_request:
             - py3.6:
                 name: Python 3.6 tests
                 image: pybee/voc-py36
+            - py3.7:
+                name: Python 3.7 tests
+                image: pybee/voc-py37
         profile: hi-cpu
 push:
     - smoke-test:

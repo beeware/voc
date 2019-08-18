@@ -442,8 +442,10 @@ public class Str extends org.python.types.Object {
         }
         if (org.Python.VERSION < 0x03060000) {
             throw new org.python.exceptions.TypeError("Can't convert '" + other.typeName() + "' object to str implicitly");
-        } else {
+        } else if (org.Python.VERSION < 0x03070000) {
             throw new org.python.exceptions.TypeError("must be str, not " + other.typeName());
+        } else {
+            throw new org.python.exceptions.TypeError("can only concatenate str (not \"" + other.typeName() + "\") to str");
         }
     }
 
@@ -1771,7 +1773,11 @@ public class Str extends org.python.types.Object {
     )
     public org.python.Object zfill(org.python.Object width) {
         if (width == null) {
-            throw new org.python.exceptions.TypeError("zfill() takes exactly 1 argument (0 given)");
+            if (org.Python.VERSION < 0x03070000) {
+                throw new org.python.exceptions.TypeError("zfill() takes exactly 1 argument (0 given)");
+            } else {
+                throw new org.python.exceptions.TypeError("zfill() takes exactly one argument (0 given)");
+            }
         } else if (width instanceof org.python.types.Float) {
             throw new org.python.exceptions.TypeError("integer argument expected, got float");
         } else if (!(width instanceof org.python.types.Int)) {

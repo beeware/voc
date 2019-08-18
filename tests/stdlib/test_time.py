@@ -2,10 +2,10 @@ import os
 import sys
 from unittest import expectedFailure
 
-from ..utils import TranspileTestCase
+from ..utils import TranspileTestCase, NotImplementedToExpectedFailure
 
 
-class TimeModuleTests(TranspileTestCase):
+class TimeModuleTests(NotImplementedToExpectedFailure, TranspileTestCase):
 
     #######################################################
     # _STRUCT_TM_ITEMS
@@ -311,3 +311,7 @@ class TimeModuleTests(TranspileTestCase):
             import time
             print(time.tzset())
             """)
+
+    not_implemented_versions = {
+        'test_clock': (3.7, )
+    }

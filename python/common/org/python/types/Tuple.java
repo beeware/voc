@@ -50,8 +50,10 @@ public class Tuple extends org.python.types.Object {
                 }
                 this.value = generated;
             }
-        } else {
+        } else if (org.Python.VERSION < 0x03070000) {
             throw new org.python.exceptions.TypeError("tuple() takes at most 1 argument (" + args.length + " given)");
+        } else {
+            throw new org.python.exceptions.TypeError("tuple expected at most 1 arguments, got " + args.length);
         }
     }
 

@@ -108,7 +108,8 @@ public class FrozenSet extends org.python.types.Object {
             args = {"index"}
     )
     public org.python.Object __getitem__(org.python.Object index) {
-        if (index instanceof org.python.types.Int || index instanceof org.python.types.Bool) {
+        if (org.Python.VERSION < 0x03070000 &&
+                (index instanceof org.python.types.Int || index instanceof org.python.types.Bool)) {
             throw new org.python.exceptions.TypeError("'frozenset' object does not support indexing");
         } else {
             throw new org.python.exceptions.TypeError("'frozenset' object is not subscriptable");
