@@ -93,7 +93,7 @@ public class sys extends org.python.types.Module {
 
         version_info = new org.python.stdlib.sys.VersionInfo(major, minor, micro, releaselevel, serial);
         version = new org.python.types.Str(
-                java.lang.String.format("%x.%x.%x (VOC)\n[Java(TM) SE Runtime Environment (build %s)]",
+                java.lang.String.format("%d.%d.%d (VOC)\n[Java(TM) SE Runtime Environment (build %s)]",
                         major, minor, micro,
                         System.getProperty("java.version")
                 )
