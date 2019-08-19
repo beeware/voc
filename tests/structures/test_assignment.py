@@ -73,8 +73,36 @@ class AssignmentTests(TranspileTestCase):
             print(z)
         """)
 
-    @expectedFailure
-    def test_bad_list_assignment(self):
+    def test_list_assignment_nested(self):
+        self.assertCodeExecution("""
+            [x, [y, z]] = 1, (2, 3)
+            print(x)
+            print(y)
+            print(z)
+        """)
+
+    def test_list_assignment_starred_0(self):
+        self.assertCodeExecution("""
+            [*x, y, z] = range(2)
+            print(x)
+            print(y)
+            print(z)
+        """)
+
+    def test_list_assignment_starred_1(self):
+        self.assertCodeExecution("""
+            [*x, y] = range(2)
+            print(x)
+            print(y)
+        """)
+
+    def test_list_assignment_starred_2(self):
+        self.assertCodeExecution("""
+            [*x] = range(2)
+            print(x)
+        """)
+
+    def test_bad_list_assignment_too_few(self):
         self.assertCodeExecution("""
             try:
                 [x, y, z, a] = range(3)
@@ -86,21 +114,27 @@ class AssignmentTests(TranspileTestCase):
                 print("Got a ValueError:", e)
         """)
 
-    def test_bad_list_assignment_raises_StopIteration(self):
-        """
-        This test is a copy of test_bad_list_assignment.
-        Raising ValueError as a result of a bad unpacking is not currently implemented;
-        this test should be deleted when it is.
-        """
+    def test_bad_list_assignment_too_many(self):
         self.assertCodeExecution("""
             try:
-                [x, y, z, a] = range(3)
+                [x, y, z] = range(4)
+                print(x)
+                print(y)
+                print(z)
+            except ValueError as e:
+                print("Got a ValueError:", e)
+        """)
+
+    def test_bad_list_assignment_starred(self):
+        self.assertCodeExecution("""
+            try:
+                [x, *y, z, a] = range(2)
                 print(x)
                 print(y)
                 print(z)
                 print(a)
-            except (StopIteration, ValueError) as e:
-                print("ValueError: not enough values to unpack (expected 4, got 3)")
+            except ValueError as e:
+                print("Got a ValueError:", e)
         """)
 
     def test_tuple_assignment(self):
@@ -111,8 +145,36 @@ class AssignmentTests(TranspileTestCase):
             print(z)
             """)
 
-    @expectedFailure
-    def test_bad_tuple_assignment(self):
+    def test_tuple_assignment_nested(self):
+        self.assertCodeExecution("""
+            (x, (y, z)) = 1, (2, 3)
+            print(x)
+            print(y)
+            print(z)
+        """)
+
+    def test_tuple_assignment_starred_0(self):
+        self.assertCodeExecution("""
+            (*x, y, z) = range(2)
+            print(x)
+            print(y)
+            print(z)
+            """)
+
+    def test_tuple_assignment_starred_1(self):
+        self.assertCodeExecution("""
+            (*x, y) = range(2)
+            print(x)
+            print(y)
+            """)
+
+    def test_tuple_assignment_starred_2(self):
+        self.assertCodeExecution("""
+            (*x,) = range(2)
+            print(x)
+            """)
+
+    def test_bad_tuple_assignment_too_few(self):
         self.assertCodeExecution("""
             try:
                 (x, y, z, a) = range(3)
@@ -124,21 +186,27 @@ class AssignmentTests(TranspileTestCase):
                 print("Got a ValueError:", e)
         """)
 
-    def test_bad_tuple_assignment_raises_StopIteration(self):
-        """
-        This test is a copy of test_bad_tuple_assignment.
-        Raising ValueError as a result of a bad unpacking is not currently implemented;
-        this test should be deleted when it is.
-        """
+    def test_bad_tuple_assignment_too_many(self):
         self.assertCodeExecution("""
             try:
-                (x, y, z, a) = range(3)
+                (x, y, z) = range(4)
+                print(x)
+                print(y)
+                print(z)
+            except ValueError as e:
+                print("Got a ValueError:", e)
+        """)
+
+    def test_bad_tuple_assignment_starred(self):
+        self.assertCodeExecution("""
+            try:
+                (x, *y, z, a) = range(2)
                 print(x)
                 print(y)
                 print(z)
                 print(a)
-            except (StopIteration, ValueError) as e:
-                print("ValueError: not enough values to unpack (expected 4, got 3)")
+            except ValueError as e:
+                print("Got a ValueError:", e)
         """)
 
     def test_implied_tuple_assignment(self):
@@ -149,8 +217,36 @@ class AssignmentTests(TranspileTestCase):
             print(z)
             """)
 
-    @expectedFailure
-    def test_bad_implied_tuple_assignment(self):
+    def test_implied_tuple_assignment_nested(self):
+        self.assertCodeExecution("""
+            x, (y, z) = 1, (2, 3)
+            print(x)
+            print(y)
+            print(z)
+        """)
+
+    def test_implied_tuple_assignment_starred_0(self):
+        self.assertCodeExecution("""
+            *x, y, z = range(2)
+            print(x)
+            print(y)
+            print(z)
+            """)
+
+    def test_implied_tuple_assignment_starred_1(self):
+        self.assertCodeExecution("""
+            *x, y = range(2)
+            print(x)
+            print(y)
+            """)
+
+    def test_implied_tuple_assignment_starred_2(self):
+        self.assertCodeExecution("""
+            *x, = range(2)
+            print(x)
+            """)
+
+    def test_bad_implied_tuple_assignment_too_few(self):
         self.assertCodeExecution("""
             try:
                 x, y, z, a = range(3)
@@ -162,21 +258,27 @@ class AssignmentTests(TranspileTestCase):
                 print("Got a ValueError:", e)
         """)
 
-    def test_bad_implied_tuple_assignment_raises_StopIteration(self):
-        """
-        This test is a copy of test_bad_implied_tuple_assignment.
-        Raising ValueError as a result of a bad unpacking is not currently implemented;
-        this test should be deleted when it is.
-        """
+    def test_bad_implied_tuple_assignment_too_many(self):
         self.assertCodeExecution("""
             try:
-                x, y, z, a = range(3)
+                x, y, z = range(4)
+                print(x)
+                print(y)
+                print(z)
+            except ValueError as e:
+                print("Got a ValueError:", e)
+        """)
+
+    def test_bad_implied_tuple_assignment_starred(self):
+        self.assertCodeExecution("""
+            try:
+                x, *y, z, a = range(2)
                 print(x)
                 print(y)
                 print(z)
                 print(a)
-            except (StopIteration, ValueError) as e:
-                print("ValueError: not enough values to unpack (expected 4, got 3)")
+            except ValueError as e:
+                print("Got a ValueError:", e)
         """)
 
     def test_increment_assignment(self):

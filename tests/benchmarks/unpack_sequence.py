@@ -148,10 +148,10 @@ def do_unpacking(iterations, to_unpack):
         a, b, c, d, e, f, g, h, i, j = to_unpack
         a, b, c, d, e, f, g, h, i, j = to_unpack
         a, b, c, d, e, f, g, h, i, j = to_unpack
-        a, b, c, d, e, f, g, h, i, j = to_unpack
-        a, b, c, d, e, f, g, h, i, j = to_unpack
-        a, b, c, d, e, f, g, h, i, j = to_unpack
         """
+        a, b, c, d, e, f, g, h, i, j = to_unpack
+        a, b, c, d, e, f, g, h, i, j = to_unpack
+        a, b, c, d, e, f, g, h, i, j = to_unpack
         a, b, c, d, e, f, g, h, i, j = to_unpack
         a, b, c, d, e, f, g, h, i, j = to_unpack
         a, b, c, d, e, f, g, h, i, j = to_unpack

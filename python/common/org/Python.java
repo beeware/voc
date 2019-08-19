@@ -390,6 +390,27 @@ public class Python {
         return kwargs;
     }
 
+    /**
+     * Check that the number of targets given for unpacking matches the number of provided values
+     */
+    public static void checkUnpackValues(org.python.types.List values, int tcount, int scount) {
+        int values_count = (int) ((org.python.types.Int) values.__len__()).value;
+        int min_target_count = tcount - scount;
+
+        if (scount == 0 && min_target_count < values_count) {
+            throw new org.python.exceptions.ValueError("too many values to unpack (expected " + min_target_count + ")");
+        } else if (min_target_count > values_count) {
+            if (org.Python.VERSION < 0x03050000) {
+                java.lang.String num_values = (values_count == 1) ? "1 value" : ("" + values_count + " values");
+                throw new org.python.exceptions.ValueError("need more than " + num_values + " to unpack");
+            } else {
+                java.lang.String expected_num = ((scount == 1) ? "expected at least " : "expected ") + min_target_count;
+                java.lang.String got_num = "got " + values_count;
+                throw new org.python.exceptions.ValueError("not enough values to unpack (" + expected_num + ", " + got_num + ")");
+            }
+        }
+    }
+
     @org.python.Method(
             __doc__ = "__import__(name, globals=None, locals=None, fromlist=(), level=0) -> module" +
                     "\n" +

@@ -2260,7 +2260,7 @@ class Visitor(ast.NodeVisitor):
         self.context.add_opcodes(
             java.New('org/python/types/Bytes'),
 
-            JavaOpcodes.BIPUSH(len(node.s)),
+            ICONST_val(len(node.s)),
             JavaOpcodes.NEWARRAY(JavaOpcodes.NEWARRAY.T_BYTE),
         )
 
@@ -2268,7 +2268,8 @@ class Visitor(ast.NodeVisitor):
             self.context.add_opcodes(
                 JavaOpcodes.DUP(),
                 ICONST_val(i),
-                JavaOpcodes.BIPUSH(node.s[i]),
+                # 'bytes' values are unsigned, but BIPUSH needs signed values
+                JavaOpcodes.BIPUSH(b if b <= 127 else b - 256),
                 JavaOpcodes.BASTORE(),
             )
 
@@ -2365,6 +2366,115 @@ class Visitor(ast.NodeVisitor):
         else:
             raise NotImplementedError("Unknown context %s" % node.ctx)
 
+    def unpack_iterable(self, node):
+        starred_indexes = [i for i, v in enumerate(node.elts) if type(v) == ast.Starred]
+        if len(starred_indexes) > 1:
+            raise SyntaxError('two starred expressions in assignment')
+        elif len(starred_indexes) == 1:
+            starred_index = starred_indexes[0]
+        else:
+            starred_index = None
+
+        # initialize python list from iterable
+        self.context.add_opcodes(
+            ASTORE_name('#value'),
+            java.New('org/python/types/List'),
+            java.Array(1),
+            JavaOpcodes.DUP(),
+            ICONST_val(0),
+            ALOAD_name('#value'),
+            JavaOpcodes.AASTORE(),
+            JavaOpcodes.ACONST_NULL(),
+            java.Init('org/python/types/List', '[Lorg/python/Object;', 'Ljava/util/Map;'),
+            free_name('#value')
+        )
+
+        # check list for valid number of values to unpack
+        self.context.add_opcodes(
+            JavaOpcodes.DUP(),
+            ICONST_val(len(node.elts)),
+            ICONST_val(len(starred_indexes)),
+            JavaOpcodes.INVOKESTATIC(
+                'org/Python',
+                'checkUnpackValues',
+                args=['Lorg/python/types/List;', 'I', 'I'],
+                returns='V'
+            )
+        )
+
+        self.context.add_int(0)
+
+        # unpack values preceding starred expression
+        elts = node.elts if starred_index is None else node.elts[:starred_index]
+        for child in elts:
+            # save/restore the stack when visiting an iterable child
+            if type(child) in (ast.Tuple, ast.List) or \
+                    (type(child) == ast.Starred and type(child.value) in (ast.Tuple, ast.List)):
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP2(),
+                    ASTORE_name('#unpack-index-%x' % id(node)),
+                    ASTORE_name('#unpack-list-%x' % id(node)),
+                    python.List.pop()
+                )
+                self.visit(child)
+                self.context.add_opcodes(
+                    ALOAD_name('#unpack-list-%x' % id(node)),
+                    free_name('#unpack-list-%x' % id(node)),
+                    ALOAD_name('#unpack-index-%x' % id(node)),
+                    free_name('#unpack-index-%x' % id(node)),
+                )
+            else:
+                self.context.add_opcodes(
+                    JavaOpcodes.DUP2(),
+                    python.List.pop()
+                )
+                self.visit(child)
+
+        self.context.add_opcodes(
+            JavaOpcodes.POP(),
+        )
+
+        if starred_index is not None:
+            self.context.add_opcodes(
+                JavaOpcodes.ACONST_NULL()
+            )
+
+            # unpack values following starred expression
+            for child in node.elts[:starred_index:-1]:
+                # save/restore the stack when visiting an iterable child
+                if type(child) in (ast.Tuple, ast.List) or \
+                        (type(child) == ast.Starred and type(child.value) in (ast.Tuple, ast.List)):
+                    self.context.add_opcodes(
+                        JavaOpcodes.SWAP(),
+                        JavaOpcodes.DUP_X1(),
+                        ASTORE_name('#unpack-list-%x' % id(node)),
+                        python.List.pop()
+                    )
+                    self.visit(child)
+                    self.context.add_opcodes(
+                        ALOAD_name('#unpack-list-%x' % id(node)),
+                        free_name('#unpack-list-%x' % id(node)),
+                        JavaOpcodes.ACONST_NULL()
+                    )
+                else:
+                    self.context.add_opcodes(
+                        JavaOpcodes.DUP2(),
+                        python.List.pop()
+                    )
+                    self.visit(child)
+
+            self.context.add_opcodes(
+                JavaOpcodes.POP()
+            )
+
+            # assign remaining list to starred expression
+            self.visit(node.elts[starred_index].value)
+        else:
+            # pop list off of the stack
+            self.context.add_opcodes(
+                JavaOpcodes.POP(),
+            )
+
     @node_visitor
     def visit_List(self, node):
         if isinstance(node.ctx, ast.Load):
@@ -2384,18 +2494,7 @@ class Visitor(ast.NodeVisitor):
                 )
 
         elif isinstance(node.ctx, ast.Store):
-            self.context.add_opcodes(
-                python.Object.iter()
-            )
-            for child in node.elts:
-                self.context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    python.Iterable.next()
-                )
-                self.visit(child)
-            self.context.add_opcodes(
-                JavaOpcodes.POP()
-            )
+            self.unpack_iterable(node)
 
     @node_visitor
     def visit_Tuple(self, node):
@@ -2422,18 +2521,7 @@ class Visitor(ast.NodeVisitor):
             )
 
         elif isinstance(node.ctx, ast.Store):
-            self.context.add_opcodes(
-                python.Object.iter()
-            )
-            for child in node.elts:
-                self.context.add_opcodes(
-                    JavaOpcodes.DUP(),
-                    python.Iterable.next()
-                )
-                self.visit(child)
-            self.context.add_opcodes(
-                JavaOpcodes.POP(),
-            )
+            self.unpack_iterable(node)
 
     @node_visitor
     def visit_Slice(self, node):

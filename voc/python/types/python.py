@@ -260,6 +260,17 @@ class List:
                 JavaOpcodes.POP()
             )
 
+    class pop:
+        def process(self, context):
+            context.add_opcodes(
+                JavaOpcodes.INVOKEVIRTUAL(
+                    'org/python/types/List',
+                    'pop',
+                    args=['Lorg/python/Object;'],
+                    returns='Lorg/python/Object;'
+                )
+            )
+
 
 class Str:
     def __init__(self, value=None):

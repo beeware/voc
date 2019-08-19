@@ -152,10 +152,18 @@ class Block(Accumulator):
         )
 
     def add_int(self, value):
-        self.add_opcodes(
-            LCONST_val(value),
-            JavaOpcodes.INVOKESTATIC('org/python/types/Int', 'getInt', args=['J'], returns='Lorg/python/types/Int;'),
-        )
+        if -32768 <= value <= 32767:
+            self.add_opcodes(
+                ICONST_val(value),
+                JavaOpcodes.INVOKESTATIC('org/python/types/Int', 'getInt', args=['I'],
+                                         returns='Lorg/python/types/Int;'),
+            )
+        else:
+            self.add_opcodes(
+                LCONST_val(value),
+                JavaOpcodes.INVOKESTATIC('org/python/types/Int', 'getInt', args=['J'],
+                                         returns='Lorg/python/types/Int;'),
+            )
 
     def add_float(self, value):
         self.add_opcodes(
