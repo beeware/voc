@@ -63,7 +63,7 @@ Compiler". Or "Valuable Obscure Compiler". Or "Varigated Ocelot Calibrator".
 It's your choice.
 
 Historically, VOC was the `Vereenigde Oostindische Compagnie (VOC)`_, or Dutch
-East India Company, often considered the be the world's first multinational
+East India Company, often considered to be the world's first multinational
 corporation. It was also the first company to issue shares, and facilitate the
 trading of those shares. It was granted a 21 year monopoly to carry out trade
 activities in Asia, primarily the Spice Islands - the Dutch East Indies. They
