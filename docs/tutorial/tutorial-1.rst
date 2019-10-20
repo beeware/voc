@@ -20,7 +20,7 @@ that by writing in your current terminal::
     VOC_DIR=/path/to/voc
 
 Please remember to replace ``/path/to/voc`` with the actual path to your VOC 
-repository (e.g. /home/elias/src/voc-dev/voc). In case you don't really want 
+repository (e.g. ``/home/myusername/src/voc-dev/voc``). In case you don't really want 
 to do that for some reason, you'll need to
 remember to replace ``$VOC_DIR`` with the full VOC directory any time it
 appears in the commands below.
