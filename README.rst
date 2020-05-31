@@ -1,3 +1,17 @@
+VOC is currently on hiatus
+==========================
+
+**The BeeWare project has pivoted away from using VOC for Android development.**
+We now use an `embedded CPython library
+<https://github.com/beeware/Python-Android-support>`__ to provide Android
+support.
+
+We still believe there is value in a bytecode compilation approach; however,
+we're not dedicating any BeeWare resources to VOC development, and we we're not
+encouraging other to contribute to VOC at this time.
+
+If you're still interested in working on VOC, please `get in touch
+<https://gitter.im/beeware/general>`__.
 
 VOC
 ===
