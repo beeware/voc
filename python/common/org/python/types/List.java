@@ -604,7 +604,7 @@ public class List extends org.python.types.Object {
             args = {"other"}
     )
     public org.python.Object __rmul__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("list.__rmul__() has not been implemented.");
+        return __mul__(other);
     }
 
     @org.python.Method(
