@@ -251,12 +251,6 @@ public class Bytes extends org.python.types.Object {
         return org.python.types.Bool.FALSE;
     }
 
-    @org.python.Method(
-            __doc__ = "default object formatter"
-    )
-    public org.python.types.Str __format__(java.util.List<org.python.Object> args, java.util.Map<java.lang.String, org.python.Object> kwargs, java.util.List<org.python.Object> default_args, java.util.Map<java.lang.String, org.python.Object> default_kwargs) {
-        throw new org.python.exceptions.NotImplementedError("bytes.__format__ has not been implemented.");
-    }
 
     @org.python.Method(
             __doc__ = "Return self>=value.",

@@ -490,7 +490,6 @@ class BinaryDictOperationTests(BinaryOperationTestCase, TranspileTestCase):
     not_implemented = [
         'test_subscr_bytearray',
         'test_subscr_class',
-        'test_subscr_complex',
     ]
 
 

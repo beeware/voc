@@ -156,13 +156,6 @@ public class List extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "default object formatter"
-    )
-    public org.python.types.Str __format__() {
-        throw new org.python.exceptions.NotImplementedError("list.__format__() has not been implemented.");
-    }
-
-    @org.python.Method(
             __doc__ = "Return self<value.",
             args = {"other"}
     )

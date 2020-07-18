@@ -161,39 +161,49 @@ public class Complex extends org.python.types.Object {
             __doc__ = "Return repr(self)."
     )
     public org.python.Object __repr__() {
-        java.lang.StringBuilder buffer = new java.lang.StringBuilder();
-        boolean real_present = true;
-        if (this.real.value != 0) {
-            buffer.append("(");
-            if (((org.python.types.Bool) ((this.real).__int__().__eq__(this.real))).value) {
-                buffer.append(((org.python.types.Str) this.real.__int__().__repr__()).value);
-            } else {
-                buffer.append(((org.python.types.Str) this.real.__repr__()).value);
-            }
+
+        if (this.real.value != 0.0 || this.real.isNegativeZero()) {
+            return new org.python.types.Str("(" + partToStr(this.real) + ((this.imag.value >= 0.0 && !this.imag.isNegativeZero()) ? "+" : "-") + partToStr(new org.python.types.Float(Math.abs(this.imag.value))) + "j)");
         } else {
-            real_present = false;
+            return new org.python.types.Str(partToStr(this.imag) + "j");
         }
-        if (this.real.value != 0 && this.imag.value >= 0) {
-            buffer.append("+");
-        }
-        if (((org.python.types.Bool) ((this.imag).__int__().__eq__(this.imag))).value) {
-            buffer.append(((org.python.types.Str) (this.imag).__int__().__repr__()).value);
-        } else {
-            buffer.append(((org.python.types.Str) (this.imag).__repr__()).value);
-        }
-        buffer.append("j");
-        if (real_present) {
-            buffer.append(")");
-        }
-        return new org.python.types.Str(buffer.toString());
+
     }
 
+
     @org.python.Method(
-            __doc__ = "complex.__format__() -> str\n\nConvert to a string according to format_spec."
+					   __doc__ = "complex.__format__() -> str\n\nConvert to a string according to format_spec.",
+					   args={"format_spec"}
     )
-    public org.python.Object __format__(org.python.Object format_string) {
-        throw new org.python.exceptions.NotImplementedError("complex.__format__ has not been implemented.");
-    }
+    public org.python.Object __format__(org.python.Object format_spec) {
+		String fs = ((org.python.types.Str) format_spec).value;
+
+
+		if(!(fs.endsWith("f")
+			 ||fs.endsWith("F")
+			 ||fs.endsWith("g")
+			 ||fs.endsWith("G")
+			 ||fs.endsWith("e")
+			 ||fs.endsWith("E")
+         	 ||fs.endsWith("n")
+			 )){
+			//format specs are ignored by python for complex numbers if no floatingpoit spec is present
+			return this.__repr__();
+		}
+		// use the floating point spec
+
+        java.lang.StringBuilder buffer = new java.lang.StringBuilder();
+
+		buffer.append(((org.python.types.Str) this.real.__format__(format_spec)).value);
+
+        if (this.imag.value >= 0) {
+            buffer.append("+");
+        }
+		buffer.append(((org.python.types.Str) (this.imag).__format__(format_spec)).value);
+        buffer.append("j");
+        return new org.python.types.Str(buffer.toString());
+
+	}
 
     @org.python.Method(
             __doc__ = "Return self<value.",
@@ -302,16 +312,6 @@ public class Complex extends org.python.types.Object {
         throw new org.python.exceptions.TypeError("unsupported operand type(s) for -: 'complex' and '" + other.typeName() + "'");
     }
 
-    @org.python.Method(
-            __doc__ = "Return str(self)."
-    )
-    public org.python.Object __str__() {
-        if (this.real.value != 0.0 || this.real.isNegativeZero()) {
-            return new org.python.types.Str("(" + partToStr(this.real) + ((this.imag.value >= 0.0 && !this.imag.isNegativeZero()) ? "+" : "-") + partToStr(new org.python.types.Float(Math.abs(this.imag.value))) + "j)");
-        } else {
-            return new org.python.types.Str(partToStr(this.imag) + "j");
-        }
-    }
 
     @org.python.Method(
             __doc__ = "Return self*value.",

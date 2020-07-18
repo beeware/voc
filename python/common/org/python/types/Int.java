@@ -1,5 +1,7 @@
 package org.python.types;
 
+import java.util.Locale;
+
 public class Int extends org.python.types.Object {
     public long value;
 
@@ -128,10 +130,24 @@ public class Int extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = ""
+					   __doc__ = "",
+					   args = {"format_spec"}
     )
-    public org.python.types.Str __format__(org.python.Object format_str) {
-        throw new org.python.exceptions.NotImplementedError("int.__format__() has not been implemented");
+    public org.python.types.Str __format__(org.python.Object format_spec) {
+
+		String fs = ((org.python.types.Str) format_spec).value;
+		if(fs.endsWith("n"))
+			throw new org.python.exceptions.NotImplementedError("int formatting with 'n' as formatter has not been implemented");
+		if(fs.endsWith("b"))
+			throw new org.python.exceptions.NotImplementedError("int formatting with 'b' as formatter has not been implemented");
+
+		if(fs.length() == 0 || !Character.isLetter(fs.charAt(fs.length()-1))){
+			// use d as default formatter
+			fs += "d";
+		}
+
+
+		return new org.python.types.Str(String.format(Locale.US,"%"+fs,this.value));
     }
 
     @org.python.Method(

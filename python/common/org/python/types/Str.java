@@ -139,10 +139,14 @@ public class Str extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "S.__format__(format_spec) -> str\n\nReturn a formatted version of S as described by format_spec."
+					   __doc__ = "S.__format__(format_spec) -> str\n\nReturn a formatted version of S as described by format_spec.",
+					   args = {"format_spec"}
     )
-    public org.python.Object __format__(org.python.Object format_string) {
-        throw new org.python.exceptions.NotImplementedError("__format__() has not been implemented.");
+    public org.python.Object __format__(org.python.Object format_spec) {
+		String fs = ((org.python.types.Str) format_spec).value;
+		if(!fs.endsWith("s"))
+			fs += "s";
+		return new org.python.types.Str(String.format("%"+fs,this.value));
     }
 
     @org.python.Method(

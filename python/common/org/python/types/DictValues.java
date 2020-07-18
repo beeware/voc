@@ -48,13 +48,6 @@ public class DictValues extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "default object formatter"
-    )
-    public org.python.types.Str __format__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError(this.typeName() + ".__format__() has not been implemented.");
-    }
-
-    @org.python.Method(
             __doc__ = "__dir__() -> list\ndefault dir() implementation"
     )
     public org.python.types.List __dir__() {

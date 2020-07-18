@@ -17,6 +17,14 @@
   <fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable."
         unless="sdk.dir" />
 
+  <fail message="android.jar not found at ${sdk.dir}/platforms/${target.platform}/, is your ANDROID_TARGET set?">
+    <condition>
+        <not>
+          <available file="${sdk.dir}/platforms/${target.platform}/android.jar"/>
+        </not>
+    </condition>
+  </fail>
+
   <target name="compile" description="Compile the Android-specific source">
     <mkdir dir="${build}/android"/>
     <javac debug="true"

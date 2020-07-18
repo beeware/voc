@@ -1,7 +1,7 @@
 import ast
+import _ast
 import copy
 import sys
-import traceback
 
 from ..java import opcodes as JavaOpcodes
 from .modules import Module
@@ -187,6 +187,14 @@ class Visitor(ast.NodeVisitor):
                         self.resolved_yield_expression[id(arg_node)] = convert_to_Name(arg_node)
                         return
                     index += 1
+
+    def generic_visit(self, node):
+        # Catches node types that are not implemented
+        # Expr calls this function directly and is meant to do so
+        # Other node types mean that we are skipping something that we should not
+        if type(node) != _ast.Expr:
+            raise TypeError("Not translating node of type "+str(type(node)))
+        super().generic_visit(node)
 
     def visit(self, node):
         try:
@@ -1796,7 +1804,7 @@ class Visitor(ast.NodeVisitor):
                         'Lorg/python/Object;'
                     )
                 )
-                
+
         yield_point = len(self.context.yield_points) + 1
 
         # Save the current stack and yield index
@@ -2557,6 +2565,84 @@ class Visitor(ast.NodeVisitor):
     def visit_ExtSlice(self, node):
         # slice* dims):
         raise NotImplementedError('No handler for ExtSlice')
+
+    @node_visitor
+    def visit_JoinedStr(self, node):
+        # Joined strs are new in python 3.6+ and are used in fstrings.
+        # The easyiest way to handle them seems to be to transform them to "".join(*values)
+        transformed_node = _ast.Call(
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+                func=_ast.Attribute(
+                    lineno=node.lineno,
+                    col_offset=node.col_offset,
+                    value=_ast.Str(lineno=node.lineno, col_offset=node.col_offset, s=''),
+                    attr='join',
+                    ctx=_ast.Load(),
+                ),
+                args=[
+                    _ast.List(
+                        lineno=node.lineno,
+                        col_offset=node.col_offset,
+                        elts=node.values,
+                        ctx=_ast.Load(),
+                    ),
+                ],
+                keywords=[],
+            )
+        # pass on the handling
+        self.visit(transformed_node)
+
+    @node_visitor
+    def visit_FormattedValue(self, node):
+        # Formatted values are new in pyhton 3.6+ and are used in f-strings
+        # The easyiest way to handle them seems to be to transform them to value.__format__(format_spec)
+
+        # Check if we need to call str, repr or ascii before formatting
+        if node.conversion == -1:
+            value_node = node.value
+        elif node.conversion == 114:
+            value_node = _ast.Call(
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+                func=_ast.Name(lineno=node.lineno, col_offset=node.col_offset, id='repr', ctx=_ast.Load()),
+                args=[node.value],
+                keywords=[]
+                )
+        elif node.conversion == 115:
+            value_node = _ast.Call(
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+                func=_ast.Name(lineno=node.lineno, col_offset=node.col_offset, id='str', ctx=_ast.Load()),
+                args=[node.value],
+                keywords=[]
+                )
+
+        elif node.conversion == 97:
+            value_node = _ast.Call(
+                lineno=node.lineno,
+                col_offset=node.col_offset,
+                func=_ast.Name(lineno=node.lineno, col_offset=node.col_offset, id='ascii', ctx=_ast.Load()),
+                args=[node.value],
+                keywords=[]
+            )
+        else:
+            raise ValueError("Conversion type %i not implemented for f-strings" % node.conversion)
+
+        formatspec = node.format_spec or _ast.Str(lineno=node.lineno, col_offset=node.col_offset, s="")
+        transformed_node = _ast.Call(lineno=node.lineno,
+                                     col_offset=node.col_offset,
+                                     func=_ast.Attribute(
+                                         lineno=node.lineno,
+                                         col_offset=node.col_offset,
+                                         value=value_node,
+                                         attr="__format__",
+                                         ctx=_ast.Load(),
+                                     ),
+                                     args=[formatspec],
+                                     keywords=[],
+                                     )
+        self.visit(transformed_node)
 
     @node_visitor
     def visit_Index(self, node):

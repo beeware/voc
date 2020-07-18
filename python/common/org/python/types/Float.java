@@ -63,6 +63,41 @@ public class Float extends org.python.types.Object {
             __doc__ = "Return repr(self)."
     )
     public org.python.types.Str __repr__() {
+		String format = ".17g";
+        return this.__format__(new org.python.types.Str(format));
+    }
+
+    @org.python.Method(
+            __doc__ = ""
+    )
+    public boolean isNegativeZero() {
+        return Double.doubleToRawLongBits(this.value) == NEGATIVE_ZERO_RAW_BITS;
+    }
+
+    @org.python.Method(
+					   __doc__ = "float.__format__(format_spec) -> string\n\nFormats the float according to format_spec.",
+					   args = {"format_spec"}
+    )
+    public org.python.types.Str __format__(org.python.Object format_spec) {
+		String format = ((org.python.types.Str) format_spec).value;
+		if(format.endsWith("%")){
+			org.python.types.Str new_format = new org.python.types.Str(format.substring(0,-1)+"f");
+			org.python.types.Float new_float = new org.python.types.Float(this.value*100);
+			return new_float.__format__(new_format);
+		}
+		if(format.endsWith("n")){
+			throw new org.python.exceptions.NotImplementedError("float formatting with 'n' formatter has not been implemented.");
+		}
+		if(format.length() == 0 || !Character.isLetter(format.charAt(format.length()-1))){
+			// use g as default formatter
+			if(format.indexOf('.') <0){
+				//  if no precision is given use .17
+				format += ".17g";
+			}else{
+				format += "g";
+			}
+		}
+		// handle e, E, f, F, g, G or None formatters
         double value = this.value;
         String result;
         if (Double.isNaN(value)) {
@@ -74,56 +109,50 @@ public class Float extends org.python.types.Object {
                 result = "-inf";
             }
         } else {
-            String format = "%.17g";
-            result = String.format(Locale.US, format, value);
-            int dot_pos = result.indexOf(".");
-            int e_pos = result.indexOf("e");
-            if (dot_pos != -1) {
-                // Remove trailing zeroes in the fractional part
-                int last_zero = -1;
-                int i;
-                for (i = dot_pos + 1; i < result.length(); i++) {
-                    char c = result.charAt(i);
-                    if (i == e_pos) {
-                        break;
-                    } else if (c == '0') {
-                        if (last_zero == -1) {
-                            last_zero = i;
-                        }
-                    } else {
-                        last_zero = -1;
-                    }
-                }
-                if (last_zero != -1) {
-                    if (last_zero == dot_pos + 1) {
-                        // Everything after the dot is zeros
-                        if (e_pos == -1) {
-                            // If there's no "e", leave ".0" at the end
-                            last_zero += 1;
-                        } else {
-                            // If there is an "e", nuke the dot as well
-                            last_zero -= 1;
-                        }
-                    }
-                    result = result.substring(0, last_zero) + result.substring(i);
-                }
-            }
+			result = String.format(Locale.US, "%"+format, value);
+			if(format.endsWith("g")
+				  || format.endsWith("G")){
+
+				// Check whether we need to remove trailing zeros when not using g or G as a formatter
+				int dot_pos = result.indexOf(".");
+				int e_pos = result.indexOf("e");
+				if (dot_pos != -1) {
+					// Remove trailing zeroes in the fractional part
+					int last_zero = -1;
+					int i;
+					for (i = dot_pos + 1; i < result.length(); i++) {
+						char c = result.charAt(i);
+						if (i == e_pos) {
+							break;
+						} else if (c == '0') {
+							if (last_zero == -1) {
+								last_zero = i;
+							}
+						} else {
+							last_zero = -1;
+						}
+					}
+					if (last_zero != -1) {
+						if (last_zero == dot_pos + 1) {
+							// Everything after the dot is zeros
+							if (e_pos == -1) {
+								// If there's no "e", leave ".0" at the end
+								last_zero += 1;
+							} else {
+								// If there is an "e", nuke the dot as well
+								last_zero -= 1;
+							}
+						}
+						result = result.substring(0, last_zero) + result.substring(i);
+					}
+				}
+			}
         }
+		if(format.endsWith("G")|| format.endsWith("F") || format.endsWith("E")){
+			result = result.toUpperCase();
+		}
         return new org.python.types.Str(result);
-    }
 
-    @org.python.Method(
-            __doc__ = ""
-    )
-    public boolean isNegativeZero() {
-        return Double.doubleToRawLongBits(this.value) == NEGATIVE_ZERO_RAW_BITS;
-    }
-
-    @org.python.Method(
-            __doc__ = "float.__format__(format_spec) -> string\n\nFormats the float according to format_spec."
-    )
-    public org.python.types.Str __format__(org.python.Object format_string) {
-        throw new org.python.exceptions.NotImplementedError("float.__format__() has not been implemented.");
     }
 
     @org.python.Method(

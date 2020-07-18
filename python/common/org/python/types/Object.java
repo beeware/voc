@@ -174,11 +174,15 @@ public class Object extends java.lang.RuntimeException implements org.python.Obj
 
     @org.python.Method(
             __doc__ = "default object formatter",
-            args = {"format_string"}
+            args = {"format_spec"}
     )
-    public org.python.Object __format__(org.python.Object format_string) {
-        throw new org.python.exceptions.NotImplementedError("'" + this.typeName() + ".__format__' has not been implemented");
-    }
+    public org.python.Object __format__(org.python.Object format_spec) {
+		if( format_spec != null &&
+			((org.python.types.Str) format_spec).value != ""){
+			throw new org.python.exceptions.TypeError("on-empty format string passed to object.__format__");
+		}
+		return this.__str__();
+	}
 
     @org.python.Method(
             __doc__ = "Return self<value.",

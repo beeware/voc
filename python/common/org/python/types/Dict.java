@@ -136,13 +136,6 @@ public class Dict extends org.python.types.Object {
     }
 
     @org.python.Method(
-            __doc__ = "default object formatter"
-    )
-    public org.python.types.Str __format__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError("dict.__format__() has not been implemented.");
-    }
-
-    @org.python.Method(
             __doc__ = ""
     )
     public org.python.Object __bool__() {

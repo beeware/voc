@@ -48,7 +48,7 @@ public interface Object extends Comparable {
     public org.python.Object __str__();
 
     public org.python.Object __bytes__();
-    public org.python.Object __format__(org.python.Object format);
+    public org.python.Object __format__(org.python.Object format_spec);
 
     public org.python.Object __lt__(org.python.Object other);
     public org.python.Object __le__(org.python.Object other);

@@ -120,12 +120,12 @@ public class Super implements org.python.Object {
         throw new org.python.exceptions.AttributeError(this, "__bytes__");
     }
 
-    @org.python.Method(
-            __doc__ = "default object formatter",
-            args = {"format_string"}
+	@org.python.Method(
+					   __doc__ = "",
+					   args = {"format_spec"}
     )
-    public org.python.Object __format__(org.python.Object format_string) {
-        throw new org.python.exceptions.NotImplementedError("'super().__format__' has not been implemented");
+    public org.python.Object __format__(org.python.Object format_spec) {
+		return this.__str__();
     }
 
     @org.python.Method(

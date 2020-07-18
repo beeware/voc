@@ -811,7 +811,7 @@ public class Python {
     )
     public static org.python.types.Str format(org.python.Object value, org.python.Object format_spec) {
         if (format_spec == null) {
-            return (org.python.types.Str) value.__str__();
+			return (org.python.types.Str) value.__format__(new org.python.types.Str(""));
         } else {
             return (org.python.types.Str) value.__format__(format_spec);
         }

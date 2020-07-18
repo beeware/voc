@@ -56,12 +56,6 @@ public class DictKeys extends org.python.types.FrozenSet {
         return new org.python.types.Str(buffer.toString());
     }
 
-    @org.python.Method(
-            __doc__ = "default object formatter"
-    )
-    public org.python.types.Str __format__(org.python.Object other) {
-        throw new org.python.exceptions.NotImplementedError(this.typeName() + ".__format__() has not been implemented.");
-    }
 
     @org.python.Method(
             __doc__ = "__dir__() -> list\ndefault dir() implementation"
